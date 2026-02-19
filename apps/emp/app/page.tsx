@@ -7,7 +7,9 @@ export default function Page() {
         <div className="flex flex-col items-center justify-center gap-4">
           <h1 className="text-2xl font-bold">Hello World</h1>
           <div className="flex gap-2">
-            <Button variant="outline">Outline</Button>
+            <Button type="button" variant="default">
+              Outline
+            </Button>
           </div>
         </div>
       </div>
