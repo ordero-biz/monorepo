@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "jsx": "react-jsx",
+    "noEmit": true,
+    "declaration": false,
+    "strict": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/ui/*": ["src/*"],
+      "@ordero/ui/*": ["src/*"],
+      "@ordero/ui/components/*": ["src/components/*"],
+      "@ordero/ui/hooks/*": ["src/hooks/*"],
+      "@ordero/ui/lib/*": ["src/lib/*"]
+    }
+  },
+  "include": ["src", "vitest.config.ts"]
+}

@@ -1,0 +1,20 @@
+{
+  "$schema": "https://ui.shadcn.com/schema.json",
+  "style": "base-nova",
+  "rsc": true,
+  "tsx": true,
+  "tailwind": {
+    "config": "",
+    "css": "src/styles/globals.css",
+    "baseColor": "zinc",
+    "cssVariables": true
+  },
+  "iconLibrary": "lucide",
+  "aliases": {
+    "components": "@ordero/ui/components",
+    "hooks": "@ordero/ui/hooks",
+    "lib": "@ordero/ui/lib",
+    "utils": "@ordero/ui/lib/utils",
+    "ui": "@ordero/ui/components"
+  }
+}

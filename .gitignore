@@ -1,1 +1,21 @@
-/.idea/
+node_modules
+.pnp.cjs
+.pnp.loader.mjs
+.pnpm-debug.log
+.turbo
+.next
+.dist
+.out
+storybook-static
+.DS_Store
+.env
+.env.local
+.env.*.local
+
+# tooling
+.biome
+
+# IDE
+.idea/
+*.iml
+.vscode/

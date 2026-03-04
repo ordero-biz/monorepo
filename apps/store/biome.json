@@ -1,0 +1,16 @@
+{
+  "root": false,
+  "extends": "//",
+  "files": {
+    "includes": [
+      "src/**",
+      "*.ts",
+      "*.tsx",
+      "*.js",
+      "*.jsx",
+      "*.mjs",
+      "*.cjs",
+      "*.json"
+    ]
+  }
+}

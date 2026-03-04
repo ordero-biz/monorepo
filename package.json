@@ -1,0 +1,23 @@
+{
+  "name": "ordero",
+  "private": true,
+  "packageManager": "pnpm@9.0.0",
+  "scripts": {
+    "build": "turbo build",
+    "dev": "turbo dev",
+    "lint": "turbo lint",
+    "test": "turbo test",
+    "typecheck": "turbo typecheck",
+    "format": "biome check .",
+    "format:write": "biome check --write .",
+    "shadcn:add": "cd packages/ui && pnpm dlx shadcn@latest add",
+    "storybook": "turbo storybook",
+    "build-storybook": "turbo build-storybook"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.4.3",
+    "@tailwindcss/postcss": "^4",
+    "tailwindcss": "^4",
+    "turbo": "^2.8.10"
+  }
+}
