@@ -9,7 +9,9 @@
     "lint": "biome check",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "format": "biome check .",
+    "format:write": "biome check --write ."
   },
   "dependencies": {
     "@ordero/ui": "workspace:*",
