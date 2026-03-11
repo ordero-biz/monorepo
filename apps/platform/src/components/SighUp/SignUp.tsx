@@ -4,10 +4,10 @@ export const SignUp = () => {
     return (
         <div
             className="mx-auto mt-[15%] w-full text-center">
-            <h2 className="mb-6 text-3xl font-medium leading-10 tracking-[-0.03em] text-card-foreground">
+            <h2 className="mb-6 text-2xl md:text-3xl font-medium leading-10 tracking-[-0.03em] text-card-foreground">
                 Create your business account
             </h2>
-            <form className="flex flex-col gap-4 mx-auto w-[80%] max-w-80">
+            <form className="flex flex-col gap-4 mx-auto max-w-80">
                 <Field>
                     <FieldLabel htmlFor="name">
                         Name*
@@ -24,7 +24,7 @@ export const SignUp = () => {
                     </FieldLabel>
                     <Input
                         id="phone"
-                        placeholder="Evil Rabbit"
+                        placeholder="Enter phone number"
                         required
                     />
                 </Field>
@@ -34,7 +34,7 @@ export const SignUp = () => {
                     </FieldLabel>
                     <Input
                         id="email"
-                        placeholder="Evil Rabbit"
+                        placeholder="name@service.com"
                         required
                     />
                 </Field>
@@ -45,7 +45,7 @@ export const SignUp = () => {
                     <Input
                         type='password'
                         id="password"
-                        placeholder="Evil Rabbit"
+                        placeholder="********"
                         required
                     />
                 </Field>
@@ -56,7 +56,7 @@ export const SignUp = () => {
                     <Input
                         type='password'
                         id="confirmPassword"
-                        placeholder="Evil Rabbit"
+                        placeholder="********"
                         required
                     />
                 </Field>
