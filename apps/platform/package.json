@@ -15,15 +15,15 @@
   },
   "dependencies": {
     "@ordero/ui": "workspace:*",
+    "@tanstack/react-form": "^0.33.0",
+    "@tanstack/zod-form-adapter": "^0.33.0",
     "next": "16.1.6",
     "react": "19.2.3",
-    "react-dom": "19.2.3"
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@ordero/test-config": "workspace:*",
     "@tailwindcss/postcss": "^4",
-    "@testing-library/jest-dom": "^6.9.1",
-    "@testing-library/react": "^16.3.2",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
