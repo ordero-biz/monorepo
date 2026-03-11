@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-    title: 'Ordero EMP',
+    title: 'Ordero Platform',
 };
 
 export default function RootLayout({
