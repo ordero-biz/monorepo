@@ -1,24 +1,24 @@
 import {Button, OrderoField} from "@ordero/ui";
-import {useForm} from "@tanstack/react-form";
+import {useForm, Validator} from "@tanstack/react-form";
 import {zodValidator} from "@tanstack/zod-form-adapter";
 import {type SignUpFormData, signUpSchema} from "./validation";
 
 export const SignUp = () => {
-    const form = useForm({
+    const form = useForm<SignUpFormData, Validator<SignUpFormData>>({
         defaultValues: {
             name: '',
             phone: '',
             email: '',
             password: '',
             confirmPassword: '',
-        } as SignUpFormData,
+        },
         onSubmit: async ({value}) => {
             // Handle form submission
             console.log('SignUp form submitted:', value);
             // TODO: Implement actual signup logic
             alert('Sign up form submitted! Check console for details.');
         },
-        validatorAdapter: zodValidator(),
+        validatorAdapter: zodValidator()
     });
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -119,7 +119,7 @@ export const SignUp = () => {
                     validators={{
                         onChange: signUpSchema.shape.confirmPassword,
                         onChangeAsyncDebounceMs: 500,
-                        onChangeAsync: async ({value}) => {
+                        onChangeAsync: async ({value}: { value: string }) => {
                             const password = form.getFieldValue('password');
                             if (value !== password) {
                                 return 'Passwords do not match';
@@ -148,8 +148,9 @@ export const SignUp = () => {
                     children={([canSubmit, isSubmitting]) => (
                         <Button
                             type="submit"
+                            variant='dark'
                             disabled={!canSubmit || isSubmitting}
-                            className="mt-2 h-10 w-full justify-center bg-card-foreground text-sm font-medium text-primary-foreground cursor-pointer hover:bg-card-foreground/90 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="mt-2 h-10"
                         >
                             {isSubmitting ? 'Signing Up...' : 'Sign Up'}
                         </Button>

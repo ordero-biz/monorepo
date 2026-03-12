@@ -1,14 +1,14 @@
 import {Button, OrderoField} from "@ordero/ui";
-import {useForm} from "@tanstack/react-form";
+import {useForm, Validator} from "@tanstack/react-form";
 import {zodValidator} from "@tanstack/zod-form-adapter";
 import {type SignInFormData, signInSchema} from "./validation";
 
 export const SignIn = () => {
-    const form = useForm({
+    const form = useForm<SignInFormData, Validator<SignInFormData>>({
         defaultValues: {
             email: '',
             password: '',
-        } as SignInFormData,
+        },
         onSubmit: async ({value}) => {
             // Handle form submission
             console.log('SignIn form submitted:', value);
@@ -74,8 +74,9 @@ export const SignIn = () => {
                     children={([canSubmit, isSubmitting]) => (
                         <Button
                             type="submit"
+                            variant='dark'
                             disabled={!canSubmit || isSubmitting}
-                            className="mt-2 h-10 w-full justify-center bg-card-foreground text-sm font-medium text-primary-foreground cursor-pointer hover:bg-card-foreground/90 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="mt-2 h-10"
                         >
                             {isSubmitting ? 'Signing In...' : 'Sign In'}
                         </Button>

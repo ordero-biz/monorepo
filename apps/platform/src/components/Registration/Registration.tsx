@@ -3,8 +3,8 @@
 import {useState} from "react";
 
 import {Button} from "@ordero/ui";
-import {SignUp} from "@/components/SighUp/SignUp";
-import {SignIn} from "@/components/SighIn/SignIn";
+import {SignUp} from "@/components/SignUp/SignUp";
+import {SignIn} from "@/components/SignIn/SignIn";
 
 export const Registration = () => {
     const [isSignUp, setIsSignUp] = useState(false);
