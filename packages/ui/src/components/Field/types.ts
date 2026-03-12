@@ -1,5 +1,5 @@
 import { type VariantProps } from 'class-variance-authority';
-import { Label } from '@ordero/ui/components/label';
+import { Label } from '@ordero/ui/components/Label';
 import { fieldVariants } from './constants';
 
 export type FieldProps = React.ComponentProps<'div'> & VariantProps<typeof fieldVariants>;

@@ -1,4 +1,4 @@
-import {Button, Field, FieldLabel, Input} from "@ordero/ui";
+import {Button, OrderoField} from "@ordero/ui";
 import {useForm} from "@tanstack/react-form";
 import {zodValidator} from "@tanstack/zod-form-adapter";
 import {type SignInFormData, signInSchema} from "./validation";
@@ -18,7 +18,7 @@ export const SignIn = () => {
         validatorAdapter: zodValidator(),
     });
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = (e) => {
         e.preventDefault();
         e.stopPropagation();
         form.handleSubmit();
@@ -36,25 +36,17 @@ export const SignIn = () => {
                         onChange: signInSchema.shape.email,
                     }}
                     children={(field) => (
-                        <Field>
-                            <FieldLabel htmlFor={field.name}>
-                                Email*
-                            </FieldLabel>
-                            <Input
-                                id={field.name}
-                                name={field.name}
-                                value={field.state.value}
-                                onBlur={field.handleBlur}
-                                onChange={(e) => field.handleChange(e.target.value)}
-                                placeholder="name@service.com"
-                                required
-                            />
-                            {field.state.meta.errors.length > 0 && (
-                                <span className="text-sm text-red-500 mt-1">
-                                    {field.state.meta.errors[0]}
-                                </span>
-                            )}
-                        </Field>
+                        <OrderoField
+                            id={field.name}
+                            name={field.name}
+                            label="Email"
+                            required
+                            value={field.state.value}
+                            onBlur={field.handleBlur}
+                            onChange={field.handleChange}
+                            placeholder="name@service.com"
+                            errors={field.state.meta.errors}
+                        />
                     )}
                 />
 
@@ -64,26 +56,18 @@ export const SignIn = () => {
                         onChange: signInSchema.shape.password,
                     }}
                     children={(field) => (
-                        <Field>
-                            <FieldLabel htmlFor={field.name}>
-                                Password*
-                            </FieldLabel>
-                            <Input
-                                type="password"
-                                id={field.name}
-                                name={field.name}
-                                value={field.state.value}
-                                onBlur={field.handleBlur}
-                                onChange={(e) => field.handleChange(e.target.value)}
-                                placeholder="*******"
-                                required
-                            />
-                            {field.state.meta.errors.length > 0 && (
-                                <span className="text-sm text-red-500 mt-1">
-                                    {field.state.meta.errors[0]}
-                                </span>
-                            )}
-                        </Field>
+                        <OrderoField
+                            id={field.name}
+                            name={field.name}
+                            label="Password"
+                            type="password"
+                            value={field.state.value}
+                            onBlur={field.handleBlur}
+                            onChange={field.handleChange}
+                            placeholder="*******"
+                            required
+                            errors={field.state.meta.errors}
+                        />
                     )}
                 />
 

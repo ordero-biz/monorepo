@@ -1,4 +1,4 @@
-import {Button, Field, FieldLabel, Input} from "@ordero/ui";
+import {Button, OrderoField} from "@ordero/ui";
 import {useForm} from "@tanstack/react-form";
 import {zodValidator} from "@tanstack/zod-form-adapter";
 import {type SignUpFormData, signUpSchema} from "./validation";
@@ -28,7 +28,7 @@ export const SignUp = () => {
     };
 
     return (
-        <div className="mx-auto mt-[15%] w-full text-center">
+        <div className="mx-auto mt-[15%] mb-[5%] w-full text-center">
             <h2 className="mb-6 text-2xl md:text-3xl font-medium leading-10 tracking-[-0.03em] text-card-foreground">
                 Create your business account
             </h2>
@@ -39,26 +39,17 @@ export const SignUp = () => {
                         onChange: signUpSchema.shape.name,
                     }}
                     children={(field) => (
-                        <Field>
-                            <FieldLabel htmlFor={field.name}>
-                                Name*
-                            </FieldLabel>
-                            <Input
-                                id={field.name}
-                                name={field.name}
-                                value={field.state.value}
-                                onBlur={field.handleBlur}
-                                onChange={(e) => field.handleChange(e.target.value)}
-                                placeholder="Evil Rabbit"
-                                required
-                                aria-invalid={field.state.meta.errors.length > 0}
-                            />
-                            {field.state.meta.errors.length > 0 && (
-                                <span className="text-[0.75rem] text-destructive text-left">
-                                    {field.state.meta.errors[0]}
-                                </span>
-                            )}
-                        </Field>
+                        <OrderoField
+                            id={field.name}
+                            name={field.name}
+                            label="Name"
+                            value={field.state.value}
+                            onBlur={field.handleBlur}
+                            onChange={field.handleChange}
+                            placeholder="Evil Rabbit"
+                            required
+                            errors={field.state.meta.errors}
+                        />
                     )}
                 />
 
@@ -68,26 +59,17 @@ export const SignUp = () => {
                         onChange: signUpSchema.shape.phone,
                     }}
                     children={(field) => (
-                        <Field>
-                            <FieldLabel htmlFor={field.name}>
-                                Phone*
-                            </FieldLabel>
-                            <Input
-                                id={field.name}
-                                name={field.name}
-                                value={field.state.value}
-                                onBlur={field.handleBlur}
-                                onChange={(e) => field.handleChange(e.target.value)}
-                                placeholder="Enter phone number"
-                                required
-                                aria-invalid={field.state.meta.errors.length > 0}
-                            />
-                            {field.state.meta.errors.length > 0 && (
-                                <span className="text-[0.75rem] text-destructive text-left">
-                                    {field.state.meta.errors[0]}
-                                </span>
-                            )}
-                        </Field>
+                        <OrderoField
+                            id={field.name}
+                            name={field.name}
+                            label="Phone"
+                            value={field.state.value}
+                            onBlur={field.handleBlur}
+                            onChange={field.handleChange}
+                            placeholder="Enter phone number"
+                            required
+                            errors={field.state.meta.errors}
+                        />
                     )}
                 />
 
@@ -97,26 +79,17 @@ export const SignUp = () => {
                         onChange: signUpSchema.shape.email,
                     }}
                     children={(field) => (
-                        <Field>
-                            <FieldLabel htmlFor={field.name}>
-                                Email*
-                            </FieldLabel>
-                            <Input
-                                id={field.name}
-                                name={field.name}
-                                value={field.state.value}
-                                onBlur={field.handleBlur}
-                                onChange={(e) => field.handleChange(e.target.value)}
-                                placeholder="name@service.com"
-                                required
-                                aria-invalid={field.state.meta.errors.length > 0}
-                            />
-                            {field.state.meta.errors.length > 0 && (
-                                <span className="text-[0.75rem] text-destructive text-left">
-                                    {field.state.meta.errors[0]}
-                                </span>
-                            )}
-                        </Field>
+                        <OrderoField
+                            id={field.name}
+                            name={field.name}
+                            label="Email"
+                            value={field.state.value}
+                            onBlur={field.handleBlur}
+                            onChange={field.handleChange}
+                            placeholder="name@service.com"
+                            required
+                            errors={field.state.meta.errors}
+                        />
                     )}
                 />
 
@@ -126,27 +99,18 @@ export const SignUp = () => {
                         onChange: signUpSchema.shape.password,
                     }}
                     children={(field) => (
-                        <Field>
-                            <FieldLabel htmlFor={field.name}>
-                                Password*
-                            </FieldLabel>
-                            <Input
-                                type="password"
-                                id={field.name}
-                                name={field.name}
-                                value={field.state.value}
-                                onBlur={field.handleBlur}
-                                onChange={(e) => field.handleChange(e.target.value)}
-                                placeholder="********"
-                                required
-                                aria-invalid={field.state.meta.errors.length > 0}
-                            />
-                            {field.state.meta.errors.length > 0 && (
-                                <span className="text-[0.75rem] text-destructive text-left">
-                                    {field.state.meta.errors[0]}
-                                </span>
-                            )}
-                        </Field>
+                        <OrderoField
+                            id={field.name}
+                            name={field.name}
+                            label="Password"
+                            type="password"
+                            value={field.state.value}
+                            onBlur={field.handleBlur}
+                            onChange={field.handleChange}
+                            placeholder="********"
+                            required
+                            errors={field.state.meta.errors}
+                        />
                     )}
                 />
 
@@ -164,27 +128,18 @@ export const SignUp = () => {
                         },
                     }}
                     children={(field) => (
-                        <Field>
-                            <FieldLabel htmlFor={field.name}>
-                                Confirm password*
-                            </FieldLabel>
-                            <Input
-                                type="password"
-                                id={field.name}
-                                name={field.name}
-                                value={field.state.value}
-                                onBlur={field.handleBlur}
-                                onChange={(e) => field.handleChange(e.target.value)}
-                                placeholder="********"
-                                required
-                                aria-invalid={field.state.meta.errors.length > 0}
-                            />
-                            {field.state.meta.errors.length > 0 && (
-                                <span className="text-[0.75rem] text-destructive text-left">
-                                    {field.state.meta.errors[0]}
-                                </span>
-                            )}
-                        </Field>
+                        <OrderoField
+                            id={field.name}
+                            name={field.name}
+                            label="Confirm password"
+                            type="password"
+                            value={field.state.value}
+                            onBlur={field.handleBlur}
+                            onChange={field.handleChange}
+                            placeholder="********"
+                            required
+                            errors={field.state.meta.errors}
+                        />
                     )}
                 />
 
