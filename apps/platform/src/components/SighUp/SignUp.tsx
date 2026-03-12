@@ -32,7 +32,7 @@ export const SignUp = () => {
             <h2 className="mb-6 text-2xl md:text-3xl font-medium leading-10 tracking-[-0.03em] text-card-foreground">
                 Create your business account
             </h2>
-            <form onSubmit={handleSubmit} className="flex flex-col gap-4 mx-auto max-w-80">
+            <form onSubmit={handleSubmit} className="flex flex-col gap-4 mx-auto max-w-90 md:max-w-80">
                 <form.Field
                     name="name"
                     validators={{

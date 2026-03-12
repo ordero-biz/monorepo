@@ -18,7 +18,7 @@ export const SignIn = () => {
         validatorAdapter: zodValidator(),
     });
 
-    const handleSubmit = (e) => {
+    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         e.stopPropagation();
         form.handleSubmit();
@@ -29,7 +29,7 @@ export const SignIn = () => {
             <h2 className="mb-6 text-2xl md:text-3xl font-medium leading-10 tracking-[-0.03em] text-card-foreground">
                 Sign in to your account
             </h2>
-            <form onSubmit={handleSubmit} className="flex flex-col gap-4 mx-auto max-w-80">
+            <form onSubmit={handleSubmit} className="flex flex-col gap-4 mx-auto max-w-90 md:max-w-80">
                 <form.Field
                     name="email"
                     validators={{
@@ -40,7 +40,6 @@ export const SignIn = () => {
                             id={field.name}
                             name={field.name}
                             label="Email"
-                            required
                             value={field.state.value}
                             onBlur={field.handleBlur}
                             onChange={field.handleChange}
@@ -65,7 +64,6 @@ export const SignIn = () => {
                             onBlur={field.handleBlur}
                             onChange={field.handleChange}
                             placeholder="*******"
-                            required
                             errors={field.state.meta.errors}
                         />
                     )}

@@ -7,11 +7,11 @@ import {SignUp} from "@/components/SighUp/SignUp";
 import {SignIn} from "@/components/SighIn/SignIn";
 
 export const Registration = () => {
-    const [isSignUp, setIsSignUp] = useState(true);
+    const [isSignUp, setIsSignUp] = useState(false);
 
     return (
         <>
-            <div className="flex justify-between md:justify-end">
+            <div className="flex justify-between md:justify-end items-center">
                 <div className='block md:hidden'>
                     <h1 className='text-primary text-5xl font-extrabold'>Ordero</h1>
                 </div>
