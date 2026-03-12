@@ -1,4 +1,4 @@
-import {Button, OrderoField} from "@ordero/ui";
+import {Button, InputField} from "@ordero/ui";
 import {useForm, Validator} from "@tanstack/react-form";
 import {zodValidator} from "@tanstack/zod-form-adapter";
 import {type SignInFormData, signInSchema} from "./validation";
@@ -36,7 +36,7 @@ export const SignIn = () => {
                         onChange: signInSchema.shape.email,
                     }}
                     children={(field) => (
-                        <OrderoField
+                        <InputField
                             id={field.name}
                             name={field.name}
                             label="Email"
@@ -55,7 +55,7 @@ export const SignIn = () => {
                         onChange: signInSchema.shape.password,
                     }}
                     children={(field) => (
-                        <OrderoField
+                        <InputField
                             id={field.name}
                             name={field.name}
                             label="Password"

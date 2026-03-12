@@ -2,7 +2,7 @@ import * as React from "react";
 import {Field, FieldLabel} from "../Field";
 import {Input} from "../Input";
 
-type OrderoFieldProps = {
+type InputFieldProps = {
     id: string;
     name: string;
     label: string;
@@ -18,7 +18,7 @@ type OrderoFieldProps = {
     "aria-invalid"?: boolean;
 }
 
-export function OrderoField(
+export function InputField(
     {
         id,
         name,
@@ -34,7 +34,7 @@ export function OrderoField(
         className,
         "aria-invalid": ariaInvalid,
         ...props
-    }: OrderoFieldProps) {
+    }: InputFieldProps) {
     return (
         <Field className={className}>
             <FieldLabel htmlFor={id}>

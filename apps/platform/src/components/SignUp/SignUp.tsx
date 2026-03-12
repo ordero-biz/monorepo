@@ -1,4 +1,4 @@
-import {Button, OrderoField} from "@ordero/ui";
+import {Button, InputField} from "@ordero/ui";
 import {useForm, Validator} from "@tanstack/react-form";
 import {zodValidator} from "@tanstack/zod-form-adapter";
 import {type SignUpFormData, signUpSchema} from "./validation";
@@ -39,7 +39,7 @@ export const SignUp = () => {
                         onChange: signUpSchema.shape.name,
                     }}
                     children={(field) => (
-                        <OrderoField
+                        <InputField
                             id={field.name}
                             name={field.name}
                             label="Name"
@@ -59,7 +59,7 @@ export const SignUp = () => {
                         onChange: signUpSchema.shape.phone,
                     }}
                     children={(field) => (
-                        <OrderoField
+                        <InputField
                             id={field.name}
                             name={field.name}
                             label="Phone"
@@ -79,7 +79,7 @@ export const SignUp = () => {
                         onChange: signUpSchema.shape.email,
                     }}
                     children={(field) => (
-                        <OrderoField
+                        <InputField
                             id={field.name}
                             name={field.name}
                             label="Email"
@@ -99,7 +99,7 @@ export const SignUp = () => {
                         onChange: signUpSchema.shape.password,
                     }}
                     children={(field) => (
-                        <OrderoField
+                        <InputField
                             id={field.name}
                             name={field.name}
                             label="Password"
@@ -128,7 +128,7 @@ export const SignUp = () => {
                         },
                     }}
                     children={(field) => (
-                        <OrderoField
+                        <InputField
                             id={field.name}
                             name={field.name}
                             label="Confirm password"
