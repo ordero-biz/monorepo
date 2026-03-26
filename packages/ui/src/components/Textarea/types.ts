@@ -1,3 +1,3 @@
-import * as React from "react"
+import type * as React from 'react';
 
-export type TextareaProps = React.ComponentProps<"textarea">
+export type TextareaProps = React.ComponentProps<'textarea'>;

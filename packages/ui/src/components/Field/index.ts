@@ -1,25 +1,25 @@
+export { fieldVariants } from './constants';
 export {
   Field,
-  FieldLabel,
+  FieldContent,
   FieldDescription,
   FieldError,
   FieldGroup,
+  FieldLabel,
   FieldLegend,
   FieldSeparator,
   FieldSet,
-  FieldContent,
   FieldTitle,
 } from './Field';
-export { fieldVariants } from './constants';
 export type {
-  FieldProps,
-  FieldSetProps,
-  FieldLegendProps,
-  FieldGroupProps,
   FieldContentProps,
-  FieldLabelProps,
-  FieldTitleProps,
   FieldDescriptionProps,
-  FieldSeparatorProps,
   FieldErrorProps,
+  FieldGroupProps,
+  FieldLabelProps,
+  FieldLegendProps,
+  FieldProps,
+  FieldSeparatorProps,
+  FieldSetProps,
+  FieldTitleProps,
 } from './types';

@@ -17,7 +17,7 @@
     "@ordero/ui": "workspace:*",
     "@tanstack/react-form": "^0.33.0",
     "@tanstack/zod-form-adapter": "^0.33.0",
-    "next": "16.1.6",
+    "next": "16.1.7",
     "react": "19.2.3",
     "zod": "^4.3.6"
   },

@@ -1,37 +1,36 @@
+export { DROPDOWN_MENU_DEFAULTS, DROPDOWN_MENU_VARIANTS } from './constants';
 export {
   DropdownMenu,
-  DropdownMenuPortal,
-  DropdownMenuTrigger,
+  DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuGroup,
-  DropdownMenuLabel,
   DropdownMenuItem,
-  DropdownMenuCheckboxItem,
+  DropdownMenuLabel,
+  DropdownMenuPortal,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuShortcut,
   DropdownMenuSub,
-  DropdownMenuSubTrigger,
   DropdownMenuSubContent,
-} from './DropdownMenu'
-
-export { DROPDOWN_MENU_DEFAULTS, DROPDOWN_MENU_VARIANTS } from './constants'
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+} from './DropdownMenu';
 
 export type {
-  DropdownMenuProps,
-  DropdownMenuPortalProps,
-  DropdownMenuTriggerProps,
+  DropdownMenuCheckboxItemProps,
   DropdownMenuContentProps,
   DropdownMenuGroupProps,
-  DropdownMenuLabelProps,
   DropdownMenuItemProps,
-  DropdownMenuSubProps,
-  DropdownMenuSubTriggerProps,
-  DropdownMenuSubContentProps,
-  DropdownMenuCheckboxItemProps,
+  DropdownMenuLabelProps,
+  DropdownMenuPortalProps,
+  DropdownMenuProps,
   DropdownMenuRadioGroupProps,
   DropdownMenuRadioItemProps,
   DropdownMenuSeparatorProps,
   DropdownMenuShortcutProps,
-} from './types'
+  DropdownMenuSubContentProps,
+  DropdownMenuSubProps,
+  DropdownMenuSubTriggerProps,
+  DropdownMenuTriggerProps,
+} from './types';

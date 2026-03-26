@@ -1,25 +1,24 @@
 export {
+  INPUT_GROUP_DEFAULTS,
+  inputGroupAddonVariants,
+  inputGroupButtonVariants,
+} from './constants';
+export {
   InputGroup,
   InputGroupAddon,
   InputGroupButton,
-  InputGroupText,
   InputGroupInput,
+  InputGroupText,
   InputGroupTextarea,
-} from './InputGroup'
-
-export { 
-  inputGroupAddonVariants, 
-  inputGroupButtonVariants, 
-  INPUT_GROUP_DEFAULTS 
-} from './constants'
+} from './InputGroup';
 
 export type {
-  InputGroupProps,
   InputGroupAddonProps,
   InputGroupAddonVariantProps,
   InputGroupButtonProps,
   InputGroupButtonVariantProps,
-  InputGroupTextProps,
   InputGroupInputProps,
+  InputGroupProps,
   InputGroupTextareaProps,
-} from './types'
+  InputGroupTextProps,
+} from './types';

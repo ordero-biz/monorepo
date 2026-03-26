@@ -2,14 +2,14 @@ import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import {
   Field,
-  FieldLabel,
+  FieldContent,
   FieldDescription,
   FieldError,
   FieldGroup,
+  FieldLabel,
   FieldLegend,
   FieldSeparator,
   FieldSet,
-  FieldContent,
   FieldTitle,
 } from './Field';
 
@@ -23,7 +23,11 @@ describe('Field Components', () => {
     });
 
     it('renders with horizontal orientation', () => {
-      render(<Field orientation="horizontal" data-testid="field">Field content</Field>);
+      render(
+        <Field orientation="horizontal" data-testid="field">
+          Field content
+        </Field>
+      );
       const field = screen.getByTestId('field');
       expect(field).toHaveAttribute('data-orientation', 'horizontal');
     });
@@ -118,18 +122,20 @@ describe('Field Components', () => {
     it('renders multiple error messages as list', () => {
       const errors = [
         { message: 'This field is required' },
-        { message: 'Must be at least 3 characters' }
+        { message: 'Must be at least 3 characters' },
       ];
       render(<FieldError errors={errors} />);
       expect(screen.getByText('This field is required')).toBeInTheDocument();
-      expect(screen.getByText('Must be at least 3 characters')).toBeInTheDocument();
+      expect(
+        screen.getByText('Must be at least 3 characters')
+      ).toBeInTheDocument();
     });
 
     it('filters out duplicate error messages', () => {
       const errors = [
         { message: 'This field is required' },
         { message: 'This field is required' },
-        { message: 'Must be at least 3 characters' }
+        { message: 'Must be at least 3 characters' },
       ];
       render(<FieldError errors={errors} />);
       const errorElements = screen.getAllByText('This field is required');

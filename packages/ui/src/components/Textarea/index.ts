@@ -1,3 +1,3 @@
-export { Textarea } from './Textarea'
-export { TEXTAREA_DEFAULTS } from './constants'
-export type { TextareaProps } from './types'
+export { TEXTAREA_DEFAULTS, textareaVariants } from './constants';
+export { Textarea } from './Textarea';
+export type { TextareaProps } from './types';

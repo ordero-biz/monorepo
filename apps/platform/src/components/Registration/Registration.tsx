@@ -15,8 +15,7 @@ export const Registration = () => {
                 <div className='block md:hidden'>
                     <h1 className='text-primary text-5xl font-extrabold'>Ordero</h1>
                 </div>
-                <Button onClick={() => setIsSignUp(prev => !prev)} variant="ghost" size="lg"
-                        className="h-9 px-4 cursor-pointer">
+                <Button onClick={() => setIsSignUp(prev => !prev)} variant="text" color='default' size="sm">
                     {isSignUp ? 'Sign In' : 'Sign Up'}
                 </Button>
             </div>

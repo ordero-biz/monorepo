@@ -7,7 +7,7 @@ export default function Home() {
                 <h1 className='text-primary text-5xl font-extrabold'>Ordero</h1>
             </div>
             <div
-                className="h-full min-h-screen w-full md:w-[50vw] bg-primary-foreground colom p-4 md:p-8">
+                className="h-full min-h-screen w-full md:w-[50vw] colom p-4 md:p-8">
                 <Registration/>
             </div>
         </div>

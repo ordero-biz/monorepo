@@ -149,8 +149,8 @@ export const SignUp = () => {
                         <Button
                             type="submit"
                             variant='dark'
+                            size='lg'
                             disabled={!canSubmit || isSubmitting}
-                            className="mt-2 h-10"
                         >
                             {isSubmitting ? 'Signing Up...' : 'Sign Up'}
                         </Button>

@@ -1,13 +1,14 @@
-import { type VariantProps } from 'class-variance-authority';
-import { Label } from '@ordero/ui/components/Label';
-import { fieldVariants } from './constants';
+import type { Label } from '@ordero/ui/components/Label';
+import type { VariantProps } from 'class-variance-authority';
+import type { fieldVariants } from './constants';
 
-export type FieldProps = React.ComponentProps<'div'> & VariantProps<typeof fieldVariants>;
+export type FieldProps = React.ComponentProps<'div'> &
+  VariantProps<typeof fieldVariants>;
 
 export type FieldSetProps = React.ComponentProps<'fieldset'>;
 
-export type FieldLegendProps = React.ComponentProps<'legend'> & { 
-  variant?: 'legend' | 'label' 
+export type FieldLegendProps = React.ComponentProps<'legend'> & {
+  variant?: 'legend' | 'label';
 };
 
 export type FieldGroupProps = React.ComponentProps<'div'>;
