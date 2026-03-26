@@ -9,14 +9,33 @@ const dirname =
         : path.dirname(fileURLToPath(import.meta.url));
 
 export const baseTestConfig = defineConfig({
-    plugins: [react()],
-    test: {
-        environment: 'jsdom',
-        globals: true,
-    },
-    resolve: {
-        alias: {
-            '@/ui': path.resolve(dirname, '../ui/src'),
-        },
-    },
+  plugins: [react()],
+  test: {
+    environment: 'jsdom',
+    globals: true,
+  },
+  resolve: {
+    alias: [
+      {
+        find: /^@ordero\/ui\/components\/(.+)$/,
+        replacement: path.resolve(dirname, '../ui/src/components/$1'),
+      },
+      {
+        find: /^@ordero\/ui\/hooks\/(.+)$/,
+        replacement: path.resolve(dirname, '../ui/src/hooks/$1'),
+      },
+      {
+        find: /^@ordero\/ui\/lib\/(.+)$/,
+        replacement: path.resolve(dirname, '../ui/src/lib/$1'),
+      },
+      {
+        find: /^@ordero\/ui\/(.+)$/,
+        replacement: path.resolve(dirname, '../ui/src/$1'),
+      },
+      {
+        find: '@/ui',
+        replacement: path.resolve(dirname, '../ui/src'),
+      },
+    ],
+  },
 });
