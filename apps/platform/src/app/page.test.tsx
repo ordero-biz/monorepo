@@ -1,12 +1,12 @@
-import { render, screen } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
-import Home from './page';
+import {render, screen} from '@testing-library/react';
+import {describe, expect, it} from 'vitest';
+import {Registration} from '@/components/Registration/Registration';
 
-describe('platform Home', () => {
-  it('renders', () => {
-    render(<Home />);
-    expect(
-      screen.getByRole('heading', { name: /to get started/i })
-    ).toBeInTheDocument();
-  });
+describe('SignIn', () => {
+    it('renders', () => {
+        render(<Registration/>);
+        expect(
+            screen.getByRole('heading', {name: /sign in to your account/i})
+        ).toBeInTheDocument();
+    });
 });
