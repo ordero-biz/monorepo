@@ -29,7 +29,9 @@ describe('Input', () => {
   });
 
   it('respects explicit aria-invalid prop', () => {
-    render(<Input placeholder="State override" state="error" aria-invalid={false} />);
+    render(
+      <Input placeholder="State override" state="error" aria-invalid={false} />
+    );
 
     const input = screen.getByPlaceholderText('State override');
 

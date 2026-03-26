@@ -9,7 +9,8 @@ function Textarea({
   ...props
 }: TextareaProps) {
   const resolvedState = state ?? TEXTAREA_DEFAULTS.state;
-  const resolvedAriaInvalid = ariaInvalid ?? (resolvedState === 'error' || undefined);
+  const resolvedAriaInvalid =
+    ariaInvalid ?? (resolvedState === 'error' || undefined);
 
   return (
     <textarea

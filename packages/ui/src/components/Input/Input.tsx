@@ -17,7 +17,8 @@ function Input({
   const resolvedVariant = variant ?? INPUT_DEFAULTS.variant;
   const resolvedSize = size ?? INPUT_DEFAULTS.size;
   const resolvedState = state ?? INPUT_DEFAULTS.state;
-  const resolvedAriaInvalid = ariaInvalid ?? (resolvedState === 'error' || undefined);
+  const resolvedAriaInvalid =
+    ariaInvalid ?? (resolvedState === 'error' || undefined);
 
   return (
     <InputPrimitive
