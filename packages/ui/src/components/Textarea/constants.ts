@@ -1,6 +1,8 @@
 import { cva } from 'class-variance-authority';
 
-export const TEXTAREA_DEFAULTS = {} as const;
+export const TEXTAREA_DEFAULTS = {
+  state: 'default',
+} as const;
 
 export const textareaVariants = cva(
   [
@@ -15,5 +17,21 @@ export const textareaVariants = cva(
     'border border-[var(--textfield-outline)] bg-background shadow-none',
     'hover:border-[var(--textfield-outline-strong)]',
     'focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:shadow-md',
-  ].join(' ')
+  ].join(' '),
+  {
+    variants: {
+      state: {
+        default: '',
+        error:
+          'border-error hover:border-error focus-visible:border-error focus-visible:ring-error/20',
+        warning:
+          'border-warning hover:border-warning focus-visible:border-warning focus-visible:ring-warning/20',
+        success:
+          'border-success hover:border-success focus-visible:border-success focus-visible:ring-success/20',
+      },
+    },
+    defaultVariants: {
+      state: 'default',
+    },
+  }
 );

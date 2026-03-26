@@ -19,6 +19,7 @@ export type {
   InputGroupButtonVariantProps,
   InputGroupInputProps,
   InputGroupProps,
+  InputGroupState,
   InputGroupTextareaProps,
   InputGroupTextProps,
 } from './types';

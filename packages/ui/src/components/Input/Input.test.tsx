@@ -16,5 +16,23 @@ describe('Input', () => {
 
     expect(input).toHaveAttribute('data-variant', INPUT_DEFAULTS.variant);
     expect(input).toHaveAttribute('data-size', INPUT_DEFAULTS.size);
+    expect(input).toHaveAttribute('data-state', INPUT_DEFAULTS.state);
+  });
+
+  it('sets aria-invalid automatically for error state', () => {
+    render(<Input placeholder="Invalid input" state="error" />);
+
+    const input = screen.getByPlaceholderText('Invalid input');
+
+    expect(input).toHaveAttribute('data-state', 'error');
+    expect(input).toHaveAttribute('aria-invalid', 'true');
+  });
+
+  it('respects explicit aria-invalid prop', () => {
+    render(<Input placeholder="State override" state="error" aria-invalid={false} />);
+
+    const input = screen.getByPlaceholderText('State override');
+
+    expect(input).toHaveAttribute('aria-invalid', 'false');
   });
 });

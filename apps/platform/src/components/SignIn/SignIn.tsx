@@ -25,8 +25,8 @@ export const SignIn = () => {
     };
 
     return (
-        <div className="mx-auto mt-[15%] w-full text-center">
-            <h2 className="mb-6 text-2xl md:text-3xl font-medium leading-10 tracking-[-0.03em]">
+        <div className="mx-auto mt-[15%] w-full">
+            <h2 className="mb-6 text-2xl md:text-3xl font-medium leading-10 tracking-[-0.03em]  text-center">
                 Sign in to your account
             </h2>
             <form onSubmit={handleSubmit} className="flex flex-col gap-4 mx-auto max-w-90 md:max-w-80">
@@ -74,8 +74,7 @@ export const SignIn = () => {
                     children={([canSubmit, isSubmitting]) => (
                         <Button
                             type="submit"
-                            variant='outlined'
-                            color='warning'
+                            variant='dark'
                             size='lg'
                             disabled={!canSubmit || isSubmitting}
                         >

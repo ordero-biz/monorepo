@@ -1,8 +1,14 @@
 import type { Button } from '@ordero/ui/components/Button';
+import type { Input } from '@ordero/ui/components/Input';
+import type { Textarea } from '@ordero/ui/components/Textarea';
 import type { VariantProps } from 'class-variance-authority';
 import type * as React from 'react';
 
-export type InputGroupProps = React.ComponentProps<'div'>;
+export type InputGroupState = 'default' | 'error' | 'warning' | 'success';
+
+export type InputGroupProps = React.ComponentProps<'div'> & {
+  state?: InputGroupState;
+};
 
 export type InputGroupAddonVariantProps = VariantProps<
   typeof import('./constants').inputGroupAddonVariants
@@ -25,6 +31,10 @@ export type InputGroupButtonProps = Omit<
 
 export type InputGroupTextProps = React.ComponentProps<'span'>;
 
-export type InputGroupInputProps = React.ComponentProps<'input'>;
+export type InputGroupInputProps = React.ComponentProps<typeof Input> & {
+  state?: InputGroupState;
+};
 
-export type InputGroupTextareaProps = React.ComponentProps<'textarea'>;
+export type InputGroupTextareaProps = React.ComponentProps<typeof Textarea> & {
+  state?: InputGroupState;
+};
