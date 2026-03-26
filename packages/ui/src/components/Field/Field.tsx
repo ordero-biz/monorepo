@@ -58,19 +58,13 @@ export function FieldGroup({className, ...props}: FieldGroupProps) {
 
 export function Field({
                           className,
-                          orientation = 'vertical',
                           ...props
                       }: FieldProps) {
     return (
         <div
             role="group"
             data-slot="field"
-            data-orientation={orientation}
-            className={cn(
-                'flex flex-col gap-2',
-                orientation === 'horizontal' && 'flex-row items-center gap-3',
-                className
-            )}
+            className={cn('flex flex-col gap-2', className)}
             {...props}
         />
     );

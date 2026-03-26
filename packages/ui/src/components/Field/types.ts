@@ -1,9 +1,6 @@
 import type { Label } from '@ordero/ui/components/Label';
-import type { VariantProps } from 'class-variance-authority';
-import type { fieldVariants } from './constants';
 
-export type FieldProps = React.ComponentProps<'div'> &
-  VariantProps<typeof fieldVariants>;
+export type FieldProps = React.ComponentProps<'div'>;
 
 export type FieldSetProps = React.ComponentProps<'fieldset'>;
 

@@ -40,6 +40,7 @@ export const SignIn = () => {
                             id={field.name}
                             name={field.name}
                             label="Email"
+                            required
                             value={field.state.value}
                             onBlur={field.handleBlur}
                             onChange={field.handleChange}
@@ -60,6 +61,7 @@ export const SignIn = () => {
                             name={field.name}
                             label="Password"
                             type="password"
+                            required
                             value={field.state.value}
                             onBlur={field.handleBlur}
                             onChange={field.handleChange}

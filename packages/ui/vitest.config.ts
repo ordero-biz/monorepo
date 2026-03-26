@@ -49,8 +49,27 @@ export default defineConfig({
       : {}),
   },
   resolve: {
-    alias: {
-      '@/ui': path.resolve(__dirname, './src'),
-    },
+    alias: [
+      {
+        find: /^@ordero\/ui\/components\/(.+)$/,
+        replacement: path.resolve(dirname, './src/components/$1'),
+      },
+      {
+        find: /^@ordero\/ui\/hooks\/(.+)$/,
+        replacement: path.resolve(dirname, './src/hooks/$1'),
+      },
+      {
+        find: /^@ordero\/ui\/lib\/(.+)$/,
+        replacement: path.resolve(dirname, './src/lib/$1'),
+      },
+      {
+        find: /^@ordero\/ui\/(.+)$/,
+        replacement: path.resolve(dirname, './src/$1'),
+      },
+      {
+        find: '@/ui',
+        replacement: path.resolve(dirname, './src'),
+      },
+    ],
   },
 });
