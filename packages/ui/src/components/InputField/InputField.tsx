@@ -1,7 +1,6 @@
 'use client';
 
 import { cn } from '@ordero/ui/lib/utils';
-import * as React from 'react';
 import { Field, FieldContent, FieldError, FieldLabel } from '../Field';
 import { Input } from '../Input';
 

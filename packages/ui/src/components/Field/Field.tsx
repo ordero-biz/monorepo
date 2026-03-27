@@ -59,7 +59,6 @@ export function FieldGroup({ className, ...props }: FieldGroupProps) {
 export function Field({ className, ...props }: FieldProps) {
   return (
     <div
-      role="group"
       data-slot="field"
       className={cn('flex flex-col gap-2', className)}
       {...props}
@@ -163,7 +162,8 @@ export function FieldError({
     return (
       <ul className="ml-4 list-disc space-y-1">
         {uniqueErrors.map(
-          (error, i) => error?.message && <li key={i}>{error.message}</li>
+          (error) =>
+            error?.message && <li key={error.message}>{error.message}</li>
         )}
       </ul>
     );
