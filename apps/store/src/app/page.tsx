@@ -1,14 +1,6 @@
 import { buttonVariants } from '@ordero/ui';
 import Image from 'next/image';
 
-export function addThreeNumbers(
-  first: number,
-  second: number,
-  third: number,
-): number {
-  return first + second + third;
-}
-
 export default function Home() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
@@ -42,11 +34,14 @@ export default function Home() {
             </a>{' '}
             center.
           </p>
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">
+            Sum example: {sum}
+          </p>
         </div>
         <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
           <a
             className={buttonVariants({
-              className: 'h-12 w-full gap-2 rounded-full px-5 md:w-[158px]',
+              className: 'h-12 w-full gap-2 rounded-full px-5 md:w-39.5',
             })}
             href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
             target="_blank"
@@ -62,7 +57,7 @@ export default function Home() {
             Deploy Now
           </a>
           <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
+            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/8 px-5 transition-colors hover:border-transparent hover:bg-black/4 dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-39.5"
             href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
             target="_blank"
             rel="noopener noreferrer"
