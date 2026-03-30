@@ -89,7 +89,7 @@ export const buttonVariants = cva(
     'inline-flex items-center justify-center whitespace-nowrap font-bold transition-all duration-200 ease-out',
     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40',
     'disabled:pointer-events-none',
-    'gap-[length:var(--button-gap)] rounded-[length:var(--button-radius)] min-w-[length:var(--button-min-width)]',
+    'gap-[length:var(--button-gap)] min-w-[length:var(--button-min-width)]',
     "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
     'select-none cursor-pointer',
   ].join(' '),
@@ -117,11 +117,10 @@ export const buttonVariants = cva(
         lg: "h-[length:var(--button-height-lg)] px-[length:var(--button-px-lg)] text-[15px] leading-[26px] [&_svg:not([class*='size-'])]:size-6",
         md: "h-[length:var(--button-height-md)] px-[length:var(--button-px-md)] text-sm leading-6 [&_svg:not([class*='size-'])]:size-6",
         sm: "h-[length:var(--button-height-sm)] px-[length:var(--button-px-sm)] text-[13px] leading-[22px] [&_svg:not([class*='size-'])]:size-[18px]",
-        xs: "h-6 gap-1 rounded-md px-1.5 text-xs [&_svg:not([class*='size-'])]:size-3.5",
+        xs: "h-6 gap-1 px-1.5 text-xs [&_svg:not([class*='size-'])]:size-3.5",
         icon: "h-10 w-10 min-w-0 p-0 [&_svg:not([class*='size-'])]:size-6",
         'icon-sm': "h-9 w-9 min-w-0 p-0 [&_svg:not([class*='size-'])]:size-5",
-        'icon-xs':
-          "size-6 min-w-0 rounded-md p-0 [&_svg:not([class*='size-'])]:size-3.5",
+        'icon-xs': "size-6 min-w-0 p-0 [&_svg:not([class*='size-'])]:size-3.5",
         'icon-lg':
           "h-[length:var(--button-height-lg)] w-[length:var(--button-height-lg)] min-w-0 p-0 [&_svg:not([class*='size-'])]:size-8",
       },
@@ -129,9 +128,9 @@ export const buttonVariants = cva(
         true: 'w-full',
       },
       rounded: {
-        default: '',
+        default: 'rounded-[length:var(--button-radius)]',
         sm: 'rounded-md',
-        full: 'rounded-full',
+        full: 'rounded-[50%]',
       },
       loading: {
         true: 'pointer-events-none opacity-70',
@@ -228,10 +227,6 @@ export const buttonVariants = cva(
           "size-[length:var(--button-height-lg)] p-0 [&_svg:not([class*='size-'])]:size-8",
       },
       { appearance: 'contained', loading: true, className: 'shadow-none' },
-      { size: 'icon', className: 'rounded-[length:var(--button-radius)]' },
-      { size: 'icon-sm', className: 'rounded-[length:var(--button-radius)]' },
-      { size: 'icon-xs', className: 'rounded-[length:var(--button-radius)]' },
-      { size: 'icon-lg', className: 'rounded-[length:var(--button-radius)]' },
     ],
     defaultVariants: {
       appearance: 'contained',

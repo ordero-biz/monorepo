@@ -1,10 +1,10 @@
 'use client';
 
-import { Button as ButtonPrimitive } from '@base-ui/react/button';
-import { cn } from '@ordero/ui/lib/utils';
-import { buttonVariants } from './constants';
-import { resolveButtonStyle } from './resolve-button-style';
-import type { ButtonProps } from './types';
+import {Button as ButtonPrimitive} from '@base-ui/react/button';
+import {cn} from '@ordero/ui/lib/utils';
+import {buttonVariants} from './constants';
+import {resolveButtonStyle} from './resolve-button-style';
+import type {ButtonProps} from './types';
 
 export const Button = ({
   className,
