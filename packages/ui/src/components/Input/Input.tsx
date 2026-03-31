@@ -1,7 +1,7 @@
 'use client';
 
 import { Input as InputPrimitive } from '@base-ui/react/input';
-import { cn } from '@ordero/ui/lib/utils';
+import { cn } from '../../lib/utils';
 import { INPUT_DEFAULTS, inputVariants } from './constants';
 import type { InputProps } from './types';
 

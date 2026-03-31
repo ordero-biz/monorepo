@@ -1,14 +1,14 @@
 'use client';
 
-import { cn } from '@ordero/ui/lib/utils';
-import type * as React from 'react';
+import type { ComponentProps } from 'react';
+import { cn } from '../../lib/utils';
 
 function Label({
   children,
   className,
   htmlFor,
   ...props
-}: React.ComponentProps<'label'>) {
+}: ComponentProps<'label'>) {
   return (
     <label
       htmlFor={htmlFor}

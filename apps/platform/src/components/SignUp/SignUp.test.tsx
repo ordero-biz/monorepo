@@ -18,7 +18,9 @@ describe('SignUp', () => {
     expect(screen.getByLabelText(/^email/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/^password/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/confirm password/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /sign up/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /sign up/i })
+    ).toBeInTheDocument();
   });
 
   it('shows validation errors for invalid values', async () => {

@@ -1,5 +1,9 @@
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { baseTestConfig } from '@ordero/test-config';
 import { mergeConfig } from 'vitest/config';
+
+const dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export default mergeConfig(baseTestConfig, {
   test: {
@@ -7,7 +11,7 @@ export default mergeConfig(baseTestConfig, {
   },
   resolve: {
     alias: {
-      '@': new URL('./src', import.meta.url).pathname,
+      '@': path.resolve(dirname, './src'),
     },
   },
 });

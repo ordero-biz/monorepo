@@ -1,5 +1,5 @@
 import type { Menu as MenuPrimitive } from '@base-ui/react/menu';
-import type * as React from 'react';
+import type { ComponentProps } from 'react';
 
 export type DropdownMenuProps = MenuPrimitive.Root.Props;
 
@@ -30,7 +30,7 @@ export type DropdownMenuSubTriggerProps = MenuPrimitive.SubmenuTrigger.Props & {
   inset?: boolean;
 };
 
-export type DropdownMenuSubContentProps = React.ComponentProps<
+export type DropdownMenuSubContentProps = ComponentProps<
   typeof import('./DropdownMenu').DropdownMenuContent
 >;
 
@@ -46,4 +46,4 @@ export type DropdownMenuRadioItemProps = MenuPrimitive.RadioItem.Props & {
 
 export type DropdownMenuSeparatorProps = MenuPrimitive.Separator.Props;
 
-export type DropdownMenuShortcutProps = React.ComponentProps<'span'>;
+export type DropdownMenuShortcutProps = ComponentProps<'span'>;

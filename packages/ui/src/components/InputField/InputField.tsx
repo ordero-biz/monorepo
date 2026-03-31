@@ -1,6 +1,6 @@
 'use client';
 
-import { cn } from '@ordero/ui/lib/utils';
+import { cn } from '../../lib/utils';
 import { Field, FieldContent, FieldError, FieldLabel } from '../Field';
 import { Input } from '../Input';
 

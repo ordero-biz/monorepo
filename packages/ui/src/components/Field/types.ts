@@ -1,4 +1,4 @@
-import type { Label } from '@ordero/ui/components/Label';
+import type { Label } from '../Label';
 
 export type FieldProps = React.ComponentProps<'div'>;
 
