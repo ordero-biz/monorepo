@@ -1,10 +1,10 @@
 'use client';
 
-import {Dialog as DialogPrimitive} from '@base-ui/react/dialog';
-import {Button} from '@ordero/ui/components/Button';
-import {cn} from '@ordero/ui/lib/utils';
-import {XIcon} from 'lucide-react';
-import type {ComponentProps} from 'react';
+import { Dialog as DialogPrimitive } from '@base-ui/react/dialog';
+import { Button } from '@ordero/ui/components/Button';
+import { cn } from '@ordero/ui/lib/utils';
+import { XIcon } from 'lucide-react';
+import type { ComponentProps } from 'react';
 
 function Dialog({ ...props }: DialogPrimitive.Root.Props) {
   return <DialogPrimitive.Root data-slot="dialog" {...props} />;
