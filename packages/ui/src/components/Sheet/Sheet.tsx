@@ -1,10 +1,10 @@
 'use client';
 
-import {Dialog as SheetPrimitive} from '@base-ui/react/dialog';
-import {Button} from '@ordero/ui/components/Button';
-import {cn} from '@ordero/ui/lib/utils';
-import {XIcon} from 'lucide-react';
-import type * as React from 'react';
+import { Dialog as SheetPrimitive } from '@base-ui/react/dialog';
+import { Button } from '@ordero/ui/components/Button';
+import { cn } from '@ordero/ui/lib/utils';
+import { XIcon } from 'lucide-react';
+import type { ComponentProps } from 'react';
 
 function Sheet({ ...props }: SheetPrimitive.Root.Props) {
   return <SheetPrimitive.Root data-slot="sheet" {...props} />;
@@ -78,7 +78,7 @@ function SheetContent({
   );
 }
 
-function SheetHeader({ className, ...props }: React.ComponentProps<'div'>) {
+function SheetHeader({ className, ...props }: ComponentProps<'div'>) {
   return (
     <div
       data-slot="sheet-header"
@@ -88,7 +88,7 @@ function SheetHeader({ className, ...props }: React.ComponentProps<'div'>) {
   );
 }
 
-function SheetFooter({ className, ...props }: React.ComponentProps<'div'>) {
+function SheetFooter({ className, ...props }: ComponentProps<'div'>) {
   return (
     <div
       data-slot="sheet-footer"
