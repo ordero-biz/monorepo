@@ -19,5 +19,5 @@
       "@ordero/ui/lib/*": ["src/lib/*"]
     }
   },
-  "include": ["src", "vitest.config.ts"]
+  "include": ["src", "stories", ".storybook", "vitest.config.ts"]
 }
