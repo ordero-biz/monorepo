@@ -19,6 +19,7 @@
     "@tanstack/zod-form-adapter": "^0.33.0",
     "next": "16.1.7",
     "react": "19.2.3",
+    "react-dom": "19.2.3",
     "zod": "^4.3.6",
     "lucide-react": "^0.541.0"
   },

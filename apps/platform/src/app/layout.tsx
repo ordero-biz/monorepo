@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
+import type { PropsWithChildren } from 'react';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -16,11 +17,7 @@ export const metadata: Metadata = {
   title: 'Ordero Platform',
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: PropsWithChildren) {
   return (
     <html lang="en">
       <head>

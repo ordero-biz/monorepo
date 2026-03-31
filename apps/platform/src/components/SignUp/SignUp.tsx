@@ -1,6 +1,7 @@
 import { Button, InputField } from '@ordero/ui';
 import { useForm, type Validator } from '@tanstack/react-form';
 import { zodValidator } from '@tanstack/zod-form-adapter';
+import type { SubmitEvent } from 'react';
 import { type SignUpFormData, signUpSchema } from './validation';
 
 export const SignUp = () => {
@@ -21,7 +22,7 @@ export const SignUp = () => {
     validatorAdapter: zodValidator(),
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     e.stopPropagation();
     form.handleSubmit();
@@ -41,7 +42,8 @@ export const SignUp = () => {
           validators={{
             onChange: signUpSchema.shape.name,
           }}
-          children={(field) => (
+        >
+          {(field) => (
             <InputField
               id={field.name}
               name={field.name}
@@ -54,14 +56,15 @@ export const SignUp = () => {
               errors={field.state.meta.errors}
             />
           )}
-        />
+        </form.Field>
 
         <form.Field
           name="phone"
           validators={{
             onChange: signUpSchema.shape.phone,
           }}
-          children={(field) => (
+        >
+          {(field) => (
             <InputField
               id={field.name}
               name={field.name}
@@ -74,14 +77,15 @@ export const SignUp = () => {
               errors={field.state.meta.errors}
             />
           )}
-        />
+        </form.Field>
 
         <form.Field
           name="email"
           validators={{
             onChange: signUpSchema.shape.email,
           }}
-          children={(field) => (
+        >
+          {(field) => (
             <InputField
               id={field.name}
               name={field.name}
@@ -94,14 +98,15 @@ export const SignUp = () => {
               errors={field.state.meta.errors}
             />
           )}
-        />
+        </form.Field>
 
         <form.Field
           name="password"
           validators={{
             onChange: signUpSchema.shape.password,
           }}
-          children={(field) => (
+        >
+          {(field) => (
             <InputField
               id={field.name}
               name={field.name}
@@ -115,7 +120,7 @@ export const SignUp = () => {
               errors={field.state.meta.errors}
             />
           )}
-        />
+        </form.Field>
 
         <form.Field
           name="confirmPassword"
@@ -130,7 +135,8 @@ export const SignUp = () => {
               return undefined;
             },
           }}
-          children={(field) => (
+        >
+          {(field) => (
             <InputField
               id={field.name}
               name={field.name}
@@ -144,11 +150,12 @@ export const SignUp = () => {
               errors={field.state.meta.errors}
             />
           )}
-        />
+        </form.Field>
 
         <form.Subscribe
           selector={(state) => [state.canSubmit, state.isSubmitting]}
-          children={([canSubmit, isSubmitting]) => (
+        >
+          {([canSubmit, isSubmitting]) => (
             <Button
               type="submit"
               variant="dark"
@@ -158,12 +165,12 @@ export const SignUp = () => {
               {isSubmitting ? 'Signing Up...' : 'Sign Up'}
             </Button>
           )}
-        />
+        </form.Subscribe>
       </form>
       <p className="mt-4 text-center text-sm text-foreground">
         Read{' '}
         <a
-          href="#"
+          href="https://google.com"
           className="font-normal text-primary underline underline-offset-4"
         >
           Terms and Conditions policy

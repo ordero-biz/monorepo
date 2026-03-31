@@ -1,6 +1,7 @@
 import { Button, InputField } from '@ordero/ui';
 import { useForm, type Validator } from '@tanstack/react-form';
 import { zodValidator } from '@tanstack/zod-form-adapter';
+import type { SubmitEvent } from 'react';
 import { type SignInFormData, signInSchema } from './validation';
 
 export const SignIn = () => {
@@ -18,7 +19,7 @@ export const SignIn = () => {
     validatorAdapter: zodValidator(),
   });
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     e.stopPropagation();
     form.handleSubmit();
@@ -38,7 +39,8 @@ export const SignIn = () => {
           validators={{
             onChange: signInSchema.shape.email,
           }}
-          children={(field) => (
+        >
+          {(field) => (
             <InputField
               id={field.name}
               name={field.name}
@@ -51,14 +53,15 @@ export const SignIn = () => {
               errors={field.state.meta.errors}
             />
           )}
-        />
+        </form.Field>
 
         <form.Field
           name="password"
           validators={{
             onChange: signInSchema.shape.password,
           }}
-          children={(field) => (
+        >
+          {(field) => (
             <InputField
               id={field.name}
               name={field.name}
@@ -72,11 +75,12 @@ export const SignIn = () => {
               errors={field.state.meta.errors}
             />
           )}
-        />
+        </form.Field>
 
         <form.Subscribe
           selector={(state) => [state.canSubmit, state.isSubmitting]}
-          children={([canSubmit, isSubmitting]) => (
+        >
+          {([canSubmit, isSubmitting]) => (
             <Button
               type="submit"
               variant="dark"
@@ -86,7 +90,7 @@ export const SignIn = () => {
               {isSubmitting ? 'Signing Up...' : 'Sign Up'}
             </Button>
           )}
-        />
+        </form.Subscribe>
       </form>
     </div>
   );
