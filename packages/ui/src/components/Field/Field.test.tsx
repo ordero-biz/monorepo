@@ -1,6 +1,5 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
-import { cleanupAfterEach } from '../../../vitest.utils';
 import {
   Field,
   FieldContent,
@@ -13,8 +12,6 @@ import {
   FieldSet,
   FieldTitle,
 } from './Field';
-
-cleanupAfterEach();
 
 describe('Field Components', () => {
   describe('Field', () => {

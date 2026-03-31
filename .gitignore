@@ -19,5 +19,3 @@ storybook-static
 .idea/
 *.iml
 .vscode/
-/.junie/
-/.ai/mcp/mcp.json
