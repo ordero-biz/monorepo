@@ -1,17 +1,27 @@
 'use client';
 
-import {mergeProps} from '@base-ui/react/merge-props';
-import {useRender} from '@base-ui/react/use-render';
-import {Button} from '@ordero/ui/components/Button';
-import {Input} from '@ordero/ui/components/Input';
-import {Separator} from '@ordero/ui/components/Separator';
-import {Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle,} from '@ordero/ui/components/Sheet';
-import {Skeleton} from '@ordero/ui/components/Skeleton';
-import {Tooltip, TooltipContent, TooltipTrigger,} from '@ordero/ui/components/Tooltip';
-import {useIsMobile} from '@ordero/ui/hooks/use-mobile';
-import {cn} from '@ordero/ui/lib/utils';
-import {cva, type VariantProps} from 'class-variance-authority';
-import {ChevronLeft} from 'lucide-react';
+import { mergeProps } from '@base-ui/react/merge-props';
+import { useRender } from '@base-ui/react/use-render';
+import { Button } from '@ordero/ui/components/Button';
+import { Input } from '@ordero/ui/components/Input';
+import { Separator } from '@ordero/ui/components/Separator';
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from '@ordero/ui/components/Sheet';
+import { Skeleton } from '@ordero/ui/components/Skeleton';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@ordero/ui/components/Tooltip';
+import { useIsMobile } from '@ordero/ui/hooks/use-mobile';
+import { cn } from '@ordero/ui/lib/utils';
+import { cva, type VariantProps } from 'class-variance-authority';
+import { ChevronLeft } from 'lucide-react';
 import * as React from 'react';
 
 const SIDEBAR_WIDTH = '17.5rem';
@@ -291,7 +301,7 @@ function SidebarTrigger({
       aria-label="Toggle Sidebar"
       title="Toggle Sidebar"
       className={cn(
-        'size-[26px] border border-sidebar-border bg-[var(--sidebar-toggle)] text-[var(--sidebar-muted-foreground)] shadow-[var(--sidebar-toggle-shadow)] hover:bg-[var(--default-button-soft-bg)] hover:text-foreground',
+        'size-6.5 border border-sidebar-border bg-(--sidebar-toggle) text-sidebar-muted-foreground shadow-(--sidebar-toggle-shadow) hover:bg-(--default-button-soft-bg) hover:text-foreground',
         className
       )}
       onClick={(event) => {
@@ -322,7 +332,7 @@ function SidebarRail({ className, ...props }: React.ComponentProps<'button'>) {
       onClick={toggleSidebar}
       title="Toggle Sidebar"
       className={cn(
-        'absolute inset-y-0 z-20 hidden w-4 transition-all ease-linear group-data-[side=left]:-right-4 group-data-[side=right]:left-0 after:absolute after:inset-y-0 after:start-1/2 after:w-[2px] hover:after:bg-sidebar-border sm:flex ltr:-translate-x-1/2 rtl:-translate-x-1/2',
+        'absolute inset-y-0 z-20 hidden w-4 transition-all ease-linear group-data-[side=left]:-right-4 group-data-[side=right]:left-0 after:absolute after:inset-y-0 after:inset-s-1/2 after:w-0.5 hover:after:bg-sidebar-border sm:flex ltr:-translate-x-1/2 rtl:-translate-x-1/2',
         'in-data-[side=left]:cursor-w-resize in-data-[side=right]:cursor-e-resize',
         '[[data-side=left][data-state=collapsed]_&]:cursor-e-resize [[data-side=right][data-state=collapsed]_&]:cursor-w-resize',
         'group-data-[collapsible=offcanvas]:translate-x-0 group-data-[collapsible=offcanvas]:after:left-full hover:group-data-[collapsible=offcanvas]:bg-sidebar',
@@ -357,7 +367,7 @@ function SidebarInput({
       data-slot="sidebar-input"
       data-sidebar="input"
       className={cn(
-        'h-9 rounded-[8px] border-sidebar-border bg-background shadow-none',
+        'h-9 rounded-xl border-sidebar-border bg-background shadow-none',
         className
       )}
       {...props}
@@ -603,7 +613,7 @@ function SidebarMenuAction({
     props: mergeProps<'button'>(
       {
         className: cn(
-          'absolute top-2 right-2 flex aspect-square w-6 items-center justify-center rounded-[8px] p-0 text-sidebar-muted-foreground ring-sidebar-ring outline-hidden transition-transform group-data-[icon-state=collapsed]:hidden peer-hover/menu-button:text-foreground peer-data-[size=default]/menu-button:top-2 peer-data-[size=lg]/menu-button:top-2 peer-data-[size=sm]/menu-button:top-1.5 after:absolute after:-inset-2 hover:bg-[var(--default-button-soft-bg)] hover:text-foreground focus-visible:ring-2 md:after:hidden [&>svg]:size-4 [&>svg]:shrink-0',
+          'absolute top-2 right-2 flex aspect-square w-6 items-center justify-center rounded-xl p-0 text-sidebar-muted-foreground ring-sidebar-ring outline-hidden transition-transform group-data-[icon-state=collapsed]:hidden peer-hover/menu-button:text-foreground peer-data-[size=default]/menu-button:top-2 peer-data-[size=lg]/menu-button:top-2 peer-data-[size=sm]/menu-button:top-1.5 after:absolute after:-inset-2 hover:bg-[var(--default-button-soft-bg)] hover:text-foreground focus-visible:ring-2 md:after:hidden [&>svg]:size-4 [&>svg]:shrink-0',
           showOnHover &&
             'group-focus-within/menu-item:opacity-100 group-hover/menu-item:opacity-100 peer-data-active/menu-button:text-sidebar-accent-foreground aria-expanded:opacity-100 md:opacity-0',
           className
@@ -651,10 +661,7 @@ function SidebarMenuSkeleton({
     <div
       data-slot="sidebar-menu-skeleton"
       data-sidebar="menu-skeleton"
-      className={cn(
-        'flex h-10 items-center gap-3 rounded-[8px] px-3',
-        className
-      )}
+      className={cn('flex h-10 items-center gap-3 rounded-xl px-3', className)}
       {...props}
     >
       {showIcon && (

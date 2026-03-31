@@ -1,9 +1,9 @@
 'use client';
 
-import { Dialog as SheetPrimitive } from '@base-ui/react/dialog';
-import { Button } from '@ordero/ui/components/Button';
-import { cn } from '@ordero/ui/lib/utils';
-import { XIcon } from 'lucide-react';
+import {Dialog as SheetPrimitive} from '@base-ui/react/dialog';
+import {Button} from '@ordero/ui/components/Button';
+import {cn} from '@ordero/ui/lib/utils';
+import {XIcon} from 'lucide-react';
 import type * as React from 'react';
 
 function Sheet({ ...props }: SheetPrimitive.Root.Props) {
@@ -27,7 +27,7 @@ function SheetOverlay({ className, ...props }: SheetPrimitive.Backdrop.Props) {
     <SheetPrimitive.Backdrop
       data-slot="sheet-overlay"
       className={cn(
-        'fixed inset-0 z-50 bg-[color:color-mix(in_oklab,var(--default-button)_12%,transparent)] transition-opacity duration-200 data-ending-style:opacity-0 data-starting-style:opacity-0 supports-backdrop-filter:backdrop-blur-[2px]',
+        'fixed inset-0 z-50 bg-[color-mix(in_oklab,var(--default-button)_12%,transparent)] transition-opacity duration-200 data-ending-style:opacity-0 data-starting-style:opacity-0 supports-backdrop-filter:backdrop-blur-[2px]',
         className
       )}
       {...props}
@@ -52,7 +52,7 @@ function SheetContent({
         data-slot="sheet-content"
         data-side={side}
         className={cn(
-          'fixed z-50 flex flex-col gap-4 border border-border/70 bg-background bg-clip-padding text-sm text-foreground shadow-xl outline-none transition duration-200 ease-out data-ending-style:opacity-0 data-starting-style:opacity-0 data-[side=bottom]:inset-x-2 data-[side=bottom]:bottom-2 data-[side=bottom]:h-auto data-[side=bottom]:rounded-[20px] data-[side=bottom]:data-ending-style:translate-y-8 data-[side=bottom]:data-starting-style:translate-y-8 data-[side=left]:inset-y-2 data-[side=left]:left-2 data-[side=left]:h-[calc(100svh-1rem)] data-[side=left]:w-[min(calc(100vw-1rem),420px)] data-[side=left]:rounded-[20px] data-[side=left]:data-ending-style:translate-x-8 data-[side=left]:data-starting-style:translate-x-8 data-[side=right]:inset-y-2 data-[side=right]:right-2 data-[side=right]:h-[calc(100svh-1rem)] data-[side=right]:w-[min(calc(100vw-1rem),420px)] data-[side=right]:rounded-[20px] data-[side=right]:data-ending-style:translate-x-8 data-[side=right]:data-starting-style:translate-x-8 data-[side=top]:inset-x-2 data-[side=top]:top-2 data-[side=top]:h-auto data-[side=top]:rounded-[20px] data-[side=top]:data-ending-style:translate-y-[-2rem] data-[side=top]:data-starting-style:translate-y-[-2rem]',
+          'fixed z-50 flex flex-col gap-4 border border-border/70 bg-background bg-clip-padding text-sm text-foreground shadow-xl outline-none transition duration-200 ease-out data-ending-style:opacity-0 data-starting-style:opacity-0 data-[side=bottom]:inset-x-2 data-[side=bottom]:bottom-2 data-[side=bottom]:h-auto data-[side=bottom]:rounded-[20px] data-[side=bottom]:data-ending-style:translate-y-8 data-[side=bottom]:data-starting-style:translate-y-8 data-[side=left]:inset-y-2 data-[side=left]:left-2 data-[side=left]:h-[calc(100svh-1rem)] data-[side=left]:w-[min(calc(100vw-1rem),420px)] data-[side=left]:rounded-[20px] data-[side=left]:data-ending-style:translate-x-8 data-[side=left]:data-starting-style:translate-x-8 data-[side=right]:inset-y-2 data-[side=right]:right-2 data-[side=right]:h-[calc(100svh-1rem)] data-[side=right]:w-[min(calc(100vw-1rem),420px)] data-[side=right]:rounded-[20px] data-[side=right]:data-ending-style:translate-x-8 data-[side=right]:data-starting-style:translate-x-8 data-[side=top]:inset-x-2 data-[side=top]:top-2 data-[side=top]:h-auto data-[side=top]:rounded-[20px] data-[side=top]:data-ending-style:-translate-y-8 data-[side=top]:data-starting-style:-translate-y-8',
           className
         )}
         {...props}
@@ -64,7 +64,7 @@ function SheetContent({
             render={
               <Button
                 variant="surface"
-                className="absolute top-4 right-4 border border-border/70 bg-background text-muted-foreground shadow-none hover:bg-[var(--default-button-soft-bg)] hover:text-foreground"
+                className="absolute top-4 right-4 border border-border/70 bg-background text-muted-foreground shadow-none hover:bg-(--default-button-soft-bg) hover:text-foreground"
                 size="icon-sm"
               />
             }
