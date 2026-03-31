@@ -9,6 +9,7 @@ const dirname =
   typeof __dirname !== 'undefined'
     ? __dirname
     : path.dirname(fileURLToPath(import.meta.url));
+
 const enableStorybookTests = process.env.STORYBOOK_TEST === '1';
 
 // More info at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon
@@ -16,6 +17,7 @@ export default defineConfig({
   plugins: [react()],
   test: {
     environment: 'jsdom',
+    globals: true,
     setupFiles: ['./vitest.setup.ts'],
     ...(enableStorybookTests
       ? {
@@ -49,27 +51,8 @@ export default defineConfig({
       : {}),
   },
   resolve: {
-    alias: [
-      {
-        find: /^@ordero\/ui\/components\/(.+)$/,
-        replacement: path.resolve(dirname, './src/components/$1'),
-      },
-      {
-        find: /^@ordero\/ui\/hooks\/(.+)$/,
-        replacement: path.resolve(dirname, './src/hooks/$1'),
-      },
-      {
-        find: /^@ordero\/ui\/lib\/(.+)$/,
-        replacement: path.resolve(dirname, './src/lib/$1'),
-      },
-      {
-        find: /^@ordero\/ui\/(.+)$/,
-        replacement: path.resolve(dirname, './src/$1'),
-      },
-      {
-        find: '@/ui',
-        replacement: path.resolve(dirname, './src'),
-      },
-    ],
+    alias: {
+      '@/ui': path.resolve(dirname, './src'),
+    },
   },
 });

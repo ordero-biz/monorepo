@@ -1,4 +1,4 @@
-import { cn } from '@ordero/ui/lib/utils';
+import { cn } from '../../lib/utils';
 import { TEXTAREA_DEFAULTS, textareaVariants } from './constants';
 import type { TextareaProps } from './types';
 

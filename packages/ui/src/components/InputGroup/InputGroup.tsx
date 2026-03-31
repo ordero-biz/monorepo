@@ -1,11 +1,11 @@
 'use client';
 
-import { Button } from '@ordero/ui/components/Button';
-import { Input } from '@ordero/ui/components/Input';
-import { Textarea } from '@ordero/ui/components/Textarea';
-import { cn } from '@ordero/ui/lib/utils';
 import type { VariantProps } from 'class-variance-authority';
-import type * as React from 'react';
+import type { ComponentProps } from 'react';
+import { cn } from '../../lib/utils';
+import { Button } from '../Button';
+import { Input } from '../Input';
+import { Textarea } from '../Textarea';
 import { inputGroupAddonVariants, inputGroupButtonVariants } from './constants';
 import type {
   InputGroupInputProps,
@@ -41,7 +41,7 @@ function InputGroupAddon({
   className,
   align = 'inline-start',
   ...props
-}: React.ComponentProps<'div'> & VariantProps<typeof inputGroupAddonVariants>) {
+}: ComponentProps<'div'> & VariantProps<typeof inputGroupAddonVariants>) {
   return (
     <div
       data-slot="input-group-addon"

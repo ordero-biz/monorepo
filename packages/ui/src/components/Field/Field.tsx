@@ -1,9 +1,9 @@
 'use client';
 
-import { Label } from '@ordero/ui/components/Label';
-import { Separator } from '@ordero/ui/components/Separator';
-import { cn } from '@ordero/ui/lib/utils';
 import { useMemo } from 'react';
+import { cn } from '../../lib/utils';
+import { Label } from '../Label';
+import { Separator } from '../Separator';
 import type {
   FieldContentProps,
   FieldDescriptionProps,
