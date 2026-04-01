@@ -31,3 +31,9 @@ Apply these conventions in touched files.
 ## 4. Prefer arrow functions
 
 - Prefer arrow functions for new functions in app code.
+
+## 5. Avoid React namespace usage
+
+- Do not reference the global React namespace for types (for example, `React.ReactNode`).
+- Do not use namespace imports like `import * as React from 'react'`.
+- Prefer direct type imports, for example `import type { ReactNode } from 'react'`.
