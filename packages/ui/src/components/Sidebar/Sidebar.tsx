@@ -5,13 +5,7 @@ import { useRender } from '@base-ui/react/use-render';
 import { Button } from '@ordero/ui/components/Button';
 import { Input } from '@ordero/ui/components/Input';
 import { Separator } from '@ordero/ui/components/Separator';
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from '@ordero/ui/components/Sheet';
+import { Sheet, SheetContent } from '@ordero/ui/components/Sheet';
 import { Skeleton } from '@ordero/ui/components/Skeleton';
 import {
   Tooltip,
@@ -21,12 +15,13 @@ import {
 import { useIsMobile } from '@ordero/ui/hooks/use-mobile';
 import { cn } from '@ordero/ui/lib/utils';
 import { cva, type VariantProps } from 'class-variance-authority';
-import { ChevronLeft } from 'lucide-react';
+import { ChevronLeft, X } from 'lucide-react';
 import {
   type ComponentProps,
   type CSSProperties,
   createContext,
   type MouseEvent,
+  type ReactElement,
   type TransitionEvent,
   useCallback,
   useContext,
@@ -230,10 +225,6 @@ function Sidebar({
             }
             side={side}
           >
-            <SheetHeader className="sr-only">
-              <SheetTitle>Sidebar</SheetTitle>
-              <SheetDescription>Displays the mobile sidebar.</SheetDescription>
-            </SheetHeader>
             <div className="flex h-full w-full flex-col">{children}</div>
           </SheetContent>
         </Sheet>
@@ -299,8 +290,9 @@ function Sidebar({
 function SidebarTrigger({
   className,
   onClick,
+  icon = null,
   ...props
-}: ComponentProps<typeof Button>) {
+}: ComponentProps<typeof Button & { icon: ReactElement }>) {
   const { state, toggleSidebar } = useSidebar();
 
   return (
@@ -322,12 +314,14 @@ function SidebarTrigger({
       }}
       {...props}
     >
-      <ChevronLeft
-        className={cn(
-          'transition-transform duration-200 ease-out',
-          state === 'collapsed' && 'rotate-180'
-        )}
-      />
+      {icon || (
+        <ChevronLeft
+          className={cn(
+            'transition-transform duration-200 ease-out',
+            state === 'collapsed' && 'rotate-180'
+          )}
+        />
+      )}
     </Button>
   );
 }
@@ -391,7 +385,12 @@ function SidebarHeader({ className, ...props }: ComponentProps<'div'>) {
       data-sidebar="header"
       className={cn('flex flex-col gap-2 px-3 pt-2.5 pb-2.5', className)}
       {...props}
-    />
+    >
+      <div className="flex items-center justify-between">
+        {props.children}
+        <SidebarTrigger icon={<X />} />
+      </div>
+    </div>
   );
 }
 
