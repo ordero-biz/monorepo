@@ -274,15 +274,6 @@ function Sidebar({
           {children}
         </div>
       </div>
-      <SidebarTrigger
-        data-side={side}
-        className={cn(
-          'absolute top-5 z-20 hidden md:flex',
-          side === 'left'
-            ? 'right-0 translate-x-1/2'
-            : 'left-0 -translate-x-1/2'
-        )}
-      />
     </div>
   );
 }
@@ -379,6 +370,8 @@ function SidebarInput({ className, ...props }: ComponentProps<typeof Input>) {
 }
 
 function SidebarHeader({ className, ...props }: ComponentProps<'div'>) {
+  const { isMobile } = useSidebar();
+
   return (
     <div
       data-slot="sidebar-header"
@@ -386,10 +379,20 @@ function SidebarHeader({ className, ...props }: ComponentProps<'div'>) {
       className={cn('flex flex-col gap-2 px-3 pt-2.5 pb-2.5', className)}
       {...props}
     >
-      <div className="flex items-center justify-between">
-        {props.children}
-        <SidebarTrigger icon={<X />} />
-      </div>
+      {isMobile && (
+        <div className="flex items-center justify-between">
+          {props.children}
+          <SidebarTrigger icon={<X />} />
+        </div>
+      )}
+      {!isMobile && (
+        <>
+          {props.children}
+          <SidebarTrigger
+            className={cn('absolute top-5 right-0 translate-x-1/2 z-10')}
+          />
+        </>
+      )}
     </div>
   );
 }

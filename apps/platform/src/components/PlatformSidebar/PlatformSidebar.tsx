@@ -71,7 +71,7 @@ export function PlatformSidebar({ children, title }: PlatformSidebarProps) {
       </Sidebar>
       <SidebarInset className="min-h-svh">
         {/*TODO: Create Header component*/}
-        <header className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b bg-background/95 px-4 backdrop-blur supports-backdrop-filter:bg-background/80 md:h-16 md:px-6">
+        <header className="sticky top-0 flex h-14 items-center gap-3 px-4 border-b bg-background/95  backdrop-blur supports-backdrop-filter:bg-background/80 md:h-16 md:px-6">
           {title && (
             <div className="min-w-0">
               <h1 className="truncate text-lg font-semibold tracking-[-0.01em] text-foreground md:text-xl">
