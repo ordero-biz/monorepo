@@ -1,0 +1,799 @@
+:root {
+  /* Component tokens imported from Figma JSON */
+
+  /* fab */
+  --figma-fab-icon: 24px;
+  --figma-fab-radius: var(--figma-radius-50);
+  --figma-fab-spacing: var(--figma-spacing-1);
+  --figma-fab-min-width: 40px;
+  --figma-fab-circular-sm-size: 40px;
+  --figma-fab-circular-md-size: 48px;
+  --figma-fab-circular-lg-size: 56px;
+  --figma-fab-extended-sm-px: 8px;
+  --figma-fab-extended-sm-height: 34px;
+  --figma-fab-extended-md-px: 16px;
+  --figma-fab-extended-md-height: 40px;
+  --figma-fab-extended-lg-px: 16px;
+  --figma-fab-extended-lg-height: 48px;
+
+  /* tabs */
+  --figma-tabs-item-px: 16px;
+  --figma-tabs-item-spacing: var(--figma-spacing-1);
+  --figma-tabs-item-min-width: 48px;
+  --figma-tabs-item-min-height: 48px;
+  --figma-tabs-list-spacing: var(--figma-spacing-5);
+  --figma-tabs-mobile-list-spacing: var(--figma-spacing-3);
+
+  /* alert */
+  --figma-alert-pl: 16px;
+  --figma-alert-pr: 8px;
+  --figma-alert-py: 6px;
+  --figma-alert-icon: 24px;
+  --figma-alert-radius: var(--figma-radius-1);
+  --figma-alert-spacing: var(--figma-spacing-1-5);
+
+  /* radio */
+  --figma-radio-p: 8px;
+  --figma-radio-sm-icon: 20px;
+  --figma-radio-md-icon: 24px;
+
+  /* label */
+  --figma-label-px: 6px;
+  --figma-label-icon: 16px;
+  --figma-label-radius: var(--figma-radius-0-75);
+  --figma-label-height: 24px;
+  --figma-label-spacing: var(--figma-spacing-0-75);
+  --figma-label-min-width: 24px;
+
+  /* chip */
+  --figma-chip-spacing: -2px;
+  --figma-chip-close-icon: 20px;
+  --figma-chip-sm-radius: var(--figma-radius-1);
+  --figma-chip-sm-px: 3px;
+  --figma-chip-sm-icon: 18px;
+  --figma-chip-sm-height: 24px;
+  --figma-chip-sm-spacing: 5px;
+  --figma-chip-md-radius: var(--figma-radius-1-25);
+  --figma-chip-md-px: 4px;
+  --figma-chip-md-icon: 24px;
+  --figma-chip-md-height: 32px;
+  --figma-chip-md-spacing: 8px;
+
+  /* card */
+  --figma-card-radius: var(--figma-radius-2);
+  --figma-card-header-pl: var(--figma-spacing-3);
+  --figma-card-header-pr: var(--figma-spacing-2);
+  --figma-card-header-py: var(--figma-spacing-3);
+  --figma-card-header-spacing: var(--figma-spacing-2);
+  --figma-card-content-p: var(--figma-spacing-3);
+
+  /* rating */
+  --figma-rating-spacing: var(--figma-spacing-1);
+  --figma-rating-sm-icon: 20px;
+  --figma-rating-md-icon: 24px;
+  --figma-rating-lg-icon: 28px;
+
+  /* button */
+  --figma-button-radius: var(--figma-radius-1);
+  --figma-button-spacing: var(--figma-spacing-1);
+  --figma-button-min-width: 64px;
+  --figma-button-sm-px: 8px;
+  --figma-button-sm-icon: 18px;
+  --figma-button-sm-height: 30px;
+  --figma-button-md-px: 12px;
+  --figma-button-md-icon: 20px;
+  --figma-button-md-height: 36px;
+  --figma-button-lg-px: 16px;
+  --figma-button-lg-icon: 24px;
+  --figma-button-lg-height: 48px;
+  --figma-button-text-variant-sm-px: 4px;
+  --figma-button-text-variant-md-px: 8px;
+  --figma-button-text-variant-lg-px: 10px;
+
+  /* dialog */
+  --figma-dialog-radius: var(--figma-radius-2);
+  --figma-dialog-content-px: var(--figma-spacing-3);
+  --figma-dialog-header-pl: 24px;
+  --figma-dialog-header-pr: 12px;
+  --figma-dialog-header-py: 24px;
+  --figma-dialog-header-spacing: var(--figma-spacing-2);
+  --figma-dialog-action-px: var(--figma-spacing-3);
+  --figma-dialog-action-py: var(--figma-spacing-3);
+  --figma-dialog-action-spacing: var(--figma-spacing-1-5);
+
+  /* switch */
+  --figma-switch-p: 3px;
+  --figma-switch-sm-spacing: 7px;
+  --figma-switch-sm-width: 25px;
+  --figma-switch-sm-height: 24px;
+  --figma-switch-md-spacing: 9px;
+  --figma-switch-md-width: 33px;
+  --figma-switch-md-height: 38px;
+
+  /* menu */
+  --figma-menu-item-radius: var(--figma-radius-0-75);
+  --figma-menu-item-px: 8px;
+  --figma-menu-item-py: 6px;
+  --figma-menu-item-spacing: var(--figma-spacing-1);
+  --figma-menu-list-p: 4px;
+  --figma-menu-list-spacing: var(--figma-spacing-0-5);
+
+  /* slider */
+  --figma-slider-marks-color: var(--figma-grey-48);
+  --figma-slider-label-px: 6px;
+  --figma-slider-label-py: 3px;
+  --figma-slider-rail-bgcolor: var(--figma-grey-12);
+  --figma-slider-rail-radius: var(--figma-radius-50);
+  --figma-slider-rail-sm-height: 6px;
+  --figma-slider-rail-md-height: 10px;
+  --figma-slider-thumb-sm-size: 16px;
+  --figma-slider-thumb-md-size: 20px;
+
+  /* avatar */
+  --figma-avatar-rounded-radius: var(--figma-radius-1-5);
+  --figma-avatar-group-sm-spacing: -4px;
+  --figma-avatar-group-md-spacing: -6px;
+  --figma-avatar-group-lg-spacing: -10px;
+
+  /* badge */
+  --figma-badge-dot-size: 10px;
+  --figma-badge-standard-px: 6px;
+  --figma-badge-standard-size: 20px;
+  --figma-badge-status-sm-size: 8px;
+  --figma-badge-status-md-size: 10px;
+  --figma-badge-status-lg-size: 12px;
+
+  /* tooltip */
+  --figma-tooltip-py: 3px;
+  --figma-tooltip-px: 6px;
+
+  /* textarea */
+  --figma-textarea-min-height: 98px;
+  --figma-textarea-outlined-px: 14px;
+  --figma-textarea-outlined-py: 16px;
+  --figma-textarea-filled-spacing: var(--figma-spacing-0-75);
+  --figma-textarea-filled-px: 12px;
+  --figma-textarea-filled-py: 16px;
+  --figma-textarea-filled-has-value-py: 10px;
+  --figma-textarea-standard-spacing: var(--figma-spacing-1);
+  --figma-textarea-standard-pr: 12px;
+  --figma-textarea-standard-pt: 20px;
+  --figma-textarea-standard-has-value-pt: 3px;
+
+  /* snackbar */
+  --figma-snackbar-pl: 4px;
+  --figma-snackbar-pr: 8px;
+  --figma-snackbar-py: 4px;
+  --figma-snackbar-radius: var(--figma-radius-1-5);
+  --figma-snackbar-spacing: var(--figma-spacing-1-5);
+
+  /* list-item */
+  --figma-list-item-px: 8px;
+  --figma-list-item-py: 8px;
+  --figma-list-item-spacing: var(--figma-spacing-2);
+
+  /* checkbox */
+  --figma-checkbox-p: 8px;
+  --figma-checkbox-sm-icon: 20px;
+  --figma-checkbox-md-icon: 24px;
+
+  /* textfield */
+  --figma-textfield-sm-height: 45px;
+  --figma-textfield-md-height: 53px;
+  --figma-textfield-select-arrow-mr: 10px;
+  --figma-textfield-select-arrow-icon: 20px;
+  --figma-textfield-start-adornment-mr: 8px;
+  --figma-textfield-filled-pl: 12px;
+  --figma-textfield-filled-pr: 10px;
+  --figma-textfield-filled-radius: var(--figma-radius-1);
+  --figma-textfield-outlined-px: 14px;
+  --figma-textfield-outlined-radius: var(--figma-radius-1);
+  --figma-textfield-outlined-sm-height: 40px;
+  --figma-textfield-outlined-md-height: 54px;
+  --figma-textfield-standard-input-pb: 4px;
+  --figma-textfield-standard-sm-height: 42px;
+  --figma-textfield-standard-md-height: 45px;
+  --figma-textfield-standard-input-sm-pt: 1px;
+  --figma-textfield-standard-input-md-pt: 3px;
+
+  /* progress */
+  --figma-progress-circular-size: 44px;
+  --figma-progress-linear-radius: var(--figma-radius-2);
+  --figma-progress-linear-spacing: var(--figma-spacing-1);
+  --figma-progress-linear-height: 4px;
+
+  /* accordion */
+  --figma-accordion-radius: var(--figma-radius-1-5);
+  --figma-accordion-summary-pl: var(--figma-spacing-2);
+  --figma-accordion-summary-pr: var(--figma-spacing-1);
+  --figma-accordion-summary-py: var(--figma-spacing-2);
+  --figma-accordion-details-pt: var(--figma-spacing-1);
+  --figma-accordion-details-pb: var(--figma-spacing-2);
+  --figma-accordion-details-px: var(--figma-spacing-2);
+
+  /* pagination */
+  --figma-pagination-item-circular-radius: var(--figma-radius-50);
+  --figma-pagination-item-rounded-radius: var(--figma-radius-1);
+  --figma-pagination-item-sm-size: 26px;
+  --figma-pagination-item-sm-spacing: var(--figma-spacing-2);
+  --figma-pagination-item-md-size: 32px;
+  --figma-pagination-item-md-spacing: var(--figma-spacing-0-75);
+  --figma-pagination-item-lg-size: 40px;
+  --figma-pagination-item-lg-spacing: var(--figma-spacing-0-75);
+
+  /* icon-button */
+  --figma-icon-button-radius: var(--figma-radius-50);
+  --figma-icon-button-xs-icon: 18px;
+  --figma-icon-button-xs-size: 28px;
+  --figma-icon-button-sm-icon: 20px;
+  --figma-icon-button-sm-size: 36px;
+  --figma-icon-button-md-icon: 24px;
+  --figma-icon-button-sizesize: 40px;
+  --figma-icon-button-lg-icon: 32px;
+  --figma-icon-button-lg-size: 48px;
+
+  /* button-group */
+  --figma-button-group-radius: var(--figma-radius-1);
+  --figma-button-group-sm-spacing: var(--figma-spacing-1-5);
+  --figma-button-group-md-spacing: var(--figma-spacing-2);
+  --figma-button-group-lg-spacing: var(--figma-spacing-2-5);
+  --figma-button-group-vertical-sm-px: 12px;
+  --figma-button-group-vertical-md-px: 16px;
+  --figma-button-group-vertical-lg-px: 20px;
+  --figma-button-group-horizontal-sm-px: 12px;
+  --figma-button-group-horizontal-md-px: 16px;
+  --figma-button-group-horizontal-lg-px: 20px;
+
+  /* toggle-button */
+  --figma-toggle-button-radius: var(--figma-radius-1);
+  --figma-toggle-button-spacing: var(--figma-spacing-1);
+  --figma-toggle-button-standalone-sm-p: var(--figma-spacing-1);
+  --figma-toggle-button-standalone-sm-size: 36px;
+  --figma-toggle-button-standalone-sm-icon: 20px;
+  --figma-toggle-button-standalone-md-p: var(--figma-spacing-1-5);
+  --figma-toggle-button-standalone-md-size: 48px;
+  --figma-toggle-button-standalone-md-icon: 24px;
+  --figma-toggle-button-standalone-lg-p: var(--figma-spacing-2);
+  --figma-toggle-button-standalone-lg-size: 56px;
+  --figma-toggle-button-standalone-lg-icon: 24px;
+  --figma-toggle-button-group-p: 4px;
+  --figma-toggle-button-group-spacing: var(--figma-spacing-0-5);
+
+  /* form-helper-text */
+  --figma-form-helper-text-pl: 12px;
+  --figma-form-helper-text-pt: 8px;
+  --figma-form-helper-text-icon: 16px;
+  --figma-form-helper-text-spacing: var(--figma-spacing-0-5);
+
+  /* fab bridge */
+  --fab-icon-token: var(--figma-fab-icon);
+  --fab-radius-token: var(--figma-fab-radius);
+  --fab-spacing-token: var(--figma-fab-spacing);
+  --fab-min-width-token: var(--figma-fab-min-width);
+  --fab-circular-sm-size-token: var(--figma-fab-circular-sm-size);
+  --fab-circular-md-size-token: var(--figma-fab-circular-md-size);
+  --fab-circular-lg-size-token: var(--figma-fab-circular-lg-size);
+  --fab-extended-sm-px-token: var(--figma-fab-extended-sm-px);
+  --fab-extended-sm-height-token: var(--figma-fab-extended-sm-height);
+  --fab-extended-md-px-token: var(--figma-fab-extended-md-px);
+  --fab-extended-md-height-token: var(--figma-fab-extended-md-height);
+  --fab-extended-lg-px-token: var(--figma-fab-extended-lg-px);
+  --fab-extended-lg-height-token: var(--figma-fab-extended-lg-height);
+
+  /* tabs bridge */
+  --tabs-item-px-token: var(--figma-tabs-item-px);
+  --tabs-item-spacing-token: var(--figma-tabs-item-spacing);
+  --tabs-item-min-width-token: var(--figma-tabs-item-min-width);
+  --tabs-item-min-height-token: var(--figma-tabs-item-min-height);
+  --tabs-list-spacing-token: var(--figma-tabs-list-spacing);
+  --tabs-mobile-list-spacing-token: var(--figma-tabs-mobile-list-spacing);
+
+  /* alert bridge */
+  --alert-pl-token: var(--figma-alert-pl);
+  --alert-pr-token: var(--figma-alert-pr);
+  --alert-py-token: var(--figma-alert-py);
+  --alert-icon-token: var(--figma-alert-icon);
+  --alert-radius-token: var(--figma-alert-radius);
+  --alert-spacing-token: var(--figma-alert-spacing);
+
+  /* radio bridge */
+  --radio-p-token: var(--figma-radio-p);
+  --radio-sm-icon-token: var(--figma-radio-sm-icon);
+  --radio-md-icon-token: var(--figma-radio-md-icon);
+
+  /* label bridge */
+  --label-px-token: var(--figma-label-px);
+  --label-icon-token: var(--figma-label-icon);
+  --label-radius-token: var(--figma-label-radius);
+  --label-height-token: var(--figma-label-height);
+  --label-spacing-token: var(--figma-label-spacing);
+  --label-min-width-token: var(--figma-label-min-width);
+
+  /* chip bridge */
+  --chip-spacing-token: var(--figma-chip-spacing);
+  --chip-close-icon-token: var(--figma-chip-close-icon);
+  --chip-sm-radius-token: var(--figma-chip-sm-radius);
+  --chip-sm-px-token: var(--figma-chip-sm-px);
+  --chip-sm-icon-token: var(--figma-chip-sm-icon);
+  --chip-sm-height-token: var(--figma-chip-sm-height);
+  --chip-sm-spacing-token: var(--figma-chip-sm-spacing);
+  --chip-md-radius-token: var(--figma-chip-md-radius);
+  --chip-md-px-token: var(--figma-chip-md-px);
+  --chip-md-icon-token: var(--figma-chip-md-icon);
+  --chip-md-height-token: var(--figma-chip-md-height);
+  --chip-md-spacing-token: var(--figma-chip-md-spacing);
+
+  /* card bridge */
+  --card-radius-token: var(--figma-card-radius);
+  --card-header-pl-token: var(--figma-card-header-pl);
+  --card-header-pr-token: var(--figma-card-header-pr);
+  --card-header-py-token: var(--figma-card-header-py);
+  --card-header-spacing-token: var(--figma-card-header-spacing);
+  --card-content-p-token: var(--figma-card-content-p);
+
+  /* rating bridge */
+  --rating-spacing-token: var(--figma-rating-spacing);
+  --rating-sm-icon-token: var(--figma-rating-sm-icon);
+  --rating-md-icon-token: var(--figma-rating-md-icon);
+  --rating-lg-icon-token: var(--figma-rating-lg-icon);
+
+  /* button bridge */
+  --button-radius-token: var(--figma-button-radius);
+  --button-spacing-token: var(--figma-button-spacing);
+  --button-min-width-token: var(--figma-button-min-width);
+  --button-sm-px-token: var(--figma-button-sm-px);
+  --button-sm-icon-token: var(--figma-button-sm-icon);
+  --button-sm-height-token: var(--figma-button-sm-height);
+  --button-md-px-token: var(--figma-button-md-px);
+  --button-md-icon-token: var(--figma-button-md-icon);
+  --button-md-height-token: var(--figma-button-md-height);
+  --button-lg-px-token: var(--figma-button-lg-px);
+  --button-lg-icon-token: var(--figma-button-lg-icon);
+  --button-lg-height-token: var(--figma-button-lg-height);
+  --button-text-variant-sm-px-token: var(--figma-button-text-variant-sm-px);
+  --button-text-variant-md-px-token: var(--figma-button-text-variant-md-px);
+  --button-text-variant-lg-px-token: var(--figma-button-text-variant-lg-px);
+
+  /* dialog bridge */
+  --dialog-radius-token: var(--figma-dialog-radius);
+  --dialog-content-px-token: var(--figma-dialog-content-px);
+  --dialog-header-pl-token: var(--figma-dialog-header-pl);
+  --dialog-header-pr-token: var(--figma-dialog-header-pr);
+  --dialog-header-py-token: var(--figma-dialog-header-py);
+  --dialog-header-spacing-token: var(--figma-dialog-header-spacing);
+  --dialog-action-px-token: var(--figma-dialog-action-px);
+  --dialog-action-py-token: var(--figma-dialog-action-py);
+  --dialog-action-spacing-token: var(--figma-dialog-action-spacing);
+
+  /* switch bridge */
+  --switch-p-token: var(--figma-switch-p);
+  --switch-sm-spacing-token: var(--figma-switch-sm-spacing);
+  --switch-sm-width-token: var(--figma-switch-sm-width);
+  --switch-sm-height-token: var(--figma-switch-sm-height);
+  --switch-md-spacing-token: var(--figma-switch-md-spacing);
+  --switch-md-width-token: var(--figma-switch-md-width);
+  --switch-md-height-token: var(--figma-switch-md-height);
+
+  /* menu bridge */
+  --menu-item-radius-token: var(--figma-menu-item-radius);
+  --menu-item-px-token: var(--figma-menu-item-px);
+  --menu-item-py-token: var(--figma-menu-item-py);
+  --menu-item-spacing-token: var(--figma-menu-item-spacing);
+  --menu-list-p-token: var(--figma-menu-list-p);
+  --menu-list-spacing-token: var(--figma-menu-list-spacing);
+
+  /* slider bridge */
+  --slider-marks-color-token: var(--figma-slider-marks-color);
+  --slider-label-px-token: var(--figma-slider-label-px);
+  --slider-label-py-token: var(--figma-slider-label-py);
+  --slider-rail-bgcolor-token: var(--figma-slider-rail-bgcolor);
+  --slider-rail-radius-token: var(--figma-slider-rail-radius);
+  --slider-rail-sm-height-token: var(--figma-slider-rail-sm-height);
+  --slider-rail-md-height-token: var(--figma-slider-rail-md-height);
+  --slider-thumb-sm-size-token: var(--figma-slider-thumb-sm-size);
+  --slider-thumb-md-size-token: var(--figma-slider-thumb-md-size);
+
+  /* avatar bridge */
+  --avatar-rounded-radius-token: var(--figma-avatar-rounded-radius);
+  --avatar-group-sm-spacing-token: var(--figma-avatar-group-sm-spacing);
+  --avatar-group-md-spacing-token: var(--figma-avatar-group-md-spacing);
+  --avatar-group-lg-spacing-token: var(--figma-avatar-group-lg-spacing);
+
+  /* badge bridge */
+  --badge-dot-size-token: var(--figma-badge-dot-size);
+  --badge-standard-px-token: var(--figma-badge-standard-px);
+  --badge-standard-size-token: var(--figma-badge-standard-size);
+  --badge-status-sm-size-token: var(--figma-badge-status-sm-size);
+  --badge-status-md-size-token: var(--figma-badge-status-md-size);
+  --badge-status-lg-size-token: var(--figma-badge-status-lg-size);
+
+  /* tooltip bridge */
+  --tooltip-py-token: var(--figma-tooltip-py);
+  --tooltip-px-token: var(--figma-tooltip-px);
+
+  /* textarea bridge */
+  --textarea-min-height-token: var(--figma-textarea-min-height);
+  --textarea-outlined-px-token: var(--figma-textarea-outlined-px);
+  --textarea-outlined-py-token: var(--figma-textarea-outlined-py);
+  --textarea-filled-spacing-token: var(--figma-textarea-filled-spacing);
+  --textarea-filled-px-token: var(--figma-textarea-filled-px);
+  --textarea-filled-py-token: var(--figma-textarea-filled-py);
+  --textarea-filled-has-value-py-token: var(--figma-textarea-filled-has-value-py);
+  --textarea-standard-spacing-token: var(--figma-textarea-standard-spacing);
+  --textarea-standard-pr-token: var(--figma-textarea-standard-pr);
+  --textarea-standard-pt-token: var(--figma-textarea-standard-pt);
+  --textarea-standard-has-value-pt-token: var(--figma-textarea-standard-has-value-pt);
+
+  /* snackbar bridge */
+  --snackbar-pl-token: var(--figma-snackbar-pl);
+  --snackbar-pr-token: var(--figma-snackbar-pr);
+  --snackbar-py-token: var(--figma-snackbar-py);
+  --snackbar-radius-token: var(--figma-snackbar-radius);
+  --snackbar-spacing-token: var(--figma-snackbar-spacing);
+
+  /* list-item bridge */
+  --list-item-px-token: var(--figma-list-item-px);
+  --list-item-py-token: var(--figma-list-item-py);
+  --list-item-spacing-token: var(--figma-list-item-spacing);
+
+  /* checkbox bridge */
+  --checkbox-p-token: var(--figma-checkbox-p);
+  --checkbox-sm-icon-token: var(--figma-checkbox-sm-icon);
+  --checkbox-md-icon-token: var(--figma-checkbox-md-icon);
+
+  /* textfield bridge */
+  --textfield-sm-height-token: var(--figma-textfield-sm-height);
+  --textfield-md-height-token: var(--figma-textfield-md-height);
+  --textfield-select-arrow-mr-token: var(--figma-textfield-select-arrow-mr);
+  --textfield-select-arrow-icon-token: var(--figma-textfield-select-arrow-icon);
+  --textfield-start-adornment-mr-token: var(--figma-textfield-start-adornment-mr);
+  --textfield-filled-pl-token: var(--figma-textfield-filled-pl);
+  --textfield-filled-pr-token: var(--figma-textfield-filled-pr);
+  --textfield-filled-radius-token: var(--figma-textfield-filled-radius);
+  --textfield-outlined-px-token: var(--figma-textfield-outlined-px);
+  --textfield-outlined-radius-token: var(--figma-textfield-outlined-radius);
+  --textfield-outlined-sm-height-token: var(--figma-textfield-outlined-sm-height);
+  --textfield-outlined-md-height-token: var(--figma-textfield-outlined-md-height);
+  --textfield-standard-input-pb-token: var(--figma-textfield-standard-input-pb);
+  --textfield-standard-sm-height-token: var(--figma-textfield-standard-sm-height);
+  --textfield-standard-md-height-token: var(--figma-textfield-standard-md-height);
+  --textfield-standard-input-sm-pt-token: var(--figma-textfield-standard-input-sm-pt);
+  --textfield-standard-input-md-pt-token: var(--figma-textfield-standard-input-md-pt);
+
+  /* progress bridge */
+  --progress-circular-size-token: var(--figma-progress-circular-size);
+  --progress-linear-radius-token: var(--figma-progress-linear-radius);
+  --progress-linear-spacing-token: var(--figma-progress-linear-spacing);
+  --progress-linear-height-token: var(--figma-progress-linear-height);
+
+  /* accordion bridge */
+  --accordion-radius-token: var(--figma-accordion-radius);
+  --accordion-summary-pl-token: var(--figma-accordion-summary-pl);
+  --accordion-summary-pr-token: var(--figma-accordion-summary-pr);
+  --accordion-summary-py-token: var(--figma-accordion-summary-py);
+  --accordion-details-pt-token: var(--figma-accordion-details-pt);
+  --accordion-details-pb-token: var(--figma-accordion-details-pb);
+  --accordion-details-px-token: var(--figma-accordion-details-px);
+
+  /* pagination bridge */
+  --pagination-item-circular-radius-token: var(--figma-pagination-item-circular-radius);
+  --pagination-item-rounded-radius-token: var(--figma-pagination-item-rounded-radius);
+  --pagination-item-sm-size-token: var(--figma-pagination-item-sm-size);
+  --pagination-item-sm-spacing-token: var(--figma-pagination-item-sm-spacing);
+  --pagination-item-md-size-token: var(--figma-pagination-item-md-size);
+  --pagination-item-md-spacing-token: var(--figma-pagination-item-md-spacing);
+  --pagination-item-lg-size-token: var(--figma-pagination-item-lg-size);
+  --pagination-item-lg-spacing-token: var(--figma-pagination-item-lg-spacing);
+
+  /* icon-button bridge */
+  --icon-button-radius-token: var(--figma-icon-button-radius);
+  --icon-button-xs-icon-token: var(--figma-icon-button-xs-icon);
+  --icon-button-xs-size-token: var(--figma-icon-button-xs-size);
+  --icon-button-sm-icon-token: var(--figma-icon-button-sm-icon);
+  --icon-button-sm-size-token: var(--figma-icon-button-sm-size);
+  --icon-button-md-icon-token: var(--figma-icon-button-md-icon);
+  --icon-button-sizesize-token: var(--figma-icon-button-sizesize);
+  --icon-button-lg-icon-token: var(--figma-icon-button-lg-icon);
+  --icon-button-lg-size-token: var(--figma-icon-button-lg-size);
+
+  /* button-group bridge */
+  --button-group-radius-token: var(--figma-button-group-radius);
+  --button-group-sm-spacing-token: var(--figma-button-group-sm-spacing);
+  --button-group-md-spacing-token: var(--figma-button-group-md-spacing);
+  --button-group-lg-spacing-token: var(--figma-button-group-lg-spacing);
+  --button-group-vertical-sm-px-token: var(--figma-button-group-vertical-sm-px);
+  --button-group-vertical-md-px-token: var(--figma-button-group-vertical-md-px);
+  --button-group-vertical-lg-px-token: var(--figma-button-group-vertical-lg-px);
+  --button-group-horizontal-sm-px-token: var(--figma-button-group-horizontal-sm-px);
+  --button-group-horizontal-md-px-token: var(--figma-button-group-horizontal-md-px);
+  --button-group-horizontal-lg-px-token: var(--figma-button-group-horizontal-lg-px);
+
+  /* toggle-button bridge */
+  --toggle-button-radius-token: var(--figma-toggle-button-radius);
+  --toggle-button-spacing-token: var(--figma-toggle-button-spacing);
+  --toggle-button-standalone-sm-p-token: var(--figma-toggle-button-standalone-sm-p);
+  --toggle-button-standalone-sm-size-token: var(--figma-toggle-button-standalone-sm-size);
+  --toggle-button-standalone-sm-icon-token: var(--figma-toggle-button-standalone-sm-icon);
+  --toggle-button-standalone-md-p-token: var(--figma-toggle-button-standalone-md-p);
+  --toggle-button-standalone-md-size-token: var(--figma-toggle-button-standalone-md-size);
+  --toggle-button-standalone-md-icon-token: var(--figma-toggle-button-standalone-md-icon);
+  --toggle-button-standalone-lg-p-token: var(--figma-toggle-button-standalone-lg-p);
+  --toggle-button-standalone-lg-size-token: var(--figma-toggle-button-standalone-lg-size);
+  --toggle-button-standalone-lg-icon-token: var(--figma-toggle-button-standalone-lg-icon);
+  --toggle-button-group-p-token: var(--figma-toggle-button-group-p);
+  --toggle-button-group-spacing-token: var(--figma-toggle-button-group-spacing);
+
+  /* form-helper-text bridge */
+  --form-helper-text-pl-token: var(--figma-form-helper-text-pl);
+  --form-helper-text-pt-token: var(--figma-form-helper-text-pt);
+  --form-helper-text-icon-token: var(--figma-form-helper-text-icon);
+  --form-helper-text-spacing-token: var(--figma-form-helper-text-spacing);
+}
+
+@theme inline {
+  /* Component token exports */
+
+  /* fab */
+  --fab-icon: var(--fab-icon-token);
+  --fab-radius: var(--fab-radius-token);
+  --fab-spacing: var(--fab-spacing-token);
+  --fab-min-width: var(--fab-min-width-token);
+  --fab-circular-sm-size: var(--fab-circular-sm-size-token);
+  --fab-circular-md-size: var(--fab-circular-md-size-token);
+  --fab-circular-lg-size: var(--fab-circular-lg-size-token);
+  --fab-extended-sm-px: var(--fab-extended-sm-px-token);
+  --fab-extended-sm-height: var(--fab-extended-sm-height-token);
+  --fab-extended-md-px: var(--fab-extended-md-px-token);
+  --fab-extended-md-height: var(--fab-extended-md-height-token);
+  --fab-extended-lg-px: var(--fab-extended-lg-px-token);
+  --fab-extended-lg-height: var(--fab-extended-lg-height-token);
+
+  /* tabs */
+  --tabs-item-px: var(--tabs-item-px-token);
+  --tabs-item-spacing: var(--tabs-item-spacing-token);
+  --tabs-item-min-width: var(--tabs-item-min-width-token);
+  --tabs-item-min-height: var(--tabs-item-min-height-token);
+  --tabs-list-spacing: var(--tabs-list-spacing-token);
+  --tabs-mobile-list-spacing: var(--tabs-mobile-list-spacing-token);
+
+  /* alert */
+  --alert-pl: var(--alert-pl-token);
+  --alert-pr: var(--alert-pr-token);
+  --alert-py: var(--alert-py-token);
+  --alert-icon: var(--alert-icon-token);
+  --alert-radius: var(--alert-radius-token);
+  --alert-spacing: var(--alert-spacing-token);
+
+  /* radio */
+  --radio-p: var(--radio-p-token);
+  --radio-sm-icon: var(--radio-sm-icon-token);
+  --radio-md-icon: var(--radio-md-icon-token);
+
+  /* label */
+  --label-px: var(--label-px-token);
+  --label-icon: var(--label-icon-token);
+  --label-radius: var(--label-radius-token);
+  --label-height: var(--label-height-token);
+  --label-spacing: var(--label-spacing-token);
+  --label-min-width: var(--label-min-width-token);
+
+  /* chip */
+  --chip-spacing: var(--chip-spacing-token);
+  --chip-close-icon: var(--chip-close-icon-token);
+  --chip-sm-radius: var(--chip-sm-radius-token);
+  --chip-sm-px: var(--chip-sm-px-token);
+  --chip-sm-icon: var(--chip-sm-icon-token);
+  --chip-sm-height: var(--chip-sm-height-token);
+  --chip-sm-spacing: var(--chip-sm-spacing-token);
+  --chip-md-radius: var(--chip-md-radius-token);
+  --chip-md-px: var(--chip-md-px-token);
+  --chip-md-icon: var(--chip-md-icon-token);
+  --chip-md-height: var(--chip-md-height-token);
+  --chip-md-spacing: var(--chip-md-spacing-token);
+
+  /* card */
+  --card-radius: var(--card-radius-token);
+  --card-header-pl: var(--card-header-pl-token);
+  --card-header-pr: var(--card-header-pr-token);
+  --card-header-py: var(--card-header-py-token);
+  --card-header-spacing: var(--card-header-spacing-token);
+  --card-content-p: var(--card-content-p-token);
+
+  /* rating */
+  --rating-spacing: var(--rating-spacing-token);
+  --rating-sm-icon: var(--rating-sm-icon-token);
+  --rating-md-icon: var(--rating-md-icon-token);
+  --rating-lg-icon: var(--rating-lg-icon-token);
+
+  /* button */
+  --button-radius: var(--button-radius-token);
+  --button-spacing: var(--button-spacing-token);
+  --button-min-width: var(--button-min-width-token);
+  --button-sm-px: var(--button-sm-px-token);
+  --button-sm-icon: var(--button-sm-icon-token);
+  --button-sm-height: var(--button-sm-height-token);
+  --button-md-px: var(--button-md-px-token);
+  --button-md-icon: var(--button-md-icon-token);
+  --button-md-height: var(--button-md-height-token);
+  --button-lg-px: var(--button-lg-px-token);
+  --button-lg-icon: var(--button-lg-icon-token);
+  --button-lg-height: var(--button-lg-height-token);
+  --button-text-variant-sm-px: var(--button-text-variant-sm-px-token);
+  --button-text-variant-md-px: var(--button-text-variant-md-px-token);
+  --button-text-variant-lg-px: var(--button-text-variant-lg-px-token);
+
+  /* dialog */
+  --dialog-radius: var(--dialog-radius-token);
+  --dialog-content-px: var(--dialog-content-px-token);
+  --dialog-header-pl: var(--dialog-header-pl-token);
+  --dialog-header-pr: var(--dialog-header-pr-token);
+  --dialog-header-py: var(--dialog-header-py-token);
+  --dialog-header-spacing: var(--dialog-header-spacing-token);
+  --dialog-action-px: var(--dialog-action-px-token);
+  --dialog-action-py: var(--dialog-action-py-token);
+  --dialog-action-spacing: var(--dialog-action-spacing-token);
+
+  /* switch */
+  --switch-p: var(--switch-p-token);
+  --switch-sm-spacing: var(--switch-sm-spacing-token);
+  --switch-sm-width: var(--switch-sm-width-token);
+  --switch-sm-height: var(--switch-sm-height-token);
+  --switch-md-spacing: var(--switch-md-spacing-token);
+  --switch-md-width: var(--switch-md-width-token);
+  --switch-md-height: var(--switch-md-height-token);
+
+  /* menu */
+  --menu-item-radius: var(--menu-item-radius-token);
+  --menu-item-px: var(--menu-item-px-token);
+  --menu-item-py: var(--menu-item-py-token);
+  --menu-item-spacing: var(--menu-item-spacing-token);
+  --menu-list-p: var(--menu-list-p-token);
+  --menu-list-spacing: var(--menu-list-spacing-token);
+
+  /* slider */
+  --slider-marks-color: var(--slider-marks-color-token);
+  --slider-label-px: var(--slider-label-px-token);
+  --slider-label-py: var(--slider-label-py-token);
+  --slider-rail-bgcolor: var(--slider-rail-bgcolor-token);
+  --slider-rail-radius: var(--slider-rail-radius-token);
+  --slider-rail-sm-height: var(--slider-rail-sm-height-token);
+  --slider-rail-md-height: var(--slider-rail-md-height-token);
+  --slider-thumb-sm-size: var(--slider-thumb-sm-size-token);
+  --slider-thumb-md-size: var(--slider-thumb-md-size-token);
+
+  /* avatar */
+  --avatar-rounded-radius: var(--avatar-rounded-radius-token);
+  --avatar-group-sm-spacing: var(--avatar-group-sm-spacing-token);
+  --avatar-group-md-spacing: var(--avatar-group-md-spacing-token);
+  --avatar-group-lg-spacing: var(--avatar-group-lg-spacing-token);
+
+  /* badge */
+  --badge-dot-size: var(--badge-dot-size-token);
+  --badge-standard-px: var(--badge-standard-px-token);
+  --badge-standard-size: var(--badge-standard-size-token);
+  --badge-status-sm-size: var(--badge-status-sm-size-token);
+  --badge-status-md-size: var(--badge-status-md-size-token);
+  --badge-status-lg-size: var(--badge-status-lg-size-token);
+
+  /* tooltip */
+  --tooltip-py: var(--tooltip-py-token);
+  --tooltip-px: var(--tooltip-px-token);
+
+  /* textarea */
+  --textarea-min-height: var(--textarea-min-height-token);
+  --textarea-outlined-px: var(--textarea-outlined-px-token);
+  --textarea-outlined-py: var(--textarea-outlined-py-token);
+  --textarea-filled-spacing: var(--textarea-filled-spacing-token);
+  --textarea-filled-px: var(--textarea-filled-px-token);
+  --textarea-filled-py: var(--textarea-filled-py-token);
+  --textarea-filled-has-value-py: var(--textarea-filled-has-value-py-token);
+  --textarea-standard-spacing: var(--textarea-standard-spacing-token);
+  --textarea-standard-pr: var(--textarea-standard-pr-token);
+  --textarea-standard-pt: var(--textarea-standard-pt-token);
+  --textarea-standard-has-value-pt: var(--textarea-standard-has-value-pt-token);
+
+  /* snackbar */
+  --snackbar-pl: var(--snackbar-pl-token);
+  --snackbar-pr: var(--snackbar-pr-token);
+  --snackbar-py: var(--snackbar-py-token);
+  --snackbar-radius: var(--snackbar-radius-token);
+  --snackbar-spacing: var(--snackbar-spacing-token);
+
+  /* list-item */
+  --list-item-px: var(--list-item-px-token);
+  --list-item-py: var(--list-item-py-token);
+  --list-item-spacing: var(--list-item-spacing-token);
+
+  /* checkbox */
+  --checkbox-p: var(--checkbox-p-token);
+  --checkbox-sm-icon: var(--checkbox-sm-icon-token);
+  --checkbox-md-icon: var(--checkbox-md-icon-token);
+
+  /* textfield */
+  --textfield-sm-height: var(--textfield-sm-height-token);
+  --textfield-md-height: var(--textfield-md-height-token);
+  --textfield-select-arrow-mr: var(--textfield-select-arrow-mr-token);
+  --textfield-select-arrow-icon: var(--textfield-select-arrow-icon-token);
+  --textfield-start-adornment-mr: var(--textfield-start-adornment-mr-token);
+  --textfield-filled-pl: var(--textfield-filled-pl-token);
+  --textfield-filled-pr: var(--textfield-filled-pr-token);
+  --textfield-filled-radius: var(--textfield-filled-radius-token);
+  --textfield-outlined-px: var(--textfield-outlined-px-token);
+  --textfield-outlined-radius: var(--textfield-outlined-radius-token);
+  --textfield-outlined-sm-height: var(--textfield-outlined-sm-height-token);
+  --textfield-outlined-md-height: var(--textfield-outlined-md-height-token);
+  --textfield-standard-input-pb: var(--textfield-standard-input-pb-token);
+  --textfield-standard-sm-height: var(--textfield-standard-sm-height-token);
+  --textfield-standard-md-height: var(--textfield-standard-md-height-token);
+  --textfield-standard-input-sm-pt: var(--textfield-standard-input-sm-pt-token);
+  --textfield-standard-input-md-pt: var(--textfield-standard-input-md-pt-token);
+
+  /* progress */
+  --progress-circular-size: var(--progress-circular-size-token);
+  --progress-linear-radius: var(--progress-linear-radius-token);
+  --progress-linear-spacing: var(--progress-linear-spacing-token);
+  --progress-linear-height: var(--progress-linear-height-token);
+
+  /* accordion */
+  --accordion-radius: var(--accordion-radius-token);
+  --accordion-summary-pl: var(--accordion-summary-pl-token);
+  --accordion-summary-pr: var(--accordion-summary-pr-token);
+  --accordion-summary-py: var(--accordion-summary-py-token);
+  --accordion-details-pt: var(--accordion-details-pt-token);
+  --accordion-details-pb: var(--accordion-details-pb-token);
+  --accordion-details-px: var(--accordion-details-px-token);
+
+  /* pagination */
+  --pagination-item-circular-radius: var(--pagination-item-circular-radius-token);
+  --pagination-item-rounded-radius: var(--pagination-item-rounded-radius-token);
+  --pagination-item-sm-size: var(--pagination-item-sm-size-token);
+  --pagination-item-sm-spacing: var(--pagination-item-sm-spacing-token);
+  --pagination-item-md-size: var(--pagination-item-md-size-token);
+  --pagination-item-md-spacing: var(--pagination-item-md-spacing-token);
+  --pagination-item-lg-size: var(--pagination-item-lg-size-token);
+  --pagination-item-lg-spacing: var(--pagination-item-lg-spacing-token);
+
+  /* icon-button */
+  --icon-button-radius: var(--icon-button-radius-token);
+  --icon-button-xs-icon: var(--icon-button-xs-icon-token);
+  --icon-button-xs-size: var(--icon-button-xs-size-token);
+  --icon-button-sm-icon: var(--icon-button-sm-icon-token);
+  --icon-button-sm-size: var(--icon-button-sm-size-token);
+  --icon-button-md-icon: var(--icon-button-md-icon-token);
+  --icon-button-sizesize: var(--icon-button-sizesize-token);
+  --icon-button-lg-icon: var(--icon-button-lg-icon-token);
+  --icon-button-lg-size: var(--icon-button-lg-size-token);
+
+  /* button-group */
+  --button-group-radius: var(--button-group-radius-token);
+  --button-group-sm-spacing: var(--button-group-sm-spacing-token);
+  --button-group-md-spacing: var(--button-group-md-spacing-token);
+  --button-group-lg-spacing: var(--button-group-lg-spacing-token);
+  --button-group-vertical-sm-px: var(--button-group-vertical-sm-px-token);
+  --button-group-vertical-md-px: var(--button-group-vertical-md-px-token);
+  --button-group-vertical-lg-px: var(--button-group-vertical-lg-px-token);
+  --button-group-horizontal-sm-px: var(--button-group-horizontal-sm-px-token);
+  --button-group-horizontal-md-px: var(--button-group-horizontal-md-px-token);
+  --button-group-horizontal-lg-px: var(--button-group-horizontal-lg-px-token);
+
+  /* toggle-button */
+  --toggle-button-radius: var(--toggle-button-radius-token);
+  --toggle-button-spacing: var(--toggle-button-spacing-token);
+  --toggle-button-standalone-sm-p: var(--toggle-button-standalone-sm-p-token);
+  --toggle-button-standalone-sm-size: var(--toggle-button-standalone-sm-size-token);
+  --toggle-button-standalone-sm-icon: var(--toggle-button-standalone-sm-icon-token);
+  --toggle-button-standalone-md-p: var(--toggle-button-standalone-md-p-token);
+  --toggle-button-standalone-md-size: var(--toggle-button-standalone-md-size-token);
+  --toggle-button-standalone-md-icon: var(--toggle-button-standalone-md-icon-token);
+  --toggle-button-standalone-lg-p: var(--toggle-button-standalone-lg-p-token);
+  --toggle-button-standalone-lg-size: var(--toggle-button-standalone-lg-size-token);
+  --toggle-button-standalone-lg-icon: var(--toggle-button-standalone-lg-icon-token);
+  --toggle-button-group-p: var(--toggle-button-group-p-token);
+  --toggle-button-group-spacing: var(--toggle-button-group-spacing-token);
+
+  /* form-helper-text */
+  --form-helper-text-pl: var(--form-helper-text-pl-token);
+  --form-helper-text-pt: var(--form-helper-text-pt-token);
+  --form-helper-text-icon: var(--form-helper-text-icon-token);
+  --form-helper-text-spacing: var(--form-helper-text-spacing-token);
+}

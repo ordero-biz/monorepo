@@ -1,0 +1,73 @@
+:root {
+  /* Radius */
+  --figma-radius-1px: 1px;
+  --figma-radius-2px: 2px;
+  --figma-radius-0-5: 4px;
+  --figma-radius-0-75: 6px;
+  --figma-radius-1: 8px;
+  --figma-radius-1-25: 10px;
+  --figma-radius-1-5: 12px;
+  --figma-radius-1-75: 14px;
+  --figma-radius-2: 16px;
+  --figma-radius-2-5: 20px;
+  --figma-radius-3: 24px;
+  --figma-radius-4: 32px;
+  --figma-radius-5: 40px;
+  --figma-radius-6: 48px;
+  --figma-radius-7: 56px;
+  --figma-radius-8: 64px;
+  --figma-radius-9: 72px;
+  --figma-radius-10: 80px;
+  --figma-radius-50: 500px;
+}
+
+:root {
+  /* Radius */
+  --radius-1px-token: var(--figma-radius-1px);
+  --radius-2px-token: var(--figma-radius-2px);
+  --radius-0-5-token: var(--figma-radius-0-5);
+  --radius-0-75-token: var(--figma-radius-0-75);
+  --radius-1-token: var(--figma-radius-1);
+  --radius-1-25-token: var(--figma-radius-1-25);
+  --radius-1-5-token: var(--figma-radius-1-5);
+  --radius-1-75-token: var(--figma-radius-1-75);
+  --radius-2-token: var(--figma-radius-2);
+  --radius-2-5-token: var(--figma-radius-2-5);
+  --radius-3-token: var(--figma-radius-3);
+  --radius-4-token: var(--figma-radius-4);
+  --radius-5-token: var(--figma-radius-5);
+  --radius-6-token: var(--figma-radius-6);
+  --radius-7-token: var(--figma-radius-7);
+  --radius-8-token: var(--figma-radius-8);
+  --radius-9-token: var(--figma-radius-9);
+  --radius-10-token: var(--figma-radius-10);
+  --radius-50-token: var(--figma-radius-50);
+
+}
+
+@theme inline {
+  /* Radius */
+  --radius-sm: var(--radius-0-5-token);
+  --radius-md: var(--radius-0-75-token);
+  --radius-lg: var(--radius-1-token);
+  --radius-xl: var(--radius-1-5-token);
+  --radius-1px: var(--radius-1px-token);
+  --radius-2px: var(--radius-2px-token);
+  --radius-0-5: var(--radius-0-5-token);
+  --radius-0-75: var(--radius-0-75-token);
+  --radius-1: var(--radius-1-token);
+  --radius-1-25: var(--radius-1-25-token);
+  --radius-1-5: var(--radius-1-5-token);
+  --radius-1-75: var(--radius-1-75-token);
+  --radius-2: var(--radius-2-token);
+  --radius-2-5: var(--radius-2-5-token);
+  --radius-3: var(--radius-3-token);
+  --radius-4: var(--radius-4-token);
+  --radius-5: var(--radius-5-token);
+  --radius-6: var(--radius-6-token);
+  --radius-7: var(--radius-7-token);
+  --radius-8: var(--radius-8-token);
+  --radius-9: var(--radius-9-token);
+  --radius-10: var(--radius-10-token);
+  --radius-50: var(--radius-50-token);
+}
