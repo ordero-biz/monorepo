@@ -197,6 +197,25 @@
   --figma-settings-label-md-line-height-desktop: 18px;
   --figma-settings-label-md-line-height-mobile: 18px;
   --figma-settings-label-md-weight: var(--figma-weight-600);
+  --figma-pdf-font-family: 'Roboto';
+  --figma-pdf-h3-size: 16px;
+  --figma-pdf-h3-line-height: 25.6px;
+  --figma-pdf-h3-weight: var(--figma-weight-700);
+  --figma-pdf-h4-size: 13px;
+  --figma-pdf-h4-line-height: 20.8px;
+  --figma-pdf-h4-weight: var(--figma-weight-700);
+  --figma-pdf-body1-size: 10px;
+  --figma-pdf-body1-line-height: 16px;
+  --figma-pdf-body1-weight: var(--figma-weight-400);
+  --figma-pdf-body2-size: 9px;
+  --figma-pdf-body2-line-height: 14.4px;
+  --figma-pdf-body2-weight: var(--figma-weight-400);
+  --figma-pdf-subtitle1-size: var(--figma-pdf-body1-size);
+  --figma-pdf-subtitle1-line-height: var(--figma-pdf-body1-line-height);
+  --figma-pdf-subtitle1-weight: var(--figma-weight-700);
+  --figma-pdf-subtitle2-size: var(--figma-pdf-body2-size);
+  --figma-pdf-subtitle2-line-height: var(--figma-pdf-body2-line-height);
+  --figma-pdf-subtitle2-weight: var(--figma-weight-700);
 
 
   /* Typography */
@@ -397,6 +416,25 @@
   --settings-label-md-line-height-desktop-token: var(--figma-settings-label-md-line-height-desktop);
   --settings-label-md-line-height-mobile-token: var(--figma-settings-label-md-line-height-mobile);
   --settings-label-md-weight-token: var(--figma-settings-label-md-weight);
+  --pdf-font-family-token: var(--figma-pdf-font-family);
+  --pdf-h3-size-token: var(--figma-pdf-h3-size);
+  --pdf-h3-line-height-token: var(--figma-pdf-h3-line-height);
+  --pdf-h3-weight-token: var(--figma-pdf-h3-weight);
+  --pdf-h4-size-token: var(--figma-pdf-h4-size);
+  --pdf-h4-line-height-token: var(--figma-pdf-h4-line-height);
+  --pdf-h4-weight-token: var(--figma-pdf-h4-weight);
+  --pdf-body1-size-token: var(--figma-pdf-body1-size);
+  --pdf-body1-line-height-token: var(--figma-pdf-body1-line-height);
+  --pdf-body1-weight-token: var(--figma-pdf-body1-weight);
+  --pdf-body2-size-token: var(--figma-pdf-body2-size);
+  --pdf-body2-line-height-token: var(--figma-pdf-body2-line-height);
+  --pdf-body2-weight-token: var(--figma-pdf-body2-weight);
+  --pdf-subtitle1-size-token: var(--figma-pdf-subtitle1-size);
+  --pdf-subtitle1-line-height-token: var(--figma-pdf-subtitle1-line-height);
+  --pdf-subtitle1-weight-token: var(--figma-pdf-subtitle1-weight);
+  --pdf-subtitle2-size-token: var(--figma-pdf-subtitle2-size);
+  --pdf-subtitle2-line-height-token: var(--figma-pdf-subtitle2-line-height);
+  --pdf-subtitle2-weight-token: var(--figma-pdf-subtitle2-weight);
 
 }
 
@@ -599,5 +637,24 @@
   --settings-label-md-line-height-desktop: var(--settings-label-md-line-height-desktop-token);
   --settings-label-md-line-height-mobile: var(--settings-label-md-line-height-mobile-token);
   --settings-label-md-weight: var(--settings-label-md-weight-token);
+  --pdf-font-family: var(--pdf-font-family-token);
+  --pdf-h3-size: var(--pdf-h3-size-token);
+  --pdf-h3-line-height: var(--pdf-h3-line-height-token);
+  --pdf-h3-weight: var(--pdf-h3-weight-token);
+  --pdf-h4-size: var(--pdf-h4-size-token);
+  --pdf-h4-line-height: var(--pdf-h4-line-height-token);
+  --pdf-h4-weight: var(--pdf-h4-weight-token);
+  --pdf-body1-size: var(--pdf-body1-size-token);
+  --pdf-body1-line-height: var(--pdf-body1-line-height-token);
+  --pdf-body1-weight: var(--pdf-body1-weight-token);
+  --pdf-body2-size: var(--pdf-body2-size-token);
+  --pdf-body2-line-height: var(--pdf-body2-line-height-token);
+  --pdf-body2-weight: var(--pdf-body2-weight-token);
+  --pdf-subtitle1-size: var(--pdf-subtitle1-size-token);
+  --pdf-subtitle1-line-height: var(--pdf-subtitle1-line-height-token);
+  --pdf-subtitle1-weight: var(--pdf-subtitle1-weight-token);
+  --pdf-subtitle2-size: var(--pdf-subtitle2-size-token);
+  --pdf-subtitle2-line-height: var(--pdf-subtitle2-line-height-token);
+  --pdf-subtitle2-weight: var(--pdf-subtitle2-weight-token);
 
 }
