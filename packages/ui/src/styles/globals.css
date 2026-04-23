@@ -29,7 +29,6 @@
   --radius: var(--radius-1-token);
 }
 
-
 .dark {
   --background: var(--grey-900);
   --foreground: var(--white-main);

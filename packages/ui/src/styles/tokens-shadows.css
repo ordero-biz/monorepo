@@ -72,12 +72,36 @@
   --figma-icon-sm-inset-y: -1px;
   --figma-icon-sm-inset-blur: 2px;
   --figma-icon-sm-inset-spread: 0px;
-  --figma-icon-primary-shadow-color: color-mix(in srgb, var(--figma-primary-dark) 16%, transparent);
-  --figma-icon-primary-inset-color: color-mix(in srgb, var(--figma-primary-dark) 48%, transparent);
-  --figma-icon-secondary-shadow-color: color-mix(in srgb, var(--figma-warning-dark) 16%, transparent);
-  --figma-icon-secondary-inset-color: color-mix(in srgb, var(--figma-warning-dark) 48%, transparent);
-  --figma-icon-neutral-shadow-color: color-mix(in srgb, #c5cad1 16%, transparent);
-  --figma-icon-neutral-inset-color: color-mix(in srgb, #c5cad1 48%, transparent);
+  --figma-icon-primary-shadow-color: color-mix(
+    in srgb,
+    var(--figma-primary-dark) 16%,
+    transparent
+  );
+  --figma-icon-primary-inset-color: color-mix(
+    in srgb,
+    var(--figma-primary-dark) 48%,
+    transparent
+  );
+  --figma-icon-secondary-shadow-color: color-mix(
+    in srgb,
+    var(--figma-warning-dark) 16%,
+    transparent
+  );
+  --figma-icon-secondary-inset-color: color-mix(
+    in srgb,
+    var(--figma-warning-dark) 48%,
+    transparent
+  );
+  --figma-icon-neutral-shadow-color: color-mix(
+    in srgb,
+    #c5cad1 16%,
+    transparent
+  );
+  --figma-icon-neutral-inset-color: color-mix(
+    in srgb,
+    #c5cad1 48%,
+    transparent
+  );
   --figma-color-x: var(--figma-z8-x);
   --figma-color-y: var(--figma-z8-y);
   --figma-color-blur: var(--figma-z8-blur);
@@ -168,7 +192,6 @@
   --color-y-token: var(--figma-color-y);
   --color-blur-token: var(--figma-color-blur);
   --color-spread-token: var(--figma-color-spread);
-
 }
 
 @theme inline {
@@ -255,5 +278,4 @@
   --color-y: var(--color-y-token);
   --color-blur: var(--color-blur-token);
   --color-spread: var(--color-spread-token);
-
 }

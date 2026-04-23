@@ -1,7 +1,7 @@
 :root {
   /* Typography */
-  --figma-family-primary: 'Public Sans';
-  --figma-family-secondary: 'Barlow';
+  --figma-family-primary: "Public Sans";
+  --figma-family-secondary: "Barlow";
   --figma-weight-400: 400;
   --figma-weight-500: 500;
   --figma-weight-600: 600;
@@ -197,7 +197,7 @@
   --figma-settings-label-md-line-height-desktop: 18px;
   --figma-settings-label-md-line-height-mobile: 18px;
   --figma-settings-label-md-weight: var(--figma-weight-600);
-  --figma-pdf-font-family: 'Roboto';
+  --figma-pdf-font-family: "Roboto";
   --figma-pdf-h3-size: 16px;
   --figma-pdf-h3-line-height: 25.6px;
   --figma-pdf-h3-weight: var(--figma-weight-700);
@@ -216,7 +216,6 @@
   --figma-pdf-subtitle2-size: var(--figma-pdf-body2-size);
   --figma-pdf-subtitle2-line-height: var(--figma-pdf-body2-line-height);
   --figma-pdf-subtitle2-weight: var(--figma-weight-700);
-
 
   /* Typography */
   --font-family-primary-token: var(--figma-family-primary);
@@ -286,16 +285,24 @@
   --subtitle1-size-desktop-token: var(--figma-subtitle1-size-desktop);
   --subtitle1-size-mobile-token: var(--figma-subtitle1-size-mobile);
   --subtitle1-weight-token: var(--figma-subtitle1-weight);
-  --subtitle1-line-height-desktop-token: var(--figma-subtitle1-line-height-desktop);
-  --subtitle1-line-height-mobile-token: var(--figma-subtitle1-line-height-mobile);
+  --subtitle1-line-height-desktop-token: var(
+    --figma-subtitle1-line-height-desktop
+  );
+  --subtitle1-line-height-mobile-token: var(
+    --figma-subtitle1-line-height-mobile
+  );
   --subtitle1-letter-spacing-token: var(--figma-subtitle1-letter-spacing);
   --subtitle1-paragraph-spacing-token: var(--figma-subtitle1-paragraph-spacing);
   --subtitle2-family-token: var(--figma-subtitle2-family);
   --subtitle2-size-desktop-token: var(--figma-subtitle2-size-desktop);
   --subtitle2-size-mobile-token: var(--figma-subtitle2-size-mobile);
   --subtitle2-weight-token: var(--figma-subtitle2-weight);
-  --subtitle2-line-height-desktop-token: var(--figma-subtitle2-line-height-desktop);
-  --subtitle2-line-height-mobile-token: var(--figma-subtitle2-line-height-mobile);
+  --subtitle2-line-height-desktop-token: var(
+    --figma-subtitle2-line-height-desktop
+  );
+  --subtitle2-line-height-mobile-token: var(
+    --figma-subtitle2-line-height-mobile
+  );
   --subtitle2-letter-spacing-token: var(--figma-subtitle2-letter-spacing);
   --subtitle2-paragraph-spacing-token: var(--figma-subtitle2-paragraph-spacing);
   --body1-family-token: var(--figma-body1-family);
@@ -326,24 +333,38 @@
   --overline-size-desktop-token: var(--figma-overline-size-desktop);
   --overline-size-mobile-token: var(--figma-overline-size-mobile);
   --overline-weight-token: var(--figma-overline-weight);
-  --overline-line-height-desktop-token: var(--figma-overline-line-height-desktop);
+  --overline-line-height-desktop-token: var(
+    --figma-overline-line-height-desktop
+  );
   --overline-line-height-mobile-token: var(--figma-overline-line-height-mobile);
   --overline-letter-spacing-token: var(--figma-overline-letter-spacing);
   --overline-paragraph-spacing-token: var(--figma-overline-paragraph-spacing);
   --button-small-size-desktop-token: var(--figma-button-small-size-desktop);
   --button-small-size-mobile-token: var(--figma-button-small-size-mobile);
-  --button-small-line-height-desktop-token: var(--figma-button-small-line-height-desktop);
-  --button-small-line-height-mobile-token: var(--figma-button-small-line-height-mobile);
+  --button-small-line-height-desktop-token: var(
+    --figma-button-small-line-height-desktop
+  );
+  --button-small-line-height-mobile-token: var(
+    --figma-button-small-line-height-mobile
+  );
   --button-small-weight-token: var(--figma-button-small-weight);
   --button-medium-size-desktop-token: var(--figma-button-medium-size-desktop);
   --button-medium-size-mobile-token: var(--figma-button-medium-size-mobile);
-  --button-medium-line-height-desktop-token: var(--figma-button-medium-line-height-desktop);
-  --button-medium-line-height-mobile-token: var(--figma-button-medium-line-height-mobile);
+  --button-medium-line-height-desktop-token: var(
+    --figma-button-medium-line-height-desktop
+  );
+  --button-medium-line-height-mobile-token: var(
+    --figma-button-medium-line-height-mobile
+  );
   --button-medium-weight-token: var(--figma-button-medium-weight);
   --button-large-size-desktop-token: var(--figma-button-large-size-desktop);
   --button-large-size-mobile-token: var(--figma-button-large-size-mobile);
-  --button-large-line-height-desktop-token: var(--figma-button-large-line-height-desktop);
-  --button-large-line-height-mobile-token: var(--figma-button-large-line-height-mobile);
+  --button-large-line-height-desktop-token: var(
+    --figma-button-large-line-height-desktop
+  );
+  --button-large-line-height-mobile-token: var(
+    --figma-button-large-line-height-mobile
+  );
   --button-large-weight-token: var(--figma-button-large-weight);
   --label-size-desktop-token: var(--figma-label-size-desktop);
   --label-size-mobile-token: var(--figma-label-size-mobile);
@@ -357,13 +378,19 @@
   --avatar-weight-token: var(--figma-avatar-weight);
   --carousel-size-desktop-token: var(--figma-carousel-size-desktop);
   --carousel-size-mobile-token: var(--figma-carousel-size-mobile);
-  --carousel-line-height-desktop-token: var(--figma-carousel-line-height-desktop);
+  --carousel-line-height-desktop-token: var(
+    --figma-carousel-line-height-desktop
+  );
   --carousel-line-height-mobile-token: var(--figma-carousel-line-height-mobile);
   --carousel-weight-token: var(--figma-carousel-weight);
   --chart-legend-size-desktop-token: var(--figma-chart-legend-size-desktop);
   --chart-legend-size-mobile-token: var(--figma-chart-legend-size-mobile);
-  --chart-legend-line-height-desktop-token: var(--figma-chart-legend-line-height-desktop);
-  --chart-legend-line-height-mobile-token: var(--figma-chart-legend-line-height-mobile);
+  --chart-legend-line-height-desktop-token: var(
+    --figma-chart-legend-line-height-desktop
+  );
+  --chart-legend-line-height-mobile-token: var(
+    --figma-chart-legend-line-height-mobile
+  );
   --chart-legend-weight-token: var(--figma-chart-legend-weight);
   --chip-size-desktop-token: var(--figma-chip-size-desktop);
   --chip-size-mobile-token: var(--figma-chip-size-mobile);
@@ -372,49 +399,91 @@
   --chip-weight-token: var(--figma-chip-weight);
   --table-head-size-desktop-token: var(--figma-table-head-size-desktop);
   --table-head-size-mobile-token: var(--figma-table-head-size-mobile);
-  --table-head-line-height-desktop-token: var(--figma-table-head-line-height-desktop);
-  --table-head-line-height-mobile-token: var(--figma-table-head-line-height-mobile);
+  --table-head-line-height-desktop-token: var(
+    --figma-table-head-line-height-desktop
+  );
+  --table-head-line-height-mobile-token: var(
+    --figma-table-head-line-height-mobile
+  );
   --table-head-weight-token: var(--figma-table-head-weight);
   --input-label-size-desktop-token: var(--figma-input-label-size-desktop);
   --input-label-size-mobile-token: var(--figma-input-label-size-mobile);
-  --input-label-line-height-desktop-token: var(--figma-input-label-line-height-desktop);
-  --input-label-line-height-mobile-token: var(--figma-input-label-line-height-mobile);
+  --input-label-line-height-desktop-token: var(
+    --figma-input-label-line-height-desktop
+  );
+  --input-label-line-height-mobile-token: var(
+    --figma-input-label-line-height-mobile
+  );
   --input-label-weight-token: var(--figma-input-label-weight);
   --input-value-size-desktop-token: var(--figma-input-value-size-desktop);
   --input-value-size-mobile-token: var(--figma-input-value-size-mobile);
-  --input-value-line-height-desktop-token: var(--figma-input-value-line-height-desktop);
-  --input-value-line-height-mobile-token: var(--figma-input-value-line-height-mobile);
+  --input-value-line-height-desktop-token: var(
+    --figma-input-value-line-height-desktop
+  );
+  --input-value-line-height-mobile-token: var(
+    --figma-input-value-line-height-mobile
+  );
   --input-value-weight-token: var(--figma-input-value-weight);
   --nav-item-size-desktop-token: var(--figma-nav-item-size-desktop);
   --nav-item-size-mobile-token: var(--figma-nav-item-size-mobile);
-  --nav-item-line-height-desktop-token: var(--figma-nav-item-line-height-desktop);
+  --nav-item-line-height-desktop-token: var(
+    --figma-nav-item-line-height-desktop
+  );
   --nav-item-line-height-mobile-token: var(--figma-nav-item-line-height-mobile);
   --nav-item-weight-token: var(--figma-nav-item-weight);
   --nav-item-active-weight-token: var(--figma-nav-item-active-weight);
   --nav-item-mini-size-desktop-token: var(--figma-nav-item-mini-size-desktop);
   --nav-item-mini-size-mobile-token: var(--figma-nav-item-mini-size-mobile);
-  --nav-item-mini-line-height-desktop-token: var(--figma-nav-item-mini-line-height-desktop);
-  --nav-item-mini-line-height-mobile-token: var(--figma-nav-item-mini-line-height-mobile);
+  --nav-item-mini-line-height-desktop-token: var(
+    --figma-nav-item-mini-line-height-desktop
+  );
+  --nav-item-mini-line-height-mobile-token: var(
+    --figma-nav-item-mini-line-height-mobile
+  );
   --nav-item-mini-weight-token: var(--figma-nav-item-mini-weight);
   --nav-subheader-size-desktop-token: var(--figma-nav-subheader-size-desktop);
   --nav-subheader-size-mobile-token: var(--figma-nav-subheader-size-mobile);
-  --nav-subheader-line-height-desktop-token: var(--figma-nav-subheader-line-height-desktop);
-  --nav-subheader-line-height-mobile-token: var(--figma-nav-subheader-line-height-mobile);
+  --nav-subheader-line-height-desktop-token: var(
+    --figma-nav-subheader-line-height-desktop
+  );
+  --nav-subheader-line-height-mobile-token: var(
+    --figma-nav-subheader-line-height-mobile
+  );
   --nav-subheader-weight-token: var(--figma-nav-subheader-weight);
   --tab-label-size-desktop-token: var(--figma-tab-label-size-desktop);
   --tab-label-size-mobile-token: var(--figma-tab-label-size-mobile);
-  --tab-label-line-height-desktop-token: var(--figma-tab-label-line-height-desktop);
-  --tab-label-line-height-mobile-token: var(--figma-tab-label-line-height-mobile);
+  --tab-label-line-height-desktop-token: var(
+    --figma-tab-label-line-height-desktop
+  );
+  --tab-label-line-height-mobile-token: var(
+    --figma-tab-label-line-height-mobile
+  );
   --tab-label-weight-token: var(--figma-tab-label-weight);
-  --settings-label-sm-size-desktop-token: var(--figma-settings-label-sm-size-desktop);
-  --settings-label-sm-size-mobile-token: var(--figma-settings-label-sm-size-mobile);
-  --settings-label-sm-line-height-desktop-token: var(--figma-settings-label-sm-line-height-desktop);
-  --settings-label-sm-line-height-mobile-token: var(--figma-settings-label-sm-line-height-mobile);
+  --settings-label-sm-size-desktop-token: var(
+    --figma-settings-label-sm-size-desktop
+  );
+  --settings-label-sm-size-mobile-token: var(
+    --figma-settings-label-sm-size-mobile
+  );
+  --settings-label-sm-line-height-desktop-token: var(
+    --figma-settings-label-sm-line-height-desktop
+  );
+  --settings-label-sm-line-height-mobile-token: var(
+    --figma-settings-label-sm-line-height-mobile
+  );
   --settings-label-sm-weight-token: var(--figma-settings-label-sm-weight);
-  --settings-label-md-size-desktop-token: var(--figma-settings-label-md-size-desktop);
-  --settings-label-md-size-mobile-token: var(--figma-settings-label-md-size-mobile);
-  --settings-label-md-line-height-desktop-token: var(--figma-settings-label-md-line-height-desktop);
-  --settings-label-md-line-height-mobile-token: var(--figma-settings-label-md-line-height-mobile);
+  --settings-label-md-size-desktop-token: var(
+    --figma-settings-label-md-size-desktop
+  );
+  --settings-label-md-size-mobile-token: var(
+    --figma-settings-label-md-size-mobile
+  );
+  --settings-label-md-line-height-desktop-token: var(
+    --figma-settings-label-md-line-height-desktop
+  );
+  --settings-label-md-line-height-mobile-token: var(
+    --figma-settings-label-md-line-height-mobile
+  );
   --settings-label-md-weight-token: var(--figma-settings-label-md-weight);
   --pdf-font-family-token: var(--figma-pdf-font-family);
   --pdf-h3-size-token: var(--figma-pdf-h3-size);
@@ -435,7 +504,6 @@
   --pdf-subtitle2-size-token: var(--figma-pdf-subtitle2-size);
   --pdf-subtitle2-line-height-token: var(--figma-pdf-subtitle2-line-height);
   --pdf-subtitle2-weight-token: var(--figma-pdf-subtitle2-weight);
-
 }
 
 @theme inline {
@@ -553,18 +621,30 @@
   --overline-paragraph-spacing: var(--overline-paragraph-spacing-token);
   --button-small-size-desktop: var(--button-small-size-desktop-token);
   --button-small-size-mobile: var(--button-small-size-mobile-token);
-  --button-small-line-height-desktop: var(--button-small-line-height-desktop-token);
-  --button-small-line-height-mobile: var(--button-small-line-height-mobile-token);
+  --button-small-line-height-desktop: var(
+    --button-small-line-height-desktop-token
+  );
+  --button-small-line-height-mobile: var(
+    --button-small-line-height-mobile-token
+  );
   --button-small-weight: var(--button-small-weight-token);
   --button-medium-size-desktop: var(--button-medium-size-desktop-token);
   --button-medium-size-mobile: var(--button-medium-size-mobile-token);
-  --button-medium-line-height-desktop: var(--button-medium-line-height-desktop-token);
-  --button-medium-line-height-mobile: var(--button-medium-line-height-mobile-token);
+  --button-medium-line-height-desktop: var(
+    --button-medium-line-height-desktop-token
+  );
+  --button-medium-line-height-mobile: var(
+    --button-medium-line-height-mobile-token
+  );
   --button-medium-weight: var(--button-medium-weight-token);
   --button-large-size-desktop: var(--button-large-size-desktop-token);
   --button-large-size-mobile: var(--button-large-size-mobile-token);
-  --button-large-line-height-desktop: var(--button-large-line-height-desktop-token);
-  --button-large-line-height-mobile: var(--button-large-line-height-mobile-token);
+  --button-large-line-height-desktop: var(
+    --button-large-line-height-desktop-token
+  );
+  --button-large-line-height-mobile: var(
+    --button-large-line-height-mobile-token
+  );
   --button-large-weight: var(--button-large-weight-token);
   --label-size-desktop: var(--label-size-desktop-token);
   --label-size-mobile: var(--label-size-mobile-token);
@@ -583,8 +663,12 @@
   --carousel-weight: var(--carousel-weight-token);
   --chart-legend-size-desktop: var(--chart-legend-size-desktop-token);
   --chart-legend-size-mobile: var(--chart-legend-size-mobile-token);
-  --chart-legend-line-height-desktop: var(--chart-legend-line-height-desktop-token);
-  --chart-legend-line-height-mobile: var(--chart-legend-line-height-mobile-token);
+  --chart-legend-line-height-desktop: var(
+    --chart-legend-line-height-desktop-token
+  );
+  --chart-legend-line-height-mobile: var(
+    --chart-legend-line-height-mobile-token
+  );
   --chart-legend-weight: var(--chart-legend-weight-token);
   --chip-size-desktop: var(--chip-size-desktop-token);
   --chip-size-mobile: var(--chip-size-mobile-token);
@@ -598,12 +682,16 @@
   --table-head-weight: var(--table-head-weight-token);
   --input-label-size-desktop: var(--input-label-size-desktop-token);
   --input-label-size-mobile: var(--input-label-size-mobile-token);
-  --input-label-line-height-desktop: var(--input-label-line-height-desktop-token);
+  --input-label-line-height-desktop: var(
+    --input-label-line-height-desktop-token
+  );
   --input-label-line-height-mobile: var(--input-label-line-height-mobile-token);
   --input-label-weight: var(--input-label-weight-token);
   --input-value-size-desktop: var(--input-value-size-desktop-token);
   --input-value-size-mobile: var(--input-value-size-mobile-token);
-  --input-value-line-height-desktop: var(--input-value-line-height-desktop-token);
+  --input-value-line-height-desktop: var(
+    --input-value-line-height-desktop-token
+  );
   --input-value-line-height-mobile: var(--input-value-line-height-mobile-token);
   --input-value-weight: var(--input-value-weight-token);
   --nav-item-size-desktop: var(--nav-item-size-desktop-token);
@@ -614,13 +702,21 @@
   --nav-item-active-weight: var(--nav-item-active-weight-token);
   --nav-item-mini-size-desktop: var(--nav-item-mini-size-desktop-token);
   --nav-item-mini-size-mobile: var(--nav-item-mini-size-mobile-token);
-  --nav-item-mini-line-height-desktop: var(--nav-item-mini-line-height-desktop-token);
-  --nav-item-mini-line-height-mobile: var(--nav-item-mini-line-height-mobile-token);
+  --nav-item-mini-line-height-desktop: var(
+    --nav-item-mini-line-height-desktop-token
+  );
+  --nav-item-mini-line-height-mobile: var(
+    --nav-item-mini-line-height-mobile-token
+  );
   --nav-item-mini-weight: var(--nav-item-mini-weight-token);
   --nav-subheader-size-desktop: var(--nav-subheader-size-desktop-token);
   --nav-subheader-size-mobile: var(--nav-subheader-size-mobile-token);
-  --nav-subheader-line-height-desktop: var(--nav-subheader-line-height-desktop-token);
-  --nav-subheader-line-height-mobile: var(--nav-subheader-line-height-mobile-token);
+  --nav-subheader-line-height-desktop: var(
+    --nav-subheader-line-height-desktop-token
+  );
+  --nav-subheader-line-height-mobile: var(
+    --nav-subheader-line-height-mobile-token
+  );
   --nav-subheader-weight: var(--nav-subheader-weight-token);
   --tab-label-size-desktop: var(--tab-label-size-desktop-token);
   --tab-label-size-mobile: var(--tab-label-size-mobile-token);
@@ -629,13 +725,21 @@
   --tab-label-weight: var(--tab-label-weight-token);
   --settings-label-sm-size-desktop: var(--settings-label-sm-size-desktop-token);
   --settings-label-sm-size-mobile: var(--settings-label-sm-size-mobile-token);
-  --settings-label-sm-line-height-desktop: var(--settings-label-sm-line-height-desktop-token);
-  --settings-label-sm-line-height-mobile: var(--settings-label-sm-line-height-mobile-token);
+  --settings-label-sm-line-height-desktop: var(
+    --settings-label-sm-line-height-desktop-token
+  );
+  --settings-label-sm-line-height-mobile: var(
+    --settings-label-sm-line-height-mobile-token
+  );
   --settings-label-sm-weight: var(--settings-label-sm-weight-token);
   --settings-label-md-size-desktop: var(--settings-label-md-size-desktop-token);
   --settings-label-md-size-mobile: var(--settings-label-md-size-mobile-token);
-  --settings-label-md-line-height-desktop: var(--settings-label-md-line-height-desktop-token);
-  --settings-label-md-line-height-mobile: var(--settings-label-md-line-height-mobile-token);
+  --settings-label-md-line-height-desktop: var(
+    --settings-label-md-line-height-desktop-token
+  );
+  --settings-label-md-line-height-mobile: var(
+    --settings-label-md-line-height-mobile-token
+  );
   --settings-label-md-weight: var(--settings-label-md-weight-token);
   --pdf-font-family: var(--pdf-font-family-token);
   --pdf-h3-size: var(--pdf-h3-size-token);
@@ -656,5 +760,4 @@
   --pdf-subtitle2-size: var(--pdf-subtitle2-size-token);
   --pdf-subtitle2-line-height: var(--pdf-subtitle2-line-height-token);
   --pdf-subtitle2-weight: var(--pdf-subtitle2-weight-token);
-
 }

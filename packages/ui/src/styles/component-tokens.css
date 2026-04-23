@@ -418,11 +418,15 @@
   --textarea-filled-spacing-token: var(--figma-textarea-filled-spacing);
   --textarea-filled-px-token: var(--figma-textarea-filled-px);
   --textarea-filled-py-token: var(--figma-textarea-filled-py);
-  --textarea-filled-has-value-py-token: var(--figma-textarea-filled-has-value-py);
+  --textarea-filled-has-value-py-token: var(
+    --figma-textarea-filled-has-value-py
+  );
   --textarea-standard-spacing-token: var(--figma-textarea-standard-spacing);
   --textarea-standard-pr-token: var(--figma-textarea-standard-pr);
   --textarea-standard-pt-token: var(--figma-textarea-standard-pt);
-  --textarea-standard-has-value-pt-token: var(--figma-textarea-standard-has-value-pt);
+  --textarea-standard-has-value-pt-token: var(
+    --figma-textarea-standard-has-value-pt
+  );
 
   /* snackbar bridge */
   --snackbar-pl-token: var(--figma-snackbar-pl);
@@ -446,19 +450,33 @@
   --textfield-md-height-token: var(--figma-textfield-md-height);
   --textfield-select-arrow-mr-token: var(--figma-textfield-select-arrow-mr);
   --textfield-select-arrow-icon-token: var(--figma-textfield-select-arrow-icon);
-  --textfield-start-adornment-mr-token: var(--figma-textfield-start-adornment-mr);
+  --textfield-start-adornment-mr-token: var(
+    --figma-textfield-start-adornment-mr
+  );
   --textfield-filled-pl-token: var(--figma-textfield-filled-pl);
   --textfield-filled-pr-token: var(--figma-textfield-filled-pr);
   --textfield-filled-radius-token: var(--figma-textfield-filled-radius);
   --textfield-outlined-px-token: var(--figma-textfield-outlined-px);
   --textfield-outlined-radius-token: var(--figma-textfield-outlined-radius);
-  --textfield-outlined-sm-height-token: var(--figma-textfield-outlined-sm-height);
-  --textfield-outlined-md-height-token: var(--figma-textfield-outlined-md-height);
+  --textfield-outlined-sm-height-token: var(
+    --figma-textfield-outlined-sm-height
+  );
+  --textfield-outlined-md-height-token: var(
+    --figma-textfield-outlined-md-height
+  );
   --textfield-standard-input-pb-token: var(--figma-textfield-standard-input-pb);
-  --textfield-standard-sm-height-token: var(--figma-textfield-standard-sm-height);
-  --textfield-standard-md-height-token: var(--figma-textfield-standard-md-height);
-  --textfield-standard-input-sm-pt-token: var(--figma-textfield-standard-input-sm-pt);
-  --textfield-standard-input-md-pt-token: var(--figma-textfield-standard-input-md-pt);
+  --textfield-standard-sm-height-token: var(
+    --figma-textfield-standard-sm-height
+  );
+  --textfield-standard-md-height-token: var(
+    --figma-textfield-standard-md-height
+  );
+  --textfield-standard-input-sm-pt-token: var(
+    --figma-textfield-standard-input-sm-pt
+  );
+  --textfield-standard-input-md-pt-token: var(
+    --figma-textfield-standard-input-md-pt
+  );
 
   /* progress bridge */
   --progress-circular-size-token: var(--figma-progress-circular-size);
@@ -476,8 +494,12 @@
   --accordion-details-px-token: var(--figma-accordion-details-px);
 
   /* pagination bridge */
-  --pagination-item-circular-radius-token: var(--figma-pagination-item-circular-radius);
-  --pagination-item-rounded-radius-token: var(--figma-pagination-item-rounded-radius);
+  --pagination-item-circular-radius-token: var(
+    --figma-pagination-item-circular-radius
+  );
+  --pagination-item-rounded-radius-token: var(
+    --figma-pagination-item-rounded-radius
+  );
   --pagination-item-sm-size-token: var(--figma-pagination-item-sm-size);
   --pagination-item-sm-spacing-token: var(--figma-pagination-item-sm-spacing);
   --pagination-item-md-size-token: var(--figma-pagination-item-md-size);
@@ -504,22 +526,46 @@
   --button-group-vertical-sm-px-token: var(--figma-button-group-vertical-sm-px);
   --button-group-vertical-md-px-token: var(--figma-button-group-vertical-md-px);
   --button-group-vertical-lg-px-token: var(--figma-button-group-vertical-lg-px);
-  --button-group-horizontal-sm-px-token: var(--figma-button-group-horizontal-sm-px);
-  --button-group-horizontal-md-px-token: var(--figma-button-group-horizontal-md-px);
-  --button-group-horizontal-lg-px-token: var(--figma-button-group-horizontal-lg-px);
+  --button-group-horizontal-sm-px-token: var(
+    --figma-button-group-horizontal-sm-px
+  );
+  --button-group-horizontal-md-px-token: var(
+    --figma-button-group-horizontal-md-px
+  );
+  --button-group-horizontal-lg-px-token: var(
+    --figma-button-group-horizontal-lg-px
+  );
 
   /* toggle-button bridge */
   --toggle-button-radius-token: var(--figma-toggle-button-radius);
   --toggle-button-spacing-token: var(--figma-toggle-button-spacing);
-  --toggle-button-standalone-sm-p-token: var(--figma-toggle-button-standalone-sm-p);
-  --toggle-button-standalone-sm-size-token: var(--figma-toggle-button-standalone-sm-size);
-  --toggle-button-standalone-sm-icon-token: var(--figma-toggle-button-standalone-sm-icon);
-  --toggle-button-standalone-md-p-token: var(--figma-toggle-button-standalone-md-p);
-  --toggle-button-standalone-md-size-token: var(--figma-toggle-button-standalone-md-size);
-  --toggle-button-standalone-md-icon-token: var(--figma-toggle-button-standalone-md-icon);
-  --toggle-button-standalone-lg-p-token: var(--figma-toggle-button-standalone-lg-p);
-  --toggle-button-standalone-lg-size-token: var(--figma-toggle-button-standalone-lg-size);
-  --toggle-button-standalone-lg-icon-token: var(--figma-toggle-button-standalone-lg-icon);
+  --toggle-button-standalone-sm-p-token: var(
+    --figma-toggle-button-standalone-sm-p
+  );
+  --toggle-button-standalone-sm-size-token: var(
+    --figma-toggle-button-standalone-sm-size
+  );
+  --toggle-button-standalone-sm-icon-token: var(
+    --figma-toggle-button-standalone-sm-icon
+  );
+  --toggle-button-standalone-md-p-token: var(
+    --figma-toggle-button-standalone-md-p
+  );
+  --toggle-button-standalone-md-size-token: var(
+    --figma-toggle-button-standalone-md-size
+  );
+  --toggle-button-standalone-md-icon-token: var(
+    --figma-toggle-button-standalone-md-icon
+  );
+  --toggle-button-standalone-lg-p-token: var(
+    --figma-toggle-button-standalone-lg-p
+  );
+  --toggle-button-standalone-lg-size-token: var(
+    --figma-toggle-button-standalone-lg-size
+  );
+  --toggle-button-standalone-lg-icon-token: var(
+    --figma-toggle-button-standalone-lg-icon
+  );
   --toggle-button-group-p-token: var(--figma-toggle-button-group-p);
   --toggle-button-group-spacing-token: var(--figma-toggle-button-group-spacing);
 
@@ -744,7 +790,9 @@
   --accordion-details-px: var(--accordion-details-px-token);
 
   /* pagination */
-  --pagination-item-circular-radius: var(--pagination-item-circular-radius-token);
+  --pagination-item-circular-radius: var(
+    --pagination-item-circular-radius-token
+  );
   --pagination-item-rounded-radius: var(--pagination-item-rounded-radius-token);
   --pagination-item-sm-size: var(--pagination-item-sm-size-token);
   --pagination-item-sm-spacing: var(--pagination-item-sm-spacing-token);
@@ -780,14 +828,26 @@
   --toggle-button-radius: var(--toggle-button-radius-token);
   --toggle-button-spacing: var(--toggle-button-spacing-token);
   --toggle-button-standalone-sm-p: var(--toggle-button-standalone-sm-p-token);
-  --toggle-button-standalone-sm-size: var(--toggle-button-standalone-sm-size-token);
-  --toggle-button-standalone-sm-icon: var(--toggle-button-standalone-sm-icon-token);
+  --toggle-button-standalone-sm-size: var(
+    --toggle-button-standalone-sm-size-token
+  );
+  --toggle-button-standalone-sm-icon: var(
+    --toggle-button-standalone-sm-icon-token
+  );
   --toggle-button-standalone-md-p: var(--toggle-button-standalone-md-p-token);
-  --toggle-button-standalone-md-size: var(--toggle-button-standalone-md-size-token);
-  --toggle-button-standalone-md-icon: var(--toggle-button-standalone-md-icon-token);
+  --toggle-button-standalone-md-size: var(
+    --toggle-button-standalone-md-size-token
+  );
+  --toggle-button-standalone-md-icon: var(
+    --toggle-button-standalone-md-icon-token
+  );
   --toggle-button-standalone-lg-p: var(--toggle-button-standalone-lg-p-token);
-  --toggle-button-standalone-lg-size: var(--toggle-button-standalone-lg-size-token);
-  --toggle-button-standalone-lg-icon: var(--toggle-button-standalone-lg-icon-token);
+  --toggle-button-standalone-lg-size: var(
+    --toggle-button-standalone-lg-size-token
+  );
+  --toggle-button-standalone-lg-icon: var(
+    --toggle-button-standalone-lg-icon-token
+  );
   --toggle-button-group-p: var(--toggle-button-group-p-token);
   --toggle-button-group-spacing: var(--toggle-button-group-spacing-token);
 

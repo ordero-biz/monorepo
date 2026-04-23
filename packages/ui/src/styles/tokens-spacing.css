@@ -58,7 +58,6 @@
   --space-18: var(--figma-spacing-18);
   --space-19: var(--figma-spacing-19);
   --space-20: var(--figma-spacing-20);
-
 }
 
 @theme inline {
@@ -89,5 +88,4 @@
   --spacing-18: var(--space-18);
   --spacing-19: var(--space-19);
   --spacing-20: var(--space-20);
-
 }

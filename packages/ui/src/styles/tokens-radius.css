@@ -42,7 +42,6 @@
   --radius-9-token: var(--figma-radius-9);
   --radius-10-token: var(--figma-radius-10);
   --radius-50-token: var(--figma-radius-50);
-
 }
 
 @theme inline {
