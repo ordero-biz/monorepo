@@ -23,7 +23,6 @@ export type ButtonProps = {
   'aria-label'?: string;
   'aria-labelledby'?: string;
   children?: ReactNode;
-  className?: string;
   color?: ButtonColor;
   disabled?: boolean;
   endIcon?: ReactNode;

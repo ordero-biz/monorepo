@@ -242,7 +242,6 @@ export const Button = forwardRef<HTMLElement, ButtonProps>(
       'aria-label': ariaLabel,
       'aria-labelledby': ariaLabelledBy,
       children,
-      className,
       color,
       disabled,
       endIcon,
@@ -283,10 +282,7 @@ export const Button = forwardRef<HTMLElement, ButtonProps>(
         onKeyDown={onKeyDown}
         tabIndex={tabIndex}
         title={title}
-        className={cn(
-          buttonVariants({ color, fullWidth, size, variant }),
-          className
-        )}
+        className={cn(buttonVariants({ color, fullWidth, size, variant }))}
       >
         {startIcon ? (
           <span className={cn(iconClassName)}>{startIcon}</span>

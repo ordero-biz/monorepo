@@ -30,6 +30,7 @@
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
+    "@ordero/test-config": "workspace:*",
     "@chromatic-com/storybook": "^5.0.1",
     "@storybook/addon-a11y": "^10.2.10",
     "@storybook/addon-docs": "^10.2.10",
