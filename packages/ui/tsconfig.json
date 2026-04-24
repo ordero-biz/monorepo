@@ -19,5 +19,11 @@
       "@ordero/ui/lib/*": ["src/lib/*"]
     }
   },
-  "include": ["src", "stories", ".storybook", "vitest.config.ts"]
+  "include": [
+    "src",
+    "stories",
+    ".storybook",
+    "vitest.config.ts",
+    "vitest.shims.d.ts"
+  ]
 }

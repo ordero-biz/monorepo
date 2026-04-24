@@ -38,6 +38,7 @@
     "@storybook/react-vite": "^10.2.10",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
     "@types/node": "^20",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
@@ -55,6 +56,8 @@
     "vitest": "^4.0.18"
   },
   "dependencies": {
-    "@base-ui/react": "^1.2.0"
+    "@base-ui/react": "^1.2.0",
+    "date-fns": "^4.1.0",
+    "react-day-picker": "^9.14.0"
   }
 }

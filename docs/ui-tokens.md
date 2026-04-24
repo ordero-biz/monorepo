@@ -107,6 +107,36 @@ When importing new variables from Figma:
 3. Expose them to Tailwind only if they need to be used in utility classes.
 4. Prefer semantic naming for component usage.
 
+## When to Expose Tokens to Tailwind Utilities
+
+Not every token should become a Tailwind utility.
+
+Use this rule:
+
+- Expose a token through `@theme inline` only if it is reusable across multiple components or clearly improves readability in component code.
+- Keep a token as a plain CSS variable if it is highly component-specific or would produce awkward utility names.
+
+### Good Candidates for Tailwind Utilities
+
+- Shared semantic colors such as `--color-primary`, `--color-foreground`, and `--color-border`
+- Shared spacing scale tokens
+- Shared semantic radius tokens
+- Shared typography tokens when they improve ergonomics across multiple components
+- Small curated semantic aliases that are likely to be reused in several components
+
+### Better Left as Plain CSS Variables
+
+- Component-internal sizing details such as button icon sizes or textfield adornment offsets
+- Tokens that describe implementation details rather than reusable design intent
+- Tokens whose generated utility names would be overly specific or hard to read
+
+### Practical Guidance
+
+- Prefer Tailwind utilities for shared semantic tokens.
+- Prefer direct CSS variable usage for component-only tokens.
+- Do not promote every component token into a Tailwind namespace just because it is technically possible.
+- Revisit whether a token should become a Tailwind utility after more components are implemented and real reuse patterns appear.
+
 ## Short Version
 
 - Raw Figma tokens for fidelity.
