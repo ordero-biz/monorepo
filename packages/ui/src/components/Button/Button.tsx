@@ -7,7 +7,7 @@ import { cn } from '@/ui/lib/utils';
 import type { ButtonProps } from './types';
 
 const buttonVariants = cva(
-  'inline-flex min-w-[var(--button-min-width)] shrink-0 items-center justify-center gap-[var(--button-spacing)] whitespace-nowrap rounded-[var(--button-radius)] border border-transparent font-bold outline-none transition-[background-color,border-color,color,box-shadow] [&_svg]:pointer-events-none [&_svg]:shrink-0 focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:shadow-none',
+  'inline-flex min-w-[var(--button-min-width)] shrink-0 cursor-pointer items-center justify-center gap-[var(--button-spacing)] whitespace-nowrap rounded-[var(--button-radius)] border border-transparent font-bold outline-none transition-[background-color,border-color,color,box-shadow] [&_svg]:pointer-events-none [&_svg]:shrink-0 focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:shadow-none',
   {
     variants: {
       color: {
