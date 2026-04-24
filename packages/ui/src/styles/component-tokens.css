@@ -514,7 +514,7 @@
   --icon-button-sm-icon-token: var(--figma-icon-button-sm-icon);
   --icon-button-sm-size-token: var(--figma-icon-button-sm-size);
   --icon-button-md-icon-token: var(--figma-icon-button-md-icon);
-  --icon-button-sizesize-token: var(--figma-icon-button-sizesize);
+  --icon-button-md-size-token: var(--figma-icon-button-sizesize);
   --icon-button-lg-icon-token: var(--figma-icon-button-lg-icon);
   --icon-button-lg-size-token: var(--figma-icon-button-lg-size);
 
@@ -808,7 +808,7 @@
   --icon-button-sm-icon: var(--icon-button-sm-icon-token);
   --icon-button-sm-size: var(--icon-button-sm-size-token);
   --icon-button-md-icon: var(--icon-button-md-icon-token);
-  --icon-button-sizesize: var(--icon-button-sizesize-token);
+  --icon-button-md-size: var(--icon-button-md-size-token);
   --icon-button-lg-icon: var(--icon-button-lg-icon-token);
   --icon-button-lg-size: var(--icon-button-lg-size-token);
 
