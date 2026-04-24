@@ -34,9 +34,6 @@ export default function Home() {
             </a>{' '}
             center.
           </p>
-          <p className="text-sm text-zinc-500 dark:text-zinc-400">
-            Sum example: {sum}
-          </p>
         </div>
         <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
           <a
