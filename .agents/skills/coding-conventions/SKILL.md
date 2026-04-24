@@ -1,11 +1,25 @@
 ---
 name: coding-conventions
-description: Use when adding or changing any TSX/TS file.
+description: Use when adding or changing any TSX/TS file for general TypeScript and React code conventions in this repo. For shared packages/ui component work, combine this with ui-component-build and ui-routine-conventions.
 ---
 
 # Coding Conventions
 
-Apply these conventions in touched files.
+Apply these conventions in touched TS/TSX files.
+
+This skill is intentionally narrow:
+
+- it covers general TypeScript and React authoring conventions
+- it does not define the full packages/ui component workflow
+- it does not define the repo's testing philosophy or token architecture
+
+For component work in `packages` or `apps`, always also use:
+
+- `ui-routine-conventions`
+
+For shared UI component work in `packages/ui`, always also use:
+
+- `ui-component-build`
 
 ## 0. Handle convention conflicts
 

@@ -1,29 +1,43 @@
 ---
 name: shadcn-component-add
-description: Add a new shared UI component to this monorepo using shadcn and local conventions. Use when asked to create, scaffold, or wire a component in packages/ui, including placement under packages/ui/src/components/[ComponentName], local types.ts and index.ts files, root export updates in packages/ui/src/index.ts, Vitest + RTL tests, and Storybook story creation.
+description: Legacy entry point for adding shared UI components in packages/ui. Use when asked to create, scaffold, or wire a component in packages/ui, then follow ui-component-build for the current project-specific workflow and ui-routine-conventions for testing and token decisions.
 ---
 
 # Shadcn Component Add
 
-Follow this workflow every time.
+This skill remains as a compatibility trigger, but the current project workflow lives in:
+
+- `ui-component-build`
+- `ui-routine-conventions`
+
+Use this skill as the entry point when a request clearly means "add a new shared UI component", then always follow the two newer skills above for implementation details.
+
+## Current Positioning
+
+- Use shadcn-style component structure and APIs.
+- Use Base UI primitives/components by default when a matching primitive/component exists.
+- Keep styling aligned with the project's Tailwind + token architecture.
+- Keep tests behavior-focused rather than implementation-focused.
 
 ## 1. Confirm target and naming
 
 - Ask for the component name if missing.
 - Use PascalCase for folder and component names.
 - Create component folder at `packages/ui/src/components/[ComponentName]`.
-- If the request includes type, naming, or TS/JS style constraints, also apply `coding-conventions`.
+- Also apply `coding-conventions`.
 
 ## 2. Scaffold with shadcn
 
-- From repo root, run:
+- Use shadcn scaffolding only when it helps materially.
+- Do not force a generator step if a manual implementation is cleaner or the component needs a Base UI primitive wrapper.
+- If you do scaffold, start from repo root:
 
 ```bash
 pnpm shadcn:add <component-token>
 ```
 
 - This maps to root script `shadcn:add` and runs shadcn inside `packages/ui`.
-- Move or adjust generated files so the final structure matches this skill.
+- Move or adjust generated files so the final structure matches the project conventions.
 
 ## 3. Enforce component structure
 
@@ -53,8 +67,9 @@ Create `packages/ui/src/components/[ComponentName]/[ComponentName].test.tsx`.
 Minimum test baseline:
 
 - Render test with `@testing-library/react`.
-- Assert an accessible role/name or visible content.
-- Use `describe/it/expect` from `vitest`.
+- Prefer role/name assertions and user-observable behavior.
+- Use `@testing-library/user-event` for interactions.
+- Rely on Vitest globals in `packages/ui` instead of importing `describe/it/expect` per file.
 
 ## 5. Add Storybook story
 
@@ -66,8 +81,4 @@ Minimum test baseline:
 - Verify imports resolve and exports are reachable from `packages/ui/src/index.ts`.
 - Run targeted tests for the new component when possible.
 - Run Storybook checks when requested.
-
-## Testing and typing preferences
-
-- For evolving preferences, keep details in `references/testing-and-types.md`.
-- Keep this SKILL.md focused on stable workflow rules.
+- Run `pnpm --dir packages/ui format` and `pnpm --dir packages/ui typecheck` when possible.
