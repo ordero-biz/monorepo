@@ -88,6 +88,7 @@ Do:
 
 - query by role and accessible name
 - use `@testing-library/user-event` for interactions
+- use `prepareSetup` from `@ordero/test-config/react` for repeated component defaults in a test file
 - test behavior such as click handling, disabled behavior, submit behavior, accessible naming, and other real outcomes
 
 Do not:
@@ -97,6 +98,8 @@ Do not:
 - test implementation details that a refactor could change without changing behavior
 
 Vitest globals are enabled in `packages/ui`, so do not import `describe`, `it`, `expect`, `vi`, or lifecycle helpers in each test file.
+
+For the canonical shared setup example, see `../ui-routine-conventions/references/prepare-setup-example.md`.
 
 ## Validation
 

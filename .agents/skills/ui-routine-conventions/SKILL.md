@@ -41,7 +41,11 @@ Preferred tooling:
 
 - `@testing-library/react`
 - `@testing-library/user-event`
+- `prepareSetup` from `@ordero/test-config/react` when a test file benefits from shared default props
 - Vitest globals (`describe`, `it`, `expect`, `vi`, etc.) without per-file imports
+
+When writing component tests with repeated default props, prefer the shared setup helper.
+See `references/prepare-setup-example.md` for the canonical example and the rule for when plain `render(...)` is still the better choice.
 
 ## CSS Variable Conventions
 
