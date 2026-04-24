@@ -10,7 +10,8 @@
       "*.jsx",
       "*.mjs",
       "*.cjs",
-      "*.json"
+      "*.json",
+      "!!next-env.d.ts"
     ]
   }
 }
