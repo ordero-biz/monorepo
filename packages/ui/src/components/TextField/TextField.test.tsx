@@ -28,9 +28,13 @@ describe('TextField', () => {
   });
 
   it('labels the input and wires helper text as the accessible description', () => {
-    const { helperText, label } = setup({
-      label: 'Your email',
-      helperText: 'Use your email',
+    const label = 'Your email';
+    const helperText = 'Use your email';
+
+    setup({
+      label,
+      helperText,
+      variant: 'filled',
     });
 
     const input = screen.getByRole('textbox', { name: label });
@@ -52,9 +56,12 @@ describe('TextField', () => {
   });
 
   it('renders helper text with its icon when valid', () => {
-    const { helperText } = setup({
+    const helperText = 'Use your email';
+
+    setup({
       helperIcon: <TestHelperIcon />,
-      helperText: 'Use your email',
+      helperText,
+      variant: 'filled',
     });
 
     expect(screen.getByText(helperText)).toBeInTheDocument();
@@ -62,12 +69,16 @@ describe('TextField', () => {
   });
 
   it('shows error text instead of helper text when invalid', () => {
-    const { errorText, helperText } = setup({
+    const errorText = 'Email is required.';
+    const helperText = 'Use your email';
+
+    setup({
       errorIcon: <TestErrorIcon />,
-      errorText: 'Email is required.',
+      errorText,
       helperIcon: <TestHelperIcon />,
       invalid: true,
-      helperText: 'Use your email',
+      helperText,
+      variant: 'filled',
     });
 
     const input = screen.getByRole('textbox', { name: 'Email' });
@@ -80,11 +91,15 @@ describe('TextField', () => {
   });
 
   it('keeps the field accessible when adornments are provided', () => {
-    const { label } = setup({
+    const label = 'Search';
+
+    setup({
+      defaultValue: 'Value',
       disabled: true,
       endAdornment: 'kg',
-      label: 'Search',
+      label,
       startAdornment: <span aria-hidden="true">$</span>,
+      variant: 'filled',
     });
 
     expect(screen.getByRole('textbox', { name: label })).toBeDisabled();

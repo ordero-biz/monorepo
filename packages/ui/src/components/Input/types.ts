@@ -9,6 +9,7 @@ import type {
 } from 'react';
 
 export type InputSize = 's' | 'm';
+export type InputVariant = 'outlined' | 'filled';
 
 export type InputProps = {
   'aria-describedby'?: string;
@@ -36,4 +37,5 @@ export type InputProps = {
   startIcon?: ElementType<{ className?: string }>;
   type?: HTMLInputTypeAttribute;
   value?: string;
+  variant?: InputVariant;
 };

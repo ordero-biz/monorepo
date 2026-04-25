@@ -9,6 +9,7 @@ import type {
 } from 'react';
 
 export type TextFieldSize = 's' | 'm';
+export type TextFieldVariant = 'outlined' | 'filled';
 
 export type TextFieldProps = {
   'aria-describedby'?: string;
@@ -40,4 +41,5 @@ export type TextFieldProps = {
   startIcon?: ElementType<{ className?: string }>;
   type?: HTMLInputTypeAttribute;
   value?: string;
+  variant?: TextFieldVariant;
 };

@@ -2,7 +2,7 @@
 
 import { Field } from '@base-ui/react/field';
 import { cva } from 'class-variance-authority';
-import { forwardRef, useId } from 'react';
+import { forwardRef, useId, useState } from 'react';
 import { Input } from '@/ui/components/Input';
 import { cn } from '@/ui/lib/utils';
 import type { TextFieldProps } from './types';
@@ -13,9 +13,14 @@ const textFieldRootVariants = cva('flex w-full min-w-0 flex-col', {
       m: '',
       s: '',
     },
+    variant: {
+      outlined: '',
+      filled: '',
+    },
   },
   defaultVariants: {
     size: 'm',
+    variant: 'outlined',
   },
 });
 
@@ -97,10 +102,12 @@ export const TextField = forwardRef<HTMLElement, TextFieldProps>(
       startIcon,
       type = 'text',
       value,
+      variant = 'outlined',
     },
     ref
   ) => {
     const supportTextId = useId();
+    const [focusedState, setFocusedState] = useState(false);
     const describedBy =
       [
         ariaDescribedBy,
@@ -111,23 +118,21 @@ export const TextField = forwardRef<HTMLElement, TextFieldProps>(
 
     return (
       <Field.Root
-        className={cn(textFieldRootVariants({ size }))}
+        className={cn(textFieldRootVariants({ size, variant }))}
         data-slot="text-field"
         disabled={disabled}
         invalid={invalid}
       >
         {label ? (
           <Field.Label
-            className={(state) =>
-              cn(
-                labelClassName,
-                getLabelColorClassName({
-                  disabled: state.disabled,
-                  focused: state.focused,
-                  invalid,
-                })
-              )
-            }
+            className={cn(
+              labelClassName,
+              getLabelColorClassName({
+                disabled,
+                focused: focusedState,
+                invalid,
+              })
+            )}
           >
             {label}
           </Field.Label>
@@ -142,11 +147,18 @@ export const TextField = forwardRef<HTMLElement, TextFieldProps>(
           disabled={disabled}
           endAdornment={endAdornment}
           endIcon={endIcon}
+          focused={focusedState}
           id={id}
           invalid={invalid}
           name={name}
-          onBlur={onBlur}
-          onFocus={onFocus}
+          onBlur={(event) => {
+            setFocusedState(false);
+            onBlur?.(event);
+          }}
+          onFocus={(event) => {
+            setFocusedState(true);
+            onFocus?.(event);
+          }}
           onKeyDown={onKeyDown}
           onValueChange={onValueChange}
           placeholder={placeholder}
@@ -158,6 +170,7 @@ export const TextField = forwardRef<HTMLElement, TextFieldProps>(
           startIcon={startIcon}
           type={type}
           value={value}
+          variant={variant}
         />
         {invalid && errorText ? (
           <Field.Error

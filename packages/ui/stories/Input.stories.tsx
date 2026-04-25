@@ -18,9 +18,15 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-export const Default: Story = {};
+export const OutlinedDefault: Story = {};
 
-export const WithIconAdornments: Story = {
+export const FilledDefault: Story = {
+  args: {
+    variant: 'filled',
+  },
+};
+
+export const OutlinedWithIconAdornments: Story = {
   args: {
     defaultValue: 'Value',
     endAdornment: (
@@ -32,7 +38,20 @@ export const WithIconAdornments: Story = {
   },
 };
 
-export const WithTextAndAction: Story = {
+export const FilledWithIconAdornments: Story = {
+  args: {
+    defaultValue: 'Value',
+    endAdornment: (
+      <IconButton aria-label="Reveal value" color="default" size="m">
+        <Eye />
+      </IconButton>
+    ),
+    startIcon: Search,
+    variant: 'filled',
+  },
+};
+
+export const OutlinedWithTextAndAction: Story = {
   args: {
     defaultValue: '100',
     endAdornment: (
@@ -44,10 +63,31 @@ export const WithTextAndAction: Story = {
   },
 };
 
-export const Disabled: Story = {
+export const FilledWithTextAndAction: Story = {
+  args: {
+    defaultValue: '100',
+    endAdornment: (
+      <Button color="inherit" size="m" variant="contained">
+        Action
+      </Button>
+    ),
+    startAdornment: 'Kg',
+    variant: 'filled',
+  },
+};
+
+export const OutlinedDisabled: Story = {
   args: {
     defaultValue: 'Disabled',
     disabled: true,
     startAdornment: 'Kg',
+  },
+};
+
+export const FilledDisabled: Story = {
+  args: {
+    defaultValue: 'Disabled',
+    disabled: true,
+    variant: 'filled',
   },
 };

@@ -23,9 +23,13 @@ describe('Input', () => {
   });
 
   it('renders a standalone textbox', () => {
-    const { 'aria-label': ariaLabel } = setup({ 'aria-label': 'Search input' });
+    const ariaLabel = 'Search input';
 
-    expect(screen.getByRole('textbox', { name: ariaLabel })).toBeInTheDocument();
+    setup({ 'aria-label': ariaLabel });
+
+    expect(
+      screen.getByRole('textbox', { name: ariaLabel })
+    ).toBeInTheDocument();
   });
 
   it('renders the initial value and supports readonly and required states', () => {
@@ -56,12 +60,16 @@ describe('Input', () => {
   });
 
   it('renders start and end adornments and icons', () => {
-    const { endAdornment, startAdornment } = setup({
+    const startAdornment = '$';
+    const endAdornment = 'kg';
+
+    setup({
       'aria-label': 'Amount',
-      endAdornment: 'kg',
+      endAdornment,
       endIcon: TestEndIcon,
-      startAdornment: '$',
+      startAdornment,
       startIcon: TestStartIcon,
+      variant: 'filled',
     });
 
     expect(screen.getByText(startAdornment)).toBeInTheDocument();
@@ -71,10 +79,14 @@ describe('Input', () => {
   });
 
   it('disables the textbox when disabled is set', () => {
-    const { 'aria-label': ariaLabel, startAdornment } = setup({
-      'aria-label': 'Amount',
+    const ariaLabel = 'Amount';
+    const startAdornment = 'Kg';
+
+    setup({
+      'aria-label': ariaLabel,
       disabled: true,
-      startAdornment: 'Kg',
+      startAdornment,
+      variant: 'filled',
     });
 
     expect(screen.getByRole('textbox', { name: ariaLabel })).toBeDisabled();
@@ -106,6 +118,8 @@ describe('Input', () => {
     expect(onFocus).toHaveBeenCalledTimes(1);
     expect(onKeyDown).toHaveBeenCalled();
     expect(onBlur).toHaveBeenCalledTimes(1);
-    expect(screen.getByRole('button', { name: 'Next focus target' })).toHaveFocus();
+    expect(
+      screen.getByRole('button', { name: 'Next focus target' })
+    ).toHaveFocus();
   });
 });
