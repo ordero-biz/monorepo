@@ -22,7 +22,7 @@ When the task touches tokens or CSS variable architecture, read:
 
 ## Testing Conventions
 
-Prefer behavior-first tests.
+Use behavior-first tests.
 
 Good tests:
 
@@ -37,22 +37,25 @@ Avoid:
 - asserting class name presence unless there is no better observable signal
 - asserting token names or `cva` internals
 
-Preferred tooling:
+Required tooling defaults:
 
 - `@testing-library/react`
 - `@testing-library/user-event`
-- `prepareSetup` from `@ordero/test-config/react` when a test file benefits from shared default props
+- `prepareSetup` from `@ordero/test-config/react` for shared component test files with repeated default props
 - Vitest globals (`describe`, `it`, `expect`, `vi`, etc.) without per-file imports
 
-When writing component tests with repeated default props, prefer the shared setup helper.
-See `references/prepare-setup-example.md` for the canonical example and the rule for when plain `render(...)` is still the better choice.
+For shared component tests with repeated default props, use `prepareSetup`.
+Use plain `render(...)` only for one-off tests that need surrounding structure such as forms, extra focus targets, or similar setup that would be less clear with `prepareSetup`.
+See `references/prepare-setup-example.md` for the canonical pattern.
 
 ## CSS Variable Conventions
 
 - Keep raw imported Figma values in the `--figma-*` layer.
-- Prefer semantic tokens over raw Figma tokens in component code.
+- Use semantic or bridged tokens instead of raw Figma tokens in component code whenever they exist.
 - Do not introduce one-off semantic globals casually.
-- Before adding new variables, check whether the existing token files already cover the needed value.
+- Before adding new variables or using raw `--figma-*` values, check whether the existing token files already cover the needed value.
+- In `packages/ui`, inspect `packages/ui/src/styles` before assuming a token is missing. Treat `globals.css` as the entry point and check the relevant token files in that folder before adding vars or using raw `--figma-*` values.
+- If a bridged or semantic token already exists, do not use the raw `--figma-*` token.
 
 ## Tailwind Utility Exposure Rule
 
