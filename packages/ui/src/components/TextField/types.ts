@@ -8,9 +8,9 @@ import type {
   ReactNode,
 } from 'react';
 
-export type InputSize = 's' | 'm';
+export type TextFieldSize = 's' | 'm';
 
-export type InputProps = {
+export type TextFieldProps = {
   'aria-describedby'?: string;
   'aria-label'?: string;
   'aria-labelledby'?: string;
@@ -20,9 +20,13 @@ export type InputProps = {
   disabled?: boolean;
   endAdornment?: ReactNode;
   endIcon?: ElementType<{ className?: string }>;
-  focused?: boolean;
+  errorIcon?: ReactNode;
+  errorText?: ReactNode;
+  helperIcon?: ReactNode;
+  helperText?: ReactNode;
   id?: string;
   invalid?: boolean;
+  label?: ReactNode;
   name?: string;
   onBlur?: FocusEventHandler<HTMLInputElement>;
   onFocus?: FocusEventHandler<HTMLInputElement>;
@@ -31,7 +35,7 @@ export type InputProps = {
   placeholder?: string;
   readOnly?: boolean;
   required?: boolean;
-  size?: InputSize;
+  size?: TextFieldSize;
   startAdornment?: ReactNode;
   startIcon?: ElementType<{ className?: string }>;
   type?: HTMLInputTypeAttribute;

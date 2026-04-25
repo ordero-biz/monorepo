@@ -1,4 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { Eye, Search } from 'lucide-react';
+import { Button } from '@/ui/components/Button';
+import { IconButton } from '@/ui/components/IconButton';
 import { Input } from '@/ui/components/Input';
 
 const meta = {
@@ -6,7 +9,8 @@ const meta = {
   component: Input,
   tags: ['autodocs'],
   args: {
-    placeholder: 'Type here...',
+    'aria-label': 'Input',
+    placeholder: 'Value',
   },
 } satisfies Meta<typeof Input>;
 
@@ -16,16 +20,34 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {};
 
-export const Password: Story = {
+export const WithIconAdornments: Story = {
   args: {
-    type: 'password',
-    placeholder: 'Enter password...',
+    defaultValue: 'Value',
+    endAdornment: (
+      <IconButton aria-label="Reveal value" color="default" size="m">
+        <Eye />
+      </IconButton>
+    ),
+    startIcon: Search,
   },
 };
 
-export const Error: Story = {
+export const WithTextAndAction: Story = {
   args: {
-    'aria-invalid': true,
-    placeholder: 'Invalid value',
+    defaultValue: '100',
+    endAdornment: (
+      <Button color="inherit" size="m" variant="contained">
+        Action
+      </Button>
+    ),
+    startAdornment: 'Kg',
+  },
+};
+
+export const Disabled: Story = {
+  args: {
+    defaultValue: 'Disabled',
+    disabled: true,
+    startAdornment: 'Kg',
   },
 };

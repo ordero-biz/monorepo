@@ -17,11 +17,10 @@ const { setup } = prepareSetup<ButtonProps & { children: string }>({
 
 it('calls the click handler when enabled', async () => {
   const user = userEvent.setup();
-  const onClick = vi.fn();
 
-  setup({ children: 'Click me', onClick });
+  const { children, onClick } = setup({ children: 'Click me', onClick: vi.fn() });
 
-  await user.click(screen.getByRole('button', { name: 'Click me' }));
+  await user.click(screen.getByRole('button', { name: children }));
 
   expect(onClick).toHaveBeenCalledTimes(1);
 });

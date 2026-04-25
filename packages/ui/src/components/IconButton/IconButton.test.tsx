@@ -17,31 +17,34 @@ describe('IconButton', () => {
   });
 
   it('renders a button users can find by its accessible name', () => {
-    setup();
+    const { 'aria-label': ariaLabel } = setup({ 'aria-label': 'Save' });
 
-    expect(screen.getByRole('button', { name: 'Refresh' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: ariaLabel })).toBeInTheDocument();
   });
 
   it('calls the click handler when enabled', async () => {
     const user = userEvent.setup();
-    const onClick = vi.fn();
+    const { onClick, 'aria-label': ariaLabel } = setup({
+      'aria-label': 'Save',
+      onClick: vi.fn(),
+    });
 
-    setup({ onClick });
-
-    await user.click(screen.getByRole('button', { name: 'Refresh' }));
+    await user.click(screen.getByRole('button', { name: ariaLabel }));
 
     expect(onClick).toHaveBeenCalledTimes(1);
   });
 
   it('does not call the click handler when disabled', async () => {
     const user = userEvent.setup();
-    const onClick = vi.fn();
+    const { onClick, 'aria-label': ariaLabel } = setup({
+      'aria-label': 'Save',
+      onClick: vi.fn(),
+      disabled: true,
+    });
 
-    setup({ disabled: true, onClick });
+    await user.click(screen.getByRole('button', { name: ariaLabel }));
 
-    await user.click(screen.getByRole('button', { name: 'Refresh' }));
-
-    expect(screen.getByRole('button', { name: 'Refresh' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: ariaLabel })).toBeDisabled();
     expect(onClick).not.toHaveBeenCalled();
   });
 
@@ -62,9 +65,7 @@ describe('IconButton', () => {
     await user.tab();
     await user.tab();
 
-    expect(
-      screen.getByRole('button', { name: 'Next focus target' })
-    ).toHaveFocus();
+    expect(screen.getByRole('button', { name: 'Next focus target' })).toHaveFocus();
     expect(onFocus).toHaveBeenCalledTimes(1);
     expect(onBlur).toHaveBeenCalledTimes(1);
   });
