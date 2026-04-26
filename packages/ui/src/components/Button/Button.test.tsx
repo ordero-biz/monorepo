@@ -23,14 +23,20 @@ describe('Button', () => {
   });
 
   it('uses the aria-label as the accessible name when provided', () => {
-    const { 'aria-label': ariaLabel } = setup({ 'aria-label': 'Close dialog', children: '' });
+    const { 'aria-label': ariaLabel } = setup({
+      'aria-label': 'Close dialog',
+      children: '',
+    });
 
     expect(screen.getByRole('button', { name: ariaLabel })).toBeInTheDocument();
   });
 
   it('calls the click handler when enabled', async () => {
     const user = userEvent.setup();
-    const { onClick, children } = setup({ children: 'Click me', onClick: vi.fn() });
+    const { onClick, children } = setup({
+      children: 'Click me',
+      onClick: vi.fn(),
+    });
 
     await user.click(screen.getByRole('button', { name: children }));
 
@@ -53,7 +59,10 @@ describe('Button', () => {
 
   it('calls the focus handler when the button receives focus', async () => {
     const user = userEvent.setup();
-    const { onFocus, children } = setup({ children: 'Focus me', onFocus: vi.fn() });
+    const { onFocus, children } = setup({
+      children: 'Focus me',
+      onFocus: vi.fn(),
+    });
 
     await user.tab();
 
@@ -75,13 +84,18 @@ describe('Button', () => {
     await user.tab();
     await user.tab();
 
-    expect(screen.getByRole('button', { name: 'Next focus target' })).toHaveFocus();
+    expect(
+      screen.getByRole('button', { name: 'Next focus target' })
+    ).toHaveFocus();
     expect(onBlur).toHaveBeenCalledTimes(1);
   });
 
   it('calls the keydown handler when a key is pressed', async () => {
     const user = userEvent.setup();
-    const { onKeyDown, children } = setup({ children: 'Keyboard', onKeyDown: vi.fn() });
+    const { onKeyDown, children } = setup({
+      children: 'Keyboard',
+      onKeyDown: vi.fn(),
+    });
 
     await user.tab();
     await user.keyboard('{Enter}');

@@ -30,6 +30,9 @@
     }
   },
   "css": {
+    "formatter": {
+      "quoteStyle": "single"
+    },
     "parser": {
       "tailwindDirectives": true
     }
