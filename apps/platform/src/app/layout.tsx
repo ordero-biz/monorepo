@@ -1,15 +1,20 @@
 import type { Metadata } from 'next';
-import { Geist, Geist_Mono } from 'next/font/google';
+import { Barlow, Public_Sans } from 'next/font/google';
+import type { ReactNode } from 'react';
 import './globals.css';
 
-const geistSans = Geist({
-  variable: '--font-geist-sans',
+const publicSans = Public_Sans({
+  variable: '--font-public-sans',
   subsets: ['latin'],
+  display: 'swap',
+  weight: ['400', '500', '600', '700', '800'],
 });
 
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
+const barlow = Barlow({
+  variable: '--font-barlow',
   subsets: ['latin'],
+  display: 'swap',
+  weight: ['700', '800'],
 });
 
 export const metadata: Metadata = {
@@ -20,13 +25,11 @@ export const metadata: Metadata = {
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: ReactNode;
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className={`${publicSans.variable} ${barlow.variable} antialiased`}>
         {children}
       </body>
     </html>

@@ -155,6 +155,15 @@ importers:
       '@base-ui/react':
         specifier: ^1.2.0
         version: 1.2.0(@types/react@19.2.14)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+      '@fontsource/barlow':
+        specifier: ^5.2.8
+        version: 5.2.8
+      '@fontsource/public-sans':
+        specifier: ^5.2.7
+        version: 5.2.7
+      '@fontsource/roboto':
+        specifier: ^5.2.10
+        version: 5.2.10
       date-fns:
         specifier: ^4.1.0
         version: 4.1.0
@@ -656,6 +665,15 @@ packages:
 
   '@floating-ui/utils@0.2.10':
     resolution: {integrity: sha512-aGTxbpbg8/b5JfU1HXSrbH3wXZuLPJcNEcZQFMxLs3oSzgtVu6nFPkbbGGUvBcUjKV2YyB9Wxxabo+HEH9tcRQ==}
+
+  '@fontsource/barlow@5.2.8':
+    resolution: {integrity: sha512-iuFOnY4OI2cd1STrJ3NdJNzWjhcwv6JarmqfdoZzAmz9g0jTVjES86MNbuBxqVR3ydbTEjo4opEl24GXScRM7w==}
+
+  '@fontsource/public-sans@5.2.7':
+    resolution: {integrity: sha512-pVttDr3HvhVIt2x6sZJfZKksNEpq23C1JCHTQwT9KWJdmFRdNeRM8gQftq8uP72sPW+p3Ku9x8HPk2E392DFvg==}
+
+  '@fontsource/roboto@5.2.10':
+    resolution: {integrity: sha512-8HlA5FtSfz//oFSr2eL7GFXAiE7eIkcGOtx7tjsLKq+as702x9+GU7K95iDeWFapHC4M2hv9RrpXKRTGGBI8Zg==}
 
   '@img/colour@1.0.0':
     resolution: {integrity: sha512-A5P/LfWGFSl6nsckYtjw9da+19jB8hkJ6ACTGcDfEJ0aE+l2n2El7dsVM7UVHZQ9s2lmYMWlrS21YLy2IR1LUw==}
@@ -2670,6 +2688,12 @@ snapshots:
       react-dom: 19.2.3(react@19.2.3)
 
   '@floating-ui/utils@0.2.10': {}
+
+  '@fontsource/barlow@5.2.8': {}
+
+  '@fontsource/public-sans@5.2.7': {}
+
+  '@fontsource/roboto@5.2.10': {}
 
   '@img/colour@1.0.0':
     optional: true
