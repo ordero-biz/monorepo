@@ -51,3 +51,9 @@ For shared UI component work in `packages/ui`, always also use:
 - Do not reference the global React namespace for types (for example, `React.ReactNode`).
 - Do not use namespace imports like `import * as React from 'react'`.
 - Prefer direct type imports, for example `import type { ReactNode } from 'react'`.
+
+## 6. Avoid deprecated library types
+
+- Do not introduce deprecated library types in new or touched code.
+- Prefer the non-deprecated types that match the actual value, event, ref, or API shape being used.
+- When a library marks a broad alias or compatibility type as deprecated, use the more specific supported type instead.
