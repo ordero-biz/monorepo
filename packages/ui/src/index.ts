@@ -6,6 +6,12 @@ export type {
 } from './components/Button';
 export { Button, buttonVariants } from './components/Button';
 export type {
+  CheckboxColor,
+  CheckboxProps,
+  CheckboxSize,
+} from './components/Checkbox';
+export { Checkbox, checkboxRootVariants } from './components/Checkbox';
+export type {
   IconButtonColor,
   IconButtonProps,
   IconButtonSize,

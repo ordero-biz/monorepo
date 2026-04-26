@@ -92,6 +92,7 @@ Do:
 - query by role and accessible name
 - use `@testing-library/user-event` for interactions
 - use `prepareSetup` from `@ordero/test-config/react` for repeated component defaults in a test file
+- when a `prepareSetup` test asserts on an overridden prop, destructure that prop from `setup(...)` and assert on the returned value rather than a separate local variable
 - test behavior such as click handling, disabled behavior, submit behavior, accessible naming, and other real outcomes
 
 Do not:

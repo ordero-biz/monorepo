@@ -45,6 +45,7 @@ Required tooling defaults:
 - Vitest globals (`describe`, `it`, `expect`, `vi`, etc.) without per-file imports
 
 For shared component tests with repeated default props, use `prepareSetup`.
+When a `prepareSetup` test overrides a prop and later asserts on that prop, destructure the asserted value from the object returned by `setup(...)` instead of keeping a separate local variable for the same override.
 Use plain `render(...)` only for one-off tests that need surrounding structure such as forms, extra focus targets, or similar setup that would be less clear with `prepareSetup`.
 See `references/prepare-setup-example.md` for the canonical pattern.
 

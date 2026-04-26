@@ -45,10 +45,9 @@ describe('Select', () => {
 
   it('opens the list and calls onValueChange when the user picks an option', async () => {
     const user = userEvent.setup();
-    const onValueChange = vi.fn();
-    const { 'aria-label': ariaLabel } = setup({
+    const { 'aria-label': ariaLabel, onValueChange } = setup({
       'aria-label': 'Navigation mode',
-      onValueChange,
+      onValueChange: vi.fn(),
     });
 
     await user.click(screen.getByRole('combobox', { name: ariaLabel }));
