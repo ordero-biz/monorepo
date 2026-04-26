@@ -49,13 +49,13 @@ const iconClassName =
   'ml-[var(--textfield-select-arrow-mr)] flex shrink-0 items-center justify-center text-[var(--text-secondary)] transition-transform data-[popup-open]:rotate-180 [&_svg]:size-[var(--textfield-select-arrow-icon)]';
 
 const popupClassName =
-  'overflow-hidden rounded-[var(--radius)] border border-[var(--figma-grey-16)] bg-[var(--figma-white-main)] p-[var(--menu-list-p)] shadow-[0_0_2px_0_var(--figma-grey-16),0_20px_40px_-12px_var(--figma-grey-20)]';
+  'overflow-hidden rounded-[var(--radius)] border border-[var(--color-grey-16)] bg-[var(--white-main)] p-[var(--menu-list-p)] shadow-[var(--dropdown-x1)_var(--dropdown-y1)_var(--dropdown-blur1)_var(--dropdown-spread1)_var(--color-grey-16),var(--dropdown-x2)_var(--dropdown-y2)_var(--dropdown-blur2)_var(--dropdown-spread2)_var(--color-grey-20)]';
 
 const listClassName =
   'flex flex-col gap-[var(--menu-list-spacing)] rounded-[calc(var(--radius)-4px)]';
 
 const itemClassName =
-  'flex h-[36px] w-full cursor-pointer items-center rounded-[var(--radius)] text-left outline-none transition-[background-color,color] data-[highlighted]:bg-[var(--figma-grey-8)] data-[selected]:bg-[var(--figma-grey-16)]';
+  'flex h-[36px] w-full cursor-pointer items-center rounded-[var(--radius)] text-left outline-none transition-[background-color,color] data-[highlighted]:bg-[var(--color-grey-8)] data-[selected]:bg-[var(--color-grey-16)]';
 
 const itemPaddingClassNames = {
   outlined: 'px-[10px]',
@@ -142,8 +142,8 @@ const getSelectStyle = ({
 
   if (disabled) {
     return {
-      '--_select-outline-shadow': 'inset 0 0 0 1px var(--figma-grey-20)',
-      '--_select-hover-outline-shadow': 'inset 0 0 0 1px var(--figma-grey-20)',
+      '--_select-outline-shadow': 'inset 0 0 0 1px var(--color-grey-20)',
+      '--_select-hover-outline-shadow': 'inset 0 0 0 1px var(--color-grey-20)',
     };
   }
 

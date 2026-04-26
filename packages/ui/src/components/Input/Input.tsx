@@ -101,8 +101,8 @@ const getInputStyle = ({
 
   if (disabled) {
     return {
-      '--_input-outline-shadow': 'inset 0 0 0 1px var(--figma-grey-20)',
-      '--_input-hover-outline-shadow': 'inset 0 0 0 1px var(--figma-grey-20)',
+      '--_input-outline-shadow': 'inset 0 0 0 1px var(--color-grey-20)',
+      '--_input-hover-outline-shadow': 'inset 0 0 0 1px var(--color-grey-20)',
     };
   }
 

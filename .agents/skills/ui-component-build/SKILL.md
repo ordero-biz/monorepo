@@ -59,12 +59,15 @@ Follow this token architecture:
 - Semantic app tokens are the preferred layer for component usage.
 - Tailwind utilities should be used for shared semantic tokens.
 - Component-only tokens may stay as CSS variable references when promoting them to Tailwind utilities would be noisy or premature.
+- Do not use raw `--figma-*` tokens in component code.
+- Do not invent new semantic or bridged tokens until you have reviewed the existing token system through `packages/ui/src/styles/globals.css`, then the imported token files under `packages/ui/src/styles`.
 
 Do not add ad hoc component-specific semantic globals to `globals.css` unless there is a strong architectural reason.
 
 When implementing from Figma:
 
 - Prefer existing imported tokens first.
+- Review `packages/ui/src/styles/globals.css` as the entry point, then the imported token files under `packages/ui/src/styles`, before deciding a token is missing.
 - Only add new token mappings when the value is genuinely missing from the current token layers.
 - Preserve the project structure described in `docs/ui-tokens.md`.
 

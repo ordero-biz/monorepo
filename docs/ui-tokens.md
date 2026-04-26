@@ -68,11 +68,13 @@ That means the architecture is:
 ## Recommended Rules
 
 - Keep raw Figma tokens in a dedicated `--figma-*` layer.
-- Do not style components directly with raw `--figma-*` tokens unless there is a specific reason.
+- Do not use raw `--figma-*` tokens in component code.
 - Prefer semantic tokens like `--background`, `--foreground`, `--primary`, `--border`, `--input`, `--ring`, and `--radius`.
 - Keep the semantic layer stable even if raw Figma token names evolve.
 - Export semantic tokens to Tailwind through `@theme inline`.
 - Preserve shadcn compatibility by keeping the semantic token set that shadcn expects.
+- Before adding or changing tokens for `packages/ui`, review `packages/ui/src/styles/globals.css` as the entry point, then the imported token files under `packages/ui/src/styles`.
+- Do not invent new semantic or bridged tokens when an existing token already covers the value.
 
 ## Radius Guidance
 
@@ -103,9 +105,10 @@ This keeps the component radius behavior aligned with Figma while preserving sha
 When importing new variables from Figma:
 
 1. Add them to the raw `--figma-*` layer.
-2. Decide whether they need an app-level semantic alias.
-3. Expose them to Tailwind only if they need to be used in utility classes.
-4. Prefer semantic naming for component usage.
+2. Review `packages/ui/src/styles/globals.css` as the entry point, then the imported token files under `packages/ui/src/styles`, to confirm the value is not already covered.
+3. Decide whether they need an app-level semantic alias.
+4. Expose them to Tailwind only if they need to be used in utility classes.
+5. Prefer semantic naming for component usage.
 
 ## When to Expose Tokens to Tailwind Utilities
 

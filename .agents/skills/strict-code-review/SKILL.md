@@ -117,7 +117,9 @@ When the diff touches UI components, styles, stories, or tests, also apply the r
 From `AGENTS.md` and local skills, pay particular attention to:
 
 - keeping raw Figma values in the `--figma-*` layer
-- preferring semantic tokens in component code over raw Figma tokens
+- forbidding raw `--figma-*` tokens in component code
+- preferring existing semantic or bridged tokens in component code
+- reviewing `packages/ui/src/styles/globals.css` as the token entry point, then the imported token files under `packages/ui/src/styles`, before claiming a token is missing
 - exposing shared semantic tokens through `@theme inline` only when that reuse is justified
 
 Read `docs/ui-tokens.md` when the review touches:
@@ -190,7 +192,8 @@ If checks were not run, note that as residual risk. If the diff changes runtime 
 ## What strong findings look like
 
 - a new shared UI component exposes `className`, breaking the repo’s design-system boundary
-- a component uses raw `--figma-*` tokens even though a semantic token already exists
+- a component uses raw `--figma-*` tokens
+- a change invents new semantic tokens without first reusing or exhausting the existing token layers in `packages/ui/src/styles`
 - a TS change relies on `as any`, `@ts-ignore`, or broad assertions to bypass a modeling problem
 - a refactor removes behavior coverage and leaves interactive paths unverified
 - a shared component is added but not exported from `packages/ui/src/index.ts`

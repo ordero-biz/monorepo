@@ -17,6 +17,8 @@ Use this skill as the entry point when a request clearly means "add a new shared
 - Use shadcn-style component structure and APIs.
 - Use Base UI primitives/components by default when a matching primitive/component exists.
 - Keep styling aligned with the project's Tailwind + token architecture.
+- Reuse existing tokens from `packages/ui/src/styles` before adding any new token mapping.
+- Do not use raw `--figma-*` tokens in component code.
 - Keep tests behavior-focused rather than implementation-focused.
 
 ## 1. Confirm target and naming

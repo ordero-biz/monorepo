@@ -51,11 +51,14 @@ See `references/prepare-setup-example.md` for the canonical pattern.
 ## CSS Variable Conventions
 
 - Keep raw imported Figma values in the `--figma-*` layer.
-- Use semantic or bridged tokens instead of raw Figma tokens in component code whenever they exist.
+- Raw `--figma-*` tokens are forbidden in component code.
+- Use semantic or bridged tokens instead of raw Figma tokens in component code.
 - Do not introduce one-off semantic globals casually.
-- Before adding new variables or using raw `--figma-*` values, check whether the existing token files already cover the needed value.
-- In `packages/ui`, inspect `packages/ui/src/styles` before assuming a token is missing. Treat `globals.css` as the entry point and check the relevant token files in that folder before adding vars or using raw `--figma-*` values.
-- If a bridged or semantic token already exists, do not use the raw `--figma-*` token.
+- Do not make up new semantic or bridged tokens until you have reviewed the existing token files.
+- In `packages/ui`, inspect `packages/ui/src/styles` before assuming a token is missing.
+- Treat `packages/ui/src/styles/globals.css` as the entry point, then review the imported token files under `packages/ui/src/styles` before adding vars.
+- If an existing semantic or bridged token covers the need, reuse it.
+- Only add a new token mapping when the needed value truly does not exist in the current token layers.
 
 ## Tailwind Utility Exposure Rule
 
