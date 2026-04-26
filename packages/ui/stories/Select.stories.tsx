@@ -1,16 +1,14 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import {
-  CircleAlert,
-  Eye,
-  Heart,
-  Info,
-  Search,
-  UserRound,
-} from 'lucide-react';
+import { CircleAlert, Heart, Info, UserRound } from 'lucide-react';
 import type { ComponentProps } from 'react';
-import { Button } from '@/ui/components/Button';
-import { IconButton } from '@/ui/components/IconButton';
-import { TextField } from '@/ui/components/TextField';
+import { Select } from '@/ui/components/Select';
+
+const options = [
+  { label: 'List', value: 'list' },
+  { label: 'Details', value: 'details' },
+  { label: 'Create', value: 'create' },
+  { label: 'Edit', value: 'edit' },
+];
 
 const previewGridClassName = 'grid gap-8 md:grid-cols-2';
 const previewColumnClassName = 'min-w-0';
@@ -19,28 +17,29 @@ const renderPair = ({
   filled,
   outlined,
 }: {
-  filled: ComponentProps<typeof TextField>;
-  outlined: ComponentProps<typeof TextField>;
+  filled: ComponentProps<typeof Select>;
+  outlined: ComponentProps<typeof Select>;
 }) => (
   <div className={previewGridClassName}>
     <div className={previewColumnClassName}>
-      <TextField {...outlined} />
+      <Select {...outlined} />
     </div>
     <div className={previewColumnClassName}>
-      <TextField {...filled} />
+      <Select {...filled} />
     </div>
   </div>
 );
 
 const meta = {
-  title: 'Components/TextField',
-  component: TextField,
+  title: 'Components/Select',
+  component: Select,
   tags: ['autodocs'],
   args: {
     label: 'Label',
-    placeholder: 'Value',
+    options,
+    placeholder: 'Label',
   },
-} satisfies Meta<typeof TextField>;
+} satisfies Meta<typeof Select>;
 
 export default meta;
 
@@ -51,37 +50,12 @@ export const Default: Story = {
     renderPair({
       filled: {
         ...args,
+        defaultValue: 'list',
         variant: 'filled',
       },
       outlined: {
         ...args,
-      },
-    }),
-};
-
-export const WithAdornments: Story = {
-  render: (args) =>
-    renderPair({
-      filled: {
-        ...args,
-        defaultValue: 'Value',
-        endAdornment: (
-          <IconButton aria-label="Reveal value" color="default" size="m">
-            <Eye />
-          </IconButton>
-        ),
-        startIcon: Search,
-        variant: 'filled',
-      },
-      outlined: {
-        ...args,
-        defaultValue: 'Value',
-        endAdornment: (
-          <IconButton aria-label="Reveal value" color="default" size="m">
-            <Eye />
-          </IconButton>
-        ),
-        startIcon: Search,
+        defaultValue: 'list',
       },
     }),
 };
@@ -91,7 +65,7 @@ export const Invalid: Story = {
     renderPair({
       filled: {
         ...args,
-        defaultValue: 'Incorrect',
+        defaultValue: 'create',
         errorIcon: <CircleAlert aria-hidden="true" />,
         errorText: 'Caption text, description, notification',
         invalid: true,
@@ -99,7 +73,7 @@ export const Invalid: Story = {
       },
       outlined: {
         ...args,
-        defaultValue: 'Incorrect',
+        defaultValue: 'create',
         errorIcon: <CircleAlert aria-hidden="true" />,
         errorText: 'Caption text, description, notification',
         invalid: true,
@@ -112,7 +86,7 @@ export const DisabledWithStartIconAndHelperText: Story = {
     renderPair({
       filled: {
         ...args,
-        defaultValue: 'Default value',
+        defaultValue: 'details',
         disabled: true,
         helperIcon: <Info aria-hidden="true" />,
         helperText: 'Helper text',
@@ -122,7 +96,7 @@ export const DisabledWithStartIconAndHelperText: Story = {
       },
       outlined: {
         ...args,
-        defaultValue: 'Default value',
+        defaultValue: 'details',
         disabled: true,
         helperIcon: <Info aria-hidden="true" />,
         helperText: 'Helper text',
@@ -132,52 +106,42 @@ export const DisabledWithStartIconAndHelperText: Story = {
     }),
 };
 
-export const WithTextStartAndAction: Story = {
+export const WithTextStart: Story = {
   render: (args) =>
     renderPair({
       filled: {
         ...args,
-        defaultValue: '100',
-        endAdornment: (
-          <Button color="inherit" size="m" variant="contained">
-            Action
-          </Button>
-        ),
-        label: 'With normal TextField',
-        startAdornment: 'Kg',
+        defaultValue: 'details',
+        label: 'Currency',
+        startAdornment: '$',
         variant: 'filled',
       },
       outlined: {
         ...args,
-        defaultValue: '100',
-        endAdornment: (
-          <Button color="inherit" size="m" variant="contained">
-            Action
-          </Button>
-        ),
-        label: 'With normal TextField',
-        startAdornment: 'Kg',
+        defaultValue: 'details',
+        label: 'Currency',
+        startAdornment: '$',
       },
     }),
 };
 
-export const WithEndText: Story = {
+export const WithIconAdornment: Story = {
   render: (args) =>
     renderPair({
       filled: {
         ...args,
-        helperText: 'Weight',
-        label: 'End adornment',
-        endAdornment: 'Kg',
-        placeholder: 'End adornment',
+        defaultValue: 'edit',
+        helperIcon: <Info aria-hidden="true" />,
+        helperText: 'Caption text, description, notification',
+        startIcon: Heart,
         variant: 'filled',
       },
       outlined: {
         ...args,
-        helperText: 'Weight',
-        label: 'End adornment',
-        endAdornment: 'Kg',
-        placeholder: 'End adornment',
+        defaultValue: 'edit',
+        helperIcon: <Info aria-hidden="true" />,
+        helperText: 'Caption text, description, notification',
+        startIcon: Heart,
       },
     }),
 };
@@ -187,14 +151,14 @@ export const SmallSizes: Story = {
     renderPair({
       filled: {
         ...args,
-        placeholder: 'Small',
+        defaultValue: 'edit',
         size: 's',
         startIcon: Heart,
         variant: 'filled',
       },
       outlined: {
         ...args,
-        placeholder: 'Small',
+        defaultValue: 'edit',
         size: 's',
         startIcon: Heart,
       },
