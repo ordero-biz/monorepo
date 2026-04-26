@@ -33,4 +33,10 @@ export type {
 export { Select } from './components/Select';
 export type { TextFieldProps, TextFieldSize } from './components/TextField';
 export { TextField } from './components/TextField';
+export type {
+  TypographyColor,
+  TypographyProps,
+  TypographyVariant,
+} from './components/Typography';
+export { Typography } from './components/Typography';
 export { cn } from './lib/utils';
