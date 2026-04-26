@@ -90,6 +90,23 @@ describe('TextField', () => {
     expect(input).toHaveAccessibleDescription(errorText);
   });
 
+  it('keeps helper text when invalid without error text', () => {
+    const helperText = 'Use your email';
+
+    setup({
+      helperIcon: <TestHelperIcon />,
+      helperText,
+      invalid: true,
+      variant: 'filled',
+    });
+
+    const input = screen.getByRole('textbox', { name: 'Email' });
+
+    expect(screen.getByText(helperText)).toBeInTheDocument();
+    expect(screen.getByTestId('helper-icon')).toBeInTheDocument();
+    expect(input).toHaveAccessibleDescription(helperText);
+  });
+
   it('keeps the field accessible when adornments are provided', () => {
     const label = 'Search';
 

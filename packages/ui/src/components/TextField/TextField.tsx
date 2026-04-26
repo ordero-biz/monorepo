@@ -108,10 +108,12 @@ export const TextField = forwardRef<HTMLElement, TextFieldProps>(
   ) => {
     const supportTextId = useId();
     const [focusedState, setFocusedState] = useState(false);
+    const hasErrorText = Boolean(invalid && errorText);
+    const hasHelperText = Boolean(helperText);
     const describedBy =
       [
         ariaDescribedBy,
-        helperText || (invalid && errorText) ? supportTextId : undefined,
+        hasErrorText || hasHelperText ? supportTextId : undefined,
       ]
         .filter(Boolean)
         .join(' ') || undefined;
@@ -172,7 +174,7 @@ export const TextField = forwardRef<HTMLElement, TextFieldProps>(
           value={value}
           variant={variant}
         />
-        {invalid && errorText ? (
+        {hasErrorText ? (
           <Field.Error
             className={cn(helperTextClassName, 'text-destructive')}
             id={supportTextId}
@@ -184,7 +186,7 @@ export const TextField = forwardRef<HTMLElement, TextFieldProps>(
             })}
           </Field.Error>
         ) : null}
-        {!invalid && helperText ? (
+        {hasHelperText && !hasErrorText ? (
           <Field.Description
             className={cn(helperTextClassName, 'text-text-secondary')}
             id={supportTextId}

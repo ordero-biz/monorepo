@@ -232,10 +232,12 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
     const supportTextId = useId();
     const [focused, setFocused] = useState(false);
     const [open, setOpen] = useState(defaultOpen ?? false);
+    const hasErrorText = Boolean(invalid && errorText);
+    const hasHelperText = Boolean(helperText);
     const describedBy =
       [
         ariaDescribedBy,
-        helperText || (invalid && errorText) ? supportTextId : undefined,
+        hasErrorText || hasHelperText ? supportTextId : undefined,
       ]
         .filter(Boolean)
         .join(' ') || undefined;
@@ -389,7 +391,7 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
             </SelectPrimitive.Positioner>
           </SelectPrimitive.Portal>
         </SelectPrimitive.Root>
-        {invalid && errorText ? (
+        {hasErrorText ? (
           <Field.Error
             className={cn(helperTextClassName, 'text-destructive')}
             id={supportTextId}
@@ -401,7 +403,7 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
             })}
           </Field.Error>
         ) : null}
-        {!invalid && helperText ? (
+        {hasHelperText && !hasErrorText ? (
           <Field.Description
             className={cn(helperTextClassName, 'text-text-secondary')}
             id={supportTextId}

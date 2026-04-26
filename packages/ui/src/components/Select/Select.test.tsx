@@ -93,6 +93,23 @@ describe('Select', () => {
     expect(screen.getByText('Selection is incorrect')).toBeInTheDocument();
   });
 
+  it('keeps helper text when invalid without error text', () => {
+    const helperText = 'Caption text, description, notification';
+
+    setup({
+      helperIcon: <Info aria-hidden="true" />,
+      helperText,
+      invalid: true,
+      label: 'Label',
+      variant: 'filled',
+    });
+
+    const trigger = screen.getByRole('combobox', { name: 'View mode' });
+
+    expect(screen.getByText(helperText)).toBeInTheDocument();
+    expect(trigger).toHaveAccessibleDescription(helperText);
+  });
+
   it('supports focus, blur, and keyboard handlers', async () => {
     const user = userEvent.setup();
     const onFocus = vi.fn();
