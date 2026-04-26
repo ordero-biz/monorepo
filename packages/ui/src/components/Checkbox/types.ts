@@ -39,6 +39,7 @@ export type CheckboxProps = {
   onClick?: MouseEventHandler<HTMLElement>;
   onFocus?: FocusEventHandler<HTMLElement>;
   onKeyDown?: KeyboardEventHandler<HTMLElement>;
+  parent?: boolean;
   readOnly?: boolean;
   required?: boolean;
   size?: CheckboxSize;

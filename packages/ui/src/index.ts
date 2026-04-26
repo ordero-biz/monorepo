@@ -12,6 +12,11 @@ export type {
 } from './components/Checkbox';
 export { Checkbox, checkboxRootVariants } from './components/Checkbox';
 export type {
+  CheckboxGroupOrientation,
+  CheckboxGroupProps,
+} from './components/CheckboxGroup';
+export { CheckboxGroup } from './components/CheckboxGroup';
+export type {
   IconButtonColor,
   IconButtonProps,
   IconButtonSize,

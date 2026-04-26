@@ -3,7 +3,7 @@
 import { Checkbox as CheckboxPrimitive } from '@base-ui/react/checkbox';
 import { cva } from 'class-variance-authority';
 import { Check, Minus } from 'lucide-react';
-import { forwardRef, useId } from 'react';
+import { forwardRef, useCallback, useId, useState } from 'react';
 import { cn } from '@/ui/lib/utils';
 import type { CheckboxColor, CheckboxProps, CheckboxSize } from './types';
 
@@ -154,6 +154,7 @@ export const Checkbox = forwardRef<HTMLElement, CheckboxProps>(
       onClick,
       onFocus,
       onKeyDown,
+      parent = false,
       readOnly = false,
       required = false,
       size = 'm',
@@ -167,9 +168,25 @@ export const Checkbox = forwardRef<HTMLElement, CheckboxProps>(
     const generatedId = useId();
     const controlId = id ?? generatedId;
     const generatedLabelId = useId();
+    const [inputId, setInputId] = useState(controlId);
     const checkboxLabelId = children ? `${generatedLabelId}-label` : undefined;
     const labelledBy =
       [ariaLabelledBy, checkboxLabelId].filter(Boolean).join(' ') || undefined;
+    const setInputRefs = useCallback(
+      (node: HTMLInputElement | null) => {
+        setInputId(node?.id ?? controlId);
+
+        if (typeof inputRef === 'function') {
+          inputRef(node);
+          return;
+        }
+
+        if (inputRef) {
+          inputRef.current = node;
+        }
+      },
+      [controlId, inputRef]
+    );
 
     return (
       <label
@@ -177,7 +194,7 @@ export const Checkbox = forwardRef<HTMLElement, CheckboxProps>(
           'inline-flex max-w-fit items-center gap-0 align-top',
           disabled ? 'cursor-not-allowed' : 'cursor-pointer'
         )}
-        htmlFor={controlId}
+        htmlFor={inputId}
       >
         <CheckboxPrimitive.Root
           ref={ref}
@@ -189,13 +206,14 @@ export const Checkbox = forwardRef<HTMLElement, CheckboxProps>(
           disabled={disabled}
           id={controlId}
           indeterminate={indeterminate}
-          inputRef={inputRef}
+          inputRef={setInputRefs}
           name={name}
           onBlur={onBlur}
           onCheckedChange={onCheckedChange}
           onClick={onClick}
           onFocus={onFocus}
           onKeyDown={onKeyDown}
+          parent={parent}
           readOnly={readOnly}
           render={(rootProps, state) => (
             <span
