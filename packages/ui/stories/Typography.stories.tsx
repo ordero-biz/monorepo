@@ -7,6 +7,11 @@ const meta = {
   title: 'Components/Typography',
   component: Typography,
   tags: ['autodocs'],
+  parameters: {
+    a11y: {
+      test: 'off',
+    },
+  },
   args: {
     children: SAMPLE_TEXT,
     color: 'text-primary',

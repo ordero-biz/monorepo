@@ -133,8 +133,7 @@ const getInputStyle = ({
   };
 };
 
-const getAdornmentColorClassName = ({ disabled }: { disabled: boolean }) =>
-  disabled ? 'text-[var(--text-disabled)]' : 'text-[var(--text-secondary)]';
+const getAdornmentColorClassName = () => 'text-[var(--text-secondary)]';
 
 const getInputTextColorClassName = ({ disabled }: { disabled: boolean }) =>
   disabled ? 'text-[var(--text-disabled)]' : 'text-foreground';
@@ -200,7 +199,7 @@ export const Input = forwardRef<HTMLElement, InputProps>(
               className={cn(
                 adornmentClassName,
                 startAdornmentClassName,
-                getAdornmentColorClassName({ disabled })
+                getAdornmentColorClassName()
               )}
             >
               {startAdornment}
@@ -252,7 +251,7 @@ export const Input = forwardRef<HTMLElement, InputProps>(
               className={cn(
                 adornmentClassName,
                 endAdornmentClassName,
-                getAdornmentColorClassName({ disabled })
+                getAdornmentColorClassName()
               )}
             >
               {endAdornment}

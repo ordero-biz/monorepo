@@ -20,6 +20,10 @@ When the task touches tokens or CSS variable architecture, read:
 
 - `docs/ui-tokens.md`
 
+When the task touches accessibility testing strategy for shared UI, also read:
+
+- `docs/accessibility-testing.md`
+
 ## Testing Conventions
 
 Use behavior-first tests.
@@ -43,6 +47,14 @@ Required tooling defaults:
 - `@testing-library/user-event`
 - `prepareSetup` from `@ordero/test-config/react` for shared component test files with repeated default props
 - Vitest globals (`describe`, `it`, `expect`, `vi`, etc.) without per-file imports
+
+Testing layer split for `packages/ui`:
+
+- use `pnpm --dir packages/ui test` for the `unit` Vitest project
+- use `pnpm --dir packages/ui test:storybook` for the Storybook Vitest project and browser-backed a11y coverage
+- use Playwright for app-level composed flows rather than as the default shared-component test layer
+
+For the repo-specific accessibility testing workflow, see `references/accessibility-testing.md`.
 
 For shared component tests with repeated default props, use `prepareSetup`.
 When a `prepareSetup` test overrides a prop and later asserts on that prop, destructure the asserted value from the object returned by `setup(...)` instead of keeping a separate local variable for the same override.
@@ -111,6 +123,7 @@ For shared UI work across `packages` and `apps`:
 - do not expose `className` on shared `packages/ui` components
 - keep stories and tests aligned with the public API, not internal structure
 - preserve consistency with existing components unless there is a deliberate architectural improvement
+- do not move field-level helper text or error-text expectations into low-level primitives if wrapper components own that part of the API
 
 For `packages/ui` specifically:
 

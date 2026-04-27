@@ -61,7 +61,7 @@ const buttonVariants = cva(
         color: 'primary',
         variant: 'contained',
         class:
-          'bg-[var(--primary-main)] text-[var(--figma-primary-contrast-text)] hover:bg-[var(--primary-dark)] disabled:border-transparent disabled:bg-[var(--figma-grey-20)] disabled:text-[var(--text-disabled)]',
+          'bg-[var(--primary-dark)] text-[var(--figma-primary-contrast-text)] hover:bg-[var(--primary-darker)] disabled:border-transparent disabled:bg-[var(--figma-grey-20)] disabled:text-[var(--text-disabled)]',
       },
       {
         color: 'secondary',
@@ -73,13 +73,13 @@ const buttonVariants = cva(
         color: 'info',
         variant: 'contained',
         class:
-          'bg-[var(--info-main)] text-[var(--figma-info-contrast-text)] hover:bg-[var(--info-dark)] disabled:border-transparent disabled:bg-[var(--figma-grey-20)] disabled:text-[var(--text-disabled)]',
+          'bg-[var(--info-dark)] text-[var(--figma-info-contrast-text)] hover:bg-[var(--info-darker)] disabled:border-transparent disabled:bg-[var(--figma-grey-20)] disabled:text-[var(--text-disabled)]',
       },
       {
         color: 'success',
         variant: 'contained',
         class:
-          'bg-[var(--success-main)] text-[var(--figma-success-contrast-text)] hover:bg-[var(--success-dark)] disabled:border-transparent disabled:bg-[var(--figma-grey-20)] disabled:text-[var(--text-disabled)]',
+          'bg-[var(--success-darker)] text-[var(--figma-success-contrast-text)] hover:bg-[var(--success-dark)] disabled:border-transparent disabled:bg-[var(--figma-grey-20)] disabled:text-[var(--text-disabled)]',
       },
       {
         color: 'warning',
@@ -91,7 +91,7 @@ const buttonVariants = cva(
         color: 'error',
         variant: 'contained',
         class:
-          'bg-[var(--error-main)] text-[var(--figma-error-contrast-text)] hover:bg-[var(--error-dark)] disabled:border-transparent disabled:bg-[var(--figma-grey-20)] disabled:text-[var(--text-disabled)]',
+          'bg-[var(--error-dark)] text-[var(--figma-error-contrast-text)] hover:bg-[var(--error-darker)] disabled:border-transparent disabled:bg-[var(--figma-grey-20)] disabled:text-[var(--text-disabled)]',
       },
       {
         color: 'inherit',
@@ -103,7 +103,7 @@ const buttonVariants = cva(
         color: 'primary',
         variant: 'outlined',
         class:
-          'border-[var(--figma-primary-48)] text-[var(--primary-main)] hover:border-[var(--primary-main)] hover:bg-[var(--figma-primary-8)] disabled:border-[var(--figma-grey-24)] disabled:text-[var(--text-disabled)]',
+          'border-[var(--primary-dark)] text-[var(--primary-dark)] hover:border-[var(--primary-dark)] hover:bg-[var(--figma-primary-8)] disabled:border-[var(--figma-grey-24)] disabled:text-[var(--text-disabled)]',
       },
       {
         color: 'secondary',
@@ -115,25 +115,25 @@ const buttonVariants = cva(
         color: 'info',
         variant: 'outlined',
         class:
-          'border-[var(--figma-info-48)] text-[var(--info-main)] hover:border-[var(--info-main)] hover:bg-[var(--figma-info-8)] disabled:border-[var(--figma-grey-24)] disabled:text-[var(--text-disabled)]',
+          'border-[var(--info-dark)] text-[var(--info-dark)] hover:border-[var(--info-dark)] hover:bg-[var(--figma-info-8)] disabled:border-[var(--figma-grey-24)] disabled:text-[var(--text-disabled)]',
       },
       {
         color: 'success',
         variant: 'outlined',
         class:
-          'border-[var(--figma-success-48)] text-[var(--success-main)] hover:border-[var(--success-main)] hover:bg-[var(--figma-success-8)] disabled:border-[var(--figma-grey-24)] disabled:text-[var(--text-disabled)]',
+          'border-[var(--success-darker)] text-[var(--success-darker)] hover:border-[var(--success-darker)] hover:bg-[var(--figma-success-8)] disabled:border-[var(--figma-grey-24)] disabled:text-[var(--text-disabled)]',
       },
       {
         color: 'warning',
         variant: 'outlined',
         class:
-          'border-[var(--figma-warning-48)] text-[var(--warning-main)] hover:border-[var(--warning-main)] hover:bg-[var(--figma-warning-8)] disabled:border-[var(--figma-grey-24)] disabled:text-[var(--text-disabled)]',
+          'border-[var(--warning-darker)] text-[var(--warning-darker)] hover:border-[var(--warning-darker)] hover:bg-[var(--figma-warning-8)] disabled:border-[var(--figma-grey-24)] disabled:text-[var(--text-disabled)]',
       },
       {
         color: 'error',
         variant: 'outlined',
         class:
-          'border-[var(--figma-error-48)] text-[var(--error-main)] hover:border-[var(--error-main)] hover:bg-[var(--figma-error-8)] disabled:border-[var(--figma-grey-24)] disabled:text-[var(--text-disabled)]',
+          'border-[var(--error-dark)] text-[var(--error-dark)] hover:border-[var(--error-dark)] hover:bg-[var(--figma-error-8)] disabled:border-[var(--figma-grey-24)] disabled:text-[var(--text-disabled)]',
       },
       {
         color: 'inherit',
@@ -145,7 +145,7 @@ const buttonVariants = cva(
         color: 'primary',
         variant: 'text',
         class:
-          'text-[var(--primary-main)] hover:bg-[var(--figma-primary-8)] disabled:text-[var(--text-disabled)]',
+          'text-[var(--primary-dark)] hover:bg-[var(--figma-primary-8)] disabled:text-[var(--text-disabled)]',
       },
       {
         color: 'secondary',
@@ -157,25 +157,25 @@ const buttonVariants = cva(
         color: 'info',
         variant: 'text',
         class:
-          'text-[var(--info-main)] hover:bg-[var(--figma-info-8)] disabled:text-[var(--text-disabled)]',
+          'text-[var(--info-dark)] hover:bg-[var(--figma-info-8)] disabled:text-[var(--text-disabled)]',
       },
       {
         color: 'success',
         variant: 'text',
         class:
-          'text-[var(--success-main)] hover:bg-[var(--figma-success-8)] disabled:text-[var(--text-disabled)]',
+          'text-[var(--success-darker)] hover:bg-[var(--figma-success-8)] disabled:text-[var(--text-disabled)]',
       },
       {
         color: 'warning',
         variant: 'text',
         class:
-          'text-[var(--warning-main)] hover:bg-[var(--figma-warning-8)] disabled:text-[var(--text-disabled)]',
+          'text-[var(--warning-darker)] hover:bg-[var(--figma-warning-8)] disabled:text-[var(--text-disabled)]',
       },
       {
         color: 'error',
         variant: 'text',
         class:
-          'text-[var(--error-main)] hover:bg-[var(--figma-error-8)] disabled:text-[var(--text-disabled)]',
+          'text-[var(--error-dark)] hover:bg-[var(--figma-error-8)] disabled:text-[var(--text-disabled)]',
       },
       {
         color: 'inherit',
@@ -205,13 +205,13 @@ const buttonVariants = cva(
         color: 'success',
         variant: 'soft',
         class:
-          'bg-[var(--figma-success-8)] text-[var(--success-dark)] hover:bg-[var(--figma-success-16)] disabled:bg-[var(--figma-grey-20)] disabled:text-[var(--text-disabled)]',
+          'bg-[var(--figma-success-8)] text-[var(--success-darker)] hover:bg-[var(--figma-success-16)] disabled:bg-[var(--figma-grey-20)] disabled:text-[var(--text-disabled)]',
       },
       {
         color: 'warning',
         variant: 'soft',
         class:
-          'bg-[var(--figma-warning-8)] text-[var(--warning-dark)] hover:bg-[var(--figma-warning-16)] disabled:bg-[var(--figma-grey-20)] disabled:text-[var(--text-disabled)]',
+          'bg-[var(--figma-warning-8)] text-[var(--warning-darker)] hover:bg-[var(--figma-warning-16)] disabled:bg-[var(--figma-grey-20)] disabled:text-[var(--text-disabled)]',
       },
       {
         color: 'error',

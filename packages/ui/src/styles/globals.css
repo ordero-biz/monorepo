@@ -21,7 +21,7 @@
   --muted-foreground: var(--text-secondary);
   --accent: var(--primary-lighter);
   --accent-foreground: var(--primary-dark);
-  --destructive: var(--error-main);
+  --destructive: var(--error-dark);
   --destructive-foreground: var(--figma-error-contrast-text);
   --border: var(--figma-paper-outlined);
   --input: var(--figma-textfield-outline);
@@ -44,7 +44,7 @@
   --muted-foreground: var(--grey-500);
   --accent: var(--grey-700);
   --accent-foreground: var(--white-main);
-  --destructive: var(--error-main);
+  --destructive: var(--error-dark);
   --destructive-foreground: var(--figma-error-contrast-text);
   --border: var(--figma-grey-16);
   --input: var(--figma-grey-24);

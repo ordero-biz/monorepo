@@ -82,8 +82,24 @@ Minimum expectations:
 - a default story
 - stories that reflect meaningful variant groups from the design system
 - icon / disabled / size examples where they matter for consumers
+- invalid and helper-text stories when the component owns those states
+
+For accessibility-sensitive controls, stories should cover the meaningful states that Storybook accessibility checks are expected to validate.
+
+Examples:
+
+- default
+- disabled
+- invalid
+- helper text or description
+- icon/adornment states when they affect accessibility or contrast
 
 When the design system presents variants separately, prefer separate stories rather than one giant demo.
+
+For the repo-specific accessibility testing workflow, read:
+
+- `docs/accessibility-testing.md`
+- `../ui-routine-conventions/references/accessibility-testing.md`
 
 ## Testing Rules
 
@@ -96,6 +112,13 @@ Do:
 - use `prepareSetup` from `@ordero/test-config/react` for repeated component defaults in a test file
 - when a `prepareSetup` test asserts on an overridden prop, destructure that prop from `setup(...)` and assert on the returned value rather than a separate local variable
 - test behavior such as click handling, disabled behavior, submit behavior, accessible naming, and other real outcomes
+- keep assertions at the correct component boundary
+
+Examples of correct boundary choices:
+
+- `Input` should be tested for primitive ARIA support such as `aria-describedby`
+- `TextField` should be tested for label, helper text, and error text behavior
+- `PasswordField` should be tested as a field wrapper, not as if it directly owned low-level input internals
 
 Do not:
 
@@ -114,5 +137,6 @@ Run these when possible:
 - `pnpm --dir packages/ui format`
 - `pnpm --dir packages/ui typecheck`
 - `pnpm --dir packages/ui test src/components/[ComponentName]/[ComponentName].test.tsx`
+- `pnpm --dir packages/ui test:storybook` when story states or shared UI accessibility behavior changed
 
 If the component changed Storybook stories only, still run `format` and `typecheck`.
