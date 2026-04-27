@@ -24,6 +24,8 @@ export type {
 export { IconButton, iconButtonVariants } from './components/IconButton';
 export type { InputProps, InputSize } from './components/Input';
 export { Input } from './components/Input';
+export type { PasswordFieldProps } from './components/PasswordField';
+export { PasswordField } from './components/PasswordField';
 export type {
   SelectOption,
   SelectProps,

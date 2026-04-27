@@ -51,15 +51,41 @@ See `references/prepare-setup-example.md` for the canonical pattern.
 
 ## CSS Variable Conventions
 
-- Keep raw imported Figma values in the `--figma-*` layer.
+Treat these rules as mandatory for UI work in both `packages` and `apps`.
+
+Always review the token system in this order before introducing or changing UI values:
+
+1. `packages/ui/src/styles/globals.css`
+2. the files imported by `globals.css` under `packages/ui/src/styles`
+3. `docs/ui-tokens.md`
+
+Required rules:
+
+- Keep raw imported Figma values in the `--figma-*` layer only.
 - Raw `--figma-*` tokens are forbidden in component code.
-- Use semantic or bridged tokens instead of raw Figma tokens in component code.
+- Use existing semantic or bridged tokens instead of raw Figma tokens in component code.
+- If a needed spacing, radius, color, typography, shadow, sizing, or component token already exists in `packages/ui/src/styles`, you must use it instead of introducing a hard-coded value.
+- Hard-coded px/rem/hex/rgba values in component code are forbidden when an existing token already represents that value or intent.
 - Do not introduce one-off semantic globals casually.
 - Do not make up new semantic or bridged tokens until you have reviewed the existing token files.
-- In `packages/ui`, inspect `packages/ui/src/styles` before assuming a token is missing.
-- Treat `packages/ui/src/styles/globals.css` as the entry point, then review the imported token files under `packages/ui/src/styles` before adding vars.
 - If an existing semantic or bridged token covers the need, reuse it.
 - Only add a new token mapping when the needed value truly does not exist in the current token layers.
+
+For Figma-driven implementation:
+
+- Treat `packages/ui/src/styles/globals.css` as the styling entry point and source of truth for token lookup.
+- Map Figma spacing, radius, color, typography, shadow, and component sizing to existing `packages/ui/src/styles` tokens whenever possible.
+- Use tokenized values for layout shells too, not only inside shared controls.
+- Do not approximate Figma values with nearby hard-coded values when the exact token already exists.
+- Do not add responsive overrides that change tokenized spacing, radius, or sizing unless the design explicitly specifies a breakpoint change.
+- If the design appears to require a value that is not in the current token system, verify that it is truly missing before adding a new token or using a temporary hard-coded fallback.
+
+Violation examples:
+
+- replacing an existing `24px` token with `px-6` or `px-[24px]` in app UI when a shared spacing token exists
+- adding `sm:px-10` or similar overrides that change Figma-defined padding without design evidence
+- using direct `rgba(...)` or hex values for layout styling when a semantic or bridged token already exists
+- adding ad hoc card/container values without checking `globals.css` and the imported token files first
 
 ## Tailwind Utility Exposure Rule
 

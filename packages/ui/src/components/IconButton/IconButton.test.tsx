@@ -65,7 +65,9 @@ describe('IconButton', () => {
     await user.tab();
     await user.tab();
 
-    expect(screen.getByRole('button', { name: 'Next focus target' })).toHaveFocus();
+    expect(
+      screen.getByRole('button', { name: 'Next focus target' })
+    ).toHaveFocus();
     expect(onFocus).toHaveBeenCalledTimes(1);
     expect(onBlur).toHaveBeenCalledTimes(1);
   });

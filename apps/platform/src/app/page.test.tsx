@@ -6,7 +6,10 @@ describe('platform Home', () => {
   it('renders', () => {
     render(<Home />);
     expect(
-      screen.getByRole('heading', { name: /to get started/i })
+      screen.getByRole('heading', { name: /sign in to access your workspace/i })
     ).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: /go to login/i })
+    ).toHaveAttribute('href', '/log-in');
   });
 });

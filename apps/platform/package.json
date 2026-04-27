@@ -15,9 +15,11 @@
   },
   "dependencies": {
     "@ordero/ui": "workspace:*",
+    "@tanstack/react-form": "^1.29.1",
     "next": "16.1.6",
     "react": "19.2.3",
-    "react-dom": "19.2.3"
+    "react-dom": "19.2.3",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@ordero/test-config": "workspace:*",

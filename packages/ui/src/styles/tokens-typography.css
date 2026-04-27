@@ -1,7 +1,7 @@
 :root {
   /* Typography */
-  --figma-family-primary: "Public Sans";
-  --figma-family-secondary: "Barlow";
+  --figma-family-primary: 'Public Sans';
+  --figma-family-secondary: 'Barlow';
   --figma-weight-400: 400;
   --figma-weight-500: 500;
   --figma-weight-600: 600;
@@ -197,7 +197,7 @@
   --figma-settings-label-md-line-height-desktop: 18px;
   --figma-settings-label-md-line-height-mobile: 18px;
   --figma-settings-label-md-weight: var(--figma-weight-600);
-  --figma-pdf-font-family: "Roboto";
+  --figma-pdf-font-family: 'Roboto';
   --figma-pdf-h3-size: 16px;
   --figma-pdf-h3-line-height: 25.6px;
   --figma-pdf-h3-weight: var(--figma-weight-700);
