@@ -1,0 +1,141 @@
+import { prepareSetup } from '@ordero/test-config/react';
+import { screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { LogInForm } from './LogInForm';
+
+const { setup } = prepareSetup({
+  component: LogInForm,
+});
+
+const setupLogInForm = () => {
+  const user = userEvent.setup();
+
+  setup();
+
+  return {
+    emailField: screen.getByRole('textbox', { name: 'Email address' }),
+    passwordField: screen.getByLabelText('Password'),
+    signInButton: screen.getByRole('button', { name: 'Sign in' }),
+    user,
+  };
+};
+
+describe('LogInForm', () => {
+  it('renders the expected form controls and secondary actions', () => {
+    setupLogInForm();
+
+    expect(
+      screen.getByRole('heading', { name: 'Sign in to your account' })
+    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Get started' })).toHaveAttribute(
+      'type',
+      'button'
+    );
+    expect(
+      screen.getByRole('button', { name: 'Forgot password?' })
+    ).toHaveAttribute('type', 'button');
+    expect(screen.getByRole('button', { name: 'Sign in' })).toHaveAttribute(
+      'type',
+      'submit'
+    );
+  });
+
+  it('does not show client email validation on the first keystroke', async () => {
+    const { emailField, user } = setupLogInForm();
+
+    await user.type(emailField, 'x');
+
+    expect(
+      screen.queryByText('Enter a valid email address.')
+    ).not.toBeInTheDocument();
+  });
+
+  it('shows client email validation after the user blurs the field once', async () => {
+    const { emailField, passwordField, user } = setupLogInForm();
+
+    await user.type(emailField, 'x');
+    await user.click(passwordField);
+
+    expect(screen.getByText('Enter a valid email address.')).toBeVisible();
+  });
+
+  it('updates email validity live after an invalid field has been revealed', async () => {
+    const { emailField, passwordField, user } = setupLogInForm();
+
+    await user.type(emailField, 'x');
+    await user.click(passwordField);
+
+    expect(screen.getByText('Enter a valid email address.')).toBeVisible();
+
+    await user.clear(emailField);
+    await user.type(emailField, 'admin@gmail.com');
+
+    expect(
+      screen.queryByText('Enter a valid email address.')
+    ).not.toBeInTheDocument();
+  });
+
+  it('does not show client password validation on the first keystroke', async () => {
+    const { passwordField, user } = setupLogInForm();
+
+    await user.type(passwordField, 'x');
+
+    expect(
+      screen.queryByText('Password must contain at least 6 characters.')
+    ).not.toBeInTheDocument();
+  });
+
+  it('shows client password validation after the user blurs the field once', async () => {
+    const { emailField, passwordField, user } = setupLogInForm();
+
+    await user.type(passwordField, 'x');
+    await user.click(emailField);
+
+    expect(
+      screen.getByText('Password must contain at least 6 characters.')
+    ).toBeVisible();
+  });
+
+  it('updates password validity live after an invalid field has been revealed', async () => {
+    const { emailField, passwordField, user } = setupLogInForm();
+
+    await user.type(passwordField, 'x');
+    await user.click(emailField);
+
+    expect(
+      screen.getByText('Password must contain at least 6 characters.')
+    ).toBeVisible();
+
+    await user.clear(passwordField);
+    await user.type(passwordField, '123456');
+
+    expect(
+      screen.queryByText('Password must contain at least 6 characters.')
+    ).not.toBeInTheDocument();
+  });
+
+  it('shows the backend email error for a valid non-gmail address on submit', async () => {
+    const { emailField, passwordField, signInButton, user } = setupLogInForm();
+
+    await user.type(emailField, 'admin@mail.com');
+    await user.type(passwordField, '123456');
+    await user.click(signInButton);
+
+    expect(screen.getByText('Use a gmail.com email address.')).toBeVisible();
+    expect(emailField).toHaveAccessibleDescription(
+      'Use a gmail.com email address.'
+    );
+    expect(passwordField).toHaveValue('123456');
+  });
+
+  it('keeps the email and clears the password after successful sign in', async () => {
+    const { emailField, passwordField, signInButton, user } = setupLogInForm();
+
+    await user.type(emailField, 'admin@gmail.com');
+    await user.type(passwordField, '123456');
+    await user.click(signInButton);
+
+    expect(emailField).toHaveValue('admin@gmail.com');
+    expect(passwordField).toHaveValue('');
+  });
+});

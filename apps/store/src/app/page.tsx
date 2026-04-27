@@ -1,4 +1,3 @@
-import { buttonVariants } from '@ordero/ui';
 import Image from 'next/image';
 
 export default function Home() {
@@ -37,9 +36,7 @@ export default function Home() {
         </div>
         <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
           <a
-            className={buttonVariants({
-              className: 'h-12 w-full gap-2 rounded-full px-5 md:w-39.5',
-            })}
+            className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-black px-5 text-base font-medium text-white transition-colors hover:bg-zinc-800 dark:bg-white dark:text-black dark:hover:bg-zinc-200 md:w-39.5"
             href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
             target="_blank"
             rel="noopener noreferrer"

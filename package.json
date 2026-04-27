@@ -7,6 +7,8 @@
     "dev": "turbo dev",
     "lint": "turbo lint",
     "test": "turbo test",
+    "test:e2e": "turbo run test:e2e",
+    "test:e2e:affected": "turbo run test:e2e --affected",
     "typecheck": "turbo typecheck",
     "format": "biome check .",
     "format:write": "biome check --write .",
@@ -16,8 +18,20 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^2.4.3",
+    "@playwright/cli": "^0.1.9",
+    "@playwright/test": "^1.59.1",
     "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
     "tailwindcss": "^4",
     "turbo": "^2.8.10"
+  },
+  "pnpm": {
+    "packageExtensions": {
+      "@playwright/cli@*": {
+        "dependencies": {
+          "playwright-core": "1.60.0-alpha-1777077614000"
+        }
+      }
+    }
   }
 }

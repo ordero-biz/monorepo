@@ -3,12 +3,14 @@
 ## Purpose
 
 This repo uses a layered accessibility testing approach for shared UI work in `packages/ui`.
+For the general repo testing workflow, app E2E commands, and app Vitest setup,
+see `docs/testing.md`.
 
 Each layer answers a different question:
 
 - unit Vitest tests verify semantic behavior and interaction details
 - Storybook Vitest tests verify story states in a real browser and run automated accessibility checks
-- Playwright should be reserved for app-level flows where composition across multiple components matters
+- Playwright Test should be reserved for routed app flows where composition across multiple components matters
 
 ## Commands
 
@@ -76,9 +78,9 @@ Storybook accessibility checks are enforced for the main first-wave shared contr
 
 `Typography` is intentionally excluded from enforced Storybook accessibility checks. Its stories are primarily visual documentation and color samples, so automated Storybook a11y checks add less signal there than they do for interactive controls. Typography semantics should still be covered in component tests where relevant.
 
-### Playwright
+### Playwright Test
 
-Use Playwright for integrated app flows, not as the default shared-component testing tool.
+Use Playwright Test for routed app flows, not as the default shared-component testing tool.
 
 Good candidates:
 

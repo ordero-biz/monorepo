@@ -44,17 +44,3 @@ export const Disabled: Story = {
     helperText: 'Password editing is unavailable in this state.',
   },
 };
-
-export const WithHelperText: Story = {
-  args: {
-    helperText: 'Use at least 12 characters for a stronger password.',
-  },
-};
-
-export const Disabled: Story = {
-  args: {
-    defaultValue: 'correct horse battery staple',
-    disabled: true,
-    helperText: 'Password editing is unavailable in this state.',
-  },
-};

@@ -9,6 +9,10 @@
     "lint": "biome check",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
+    "test:e2e": "pnpm --workspace-root exec playwright test -c apps/store/playwright.config.ts",
+    "test:e2e:file": "pnpm --workspace-root exec playwright test -c apps/store/playwright.config.ts",
+    "test:e2e:grep": "pnpm --workspace-root exec playwright test -c apps/store/playwright.config.ts -g",
+    "test:e2e:ui": "pnpm --workspace-root exec playwright test -c apps/store/playwright.config.ts --ui",
     "test:watch": "vitest",
     "format": "biome check .",
     "format:write": "biome check --write ."

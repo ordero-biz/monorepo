@@ -70,6 +70,10 @@ Recommended UX behavior:
 This produces a calmer UX than immediate validation while still helping the
 user fix problems quickly.
 
+Cover these field-level rules with unit/component tests. Use Playwright for
+routed form flows and browser integration. See `docs/testing.md` for the full
+testing split and commands.
+
 ## Submit Model
 
 Use TanStack Form in the feature component and handle submit through the form's

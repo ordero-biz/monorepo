@@ -41,11 +41,11 @@ Avoid:
 - asserting class name presence unless there is no better observable signal
 - asserting token names or `cva` internals
 
-Required tooling defaults:
+Required tooling defaults across apps and packages:
 
 - `@testing-library/react`
 - `@testing-library/user-event`
-- `prepareSetup` from `@ordero/test-config/react` for shared component test files with repeated default props
+- `prepareSetup` from `@ordero/test-config/react` for component test setup, unless a one-off `render(...)` makes required surrounding structure clearer
 - Vitest globals (`describe`, `it`, `expect`, `vi`, etc.) without per-file imports
 
 Testing layer split for `packages/ui`:
@@ -53,6 +53,14 @@ Testing layer split for `packages/ui`:
 - use `pnpm --dir packages/ui test` for the `unit` Vitest project
 - use `pnpm --dir packages/ui test:storybook` for the Storybook Vitest project and browser-backed a11y coverage
 - use Playwright for app-level composed flows rather than as the default shared-component test layer
+
+For app feature/component tests outside `packages/ui`:
+
+- use Testing Library and `@testing-library/user-event` for component-local behavior such as form validation timing, blur/change interactions, disabled states, reset behavior, and user-visible messages
+- use Playwright for routed/composed app flows, smoke coverage, browser integration, and behavior that depends on the real browser page
+- prefer role/name queries when available; use `getByLabelText` for inputs that do not expose a queryable role in jsdom, such as `input[type="password"]`
+- configure app TypeScript/Vitest so Vitest globals are available in test files; do not import Vitest globals per file as a workaround
+- use `prepareSetup` as the base render helper, and layer a small local `setup...` helper on top when the test needs named queried elements or a `userEvent` instance
 
 For the repo-specific accessibility testing workflow, see `references/accessibility-testing.md`.
 

@@ -103,16 +103,13 @@ For the repo-specific accessibility testing workflow, read:
 
 ## Testing Rules
 
-Tests should cover user-observable behavior only.
+Follow the testing conventions in `ui-routine-conventions`; this section only adds package-specific boundaries for `packages/ui`.
 
-Do:
+For shared `packages/ui` components:
 
-- query by role and accessible name
-- use `@testing-library/user-event` for interactions
-- use `prepareSetup` from `@ordero/test-config/react` for repeated component defaults in a test file
-- when a `prepareSetup` test asserts on an overridden prop, destructure that prop from `setup(...)` and assert on the returned value rather than a separate local variable
-- test behavior such as click handling, disabled behavior, submit behavior, accessible naming, and other real outcomes
 - keep assertions at the correct component boundary
+- cover the public API documented by the component stories
+- use Storybook Vitest for browser-backed story and accessibility coverage when story states or accessibility behavior changed
 
 Examples of correct boundary choices:
 
@@ -122,11 +119,8 @@ Examples of correct boundary choices:
 
 Do not:
 
-- assert internal class names or token names
-- test `cva` output directly
-- test implementation details that a refactor could change without changing behavior
-
-Vitest globals are enabled in `packages/ui`, so do not import `describe`, `it`, `expect`, `vi`, or lifecycle helpers in each test file.
+- test low-level primitive behavior from a wrapper component that does not own that behavior
+- duplicate coverage already owned by a lower-level shared component unless the wrapper changes the user-visible contract
 
 For the canonical shared setup example, see `../ui-routine-conventions/references/prepare-setup-example.md`.
 

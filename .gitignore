@@ -11,6 +11,7 @@ storybook-static
 .env
 .env.local
 .env.*.local
+.playwright-cli/
 
 # tooling
 .biome
@@ -19,3 +20,10 @@ storybook-static
 .idea/
 *.iml
 .vscode/
+
+# Playwright
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+playwright/.auth/
