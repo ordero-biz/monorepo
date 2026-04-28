@@ -9,7 +9,7 @@ describe('platform Home', () => {
       screen.getByRole('heading', { name: /sign in to access your workspace/i })
     ).toBeInTheDocument();
     expect(
-      screen.getByRole('link', { name: /go to login/i })
-    ).toHaveAttribute('href', '/log-in');
+      screen.getByRole('link', { name: /go to sign in/i })
+    ).toHaveAttribute('href', '/sign-in');
   });
 });

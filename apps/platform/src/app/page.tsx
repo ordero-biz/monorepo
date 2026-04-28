@@ -12,14 +12,14 @@ export default function Home() {
             Sign in to access your workspace
           </h1>
           <p className="max-w-[44ch] text-base text-muted-foreground">
-            Continue to the login page to open the newly added account form.
+            Continue to the sign-in page to open the newly added account form.
           </p>
         </div>
         <Link
           className="inline-flex items-center justify-center rounded-[var(--radius)] bg-primary px-[var(--space-3)] py-[var(--space-1-5)] text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-          href="/log-in"
+          href="/sign-in"
         >
-          Go to login
+          Go to sign in
         </Link>
       </section>
     </main>

@@ -1,8 +1,8 @@
 import { expect, test } from '@playwright/test';
 
-test.describe('LogInForm', () => {
+test.describe('SignInForm', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/log-in');
+    await page.goto('/sign-in');
   });
 
   test('shows validation feedback for invalid credentials', async ({ page }) => {

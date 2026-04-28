@@ -2,17 +2,17 @@
 
 import { Button, PasswordField, TextField, Typography } from '@ordero/ui';
 import { useForm } from '@tanstack/react-form';
-import { logInDefaultValues } from './constants';
+import { signInDefaultValues } from './constants';
 import { getErrorMessage } from './utils/error';
 import {
-  type LogInFormValues,
-  validateLogInEmail,
-  validateLogInPassword,
+  type SignInFormValues,
+  validateSignInEmail,
+  validateSignInPassword,
 } from './utils/validations';
 
 const gmailEmailRegex = /^[^@\s]+@gmail\.com$/i;
 
-const submitLogInToBackend = async (value: LogInFormValues) => {
+const submitSignInToBackend = async (value: SignInFormValues) => {
   if (!gmailEmailRegex.test(value.email)) {
     return {
       ok: false,
@@ -31,11 +31,11 @@ const submitLogInToBackend = async (value: LogInFormValues) => {
   };
 };
 
-export const LogInForm = () => {
+export const SignInForm = () => {
   const form = useForm({
-    defaultValues: logInDefaultValues,
+    defaultValues: signInDefaultValues,
     onSubmit: async ({ formApi, value }) => {
-      const result = await submitLogInToBackend(value);
+      const result = await submitSignInToBackend(value);
 
       if (!result.ok) {
         formApi.setErrorMap({
@@ -48,7 +48,7 @@ export const LogInForm = () => {
       }
 
       formApi.reset({
-        ...logInDefaultValues,
+        ...signInDefaultValues,
         email: value.email,
       });
     },
@@ -86,7 +86,7 @@ export const LogInForm = () => {
         <form.Field
           name="email"
           validators={{
-            onChange: ({ value }) => validateLogInEmail(value),
+            onChange: ({ value }) => validateSignInEmail(value),
           }}
         >
           {(field) => {
@@ -128,7 +128,7 @@ export const LogInForm = () => {
           <form.Field
             name="password"
             validators={{
-              onChange: ({ value }) => validateLogInPassword(value),
+              onChange: ({ value }) => validateSignInPassword(value),
             }}
           >
             {(field) => {

@@ -1,13 +1,13 @@
 import { prepareSetup } from '@ordero/test-config/react';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { LogInForm } from './LogInForm';
+import { SignInForm } from './SignInForm';
 
 const { setup } = prepareSetup({
-  component: LogInForm,
+  component: SignInForm,
 });
 
-const setupLogInForm = () => {
+const setupSignInForm = () => {
   const user = userEvent.setup();
 
   setup();
@@ -20,9 +20,9 @@ const setupLogInForm = () => {
   };
 };
 
-describe('LogInForm', () => {
+describe('SignInForm', () => {
   it('renders the expected form controls and secondary actions', () => {
-    setupLogInForm();
+    setupSignInForm();
 
     expect(
       screen.getByRole('heading', { name: 'Sign in to your account' })
@@ -41,7 +41,7 @@ describe('LogInForm', () => {
   });
 
   it('does not show client email validation on the first keystroke', async () => {
-    const { emailField, user } = setupLogInForm();
+    const { emailField, user } = setupSignInForm();
 
     await user.type(emailField, 'x');
 
@@ -51,7 +51,7 @@ describe('LogInForm', () => {
   });
 
   it('shows client email validation after the user blurs the field once', async () => {
-    const { emailField, passwordField, user } = setupLogInForm();
+    const { emailField, passwordField, user } = setupSignInForm();
 
     await user.type(emailField, 'x');
     await user.click(passwordField);
@@ -60,7 +60,7 @@ describe('LogInForm', () => {
   });
 
   it('updates email validity live after an invalid field has been revealed', async () => {
-    const { emailField, passwordField, user } = setupLogInForm();
+    const { emailField, passwordField, user } = setupSignInForm();
 
     await user.type(emailField, 'x');
     await user.click(passwordField);
@@ -76,7 +76,7 @@ describe('LogInForm', () => {
   });
 
   it('does not show client password validation on the first keystroke', async () => {
-    const { passwordField, user } = setupLogInForm();
+    const { passwordField, user } = setupSignInForm();
 
     await user.type(passwordField, 'x');
 
@@ -86,7 +86,7 @@ describe('LogInForm', () => {
   });
 
   it('shows client password validation after the user blurs the field once', async () => {
-    const { emailField, passwordField, user } = setupLogInForm();
+    const { emailField, passwordField, user } = setupSignInForm();
 
     await user.type(passwordField, 'x');
     await user.click(emailField);
@@ -97,7 +97,7 @@ describe('LogInForm', () => {
   });
 
   it('updates password validity live after an invalid field has been revealed', async () => {
-    const { emailField, passwordField, user } = setupLogInForm();
+    const { emailField, passwordField, user } = setupSignInForm();
 
     await user.type(passwordField, 'x');
     await user.click(emailField);
@@ -115,7 +115,7 @@ describe('LogInForm', () => {
   });
 
   it('shows the backend email error for a valid non-gmail address on submit', async () => {
-    const { emailField, passwordField, signInButton, user } = setupLogInForm();
+    const { emailField, passwordField, signInButton, user } = setupSignInForm();
 
     await user.type(emailField, 'admin@mail.com');
     await user.type(passwordField, '123456');
@@ -129,7 +129,7 @@ describe('LogInForm', () => {
   });
 
   it('keeps the email and clears the password after successful sign in', async () => {
-    const { emailField, passwordField, signInButton, user } = setupLogInForm();
+    const { emailField, passwordField, signInButton, user } = setupSignInForm();
 
     await user.type(emailField, 'admin@gmail.com');
     await user.type(passwordField, '123456');
