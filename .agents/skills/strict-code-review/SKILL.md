@@ -29,6 +29,12 @@ This skill is review-only. It is for finding issues, not for authoring new code 
 - Prefer actionable findings to vague advice.
 - Call out missing verification when the change touches behavior but no meaningful check was run.
 
+Use this lightweight severity rubric:
+
+- `P1`: likely to break real usage on an important path and should normally block merge until fixed
+- `P2`: important regression risk, architecture break, or validation/testing gap that should be fixed but is less urgent than `P1`
+- `P3`: lower-risk inconsistency, maintainability problem, or weaker coverage that is worth fixing but is unlikely to break core usage immediately
+
 ## Review scope
 
 Use this default scope unless the user asks for something broader:
@@ -65,7 +71,7 @@ Treat these as the source of truth for mechanical enforcement:
 - `biome.json`
 - the relevant `tsconfig*.json`
 - package scripts such as `format`, `lint`, `typecheck`, and `test`
-- `coding-conventions` for TS and TSX authoring expectations
+- `ts-react-conventions` for TS and TSX authoring expectations
 - `ui-component-build` and `ui-routine-conventions` for shared UI expectations
 
 The review skill should not copy those rules into prose or try to become a second linter spec.
@@ -83,9 +89,19 @@ Keep the human review focus on issues that configs do not judge well, such as:
 - broken imports, exports, or alias usage that suggest structural drift
 - convention breaks from `AGENTS.md` and local skills that reflect architecture, not formatting
 
+## Docs to consult by change type
+
+Use this map to load the smallest relevant source of truth for the diff:
+
+- forms and validation: `docs/forms.md`, `docs/testing.md`
+- shared UI components in `packages/ui`: `ui-component-build`, `ui-routine-conventions`
+- tokens, CSS variables, and Tailwind exposure: `docs/ui-tokens.md`, `ui-routine-conventions`
+- TS and TSX authoring conventions: `ts-react-conventions`
+- shared UI accessibility testing: `docs/accessibility-testing.md`
+
 ## Convention enforcement in review
 
-For TS and TSX changes, use `coding-conventions` as the authoring baseline.
+For TS and TSX changes, use `ts-react-conventions` as the authoring baseline.
 
 Do not restate routine convention nits in review when they are already handled clearly by automation or are low-impact one-off style issues.
 
@@ -160,6 +176,37 @@ Current import and export patterns to review against:
 
 Missing exports, misplaced files, tests not colocated with the file they cover, overly broad prop passthrough, absent tests for interactive behavior, or styling that bypasses the token system should usually be findings.
 
+## Form review rules
+
+When the diff touches feature forms, form validation, submit handling, or
+backend error mapping, also review against `docs/forms.md` and `docs/testing.md`.
+
+Expect the form architecture to preserve these boundaries:
+
+- TanStack Form wiring stays in feature code
+- Zod schemas and validation helpers stay feature-owned
+- shared UI fields remain presentational and form-library agnostic
+- backend validation remains authoritative over client validation
+
+Expect the validation UX to preserve these defaults unless the feature has a
+clear documented reason to differ:
+
+- do not show client validation errors on the first keystroke
+- show client validation errors after blur
+- once a field has been revealed as invalid, update its validity live while the user corrects it
+- show submit or backend field errors even if the field was never blurred
+
+Review submit and error handling for:
+
+- backend field errors being mapped back into the form in the feature layer
+- form-level submit errors being rendered in a form-level error area
+- field-level submit errors not depending on prior blur state to become visible
+- client validation not being treated as a replacement for backend validation
+
+When form behavior changes, expect targeted tests that cover the user-visible
+validation and submit behavior. Use `docs/testing.md` as the source of truth for
+the testing split between component tests and Playwright flows.
+
 ## Validation expectations
 
 A strict review should mention whether the author ran the smallest relevant checks for the touched area.
@@ -189,6 +236,17 @@ If checks were not run, note that as residual risk. If the diff changes runtime 
 6. Check whether the change preserves the repo architecture:
    types, exports, tokens, component APIs, and test philosophy.
 7. Report only findings that clear the evidence bar.
+
+## Review questions
+
+Use these questions to sharpen the review before writing findings:
+
+- what user-visible behavior changed?
+- what can fail silently or only after integration?
+- what existing repo pattern, boundary, or helper does this diff rely on?
+- did the change bypass an existing pattern for a clear reason?
+- what path in this change is least covered by tests?
+- if this change is wrong, where would the user or the next maintainer feel it first?
 
 ## What strong findings look like
 

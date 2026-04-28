@@ -1,11 +1,11 @@
 ---
 name: ui-routine-conventions
-description: Use for all component work in this repo across packages and apps, and for day-to-day UI decisions about testing style, CSS variable usage, Tailwind token exposure, and shared component conventions.
+description: Use for UI component work in this repo and for day-to-day UI decisions about testing style, CSS variable usage, Tailwind token exposure, and shared component conventions.
 ---
 
 # UI Routine Conventions
 
-Use this skill for all component work in this repo across `packages` and `apps`.
+Use this skill for UI component work across `packages` and `apps`.
 
 It should also be used for general UI work when making decisions about:
 
@@ -13,6 +13,10 @@ It should also be used for general UI work when making decisions about:
 - CSS variable usage
 - Tailwind token exposure
 - shared component conventions
+
+For TS and TSX authoring rules that are not UI-specific, also use:
+
+- `ts-react-conventions`
 
 ## Read First
 

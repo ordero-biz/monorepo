@@ -26,7 +26,7 @@ Use this skill as the entry point when a request clearly means "add a new shared
 - Ask for the component name if missing.
 - Use PascalCase for folder and component names.
 - Create component folder at `packages/ui/src/components/[ComponentName]`.
-- Also apply `coding-conventions`.
+- Also apply `ts-react-conventions`.
 
 ## 2. Scaffold with shadcn
 

@@ -70,9 +70,32 @@ Recommended UX behavior:
 This produces a calmer UX than immediate validation while still helping the
 user fix problems quickly.
 
+Default conventions for new forms:
+
+- define the Zod schema in `utils/validations.ts`
+- keep TanStack Form validation wiring in the feature form component
+- use blur-first validation visibility by default
+- after a field has been shown invalid once, revalidate it live while the user edits
+- treat backend validation as a separate submit concern, not as part of the client schema
+
 Cover these field-level rules with unit/component tests. Use Playwright for
 routed form flows and browser integration. See `docs/testing.md` for the full
 testing split and commands.
+
+## Canonical Flow
+
+Use this as the default shape unless a feature has a clear reason to differ:
+
+1. define default values in `constants.ts`
+2. define the Zod schema and any small validation helpers in `utils/validations.ts`
+3. create the TanStack Form instance in the feature form component
+4. keep field components in `packages/ui` controlled and form-library agnostic
+5. reveal client validation errors after blur, then update them live during correction
+6. on submit, send the current form values to the backend
+7. map backend field or form errors back into TanStack Form in the feature
+
+This gives each form a predictable shape without introducing shared abstractions
+too early.
 
 ## Submit Model
 
@@ -97,9 +120,16 @@ Treat client and submit errors as separate concerns.
 - submit or backend errors should be mapped back to fields when possible
 - form-level submit errors should be rendered in a form-level error area
 - field-level submit errors should not depend on prior blur state to become visible
+- when both client and backend errors are present, prefer the error that best explains the current state of the field to the user
+- if backend error mapping needs normalization, keep that logic inside the feature until multiple forms share the same server contract
 
 Keep error-message extraction logic centralized when possible so forms stay easy
 to read.
+
+We do not yet define a shared backend error payload shape. Each feature may
+translate its backend response into TanStack Form's field-level and form-level
+errors locally. Introduce a shared adapter only after multiple forms use the
+same error contract.
 
 ## Shared Fields
 
@@ -114,6 +144,11 @@ Examples of behavior that may justify a shared field:
 
 The rule is still the same: shared fields remain presentational and
 form-library agnostic.
+
+Use this quick check before moving behavior into `packages/ui`:
+
+- keep it in the feature if it depends on TanStack Form state, submit state, schema knowledge, or backend response details
+- consider moving it to `packages/ui` if the behavior is purely presentational or interaction-focused and repeats across forms
 
 ## Styling
 

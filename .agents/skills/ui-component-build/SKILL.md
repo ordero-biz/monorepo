@@ -19,7 +19,7 @@ This skill is for components that should:
 
 Always also apply:
 
-- `coding-conventions`
+- `ts-react-conventions`
 - `ui-routine-conventions`
 
 ## Build Rules

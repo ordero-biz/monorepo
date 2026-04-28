@@ -1,19 +1,20 @@
 ---
-name: coding-conventions
-description: Use when adding or changing any TSX/TS file for general TypeScript and React code conventions in this repo. For shared packages/ui component work, combine this with ui-component-build and ui-routine-conventions.
+name: ts-react-conventions
+description: Use when adding or changing any TSX/TS file for general TypeScript and React authoring conventions in this repo. For UI component work, also use ui-routine-conventions. For shared packages/ui component work, also use ui-component-build.
 ---
 
-# Coding Conventions
+# TS/React Conventions
 
 Apply these conventions in touched TS/TSX files.
 
 This skill is intentionally narrow:
 
 - it covers general TypeScript and React authoring conventions
-- it does not define the full packages/ui component workflow
-- it does not define the repo's testing philosophy or token architecture
+- it does not define UI testing conventions
+- it does not define token or styling architecture
+- it does not define the full `packages/ui` component workflow
 
-For component work in `packages` or `apps`, always also use:
+For UI component work, also use:
 
 - `ui-routine-conventions`
 
@@ -24,7 +25,7 @@ For shared UI component work in `packages/ui`, always also use:
 ## 0. Handle convention conflicts
 
 - If a user request conflicts with any rule in this skill, pause and ask for explicit confirmation before overriding.
-- Use a direct question, for example: `This conflicts with coding-conventions rule "<rule>". Do you want to override it for this task?`
+- Use a direct question, for example: `This conflicts with ts-react-conventions rule "<rule>". Do you want to override it for this task?`
 - If confirmation is not given, follow the skill rules.
 
 ## 1. Prefer `type`
