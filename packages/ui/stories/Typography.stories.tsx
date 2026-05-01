@@ -1,7 +1,18 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { Typography } from '@/ui/components/Typography';
+import { Typography, type TypographyColor } from '@/ui/components/Typography';
 
 const SAMPLE_TEXT = 'Sample text';
+const colors = [
+  'text-primary',
+  'text-secondary',
+  'text-disabled',
+  'primary',
+  'secondary',
+  'info',
+  'success',
+  'warning',
+  'error',
+] satisfies readonly TypographyColor[];
 
 const meta = {
   title: 'Components/Typography',
@@ -97,33 +108,11 @@ export const Overline: Story = {
 export const Colors: Story = {
   render: () => (
     <div className="grid gap-4 md:grid-cols-3">
-      <Typography color="text-primary" variant="body1">
-        {SAMPLE_TEXT}
-      </Typography>
-      <Typography color="text-secondary" variant="body1">
-        {SAMPLE_TEXT}
-      </Typography>
-      <Typography color="text-disabled" variant="body1">
-        {SAMPLE_TEXT}
-      </Typography>
-      <Typography color="primary" variant="body1">
-        {SAMPLE_TEXT}
-      </Typography>
-      <Typography color="secondary" variant="body1">
-        {SAMPLE_TEXT}
-      </Typography>
-      <Typography color="info" variant="body1">
-        {SAMPLE_TEXT}
-      </Typography>
-      <Typography color="success" variant="body1">
-        {SAMPLE_TEXT}
-      </Typography>
-      <Typography color="warning" variant="body1">
-        {SAMPLE_TEXT}
-      </Typography>
-      <Typography color="error" variant="body1">
-        {SAMPLE_TEXT}
-      </Typography>
+      {colors.map((color) => (
+        <Typography key={color} color={color} variant="body1">
+          {SAMPLE_TEXT}
+        </Typography>
+      ))}
     </div>
   ),
 };

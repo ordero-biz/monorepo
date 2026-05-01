@@ -7,10 +7,14 @@ import {
   Search,
   UserRound,
 } from 'lucide-react';
-import type { ComponentProps } from 'react';
 import { Button } from '@/ui/components/Button';
 import { IconButton } from '@/ui/components/IconButton';
-import { TextField } from '@/ui/components/TextField';
+import {
+  TextField,
+  type TextFieldProps,
+  type TextFieldSize,
+  type TextFieldVariant,
+} from '@/ui/components/TextField';
 
 const previewGridClassName = 'grid gap-8 md:grid-cols-2';
 const previewColumnClassName = 'min-w-0';
@@ -19,8 +23,8 @@ const renderPair = ({
   filled,
   outlined,
 }: {
-  filled: ComponentProps<typeof TextField>;
-  outlined: ComponentProps<typeof TextField>;
+  filled: TextFieldProps;
+  outlined: TextFieldProps;
 }) => (
   <div className={previewGridClassName}>
     <div className={previewColumnClassName}>

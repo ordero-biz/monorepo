@@ -22,10 +22,17 @@ export type {
   IconButtonSize,
 } from './components/IconButton';
 export { IconButton, iconButtonVariants } from './components/IconButton';
-export type { InputProps, InputSize } from './components/Input';
+export type { InputProps, InputSize, InputVariant } from './components/Input';
 export { Input } from './components/Input';
 export type { PasswordFieldProps } from './components/PasswordField';
 export { PasswordField } from './components/PasswordField';
+export type { RadioColor, RadioProps, RadioSize } from './components/Radio';
+export { Radio, radioRootVariants } from './components/Radio';
+export type {
+  RadioGroupOrientation,
+  RadioGroupProps,
+} from './components/RadioGroup';
+export { RadioGroup } from './components/RadioGroup';
 export type {
   SelectOption,
   SelectProps,
@@ -33,7 +40,11 @@ export type {
   SelectVariant,
 } from './components/Select';
 export { Select } from './components/Select';
-export type { TextFieldProps, TextFieldSize } from './components/TextField';
+export type {
+  TextFieldProps,
+  TextFieldSize,
+  TextFieldVariant,
+} from './components/TextField';
 export { TextField } from './components/TextField';
 export type {
   TypographyColor,

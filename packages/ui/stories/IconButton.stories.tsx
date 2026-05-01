@@ -1,6 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Bell, RefreshCw } from 'lucide-react';
-import { IconButton } from '@/ui/components/IconButton';
+import {
+  IconButton,
+  type IconButtonColor,
+  type IconButtonSize,
+} from '@/ui/components/IconButton';
 
 const colors = [
   'default',
@@ -10,9 +14,9 @@ const colors = [
   'success',
   'warning',
   'error',
-] as const;
+] satisfies readonly IconButtonColor[];
 
-const sizes = ['l', 'm', 's', 'xs'] as const;
+const sizes = ['l', 'm', 's', 'xs'] satisfies readonly IconButtonSize[];
 
 const meta = {
   title: 'Components/IconButton',

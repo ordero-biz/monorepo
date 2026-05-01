@@ -1,14 +1,19 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { CircleAlert, Heart, Info, UserRound } from 'lucide-react';
-import type { ComponentProps } from 'react';
-import { Select } from '@/ui/components/Select';
+import {
+  Select,
+  type SelectOption,
+  type SelectProps,
+  type SelectSize,
+  type SelectVariant,
+} from '@/ui/components/Select';
 
 const options = [
   { label: 'List', value: 'list' },
   { label: 'Details', value: 'details' },
   { label: 'Create', value: 'create' },
   { label: 'Edit', value: 'edit' },
-];
+] satisfies readonly SelectOption[];
 
 const previewGridClassName = 'grid gap-8 md:grid-cols-2';
 const previewColumnClassName = 'min-w-0';
@@ -17,8 +22,8 @@ const renderPair = ({
   filled,
   outlined,
 }: {
-  filled: ComponentProps<typeof Select>;
-  outlined: ComponentProps<typeof Select>;
+  filled: SelectProps;
+  outlined: SelectProps;
 }) => (
   <div className={previewGridClassName}>
     <div className={previewColumnClassName}>

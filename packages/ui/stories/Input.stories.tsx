@@ -1,9 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Eye, Search } from 'lucide-react';
-import type { ComponentProps } from 'react';
 import { Button } from '@/ui/components/Button';
 import { IconButton } from '@/ui/components/IconButton';
-import { Input } from '@/ui/components/Input';
+import {
+  Input,
+  type InputProps,
+  type InputVariant,
+} from '@/ui/components/Input';
 
 const previewGridClassName = 'grid gap-8 md:grid-cols-2';
 const previewColumnClassName = 'min-w-0';
@@ -12,8 +15,8 @@ const renderPair = ({
   filled,
   outlined,
 }: {
-  filled: ComponentProps<typeof Input>;
-  outlined: ComponentProps<typeof Input>;
+  filled: InputProps;
+  outlined: InputProps;
 }) => (
   <div className={previewGridClassName}>
     <div className={previewColumnClassName}>

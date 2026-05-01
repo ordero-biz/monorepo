@@ -1,8 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { ChevronRight, Sparkles } from 'lucide-react';
-import { Button } from '@/ui/components/Button';
+import {
+  Button,
+  type ButtonColor,
+  type ButtonSize,
+  type ButtonVariant,
+} from '@/ui/components/Button';
 
-const variants = ['contained', 'outlined', 'text', 'soft'] as const;
+const variants = ['contained', 'outlined', 'text', 'soft'] satisfies readonly ButtonVariant[];
 const colors = [
   'inherit',
   'primary',
@@ -11,7 +16,8 @@ const colors = [
   'success',
   'warning',
   'error',
-] as const;
+] satisfies readonly ButtonColor[];
+const sizes = ['s', 'm', 'l'] satisfies readonly ButtonSize[];
 
 const meta = {
   title: 'Components/Button',
@@ -55,9 +61,11 @@ export const AllVariants: Story = {
 export const Sizes: Story = {
   render: () => (
     <div className='flex items-center gap-3'>
-      <Button size='s'>Small</Button>
-      <Button size='m'>Medium</Button>
-      <Button size='l'>Large</Button>
+      {sizes.map((size) => (
+        <Button key={size} size={size}>
+          {size === 's' ? 'Small' : size === 'm' ? 'Medium' : 'Large'}
+        </Button>
+      ))}
     </div>
   ),
 };

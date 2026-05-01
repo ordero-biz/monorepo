@@ -1,5 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { Checkbox } from '@/ui/components/Checkbox';
+import {
+  Checkbox,
+  type CheckboxColor,
+  type CheckboxSize,
+} from '@/ui/components/Checkbox';
 
 const colors = [
   'default',
@@ -9,7 +13,8 @@ const colors = [
   'success',
   'warning',
   'error',
-] as const;
+] satisfies readonly CheckboxColor[];
+const sizes = ['s', 'm'] satisfies readonly CheckboxSize[];
 
 const meta = {
   title: 'Components/Checkbox',
@@ -60,14 +65,16 @@ export const States: Story = {
 export const Sizes: Story = {
   render: () => (
     <div className='flex flex-wrap items-center gap-4'>
-      <Checkbox size='s'>Small</Checkbox>
-      <Checkbox size='m'>Medium</Checkbox>
-      <Checkbox size='s' defaultChecked>
-        Small checked
-      </Checkbox>
-      <Checkbox size='m' defaultChecked>
-        Medium checked
-      </Checkbox>
+      {sizes.map((size) => (
+        <Checkbox key={size} size={size}>
+          {size === 's' ? 'Small' : 'Medium'}
+        </Checkbox>
+      ))}
+      {sizes.map((size) => (
+        <Checkbox key={`${size}-checked`} size={size} defaultChecked>
+          {size === 's' ? 'Small checked' : 'Medium checked'}
+        </Checkbox>
+      ))}
     </div>
   ),
 };

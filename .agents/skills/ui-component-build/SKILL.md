@@ -96,6 +96,13 @@ Examples:
 
 When the design system presents variants separately, prefer separate stories rather than one giant demo.
 
+For story typing in `packages/ui`:
+
+- keep `type Story = StoryObj<typeof meta>` instead of switching story aliases to the component type
+- type story constants that mirror component unions from the exported component types, for example `ButtonColor`, `ButtonSize`, or `RadioColor`
+- prefer `satisfies readonly SomeUnionType[]` for story option arrays so values are checked against the public union while preserving literal inference
+- type story helper objects from exported component prop types such as `InputProps`, `SelectProps`, or `TextFieldProps` instead of reconstructing ad hoc local shapes
+
 For the repo-specific accessibility testing workflow, read:
 
 - `docs/accessibility-testing.md`
