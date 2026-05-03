@@ -40,7 +40,7 @@ const checkedRingClassNames: Record<RadioColor, string> = {
   info: 'border-[var(--info-main)] text-[var(--info-main)]',
   success: 'border-[var(--success-main)] text-[var(--success-main)]',
   warning: 'border-[var(--warning-main)] text-[var(--warning-main)]',
-  error: 'border-[var(--error-main)] text-[var(--error-main)]',
+  error: 'border-[var(--destructive)] text-[var(--destructive)]',
 };
 
 const checkedHoverClassNames: Record<RadioColor, string> = {

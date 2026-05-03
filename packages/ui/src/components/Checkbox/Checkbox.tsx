@@ -62,7 +62,7 @@ const checkedBoxClassNames: Record<CheckboxColor, string> = {
   warning:
     'border-[var(--warning-main)] bg-[var(--warning-main)] text-[var(--white-main)]',
   error:
-    'border-[var(--error-main)] bg-[var(--error-main)] text-[var(--white-main)]',
+    'border-[var(--destructive)] bg-[var(--destructive)] text-[var(--destructive-foreground)]',
 };
 
 const checkedHoverClassNames: Record<CheckboxColor, string> = {
@@ -229,7 +229,7 @@ export const Checkbox = forwardRef<HTMLElement, CheckboxProps>(
                 })
               )}
               data-slot="checkbox"
-              tabIndex={state.disabled ? -1 : tabIndex ?? 0}
+              tabIndex={state.disabled ? -1 : (tabIndex ?? 0)}
             >
               <span className={cn(checkboxIconViewportVariants({ size }))}>
                 <span

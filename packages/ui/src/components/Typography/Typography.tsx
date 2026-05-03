@@ -35,7 +35,7 @@ const colorClassNames: Record<TypographyColor, string> = {
   info: 'text-[var(--info-main)]',
   success: 'text-[var(--success-main)]',
   warning: 'text-[var(--warning-main)]',
-  error: 'text-[var(--error-main)]',
+  error: 'text-destructive',
 };
 
 type TypographyElementName = 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'p';
