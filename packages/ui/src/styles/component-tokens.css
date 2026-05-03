@@ -261,7 +261,7 @@
 
   /* form-helper-text */
   --figma-form-helper-text-pl: 12px;
-  --figma-form-helper-text-pt: 8px;
+  --figma-form-helper-text-pt: 2px;
   --figma-form-helper-text-icon: 16px;
   --figma-form-helper-text-spacing: var(--figma-spacing-0-5);
 
