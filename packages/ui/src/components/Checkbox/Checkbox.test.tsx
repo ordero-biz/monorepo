@@ -45,6 +45,17 @@ describe('Checkbox', () => {
     expect(onCheckedChange).toHaveBeenCalledWith(true, expect.any(Object));
   });
 
+  it('receives focus when users tab to it', async () => {
+    const user = userEvent.setup();
+    const { children } = setup({
+      children: 'Keyboard focus target',
+    });
+
+    await user.tab();
+
+    expect(screen.getByRole('checkbox', { name: children })).toHaveFocus();
+  });
+
   it('does not toggle when disabled', async () => {
     const user = userEvent.setup();
     const { children, onCheckedChange } = setup({

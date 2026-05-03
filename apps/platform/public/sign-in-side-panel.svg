@@ -1,0 +1,223 @@
+<svg
+  width="720"
+  height="915"
+  viewBox="0 0 720 915"
+  fill="none"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <rect width="720" height="915" fill="#1C252E" />
+  <g opacity="0.12">
+    <path d="M0 46H720" stroke="white" />
+    <path d="M0 99H720" stroke="white" />
+    <path d="M0 152H720" stroke="white" />
+    <path d="M0 205H720" stroke="white" />
+    <path d="M0 258H720" stroke="white" />
+    <path d="M0 311H720" stroke="white" />
+    <path d="M0 364H720" stroke="white" />
+    <path d="M0 417H720" stroke="white" />
+    <path d="M0 470H720" stroke="white" />
+    <path d="M0 523H720" stroke="white" />
+    <path d="M0 576H720" stroke="white" />
+    <path d="M0 629H720" stroke="white" />
+    <path d="M0 682H720" stroke="white" />
+    <path d="M0 735H720" stroke="white" />
+    <path d="M0 788H720" stroke="white" />
+    <path d="M0 841H720" stroke="white" />
+    <path d="M0 894H720" stroke="white" />
+    <path d="M56 0V915" stroke="white" />
+    <path d="M133 0V915" stroke="white" />
+    <path d="M210 0V915" stroke="white" />
+    <path d="M287 0V915" stroke="white" />
+    <path d="M364 0V915" stroke="white" />
+    <path d="M441 0V915" stroke="white" />
+    <path d="M518 0V915" stroke="white" />
+    <path d="M595 0V915" stroke="white" />
+    <path d="M672 0V915" stroke="white" />
+  </g>
+  <rect
+    width="720"
+    height="915"
+    fill="url(#paint0_radial)"
+    fill-opacity="0.86"
+  />
+  <g filter="url(#filter0_dd)">
+    <rect x="90" y="182" width="433" height="404" rx="16" fill="white" />
+  </g>
+  <text
+    x="114"
+    y="228"
+    fill="#1C252E"
+    font-family="'Public Sans', Arial, sans-serif"
+    font-size="18"
+    font-weight="700"
+  >
+    Yearly sales
+  </text>
+  <text
+    x="114"
+    y="254"
+    fill="#637381"
+    font-family="'Public Sans', Arial, sans-serif"
+    font-size="14"
+    font-weight="400"
+  >
+    (+43%) than last year
+  </text>
+  <rect x="423" y="208" width="84" height="32" rx="8" fill="white" stroke="#DFE3E8" />
+  <text
+    x="447"
+    y="228"
+    fill="#1C252E"
+    font-family="'Public Sans', Arial, sans-serif"
+    font-size="14"
+    font-weight="600"
+  >
+    2023
+  </text>
+  <path d="M488 220L492 224L496 220" stroke="#1C252E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+  <circle cx="118" cy="295" r="6" fill="#007867" />
+  <circle cx="244" cy="295" r="6" fill="#FFAB00" />
+  <text
+    x="132"
+    y="300"
+    fill="#1C252E"
+    font-family="'Public Sans', Arial, sans-serif"
+    font-size="13"
+    font-weight="500"
+  >
+    Total income
+  </text>
+  <text
+    x="258"
+    y="300"
+    fill="#1C252E"
+    font-family="'Public Sans', Arial, sans-serif"
+    font-size="13"
+    font-weight="500"
+  >
+    Total expenses
+  </text>
+  <text
+    x="114"
+    y="334"
+    fill="#1C252E"
+    font-family="'Public Sans', Arial, sans-serif"
+    font-size="18"
+    font-weight="600"
+  >
+    $16.19k
+  </text>
+  <text
+    x="238"
+    y="334"
+    fill="#1C252E"
+    font-family="'Public Sans', Arial, sans-serif"
+    font-size="18"
+    font-weight="600"
+  >
+    $35.71k
+  </text>
+  <g opacity="0.42">
+    <path d="M156 376H500" stroke="#DADFE4" stroke-dasharray="2 6" />
+    <path d="M156 419H500" stroke="#DADFE4" stroke-dasharray="2 6" />
+    <path d="M156 462H500" stroke="#DADFE4" stroke-dasharray="2 6" />
+    <path d="M156 505H500" stroke="#DADFE4" stroke-dasharray="2 6" />
+    <path d="M156 548H500" stroke="#DADFE4" stroke-dasharray="2 6" />
+  </g>
+  <text x="117" y="380" fill="#919EAB" font-family="'Public Sans', Arial, sans-serif" font-size="12">100</text>
+  <text x="123" y="423" fill="#919EAB" font-family="'Public Sans', Arial, sans-serif" font-size="12">80</text>
+  <text x="123" y="466" fill="#919EAB" font-family="'Public Sans', Arial, sans-serif" font-size="12">60</text>
+  <text x="123" y="509" fill="#919EAB" font-family="'Public Sans', Arial, sans-serif" font-size="12">40</text>
+  <text x="123" y="552" fill="#919EAB" font-family="'Public Sans', Arial, sans-serif" font-size="12">20</text>
+  <path d="M156 494C196 448 230 432 262 447C293 462 320 510 355 514C391 519 421 478 454 469C479 463 498 466 523 475" stroke="#FFAB00" stroke-width="3" stroke-linecap="round" />
+  <path d="M156 570C195 573 225 565 256 522C286 481 315 428 357 434C401 441 434 494 475 475C493 467 507 450 523 423" stroke="#00A76F" stroke-width="3" stroke-linecap="round" />
+  <path d="M156 571C195 574 225 566 256 523C286 482 315 429 357 435C401 442 434 495 475 476C493 468 507 451 523 424V586H156V571Z" fill="url(#paint1_linear)" />
+  <g filter="url(#filter1_dd)">
+    <rect x="286" y="384" width="344" height="292" rx="16" fill="white" />
+  </g>
+  <text
+    x="310"
+    y="424"
+    fill="#1C252E"
+    font-family="'Public Sans', Arial, sans-serif"
+    font-size="14"
+    font-weight="600"
+  >
+    Your current balance
+  </text>
+  <text
+    x="310"
+    y="475"
+    fill="#1C252E"
+    font-family="'Public Sans', Arial, sans-serif"
+    font-size="32"
+    font-weight="700"
+  >
+    $9,990
+  </text>
+  <text x="310" y="518" fill="#637381" font-family="'Public Sans', Arial, sans-serif" font-size="14">Order total</text>
+  <text x="552" y="518" fill="#1C252E" font-family="'Public Sans', Arial, sans-serif" font-size="14"> $10,989</text>
+  <text x="310" y="556" fill="#637381" font-family="'Public Sans', Arial, sans-serif" font-size="14">Earning</text>
+  <text x="558" y="556" fill="#1C252E" font-family="'Public Sans', Arial, sans-serif" font-size="14"> $11,988</text>
+  <text x="310" y="594" fill="#637381" font-family="'Public Sans', Arial, sans-serif" font-size="14">Refunded</text>
+  <text x="560" y="594" fill="#1C252E" font-family="'Public Sans', Arial, sans-serif" font-size="14"> $93.10</text>
+  <rect x="310" y="617" width="143" height="36" rx="8" fill="#FFAB00" />
+  <rect x="463" y="617" width="143" height="36" rx="8" fill="#00A76F" />
+  <text
+    x="351"
+    y="640"
+    fill="#1C252E"
+    font-family="'Public Sans', Arial, sans-serif"
+    font-size="14"
+    font-weight="700"
+  >
+    Request
+  </text>
+  <text
+    x="517"
+    y="640"
+    fill="white"
+    font-family="'Public Sans', Arial, sans-serif"
+    font-size="14"
+    font-weight="700"
+  >
+    Send
+  </text>
+  <defs>
+    <filter id="filter0_dd" x="78" y="178" width="457" height="428" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feFlood flood-opacity="0" result="BackgroundImageFix" />
+      <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha" />
+      <feOffset dy="12" />
+      <feGaussianBlur stdDeviation="12" />
+      <feColorMatrix type="matrix" values="0 0 0 0 0.568627 0 0 0 0 0.619608 0 0 0 0 0.670588 0 0 0 0.12 0" />
+      <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow" />
+      <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha2" />
+      <feGaussianBlur stdDeviation="1" />
+      <feColorMatrix type="matrix" values="0 0 0 0 0.568627 0 0 0 0 0.619608 0 0 0 0 0.670588 0 0 0 0.2 0" />
+      <feBlend mode="normal" in2="effect1_dropShadow" result="effect2_dropShadow" />
+      <feBlend mode="normal" in="SourceGraphic" in2="effect2_dropShadow" result="shape" />
+    </filter>
+    <filter id="filter1_dd" x="274" y="380" width="368" height="316" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feFlood flood-opacity="0" result="BackgroundImageFix" />
+      <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha" />
+      <feOffset dy="12" />
+      <feGaussianBlur stdDeviation="12" />
+      <feColorMatrix type="matrix" values="0 0 0 0 0.568627 0 0 0 0 0.619608 0 0 0 0 0.670588 0 0 0 0.12 0" />
+      <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow" />
+      <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha2" />
+      <feGaussianBlur stdDeviation="1" />
+      <feColorMatrix type="matrix" values="0 0 0 0 0.568627 0 0 0 0 0.619608 0 0 0 0 0.670588 0 0 0 0.2 0" />
+      <feBlend mode="normal" in2="effect1_dropShadow" result="effect2_dropShadow" />
+      <feBlend mode="normal" in="SourceGraphic" in2="effect2_dropShadow" result="shape" />
+    </filter>
+    <radialGradient id="paint0_radial" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(536 76) rotate(127.046) scale(1104.34 950.84)">
+      <stop stop-color="#2B3640" stop-opacity="0.36" />
+      <stop offset="0.55" stop-color="#1C252E" stop-opacity="0.18" />
+      <stop offset="1" stop-color="#141A21" />
+    </radialGradient>
+    <linearGradient id="paint1_linear" x1="339.5" y1="423" x2="339.5" y2="586" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#C8FAD6" stop-opacity="0.42" />
+      <stop offset="1" stop-color="#C8FAD6" stop-opacity="0" />
+    </linearGradient>
+  </defs>
+</svg>

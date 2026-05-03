@@ -1,54 +1,28 @@
 'use client';
 
-import { Button, PasswordField, TextField, Typography } from '@ordero/ui';
-import { useForm } from '@tanstack/react-form';
-import { signInDefaultValues } from './constants';
-import { getErrorMessage } from './utils/error';
 import {
-  type SignInFormValues,
-  validateSignInEmail,
-  validateSignInPassword,
+  Button,
+  Checkbox,
+  PasswordField,
+  TextField,
+  Typography,
+} from '@ordero/ui';
+import { useForm } from '@tanstack/react-form';
+import Link from 'next/link';
+import { getErrorMessage } from '@/features/sign-in/utils/error';
+import { signUpDefaultValues } from './constants';
+import {
+  validateAcceptTerms,
+  validateSignUpEmail,
+  validateSignUpPassword,
 } from './utils/validations';
 
-const gmailEmailRegex = /^[^@\s]+@gmail\.com$/i;
-
-const submitSignInToBackend = async (value: SignInFormValues) => {
-  if (!gmailEmailRegex.test(value.email)) {
-    return {
-      ok: false,
-      error: {
-        fieldErrors: {
-          email: 'Use a gmail.com email address.',
-        },
-        formError: undefined,
-      },
-    };
-  }
-
-  return {
-    ok: true,
-    error: {},
-  };
-};
-
-export const SignInForm = () => {
+export const SignUpForm = () => {
   const form = useForm({
-    defaultValues: signInDefaultValues,
+    defaultValues: signUpDefaultValues,
     onSubmit: async ({ formApi, value }) => {
-      const result = await submitSignInToBackend(value);
-
-      if (!result.ok) {
-        formApi.setErrorMap({
-          onSubmit: {
-            fields: result.error.fieldErrors ?? {},
-            form: result.error.formError,
-          },
-        });
-        return;
-      }
-
       formApi.reset({
-        ...signInDefaultValues,
+        ...signUpDefaultValues,
         email: value.email,
       });
     },
@@ -65,7 +39,7 @@ export const SignInForm = () => {
       <form.Field
         name="email"
         validators={{
-          onChange: ({ value }) => validateSignInEmail(value),
+          onChange: ({ value }) => validateSignUpEmail(value),
         }}
       >
         {(field) => {
@@ -91,8 +65,8 @@ export const SignInForm = () => {
               onValueChange={(value) => field.handleChange(value)}
               placeholder="example@gmail.com"
               required
-              value={field.state.value}
               size="s"
+              value={field.state.value}
             />
           );
         }}
@@ -102,7 +76,7 @@ export const SignInForm = () => {
         <form.Field
           name="password"
           validators={{
-            onChange: ({ value }) => validateSignInPassword(value),
+            onChange: ({ value }) => validateSignUpPassword(value),
           }}
         >
           {(field) => {
@@ -119,6 +93,7 @@ export const SignInForm = () => {
 
             return (
               <PasswordField
+                autoComplete="new-password"
                 errorText={errorText}
                 invalid={Boolean(errorText)}
                 label="Password"
@@ -127,22 +102,68 @@ export const SignInForm = () => {
                 onValueChange={(value) => field.handleChange(value)}
                 placeholder="6+ characters"
                 required
-                value={field.state.value}
                 size="s"
+                value={field.state.value}
               />
             );
           }}
         </form.Field>
 
-        <button className="w-fit text-left" type="button">
-          <Typography variant="body2">Forgot password?</Typography>
-        </button>
+        <form.Field
+          name="acceptTerms"
+          validators={{
+            onSubmit: ({ value }) => validateAcceptTerms(value),
+          }}
+        >
+          {(field) => {
+            const submitError = field.state.meta.errorMap.onSubmit;
+            const errorText = submitError
+              ? getErrorMessage(submitError)
+              : undefined;
+
+            return (
+              <div className="flex flex-col gap-[var(--space-1)]">
+                <Checkbox
+                  checked={Boolean(field.state.value)}
+                  color="primary"
+                  name={field.name}
+                  onBlur={field.handleBlur}
+                  onCheckedChange={(checked) =>
+                    field.handleChange(checked === true)
+                  }
+                  size="s"
+                >
+                  <span className="text-[var(--text-secondary)]">
+                    By signing up, I agree to{' '}
+                    <Link
+                      className="text-[var(--text-secondary)] underline underline-offset-[3px]"
+                      href="/terms"
+                    >
+                      terms of use
+                    </Link>{' '}
+                    and{' '}
+                    <Link
+                      className="text-[var(--text-secondary)] underline underline-offset-[3px]"
+                      href="/privacy"
+                    >
+                      privacy policy
+                    </Link>
+                    .
+                  </span>
+                </Checkbox>
+                {errorText ? (
+                  <Typography color="error" variant="caption">
+                    {errorText}
+                  </Typography>
+                ) : null}
+              </div>
+            );
+          }}
+        </form.Field>
       </div>
 
-      <form.Subscribe
-        selector={(state) => [state.values, state.isSubmitting] as const}
-      >
-        {([_, isSubmitting]) => (
+      <form.Subscribe selector={(state) => state.isSubmitting}>
+        {(isSubmitting) => (
           <Button
             color="inherit"
             disabled={isSubmitting}
@@ -150,7 +171,7 @@ export const SignInForm = () => {
             size="l"
             type="submit"
           >
-            {isSubmitting ? 'Signing in...' : 'Sign in'}
+            {isSubmitting ? 'Signing up...' : 'Sign up'}
           </Button>
         )}
       </form.Subscribe>

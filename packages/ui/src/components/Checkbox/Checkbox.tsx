@@ -229,6 +229,7 @@ export const Checkbox = forwardRef<HTMLElement, CheckboxProps>(
                 })
               )}
               data-slot="checkbox"
+              tabIndex={state.disabled ? -1 : tabIndex ?? 0}
             >
               <span className={cn(checkboxIconViewportVariants({ size }))}>
                 <span

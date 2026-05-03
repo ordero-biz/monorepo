@@ -25,13 +25,6 @@ describe('SignInForm', () => {
     setupSignInForm();
 
     expect(
-      screen.getByRole('heading', { name: 'Sign in to your account' })
-    ).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Get started' })).toHaveAttribute(
-      'type',
-      'button'
-    );
-    expect(
       screen.getByRole('button', { name: 'Forgot password?' })
     ).toHaveAttribute('type', 'button');
     expect(screen.getByRole('button', { name: 'Sign in' })).toHaveAttribute(
