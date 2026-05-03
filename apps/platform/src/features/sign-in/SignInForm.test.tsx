@@ -22,15 +22,29 @@ const setupSignInForm = () => {
 
 describe('SignInForm', () => {
   it('renders the expected form controls and secondary actions', () => {
-    setupSignInForm();
+    const { emailField, passwordField, signInButton } = setupSignInForm();
 
+    expect(emailField).toBeVisible();
+    expect(passwordField).toBeVisible();
     expect(
       screen.getByRole('button', { name: 'Forgot password?' })
     ).toHaveAttribute('type', 'button');
-    expect(screen.getByRole('button', { name: 'Sign in' })).toHaveAttribute(
-      'type',
-      'submit'
+    expect(signInButton).toHaveAttribute('type', 'submit');
+  });
+
+  it('shows submit validation when the user submits the untouched form', async () => {
+    const { emailField, passwordField, signInButton, user } = setupSignInForm();
+
+    await user.click(signInButton);
+
+    expect(screen.getByText('Enter a valid email address.')).toBeVisible();
+    expect(emailField).toHaveAccessibleDescription(
+      'Enter a valid email address.'
     );
+    expect(
+      screen.getByText('Password must contain at least 6 characters.')
+    ).toBeVisible();
+    expect(passwordField).toHaveValue('');
   });
 
   it('does not show client email validation on the first keystroke', async () => {

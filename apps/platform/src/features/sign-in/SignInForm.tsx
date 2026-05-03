@@ -57,6 +57,7 @@ export const SignInForm = () => {
   return (
     <form
       className="flex w-full flex-col gap-[var(--space-4)]"
+      noValidate
       onSubmit={(event) => {
         event.preventDefault();
         form.handleSubmit();
@@ -66,6 +67,7 @@ export const SignInForm = () => {
         name="email"
         validators={{
           onChange: ({ value }) => validateSignInEmail(value),
+          onSubmit: ({ value }) => validateSignInEmail(value),
         }}
       >
         {(field) => {
@@ -103,6 +105,7 @@ export const SignInForm = () => {
           name="password"
           validators={{
             onChange: ({ value }) => validateSignInPassword(value),
+            onSubmit: ({ value }) => validateSignInPassword(value),
           }}
         >
           {(field) => {
