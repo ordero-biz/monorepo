@@ -26,6 +26,14 @@ Use these tools:
 - `prepareSetup` from `@ordero/test-config/react`
 - Vitest globals such as `describe`, `it`, `expect`, and `vi`
 
+For component tests across `apps` and `packages`, default to `prepareSetup`
+when the file has repeated default props or a stable wrapper. Treat ad hoc
+render helpers as the exception, not the default.
+
+Use plain `render(...)` directly only when a one-off test is clearer because it
+needs surrounding structure such as a form, extra focus targets, or similar
+test-local setup.
+
 Do not import Vitest globals in individual test files. App and package
 TypeScript configs should expose them through a local Vitest shim.
 

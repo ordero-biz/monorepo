@@ -129,6 +129,7 @@ When the diff touches UI components, styles, stories, or tests, also apply the r
 - favor accessible role and name coverage for user-facing behavior
 - avoid asserting class names, token names, or `cva` internals when a user-visible signal exists
 - check whether the change preserves the semantic token architecture described in `docs/ui-tokens.md`
+- for component tests across `apps` and `packages`, expect `prepareSetup` to be the default when the file has repeated default props or a stable wrapper; treat ad hoc render helpers as the exception
 - for `prepareSetup`-based tests, expect overridden props that are later asserted on to be destructured from `setup(...)` rather than tracked in separate local variables
 
 From `AGENTS.md` and local skills, pay particular attention to:
@@ -253,6 +254,7 @@ Use these questions to sharpen the review before writing findings:
 - a new shared UI component exposes `className`, breaking the repo’s design-system boundary
 - a component uses raw `--figma-*` tokens
 - a change invents new semantic tokens without first reusing or exhausting the existing token layers in `packages/ui/src/styles`
+- a component test introduces an ad hoc render helper even though `prepareSetup` would cover repeated default props or a stable wrapper more cleanly
 - a `prepareSetup`-based test asserts on an overridden prop through a separate local variable instead of destructuring the asserted value from `setup(...)`
 - a TS change relies on `as any`, `@ts-ignore`, or broad assertions to bypass a modeling problem
 - a refactor removes behavior coverage and leaves interactive paths unverified

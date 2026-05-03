@@ -1,6 +1,8 @@
 # `prepareSetup` Example
 
-Use `prepareSetup` from `@ordero/test-config/react` when a test file has repeated default props and benefits from a shared setup helper.
+Use `prepareSetup` from `@ordero/test-config/react` as the default pattern for
+component tests across `apps` and `packages` when a file has repeated default
+props or benefits from a shared setup helper.
 
 Strict rule: when a `prepareSetup` test overrides a prop and later asserts on that prop, destructure the asserted prop from the object returned by `setup(...)`. Do not keep a separate local variable for the same overridden prop.
 
