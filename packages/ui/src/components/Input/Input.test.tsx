@@ -23,9 +23,7 @@ describe('Input', () => {
   });
 
   it('renders a standalone textbox', () => {
-    const ariaLabel = 'Search input';
-
-    setup({ 'aria-label': ariaLabel });
+    const { 'aria-label': ariaLabel } = setup({ 'aria-label': 'Search input' });
 
     expect(
       screen.getByRole('textbox', { name: ariaLabel })
@@ -49,6 +47,7 @@ describe('Input', () => {
 
   it('calls onValueChange when the user types', async () => {
     const user = userEvent.setup();
+
     const { 'aria-label': ariaLabel, onValueChange } = setup({
       'aria-label': 'Search',
       onValueChange: vi.fn(),
@@ -60,14 +59,11 @@ describe('Input', () => {
   });
 
   it('renders start and end adornments and icons', () => {
-    const startAdornment = '$';
-    const endAdornment = 'kg';
-
-    setup({
+    const { startAdornment, endAdornment } = setup({
       'aria-label': 'Amount',
-      endAdornment,
+      endAdornment: 'kg',
       endIcon: TestEndIcon,
-      startAdornment,
+      startAdornment: '$',
       startIcon: TestStartIcon,
       variant: 'filled',
     });
@@ -79,13 +75,10 @@ describe('Input', () => {
   });
 
   it('disables the textbox when disabled is set', () => {
-    const ariaLabel = 'Amount';
-    const startAdornment = 'Kg';
-
-    setup({
-      'aria-label': ariaLabel,
+    const { 'aria-label': ariaLabel, startAdornment } = setup({
+      'aria-label': 'Amount',
       disabled: true,
-      startAdornment,
+      startAdornment: 'Kg',
       variant: 'filled',
     });
 

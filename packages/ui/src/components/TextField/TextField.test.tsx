@@ -28,12 +28,9 @@ describe('TextField', () => {
   });
 
   it('labels the input and wires helper text as the accessible description', () => {
-    const label = 'Your email';
-    const helperText = 'Use your email';
-
-    setup({
-      label,
-      helperText,
+    const { label, helperText } = setup({
+      label: 'Your email',
+      helperText: 'Use your email',
       variant: 'filled',
     });
 
@@ -45,6 +42,7 @@ describe('TextField', () => {
 
   it('calls onValueChange when the user types', async () => {
     const user = userEvent.setup();
+
     const { label, onValueChange } = setup({
       label: 'Name',
       onValueChange: vi.fn(),
@@ -56,11 +54,9 @@ describe('TextField', () => {
   });
 
   it('renders helper text with its icon when valid', () => {
-    const helperText = 'Use your email';
-
-    setup({
+    const { helperText } = setup({
       helperIcon: <TestHelperIcon />,
-      helperText,
+      helperText: 'Use your email',
       variant: 'filled',
     });
 
@@ -69,15 +65,12 @@ describe('TextField', () => {
   });
 
   it('shows error text instead of helper text when invalid', () => {
-    const errorText = 'Email is required.';
-    const helperText = 'Use your email';
-
-    setup({
+    const { errorText, helperText } = setup({
       errorIcon: <TestErrorIcon />,
-      errorText,
+      errorText: 'Email is required.',
       helperIcon: <TestHelperIcon />,
       invalid: true,
-      helperText,
+      helperText: 'Use your email',
       variant: 'filled',
     });
 
@@ -91,11 +84,9 @@ describe('TextField', () => {
   });
 
   it('keeps helper text when invalid without error text', () => {
-    const helperText = 'Use your email';
-
-    setup({
+    const { helperText } = setup({
       helperIcon: <TestHelperIcon />,
-      helperText,
+      helperText: 'Use your email',
       invalid: true,
       variant: 'filled',
     });
@@ -108,13 +99,11 @@ describe('TextField', () => {
   });
 
   it('keeps the field accessible when adornments are provided', () => {
-    const label = 'Search';
-
-    setup({
+    const { label } = setup({
       defaultValue: 'Value',
       disabled: true,
       endAdornment: 'kg',
-      label,
+      label: 'Search',
       startAdornment: <span aria-hidden="true">$</span>,
       variant: 'filled',
     });
@@ -122,5 +111,15 @@ describe('TextField', () => {
     expect(screen.getByRole('textbox', { name: label })).toBeDisabled();
     expect(screen.getByText('$')).toBeInTheDocument();
     expect(screen.getByText('kg')).toBeInTheDocument();
+  });
+
+  it('shows a visual asterisk for required fields without changing the accessible name', () => {
+    const { label } = setup({
+      label: 'Email',
+      required: true,
+    });
+
+    expect(screen.getByRole('textbox', { name: label })).toBeRequired();
+    expect(screen.getByText('*')).toHaveAttribute('aria-hidden', 'true');
   });
 });

@@ -1,3 +1,4 @@
+import type { RenderResult } from '@testing-library/react';
 import { render } from '@testing-library/react';
 import type { ComponentType } from 'react';
 
@@ -6,26 +7,40 @@ type PrepareSetupArgs<T extends object> = {
   props?: T;
 };
 
-type CombinedProps<T extends object, U extends Partial<T>> = {
-  [K in keyof (T & U)]: (T & U)[K];
+type CombinedProps<T extends object, U extends Partial<T>> = Omit<T, keyof U> &
+  U;
+
+type SetupRenderResult<T extends object> = Omit<
+  RenderResult,
+  'rerender'
+> & {
+  rerender: (rerenderProps?: Partial<T>) => void;
+};
+
+type SetupResult<T extends object, U extends Partial<T>> = CombinedProps<T, U> & {
+  renderResult: SetupRenderResult<T>;
 };
 
 export const prepareSetup = <T extends object>({
   component,
   props = {} as T,
 }: PrepareSetupArgs<T>) => {
-  const setup = <U extends Partial<T>>(caseProps: U = {} as U) => {
+  const setup = <const U extends Partial<T>>(
+    caseProps: U = {} as U
+  ): SetupResult<T, U> => {
     const combinedProps = {
       ...props,
       ...caseProps,
     } as CombinedProps<T, U>;
 
     const CaseComponent = component;
-    const renderResult = render(<CaseComponent {...combinedProps} />);
+    const renderResult = render(
+      <CaseComponent {...(combinedProps as unknown as T)} />
+    );
     const rerender = (rerenderProps: Partial<T> = {}) =>
       renderResult.rerender(
         <CaseComponent
-          {...combinedProps}
+          {...(combinedProps as unknown as T)}
           {...(rerenderProps as Partial<CombinedProps<T, U>>)}
         />
       );

@@ -34,6 +34,7 @@ describe('Checkbox', () => {
 
   it('toggles when users click the label text', async () => {
     const user = userEvent.setup();
+
     const { children, onCheckedChange } = setup({
       children: 'Enable notifications',
       onCheckedChange: vi.fn(),
@@ -47,6 +48,7 @@ describe('Checkbox', () => {
 
   it('receives focus when users tab to it', async () => {
     const user = userEvent.setup();
+
     const { children } = setup({
       children: 'Keyboard focus target',
     });
@@ -58,6 +60,7 @@ describe('Checkbox', () => {
 
   it('does not toggle when disabled', async () => {
     const user = userEvent.setup();
+
     const { children, onCheckedChange } = setup({
       children: 'Send reminders',
       disabled: true,

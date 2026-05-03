@@ -33,6 +33,7 @@ describe('Button', () => {
 
   it('calls the click handler when enabled', async () => {
     const user = userEvent.setup();
+
     const { onClick, children } = setup({
       children: 'Click me',
       onClick: vi.fn(),
@@ -45,6 +46,7 @@ describe('Button', () => {
 
   it('does not call the click handler when disabled', async () => {
     const user = userEvent.setup();
+
     const { onClick, children } = setup({
       children: 'Disabled',
       disabled: true,
@@ -59,6 +61,7 @@ describe('Button', () => {
 
   it('calls the focus handler when the button receives focus', async () => {
     const user = userEvent.setup();
+
     const { onFocus, children } = setup({
       children: 'Focus me',
       onFocus: vi.fn(),
@@ -92,6 +95,7 @@ describe('Button', () => {
 
   it('calls the keydown handler when a key is pressed', async () => {
     const user = userEvent.setup();
+
     const { onKeyDown, children } = setup({
       children: 'Keyboard',
       onKeyDown: vi.fn(),

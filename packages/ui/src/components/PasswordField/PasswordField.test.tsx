@@ -15,9 +15,11 @@ describe('PasswordField', () => {
   });
 
   it('renders a password input by default', () => {
-    setup({});
+    const { label } = setup({
+      label: 'Password',
+    });
 
-    expect(screen.getByLabelText('Password')).toHaveAttribute(
+    expect(screen.getByLabelText(label)).toHaveAttribute(
       'type',
       'password'
     );
@@ -29,9 +31,11 @@ describe('PasswordField', () => {
   it('toggles the input type when the icon button is pressed', async () => {
     const user = userEvent.setup();
 
-    setup({});
+    const { label } = setup({
+      label: 'Password',
+    });
 
-    const input = screen.getByLabelText('Password');
+    const input = screen.getByLabelText(label);
 
     await user.click(screen.getByRole('button', { name: 'Show password' }));
 
@@ -42,19 +46,21 @@ describe('PasswordField', () => {
   });
 
   it('respects a visible default value', () => {
-    setup({
+    const { label } = setup({
       defaultVisible: true,
+      label: 'Password',
     });
 
-    expect(screen.getByLabelText('Password')).toHaveAttribute('type', 'text');
+    expect(screen.getByLabelText(label)).toHaveAttribute('type', 'text');
   });
 
   it('disables the toggle when the field is disabled', () => {
-    setup({
+    const { label } = setup({
       disabled: true,
+      label: 'Password',
     });
 
-    expect(screen.getByLabelText('Password')).toBeDisabled();
+    expect(screen.getByLabelText(label)).toBeDisabled();
     expect(
       screen.getByRole('button', { name: 'Show password' })
     ).toBeDisabled();

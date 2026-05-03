@@ -23,10 +23,8 @@ describe('Select', () => {
   });
 
   it('renders a button trigger with the selected value', () => {
-    const ariaLabel = 'Page view';
-
-    setup({
-      'aria-label': ariaLabel,
+    const { 'aria-label': ariaLabel } = setup({
+      'aria-label': 'Page view',
       defaultValue: 'list',
     });
 
@@ -36,15 +34,16 @@ describe('Select', () => {
   });
 
   it('shows the placeholder when no value is selected', () => {
-    const { 'aria-label': ariaLabel, placeholder } = setup();
+    const { 'aria-label': ariaLabel, placeholder } = setup({
+      placeholder: 'Select view',
+    });
 
-    expect(screen.getByRole('combobox', { name: ariaLabel })).toHaveTextContent(
-      String(placeholder)
-    );
+    expect(screen.getByRole('combobox', { name: ariaLabel })).toHaveTextContent(placeholder);
   });
 
   it('opens the list and calls onValueChange when the user picks an option', async () => {
     const user = userEvent.setup();
+
     const { 'aria-label': ariaLabel, onValueChange } = setup({
       'aria-label': 'Navigation mode',
       onValueChange: vi.fn(),
@@ -62,7 +61,7 @@ describe('Select', () => {
   it('renders helper text and start content', async () => {
     const user = userEvent.setup();
 
-    setup({
+    const { helperText } = setup({
       defaultValue: 'list',
       helperIcon: <Info aria-hidden="true" />,
       helperText: 'Caption text, description, notification',
@@ -73,31 +72,27 @@ describe('Select', () => {
 
     await user.click(screen.getByRole('combobox', { name: 'View mode' }));
 
-    expect(
-      screen.getByText('Caption text, description, notification')
-    ).toBeInTheDocument();
+    expect(screen.getByText(helperText)).toBeInTheDocument();
     expect(
       screen.getByRole('combobox', { name: 'View mode' })
     ).toHaveTextContent('List');
   });
 
   it('renders error text when invalid', () => {
-    setup({
+    const { errorText } = setup({
       defaultValue: 'create',
       errorText: 'Selection is incorrect',
       invalid: true,
       label: 'Label',
     });
 
-    expect(screen.getByText('Selection is incorrect')).toBeInTheDocument();
+    expect(screen.getByText(errorText)).toBeInTheDocument();
   });
 
   it('keeps helper text when invalid without error text', () => {
-    const helperText = 'Caption text, description, notification';
-
-    setup({
+    const { helperText } = setup({
       helperIcon: <Info aria-hidden="true" />,
-      helperText,
+      helperText: 'Caption text, description, notification',
       invalid: true,
       label: 'Label',
       variant: 'filled',
@@ -141,13 +136,22 @@ describe('Select', () => {
   });
 
   it('disables the trigger when disabled is set', () => {
-    const ariaLabel = 'Status';
-
-    setup({
-      'aria-label': ariaLabel,
+    const { 'aria-label': ariaLabel } = setup({
+      'aria-label': 'Status',
       disabled: true,
     });
 
     expect(screen.getByRole('combobox', { name: ariaLabel })).toBeDisabled();
+  });
+
+  it('shows a visual asterisk for required fields without changing the accessible name', () => {
+    const { 'aria-label': ariaLabel } = setup({
+      'aria-label': 'View mode',
+      label: 'Mode',
+      required: true,
+    });
+
+    expect(screen.getByRole('combobox', { name: ariaLabel })).toBeRequired();
+    expect(screen.getByText('*')).toHaveAttribute('aria-hidden', 'true');
   });
 });

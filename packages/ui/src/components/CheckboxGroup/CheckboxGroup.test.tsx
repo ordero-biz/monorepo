@@ -63,6 +63,7 @@ describe('CheckboxGroup', () => {
 
   it('updates the selected values when users toggle a checkbox', async () => {
     const user = userEvent.setup();
+
     const { onValueChange } = setup({
       onValueChange: vi.fn(),
     });

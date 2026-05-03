@@ -5,6 +5,7 @@ import { Select as SelectPrimitive } from '@base-ui/react/select';
 import { ChevronDown } from 'lucide-react';
 import type { CSSProperties } from 'react';
 import { forwardRef, useId, useMemo, useState } from 'react';
+import { renderFieldLabelContent } from '@/ui/components/shared/renderFieldLabelContent';
 import { cn } from '@/ui/lib/utils';
 import type { SelectProps } from './types';
 
@@ -273,7 +274,7 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps>(
               })
             )}
           >
-            {label}
+            {renderFieldLabelContent({ label, required })}
           </Field.Label>
         ) : null}
         <SelectPrimitive.Root

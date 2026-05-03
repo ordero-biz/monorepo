@@ -11,6 +11,7 @@ import {
   useRef,
   useState,
 } from 'react';
+import { renderFieldLabelContent } from '@/ui/components/shared/renderFieldLabelContent';
 import { cn } from '@/ui/lib/utils';
 import type { RadioGroupProps } from './types';
 
@@ -166,7 +167,7 @@ export const RadioGroup = forwardRef<HTMLDivElement, RadioGroupProps>(
             )}
             id={labelId}
           >
-            {label}
+            {renderFieldLabelContent({ label, required })}
           </Field.Label>
         ) : null}
         <RadioGroupPrimitive

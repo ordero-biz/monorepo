@@ -44,6 +44,7 @@ describe('RadioGroup', () => {
 
   it('updates the selected value when users choose a radio', async () => {
     const user = userEvent.setup();
+
     const { onValueChange } = setup({
       onValueChange: vi.fn(),
     });
@@ -57,13 +58,11 @@ describe('RadioGroup', () => {
   it('moves focus into the group when users click the group label', async () => {
     const user = userEvent.setup();
 
-    setup({
+    const { label } = setup({
       label: 'Delivery method',
     });
 
-    const radioGroup = screen.getByRole('radiogroup', {
-      name: 'Delivery method',
-    });
+    const radioGroup = screen.getByRole('radiogroup', { name: label });
 
     await user.click(screen.getByText('Delivery method'));
 
@@ -116,5 +115,15 @@ describe('RadioGroup', () => {
       expect(screen.getByRole('radio', { name: 'Email' })).toBeChecked();
       expect(screen.getByRole('radio', { name: 'SMS' })).not.toBeChecked();
     });
+  });
+
+  it('shows a visual asterisk for required groups without changing the accessible name', () => {
+    const { label } = setup({
+      label: 'Notification channel',
+      required: true,
+    });
+
+    expect(screen.getByRole('radiogroup', { name: label })).toBeRequired();
+    expect(screen.getByText('*')).toHaveAttribute('aria-hidden', 'true');
   });
 });

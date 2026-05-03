@@ -24,6 +24,7 @@ describe('IconButton', () => {
 
   it('calls the click handler when enabled', async () => {
     const user = userEvent.setup();
+
     const { onClick, 'aria-label': ariaLabel } = setup({
       'aria-label': 'Save',
       onClick: vi.fn(),
@@ -36,6 +37,7 @@ describe('IconButton', () => {
 
   it('does not call the click handler when disabled', async () => {
     const user = userEvent.setup();
+
     const { onClick, 'aria-label': ariaLabel } = setup({
       'aria-label': 'Save',
       onClick: vi.fn(),
@@ -74,6 +76,7 @@ describe('IconButton', () => {
 
   it('does not submit a form by default when clicked', async () => {
     const user = userEvent.setup();
+
     const handleSubmit = vi.fn();
 
     const onSubmit: SubmitEventHandler<HTMLFormElement> = (event) => {
@@ -96,6 +99,7 @@ describe('IconButton', () => {
 
   it('submits a form when type is submit', async () => {
     const user = userEvent.setup();
+
     const handleSubmit = vi.fn();
 
     const onSubmit: SubmitEventHandler<HTMLFormElement> = (event) => {

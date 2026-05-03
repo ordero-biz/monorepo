@@ -4,6 +4,7 @@ import { Field } from '@base-ui/react/field';
 import { cva } from 'class-variance-authority';
 import { forwardRef, useId, useState } from 'react';
 import { Input } from '@/ui/components/Input';
+import { renderFieldLabelContent } from '@/ui/components/shared/renderFieldLabelContent';
 import { cn } from '@/ui/lib/utils';
 import type { TextFieldProps } from './types';
 
@@ -136,7 +137,7 @@ export const TextField = forwardRef<HTMLElement, TextFieldProps>(
               })
             )}
           >
-            {label}
+            {renderFieldLabelContent({ label, required })}
           </Field.Label>
         ) : null}
         <Input
