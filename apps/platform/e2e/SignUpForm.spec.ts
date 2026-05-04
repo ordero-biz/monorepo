@@ -1,0 +1,87 @@
+import { expect, test } from '@playwright/test';
+
+test.describe('SignUpForm', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/sign-up');
+  });
+
+  test('renders the sign-up page, footer link, and form controls', async ({
+    page,
+  }) => {
+    await expect(
+      page.getByRole('heading', { name: 'Get started' }),
+    ).toBeVisible();
+    await expect(
+      page.getByText('Please enter your details to get started'),
+    ).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Sign in' })).toHaveAttribute(
+      'href',
+      '/sign-in',
+    );
+    await expect(
+      page.getByRole('textbox', { name: 'Email address' }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole('textbox', { name: 'Password' }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole('checkbox', {
+        name: /by signing up, i agree to/i,
+      }),
+    ).not.toBeChecked();
+    await expect(
+      page.getByRole('link', { name: 'terms of use' }),
+    ).toHaveAttribute('href', '/terms');
+    await expect(
+      page.getByRole('link', { name: 'privacy policy' }),
+    ).toHaveAttribute('href', '/privacy');
+    await expect(page.getByRole('button', { name: 'Sign up' })).toBeVisible();
+  });
+
+  test('shows checkbox validation when the user submits without accepting terms', async ({
+    page,
+  }) => {
+    const emailField = page.getByRole('textbox', { name: 'Email address' });
+    const passwordField = page.getByRole('textbox', { name: 'Password' });
+
+    await emailField.pressSequentially('admin@gmail.com');
+    await passwordField.pressSequentially('123456');
+    await page.getByRole('button', { name: 'Sign up' }).click();
+
+    await expect(
+      page.getByText('You must accept the terms to continue.'),
+    ).toBeVisible();
+  });
+
+  test('shows client validation errors when the user submits the untouched form', async ({
+    page,
+  }) => {
+    await page.getByRole('button', { name: 'Sign up' }).click();
+
+    await expect(
+      page.getByText('Enter a valid email address.'),
+    ).toBeVisible();
+    await expect(
+      page.getByText('Password must contain at least 6 characters.'),
+    ).toBeVisible();
+  });
+
+  test('keeps the email and clears the password and checkbox after successful sign up', async ({
+    page,
+  }) => {
+    const emailField = page.getByRole('textbox', { name: 'Email address' });
+    const passwordField = page.getByRole('textbox', { name: 'Password' });
+    const termsCheckbox = page.getByRole('checkbox', {
+      name: /by signing up, i agree to/i,
+    });
+
+    await emailField.pressSequentially('admin@gmail.com');
+    await passwordField.pressSequentially('123456');
+    await termsCheckbox.check();
+    await page.getByRole('button', { name: 'Sign up' }).click();
+
+    await expect(emailField).toHaveValue('admin@gmail.com');
+    await expect(passwordField).toHaveValue('');
+    await expect(termsCheckbox).not.toBeChecked();
+  });
+});
