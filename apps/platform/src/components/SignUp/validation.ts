@@ -2,16 +2,9 @@ import { z } from 'zod';
 
 export const signUpSchema = z
   .object({
-    name: z
-      .string()
-      .min(1, 'Name is required')
-      .min(2, 'Name must be at least 2 characters')
-      .max(50, 'Name must be less than 50 characters'),
-
-    phone: z
-      .string()
-      .min(1, 'Phone number is required')
-      .regex(/^[+]?[1-9][\d]{0,15}$/, 'Please enter a valid phone number'),
+    // name: z.string(),
+    //
+    // phone: z.string(),
 
     email: z
       .string()

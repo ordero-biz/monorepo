@@ -7,17 +7,30 @@ import { type SignUpFormData, signUpSchema } from './validation';
 export const SignUp = () => {
   const form = useForm<SignUpFormData, Validator<SignUpFormData>>({
     defaultValues: {
-      name: '',
-      phone: '',
+      // name: '',
+      // phone: '',
       email: '',
       password: '',
       confirmPassword: '',
     },
     onSubmit: async ({ value }) => {
-      // Handle form submission
-      console.log('SignUp form submitted:', value);
-      // TODO: Implement actual signup logic
-      alert('Sign up form submitted! Check console for details.');
+      const response = await fetch('/api/v1/platform/owners/sign-up', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: value.email,
+          password: value.password,
+        }),
+      });
+
+      if (!response.ok) {
+        console.error('Failed to sign up:', response.statusText);
+        return;
+      }
+
+      const result = await response.json();
+
+      console.log(result);
     },
     validatorAdapter: zodValidator(),
   });
@@ -37,47 +50,45 @@ export const SignUp = () => {
         onSubmit={handleSubmit}
         className="flex flex-col gap-4 mx-auto max-w-90 md:max-w-80"
       >
-        <form.Field
-          name="name"
-          validators={{
-            onChange: signUpSchema.shape.name,
-          }}
-        >
-          {(field) => (
-            <InputField
-              id={field.name}
-              name={field.name}
-              label="Name"
-              value={field.state.value}
-              onBlur={field.handleBlur}
-              onChange={field.handleChange}
-              placeholder="Evil Rabbit"
-              required
-              errors={field.state.meta.errors}
-            />
-          )}
-        </form.Field>
+        {/*<form.Field*/}
+        {/*  name="name"*/}
+        {/*  validators={{*/}
+        {/*    onChange: signUpSchema.shape.name,*/}
+        {/*  }}*/}
+        {/*>*/}
+        {/*  {(field) => (*/}
+        {/*    <InputField*/}
+        {/*      id={field.name}*/}
+        {/*      name={field.name}*/}
+        {/*      label="Name"*/}
+        {/*      value={field.state.value}*/}
+        {/*      onBlur={field.handleBlur}*/}
+        {/*      onChange={field.handleChange}*/}
+        {/*      placeholder="Evil Rabbit"*/}
+        {/*      errors={field.state.meta.errors}*/}
+        {/*    />*/}
+        {/*  )}*/}
+        {/*</form.Field>*/}
 
-        <form.Field
-          name="phone"
-          validators={{
-            onChange: signUpSchema.shape.phone,
-          }}
-        >
-          {(field) => (
-            <InputField
-              id={field.name}
-              name={field.name}
-              label="Phone"
-              value={field.state.value}
-              onBlur={field.handleBlur}
-              onChange={field.handleChange}
-              placeholder="Enter phone number"
-              required
-              errors={field.state.meta.errors}
-            />
-          )}
-        </form.Field>
+        {/*<form.Field*/}
+        {/*  name="phone"*/}
+        {/*  validators={{*/}
+        {/*    onChange: signUpSchema.shape.phone,*/}
+        {/*  }}*/}
+        {/*>*/}
+        {/*  {(field) => (*/}
+        {/*    <InputField*/}
+        {/*      id={field.name}*/}
+        {/*      name={field.name}*/}
+        {/*      label="Phone"*/}
+        {/*      value={field.state.value}*/}
+        {/*      onBlur={field.handleBlur}*/}
+        {/*      onChange={field.handleChange}*/}
+        {/*      placeholder="Enter phone number"*/}
+        {/*      errors={field.state.meta.errors}*/}
+        {/*    />*/}
+        {/*  )}*/}
+        {/*</form.Field>*/}
 
         <form.Field
           name="email"

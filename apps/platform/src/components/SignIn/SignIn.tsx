@@ -11,10 +11,23 @@ export const SignIn = () => {
       password: '',
     },
     onSubmit: async ({ value }) => {
-      // Handle form submission
-      console.log('SignIn form submitted:', value);
-      // TODO: Implement actual signin logic
-      alert('Sign in form submitted! Check console for details.');
+      const response = await fetch('/api/v1/platform/owners/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: value.email,
+          password: value.password,
+        }),
+      });
+
+      if (!response.ok) {
+        console.error('Failed to sign ip:', response.statusText);
+        return;
+      }
+
+      const result = await response.json();
+
+      console.log(result);
     },
     validatorAdapter: zodValidator(),
   });
