@@ -17,6 +17,24 @@ export type {
 } from './components/CheckboxGroup';
 export { CheckboxGroup } from './components/CheckboxGroup';
 export type {
+  DataTableColumnAlignment,
+  DataTableColumnDef,
+  DataTableColumnHeaderProps,
+  DataTableColumnMeta,
+  DataTableColumnWrap,
+  DataTableProps,
+  DataTableRowSelectionState,
+  DataTableSelectionCellProps,
+  DataTableSelectionColumnHeaderProps,
+  DataTableSortingState,
+} from './components/DataTable';
+export {
+  DataTable,
+  DataTableColumnHeader,
+  DataTableSelectionCell,
+  DataTableSelectionColumnHeader,
+} from './components/DataTable';
+export type {
   IconButtonColor,
   IconButtonProps,
   IconButtonSize,

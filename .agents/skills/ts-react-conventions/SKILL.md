@@ -58,3 +58,13 @@ For shared UI component work in `packages/ui`, always also use:
 - Do not introduce deprecated library types in new or touched code.
 - Prefer the non-deprecated types that match the actual value, event, ref, or API shape being used.
 - When a library marks a broad alias or compatibility type as deprecated, use the more specific supported type instead.
+
+## 7. Keep TanStack Table inputs stable
+
+When touching `@tanstack/react-table` or `useReactTable` code:
+
+- Keep `columns`, `data`, and any controlled table state passed into `useReactTable` on stable references.
+- Do not define table `columns` or `data` arrays inline in the same render path that calls `useReactTable` unless they are memoized or hoisted.
+- Do not pass inline data transformations such as `data.filter(...)`, `data.map(...)`, or `data.slice(...)` directly into `useReactTable`; memoize the derived result first.
+- Prefer hoisted constants for static column defs and `useMemo` for derived columns or data.
+- If a feature updates table data while users are interacting with sorting, selection, pagination, or expanding state, decide explicitly whether the relevant TanStack auto-reset behavior should stay enabled.
