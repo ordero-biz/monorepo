@@ -5,6 +5,8 @@ import { useState } from 'react';
 import { Checkbox } from '@/ui/components/Checkbox';
 import { DataTable } from './DataTable';
 import { DataTableColumnHeader } from './DataTableColumnHeader';
+import { DataTableSelectionCell } from './DataTableSelectionCell';
+import { DataTableSelectionColumnHeader } from './DataTableSelectionColumnHeader';
 import type {
   DataTableColumnDef,
   DataTableProps,
@@ -158,6 +160,51 @@ describe('DataTable', () => {
     ).toBeChecked();
   });
 
+  it('supports row selection with reusable selection wrappers', async () => {
+    const user = userEvent.setup();
+
+    setup({
+      columns: [
+        {
+          accessorKey: 'id',
+          cell: ({ row }) => (
+            <DataTableSelectionCell
+              checkboxAriaLabel={`Select ${row.original.id}`}
+              row={row}
+            >
+              <div>{row.original.id}</div>
+            </DataTableSelectionCell>
+          ),
+          header: ({ column, table }) => (
+            <DataTableSelectionColumnHeader
+              checkboxAriaLabel="Select all rows"
+              column={column}
+              table={table}
+              title="Invoice"
+            />
+          ),
+          id: 'selection',
+        },
+      ],
+      selectable: true,
+    });
+
+    await user.click(screen.getByRole('checkbox', { name: 'Select INV-001' }));
+
+    expect(
+      screen.getByRole('checkbox', { name: 'Select INV-001' })
+    ).toBeChecked();
+
+    await user.click(screen.getByRole('checkbox', { name: 'Select all rows' }));
+
+    expect(
+      screen.getByRole('checkbox', { name: 'Select all rows' })
+    ).toBeChecked();
+    expect(
+      screen.getByRole('checkbox', { name: 'Select INV-002' })
+    ).toBeChecked();
+  });
+
   it('disables selection for rows excluded by getRowCanSelect', () => {
     setup({
       columns: [
@@ -182,6 +229,73 @@ describe('DataTable', () => {
     expect(
       screen.getByRole('checkbox', { name: 'Select INV-002' })
     ).toHaveAttribute('aria-disabled', 'true');
+  });
+
+  it('hides the reusable selection header checkbox when selection is disabled', () => {
+    setup({
+      columns: [
+        {
+          accessorKey: 'id',
+          cell: ({ row }) => (
+            <DataTableSelectionCell
+              checkboxAriaLabel={`Select ${row.original.id}`}
+              row={row}
+            >
+              <div>{row.original.id}</div>
+            </DataTableSelectionCell>
+          ),
+          header: ({ column, table }) => (
+            <DataTableSelectionColumnHeader
+              checkboxAriaLabel="Select all rows"
+              column={column}
+              table={table}
+              title="Selection"
+            />
+          ),
+          id: 'selection',
+        },
+      ],
+      selectable: false,
+    });
+
+    expect(
+      screen.queryByRole('checkbox', { name: 'Select all rows' })
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('columnheader', { name: 'Selection' })
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('checkbox', { name: 'Select INV-001' })
+    ).not.toBeInTheDocument();
+  });
+
+  it('hides the reusable row checkbox when a row cannot be selected', () => {
+    setup({
+      columns: [
+        {
+          accessorKey: 'id',
+          cell: ({ row }) => (
+            <DataTableSelectionCell
+              checkboxAriaLabel={`Select ${row.original.id}`}
+              row={row}
+            >
+              <div>{row.original.id}</div>
+            </DataTableSelectionCell>
+          ),
+          header: 'Selection',
+          id: 'selection',
+        },
+      ],
+      getRowCanSelect: (row) => row.status !== 'Pending',
+      selectable: true,
+    });
+
+    expect(
+      screen.getByRole('checkbox', { name: 'Select INV-001' })
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('checkbox', { name: 'Select INV-002' })
+    ).not.toBeInTheDocument();
   });
 
   it('updates row order when a sortable header toggles sorting', async () => {

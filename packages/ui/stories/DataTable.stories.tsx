@@ -1,10 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import type { CellContext, HeaderContext } from '@tanstack/react-table';
 import { format, parseISO } from 'date-fns';
-import { Checkbox } from '@/ui/components/Checkbox';
 import {
   DataTable,
   DataTableColumnHeader,
+  DataTableSelectionCell,
+  DataTableSelectionColumnHeader,
   type DataTableColumnDef,
 } from '@/ui/components/DataTable';
 import { IconButton } from '@/ui/components/IconButton';
@@ -130,39 +131,30 @@ const publishToneClassNames = {
   Published: 'bg-[var(--color-info-16)] text-[var(--info-dark)]',
 } as const;
 
-const productColumnHeader = ({ table, column }: HeaderContext<ProductRow, unknown>) => (
-  <div className="flex items-center">
-    <div className="flex items-center pl-[var(--spacing-1)]">
-      <Checkbox
-        aria-label="Select all products"
-        checked={table.getIsAllRowsSelected()}
-        indeterminate={table.getIsSomeRowsSelected() && !table.getIsAllRowsSelected()}
-        onCheckedChange={(checked) => table.toggleAllRowsSelected(checked)}
-        size="s"
-      />
-    </div>
-    <DataTableColumnHeader column={column} title="Product" />
-  </div>
+const productColumnHeader = ({
+  table,
+  column,
+}: HeaderContext<ProductRow, unknown>) => (
+  <DataTableSelectionColumnHeader
+    checkboxAriaLabel="Select all products"
+    column={column}
+    table={table}
+    title="Product"
+  />
 );
 
 const productColumnCell = ({ row }: CellContext<ProductRow, unknown>) => (
-  <div className="flex min-w-0 items-center">
-    <div className="flex items-center pl-[var(--spacing-1)]">
-      <Checkbox
-        aria-label={`Select ${row.original.name}`}
-        checked={row.getIsSelected()}
-        disabled={!row.getCanSelect()}
-        onCheckedChange={(checked) => row.toggleSelected(checked)}
-        size="s"
-      />
-    </div>
+  <DataTableSelectionCell
+    checkboxAriaLabel={`Select ${row.original.name}`}
+    row={row}
+  >
     <div className="flex min-w-0 flex-1 items-center py-[var(--spacing-2)]">
       <div className="flex min-w-0 flex-1 flex-col items-start justify-center px-[var(--spacing-2)]">
         <p className="w-full text-card-foreground">{row.original.name}</p>
         <p className="w-full text-muted-foreground">{row.original.category}</p>
       </div>
     </div>
-  </div>
+  </DataTableSelectionCell>
 );
 
 const renderTextCell = (value: string) => (
@@ -281,7 +273,7 @@ const meta = {
     ariaLabel: 'Products table',
     columns,
     data: rows,
-    selectable: true,
+    selectable: false,
   },
 } satisfies Meta<typeof DataTable<ProductRow>>;
 

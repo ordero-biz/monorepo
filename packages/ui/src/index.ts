@@ -24,9 +24,16 @@ export type {
   DataTableColumnWrap,
   DataTableProps,
   DataTableRowSelectionState,
+  DataTableSelectionCellProps,
+  DataTableSelectionColumnHeaderProps,
   DataTableSortingState,
 } from './components/DataTable';
-export { DataTable, DataTableColumnHeader } from './components/DataTable';
+export {
+  DataTable,
+  DataTableColumnHeader,
+  DataTableSelectionCell,
+  DataTableSelectionColumnHeader,
+} from './components/DataTable';
 export type {
   IconButtonColor,
   IconButtonProps,

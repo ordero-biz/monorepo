@@ -5,7 +5,9 @@ import type {
   RowData,
   RowSelectionState,
   SortingState,
+  Table,
 } from '@tanstack/react-table';
+import type { ReactNode } from 'react';
 
 export type DataTableColumnAlignment = 'left' | 'center' | 'right';
 
@@ -28,6 +30,19 @@ export type DataTableColumnDef<TData> = ColumnDef<TData, unknown>;
 export type DataTableColumnHeaderProps<TData extends RowData> = {
   column: Column<TData, unknown>;
   title: string;
+};
+
+export type DataTableSelectionColumnHeaderProps<TData extends RowData> = {
+  checkboxAriaLabel: string;
+  column: Column<TData, unknown>;
+  table: Table<TData>;
+  title: string;
+};
+
+export type DataTableSelectionCellProps<TData extends RowData> = {
+  checkboxAriaLabel: string;
+  children: ReactNode;
+  row: Row<TData>;
 };
 
 export type DataTableRowSelectionState = RowSelectionState;
