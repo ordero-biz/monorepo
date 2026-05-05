@@ -17,6 +17,13 @@ export type {
 } from './components/CheckboxGroup';
 export { CheckboxGroup } from './components/CheckboxGroup';
 export type {
+  ChipColor,
+  ChipProps,
+  ChipSize,
+  ChipVariant,
+} from './components/Chip';
+export { Chip, chipVariants } from './components/Chip';
+export type {
   IconButtonColor,
   IconButtonProps,
   IconButtonSize,
