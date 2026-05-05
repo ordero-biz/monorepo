@@ -1,10 +1,15 @@
 import { prepareSetup } from '@ordero/test-config/react';
-import { screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { useState } from 'react';
 import { Checkbox } from '@/ui/components/Checkbox';
 import { DataTable } from './DataTable';
 import { DataTableColumnHeader } from './DataTableColumnHeader';
-import type { DataTableColumnDef, DataTableProps } from './types';
+import type {
+  DataTableColumnDef,
+  DataTableProps,
+  DataTableSortingState,
+} from './types';
 
 type InvoiceRow = {
   amount: string;
@@ -214,6 +219,89 @@ describe('DataTable', () => {
     expect(
       screen.getByRole('columnheader', { name: 'Amount' })
     ).toHaveAttribute('aria-sort', 'ascending');
+  });
+
+  it('supports server-side sorting without locally reordering stale rows', async () => {
+    const user = userEvent.setup();
+    const onSortingChange = vi.fn();
+
+    const ServerSortedTable = () => {
+      const [sorting, setSorting] = useState<DataTableSortingState>([]);
+
+      return (
+        <DataTable
+          ariaLabel="Server-sorted invoice table"
+          columns={[
+            {
+              accessorKey: 'amount',
+              header: ({ column }) => (
+                <DataTableColumnHeader column={column} title="Amount" />
+              ),
+            },
+          ]}
+          data={[
+            {
+              amount: '$300.00',
+              id: 'INV-003',
+              status: 'Unpaid',
+            },
+            {
+              amount: '$100.00',
+              id: 'INV-001',
+              status: 'Paid',
+            },
+          ]}
+          manualSorting
+          onSortingChange={(nextSorting) => {
+            setSorting(nextSorting);
+            onSortingChange(nextSorting);
+          }}
+          sorting={sorting}
+        />
+      );
+    };
+
+    render(<ServerSortedTable />);
+
+    await user.click(screen.getByRole('button', { name: /amount/i }));
+
+    const rows = screen.getAllByRole('row');
+
+    expect(rows[1]).toHaveTextContent('$300.00');
+    expect(rows[2]).toHaveTextContent('$100.00');
+    expect(onSortingChange).toHaveBeenCalledWith([
+      {
+        desc: false,
+        id: 'amount',
+      },
+    ]);
+    expect(
+      screen.getByRole('columnheader', { name: 'Amount' })
+    ).toHaveAttribute('aria-sort', 'ascending');
+  });
+
+  it('announces clearing sorting after a sortable header reaches descending order', async () => {
+    const user = userEvent.setup();
+
+    setup({
+      columns: [
+        {
+          accessorKey: 'amount',
+          header: ({ column }) => (
+            <DataTableColumnHeader column={column} title="Amount" />
+          ),
+        },
+      ],
+    });
+
+    const sortButton = screen.getByRole('button', { name: /amount/i });
+
+    await user.click(sortButton);
+    await user.click(sortButton);
+
+    expect(sortButton).toHaveAccessibleName(
+      'Amount. sorted descending. Activate to clear sorting.'
+    );
   });
 
   it('renders a static title when a helper-backed header is not sortable', () => {

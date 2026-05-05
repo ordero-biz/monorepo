@@ -40,6 +40,7 @@ export type DataTableProps<TData> = {
   emptyMessage?: string;
   getRowCanSelect?: (row: TData, index: number) => boolean;
   getRowId?: (originalRow: TData, index: number, parent?: Row<TData>) => string;
+  manualSorting?: boolean;
   onRowSelectionChange?: (rowSelection: DataTableRowSelectionState) => void;
   onSortingChange?: (sorting: DataTableSortingState) => void;
   rowSelection?: DataTableRowSelectionState;

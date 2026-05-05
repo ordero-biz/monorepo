@@ -89,6 +89,7 @@ export const DataTable = <TData,>({
   emptyMessage = 'No results.',
   getRowCanSelect,
   getRowId,
+  manualSorting = false,
   onRowSelectionChange,
   onSortingChange,
   rowSelection,
@@ -110,7 +111,8 @@ export const DataTable = <TData,>({
       : false,
     getCoreRowModel: getCoreRowModel(),
     getRowId,
-    getSortedRowModel: getSortedRowModel(),
+    getSortedRowModel: manualSorting ? undefined : getSortedRowModel(),
+    manualSorting,
     onRowSelectionChange: (updater) => {
       const nextRowSelection = resolveRowSelectionState(
         updater,

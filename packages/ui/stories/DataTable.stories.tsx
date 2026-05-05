@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import type { CellContext, HeaderContext } from '@tanstack/react-table';
+import { format, parseISO } from 'date-fns';
 import { Checkbox } from '@/ui/components/Checkbox';
 import {
   DataTable,
@@ -15,92 +16,99 @@ type ProductRow = {
   createdAt: string;
   id: string;
   name: string;
-  price: string;
+  price: number;
   publish: 'Draft' | 'Published';
-  stockLabel: string;
   stockTone: 'error' | 'success' | 'warning';
+  stockValue: number;
   stockWidth: string;
 };
 
 const rows: ProductRow[] = [
   {
     category: 'Shoes',
-    createdAt: '06 May 2022',
+    createdAt: '2022-05-06',
     id: 'urban-explorer-sneakers',
     name: 'Urban Explorer Sneakers',
-    price: '$16.19',
+    price: 16.19,
     publish: 'Published',
-    stockLabel: '72 in stock',
     stockTone: 'success',
+    stockValue: 72,
     stockWidth: '44.15%',
   },
   {
     category: 'Jacket',
-    createdAt: '07 Aug 2022',
+    createdAt: '2022-08-07',
     id: 'classic-leather-loafers',
     name: 'Classic Leather Loafers',
-    price: '$35.71',
+    price: 35.71,
     publish: 'Published',
-    stockLabel: '12 in stock',
     stockTone: 'warning',
+    stockValue: 12,
     stockWidth: '44.15%',
   },
   {
     category: 'Jean',
-    createdAt: '08 Apr 2022',
+    createdAt: '2022-04-08',
     id: 'mountain-trekking-boots',
     name: 'Mountain Trekking Boots',
-    price: '$34.30',
+    price: 34.3,
     publish: 'Draft',
-    stockLabel: 'Out of stock',
     stockTone: 'error',
+    stockValue: 0,
     stockWidth: '44.15%',
   },
   {
     category: 'Shoes',
-    createdAt: '09 Aug 2022',
+    createdAt: '2022-08-09',
     id: 'elegance-stiletto-heels',
     name: 'Elegance Stiletto Heels',
-    price: '$93.10',
+    price: 93.1,
     publish: 'Draft',
-    stockLabel: '42 in stock',
     stockTone: 'success',
+    stockValue: 42,
     stockWidth: '44.15%',
   },
   {
     category: 'Jacket',
-    createdAt: '10 Sep 2022',
+    createdAt: '2022-09-10',
     id: 'comfy-running-shoes',
     name: 'Comfy Running Shoes',
-    price: '$55.47',
+    price: 55.47,
     publish: 'Published',
-    stockLabel: '22 in stock',
     stockTone: 'success',
+    stockValue: 22,
     stockWidth: '44.15%',
   },
   {
     category: 'Jean',
-    createdAt: '11 Feb 2022',
+    createdAt: '2022-02-11',
     id: 'chic-ballet-flats',
     name: 'Chic Ballet Flats',
-    price: '$89.09',
+    price: 89.09,
     publish: 'Published',
-    stockLabel: '22 in stock',
     stockTone: 'success',
+    stockValue: 22,
     stockWidth: '44.15%',
   },
   {
     category: 'Shoes',
-    createdAt: '12 Jan 2022',
+    createdAt: '2022-01-12',
     id: 'vintage-oxford-shoes',
     name: 'Vintage Oxford Shoes',
-    price: '$44.39',
+    price: 44.39,
     publish: 'Published',
-    stockLabel: 'Out of stock',
     stockTone: 'error',
+    stockValue: 0,
     stockWidth: '44.15%',
   },
 ];
+
+const formatCreatedAt = (value: string) => format(parseISO(value), 'dd MMM yyyy');
+
+const formatPrice = (value: number) => `$${value.toFixed(2)}`;
+
+const formatStockValue = (value: number) =>
+  value === 0 ? 'Out of stock' : `${value} in stock`;
 
 const stockToneClassNames = {
   error: {
@@ -173,14 +181,14 @@ const columns: DataTableColumnDef<ProductRow>[] = [
   },
   {
     accessorKey: 'createdAt',
-    cell: ({ row }) => renderTextCell(row.original.createdAt),
+    cell: ({ row }) => renderTextCell(formatCreatedAt(row.original.createdAt)),
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Create at" />
     ),
     meta: { wrap: 'nowrap' },
   },
   {
-    accessorKey: 'stockLabel',
+    accessorKey: 'stockValue',
     cell: ({ row }) => {
       const tone = stockToneClassNames[row.original.stockTone];
 
@@ -200,7 +208,7 @@ const columns: DataTableColumnDef<ProductRow>[] = [
               />
             </div>
             <p className="whitespace-nowrap text-[length:var(--caption-size-desktop)] leading-[var(--caption-line-height-desktop)] text-muted-foreground">
-              {row.original.stockLabel}
+              {formatStockValue(row.original.stockValue)}
             </p>
           </div>
         </div>
@@ -212,7 +220,7 @@ const columns: DataTableColumnDef<ProductRow>[] = [
   },
   {
     accessorKey: 'price',
-    cell: ({ row }) => renderTextCell(row.original.price),
+    cell: ({ row }) => renderTextCell(formatPrice(row.original.price)),
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Price" />
     ),

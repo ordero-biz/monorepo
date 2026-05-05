@@ -40,12 +40,13 @@ const getSortButtonLabel = ({
       : sortDirection === 'desc'
         ? 'sorted descending'
         : 'not sorted';
+
+  if (nextSortingOrder === false) {
+    return `${title}. ${currentSortingLabel}. Activate to clear sorting.`;
+  }
+
   const nextSortingLabel =
-    nextSortingOrder === 'asc'
-      ? 'ascending'
-      : nextSortingOrder === 'desc'
-        ? 'descending'
-        : 'no sorting';
+    nextSortingOrder === 'asc' ? 'ascending' : 'descending';
 
   return `${title}. ${currentSortingLabel}. Activate to sort ${nextSortingLabel}.`;
 };
