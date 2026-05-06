@@ -59,6 +59,34 @@ export type {
 } from './components/Select';
 export { Select } from './components/Select';
 export type {
+  SidebarNavigationActionItem,
+  SidebarNavigationActionSelectArgs,
+  SidebarNavigationCollapseItem,
+  SidebarNavigationContentProps,
+  SidebarNavigationFooterProps,
+  SidebarNavigationHeaderProps,
+  SidebarNavigationItem,
+  SidebarNavigationLinkItem,
+  SidebarNavigationMenuProps,
+  SidebarNavigationProps,
+  SidebarNavigationRenderLink,
+  SidebarNavigationRenderLinkArgs,
+  SidebarNavigationSectionConfig,
+  SidebarNavigationSectionContentProps,
+  SidebarNavigationSectionProps,
+  SidebarNavigationSectionsProps,
+} from './components/SidebarNavigation';
+export {
+  SidebarNavigation,
+  SidebarNavigationContent,
+  SidebarNavigationFooter,
+  SidebarNavigationHeader,
+  SidebarNavigationMenu,
+  SidebarNavigationSection,
+  SidebarNavigationSectionContent,
+  SidebarNavigationSections,
+} from './components/SidebarNavigation';
+export type {
   TextFieldProps,
   TextFieldSize,
   TextFieldVariant,

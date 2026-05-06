@@ -1,0 +1,285 @@
+import { Accordion } from '@base-ui/react/accordion';
+import { Button as ButtonPrimitive } from '@base-ui/react/button';
+import { ChevronDown } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { cn } from '@/ui/lib/utils';
+import {
+  iconSlotClassName,
+  itemLabelClassName,
+  nestedItemCurveClassName,
+  nestedItemWrapperClassName,
+  nestedListContainerClassName,
+  nestedListLineClassName,
+} from './sidebarNavigationStyles';
+import {
+  getExpandedItemIds,
+  isItemBranchActive,
+  toAccordionItemIds,
+} from './sidebarNavigationUtils';
+import type {
+  SidebarNavigationCollapseItem,
+  SidebarNavigationItem,
+  SidebarNavigationRenderLink,
+} from './types';
+
+type SidebarNavigationMenuItemsProps = {
+  depth: number;
+  items: SidebarNavigationItem[];
+  renderLink?: SidebarNavigationRenderLink;
+};
+
+const getItemClassName = ({
+  active,
+  depth,
+  disabled,
+}: {
+  active: boolean;
+  depth: number;
+  disabled: boolean;
+}) =>
+  cn(
+    'flex w-full min-w-0 items-center rounded-[var(--radius-1-token)] text-left outline-none transition-[background-color,color] focus-visible:ring-3 focus-visible:ring-ring/50',
+    depth === 0
+      ? 'min-h-[var(--_sidebar-navigation-item-height)] px-[var(--space-1-5)] py-[var(--space-0-5)]'
+      : 'h-[var(--_sidebar-navigation-sub-item-height)] px-[var(--space-1-5)] py-[var(--space-0-5)]',
+    disabled
+      ? 'cursor-not-allowed text-[var(--text-disabled)]'
+      : 'cursor-pointer',
+    active && depth === 0
+      ? 'bg-[var(--color-primary-8)] text-primary hover:bg-[var(--color-primary-8)]'
+      : null,
+    active && depth > 0
+      ? 'bg-[var(--color-grey-8)] text-foreground hover:bg-[var(--color-grey-8)]'
+      : null,
+    !active && !disabled
+      ? 'text-[var(--text-secondary)] hover:bg-[var(--color-grey-8)] hover:text-foreground'
+      : null
+  );
+
+const defaultLinkRenderer: SidebarNavigationRenderLink = ({
+  ariaCurrent,
+  children,
+  className,
+  href,
+  rel,
+  target,
+}) => (
+  <a
+    aria-current={ariaCurrent}
+    className={className}
+    href={href}
+    rel={rel}
+    target={target}
+  >
+    {children}
+  </a>
+);
+
+const SidebarNavigationItemContent = ({
+  item,
+}: {
+  item: SidebarNavigationItem;
+}) => {
+  const branchActive = isItemBranchActive(item);
+
+  return (
+    <>
+      {item.icon ? (
+        <span className={iconSlotClassName}>{item.icon}</span>
+      ) : null}
+      <span
+        className={cn(
+          itemLabelClassName,
+          branchActive
+            ? 'font-[var(--nav-item-active-weight)]'
+            : 'font-[var(--nav-item-weight)]'
+        )}
+      >
+        {item.label}
+      </span>
+      {item.badge ? (
+        <span className="ml-[var(--space-1)] shrink-0">{item.badge}</span>
+      ) : null}
+      {item.kind === 'collapse' ? (
+        <span className="ml-[var(--space-1)] flex size-[var(--space-2)] shrink-0 items-center justify-center transition-transform group-data-[open]/item:rotate-180">
+          <ChevronDown />
+        </span>
+      ) : null}
+    </>
+  );
+};
+
+const SidebarNavigationLeafItem = ({
+  depth,
+  item,
+  renderLink,
+}: {
+  depth: number;
+  item: Exclude<SidebarNavigationItem, SidebarNavigationCollapseItem>;
+  renderLink?: SidebarNavigationRenderLink;
+}) => {
+  const className = getItemClassName({
+    active: Boolean(item.active),
+    depth,
+    disabled: Boolean(item.disabled),
+  });
+  const content = <SidebarNavigationItemContent item={item} />;
+
+  if (item.kind === 'action') {
+    return (
+      <ButtonPrimitive
+        className={className}
+        data-slot="sidebar-navigation-action"
+        disabled={item.disabled}
+        onClick={(event) => item.onSelect({ event, item })}
+        type="button"
+      >
+        {content}
+      </ButtonPrimitive>
+    );
+  }
+
+  if (item.disabled) {
+    return (
+      <div
+        aria-disabled="true"
+        className={className}
+        data-slot="sidebar-navigation-link"
+      >
+        {content}
+      </div>
+    );
+  }
+
+  const resolvedTarget = item.target ?? (item.external ? '_blank' : undefined);
+  const resolvedRel =
+    item.rel ??
+    (resolvedTarget === '_blank' ? 'noopener noreferrer' : undefined);
+  const resolvedRenderer = item.renderLink ?? renderLink ?? defaultLinkRenderer;
+
+  return resolvedRenderer({
+    ariaCurrent: item.active ? 'page' : undefined,
+    children: content,
+    className,
+    external: Boolean(item.external),
+    href: item.href,
+    item,
+    rel: resolvedRel,
+    target: resolvedTarget,
+  });
+};
+
+export const SidebarNavigationMenuItems = ({
+  depth,
+  items,
+  renderLink,
+}: SidebarNavigationMenuItemsProps) => {
+  const expandedItemIds = getExpandedItemIds(items);
+  const expandedItemIdsKey = JSON.stringify(expandedItemIds);
+  const previousExpandedItemIdsKeyRef = useRef(expandedItemIdsKey);
+  const [openItemIds, setOpenItemIds] = useState<string[]>(expandedItemIds);
+
+  useEffect(() => {
+    if (previousExpandedItemIdsKeyRef.current === expandedItemIdsKey) {
+      return;
+    }
+
+    previousExpandedItemIdsKeyRef.current = expandedItemIdsKey;
+    setOpenItemIds(expandedItemIds);
+  }, [expandedItemIds, expandedItemIdsKey]);
+
+  const content = (
+    <Accordion.Root
+      className="flex flex-col gap-[var(--space-0-5)]"
+      onValueChange={(nextValue) => setOpenItemIds(toAccordionItemIds(nextValue))}
+      multiple
+      value={openItemIds}
+    >
+      {items.map((item) => {
+        const branchActive = isItemBranchActive(item);
+
+        if (item.kind !== 'collapse') {
+          const row = (
+            <SidebarNavigationLeafItem
+              depth={depth}
+              item={item}
+              renderLink={renderLink}
+            />
+          );
+
+          if (depth === 0) {
+            return (
+              <div data-slot="sidebar-navigation-menu-item" key={item.id}>
+                {row}
+              </div>
+            );
+          }
+
+          return (
+            <div
+              className={nestedItemWrapperClassName}
+              data-slot="sidebar-navigation-menu-item"
+              key={item.id}
+            >
+              <span aria-hidden className={nestedItemCurveClassName} />
+              {row}
+            </div>
+          );
+        }
+
+        const rowClassName = getItemClassName({
+          active: branchActive,
+          depth,
+          disabled: Boolean(item.disabled),
+        });
+
+        const accordionItem = (
+          <Accordion.Item
+            className="group/item flex flex-col gap-[var(--space-0-5)]"
+            data-slot="sidebar-navigation-menu-item"
+            disabled={item.disabled}
+            key={item.id}
+            value={item.id}
+          >
+            <Accordion.Header className="m-0">
+              <Accordion.Trigger className={rowClassName}>
+                <SidebarNavigationItemContent item={item} />
+              </Accordion.Trigger>
+            </Accordion.Header>
+            <Accordion.Panel className="overflow-hidden">
+              <div className="pt-[var(--space-0-5)]">
+                <SidebarNavigationMenuItems
+                  depth={depth + 1}
+                  items={item.items}
+                  renderLink={renderLink}
+                />
+              </div>
+            </Accordion.Panel>
+          </Accordion.Item>
+        );
+
+        if (depth === 0) {
+          return accordionItem;
+        }
+
+        return (
+          <div className={nestedItemWrapperClassName} key={item.id}>
+            <span aria-hidden className={nestedItemCurveClassName} />
+            {accordionItem}
+          </div>
+        );
+      })}
+    </Accordion.Root>
+  );
+
+  if (depth === 0) {
+    return content;
+  }
+
+  return (
+    <div className={nestedListContainerClassName}>
+      <span aria-hidden className={nestedListLineClassName} />
+      {content}
+    </div>
+  );
+};
