@@ -10,7 +10,44 @@ import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/700.css';
 import './preview.css';
 
+type ThemeMode = 'light' | 'dark';
+
+const themeClassName = 'dark';
+
+const applyThemeMode = (themeMode: ThemeMode) => {
+  const isDarkMode = themeMode === 'dark';
+
+  document.documentElement.classList.toggle(themeClassName, isDarkMode);
+  document.body.classList.toggle(themeClassName, isDarkMode);
+};
+
 const preview: Preview = {
+  globalTypes: {
+    theme: {
+      description: 'Global theme for component previews',
+      toolbar: {
+        title: 'Theme',
+        icon: 'mirror',
+        items: [
+          { value: 'light', title: 'Light' },
+          { value: 'dark', title: 'Dark' },
+        ],
+        dynamicTitle: true,
+      },
+    },
+  },
+  initialGlobals: {
+    theme: 'light',
+  },
+  decorators: [
+    (Story, context) => {
+      const themeMode = context.globals.theme === 'dark' ? 'dark' : 'light';
+
+      applyThemeMode(themeMode);
+
+      return Story();
+    },
+  ],
   parameters: {
     controls: {
       matchers: {

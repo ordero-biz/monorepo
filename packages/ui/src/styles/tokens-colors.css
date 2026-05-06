@@ -414,6 +414,62 @@
     transparent
   );
   --figma-backdrop: color-mix(in srgb, #161c24 48%, transparent);
+  --figma-global-inherit-color: var(--figma-white-main);
+  --figma-global-inherit-background: var(--figma-grey-800);
+  --figma-global-inherit-hover: var(--figma-grey-700);
+  --figma-global-default-color: var(--figma-grey-800);
+  --figma-global-default-background: var(--figma-grey-300);
+  --figma-global-default-hover-background: var(--figma-grey-400);
+  --figma-action-active: var(--figma-grey-600);
+  --figma-action-hover: var(--figma-grey-8);
+  --figma-action-selected: var(--figma-grey-16);
+  --figma-action-focus: var(--figma-grey-24);
+  --figma-action-disabled: var(--figma-grey-80);
+  --figma-action-disabled-background: var(--figma-grey-20);
+  --figma-shadow-8: var(--figma-grey-8);
+  --figma-shadow-12: var(--figma-grey-12);
+  --figma-shadow-16: var(--figma-grey-16);
+  --figma-shadow-20: var(--figma-grey-20);
+  --figma-shadow-24: var(--figma-grey-24);
+  --figma-shadow-48: var(--figma-grey-48);
+  --figma-paper-background-blur: color-mix(
+    in srgb,
+    var(--figma-white-main) 90%,
+    transparent
+  );
+  --figma-default-background-blur: color-mix(
+    in srgb,
+    var(--figma-white-main) 90%,
+    transparent
+  );
+  --figma-tooltip-color: var(--figma-white-main);
+  --figma-tooltip-background: var(--figma-grey-800);
+  --figma-textfield-filled: var(--figma-grey-8);
+  --figma-textfield-underline: var(--figma-grey-32);
+  --figma-swap-lighter-darker-primary: var(--figma-primary-lighter);
+  --figma-swap-lighter-darker-secondary: var(--figma-secondary-lighter);
+  --figma-swap-lighter-darker-info: var(--figma-info-lighter);
+  --figma-swap-lighter-darker-success: var(--figma-success-lighter);
+  --figma-swap-lighter-darker-warning: var(--figma-warning-lighter);
+  --figma-swap-lighter-darker-error: var(--figma-error-lighter);
+  --figma-swap-darker-lighter-primary: var(--figma-primary-darker);
+  --figma-swap-darker-lighter-secondary: var(--figma-secondary-darker);
+  --figma-swap-darker-lighter-info: var(--figma-info-darker);
+  --figma-swap-darker-lighter-success: var(--figma-success-darker);
+  --figma-swap-darker-lighter-warning: var(--figma-warning-darker);
+  --figma-swap-darker-lighter-error: var(--figma-error-darker);
+  --figma-swap-dark-light-primary: var(--figma-primary-dark);
+  --figma-swap-dark-light-secondary: var(--figma-secondary-dark);
+  --figma-swap-dark-light-info: var(--figma-info-dark);
+  --figma-swap-dark-light-success: var(--figma-success-dark);
+  --figma-swap-dark-light-warning: var(--figma-warning-dark);
+  --figma-swap-dark-light-error: var(--figma-error-dark);
+  --figma-swap-main-light-primary: var(--figma-primary-main);
+  --figma-swap-main-light-secondary: var(--figma-secondary-main);
+  --figma-swap-main-light-info: var(--figma-info-main);
+  --figma-swap-main-light-success: var(--figma-success-main);
+  --figma-swap-main-light-warning: var(--figma-warning-main);
+  --figma-swap-main-light-error: var(--figma-error-main);
 
   --white-main: var(--figma-white-main);
   --black-main: var(--figma-black-main);
@@ -470,8 +526,107 @@
   --text-primary: var(--figma-text-primary);
   --text-secondary: var(--figma-text-secondary);
   --text-disabled: var(--figma-text-disabled);
+  --global-inherit-color: var(--figma-global-inherit-color);
+  --global-inherit-background: var(--figma-global-inherit-background);
+  --global-inherit-hover: var(--figma-global-inherit-hover);
+  --global-default-color: var(--figma-global-default-color);
+  --global-default-background: var(--figma-global-default-background);
+  --global-default-hover-background: var(
+    --figma-global-default-hover-background
+  );
+  --action-active: var(--figma-action-active);
+  --action-hover: var(--figma-action-hover);
+  --action-selected: var(--figma-action-selected);
+  --action-focus: var(--figma-action-focus);
+  --action-disabled: var(--figma-action-disabled);
+  --action-disabled-background: var(--figma-action-disabled-background);
+  --shadow-8: var(--figma-shadow-8);
+  --shadow-12: var(--figma-shadow-12);
+  --shadow-16: var(--figma-shadow-16);
+  --shadow-20: var(--figma-shadow-20);
+  --shadow-24: var(--figma-shadow-24);
+  --shadow-48: var(--figma-shadow-48);
   --divider: var(--figma-divider);
+  --paper-outlined: var(--figma-paper-outlined);
+  --paper-background-blur: var(--figma-paper-background-blur);
+  --default-background-blur: var(--figma-default-background-blur);
+  --button-outlined: var(--figma-button-outlined);
+  --tooltip-color: var(--figma-tooltip-color);
+  --tooltip-background: var(--figma-tooltip-background);
+  --textfield-filled: var(--figma-textfield-filled);
   --outline: var(--figma-textfield-outline);
+  --textfield-underline: var(--figma-textfield-underline);
+  --backdrop: var(--figma-backdrop);
+  --swap-lighter-darker-primary: var(--figma-swap-lighter-darker-primary);
+  --swap-lighter-darker-secondary: var(--figma-swap-lighter-darker-secondary);
+  --swap-lighter-darker-info: var(--figma-swap-lighter-darker-info);
+  --swap-lighter-darker-success: var(--figma-swap-lighter-darker-success);
+  --swap-lighter-darker-warning: var(--figma-swap-lighter-darker-warning);
+  --swap-lighter-darker-error: var(--figma-swap-lighter-darker-error);
+  --swap-darker-lighter-primary: var(--figma-swap-darker-lighter-primary);
+  --swap-darker-lighter-secondary: var(--figma-swap-darker-lighter-secondary);
+  --swap-darker-lighter-info: var(--figma-swap-darker-lighter-info);
+  --swap-darker-lighter-success: var(--figma-swap-darker-lighter-success);
+  --swap-darker-lighter-warning: var(--figma-swap-darker-lighter-warning);
+  --swap-darker-lighter-error: var(--figma-swap-darker-lighter-error);
+  --swap-dark-light-primary: var(--figma-swap-dark-light-primary);
+  --swap-dark-light-secondary: var(--figma-swap-dark-light-secondary);
+  --swap-dark-light-info: var(--figma-swap-dark-light-info);
+  --swap-dark-light-success: var(--figma-swap-dark-light-success);
+  --swap-dark-light-warning: var(--figma-swap-dark-light-warning);
+  --swap-dark-light-error: var(--figma-swap-dark-light-error);
+  --swap-main-light-primary: var(--figma-swap-main-light-primary);
+  --swap-main-light-secondary: var(--figma-swap-main-light-secondary);
+  --swap-main-light-info: var(--figma-swap-main-light-info);
+  --swap-main-light-success: var(--figma-swap-main-light-success);
+  --swap-main-light-warning: var(--figma-swap-main-light-warning);
+  --swap-main-light-error: var(--figma-swap-main-light-error);
+}
+
+.dark {
+  --figma-background-default: var(--figma-grey-900);
+  --figma-background-paper: var(--figma-grey-800);
+  --figma-background-neutral: #28323d;
+  --figma-text-primary: var(--figma-white-main);
+  --figma-text-secondary: var(--figma-grey-500);
+  --figma-text-disabled: var(--figma-grey-600);
+  --figma-global-inherit-color: var(--figma-grey-800);
+  --figma-global-inherit-background: var(--figma-white-main);
+  --figma-global-inherit-hover: var(--figma-grey-400);
+  --figma-action-active: var(--figma-grey-500);
+  --figma-shadow-8: var(--figma-black-8);
+  --figma-shadow-12: var(--figma-black-12);
+  --figma-shadow-16: var(--figma-black-16);
+  --figma-shadow-20: var(--figma-black-20);
+  --figma-shadow-24: var(--figma-black-24);
+  --figma-shadow-48: var(--figma-black-48);
+  --figma-paper-background-blur: color-mix(in srgb, #212b36 90%, transparent);
+  --figma-default-background-blur: color-mix(in srgb, #161c24 90%, transparent);
+  --figma-tooltip-background: var(--figma-grey-700);
+  --figma-swap-lighter-darker-primary: var(--figma-primary-darker);
+  --figma-swap-lighter-darker-secondary: var(--figma-secondary-darker);
+  --figma-swap-lighter-darker-info: var(--figma-info-darker);
+  --figma-swap-lighter-darker-success: var(--figma-success-darker);
+  --figma-swap-lighter-darker-warning: var(--figma-warning-darker);
+  --figma-swap-lighter-darker-error: var(--figma-error-darker);
+  --figma-swap-darker-lighter-primary: var(--figma-primary-lighter);
+  --figma-swap-darker-lighter-secondary: var(--figma-secondary-lighter);
+  --figma-swap-darker-lighter-info: var(--figma-info-lighter);
+  --figma-swap-darker-lighter-success: var(--figma-success-lighter);
+  --figma-swap-darker-lighter-warning: var(--figma-warning-lighter);
+  --figma-swap-darker-lighter-error: var(--figma-error-lighter);
+  --figma-swap-dark-light-primary: var(--figma-primary-light);
+  --figma-swap-dark-light-secondary: var(--figma-secondary-light);
+  --figma-swap-dark-light-info: var(--figma-info-light);
+  --figma-swap-dark-light-success: var(--figma-success-light);
+  --figma-swap-dark-light-warning: var(--figma-warning-light);
+  --figma-swap-dark-light-error: var(--figma-error-light);
+  --figma-swap-main-light-primary: var(--figma-primary-light);
+  --figma-swap-main-light-secondary: var(--figma-secondary-light);
+  --figma-swap-main-light-info: var(--figma-info-light);
+  --figma-swap-main-light-success: var(--figma-success-light);
+  --figma-swap-main-light-warning: var(--figma-warning-light);
+  --figma-swap-main-light-error: var(--figma-error-light);
 }
 
 @theme inline {
@@ -616,6 +771,26 @@
   --color-text-primary: var(--text-primary);
   --color-text-secondary: var(--text-secondary);
   --color-text-disabled: var(--text-disabled);
+  --color-global-inherit-color: var(--global-inherit-color);
+  --color-global-inherit-background: var(--global-inherit-background);
+  --color-global-inherit-hover: var(--global-inherit-hover);
+  --color-global-default-color: var(--global-default-color);
+  --color-global-default-background: var(--global-default-background);
+  --color-global-default-hover-background: var(
+    --global-default-hover-background
+  );
+  --color-action-active: var(--action-active);
+  --color-action-hover: var(--action-hover);
+  --color-action-selected: var(--action-selected);
+  --color-action-focus: var(--action-focus);
+  --color-action-disabled: var(--action-disabled);
+  --color-action-disabled-background: var(--action-disabled-background);
+  --color-shadow-8: var(--shadow-8);
+  --color-shadow-12: var(--shadow-12);
+  --color-shadow-16: var(--shadow-16);
+  --color-shadow-20: var(--shadow-20);
+  --color-shadow-24: var(--shadow-24);
+  --color-shadow-48: var(--shadow-48);
   --color-text-heading-primary: var(--figma-text-heading-primary);
   --color-text-body: var(--figma-text-body);
   --color-other-skin: var(--figma-other-skin);
@@ -626,6 +801,38 @@
   --color-other-mask: var(--figma-other-mask);
   --color-other-icon: var(--figma-other-icon);
   --color-divider: var(--divider);
+  --color-paper-outlined: var(--paper-outlined);
+  --color-paper-background-blur: var(--paper-background-blur);
+  --color-default-background-blur: var(--default-background-blur);
+  --color-button-outlined: var(--button-outlined);
+  --color-tooltip: var(--tooltip-color);
+  --color-tooltip-background: var(--tooltip-background);
+  --color-textfield-filled: var(--textfield-filled);
   --color-outline: var(--outline);
-  --color-backdrop: var(--figma-backdrop);
+  --color-textfield-underline: var(--textfield-underline);
+  --color-backdrop: var(--backdrop);
+  --color-swap-lighter-darker-primary: var(--swap-lighter-darker-primary);
+  --color-swap-lighter-darker-secondary: var(--swap-lighter-darker-secondary);
+  --color-swap-lighter-darker-info: var(--swap-lighter-darker-info);
+  --color-swap-lighter-darker-success: var(--swap-lighter-darker-success);
+  --color-swap-lighter-darker-warning: var(--swap-lighter-darker-warning);
+  --color-swap-lighter-darker-error: var(--swap-lighter-darker-error);
+  --color-swap-darker-lighter-primary: var(--swap-darker-lighter-primary);
+  --color-swap-darker-lighter-secondary: var(--swap-darker-lighter-secondary);
+  --color-swap-darker-lighter-info: var(--swap-darker-lighter-info);
+  --color-swap-darker-lighter-success: var(--swap-darker-lighter-success);
+  --color-swap-darker-lighter-warning: var(--swap-darker-lighter-warning);
+  --color-swap-darker-lighter-error: var(--swap-darker-lighter-error);
+  --color-swap-dark-light-primary: var(--swap-dark-light-primary);
+  --color-swap-dark-light-secondary: var(--swap-dark-light-secondary);
+  --color-swap-dark-light-info: var(--swap-dark-light-info);
+  --color-swap-dark-light-success: var(--swap-dark-light-success);
+  --color-swap-dark-light-warning: var(--swap-dark-light-warning);
+  --color-swap-dark-light-error: var(--swap-dark-light-error);
+  --color-swap-main-light-primary: var(--swap-main-light-primary);
+  --color-swap-main-light-secondary: var(--swap-main-light-secondary);
+  --color-swap-main-light-info: var(--swap-main-light-info);
+  --color-swap-main-light-success: var(--swap-main-light-success);
+  --color-swap-main-light-warning: var(--swap-main-light-warning);
+  --color-swap-main-light-error: var(--swap-main-light-error);
 }

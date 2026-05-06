@@ -177,6 +177,18 @@ Current import and export patterns to review against:
 
 Missing exports, misplaced files, tests not colocated with the file they cover, overly broad prop passthrough, absent tests for interactive behavior, or styling that bypasses the token system should usually be findings.
 
+## TanStack Table review rules
+
+When the diff touches `@tanstack/react-table`, `useReactTable`, shared table primitives, or table column defs:
+
+- check whether `columns`, `data`, and controlled table state passed to `useReactTable` keep stable references across renders
+- treat inline `columns` or `data` array recreation in the same render path as a likely finding because the TanStack FAQ warns this can trigger infinite re-render loops
+- treat inline data transformations passed into `useReactTable`, such as `data.filter(...)`, `data.map(...)`, or `data.slice(...)`, as a likely finding unless the derived value is memoized first
+- when a table exposes controlled sorting state such as `sorting` and `onSortingChange`, or otherwise appears intended for server-driven sorting, verify whether client-side sorting is still being applied implicitly
+- treat always-on `getSortedRowModel()` without a `manualSorting` path as a likely finding when the component API suggests server-side sorting support
+- when `manualSorting` or server-side sorting support is introduced, expect targeted tests that confirm sorting state updates without local row reordering
+- when data updates are introduced alongside sorting, selection, pagination, or expanding behavior, verify whether TanStack auto-reset behavior is still desired and whether that expectation is tested
+
 ## Form review rules
 
 When the diff touches feature forms, form validation, submit handling, or

@@ -23,31 +23,31 @@
   --accent-foreground: var(--primary-dark);
   --destructive: var(--error-dark);
   --destructive-foreground: var(--figma-error-contrast-text);
-  --border: var(--figma-paper-outlined);
-  --input: var(--figma-textfield-outline);
+  --border: var(--paper-outlined);
+  --input: var(--outline);
   --ring: var(--primary-main);
   --radius: var(--radius-1-token);
 }
 
 .dark {
-  --background: var(--grey-900);
-  --foreground: var(--white-main);
-  --card: var(--grey-800);
-  --card-foreground: var(--white-main);
-  --popover: var(--grey-800);
-  --popover-foreground: var(--white-main);
+  --background: var(--background-default);
+  --foreground: var(--text-primary);
+  --card: var(--background-paper);
+  --card-foreground: var(--text-primary);
+  --popover: var(--background-paper);
+  --popover-foreground: var(--text-primary);
   --primary: var(--primary-main);
   --primary-foreground: var(--figma-primary-contrast-text);
   --secondary: var(--grey-700);
   --secondary-foreground: var(--white-main);
-  --muted: var(--grey-800);
-  --muted-foreground: var(--grey-500);
+  --muted: var(--background-neutral);
+  --muted-foreground: var(--text-secondary);
   --accent: var(--grey-700);
   --accent-foreground: var(--white-main);
   --destructive: var(--error-dark);
   --destructive-foreground: var(--figma-error-contrast-text);
-  --border: var(--figma-grey-16);
-  --input: var(--figma-grey-24);
+  --border: var(--paper-outlined);
+  --input: var(--outline);
   --ring: var(--primary-light);
 }
 
