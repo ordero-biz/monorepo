@@ -246,6 +246,55 @@ export const WithoutHeaderOrFooter: Story = {
   },
 };
 
+export const DeeplyNestedBranches: Story = {
+  args: {
+    items: [
+      {
+        id: 'overview',
+        label: 'Overview',
+        items: [
+          {
+            id: 'product',
+            kind: 'collapse',
+            label: 'Product',
+            icon: <Package />,
+            defaultExpanded: true,
+            items: [
+              {
+                id: 'product-all',
+                kind: 'link',
+                label: 'Product',
+                href: '/products',
+                active: true,
+              },
+              {
+                id: 'product-category',
+                kind: 'collapse',
+                label: 'Category',
+                defaultExpanded: true,
+                items: [
+                  {
+                    id: 'product-category-attributes',
+                    kind: 'link',
+                    label: 'Attributes',
+                    href: '/products/categories/attributes',
+                  },
+                  {
+                    id: 'product-category-history',
+                    kind: 'link',
+                    label: 'History of movement',
+                    href: '/products/categories/history',
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  },
+};
+
 export const FrameworkAgnosticLinks: Story = {
   render: () => (
     <div className="h-[480px] bg-[var(--background-paper)]">

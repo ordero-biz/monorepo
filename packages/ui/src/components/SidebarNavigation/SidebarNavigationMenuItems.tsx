@@ -6,10 +6,9 @@ import { cn } from '@/ui/lib/utils';
 import {
   iconSlotClassName,
   itemLabelClassName,
-  nestedItemCurveClassName,
+  nestedItemClassName,
   nestedItemWrapperClassName,
   nestedListContainerClassName,
-  nestedListLineClassName,
 } from './sidebarNavigationStyles';
 import {
   getExpandedItemIds,
@@ -42,8 +41,9 @@ const getItemClassName = ({
   cn(
     'flex w-full min-w-0 items-center rounded-[var(--radius-1-token)] text-left outline-none transition-[background-color,color] focus-visible:ring-3 focus-visible:ring-ring/50',
     depth === 0
-      ? 'min-h-[var(--_sidebar-navigation-item-height)] px-[var(--space-1-5)] py-[var(--space-0-5)]'
-      : 'h-[var(--_sidebar-navigation-sub-item-height)] px-[var(--space-1-5)] py-[var(--space-0-5)]',
+      ? 'min-h-[var(--nav-item-root-height)] px-[var(--space-1-5)] py-[var(--space-0-5)]'
+      : 'h-[var(--nav-item-sub-height)] px-[var(--space-1-5)] py-[var(--space-0-5)]',
+    depth > 0 ? nestedItemClassName : null,
     disabled
       ? 'cursor-not-allowed text-[var(--text-disabled)]'
       : 'cursor-pointer',
@@ -183,9 +183,7 @@ export const SidebarNavigationMenuItems = ({
   const previousExpandedItemIdsKeyRef = useRef(expandedItemIdsKey);
   const [openItemIds, setOpenItemIds] = useState<string[]>(expandedItemIds);
   const accordionLabel =
-    labelPath.length > 0
-      ? `${rootLabel}: ${labelPath.join(' / ')}`
-      : rootLabel;
+    labelPath.length > 0 ? `${rootLabel}: ${labelPath.join(' / ')}` : rootLabel;
 
   useEffect(() => {
     if (previousExpandedItemIdsKeyRef.current === expandedItemIdsKey) {
@@ -200,7 +198,9 @@ export const SidebarNavigationMenuItems = ({
     <Accordion.Root
       aria-label={accordionLabel}
       className="flex flex-col gap-[var(--space-0-5)]"
-      onValueChange={(nextValue) => setOpenItemIds(toAccordionItemIds(nextValue))}
+      onValueChange={(nextValue) =>
+        setOpenItemIds(toAccordionItemIds(nextValue))
+      }
       multiple
       value={openItemIds}
     >
@@ -230,7 +230,6 @@ export const SidebarNavigationMenuItems = ({
               data-slot="sidebar-navigation-menu-item"
               key={item.id}
             >
-              <span aria-hidden className={nestedItemCurveClassName} />
               {row}
             </div>
           );
@@ -257,7 +256,7 @@ export const SidebarNavigationMenuItems = ({
             </Accordion.Header>
             <Accordion.Panel
               aria-label={`${item.label} submenu`}
-              className="overflow-hidden"
+              className="overflow-visible"
             >
               <div className="pt-[var(--space-0-5)]">
                 <SidebarNavigationMenuItems
@@ -278,7 +277,6 @@ export const SidebarNavigationMenuItems = ({
 
         return (
           <div className={nestedItemWrapperClassName} key={item.id}>
-            <span aria-hidden className={nestedItemCurveClassName} />
             {accordionItem}
           </div>
         );
@@ -290,10 +288,5 @@ export const SidebarNavigationMenuItems = ({
     return content;
   }
 
-  return (
-    <div className={nestedListContainerClassName}>
-      <span aria-hidden className={nestedListLineClassName} />
-      {content}
-    </div>
-  );
+  return <div className={nestedListContainerClassName}>{content}</div>;
 };

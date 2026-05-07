@@ -1,7 +1,8 @@
 'use client';
 
 import { forwardRef } from 'react';
-import { shellClassName, sidebarNavigationStyle } from './sidebarNavigationStyles';
+import './sidebarNavigation.css';
+import { shellClassName } from './sidebarNavigationStyles';
 import type { SidebarNavigationProps } from './types';
 
 export const SidebarNavigation = forwardRef<
@@ -13,7 +14,6 @@ export const SidebarNavigation = forwardRef<
     data-slot="sidebar-navigation"
     id={id}
     ref={ref}
-    style={sidebarNavigationStyle}
   >
     {children}
   </aside>

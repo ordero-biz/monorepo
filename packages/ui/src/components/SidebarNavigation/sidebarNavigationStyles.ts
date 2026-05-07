@@ -1,21 +1,5 @@
-import type { CSSProperties } from 'react';
-
-export type SidebarNavigationStyle = CSSProperties & {
-  '--_sidebar-navigation-item-height'?: string;
-  '--_sidebar-navigation-sub-item-height'?: string;
-  '--_sidebar-navigation-width'?: string;
-};
-
-export const sidebarNavigationStyle: SidebarNavigationStyle = {
-  '--_sidebar-navigation-item-height':
-    'calc(var(--space-5) + var(--space-0-5))',
-  '--_sidebar-navigation-sub-item-height':
-    'calc(var(--space-4) + var(--space-0-5))',
-  '--_sidebar-navigation-width': 'calc(var(--space-20) + var(--space-15))',
-};
-
 export const shellClassName =
-  'flex h-full w-[var(--_sidebar-navigation-width)] min-w-[var(--_sidebar-navigation-width)] flex-col overflow-hidden border-r border-border bg-background';
+  'flex h-full w-[var(--nav-width)] min-w-[var(--nav-width)] flex-col overflow-hidden border-r border-border bg-background';
 
 export const headerClassName =
   'shrink-0 px-[var(--space-1-5)] pb-[var(--space-1)] pt-[var(--space-3)]';
@@ -42,12 +26,8 @@ export const iconSlotClassName =
   'mr-[var(--space-1-5)] flex size-[var(--space-3)] shrink-0 items-center justify-center [&_svg]:size-full';
 
 export const nestedListContainerClassName =
-  'relative ml-[10px] pl-[var(--space-1-5)]';
+  'sidebar-navigation-subtree relative pl-[var(--nav-bullet-gutter)]';
 
-export const nestedListLineClassName =
-  'absolute bottom-[var(--space-2)] left-0 top-0 w-px bg-[var(--color-grey-12)]';
+export const nestedItemWrapperClassName = 'relative';
 
-export const nestedItemWrapperClassName = 'relative pl-[var(--space-1)]';
-
-export const nestedItemCurveClassName =
-  'absolute left-[-12px] top-0 h-[18px] w-[12px] rounded-bl-[var(--radius-1-token)] border-b border-l border-[var(--color-grey-12)]';
+export const nestedItemClassName = 'sidebar-navigation-subitem relative';

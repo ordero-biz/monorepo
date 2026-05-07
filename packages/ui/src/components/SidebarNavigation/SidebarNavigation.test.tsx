@@ -164,6 +164,63 @@ describe('SidebarNavigation', () => {
     expect(screen.getByRole('link', { name: 'Category' })).toBeInTheDocument();
   });
 
+  it('supports nested collapsible branches through multiple levels', async () => {
+    const user = userEvent.setup();
+
+    setup({
+      sections: [
+        {
+          id: 'overview',
+          label: 'Overview',
+          items: [
+            {
+              id: 'product',
+              kind: 'collapse',
+              label: 'Product',
+              items: [
+                {
+                  id: 'category',
+                  kind: 'collapse',
+                  label: 'Category',
+                  items: [
+                    {
+                      id: 'attributes',
+                      kind: 'link',
+                      label: 'Attributes',
+                      href: '/attributes',
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    });
+
+    expect(
+      screen.queryByRole('button', { name: 'Category' })
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('link', { name: 'Attributes' })
+    ).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Product' }));
+
+    expect(
+      screen.getByRole('button', { name: 'Category' })
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('link', { name: 'Attributes' })
+    ).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Category' }));
+
+    expect(
+      screen.getByRole('link', { name: 'Attributes' })
+    ).toBeInTheDocument();
+  });
+
   it('toggles collapsible sections', async () => {
     const user = userEvent.setup();
 
