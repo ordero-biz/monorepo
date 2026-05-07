@@ -101,6 +101,7 @@ export type SidebarNavigationSectionsProps = {
 };
 
 export type SidebarNavigationMenuProps = {
+  ariaLabel?: string;
   items: SidebarNavigationItem[];
   renderLink?: SidebarNavigationRenderLink;
 };

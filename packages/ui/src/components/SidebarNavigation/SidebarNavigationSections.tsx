@@ -28,6 +28,7 @@ export const SidebarNavigationSections = ({
         >
           <SidebarNavigationSectionContent>
             <SidebarNavigationMenu
+              ariaLabel={section.label ?? section.id}
               items={section.items}
               renderLink={renderLink}
             />

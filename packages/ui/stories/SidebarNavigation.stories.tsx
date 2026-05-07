@@ -191,36 +191,59 @@ const SidebarShell = ({
   </SidebarNavigation>
 );
 
+type SidebarNavigationStoryProps = {
+  footer?: boolean;
+  header?: boolean;
+  items: SidebarNavigationSectionConfig[];
+};
+
+const SidebarNavigationStory = ({
+  footer = true,
+  header = true,
+  items,
+}: SidebarNavigationStoryProps) => (
+  <div className="h-[960px] bg-[var(--background-paper)]">
+    <SidebarShell footer={footer} header={header} items={items} />
+  </div>
+);
+
 const meta = {
   title: 'Components/SidebarNavigation',
-  component: SidebarNavigation,
+  component: SidebarNavigationStory,
+  subcomponents: {
+    SidebarNavigation,
+    SidebarNavigationContent,
+    SidebarNavigationFooter,
+    SidebarNavigationHeader,
+    SidebarNavigationSections,
+  },
   tags: ['autodocs'],
   args: {
-    children: null,
+    footer: true,
+    header: true,
+    items: sections,
+  },
+  argTypes: {
+    items: {
+      control: false,
+    },
   },
   parameters: {
     layout: 'fullscreen',
   },
-} satisfies Meta<typeof SidebarNavigation>;
+} satisfies Meta<typeof SidebarNavigationStory>;
 
 export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-export const Default: Story = {
-  render: () => (
-    <div className="h-[960px] bg-[var(--background-paper)]">
-      <SidebarShell items={sections} />
-    </div>
-  ),
-};
+export const Default: Story = {};
 
 export const WithoutHeaderOrFooter: Story = {
-  render: () => (
-    <div className="h-[720px] bg-[var(--background-paper)]">
-      <SidebarShell footer={false} header={false} items={sections} />
-    </div>
-  ),
+  args: {
+    footer: false,
+    header: false,
+  },
 };
 
 export const FrameworkAgnosticLinks: Story = {

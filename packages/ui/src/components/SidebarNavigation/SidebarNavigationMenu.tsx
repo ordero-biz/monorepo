@@ -5,6 +5,7 @@ import { getVisibleItems } from './sidebarNavigationUtils';
 import type { SidebarNavigationMenuProps } from './types';
 
 export const SidebarNavigationMenu = ({
+  ariaLabel,
   items,
   renderLink,
 }: SidebarNavigationMenuProps) => {
@@ -19,6 +20,7 @@ export const SidebarNavigationMenu = ({
       <SidebarNavigationMenuItems
         depth={0}
         items={visibleItems}
+        rootLabel={ariaLabel ?? 'Sidebar navigation items'}
         renderLink={renderLink}
       />
     </div>

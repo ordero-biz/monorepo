@@ -25,7 +25,9 @@ import type {
 type SidebarNavigationMenuItemsProps = {
   depth: number;
   items: SidebarNavigationItem[];
+  labelPath?: string[];
   renderLink?: SidebarNavigationRenderLink;
+  rootLabel: string;
 };
 
 const getItemClassName = ({
@@ -46,7 +48,7 @@ const getItemClassName = ({
       ? 'cursor-not-allowed text-[var(--text-disabled)]'
       : 'cursor-pointer',
     active && depth === 0
-      ? 'bg-[var(--color-primary-8)] text-primary hover:bg-[var(--color-primary-8)]'
+      ? 'bg-[var(--color-primary-8)] text-[var(--primary-darker)] hover:bg-[var(--color-primary-8)] hover:text-[var(--primary-darker)]'
       : null,
     active && depth > 0
       ? 'bg-[var(--color-grey-8)] text-foreground hover:bg-[var(--color-grey-8)]'
@@ -172,12 +174,18 @@ const SidebarNavigationLeafItem = ({
 export const SidebarNavigationMenuItems = ({
   depth,
   items,
+  labelPath = [],
   renderLink,
+  rootLabel,
 }: SidebarNavigationMenuItemsProps) => {
   const expandedItemIds = getExpandedItemIds(items);
   const expandedItemIdsKey = JSON.stringify(expandedItemIds);
   const previousExpandedItemIdsKeyRef = useRef(expandedItemIdsKey);
   const [openItemIds, setOpenItemIds] = useState<string[]>(expandedItemIds);
+  const accordionLabel =
+    labelPath.length > 0
+      ? `${rootLabel}: ${labelPath.join(' / ')}`
+      : rootLabel;
 
   useEffect(() => {
     if (previousExpandedItemIdsKeyRef.current === expandedItemIdsKey) {
@@ -190,6 +198,7 @@ export const SidebarNavigationMenuItems = ({
 
   const content = (
     <Accordion.Root
+      aria-label={accordionLabel}
       className="flex flex-col gap-[var(--space-0-5)]"
       onValueChange={(nextValue) => setOpenItemIds(toAccordionItemIds(nextValue))}
       multiple
@@ -246,12 +255,17 @@ export const SidebarNavigationMenuItems = ({
                 <SidebarNavigationItemContent item={item} />
               </Accordion.Trigger>
             </Accordion.Header>
-            <Accordion.Panel className="overflow-hidden">
+            <Accordion.Panel
+              aria-label={`${item.label} submenu`}
+              className="overflow-hidden"
+            >
               <div className="pt-[var(--space-0-5)]">
                 <SidebarNavigationMenuItems
                   depth={depth + 1}
                   items={item.items}
+                  labelPath={[...labelPath, item.label]}
                   renderLink={renderLink}
+                  rootLabel={rootLabel}
                 />
               </div>
             </Accordion.Panel>

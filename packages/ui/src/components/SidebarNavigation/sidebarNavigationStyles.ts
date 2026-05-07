@@ -31,7 +31,7 @@ export const navClassName = 'flex flex-col gap-[var(--space-0-5)]';
 export const sectionRootClassName = 'flex flex-col gap-[var(--space-0-5)]';
 
 export const sectionLabelClassName =
-  'flex w-full items-center gap-[var(--space-1)] px-[var(--space-1-5)] pb-[var(--space-1)] pt-[var(--space-2)] text-left text-[length:var(--nav-subheader-size-desktop)] leading-[var(--nav-subheader-line-height-desktop)] font-[var(--nav-subheader-weight)] uppercase text-[var(--text-disabled)] outline-none transition-colors focus-visible:ring-3 focus-visible:ring-ring/50';
+  'flex w-full items-center gap-[var(--space-1)] px-[var(--space-1-5)] pb-[var(--space-1)] pt-[var(--space-2)] text-left text-[length:var(--nav-subheader-size-desktop)] leading-[var(--nav-subheader-line-height-desktop)] font-[var(--nav-subheader-weight)] uppercase text-[var(--text-secondary)] outline-none transition-colors focus-visible:ring-3 focus-visible:ring-ring/50';
 
 export const sectionContentClassName = 'flex flex-col gap-[var(--space-0-5)]';
 

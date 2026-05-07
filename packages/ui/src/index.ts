@@ -40,8 +40,12 @@ export type {
   IconButtonSize,
 } from './components/IconButton';
 export { IconButton, iconButtonVariants } from './components/IconButton';
-export type { InputProps, InputSize, InputVariant } from './components/Input';
-export { Input } from './components/Input';
+export type {
+  InputProps,
+  InputSize,
+  InputVariant,
+} from './components/Input/index';
+export { Input } from './components/Input/index';
 export type { PasswordFieldProps } from './components/PasswordField';
 export { PasswordField } from './components/PasswordField';
 export type { RadioColor, RadioProps, RadioSize } from './components/Radio';

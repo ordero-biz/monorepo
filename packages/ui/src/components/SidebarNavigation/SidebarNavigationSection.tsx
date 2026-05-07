@@ -74,7 +74,10 @@ export const SidebarNavigationSection = forwardRef<
               </span>
             </Accordion.Trigger>
           </Accordion.Header>
-          <Accordion.Panel className="overflow-hidden">
+          <Accordion.Panel
+            aria-label={`${label} section`}
+            className="overflow-hidden"
+          >
             {children}
           </Accordion.Panel>
         </Accordion.Item>
