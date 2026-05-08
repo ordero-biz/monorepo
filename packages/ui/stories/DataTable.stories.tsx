@@ -283,6 +283,12 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {};
 
+export const WithCheckboxSelection: Story = {
+  args: {
+    selectable: true,
+  },
+};
+
 export const Empty: Story = {
   args: {
     data: [],
