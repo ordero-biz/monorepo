@@ -50,7 +50,7 @@ const getItemClassName = ({
       ? 'cursor-not-allowed text-[var(--text-disabled)]'
       : 'cursor-pointer',
     active && depth === 0
-      ? 'bg-[var(--color-primary-8)] text-[var(--primary-darker)] hover:bg-[var(--color-primary-8)] hover:text-[var(--primary-darker)]'
+      ? 'bg-[var(--color-primary-8)] text-[var(--primary-main)] hover:bg-[var(--color-primary-8)] hover:text-[var(--primary-main)]'
       : null,
     active && depth > 0
       ? 'bg-[var(--color-grey-8)] text-foreground hover:bg-[var(--color-grey-8)]'
