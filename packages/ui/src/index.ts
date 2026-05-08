@@ -35,6 +35,12 @@ export {
   DataTableSelectionColumnHeader,
 } from './components/DataTable';
 export type {
+  HeaderLeftProps,
+  HeaderProps,
+  HeaderRightProps,
+} from './components/Header';
+export { Header, HeaderLeft, HeaderRight } from './components/Header';
+export type {
   IconButtonColor,
   IconButtonProps,
   IconButtonSize,
