@@ -114,6 +114,8 @@ describe('SidebarNavigation', () => {
   it('renders optional header and footer slots', () => {
     setup();
 
+    expect(screen.getByRole('banner')).toBeInTheDocument();
+    expect(screen.getByRole('contentinfo')).toBeInTheDocument();
     expect(screen.getByText('Ordero')).toBeInTheDocument();
     expect(screen.getByText('Footer profile')).toBeInTheDocument();
   });

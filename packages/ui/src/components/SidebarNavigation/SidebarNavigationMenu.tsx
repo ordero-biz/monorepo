@@ -16,13 +16,11 @@ export const SidebarNavigationMenu = ({
   }
 
   return (
-    <div data-slot="sidebar-navigation-menu">
-      <SidebarNavigationMenuItems
-        depth={0}
-        items={visibleItems}
-        rootLabel={ariaLabel ?? 'Sidebar navigation items'}
-        renderLink={renderLink}
-      />
-    </div>
+    <SidebarNavigationMenuItems
+      depth={0}
+      items={visibleItems}
+      rootLabel={ariaLabel ?? 'Sidebar navigation items'}
+      renderLink={renderLink}
+    />
   );
 };

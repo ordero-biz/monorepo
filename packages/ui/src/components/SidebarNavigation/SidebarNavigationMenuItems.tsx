@@ -202,6 +202,13 @@ export const SidebarNavigationMenuItems = ({
         setOpenItemIds(toAccordionItemIds(nextValue))
       }
       multiple
+      render={(props) => (
+        <ul
+          {...props}
+          className={props.className}
+          data-slot="sidebar-navigation-menu"
+        />
+      )}
       value={openItemIds}
     >
       {items.map((item) => {
@@ -218,20 +225,20 @@ export const SidebarNavigationMenuItems = ({
 
           if (depth === 0) {
             return (
-              <div data-slot="sidebar-navigation-menu-item" key={item.id}>
+              <li data-slot="sidebar-navigation-menu-item" key={item.id}>
                 {row}
-              </div>
+              </li>
             );
           }
 
           return (
-            <div
+            <li
               className={nestedItemWrapperClassName}
               data-slot="sidebar-navigation-menu-item"
               key={item.id}
             >
               {row}
-            </div>
+            </li>
           );
         }
 
@@ -247,6 +254,15 @@ export const SidebarNavigationMenuItems = ({
             data-slot="sidebar-navigation-menu-item"
             disabled={item.disabled}
             key={item.id}
+            render={(props) => (
+              <li
+                {...props}
+                className={cn(
+                  props.className,
+                  depth > 0 ? nestedItemWrapperClassName : null
+                )}
+              />
+            )}
             value={item.id}
           >
             <Accordion.Header className="m-0">
@@ -271,15 +287,7 @@ export const SidebarNavigationMenuItems = ({
           </Accordion.Item>
         );
 
-        if (depth === 0) {
-          return accordionItem;
-        }
-
-        return (
-          <div className={nestedItemWrapperClassName} key={item.id}>
-            {accordionItem}
-          </div>
-        );
+        return accordionItem;
       })}
     </Accordion.Root>
   );

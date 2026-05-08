@@ -11,7 +11,7 @@ import { toAccordionItemIds } from './sidebarNavigationUtils';
 import type { SidebarNavigationSectionProps } from './types';
 
 export const SidebarNavigationSection = forwardRef<
-  HTMLDivElement,
+  HTMLElement,
   SidebarNavigationSectionProps
 >(
   (
@@ -39,7 +39,7 @@ export const SidebarNavigationSection = forwardRef<
 
     if (!collapsible || !label) {
       return (
-        <div
+        <section
           className={sectionRootClassName}
           data-slot="sidebar-navigation-section"
           id={id}
@@ -47,41 +47,44 @@ export const SidebarNavigationSection = forwardRef<
         >
           {label ? <div className={sectionLabelClassName}>{label}</div> : null}
           {children}
-        </div>
+        </section>
       );
     }
 
     return (
-      <Accordion.Root
+      <section
         className={sectionRootClassName}
-        onValueChange={(nextValue) =>
-          setOpenSectionIds(toAccordionItemIds(nextValue))
-        }
-        value={openSectionIds}
+        data-slot="sidebar-navigation-section"
+        id={id}
+        ref={ref}
       >
-        <Accordion.Item
-          className="group/section flex flex-col gap-[var(--space-0-5)]"
-          data-slot="sidebar-navigation-section"
-          id={id}
-          ref={ref}
-          value={id}
+        <Accordion.Root
+          onValueChange={(nextValue) =>
+            setOpenSectionIds(toAccordionItemIds(nextValue))
+          }
+          value={openSectionIds}
         >
-          <Accordion.Header className="m-0">
-            <Accordion.Trigger className={sectionLabelClassName}>
-              <span className="min-w-0 flex-1 truncate">{label}</span>
-              <span className="flex size-[var(--space-2)] shrink-0 items-center justify-center transition-transform group-data-[open]/section:rotate-180">
-                <ChevronDown />
-              </span>
-            </Accordion.Trigger>
-          </Accordion.Header>
-          <Accordion.Panel
-            aria-label={`${label} section`}
-            className="overflow-hidden"
+          <Accordion.Item
+            className="group/section flex flex-col gap-[var(--space-0-5)]"
+            value={id}
           >
-            {children}
-          </Accordion.Panel>
-        </Accordion.Item>
-      </Accordion.Root>
+            <Accordion.Header className="m-0">
+              <Accordion.Trigger className={sectionLabelClassName}>
+                <span className="min-w-0 flex-1 truncate">{label}</span>
+                <span className="flex size-[var(--space-2)] shrink-0 items-center justify-center transition-transform group-data-[open]/section:rotate-180">
+                  <ChevronDown />
+                </span>
+              </Accordion.Trigger>
+            </Accordion.Header>
+            <Accordion.Panel
+              aria-label={`${label} section`}
+              className="overflow-hidden"
+            >
+              {children}
+            </Accordion.Panel>
+          </Accordion.Item>
+        </Accordion.Root>
+      </section>
     );
   }
 );
