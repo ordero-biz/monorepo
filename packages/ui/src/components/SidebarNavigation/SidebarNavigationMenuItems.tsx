@@ -4,6 +4,8 @@ import { ChevronDown } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { cn } from '@/ui/lib/utils';
 import {
+  accordionPanelClassName,
+  accordionPanelContentClassName,
   iconSlotClassName,
   itemLabelClassName,
   nestedItemClassName,
@@ -215,18 +217,14 @@ export const SidebarNavigationMenuItems = ({
         const branchActive = isItemBranchActive(item);
 
         if (item.kind !== 'collapse') {
-          const row = (
-            <SidebarNavigationLeafItem
-              depth={depth}
-              item={item}
-              renderLink={renderLink}
-            />
-          );
-
           if (depth === 0) {
             return (
               <li data-slot="sidebar-navigation-menu-item" key={item.id}>
-                {row}
+                <SidebarNavigationLeafItem
+                  depth={depth}
+                  item={item}
+                  renderLink={renderLink}
+                />
               </li>
             );
           }
@@ -237,7 +235,11 @@ export const SidebarNavigationMenuItems = ({
               data-slot="sidebar-navigation-menu-item"
               key={item.id}
             >
-              {row}
+              <SidebarNavigationLeafItem
+                depth={depth}
+                item={item}
+                renderLink={renderLink}
+              />
             </li>
           );
         }
@@ -272,9 +274,14 @@ export const SidebarNavigationMenuItems = ({
             </Accordion.Header>
             <Accordion.Panel
               aria-label={`${item.label} submenu`}
-              className="overflow-visible"
+              className={accordionPanelClassName}
             >
-              <div className="pt-[var(--space-0-5)]">
+              <div
+                className={cn(
+                  accordionPanelContentClassName,
+                  'pt-[var(--space-0-5)]'
+                )}
+              >
                 <SidebarNavigationMenuItems
                   depth={depth + 1}
                   items={item.items}

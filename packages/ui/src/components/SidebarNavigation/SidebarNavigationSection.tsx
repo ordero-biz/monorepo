@@ -4,6 +4,8 @@ import { Accordion } from '@base-ui/react/accordion';
 import { ChevronDown } from 'lucide-react';
 import { forwardRef, useEffect, useState } from 'react';
 import {
+  accordionPanelClassName,
+  accordionPanelContentClassName,
   sectionLabelClassName,
   sectionRootClassName,
 } from './sidebarNavigationStyles';
@@ -78,9 +80,9 @@ export const SidebarNavigationSection = forwardRef<
             </Accordion.Header>
             <Accordion.Panel
               aria-label={`${label} section`}
-              className="overflow-hidden"
+              className={accordionPanelClassName}
             >
-              {children}
+              <div className={accordionPanelContentClassName}>{children}</div>
             </Accordion.Panel>
           </Accordion.Item>
         </Accordion.Root>

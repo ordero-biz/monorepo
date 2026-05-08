@@ -19,6 +19,11 @@ export const sectionLabelClassName =
 
 export const sectionContentClassName = 'flex flex-col gap-[var(--space-0-5)]';
 
+export const accordionPanelClassName = 'sidebar-navigation-panel';
+
+export const accordionPanelContentClassName =
+  'sidebar-navigation-panel-content';
+
 export const itemLabelClassName =
   'min-w-0 flex-1 truncate text-[length:var(--nav-item-size-desktop)] leading-[var(--nav-item-line-height-desktop)]';
 
