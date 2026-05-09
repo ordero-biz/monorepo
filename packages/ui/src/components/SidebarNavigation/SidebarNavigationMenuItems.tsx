@@ -81,8 +81,10 @@ const defaultLinkRenderer: SidebarNavigationRenderLink = ({
 
 const SidebarNavigationItemContent = ({
   item,
+  isOpen,
 }: {
   item: SidebarNavigationItem;
+  isOpen?: boolean;
 }) => {
   const branchActive = isItemBranchActive(item);
 
@@ -105,7 +107,12 @@ const SidebarNavigationItemContent = ({
         <span className="ml-[var(--space-1)] shrink-0">{item.badge}</span>
       ) : null}
       {item.kind === 'collapse' ? (
-        <span className="ml-[var(--space-1)] flex size-[var(--space-2)] shrink-0 items-center justify-center transition-transform group-data-[open]/item:rotate-180">
+        <span
+          className={cn(
+            'ml-[var(--space-1)] flex size-[var(--space-2)] shrink-0 items-center justify-center transition-transform',
+            isOpen && 'rotate-180'
+          )}
+        >
           <ChevronDown />
         </span>
       ) : null}
@@ -269,7 +276,10 @@ export const SidebarNavigationMenuItems = ({
           >
             <Accordion.Header className="m-0">
               <Accordion.Trigger className={cn(rowClassName, 'sidebar-navigation-branch-trigger')}>
-                <SidebarNavigationItemContent item={item} />
+                <SidebarNavigationItemContent
+                  item={item}
+                  isOpen={openItemIds.includes(item.id)}
+                />
               </Accordion.Trigger>
             </Accordion.Header>
             <Accordion.Panel
