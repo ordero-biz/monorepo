@@ -1,31 +1,39 @@
 .sidebar-navigation-panel {
-  height: var(--accordion-panel-height);
   overflow: hidden;
-  transition: height 150ms ease-out;
 }
 
-.sidebar-navigation-panel[data-starting-style],
-.sidebar-navigation-panel[data-ending-style] {
-  height: 0;
-}
-
-.sidebar-navigation-subtree::before {
+.sidebar-navigation-subtree > ul > li::before {
   position: absolute;
-  top: calc(
-    (var(--nav-item-root-height) - var(--nav-item-sub-height)) /
-    -2 -
-    var(--space-0-5)
-  );
-  left: var(--nav-bullet-offset);
+  top: 0;
+  bottom: -8px;
+  left: calc(var(--nav-bullet-size) * -1);
+  width: var(--nav-bullet-line-width);
+  content: '';
+  background-color: var(--nav-bullet-light-color);
+  z-index: -1;
+}
+
+.sidebar-navigation-branch-trigger[data-open]::after,
+.sidebar-navigation-branch-trigger[data-state="open"]::after,
+[data-open] .sidebar-navigation-branch-trigger::after,
+[data-state="open"] .sidebar-navigation-branch-trigger::after {
+  position: absolute;
+  top: 100%;
+  left: calc(var(--nav-bullet-gutter) - var(--nav-bullet-size));
+  width: var(--nav-bullet-line-width);
+  height: calc(var(--space-0-5) * 2);
+  content: '';
+  background-color: var(--nav-bullet-light-color);
+  z-index: -1;
+}
+
+.sidebar-navigation-subtree > ul > li:last-of-type::before {
   bottom: calc(
-    var(--nav-item-sub-height) -
+    100% -
     var(--nav-bullet-line-width) -
     var(--nav-bullet-size) /
     2
   );
-  width: var(--nav-bullet-line-width);
-  content: '';
-  background-color: var(--nav-bullet-light-color);
 }
 
 .sidebar-navigation-subitem::before {

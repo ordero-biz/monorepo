@@ -41,7 +41,7 @@ const getItemClassName = ({
   disabled: boolean;
 }) =>
   cn(
-    'flex w-full min-w-0 items-center rounded-[var(--radius-1-token)] text-left outline-none transition-[background-color,color] focus-visible:ring-3 focus-visible:ring-ring/50',
+    'relative flex w-full min-w-0 items-center rounded-[var(--radius-1-token)] text-left outline-none transition-[background-color,color] focus-visible:ring-3 focus-visible:ring-ring/50',
     depth === 0
       ? 'min-h-[var(--nav-item-root-height)] px-[var(--space-1-5)] py-[var(--space-0-5)]'
       : 'h-[var(--nav-item-sub-height)] px-[var(--space-1-5)] py-[var(--space-0-5)]',
@@ -268,7 +268,7 @@ export const SidebarNavigationMenuItems = ({
             value={item.id}
           >
             <Accordion.Header className="m-0">
-              <Accordion.Trigger className={rowClassName}>
+              <Accordion.Trigger className={cn(rowClassName, 'sidebar-navigation-branch-trigger')}>
                 <SidebarNavigationItemContent item={item} />
               </Accordion.Trigger>
             </Accordion.Header>
