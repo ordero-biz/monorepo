@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Barlow, Public_Sans } from 'next/font/google';
 import type { ReactNode } from 'react';
 import './globals.css';
+import { Providers } from './providers';
 
 const publicSans = Public_Sans({
   variable: '--font-public-sans',
@@ -30,7 +31,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${publicSans.variable} ${barlow.variable} antialiased`}>
-        {children}
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

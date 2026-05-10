@@ -1,9 +1,9 @@
-import { prepareSetup } from '@ordero/test-config/react';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { preparePlatformSetup } from '@/test/prepareSetup';
 import { SignUpForm } from './SignUpForm';
 
-const { setup } = prepareSetup({
+const { setup } = preparePlatformSetup({
   component: SignUpForm,
 });
 
@@ -14,7 +14,7 @@ const setupSignUpForm = () => {
 
   return {
     emailField: screen.getByRole('textbox', { name: 'Email address' }),
-    passwordField: screen.getByLabelText('Password'),
+    passwordField: screen.getByPlaceholderText('6+ characters'),
     signUpButton: screen.getByRole('button', { name: 'Sign up' }),
     termsCheckbox: screen.getByRole('checkbox', {
       name: /by signing up, i agree to/i,
@@ -32,9 +32,10 @@ describe('SignUpForm', () => {
     expect(passwordField).toBeVisible();
     expect(signUpButton).toHaveAttribute('type', 'submit');
     expect(termsCheckbox).not.toBeChecked();
-    expect(
-      screen.getByRole('link', { name: 'terms of use' })
-    ).toHaveAttribute('href', '/terms');
+    expect(screen.getByRole('link', { name: 'terms of use' })).toHaveAttribute(
+      'href',
+      '/terms'
+    );
     expect(
       screen.getByRole('link', { name: 'privacy policy' })
     ).toHaveAttribute('href', '/privacy');

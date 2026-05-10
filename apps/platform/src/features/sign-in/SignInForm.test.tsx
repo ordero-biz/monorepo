@@ -1,26 +1,36 @@
-import { prepareSetup } from '@ordero/test-config/react';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { login } from '@/lib/api/client';
+import { preparePlatformSetup } from '@/test/prepareSetup';
 import { SignInForm } from './SignInForm';
 
-const { setup } = prepareSetup({
+vi.mock('@/lib/api/client', () => ({
+  login: vi.fn(),
+}));
+
+const loginMock = vi.mocked(login);
+
+const { setup } = preparePlatformSetup({
   component: SignInForm,
 });
 
 const setupSignInForm = () => {
   const user = userEvent.setup();
-
   setup();
 
   return {
     emailField: screen.getByRole('textbox', { name: 'Email address' }),
-    passwordField: screen.getByLabelText('Password'),
+    passwordField: screen.getByPlaceholderText('6+ characters'),
     signInButton: screen.getByRole('button', { name: 'Sign in' }),
     user,
   };
 };
 
 describe('SignInForm', () => {
+  beforeEach(() => {
+    loginMock.mockReset();
+  });
+
   it('renders the expected form controls and secondary actions', () => {
     const { emailField, passwordField, signInButton } = setupSignInForm();
 
@@ -121,13 +131,27 @@ describe('SignInForm', () => {
     ).not.toBeInTheDocument();
   });
 
-  it('shows the backend email error for a valid non-gmail address on submit', async () => {
+  it('shows the backend email error for a valid rejected address on submit', async () => {
+    loginMock.mockResolvedValue({
+      ok: false,
+      error: {
+        status: 422,
+        message: 'Sign-in failed.',
+        fieldErrors: {
+          email: 'Use a gmail.com email address.',
+        },
+      },
+    });
     const { emailField, passwordField, signInButton, user } = setupSignInForm();
 
     await user.type(emailField, 'admin@mail.com');
     await user.type(passwordField, '123456');
     await user.click(signInButton);
 
+    expect(loginMock).toHaveBeenCalledWith({
+      email: 'admin@mail.com',
+      password: '123456',
+    });
     expect(screen.getByText('Use a gmail.com email address.')).toBeVisible();
     expect(emailField).toHaveAccessibleDescription(
       'Use a gmail.com email address.'
@@ -135,14 +159,59 @@ describe('SignInForm', () => {
     expect(passwordField).toHaveValue('123456');
   });
 
-  it('keeps the email and clears the password after successful sign in', async () => {
+  it('submits credentials, keeps the email, and clears the password after successful sign in', async () => {
+    loginMock.mockResolvedValue({
+      ok: true,
+      data: {
+        authenticated: true,
+        user: {
+          email: 'admin@gmail.com',
+        },
+      },
+    });
     const { emailField, passwordField, signInButton, user } = setupSignInForm();
 
     await user.type(emailField, 'admin@gmail.com');
     await user.type(passwordField, '123456');
     await user.click(signInButton);
 
+    expect(loginMock).toHaveBeenCalledWith({
+      email: 'admin@gmail.com',
+      password: '123456',
+    });
     expect(emailField).toHaveValue('admin@gmail.com');
     expect(passwordField).toHaveValue('');
+  });
+
+  it('shows a submitting state while login is in flight', async () => {
+    let resolveLogin:
+      | ((value: Awaited<ReturnType<typeof login>>) => void)
+      | undefined;
+
+    loginMock.mockReturnValue(
+      new Promise((resolve) => {
+        resolveLogin = resolve;
+      })
+    );
+    const { emailField, passwordField, signInButton, user } = setupSignInForm();
+
+    await user.type(emailField, 'admin@gmail.com');
+    await user.type(passwordField, '123456');
+    await user.click(signInButton);
+
+    expect(signInButton).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Signing in...' })).toBeVisible();
+
+    resolveLogin?.({
+      ok: true,
+      data: {
+        authenticated: true,
+        user: {
+          email: 'admin@gmail.com',
+        },
+      },
+    });
+
+    await screen.findByRole('button', { name: 'Sign in' });
   });
 });

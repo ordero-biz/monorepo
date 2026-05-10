@@ -2,6 +2,9 @@
 
 import { Button, PasswordField, TextField, Typography } from '@ordero/ui';
 import { useForm } from '@tanstack/react-form';
+import { useQueryClient } from '@tanstack/react-query';
+import { authQueryKeys } from '@/lib/api/authQueries';
+import { login } from '@/lib/api/client';
 import { signInDefaultValues } from './constants';
 import { getErrorMessage } from './utils/error';
 import {
@@ -10,28 +13,27 @@ import {
   validateSignInPassword,
 } from './utils/validations';
 
-const gmailEmailRegex = /^[^@\s]+@gmail\.com$/i;
-
 const submitSignInToBackend = async (value: SignInFormValues) => {
-  if (!gmailEmailRegex.test(value.email)) {
+  const result = await login(value);
+
+  if (!result.ok) {
     return {
       ok: false,
       error: {
-        fieldErrors: {
-          email: 'Use a gmail.com email address.',
-        },
-        formError: undefined,
+        fieldErrors: result.error.fieldErrors,
+        formError: result.error.message,
       },
-    };
+    } as const;
   }
 
   return {
     ok: true,
-    error: {},
-  };
+    data: result.data,
+  } as const;
 };
 
 export const SignInForm = () => {
+  const queryClient = useQueryClient();
   const form = useForm({
     defaultValues: signInDefaultValues,
     onSubmit: async ({ formApi, value }) => {
@@ -47,6 +49,7 @@ export const SignInForm = () => {
         return;
       }
 
+      queryClient.setQueryData(authQueryKeys.session, result.data);
       formApi.reset({
         ...signInDefaultValues,
         email: value.email,

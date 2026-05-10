@@ -16,16 +16,17 @@ describe('SignUpLayout', () => {
     expect(
       screen.getByRole('textbox', { name: 'Email address' })
     ).toBeVisible();
-    expect(screen.getByLabelText('Password')).toBeVisible();
+    expect(screen.getByPlaceholderText('6+ characters')).toBeVisible();
     expect(
       screen.getByRole('checkbox', { name: /by signing up, i agree to/i })
     ).not.toBeChecked();
     expect(
       screen.queryByText('You must accept the terms to continue.')
     ).not.toBeInTheDocument();
-    expect(
-      screen.getByRole('link', { name: 'terms of use' })
-    ).toHaveAttribute('href', '/terms');
+    expect(screen.getByRole('link', { name: 'terms of use' })).toHaveAttribute(
+      'href',
+      '/terms'
+    );
     expect(
       screen.getByRole('link', { name: 'privacy policy' })
     ).toHaveAttribute('href', '/privacy');

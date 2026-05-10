@@ -1,9 +1,20 @@
 import { render, screen } from '@testing-library/react';
+import {
+  createTestQueryClient,
+  createTestQueryProvider,
+} from '@/test/prepareSetup';
 import { SignInFormLayout } from './SignInLayout';
 
 describe('SignInFormLayout', () => {
   it('renders the auth layout copy, footer link, and sign-in form', () => {
-    render(<SignInFormLayout />);
+    const queryClient = createTestQueryClient();
+    const TestQueryProvider = createTestQueryProvider(queryClient);
+
+    render(
+      <TestQueryProvider>
+        <SignInFormLayout />
+      </TestQueryProvider>
+    );
 
     expect(
       screen.getByRole('heading', { name: 'Welcome back!' })
@@ -17,7 +28,7 @@ describe('SignInFormLayout', () => {
     expect(
       screen.getByRole('textbox', { name: 'Email address' })
     ).toBeVisible();
-    expect(screen.getByLabelText('Password')).toBeVisible();
+    expect(screen.getByPlaceholderText('6+ characters')).toBeVisible();
     expect(screen.getByRole('button', { name: 'Sign in' })).toBeVisible();
   });
 });

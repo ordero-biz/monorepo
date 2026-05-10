@@ -1,7 +1,7 @@
 'use client';
 
-import Link from 'next/link';
 import { Typography } from '@ordero/ui';
+import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { AuthBadge } from './AuthBadge';
 
