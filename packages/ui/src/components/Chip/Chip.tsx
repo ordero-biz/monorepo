@@ -201,7 +201,7 @@ const textClassName =
 const CloseIcon = () => (
   <svg
     aria-hidden="true"
-    className="size-full opacity-48 hover:opacity-90 transition-opacity"
+    className="size-full"
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 17 17"
     fill="none"
@@ -255,7 +255,7 @@ export const Chip = ({
           type="button"
           aria-label={deleteAriaLabel}
           className={cn(
-            'inline-flex cursor-pointer shrink-0 items-center justify-center rounded-full outline-none transition-opacity hover:opacity-100 focus-visible:ring-2 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-100',
+            'cursor-pointer shrink-0 opacity-50 enabled:hover:opacity-90 transition-opacity items-center rounded-full outline-none focus-visible:ring-2 focus-visible:ring-ring/50 disabled:cursor-default',
             closeIconClassName
           )}
           onClick={onDelete}
