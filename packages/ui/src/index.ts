@@ -35,6 +35,13 @@ export {
   DataTableSelectionColumnHeader,
 } from './components/DataTable';
 export type {
+  ChipColor,
+  ChipProps,
+  ChipSize,
+  ChipVariant,
+} from './components/Chip';
+export { Chip, chipVariants } from './components/Chip';
+export type {
   IconButtonColor,
   IconButtonProps,
   IconButtonSize,
