@@ -1,7 +1,4 @@
-import type {
-  MouseEventHandler,
-  ReactNode,
-} from 'react';
+import type { MouseEventHandler, ReactNode } from 'react';
 
 export type ChipVariant = 'filled' | 'outlined' | 'soft';
 

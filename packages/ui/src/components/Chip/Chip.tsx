@@ -2,11 +2,12 @@
 
 import { Button as ButtonPrimitive } from '@base-ui/react/button';
 import { cva } from 'class-variance-authority';
+import { useId } from 'react';
 import { cn } from '@/ui/lib/utils';
 import type { ChipProps } from './types';
 
 const chipVariants = cva(
-  'inline-flex shrink-0 items-center border border-transparent',
+  'inline-flex shrink-0 select-none items-center border border-transparent',
   {
     variants: {
       color: {
@@ -191,8 +192,8 @@ const startIconSizeClassNames = {
 } as const;
 
 const closeIconSizeClassNames = {
-  m: 'size-2',
-  s: 'size-2',
+  m: 'size-[var(--chip-close-icon-token)]',
+  s: 'size-[var(--chip-close-icon-token)]',
 } as const;
 
 const textClassName =
@@ -227,12 +228,15 @@ export const Chip = ({
   title,
   variant,
 }: ChipProps) => {
+  const generatedId = useId();
   const rootClassName = cn(chipVariants({ color, disabled, size, variant }));
   const labelClassName = cn(labelContainerVariants({ size }));
   const startIconClassName = startIcon && startIconSizeClassNames[size];
   const closeIconClassName = closeIconSizeClassNames[size];
+  const labelId = id ? `${id}-label` : `${generatedId}-label`;
+  const removeTextId = id ? `${id}-remove-text` : `${generatedId}-remove-text`;
 
-  const deleteAriaLabel = ariaLabel ? `Remove ${ariaLabel}` : 'Remove chip';
+  const deleteAriaLabel = ariaLabel ? `Remove ${ariaLabel}` : undefined;
 
   const content = (
     <>
@@ -247,13 +251,16 @@ export const Chip = ({
           {startIcon}
         </span>
       ) : null}
-      <span className={labelClassName}>
+      <span className={labelClassName} id={labelId}>
         <span className={textClassName}>{children}</span>
       </span>
       {onDelete ? (
         <ButtonPrimitive
           type="button"
           aria-label={deleteAriaLabel}
+          aria-labelledby={
+            deleteAriaLabel ? undefined : `${removeTextId} ${labelId}`
+          }
           className={cn(
             'cursor-pointer shrink-0 opacity-50 enabled:hover:opacity-90 transition-opacity items-center rounded-full outline-none focus-visible:ring-2 focus-visible:ring-ring/50 disabled:cursor-default',
             closeIconClassName
@@ -261,6 +268,11 @@ export const Chip = ({
           onClick={onDelete}
           disabled={disabled}
         >
+          {!deleteAriaLabel ? (
+            <span className="sr-only" id={removeTextId}>
+              Remove
+            </span>
+          ) : null}
           <CloseIcon />
         </ButtonPrimitive>
       ) : null}

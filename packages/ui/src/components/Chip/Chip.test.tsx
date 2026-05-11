@@ -6,7 +6,7 @@ import { Chip } from './Chip';
 import type { ChipProps } from './types';
 
 describe('Chip', () => {
-  const { setup } = prepareSetup<ChipProps & { children: string }>({
+  const { setup } = prepareSetup<ChipProps>({
     component: Chip,
     props: {
       children: 'Default',
@@ -14,7 +14,9 @@ describe('Chip', () => {
   });
 
   it('renders label content users can see', () => {
-    const { children } = setup({ children: 'Processing' });
+    const children = 'Processing';
+
+    setup({ children });
 
     expect(screen.getByText(children)).toBeInTheDocument();
   });
@@ -33,7 +35,6 @@ describe('Chip', () => {
     const onDelete = vi.fn();
 
     setup({
-      'aria-label': 'Tag',
       children: 'Tag',
       onDelete,
     });
@@ -48,7 +49,6 @@ describe('Chip', () => {
     const onDelete = vi.fn();
 
     setup({
-      'aria-label': 'Tag',
       children: 'Tag',
       disabled: true,
       onDelete,
@@ -59,4 +59,15 @@ describe('Chip', () => {
     expect(onDelete).not.toHaveBeenCalled();
   });
 
+  it('uses aria-label as the remove action label override', () => {
+    setup({
+      'aria-label': 'Assigned user',
+      children: <Sparkles aria-hidden="true" />,
+      onDelete: () => undefined,
+    });
+
+    expect(
+      screen.getByRole('button', { name: 'Remove Assigned user' })
+    ).toBeInTheDocument();
+  });
 });
