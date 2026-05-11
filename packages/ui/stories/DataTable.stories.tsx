@@ -288,7 +288,7 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {};
 
-export const WithCheckbox: Story = {
+export const WithCheckboxSelection: Story = {
   args: {
     selectable: true,
   },

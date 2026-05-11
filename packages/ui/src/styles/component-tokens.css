@@ -117,6 +117,22 @@
   --figma-menu-list-p: 4px;
   --figma-menu-list-spacing: var(--figma-spacing-0-5);
 
+  /* nav vertical */
+  --figma-nav-bullet-light-color: #edeff2;
+  --figma-nav-bullet-line-width: 2px;
+  --figma-nav-bullet-size: 12px;
+  --figma-nav-bullet-offset: 10px;
+  --figma-nav-bullet-gutter: 22px;
+  --figma-nav-item-root-height: calc(
+    var(--figma-spacing-5) +
+    var(--figma-spacing-0-5)
+  );
+  --figma-nav-item-sub-height: calc(
+    var(--figma-spacing-4) +
+    var(--figma-spacing-0-5)
+  );
+  --figma-nav-width: calc(var(--figma-spacing-20) + var(--figma-spacing-15));
+
   /* slider */
   --figma-slider-marks-color: var(--figma-grey-48);
   --figma-slider-label-px: 6px;
@@ -379,6 +395,16 @@
   --menu-item-spacing-token: var(--figma-menu-item-spacing);
   --menu-list-p-token: var(--figma-menu-list-p);
   --menu-list-spacing-token: var(--figma-menu-list-spacing);
+
+  /* nav vertical bridge */
+  --nav-bullet-light-color-token: var(--figma-nav-bullet-light-color);
+  --nav-bullet-line-width-token: var(--figma-nav-bullet-line-width);
+  --nav-bullet-size-token: var(--figma-nav-bullet-size);
+  --nav-bullet-offset-token: var(--figma-nav-bullet-offset);
+  --nav-bullet-gutter-token: var(--figma-nav-bullet-gutter);
+  --nav-item-root-height-token: var(--figma-nav-item-root-height);
+  --nav-item-sub-height-token: var(--figma-nav-item-sub-height);
+  --nav-width-token: var(--figma-nav-width);
 
   /* slider bridge */
   --slider-marks-color-token: var(--figma-slider-marks-color);
@@ -692,6 +718,16 @@
   --menu-item-spacing: var(--menu-item-spacing-token);
   --menu-list-p: var(--menu-list-p-token);
   --menu-list-spacing: var(--menu-list-spacing-token);
+
+  /* nav vertical */
+  --nav-bullet-light-color: var(--nav-bullet-light-color-token);
+  --nav-bullet-line-width: var(--nav-bullet-line-width-token);
+  --nav-bullet-size: var(--nav-bullet-size-token);
+  --nav-bullet-offset: var(--nav-bullet-offset-token);
+  --nav-bullet-gutter: var(--nav-bullet-gutter-token);
+  --nav-item-root-height: var(--nav-item-root-height-token);
+  --nav-item-sub-height: var(--nav-item-sub-height-token);
+  --nav-width: var(--nav-width-token);
 
   /* slider */
   --slider-marks-color: var(--slider-marks-color-token);
