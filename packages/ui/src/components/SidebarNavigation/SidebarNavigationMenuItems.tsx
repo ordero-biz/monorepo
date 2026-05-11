@@ -257,7 +257,7 @@ export const SidebarNavigationMenuItems = ({
           disabled: Boolean(item.disabled),
         });
 
-        const accordionItem = (
+        return (
           <Accordion.Item
             className="group/item flex flex-col gap-[var(--space-0-5)]"
             data-slot="sidebar-navigation-menu-item"
@@ -303,8 +303,6 @@ export const SidebarNavigationMenuItems = ({
             </Accordion.Panel>
           </Accordion.Item>
         );
-
-        return accordionItem;
       })}
     </Accordion.Root>
   );
