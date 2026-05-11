@@ -46,7 +46,6 @@
   --figma-label-min-width: 24px;
 
   /* chip */
-  --figma-chip-spacing: -2px;
   --figma-chip-close-icon: 20px;
   --figma-chip-sm-radius: var(--figma-radius-1);
   --figma-chip-sm-px: 3px;
@@ -310,7 +309,6 @@
   --label-min-width-token: var(--figma-label-min-width);
 
   /* chip bridge */
-  --chip-spacing-token: var(--figma-chip-spacing);
   --chip-close-icon-token: var(--figma-chip-close-icon);
   --chip-sm-radius-token: var(--figma-chip-sm-radius);
   --chip-sm-px-token: var(--figma-chip-sm-px);
@@ -624,7 +622,6 @@
   --label-min-width: var(--label-min-width-token);
 
   /* chip */
-  --chip-spacing: var(--chip-spacing-token);
   --chip-close-icon: var(--chip-close-icon-token);
   --chip-sm-radius: var(--chip-sm-radius-token);
   --chip-sm-px: var(--chip-sm-px-token);

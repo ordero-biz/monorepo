@@ -6,7 +6,7 @@ import { cn } from '@/ui/lib/utils';
 import type { ChipProps } from './types';
 
 const chipVariants = cva(
-  'inline-flex shrink-0 items-center gap-[var(--chip-spacing)] border border-transparent',
+  'inline-flex shrink-0 items-center border border-transparent',
   {
     variants: {
       color: {
