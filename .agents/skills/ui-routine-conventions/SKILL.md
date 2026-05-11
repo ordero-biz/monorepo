@@ -130,6 +130,8 @@ Do not promote every component token into Tailwind utilities up front. Revisit p
 
 For shared UI work across `packages` and `apps`:
 
+- prefer semantic HTML elements over generic `div` and `span` wrappers when the content has clear structural meaning such as navigation, lists, sections, headers, footers, or other landmark/sectioning roles
+- use non-semantic wrappers only when semantic elements would be incorrect for the content or when a library primitive constrains the rendered element
 - prefer Base UI primitives/components whenever a matching primitive/component exists
 - prefer explicit component props for design-system components
 - do not expose `className` on shared `packages/ui` components
