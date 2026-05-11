@@ -9,8 +9,8 @@ import {
   accordionPanelContentClassName,
   sectionLabelClassName,
   sectionRootClassName,
-} from './sidebarNavigationStyles';
-import { toAccordionItemIds } from './sidebarNavigationUtils';
+} from './classNames';
+import { toAccordionItemIds } from './utils';
 import type { SidebarNavigationSectionProps } from './types';
 
 export const SidebarNavigationSection = forwardRef<

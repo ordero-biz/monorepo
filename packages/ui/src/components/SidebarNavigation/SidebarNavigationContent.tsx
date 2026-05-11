@@ -3,7 +3,7 @@
 import {
   contentClassName,
   navClassName,
-} from './sidebarNavigationStyles';
+} from './classNames';
 import type { SidebarNavigationContentProps } from './types';
 
 export const SidebarNavigationContent = ({

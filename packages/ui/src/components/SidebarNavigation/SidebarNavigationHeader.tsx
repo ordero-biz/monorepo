@@ -1,6 +1,6 @@
 'use client';
 
-import { headerClassName } from './sidebarNavigationStyles';
+import { headerClassName } from './classNames';
 import type { SidebarNavigationHeaderProps } from './types';
 
 export const SidebarNavigationHeader = ({

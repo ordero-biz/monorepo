@@ -1,6 +1,6 @@
 'use client';
 
-import { footerClassName } from './sidebarNavigationStyles';
+import { footerClassName } from './classNames';
 import type { SidebarNavigationFooterProps } from './types';
 
 export const SidebarNavigationFooter = ({

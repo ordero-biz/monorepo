@@ -1,8 +1,8 @@
 'use client';
 
 import { forwardRef } from 'react';
-import './sidebarNavigation.css';
-import { shellClassName } from './sidebarNavigationStyles';
+import './styles.css';
+import { shellClassName } from './classNames';
 import type { SidebarNavigationProps } from './types';
 
 export const SidebarNavigation = forwardRef<

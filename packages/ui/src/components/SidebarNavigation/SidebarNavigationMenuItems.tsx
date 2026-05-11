@@ -11,12 +11,12 @@ import {
   nestedItemClassName,
   nestedItemWrapperClassName,
   nestedListContainerClassName,
-} from './sidebarNavigationStyles';
+} from './classNames';
 import {
   getExpandedItemIds,
   isItemBranchActive,
   toAccordionItemIds,
-} from './sidebarNavigationUtils';
+} from './utils';
 import type {
   SidebarNavigationCollapseItem,
   SidebarNavigationItem,

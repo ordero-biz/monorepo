@@ -6,7 +6,7 @@ import { SidebarNavigationSectionContent } from './SidebarNavigationSectionConte
 import {
   getVisibleSections,
   shouldSectionBeExpanded,
-} from './sidebarNavigationUtils';
+} from './utils';
 import type { SidebarNavigationSectionsProps } from './types';
 
 export const SidebarNavigationSections = ({

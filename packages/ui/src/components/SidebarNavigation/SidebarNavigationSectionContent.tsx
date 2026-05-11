@@ -1,6 +1,6 @@
 'use client';
 
-import { sectionContentClassName } from './sidebarNavigationStyles';
+import { sectionContentClassName } from './classNames';
 import type { SidebarNavigationSectionContentProps } from './types';
 
 export const SidebarNavigationSectionContent = ({

@@ -1,7 +1,7 @@
 'use client';
 
 import { SidebarNavigationMenuItems } from './SidebarNavigationMenuItems';
-import { getVisibleItems } from './sidebarNavigationUtils';
+import { getVisibleItems } from './utils';
 import type { SidebarNavigationMenuProps } from './types';
 
 export const SidebarNavigationMenu = ({
