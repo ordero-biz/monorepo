@@ -185,7 +185,7 @@ const labelContainerVariants = cva(
   }
 );
 
-const labelSizeClassNames = {
+const startIconSizeClassNames = {
   m: 'size-[var(--chip-md-icon)]',
   s: 'size-[var(--chip-sm-icon)]',
 } as const;
@@ -229,8 +229,7 @@ export const Chip = ({
 }: ChipProps) => {
   const rootClassName = cn(chipVariants({ color, disabled, size, variant }));
   const labelClassName = cn(labelContainerVariants({ size }));
-  const labelClassNames =
-    startIcon || onDelete ? labelSizeClassNames.s : labelSizeClassNames[size];
+  const startIconClassName = startIcon && startIconSizeClassNames[size];
   const closeIconClassName = closeIconSizeClassNames[size];
 
   const deleteAriaLabel = ariaLabel ? `Remove ${ariaLabel}` : 'Remove chip';
@@ -242,7 +241,7 @@ export const Chip = ({
           aria-hidden="true"
           className={cn(
             'inline-flex shrink-0 items-center justify-center',
-            labelClassNames
+            startIconClassName
           )}
         >
           {startIcon}
