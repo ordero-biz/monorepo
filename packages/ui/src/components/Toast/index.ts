@@ -6,6 +6,7 @@ export type {
   ToastData,
   ToastLayout,
   ToastManagerValue,
+  ToastPromiseOptions,
   ToastProps,
   ToastProviderProps,
   ToastSwipeDirection,

@@ -109,6 +109,7 @@ export type {
   ToastLayout,
   ToastManagerValue,
   ToastProps,
+  ToastPromiseOptions,
   ToastProviderProps,
   ToastSwipeDirection,
   ToastUpdateOptions,
