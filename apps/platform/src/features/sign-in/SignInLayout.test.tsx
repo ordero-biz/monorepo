@@ -17,7 +17,7 @@ describe('SignInFormLayout', () => {
     expect(
       screen.getByRole('textbox', { name: 'Email address' })
     ).toBeVisible();
-    expect(screen.getByLabelText('Password')).toBeVisible();
+    expect(screen.getByLabelText(/Password/)).toBeVisible();
     expect(screen.getByRole('button', { name: 'Sign in' })).toBeVisible();
   });
 });

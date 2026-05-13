@@ -107,3 +107,17 @@
     font-family: var(--font-family-primary);
   }
 }
+
+@keyframes toast-deduplicated {
+  0% {
+    transform: scale(0.98);
+  }
+
+  60% {
+    transform: scale(1.01);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
