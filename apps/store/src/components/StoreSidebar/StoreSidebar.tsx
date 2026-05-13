@@ -41,7 +41,6 @@ const sidebarSections: SidebarNavigationSectionConfig[] = [
             kind: 'link',
             label: 'Product',
             href: '/products',
-            active: true,
           },
           {
             id: 'product-categories',
@@ -62,88 +61,6 @@ const sidebarSections: SidebarNavigationSectionConfig[] = [
             href: '/products/warehouse',
           },
         ],
-      },
-      {
-        id: 'supplier',
-        kind: 'collapse',
-        label: 'Supplier',
-        icon: <Warehouse />,
-        items: [
-          {
-            id: 'supplier-supply',
-            kind: 'link',
-            label: 'Supply',
-            href: '/suppliers/supply',
-          },
-          {
-            id: 'supplier-warehouse',
-            kind: 'link',
-            label: 'Warehouse',
-            href: '/suppliers/warehouse',
-          },
-        ],
-      },
-      {
-        id: 'orders',
-        kind: 'link',
-        label: 'Order',
-        href: '/orders',
-        icon: <ShoppingCart />,
-      },
-      {
-        id: 'finance',
-        kind: 'link',
-        label: 'Finance',
-        href: '/finance',
-        icon: <ChartColumn />,
-      },
-    ],
-  },
-  {
-    id: 'management',
-    label: 'Management',
-    collapsible: true,
-    items: [
-      {
-        id: 'management-home',
-        kind: 'action',
-        label: 'Management',
-        icon: <Users />,
-        onSelect: () => undefined,
-      },
-      {
-        id: 'customers',
-        kind: 'link',
-        label: 'Customers',
-        href: '/customers',
-        icon: <Users />,
-      },
-      {
-        id: 'settings',
-        kind: 'link',
-        label: 'Settings',
-        href: '/settings',
-        icon: <Settings />,
-      },
-      {
-        id: 'messages',
-        kind: 'link',
-        label: 'Messages',
-        href: '/messages',
-        icon: <MessageSquareText />,
-        badge: (
-          <span className="inline-flex min-w-[24px] items-center justify-center rounded-[var(--radius-0-75-token)] bg-[var(--color-error-8)] px-[var(--space-0-75)] text-[length:var(--label-size-desktop)] leading-[var(--label-line-height-desktop)] font-[var(--label-weight)] text-[var(--error-darker)]">
-            32+
-          </span>
-        ),
-      },
-      {
-        id: 'reports',
-        kind: 'link',
-        label: 'Report',
-        href: 'https://example.com/reports',
-        external: true,
-        icon: <FileText />,
       },
     ],
   },
