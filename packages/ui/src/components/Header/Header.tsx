@@ -10,7 +10,7 @@ type HeaderCompoundComponent = ((props: HeaderProps) => ReactElement) & {
 
 const HeaderRoot = ({ children, id }: HeaderProps) => (
   <header
-    className="flex h-[var(--space-8)] items-center justify-between border-b border-border bg-background px-[var(--space-3)]"
+    className="flex h-[var(--space-9)] items-center justify-between border-b border-border bg-background px-[var(--space-3)]"
     data-slot="header"
     id={id}
   >
