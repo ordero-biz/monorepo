@@ -5,6 +5,7 @@ import { CircleAlert, CircleCheck, Info, TriangleAlert, X } from 'lucide-react';
 import type { CSSProperties, ElementType } from 'react';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { cn } from '@/ui/lib/utils';
+import './styles.css';
 import {
   closeButtonClassName,
   closeButtonInnerClassName,

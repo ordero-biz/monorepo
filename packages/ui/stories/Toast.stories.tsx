@@ -15,6 +15,8 @@ const regularVariants = [
 
 const layouts = ['stack', 'list'] satisfies readonly ToastLayout[];
 
+const TOAST_TIMEOUT = 5000;
+
 const meta = {
   title: 'Components/Toast',
   component: Toast,
@@ -74,7 +76,12 @@ export const Layouts: Story = {
     <ToastStoryLayout>
       <div className='flex flex-wrap gap-6'>
         {layouts.map((layout) => (
-          <Toast key={layout} {...args} layout={layout}>
+          <Toast
+            key={layout}
+            {...args}
+            layout={layout}
+            viewportLabel={`${args.viewportLabel ?? 'Storybook notifications'} ${layout}`}
+          >
             <div className='flex flex-col gap-3'>
               <span className='text-[length:var(--subtitle2-size-desktop)] font-[var(--subtitle2-weight)] capitalize text-[var(--text-primary)]'>
                 {layout}
@@ -105,9 +112,21 @@ export const Deduplicated: Story = {
   ),
 };
 
+export const WithoutAutoclose: Story = {
+  render: (args) => (
+    <ToastStoryLayout>
+      <Toast {...args}>
+        <ToastStoryButton autoclose={false} type="info" />
+      </Toast>
+    </ToastStoryLayout>
+  ),
+};
+
 const ToastStoryButton = ({
+  autoclose = true,
   type,
 }: {
+  autoclose?: boolean;
   type: ToastVariant;
 }) => {
   const { add } = useToastManager();
@@ -118,7 +137,7 @@ const ToastStoryButton = ({
       onClick={() => {
         add({
           description: getToastCopy(type),
-          timeout: 0,
+          timeout: autoclose ? TOAST_TIMEOUT : 0,
           type,
         });
       }}
@@ -142,7 +161,7 @@ const DeduplicatedToastButton = () => {
         add({
           description: `Sync notification updated ${countRef.current} times`,
           id: 'storybook-deduplicated-toast',
-          timeout: 0,
+          timeout: TOAST_TIMEOUT,
           type: countRef.current % 2 === 0 ? 'success' : 'info',
         });
       }}
