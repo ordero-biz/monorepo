@@ -1,6 +1,9 @@
+import { Header } from '@ordero/ui';
 import type { Metadata } from 'next';
 import { Barlow, Public_Sans } from 'next/font/google';
 import type { ReactNode } from 'react';
+import { LayoutBox } from '@/components/LayoutBox';
+import { StoreSidebar } from '@/components/StoreSidebar';
 import './globals.css';
 
 const publicSans = Public_Sans({
@@ -30,7 +33,21 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${publicSans.variable} ${barlow.variable} antialiased`}>
-        {children}
+        <div className="min-h-screen bg-background text-foreground">
+          <div className="mx-auto min-h-screen w-full flex">
+            <StoreSidebar />
+            <main className="flex flex-col w-full">
+              <Header id="store-page-header">
+                <Header.Left>
+                  <h1 className="text-lg font-semibold tracking-tight">
+                    Store
+                  </h1>
+                </Header.Left>
+              </Header>
+              <LayoutBox>{children}</LayoutBox>
+            </main>
+          </div>
+        </div>
       </body>
     </html>
   );

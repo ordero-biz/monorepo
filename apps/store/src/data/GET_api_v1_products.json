@@ -1,0 +1,139 @@
+{
+  "content": [
+    {
+      "id": 1,
+      "name": "Wireless Headphones",
+      "description": "High-quality wireless headphones with noise cancellation",
+      "createdAt": "2025-01-15T10:30:00Z",
+      "category": {
+        "id": 1,
+        "name": "Electronics",
+        "createdAt": "2025-01-01T08:00:00Z"
+      }
+    },
+    {
+      "id": 2,
+      "name": "USB-C Cable",
+      "description": "Fast charging USB-C cable for all devices",
+      "createdAt": "2025-01-16T14:20:00Z",
+      "category": {
+        "id": 1,
+        "name": "Electronics",
+        "createdAt": "2025-01-01T08:00:00Z"
+      }
+    },
+    {
+      "id": 3,
+      "name": "Smartphone Stand",
+      "description": "Adjustable universal smartphone stand",
+      "createdAt": "2025-01-17T11:45:00Z",
+      "category": {
+        "id": 2,
+        "name": "Accessories",
+        "createdAt": "2025-01-01T08:15:00Z"
+      }
+    },
+    {
+      "id": 4,
+      "name": "Wireless Mouse",
+      "description": "Ergonomic wireless mouse with precision tracking",
+      "createdAt": "2025-01-18T09:15:00Z",
+      "category": {
+        "id": 1,
+        "name": "Electronics",
+        "createdAt": "2025-01-01T08:00:00Z"
+      }
+    },
+    {
+      "id": 5,
+      "name": "Laptop Stand",
+      "description": "Adjustable laptop cooling stand",
+      "createdAt": "2025-01-19T15:30:00Z",
+      "category": {
+        "id": 2,
+        "name": "Accessories",
+        "createdAt": "2025-01-01T08:15:00Z"
+      }
+    },
+    {
+      "id": 6,
+      "name": "Mechanical Keyboard",
+      "description": "RGB mechanical gaming keyboard",
+      "createdAt": "2025-01-20T12:00:00Z",
+      "category": {
+        "id": 1,
+        "name": "Electronics",
+        "createdAt": "2025-01-01T08:00:00Z"
+      }
+    },
+    {
+      "id": 7,
+      "name": "USB Hub",
+      "description": "7-port USB 3.0 hub with fast charging",
+      "createdAt": "2025-01-21T10:45:00Z",
+      "category": {
+        "id": 2,
+        "name": "Accessories",
+        "createdAt": "2025-01-01T08:15:00Z"
+      }
+    },
+    {
+      "id": 8,
+      "name": "Webcam",
+      "description": "Full HD 1080p webcam with auto-focus",
+      "createdAt": "2025-01-22T14:20:00Z",
+      "category": {
+        "id": 1,
+        "name": "Electronics",
+        "createdAt": "2025-01-01T08:00:00Z"
+      }
+    },
+    {
+      "id": 9,
+      "name": "Monitor",
+      "description": "IPS LED monitor with vibrant colors",
+      "createdAt": "2025-01-23T09:30:00Z",
+      "category": {
+        "id": 1,
+        "name": "Electronics",
+        "createdAt": "2025-01-01T08:00:00Z"
+      }
+    },
+    {
+      "id": 10,
+      "name": "External SSD",
+      "description": "Portable solid state drive with fast transfer speeds",
+      "createdAt": "2025-01-24T13:15:00Z",
+      "category": {
+        "id": 1,
+        "name": "Electronics",
+        "createdAt": "2025-01-01T08:00:00Z"
+      }
+    }
+  ],
+  "pageable": {
+    "pageNumber": 0,
+    "pageSize": 10,
+    "sort": {
+      "empty": false,
+      "sorted": true,
+      "unsorted": false
+    },
+    "offset": 0,
+    "paged": true,
+    "unpaged": false
+  },
+  "totalPages": 1,
+  "totalElements": 10,
+  "last": true,
+  "size": 10,
+  "number": 0,
+  "sort": {
+    "empty": false,
+    "sorted": true,
+    "unsorted": false
+  },
+  "first": true,
+  "numberOfElements": 10,
+  "empty": false
+}

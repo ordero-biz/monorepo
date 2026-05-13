@@ -1,0 +1,89 @@
+{
+  "content": [
+    {
+      "id": 1,
+      "name": "Color",
+      "sortOrder": 1,
+      "createdAt": "2025-01-01T09:00:00Z"
+    },
+    {
+      "id": 2,
+      "name": "Battery Life",
+      "sortOrder": 2,
+      "createdAt": "2025-01-01T09:00:00Z"
+    },
+    {
+      "id": 3,
+      "name": "Length",
+      "sortOrder": 3,
+      "createdAt": "2025-01-01T09:00:00Z"
+    },
+    {
+      "id": 4,
+      "name": "Material",
+      "sortOrder": 4,
+      "createdAt": "2025-01-01T09:00:00Z"
+    },
+    {
+      "id": 5,
+      "name": "Connection Type",
+      "sortOrder": 5,
+      "createdAt": "2025-01-01T09:00:00Z"
+    },
+    {
+      "id": 6,
+      "name": "Screen Size",
+      "sortOrder": 6,
+      "createdAt": "2025-01-01T09:00:00Z"
+    },
+    {
+      "id": 7,
+      "name": "Switch Type",
+      "sortOrder": 7,
+      "createdAt": "2025-01-01T09:00:00Z"
+    },
+    {
+      "id": 8,
+      "name": "USB Version",
+      "sortOrder": 8,
+      "createdAt": "2025-01-01T09:00:00Z"
+    },
+    {
+      "id": 9,
+      "name": "Port Count",
+      "sortOrder": 9,
+      "createdAt": "2025-01-01T09:00:00Z"
+    },
+    {
+      "id": 10,
+      "name": "Resolution",
+      "sortOrder": 10,
+      "createdAt": "2025-01-01T09:00:00Z"
+    }
+  ],
+  "pageable": {
+    "pageNumber": 0,
+    "pageSize": 10,
+    "sort": {
+      "empty": false,
+      "sorted": true,
+      "unsorted": false
+    },
+    "offset": 0,
+    "paged": true,
+    "unpaged": false
+  },
+  "totalPages": 2,
+  "totalElements": 13,
+  "last": false,
+  "size": 10,
+  "number": 0,
+  "sort": {
+    "empty": false,
+    "sorted": true,
+    "unsorted": false
+  },
+  "first": true,
+  "numberOfElements": 10,
+  "empty": false
+}

@@ -280,6 +280,13 @@
   --figma-form-helper-text-icon: 16px;
   --figma-form-helper-text-spacing: var(--figma-spacing-0-5);
 
+  /* breakpoints */
+  --figma-breakpoint-xs: 0px;
+  --figma-breakpoint-sm: 600px;
+  --figma-breakpoint-md: 900px;
+  --figma-breakpoint-lg: 1200px;
+  --figma-breakpoint-xl: 1536px;
+
   /* fab bridge */
   --fab-icon-token: var(--figma-fab-icon);
   --fab-radius-token: var(--figma-fab-radius);
@@ -598,6 +605,13 @@
   --form-helper-text-pt-token: var(--figma-form-helper-text-pt);
   --form-helper-text-icon-token: var(--figma-form-helper-text-icon);
   --form-helper-text-spacing-token: var(--figma-form-helper-text-spacing);
+
+  /* breakpoints bridge */
+  --breakpoint-xs-token: var(--figma-breakpoint-xs);
+  --breakpoint-sm-token: var(--figma-breakpoint-sm);
+  --breakpoint-md-token: var(--figma-breakpoint-md);
+  --breakpoint-lg-token: var(--figma-breakpoint-lg);
+  --breakpoint-xl-token: var(--figma-breakpoint-xl);
 }
 
 @theme inline {
