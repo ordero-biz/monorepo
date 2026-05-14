@@ -1,4 +1,4 @@
-import { Header } from '@ordero/ui';
+import { TopBar } from '@ordero/ui';
 import type { Metadata } from 'next';
 import { Barlow, Public_Sans } from 'next/font/google';
 import type { ReactNode } from 'react';
@@ -37,13 +37,13 @@ export default function RootLayout({
           <div className="mx-auto min-h-screen w-full flex">
             <StoreSidebar />
             <main className="flex flex-col w-full">
-              <Header id="store-page-header">
-                <Header.Left>
+              <TopBar id="store-page-header">
+                <TopBar.Left>
                   <h1 className="text-lg font-semibold tracking-tight">
                     Store
                   </h1>
-                </Header.Left>
-              </Header>
+                </TopBar.Left>
+              </TopBar>
               <LayoutBox>{children}</LayoutBox>
             </main>
           </div>
