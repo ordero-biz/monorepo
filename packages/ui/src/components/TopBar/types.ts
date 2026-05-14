@@ -1,14 +1,14 @@
 import type { ReactNode } from 'react';
 
-export type HeaderLeftProps = {
+export type TopBarLeftProps = {
   children?: ReactNode;
 };
 
-export type HeaderRightProps = {
+export type TopBarRightProps = {
   children?: ReactNode;
 };
 
-export type HeaderProps = {
+export type TopBarProps = {
   children?: ReactNode;
   id?: string;
 };
