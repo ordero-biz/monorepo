@@ -8,7 +8,7 @@ export const viewportStackClassName = viewportBaseClassName;
 export const viewportListClassName = cn(viewportBaseClassName, 'flex flex-col');
 
 export const stackRootClassName = cn(
-  'pointer-events-auto absolute right-0 bottom-0 left-auto w-full cursor-default select-none overflow-hidden rounded-[var(--snackbar-radius)] outline-none shadow-[var(--z8-x)_var(--z8-y)_var(--z8-blur)_var(--z8-spread)_var(--color-shadow-16)] [--toast-gap:var(--space-1-5)] [--toast-peek:var(--toast-gap)] [--toast-scale:calc(max(0,_1_-_(var(--toast-index)_*_0.1)))] [--toast-shrink:calc(1_-_var(--toast-scale))] [--toast-stack-height:var(--toast-frontmost-height,var(--toast-height))] [--toast-offset-y-expanded:calc((var(--toast-offset-y,0px)_*_-1)_+_(var(--toast-index)_*_var(--toast-gap)_*_-1)_+_var(--toast-swipe-movement-y,0px))] [transform-origin:center_bottom] [will-change:transform,opacity,height] focus-visible:ring-3 focus-visible:ring-ring/50',
+  'pointer-events-auto absolute right-0 bottom-0 left-auto w-full cursor-default select-none overflow-visible rounded-[var(--snackbar-radius)] outline-none shadow-[var(--z8-x)_var(--z8-y)_var(--z8-blur)_var(--z8-spread)_var(--color-shadow-16)] [--toast-gap:var(--space-1-5)] [--toast-peek:var(--toast-gap)] [--toast-scale:calc(max(0,_1_-_(var(--toast-index)_*_0.1)))] [--toast-shrink:calc(1_-_var(--toast-scale))] [--toast-stack-height:var(--toast-frontmost-height,var(--toast-height))] [--toast-offset-y-expanded:calc((var(--toast-offset-y,0px)_*_-1)_+_(var(--toast-index)_*_var(--toast-gap)_*_-1)_+_var(--toast-swipe-movement-y,0px))] [transform-origin:center_bottom] [will-change:transform,opacity,height] focus-visible:ring-3 focus-visible:ring-ring/50',
   'z-[calc(1000-var(--toast-index))]',
   'h-[var(--toast-stack-height)]',
   '[transition:transform_320ms_cubic-bezier(0.22,1,0.36,1),opacity_220ms_ease-out,height_320ms_cubic-bezier(0.22,1,0.36,1)]',
@@ -22,7 +22,7 @@ export const stackRootClassName = cn(
   'data-[ending-style]:data-[swipe-direction=left]:[transform:translateX(calc(var(--toast-swipe-movement-x,0px)_-_150%))_translateY(var(--toast-offset-y-expanded))]',
   'data-[ending-style]:data-[swipe-direction=up]:[transform:translateY(calc(var(--toast-swipe-movement-y,0px)_-_150%))]',
   'data-[ending-style]:data-[swipe-direction=down]:[transform:translateY(calc(var(--toast-swipe-movement-y,0px)_+_150%))]',
-  "after:absolute after:top-full after:left-0 after:h-[calc(var(--toast-gap)_+_1px)] after:w-full after:content-['']"
+  'before:absolute before:right-0 before:bottom-full before:left-0 before:h-[calc(var(--toast-gap)_+_1px)] before:w-full before:content-[""]'
 );
 
 export const listRootClassName = cn(
