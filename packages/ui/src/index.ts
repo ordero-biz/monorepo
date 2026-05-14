@@ -35,6 +35,21 @@ export {
   DataTableSelectionColumnHeader,
 } from './components/DataTable';
 export type {
+  DialogBackdropProps,
+  DialogCloseProps,
+  DialogContentProps,
+  DialogDescriptionProps,
+  DialogFooterProps,
+  DialogHeaderProps,
+  DialogPopupProps,
+  DialogPortalProps,
+  DialogRootProps,
+  DialogTitleProps,
+  DialogTriggerProps,
+  DialogViewportProps,
+} from './components/Dialog';
+export { Dialog } from './components/Dialog';
+export type {
   ChipColor,
   ChipProps,
   ChipSize,
