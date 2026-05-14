@@ -42,11 +42,11 @@ export type {
 } from './components/Chip';
 export { Chip, chipVariants } from './components/Chip';
 export type {
-  HeaderLeftProps,
-  HeaderProps,
-  HeaderRightProps,
-} from './components/Header';
-export { Header, HeaderLeft, HeaderRight } from './components/Header';
+  TopBarLeftProps,
+  TopBarProps,
+  TopBarRightProps,
+} from './components/TopBar';
+export { TopBar, TopBarLeft, TopBarRight } from './components/TopBar';
 export type {
   IconButtonColor,
   IconButtonProps,

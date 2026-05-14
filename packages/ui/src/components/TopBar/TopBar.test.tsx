@@ -1,12 +1,12 @@
 import { prepareSetup } from '@ordero/test-config/react';
 import { screen } from '@testing-library/react';
 import { Bell, Search } from 'lucide-react';
-import { Header } from './Header';
-import type { HeaderProps } from './types';
+import { TopBar } from './TopBar';
+import type { TopBarProps } from './types';
 
-describe('Header', () => {
-  const { setup } = prepareSetup<HeaderProps>({
-    component: Header,
+describe('TopBar', () => {
+  const { setup } = prepareSetup<TopBarProps>({
+    component: TopBar,
     props: {},
   });
 
@@ -33,20 +33,20 @@ describe('Header', () => {
     ).not.toBeInTheDocument();
   });
 
-  it('supports compound composition with Header.Left and Header.Right', () => {
+  it('supports compound composition with TopBar.Left and TopBar.Right', () => {
     setup({
       children: (
         <>
-          <Header.Left>
+          <TopBar.Left>
             <button aria-label="Search" type="button">
               <Search aria-hidden="true" />
             </button>
-          </Header.Left>
-          <Header.Right>
+          </TopBar.Left>
+          <TopBar.Right>
             <button aria-label="Notifications" type="button">
               <Bell aria-hidden="true" />
             </button>
-          </Header.Right>
+          </TopBar.Right>
         </>
       ),
     });
