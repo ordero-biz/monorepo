@@ -61,10 +61,25 @@ type ToastLayoutRect = {
   top: number;
 };
 
-type RenderedToast = {
-  toast: UseToastManagerReturnValue<ToastData>['toasts'][number];
-  updateKey: number;
-};
+type ManagedToast = UseToastManagerReturnValue<ToastData>['toasts'][number];
+
+const getToastUpdateKey = (toast: ManagedToast) =>
+  'updateKey' in toast && typeof toast.updateKey === 'number'
+    ? toast.updateKey
+    : 0;
+
+const getUniqueToasts = (toasts: ManagedToast[]) =>
+  Array.from(
+    toasts
+      .reduce<Map<string, ManagedToast>>((uniqueToasts, toast) => {
+        if (!uniqueToasts.has(toast.id)) {
+          uniqueToasts.set(toast.id, toast);
+        }
+
+        return uniqueToasts;
+      }, new Map())
+      .values()
+  );
 
 export const ToastList = ({
   layout = 'stack',
@@ -242,38 +257,8 @@ export const ToastList = ({
     });
   }, [toasts]);
 
-  const candidateToasts =
-    layout === 'list'
-      ? toasts
-      : toasts.filter(
-          (toast) => !toast.limited || toast.transitionStatus === 'ending'
-        );
-
-  const renderedToasts = Array.from(
-    candidateToasts
-      .reduce<Map<string, RenderedToast>>((next, toast) => {
-        const existingToast = next.get(toast.id);
-
-        if (!existingToast) {
-          next.set(toast.id, {
-            toast,
-            updateKey: 0,
-          });
-
-          return next;
-        }
-
-        next.set(toast.id, {
-          ...existingToast,
-          updateKey: existingToast.updateKey + 1,
-        });
-
-        return next;
-      }, new Map())
-      .values()
-  );
-
-  return renderedToasts.map(({ toast, updateKey }) => {
+  return getUniqueToasts(toasts).map((toast) => {
+    const updateKey = getToastUpdateKey(toast);
     const variant = getToastVariant(toast.type);
     const hasTitle = Boolean(toast.title);
     const hasDescription = Boolean(toast.description);

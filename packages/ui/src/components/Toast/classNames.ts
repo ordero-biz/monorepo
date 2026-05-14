@@ -13,6 +13,7 @@ export const stackRootClassName = cn(
   'h-[var(--toast-stack-height)]',
   '[transition:transform_320ms_cubic-bezier(0.22,1,0.36,1),opacity_220ms_ease-out,height_320ms_cubic-bezier(0.22,1,0.36,1)]',
   '[transform:translateX(var(--toast-swipe-movement-x,0px))_translateY(calc(var(--toast-swipe-movement-y,0px)_-_(var(--toast-index)_*_var(--toast-peek))_-_(var(--toast-shrink)_*_var(--toast-stack-height))))_scale(var(--toast-scale))]',
+  'data-[limited]:pointer-events-none data-[limited]:opacity-0',
   'data-[expanded]:h-[var(--toast-height)] data-[expanded]:[transform:translateX(var(--toast-swipe-movement-x,0px))_translateY(var(--toast-offset-y-expanded))]',
   'data-[starting-style]:opacity-0 data-[starting-style]:[transform:translateY(calc(100%_+_var(--space-2)))_scale(0.96)]',
   'data-[ending-style]:opacity-0 [&[data-ending-style]:not([data-swipe-direction])]:[transform:translateY(150%)]',

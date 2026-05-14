@@ -308,10 +308,10 @@ describe('Toast', () => {
     });
 
     expect(screen.getByText('Second toast')).toBeInTheDocument();
-    expect(screen.queryByText('First toast')).not.toBeInTheDocument();
+    expect(getToastByText('First toast')).toHaveAttribute('inert');
   });
 
-  it('removes overflowed stack toasts after repeated additions', async () => {
+  it('limits visible stack toasts after repeated additions', async () => {
     let toastCount = 0;
     const { trigger, user } = setupToast({
       label: 'Create sequential toast',
@@ -342,8 +342,8 @@ describe('Toast', () => {
     expect(screen.getByText('Toast 3')).toBeInTheDocument();
     expect(screen.getByText('Toast 4')).toBeInTheDocument();
     expect(screen.getByText('Toast 5')).toBeInTheDocument();
-    expect(screen.queryByText('Toast 1')).not.toBeInTheDocument();
-    expect(screen.queryByText('Toast 2')).not.toBeInTheDocument();
+    expect(getToastByText('Toast 1')).toHaveAttribute('inert');
+    expect(getToastByText('Toast 2')).toHaveAttribute('inert');
   });
 
   it('reveals the next hidden toast when a visible toast is dismissed', async () => {
