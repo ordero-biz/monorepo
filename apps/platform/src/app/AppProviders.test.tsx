@@ -1,6 +1,6 @@
 import { type QueryClient, useQueryClient } from '@tanstack/react-query';
 import { render } from '@testing-library/react';
-import { Providers } from './providers';
+import { AppProviders } from './AppProviders';
 
 const clients: QueryClient[] = [];
 
@@ -10,22 +10,22 @@ const QueryClientProbe = () => {
   return null;
 };
 
-describe('Providers', () => {
+describe('AppProviders', () => {
   beforeEach(() => {
     clients.length = 0;
   });
 
   it('renders children without recreating the browser query client', () => {
     const { rerender } = render(
-      <Providers>
+      <AppProviders>
         <QueryClientProbe />
-      </Providers>
+      </AppProviders>
     );
 
     rerender(
-      <Providers>
+      <AppProviders>
         <QueryClientProbe />
-      </Providers>
+      </AppProviders>
     );
 
     expect(clients).toHaveLength(2);
