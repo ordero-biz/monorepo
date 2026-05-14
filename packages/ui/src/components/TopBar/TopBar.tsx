@@ -10,7 +10,7 @@ type TopBarCompoundComponent = ((props: TopBarProps) => ReactElement) & {
 
 const TopBarRoot = ({ children, id }: TopBarProps) => (
   <header
-    className="flex h-[var(--space-9)] min-w-0 items-center gap-[var(--space-2)] border-b border-border bg-background px-[var(--space-3)]"
+    className="sticky top-0 z-10 flex h-[var(--space-9)] min-w-0 items-center gap-[var(--space-2)] border-b border-border bg-background px-[var(--space-3)]"
     data-slot="top-bar"
     id={id}
   >
