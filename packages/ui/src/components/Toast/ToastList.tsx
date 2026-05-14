@@ -58,6 +58,11 @@ type ToastLayoutRect = {
   top: number;
 };
 
+const getToastUpdateKey = (toast: object) =>
+  'updateKey' in toast && typeof toast.updateKey === 'number'
+    ? toast.updateKey
+    : 0;
+
 export const ToastList = ({
   layout = 'stack',
   swipeDirection,
@@ -234,12 +239,24 @@ export const ToastList = ({
     });
   }, [toasts]);
 
-  const renderedToasts =
+  const candidateToasts =
     layout === 'list'
       ? toasts
       : toasts.filter(
           (toast) => !toast.limited || toast.transitionStatus === 'ending'
         );
+
+  const renderedToasts = Array.from(
+    candidateToasts
+      .reduce<Map<string, (typeof candidateToasts)[number]>>((next, toast) => {
+        if (!next.has(toast.id)) {
+          next.set(toast.id, toast);
+        }
+
+        return next;
+      }, new Map())
+      .values()
+  );
 
   return renderedToasts.map((toast) => {
     const variant = getToastVariant(toast.type);
@@ -256,7 +273,7 @@ export const ToastList = ({
             '--toast-height': `${rememberedHeight}px`,
           } as CSSProperties)
         : undefined;
-    const updateKey = toast.updateKey ?? 0;
+    const updateKey = getToastUpdateKey(toast);
     const isDeduplicated = updateKey > 0;
     const VariantIcon = variant === 'default' ? null : variantIcons[variant];
     const icon =

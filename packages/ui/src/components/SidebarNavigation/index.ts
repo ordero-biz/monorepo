@@ -1,6 +1,4 @@
-export {
-  SidebarNavigation,
-} from './SidebarNavigation';
+export { SidebarNavigation } from './SidebarNavigation';
 export { SidebarNavigationContent } from './SidebarNavigationContent';
 export { SidebarNavigationFooter } from './SidebarNavigationFooter';
 export { SidebarNavigationHeader } from './SidebarNavigationHeader';

@@ -1,22 +1,19 @@
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { prepareSetup } from '@ordero/test-config/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Bell } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { Toast, ToastProvider, ToastViewport, useToastManager } from './index';
-import type { ToastLayout, ToastManagerValue } from './types';
-
-type SetupToastArgs = {
-  children?: ReactNode;
-  layout?: ToastLayout;
-  limit?: number;
-};
+import type { ToastLayout, ToastManagerValue, ToastProps } from './types';
 
 type ToastTriggerProps = {
   children: ReactNode;
   onTrigger: (add: ToastManagerValue['add']) => void;
 };
 
-type SetupToastTriggerArgs = Omit<SetupToastArgs, 'children'> & {
+type SetupToastArgs = {
+  layout?: ToastLayout;
+  limit?: number;
   label: string;
   onTrigger: ToastTriggerProps['onTrigger'];
 };
@@ -36,41 +33,94 @@ const ToastTrigger = ({ children, onTrigger }: ToastTriggerProps) => {
   );
 };
 
-const setupToast = ({
-  children,
-  layout = 'stack',
-  limit = 3,
-}: SetupToastArgs = {}) => {
-  const user = userEvent.setup();
-
-  render(
-    <Toast
-      layout={layout}
-      limit={limit}
-      timeout={0}
-      viewportLabel="Application notifications"
-    >
-      {children}
-    </Toast>
-  );
-
-  return {
-    user,
-  };
+type AppLevelToastFixtureProps = {
+  description: string;
+  label: string;
 };
 
-const setupToastTrigger = ({
+const AppLevelToastFixture = ({
+  description,
+  label,
+}: AppLevelToastFixtureProps) => (
+  <ToastProvider timeout={0}>
+    <ToastTrigger
+      onTrigger={(add) => {
+        add({
+          description,
+          timeout: 0,
+          type: 'info',
+        });
+      }}
+    >
+      {label}
+    </ToastTrigger>
+    <ToastViewport viewportLabel="Application notifications" />
+  </ToastProvider>
+);
+
+const { setup: setupAppLevelToastFixture } =
+  prepareSetup<AppLevelToastFixtureProps>({
+    component: AppLevelToastFixture,
+    props: {
+      description: 'Created from hook',
+      label: 'Create app-level toast',
+    },
+  });
+
+type ToastTestShellProps = ToastProps & {
+  label: string;
+  onTrigger: ToastTriggerProps['onTrigger'];
+};
+
+const ToastTestShell = ({
+  onTrigger,
+  label,
+  layout,
+  limit,
+  swipeDirection,
+  timeout,
+  viewportLabel,
+}: ToastTestShellProps) => (
+  <Toast
+    layout={layout}
+    limit={limit}
+    swipeDirection={swipeDirection}
+    timeout={timeout}
+    viewportLabel={viewportLabel}
+  >
+    <ToastTrigger onTrigger={onTrigger}>{label}</ToastTrigger>
+  </Toast>
+);
+
+const { setup } = prepareSetup<ToastTestShellProps>({
+  component: ToastTestShell,
+  props: {
+    layout: 'stack',
+    limit: 3,
+    timeout: 0,
+    viewportLabel: 'Application notifications',
+    label: 'Test',
+    onTrigger: vi.fn(),
+  },
+});
+
+const setupToast = ({
+  layout = 'stack',
+  limit = 3,
   label,
   onTrigger,
-  ...setupArgs
-}: SetupToastTriggerArgs) => {
-  const result = setupToast({
-    ...setupArgs,
-    children: <ToastTrigger onTrigger={onTrigger}>{label}</ToastTrigger>,
+}: SetupToastArgs) => {
+  const user = userEvent.setup();
+
+  setup({
+    layout,
+    limit,
+    label,
+    onTrigger,
   });
 
   return {
-    ...result,
+    user,
     trigger: screen.getByRole('button', { name: label }),
   };
 };
@@ -88,7 +138,7 @@ const getToastByText = (text: string) => {
 
 describe('Toast', () => {
   it('renders a default toast from the shared toast hook', async () => {
-    const { trigger, user } = setupToastTrigger({
+    const { trigger, user } = setupToast({
       label: 'Create default toast',
       onTrigger: (add) => {
         add({
@@ -108,7 +158,7 @@ describe('Toast', () => {
   });
 
   it('renders regular toasts with notification content', async () => {
-    const { trigger, user } = setupToastTrigger({
+    const { trigger, user } = setupToast({
       label: 'Create info toast',
       onTrigger: (add) => {
         add({
@@ -132,7 +182,7 @@ describe('Toast', () => {
   });
 
   it('renders a custom icon from toast data', async () => {
-    const { trigger, user } = setupToastTrigger({
+    const { trigger, user } = setupToast({
       label: 'Create custom icon toast',
       onTrigger: (add) => {
         add({
@@ -152,7 +202,7 @@ describe('Toast', () => {
   });
 
   it('supports separate title and description content', async () => {
-    const { trigger, user } = setupToastTrigger({
+    const { trigger, user } = setupToast({
       label: 'Create titled toast',
       onTrigger: (add) => {
         add({
@@ -172,7 +222,7 @@ describe('Toast', () => {
   });
 
   it('updates an existing toast instead of rendering a duplicate when id matches', async () => {
-    const { trigger, user } = setupToastTrigger({
+    const { trigger, user } = setupToast({
       label: 'Update sync toast',
       onTrigger: (add) => {
         add({
@@ -192,19 +242,20 @@ describe('Toast', () => {
 
     await user.click(trigger);
 
-    expect(await screen.findByText('Sync finished')).toBeInTheDocument();
-
     await waitFor(() => {
-      expect(screen.queryByText('Sync started')).not.toBeInTheDocument();
+      expect(
+        screen.getAllByRole('dialog', { name: 'Notification' })
+      ).toHaveLength(1);
     });
 
-    expect(
-      screen.getAllByRole('dialog', { name: 'Notification' })
-    ).toHaveLength(1);
+    const toast = screen.getByRole('dialog', { name: 'Notification' });
+
+    expect(within(toast).getByText('Sync finished')).toBeInTheDocument();
+    expect(within(toast).queryByText('Sync started')).not.toBeInTheDocument();
   });
 
   it('dismisses a toast when the close button is pressed', async () => {
-    const { trigger, user } = setupToastTrigger({
+    const { trigger, user } = setupToast({
       label: 'Create warning toast',
       onTrigger: (add) => {
         add({
@@ -229,7 +280,7 @@ describe('Toast', () => {
   });
 
   it('respects the provider limit and keeps the latest toast visible', async () => {
-    const { trigger, user } = setupToastTrigger({
+    const { trigger, user } = setupToast({
       label: 'Create limited toasts',
       limit: 1,
       onTrigger: (add) => {
@@ -260,7 +311,7 @@ describe('Toast', () => {
 
   it('removes overflowed stack toasts after repeated additions', async () => {
     let toastCount = 0;
-    const { trigger, user } = setupToastTrigger({
+    const { trigger, user } = setupToast({
       label: 'Create sequential toast',
       limit: 3,
       onTrigger: (add) => {
@@ -295,7 +346,7 @@ describe('Toast', () => {
 
   it('reveals the next hidden toast when a visible toast is dismissed', async () => {
     let toastCount = 0;
-    const { trigger, user } = setupToastTrigger({
+    const { trigger, user } = setupToast({
       label: 'Create sequential toast',
       limit: 3,
       onTrigger: (add) => {
@@ -333,7 +384,7 @@ describe('Toast', () => {
   });
 
   it('renders list layout notifications with the same accessible contract', async () => {
-    const { trigger, user } = setupToastTrigger({
+    const { trigger, user } = setupToast({
       label: 'Create multiple default toasts',
       layout: 'list',
       limit: 5,
@@ -372,30 +423,16 @@ describe('Toast', () => {
   it('supports app-level provider and viewport with the shared toast hook', async () => {
     const user = userEvent.setup();
 
-    render(
-      <ToastProvider timeout={0}>
-        <ToastTrigger
-          onTrigger={(add) => {
-            add({
-              description: 'Created from hook',
-              timeout: 0,
-              type: 'info',
-            });
-          }}
-        >
-          Create app-level toast
-        </ToastTrigger>
-        <ToastViewport viewportLabel="Application notifications" />
-      </ToastProvider>
-    );
+    const { description, label } = setupAppLevelToastFixture({
+      description: 'Toast description',
+      label: 'Test label',
+    });
 
-    await user.click(
-      screen.getByRole('button', { name: 'Create app-level toast' })
-    );
+    await user.click(screen.getByRole('button', { name: label }));
 
     expect(
       await screen.findByRole('region', { name: 'Application notifications' })
     ).toBeInTheDocument();
-    expect(await screen.findByText('Created from hook')).toBeInTheDocument();
+    expect(await screen.findByText(description)).toBeInTheDocument();
   });
 });

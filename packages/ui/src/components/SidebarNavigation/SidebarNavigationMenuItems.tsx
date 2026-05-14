@@ -12,16 +12,16 @@ import {
   nestedItemWrapperClassName,
   nestedListContainerClassName,
 } from './classNames';
-import {
-  getExpandedItemIds,
-  isItemBranchActive,
-  toAccordionItemIds,
-} from './utils';
 import type {
   SidebarNavigationCollapseItem,
   SidebarNavigationItem,
   SidebarNavigationRenderLink,
 } from './types';
+import {
+  getExpandedItemIds,
+  isItemBranchActive,
+  toAccordionItemIds,
+} from './utils';
 
 type SidebarNavigationMenuItemsProps = {
   depth: number;
@@ -275,7 +275,12 @@ export const SidebarNavigationMenuItems = ({
             value={item.id}
           >
             <Accordion.Header className="m-0">
-              <Accordion.Trigger className={cn(rowClassName, 'sidebar-navigation-branch-trigger')}>
+              <Accordion.Trigger
+                className={cn(
+                  rowClassName,
+                  'sidebar-navigation-branch-trigger'
+                )}
+              >
                 <SidebarNavigationItemContent
                   item={item}
                   isOpen={openItemIds.includes(item.id)}

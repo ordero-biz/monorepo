@@ -1,8 +1,8 @@
 'use client';
 
 import { SidebarNavigationMenuItems } from './SidebarNavigationMenuItems';
-import { getVisibleItems } from './utils';
 import type { SidebarNavigationMenuProps } from './types';
+import { getVisibleItems } from './utils';
 
 export const SidebarNavigationMenu = ({
   ariaLabel,
