@@ -1,6 +1,9 @@
 'use client';
 
-import { Toast as ToastPrimitive } from '@base-ui/react/toast';
+import {
+  Toast as ToastPrimitive,
+  type UseToastManagerReturnValue,
+} from '@base-ui/react/toast';
 import { CircleAlert, CircleCheck, Info, TriangleAlert, X } from 'lucide-react';
 import type { CSSProperties, ElementType } from 'react';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
@@ -25,7 +28,7 @@ import {
   stackRootClassName,
   titleClassName,
 } from './classNames';
-import type { ToastVariant, ToastViewportProps } from './types';
+import type { ToastData, ToastVariant, ToastViewportProps } from './types';
 import { getToastAccessibleName, getToastVariant } from './utils';
 
 const variantIcons: Record<Exclude<ToastVariant, 'default'>, ElementType> = {
@@ -58,10 +61,10 @@ type ToastLayoutRect = {
   top: number;
 };
 
-const getToastUpdateKey = (toast: object) =>
-  'updateKey' in toast && typeof toast.updateKey === 'number'
-    ? toast.updateKey
-    : 0;
+type RenderedToast = {
+  toast: UseToastManagerReturnValue<ToastData>['toasts'][number];
+  updateKey: number;
+};
 
 export const ToastList = ({
   layout = 'stack',
@@ -248,17 +251,29 @@ export const ToastList = ({
 
   const renderedToasts = Array.from(
     candidateToasts
-      .reduce<Map<string, (typeof candidateToasts)[number]>>((next, toast) => {
-        if (!next.has(toast.id)) {
-          next.set(toast.id, toast);
+      .reduce<Map<string, RenderedToast>>((next, toast) => {
+        const existingToast = next.get(toast.id);
+
+        if (!existingToast) {
+          next.set(toast.id, {
+            toast,
+            updateKey: 0,
+          });
+
+          return next;
         }
+
+        next.set(toast.id, {
+          ...existingToast,
+          updateKey: existingToast.updateKey + 1,
+        });
 
         return next;
       }, new Map())
       .values()
   );
 
-  return renderedToasts.map((toast) => {
+  return renderedToasts.map(({ toast, updateKey }) => {
     const variant = getToastVariant(toast.type);
     const hasTitle = Boolean(toast.title);
     const hasDescription = Boolean(toast.description);
@@ -273,7 +288,6 @@ export const ToastList = ({
             '--toast-height': `${rememberedHeight}px`,
           } as CSSProperties)
         : undefined;
-    const updateKey = getToastUpdateKey(toast);
     const isDeduplicated = updateKey > 0;
     const VariantIcon = variant === 'default' ? null : variantIcons[variant];
     const icon =
@@ -285,7 +299,7 @@ export const ToastList = ({
     return (
       <ToastPrimitive.Root
         key={toast.id}
-        aria-label={getToastAccessibleName(toast.title)}
+        aria-label={getToastAccessibleName(toast.title, toast.description)}
         className={cn(
           layout === 'list' ? listRootClassName : stackRootClassName,
           variant === 'default'

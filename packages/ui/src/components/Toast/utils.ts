@@ -14,8 +14,11 @@ export const getToastVariant = (type: string | undefined): ToastVariant => {
   return 'default';
 };
 
-export const getToastAccessibleName = (title: unknown) =>
-  typeof title === 'string' && title.trim() ? title : 'Notification';
+const getTextLabel = (value: unknown) =>
+  typeof value === 'string' && value.trim() ? value : undefined;
+
+export const getToastAccessibleName = (title: unknown, description: unknown) =>
+  getTextLabel(title) ?? getTextLabel(description);
 
 export const isVisibleToast = (toast: {
   limited?: boolean;

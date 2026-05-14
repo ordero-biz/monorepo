@@ -171,7 +171,9 @@ describe('Toast', () => {
 
     await user.click(trigger);
 
-    const toast = await screen.findByRole('dialog', { name: 'Notification' });
+    const toast = await screen.findByRole('dialog', {
+      name: 'This is an info message!',
+    });
 
     expect(
       within(toast).getByText('This is an info message!')
@@ -244,11 +246,11 @@ describe('Toast', () => {
 
     await waitFor(() => {
       expect(
-        screen.getAllByRole('dialog', { name: 'Notification' })
+        screen.getAllByRole('dialog', { name: 'Sync finished' })
       ).toHaveLength(1);
     });
 
-    const toast = screen.getByRole('dialog', { name: 'Notification' });
+    const toast = screen.getByRole('dialog', { name: 'Sync finished' });
 
     expect(within(toast).getByText('Sync finished')).toBeInTheDocument();
     expect(within(toast).queryByText('Sync started')).not.toBeInTheDocument();
@@ -301,7 +303,7 @@ describe('Toast', () => {
 
     await waitFor(() => {
       expect(
-        screen.getAllByRole('dialog', { name: 'Notification' })
+        screen.getAllByRole('dialog', { name: 'Second toast' })
       ).toHaveLength(1);
     });
 
@@ -333,7 +335,7 @@ describe('Toast', () => {
 
     await waitFor(() => {
       expect(
-        screen.getAllByRole('dialog', { name: 'Notification' })
+        screen.getAllByRole('dialog', { name: /Toast [3-5]/ })
       ).toHaveLength(3);
     });
 
@@ -411,7 +413,9 @@ describe('Toast', () => {
 
     await waitFor(() => {
       expect(
-        screen.getAllByRole('dialog', { name: 'Notification' })
+        screen.getAllByRole('dialog', {
+          name: /First stacked toast|Second stacked toast|Third stacked toast/,
+        })
       ).toHaveLength(3);
     });
 
