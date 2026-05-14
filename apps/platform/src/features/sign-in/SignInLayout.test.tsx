@@ -28,7 +28,7 @@ describe('SignInFormLayout', () => {
     expect(
       screen.getByRole('textbox', { name: 'Email address' })
     ).toBeVisible();
-    expect(screen.getByPlaceholderText('6+ characters')).toBeVisible();
+    expect(screen.getByLabelText(/Password/)).toBeVisible();
     expect(screen.getByRole('button', { name: 'Sign in' })).toBeVisible();
   });
 });

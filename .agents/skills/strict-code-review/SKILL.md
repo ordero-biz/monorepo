@@ -139,6 +139,7 @@ From `AGENTS.md` and local skills, pay particular attention to:
 - preferring existing semantic or bridged tokens in component code
 - reviewing `packages/ui/src/styles/globals.css` as the token entry point, then the imported token files under `packages/ui/src/styles`, before claiming a token is missing
 - exposing shared semantic tokens through `@theme inline` only when that reuse is justified
+- keeping component-specific selectors, keyframes, and other local CSS in that component's folder instead of `packages/ui/src/styles/globals.css`
 
 Read `docs/ui-tokens.md` when the review touches:
 
@@ -159,6 +160,7 @@ Also enforce the `ui-component-build` and `ui-routine-conventions` expectations:
 - ensure stable exports from `packages/ui/src/index.ts`
 - expect Storybook stories that cover meaningful public variants
 - expect behavior-focused tests for meaningful interactions and states
+- expect component-specific CSS files to live inside the component folder when Tailwind class strings are not enough
 
 Current `packages/ui` structure to review against:
 

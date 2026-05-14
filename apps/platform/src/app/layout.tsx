@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Barlow, Public_Sans } from 'next/font/google';
 import type { ReactNode } from 'react';
+import { AppProviders } from './AppProviders';
 import './globals.css';
 import { Providers } from './providers';
 
@@ -32,6 +33,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${publicSans.variable} ${barlow.variable} antialiased`}>
         <Providers>{children}</Providers>
+        <AppProviders>{children}</AppProviders>
       </body>
     </html>
   );

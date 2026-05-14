@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import type { CellContext, HeaderContext } from '@tanstack/react-table';
 import { format, parseISO } from 'date-fns';
+import { Chip } from '@/ui/components/Chip';
 import {
   DataTable,
   DataTableColumnHeader,
@@ -199,9 +200,13 @@ const columns: DataTableColumnDef<ProductRow>[] = [
                 style={{ width: row.original.stockWidth }}
               />
             </div>
-            <p className="whitespace-nowrap text-[length:var(--caption-size-desktop)] leading-[var(--caption-line-height-desktop)] text-muted-foreground">
+            <Chip
+              color={row.original.stockTone}
+              size="s"
+              variant="soft"
+            >
               {formatStockValue(row.original.stockValue)}
-            </p>
+            </Chip>
           </div>
         </div>
       );
@@ -282,6 +287,12 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {};
+
+export const WithCheckboxSelection: Story = {
+  args: {
+    selectable: true,
+  },
+};
 
 export const Empty: Story = {
   args: {

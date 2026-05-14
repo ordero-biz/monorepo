@@ -32,6 +32,11 @@ When the task touches accessibility testing strategy for shared UI, also read:
 
 Use behavior-first tests.
 
+Before adding or changing a test, name the behavior in user or public-API terms.
+Then choose assertions that prove that behavior through observable output.
+Changing `document.querySelector(...)` to a Testing Library query is not enough if
+the assertion still checks internals.
+
 Good tests:
 
 - verify accessible roles and names
@@ -42,8 +47,37 @@ Good tests:
 Avoid:
 
 - testing implementation details
-- asserting class name presence unless there is no better observable signal
+- asserting class name presence
 - asserting token names or `cva` internals
+- asserting `data-*` state flags, generated ids, DOM ancestry, portals, slots, or
+  wrapper structure unless they are explicitly documented as public API
+- using `document`, `querySelector`, `querySelectorAll`, or `closest` when the
+  same element can be found by role, label, text, display value, placeholder, or
+  another Testing Library query
+
+If requested coverage cannot be achieved under these restrictions, pause before
+writing an implementation-detail assertion. Explain the gap and suggest the
+right layer instead, such as:
+
+- a Storybook/browser test for layout, animation, hover-only visuals, CSS state,
+  or a11y behavior that needs a browser
+- a Playwright flow for routed or composed application behavior
+- a visual regression check for pixel/layout fidelity
+- dropping the test when it would only freeze private implementation
+
+Examples:
+
+- Prefer `expect(screen.getByRole('button', { name: 'Save' })).toBeDisabled()`
+  over checking disabled class names.
+- Prefer clicking a control and asserting that visible text changes over
+  asserting `data-open`, `data-state`, or internal trigger classes.
+- Prefer `expect(screen.getByRole('dialog', { name: 'Saved' }))` over finding a
+  component root by `[data-slot="toast"]`.
+- Do not unit-test animation implementation such as `data-expanded`,
+  `data-promoted`, transform classes, or stack positioning; ask whether to cover
+  it with Storybook/browser/visual tests instead.
+- Do not assert icon SVG internals. If icon presence matters to users, expose and
+  assert an accessible label; otherwise treat decorative icons as visual styling.
 
 Required tooling defaults across apps and packages:
 
@@ -134,12 +168,16 @@ Do not promote every component token into Tailwind utilities up front. Revisit p
 
 For shared UI work across `packages` and `apps`:
 
+- prefer semantic HTML elements over generic `div` and `span` wrappers when the content has clear structural meaning such as navigation, lists, sections, headers, footers, or other landmark/sectioning roles
+- use non-semantic wrappers only when semantic elements would be incorrect for the content or when a library primitive constrains the rendered element
 - prefer Base UI primitives/components whenever a matching primitive/component exists
 - prefer explicit component props for design-system components
 - do not expose `className` on shared `packages/ui` components
 - keep stories and tests aligned with the public API, not internal structure
 - preserve consistency with existing components unless there is a deliberate architectural improvement
 - do not move field-level helper text or error-text expectations into low-level primitives if wrapper components own that part of the API
+- keep component-specific styles in the component folder, for example `packages/ui/src/components/[ComponentName]/styles.css`, and import them from the component module that needs them
+- reserve `packages/ui/src/styles/globals.css` and its imported files for global base styles, design tokens, Tailwind theme exposure, and genuinely shared style layers
 
 For `packages/ui` specifically:
 

@@ -16,11 +16,12 @@ const { setup } = preparePlatformSetup({
 
 const setupSignInForm = () => {
   const user = userEvent.setup();
+
   setup();
 
   return {
     emailField: screen.getByRole('textbox', { name: 'Email address' }),
-    passwordField: screen.getByPlaceholderText('6+ characters'),
+    passwordField: screen.getByLabelText(/Password/),
     signInButton: screen.getByRole('button', { name: 'Sign in' }),
     user,
   };
