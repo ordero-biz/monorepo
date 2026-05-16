@@ -77,9 +77,74 @@ describe('backend proxy route handler', () => {
       }
     );
 
-    expect(fetchMock.mock.calls[0][1].body).toBe('{"name":"Order 1"}');
+    expect(fetchMock.mock.calls[0][1].body).toBeInstanceOf(ReadableStream);
     expect(fetchMock.mock.calls[0][1].headers.get('Content-Type')).toBe(
       'application/json'
+    );
+  });
+
+  it('does not forward a body when the request has no payload', async () => {
+    fetchMock.mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          ok: true,
+        })
+      )
+    );
+
+    await POST(
+      new NextRequest('http://localhost/api/backend/orders', {
+        headers: {
+          cookie: `${AUTH_TOKEN_COOKIE_NAME}=jwt-token`,
+        },
+        method: 'POST',
+      }),
+      {
+        params: Promise.resolve({
+          path: ['orders'],
+        }),
+      }
+    );
+
+    expect(fetchMock.mock.calls[0][1].body).toBeUndefined();
+  });
+
+  it('streams multipart request bodies without coercing them to text', async () => {
+    fetchMock.mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          ok: true,
+        })
+      )
+    );
+
+    const body = new ReadableStream({
+      start(controller) {
+        controller.enqueue(new TextEncoder().encode('--boundary'));
+        controller.close();
+      },
+    });
+
+    await POST(
+      new NextRequest('http://localhost/api/backend/orders', {
+        body,
+        duplex: 'half',
+        headers: {
+          'content-type': 'multipart/form-data; boundary=boundary',
+          cookie: `${AUTH_TOKEN_COOKIE_NAME}=jwt-token`,
+        },
+        method: 'POST',
+      }),
+      {
+        params: Promise.resolve({
+          path: ['orders'],
+        }),
+      }
+    );
+
+    expect(fetchMock.mock.calls[0][1].body).toBe(body);
+    expect(fetchMock.mock.calls[0][1].headers.get('Content-Type')).toBe(
+      'multipart/form-data; boundary=boundary'
     );
   });
 

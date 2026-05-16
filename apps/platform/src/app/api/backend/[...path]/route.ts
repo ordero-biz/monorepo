@@ -41,8 +41,6 @@ const handleBackendRequest = async (
   }
 
   const { path } = await context.params;
-  const hasBody = !['GET', 'HEAD'].includes(request.method);
-  const body = hasBody ? await request.text() : undefined;
   const result = await backendRequest({
     path: path.join('/'),
     search: request.nextUrl.search,
@@ -50,7 +48,7 @@ const handleBackendRequest = async (
     init: {
       method: request.method,
       headers: getForwardHeaders(request),
-      body,
+      body: request.body ?? undefined,
     },
   });
 

@@ -11,6 +11,17 @@ type ApiFetchOptions = Omit<RequestInit, 'body'> & {
   body?: BodyInit | Record<string, unknown>;
 };
 
+const isJsonObjectBody = (
+  body: ApiFetchOptions['body']
+): body is Record<string, unknown> =>
+  Boolean(body) &&
+  typeof body === 'object' &&
+  !(body instanceof FormData) &&
+  !(body instanceof Blob) &&
+  !(body instanceof URLSearchParams) &&
+  !(body instanceof ArrayBuffer) &&
+  !ArrayBuffer.isView(body);
+
 const getResponseBody = async (response: Response) => {
   const text = await response.text();
 
@@ -63,25 +74,33 @@ export const apiFetch = async <T>(
   options: ApiFetchOptions = {}
 ): Promise<ApiResult<T>> => {
   const headers = new Headers(options.headers);
-  const body =
-    options.body &&
-    typeof options.body === 'object' &&
-    !(options.body instanceof FormData) &&
-    !(options.body instanceof Blob) &&
-    !(options.body instanceof URLSearchParams)
-      ? JSON.stringify(options.body)
-      : options.body;
+  const body = isJsonObjectBody(options.body)
+    ? JSON.stringify(options.body)
+    : options.body;
 
-  if (body && !headers.has('Content-Type')) {
+  if (isJsonObjectBody(options.body) && !headers.has('Content-Type')) {
     headers.set('Content-Type', 'application/json');
   }
 
-  const response = await fetch(path, {
-    ...options,
-    body,
-    headers,
-    cache: 'no-store',
-  });
+  let response: Response;
+
+  try {
+    response = await fetch(path, {
+      ...options,
+      body,
+      headers,
+      cache: 'no-store',
+    });
+  } catch (error) {
+    return {
+      ok: false,
+      error: {
+        status: 500,
+        message:
+          error instanceof Error ? error.message : 'Unable to complete request.',
+      },
+    };
+  }
 
   if (!response.ok) {
     return {

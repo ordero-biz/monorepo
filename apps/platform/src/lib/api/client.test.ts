@@ -78,6 +78,31 @@ describe('apiFetch', () => {
     );
   });
 
+  it('does not force a JSON content type for FormData bodies', async () => {
+    const fetchMock = vi.mocked(fetch);
+    const body = new FormData();
+
+    fetchMock.mockResolvedValue(new Response('ok'));
+    body.set('file', new Blob(['hello'], { type: 'text/plain' }), 'hello.txt');
+
+    await apiFetch<string>('/api/upload', {
+      method: 'POST',
+      body,
+    });
+
+    const [, request] = fetchMock.mock.calls[0] ?? [];
+    const headers = new Headers(request?.headers);
+
+    expect(request).toEqual(
+      expect.objectContaining({
+        method: 'POST',
+        body,
+        cache: 'no-store',
+      })
+    );
+    expect(headers.has('Content-Type')).toBe(false);
+  });
+
   it('returns parsed JSON data for successful responses', async () => {
     vi.mocked(fetch).mockResolvedValue(
       new Response(
@@ -116,6 +141,18 @@ describe('apiFetch', () => {
     await expect(apiFetch('/api/logout')).resolves.toEqual({
       ok: true,
       data: undefined,
+    });
+  });
+
+  it('returns a normalized error when the request throws', async () => {
+    vi.mocked(fetch).mockRejectedValue(new Error('Failed to fetch'));
+
+    await expect(apiFetch('/api/auth/session')).resolves.toEqual({
+      ok: false,
+      error: {
+        status: 500,
+        message: 'Failed to fetch',
+      },
     });
   });
 
