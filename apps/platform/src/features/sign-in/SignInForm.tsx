@@ -3,7 +3,7 @@
 import { Button, PasswordField, TextField, Typography } from '@ordero/ui';
 import { useForm } from '@tanstack/react-form';
 import { useQueryClient } from '@tanstack/react-query';
-import { authQueryKeys } from '@/lib/api/authQueries';
+import { authQueryKeys } from '@/lib/hooks/useSessionQuery';
 import { login } from '@/lib/api/client';
 import { signInDefaultValues } from './constants';
 import { getErrorMessage } from './utils/error';

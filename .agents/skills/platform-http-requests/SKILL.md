@@ -91,10 +91,15 @@ When adding `/api/auth/*` or `/api/backend/*` behavior:
 
 Choose the smallest layer that proves the behavior:
 
-- client helpers/hooks: Vitest with mocked `fetch`
-- route handlers: Vitest with `NextRequest` and mocked backend `fetch`
+- client helpers that call `fetch` directly: Vitest with mocked `fetch`
+- query hooks, form hooks, and components that call app-owned request helpers: mock the nearest app-owned request helper rather than `fetch`
+- route handlers: Vitest with `NextRequest` and mocked nearest app-owned server request helper; mock backend `fetch` only when the route handler itself calls backend `fetch` directly
 - form integration: Testing Library component tests
 - routed browser flows: Playwright
+
+Mock the closest app-owned request boundary that the unit under test depends on.
+Do not mock a lower transport layer when production code already wraps that layer
+in an app-owned helper.
 
 Required coverage for new request flows:
 
