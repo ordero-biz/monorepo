@@ -1,9 +1,26 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen } from '@testing-library/react';
 import { SignUpLayout } from './SignUpLayout';
 
+vi.mock('@/lib/api/client', () => ({
+  signUp: vi.fn(),
+}));
+
+const renderWithProviders = () => {
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false } },
+  });
+
+  return render(
+    <QueryClientProvider client={queryClient}>
+      <SignUpLayout />
+    </QueryClientProvider>
+  );
+};
+
 describe('SignUpLayout', () => {
   it('renders the auth layout copy, footer link, and sign-up form', () => {
-    render(<SignUpLayout />);
+    renderWithProviders();
 
     expect(screen.getByRole('heading', { name: 'Get started' })).toBeVisible();
     expect(

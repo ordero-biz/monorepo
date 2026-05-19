@@ -1,7 +1,14 @@
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { signUp } from '@/lib/api/client';
 import { preparePlatformSetup } from '@/test/prepareSetup';
 import { SignUpForm } from './SignUpForm';
+
+vi.mock('@/lib/api/client', () => ({
+  signUp: vi.fn(),
+}));
+
+const signUpMock = vi.mocked(signUp);
 
 const { setup } = preparePlatformSetup({
   component: SignUpForm,
@@ -24,6 +31,9 @@ const setupSignUpForm = () => {
 };
 
 describe('SignUpForm', () => {
+  beforeEach(() => {
+    signUpMock.mockReset();
+  });
   it('renders the expected form controls', () => {
     const { emailField, passwordField, signUpButton, termsCheckbox } =
       setupSignUpForm();
@@ -169,6 +179,12 @@ describe('SignUpForm', () => {
   });
 
   it('keeps the email and clears the password after successful sign up', async () => {
+    signUpMock.mockResolvedValue({
+      ok: true,
+      data: {
+        authenticated: true,
+      },
+    });
     const { emailField, passwordField, signUpButton, termsCheckbox, user } =
       setupSignUpForm();
 
@@ -177,6 +193,10 @@ describe('SignUpForm', () => {
     await user.click(termsCheckbox);
     await user.click(signUpButton);
 
+    expect(signUpMock).toHaveBeenCalledWith({
+      email: 'admin@gmail.com',
+      password: '123456',
+    });
     expect(emailField).toHaveValue('admin@gmail.com');
     expect(passwordField).toHaveValue('');
     expect(termsCheckbox).not.toBeChecked();

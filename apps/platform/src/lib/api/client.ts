@@ -1,10 +1,12 @@
 'use client';
 
+import { CLIENT_AUTH_PATHS } from '@/lib/api/constants';
 import type {
   ApiError,
   ApiResult,
   AuthLoginInput,
   AuthSession,
+  AuthSignUpInput,
 } from '@/lib/api/types';
 
 type ApiFetchOptions = Omit<RequestInit, 'body'> & {
@@ -116,17 +118,23 @@ export const apiFetch = async <T>(
 };
 
 export const login = (input: AuthLoginInput) =>
-  apiFetch<AuthSession>('/api/auth/login', {
+  apiFetch<AuthSession>(CLIENT_AUTH_PATHS.login, {
+    method: 'POST',
+    body: input,
+  });
+
+export const signUp = (input: AuthSignUpInput) =>
+  apiFetch<AuthSession>(CLIENT_AUTH_PATHS.signUp, {
     method: 'POST',
     body: input,
   });
 
 export const logout = () =>
-  apiFetch<AuthSession>('/api/auth/logout', {
+  apiFetch<AuthSession>(CLIENT_AUTH_PATHS.logout, {
     method: 'POST',
   });
 
 export const getSession = () =>
-  apiFetch<AuthSession>('/api/auth/session', {
+  apiFetch<AuthSession>(CLIENT_AUTH_PATHS.session, {
     method: 'GET',
   });

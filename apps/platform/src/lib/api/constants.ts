@@ -11,4 +11,12 @@ export const BACKEND_AUTH_PATHS = {
   login: '/auth/login',
   logout: '/auth/logout',
   me: '/me',
+  signUp: '/api/v1/platform/owners/sign-up',
+} as const;
+
+export const CLIENT_AUTH_PATHS = {
+  login: '/api/auth/login',
+  logout: '/api/auth/logout',
+  session: '/api/auth/session',
+  signUp: '/api/auth/sign-up',
 } as const;

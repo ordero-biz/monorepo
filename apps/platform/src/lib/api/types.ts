@@ -19,6 +19,11 @@ export type AuthLoginInput = {
   password: string;
 };
 
+export type AuthSignUpInput = {
+  email: string;
+  password: string;
+};
+
 export type ApiError = {
   status: number;
   message: string;

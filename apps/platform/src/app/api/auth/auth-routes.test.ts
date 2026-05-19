@@ -3,6 +3,7 @@ import { AUTH_TOKEN_COOKIE_NAME } from '@/lib/api/constants';
 import { POST as login } from './login/route';
 import { POST as logout } from './logout/route';
 import { GET as getSession } from './session/route';
+import { POST as signUpHandler } from './sign-up/route';
 
 const fetchMock = vi.fn();
 const backendApiUrl = 'https://backend.example.test';
@@ -134,5 +135,69 @@ describe('auth route handlers', () => {
       `${AUTH_TOKEN_COOKIE_NAME}=`
     );
     expect(response.headers.get('set-cookie')).toContain('Max-Age=0');
+  });
+
+  it('stores the token in an HttpOnly cookie after sign-up', async () => {
+    fetchMock.mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          token: 'new-jwt-token',
+        })
+      )
+    );
+    const response = await signUpHandler(
+      new NextRequest('http://localhost/api/auth/sign-up', {
+        body: JSON.stringify({
+          email: 'new-user@gmail.com',
+          password: 'securePassword1',
+        }),
+        method: 'POST',
+      })
+    );
+
+    await expect(getJson(response)).resolves.toStrictEqual({
+      authenticated: true,
+    });
+    expect(response.headers.get('set-cookie')).toContain(
+      `${AUTH_TOKEN_COOKIE_NAME}=new-jwt-token`
+    );
+    expect(response.headers.get('set-cookie')).toContain('HttpOnly');
+    expect(fetchMock).toHaveBeenCalledWith(
+      new URL('/api/v1/platform/owners/sign-up', backendApiUrl),
+      expect.objectContaining({
+        method: 'POST',
+      })
+    );
+  });
+
+  it('forwards backend errors during sign-up', async () => {
+    fetchMock.mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          message: 'Email already exists.',
+          fieldErrors: { email: 'This email is already registered.' },
+        }),
+        {
+          status: 409,
+          statusText: 'Conflict',
+        }
+      )
+    );
+    const response = await signUpHandler(
+      new NextRequest('http://localhost/api/auth/sign-up', {
+        body: JSON.stringify({
+          email: 'existing@gmail.com',
+          password: 'securePassword1',
+        }),
+        method: 'POST',
+      })
+    );
+
+    expect(response.status).toBe(409);
+    await expect(getJson(response)).resolves.toStrictEqual({
+      status: 409,
+      message: 'Email already exists.',
+      fieldErrors: { email: 'This email is already registered.' },
+    });
   });
 });
