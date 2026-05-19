@@ -14,9 +14,9 @@
 }
 
 .sidebar-navigation-branch-trigger[data-open]::after,
-.sidebar-navigation-branch-trigger[data-state="open"]::after,
+.sidebar-navigation-branch-trigger[data-state='open']::after,
 [data-open] .sidebar-navigation-branch-trigger::after,
-[data-state="open"] .sidebar-navigation-branch-trigger::after {
+[data-state='open'] .sidebar-navigation-branch-trigger::after {
   position: absolute;
   top: 100%;
   left: calc(var(--nav-bullet-gutter) - var(--nav-bullet-size));

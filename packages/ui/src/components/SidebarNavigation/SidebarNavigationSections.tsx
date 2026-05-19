@@ -3,11 +3,8 @@
 import { SidebarNavigationMenu } from './SidebarNavigationMenu';
 import { SidebarNavigationSection } from './SidebarNavigationSection';
 import { SidebarNavigationSectionContent } from './SidebarNavigationSectionContent';
-import {
-  getVisibleSections,
-  shouldSectionBeExpanded,
-} from './utils';
 import type { SidebarNavigationSectionsProps } from './types';
+import { getVisibleSections, shouldSectionBeExpanded } from './utils';
 
 export const SidebarNavigationSections = ({
   renderLink,

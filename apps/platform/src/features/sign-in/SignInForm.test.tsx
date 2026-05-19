@@ -14,7 +14,7 @@ const setupSignInForm = () => {
 
   return {
     emailField: screen.getByRole('textbox', { name: 'Email address' }),
-    passwordField: screen.getByLabelText('Password'),
+    passwordField: screen.getByLabelText(/Password/),
     signInButton: screen.getByRole('button', { name: 'Sign in' }),
     user,
   };

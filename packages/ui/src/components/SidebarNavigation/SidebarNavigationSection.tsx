@@ -10,8 +10,8 @@ import {
   sectionLabelClassName,
   sectionRootClassName,
 } from './classNames';
-import { toAccordionItemIds } from './utils';
 import type { SidebarNavigationSectionProps } from './types';
+import { toAccordionItemIds } from './utils';
 
 export const SidebarNavigationSection = forwardRef<
   HTMLElement,
@@ -72,7 +72,9 @@ export const SidebarNavigationSection = forwardRef<
             value={id}
           >
             <Accordion.Header className="m-0">
-              <Accordion.Trigger className={cn(sectionLabelClassName, 'cursor-pointer')}>
+              <Accordion.Trigger
+                className={cn(sectionLabelClassName, 'cursor-pointer')}
+              >
                 <span className="min-w-0 flex-1 truncate">{label}</span>
                 <span className="flex size-[var(--space-2)] shrink-0 items-center justify-center transition-transform group-data-[open]/section:rotate-180">
                   <ChevronDown />

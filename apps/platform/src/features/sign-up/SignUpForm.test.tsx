@@ -14,7 +14,7 @@ const setupSignUpForm = () => {
 
   return {
     emailField: screen.getByRole('textbox', { name: 'Email address' }),
-    passwordField: screen.getByLabelText('Password'),
+    passwordField: screen.getByLabelText(/Password/),
     signUpButton: screen.getByRole('button', { name: 'Sign up' }),
     termsCheckbox: screen.getByRole('checkbox', {
       name: /by signing up, i agree to/i,
