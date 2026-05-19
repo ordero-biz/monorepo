@@ -95,6 +95,7 @@ Use this map to load the smallest relevant source of truth for the diff:
 
 - forms and validation: `docs/forms.md`, `docs/testing.md`
 - shared UI components in `packages/ui`: `ui-component-build`, `ui-routine-conventions`
+- shared UI component API shape: `docs/ui-components.md`
 - tokens, CSS variables, and Tailwind exposure: `docs/ui-tokens.md`, `ui-routine-conventions`
 - TS and TSX authoring conventions: `ts-react-conventions`
 - shared UI accessibility testing: `docs/accessibility-testing.md`
@@ -157,6 +158,7 @@ Also enforce the `ui-component-build` and `ui-routine-conventions` expectations:
 - keep public APIs explicit
 - do not expose `className` on shared `packages/ui` components
 - keep exported prop types in local `types.ts`
+- for new shared compound components, expect the Base UI-style namespace export pattern: `[ComponentName].Root`, `[ComponentName].Trigger`, etc., wired through `index.parts.ts` and `export * as [ComponentName] from './index.parts'`
 - ensure stable exports from `packages/ui/src/index.ts`
 - expect Storybook stories that cover meaningful public variants
 - expect behavior-focused tests for meaningful interactions and states
@@ -175,6 +177,7 @@ Current import and export patterns to review against:
 - use local relative imports such as `./types` inside a component folder
 - use the `@/ui/...` aliases for cross-component and shared-library imports inside `packages/ui`
 - keep component public entrypoints flowing through each local `index.ts`
+- avoid new `Object.assign(root, { Part })` compound APIs unless explicit backward compatibility requires callable shorthand
 - keep consumer-facing exports flowing through `packages/ui/src/index.ts`
 
 Missing exports, misplaced files, tests not colocated with the file they cover, overly broad prop passthrough, absent tests for interactive behavior, or styling that bypasses the token system should usually be findings.
