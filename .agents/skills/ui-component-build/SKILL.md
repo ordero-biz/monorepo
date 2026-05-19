@@ -42,6 +42,7 @@ For each shared component, create or preserve:
 - `packages/ui/src/components/[ComponentName]/index.ts`
 - `packages/ui/src/components/[ComponentName]/[ComponentName].test.tsx`
 - `packages/ui/stories/[ComponentName].stories.tsx`
+- `packages/ui/src/components/[ComponentName]/styles.css` only when the component needs component-specific CSS that cannot live cleanly in Tailwind class strings
 
 Then export it from:
 
@@ -65,6 +66,7 @@ Follow this token architecture:
 - Do not invent new semantic or bridged tokens until you have reviewed the existing token system through `packages/ui/src/styles/globals.css`, then the imported token files under `packages/ui/src/styles`.
 
 Do not add ad hoc component-specific semantic globals to `globals.css` unless there is a strong architectural reason.
+Keep component-specific CSS, including component-only selectors and keyframes, in the component folder and import it from the component module that needs it.
 
 When implementing from Figma:
 

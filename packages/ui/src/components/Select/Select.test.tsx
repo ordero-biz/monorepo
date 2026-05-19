@@ -38,7 +38,9 @@ describe('Select', () => {
       placeholder: 'Select view',
     });
 
-    expect(screen.getByRole('combobox', { name: ariaLabel })).toHaveTextContent(placeholder);
+    expect(screen.getByRole('combobox', { name: ariaLabel })).toHaveTextContent(
+      placeholder
+    );
   });
 
   it('opens the list and calls onValueChange when the user picks an option', async () => {
