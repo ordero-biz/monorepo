@@ -101,6 +101,12 @@ Mock the closest app-owned request boundary that the unit under test depends on.
 Do not mock a lower transport layer when production code already wraps that layer
 in an app-owned helper.
 
+For Playwright tests that mock an app-owned route with `page.route()` or
+`context.route()`, register the route before the user action that triggers it.
+When the request contract is part of the behavior under test, also wait for the
+request and assert stable contract details such as method and JSON body. Keep
+these assertions focused on the same app-owned boundary being mocked.
+
 Required coverage for new request flows:
 
 - success response shape

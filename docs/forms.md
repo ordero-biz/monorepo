@@ -119,6 +119,7 @@ Treat client and submit errors as separate concerns.
 - client validation errors should support inline correction
 - submit or backend errors should be mapped back to fields when possible
 - form-level submit errors should be rendered in a form-level error area
+- form-level submit errors may also use an app-level notification when the feature needs a global failure surface
 - field-level submit errors should not depend on prior blur state to become visible
 - when both client and backend errors are present, prefer the error that best explains the current state of the field to the user
 - if backend error mapping needs normalization, keep that logic inside the feature until multiple forms share the same server contract

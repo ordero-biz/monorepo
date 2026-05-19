@@ -201,4 +201,27 @@ describe('SignUpForm', () => {
     expect(passwordField).toHaveValue('');
     expect(termsCheckbox).not.toBeChecked();
   });
+
+  it('shows a toast when sign up fails with a form-level backend error', async () => {
+    signUpMock.mockResolvedValue({
+      ok: false,
+      error: {
+        status: 500,
+        message: 'Unable to create account.',
+      },
+    });
+    const { emailField, passwordField, signUpButton, termsCheckbox, user } =
+      setupSignUpForm();
+
+    await user.type(emailField, 'admin@gmail.com');
+    await user.type(passwordField, '123456');
+    await user.click(termsCheckbox);
+    await user.click(signUpButton);
+
+    expect(
+      await screen.findByRole('dialog', { name: 'Unable to create account.' })
+    ).toBeVisible();
+    expect(passwordField).toHaveValue('123456');
+    expect(termsCheckbox).toBeChecked();
+  });
 });

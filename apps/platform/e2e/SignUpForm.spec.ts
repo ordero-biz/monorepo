@@ -69,18 +69,38 @@ test.describe('SignUpForm', () => {
   test('keeps the email and clears the password and checkbox after successful sign up', async ({
     page,
   }) => {
+    const expectedCredentials = {
+      email: 'admin@gmail.com',
+      password: '123456',
+    };
+
+    await page.route('**/api/auth/sign-up', async (route) => {
+      await route.fulfill({
+        json: {
+          authenticated: true,
+        },
+      });
+    });
+
     const emailField = page.getByRole('textbox', { name: 'Email address' });
     const passwordField = page.getByRole('textbox', { name: 'Password' });
     const termsCheckbox = page.getByRole('checkbox', {
       name: /by signing up, i agree to/i,
     });
 
-    await emailField.pressSequentially('admin@gmail.com');
-    await passwordField.pressSequentially('123456');
+    await emailField.pressSequentially(expectedCredentials.email);
+    await passwordField.pressSequentially(expectedCredentials.password);
     await termsCheckbox.check();
+
+    const signUpRequestPromise = page.waitForRequest('**/api/auth/sign-up');
+
     await page.getByRole('button', { name: 'Sign up' }).click();
 
-    await expect(emailField).toHaveValue('admin@gmail.com');
+    const signUpRequest = await signUpRequestPromise;
+
+    expect(signUpRequest.method()).toBe('POST');
+    expect(signUpRequest.postDataJSON()).toEqual(expectedCredentials);
+    await expect(emailField).toHaveValue(expectedCredentials.email);
     await expect(passwordField).toHaveValue('');
     await expect(termsCheckbox).not.toBeChecked();
   });

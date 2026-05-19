@@ -1,4 +1,5 @@
 import { prepareSetup } from '@ordero/test-config/react';
+import { ToastProvider, ToastViewport } from '@ordero/ui';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { ComponentType, ReactNode } from 'react';
 
@@ -23,7 +24,10 @@ export const createTestQueryClient = () =>
 
 export const createTestQueryProvider = (queryClient: QueryClient) => {
   return ({ children }: TestQueryProviderProps) => (
-    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    <ToastProvider>
+      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+      <ToastViewport />
+    </ToastProvider>
   );
 };
 

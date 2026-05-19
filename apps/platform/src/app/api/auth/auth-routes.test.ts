@@ -22,11 +22,11 @@ describe('auth route handlers', () => {
     delete process.env.BACKEND_API_URL;
   });
 
-  it('stores the access token in an HttpOnly cookie after login', async () => {
+  it('stores the token in an HttpOnly cookie after login', async () => {
     fetchMock.mockResolvedValue(
       new Response(
         JSON.stringify({
-          accessToken: 'jwt-token',
+          token: 'jwt-token',
           user: {
             email: 'admin@gmail.com',
           },

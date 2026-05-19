@@ -89,7 +89,7 @@ type ServerSessionResult =
 ## Login Flow
 
 The sign-in form submits credentials through the client API. The backend returns
-an access token, but the browser only receives safe session data.
+a token, but the browser only receives safe session data.
 
 ```mermaid
 sequenceDiagram
@@ -105,7 +105,7 @@ sequenceDiagram
   Form->>Client: login(credentials)
   Client->>Route: POST /api/auth/login
   Route->>Backend: POST /auth/login
-  Backend-->>Route: accessToken + optional user
+  Backend-->>Route: token + optional user
   Route->>Cookie: Set ordero_access_token
   Route-->>Client: AuthSession without token
   Client-->>Form: ApiResult<AuthSession>
@@ -118,7 +118,7 @@ Failure behavior:
 - invalid JSON returns `400`
 - backend errors are normalized as `ApiError`
 - backend `fieldErrors` are mapped back into TanStack Form
-- a missing `accessToken` from the backend returns `502`
+- a missing `token` from the backend returns `502`
 
 ## Logout Flow
 
@@ -298,7 +298,7 @@ flowchart LR
 ```
 
 `fieldErrors` are optional and currently shaped as `Record<string, string>`.
-When present, sign-in maps them into TanStack Form submit errors.
+When present, sign-in and sign-up map them into TanStack Form submit errors.
 
 ## Review Checklist
 

@@ -4,7 +4,7 @@ import { backendFetch, setAuthCookie } from '@/lib/api/server';
 import type { AuthLoginInput, AuthSession, AuthUser } from '@/lib/api/types';
 
 type BackendLoginResponse = {
-  accessToken?: unknown;
+  token?: unknown;
   user?: AuthUser;
 };
 
@@ -38,11 +38,11 @@ export const POST = async (request: NextRequest) => {
     return NextResponse.json(result.error, { status: result.error.status });
   }
 
-  if (typeof result.data.accessToken !== 'string') {
+  if (typeof result.data.token !== 'string') {
     return NextResponse.json(
       {
         status: 502,
-        message: 'Backend did not return an access token.',
+        message: 'Backend did not return a token.',
       },
       { status: 502 }
     );
@@ -53,7 +53,7 @@ export const POST = async (request: NextRequest) => {
     user: result.data.user,
   });
 
-  setAuthCookie(response, result.data.accessToken);
+  setAuthCookie(response, result.data.token);
 
   return response;
 };

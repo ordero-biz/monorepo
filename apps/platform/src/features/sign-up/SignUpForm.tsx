@@ -6,6 +6,7 @@ import {
   PasswordField,
   TextField,
   Typography,
+  useToastManager,
 } from '@ordero/ui';
 import { useForm } from '@tanstack/react-form';
 import { useQueryClient } from '@tanstack/react-query';
@@ -45,6 +46,7 @@ const submitSignUpToBackend = async (value: SignUpFormValues) => {
 
 export const SignUpForm = () => {
   const queryClient = useQueryClient();
+  const { add: addToast } = useToastManager();
   const form = useForm({
     defaultValues: signUpDefaultValues,
     onSubmit: async ({ formApi, value }) => {
@@ -56,6 +58,10 @@ export const SignUpForm = () => {
             fields: result.error.fieldErrors ?? {},
             form: result.error.formError,
           },
+        });
+        addToast({
+          description: result.error.formError,
+          type: 'error',
         });
         return;
       }
