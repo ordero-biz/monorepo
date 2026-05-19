@@ -58,7 +58,7 @@
     "vitest": "^4.0.18"
   },
   "dependencies": {
-    "@base-ui/react": "^1.2.0",
+    "@base-ui/react": "^1.4.1",
     "@fontsource/barlow": "^5.2.8",
     "@fontsource/public-sans": "^5.2.7",
     "@fontsource/roboto": "^5.2.10",

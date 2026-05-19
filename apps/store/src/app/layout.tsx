@@ -2,6 +2,7 @@ import { TopBar } from '@ordero/ui';
 import type { Metadata } from 'next';
 import { Barlow, Public_Sans } from 'next/font/google';
 import type { ReactNode } from 'react';
+import { AppProviders } from './AppProviders';
 import { LayoutBox } from '@/components/LayoutBox';
 import { StoreSidebar } from '@/components/StoreSidebar';
 import './globals.css';
@@ -33,21 +34,23 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${publicSans.variable} ${barlow.variable} antialiased`}>
+      <AppProviders>
         <div className="min-h-screen bg-background text-foreground">
-          <div className="mx-auto min-h-screen w-full flex">
-            <StoreSidebar />
-            <main className="flex flex-col w-full">
-              <TopBar id="store-page-header">
-                <TopBar.Left>
-                  <h1 className="text-lg font-semibold tracking-tight">
-                    Store
-                  </h1>
-                </TopBar.Left>
-              </TopBar>
-              <LayoutBox>{children}</LayoutBox>
-            </main>
+            <div className="mx-auto min-h-screen w-full flex">
+              <StoreSidebar />
+              <main className="flex flex-col w-full">
+                <TopBar id="store-page-header">
+                  <TopBar.Left>
+                    <h1 className="text-lg font-semibold tracking-tight">
+                      Store
+                    </h1>
+                  </TopBar.Left>
+                </TopBar>
+                <LayoutBox>{children}</LayoutBox>
+              </main>
+            </div>
           </div>
-        </div>
+      </AppProviders>
       </body>
     </html>
   );

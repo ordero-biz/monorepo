@@ -16,7 +16,7 @@ describe('SignUpLayout', () => {
     expect(
       screen.getByRole('textbox', { name: 'Email address' })
     ).toBeVisible();
-    expect(screen.getByLabelText('Password')).toBeVisible();
+    expect(screen.getByLabelText(/Password/)).toBeVisible();
     expect(
       screen.getByRole('checkbox', { name: /by signing up, i agree to/i })
     ).not.toBeChecked();

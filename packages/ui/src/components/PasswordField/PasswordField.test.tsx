@@ -19,10 +19,7 @@ describe('PasswordField', () => {
       label: 'Password',
     });
 
-    expect(screen.getByLabelText(label)).toHaveAttribute(
-      'type',
-      'password'
-    );
+    expect(screen.getByLabelText(label)).toHaveAttribute('type', 'password');
     expect(
       screen.getByRole('button', { name: 'Show password' })
     ).toBeInTheDocument();
