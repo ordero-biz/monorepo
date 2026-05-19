@@ -42,12 +42,6 @@ export {
   DataTableSelectionColumnHeader,
 } from './components/DataTable';
 export type {
-  TopBarLeftProps,
-  TopBarProps,
-  TopBarRightProps,
-} from './components/TopBar';
-export { TopBar, TopBarLeft, TopBarRight } from './components/TopBar';
-export type {
   IconButtonColor,
   IconButtonProps,
   IconButtonSize,
@@ -128,6 +122,12 @@ export {
   ToastViewport,
   useToastManager,
 } from './components/Toast';
+export type {
+  TopBarLeftProps,
+  TopBarProps,
+  TopBarRightProps,
+} from './components/TopBar';
+export { TopBar } from './components/TopBar';
 export type {
   TypographyColor,
   TypographyProps,

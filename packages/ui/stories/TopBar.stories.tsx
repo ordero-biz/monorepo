@@ -6,9 +6,9 @@ import { Typography } from '@/ui/components/Typography';
 
 const meta = {
   title: 'Components/TopBar',
-  component: TopBar,
+  component: TopBar.Root,
   tags: ['autodocs'],
-} satisfies Meta<typeof TopBar>;
+} satisfies Meta<typeof TopBar.Root>;
 
 export default meta;
 
@@ -16,7 +16,7 @@ type Story = StoryObj<typeof meta>;
 
 export const WithPrimaryActions: Story = {
   render: () => (
-    <TopBar>
+    <TopBar.Root>
       <TopBar.Left>
         <IconButton aria-label='Open menu' size='l'>
           <Menu />
@@ -33,13 +33,13 @@ export const WithPrimaryActions: Story = {
           <Settings />
         </IconButton>
       </TopBar.Right>
-    </TopBar>
+    </TopBar.Root>
   ),
 };
 
 export const DenseActions: Story = {
   render: () => (
-    <TopBar>
+    <TopBar.Root>
       <TopBar.Left>
         <IconButton aria-label='Open menu' size='m'>
           <Menu />
@@ -56,13 +56,13 @@ export const DenseActions: Story = {
           <Settings />
         </IconButton>
       </TopBar.Right>
-    </TopBar>
+    </TopBar.Root>
   ),
 };
 
 export const RightOnlyActions: Story = {
   render: () => (
-    <TopBar>
+    <TopBar.Root>
       <TopBar.Right>
         <IconButton aria-label='Notifications' color='primary' size='l'>
           <Bell />
@@ -71,13 +71,13 @@ export const RightOnlyActions: Story = {
           <Settings />
         </IconButton>
       </TopBar.Right>
-    </TopBar>
+    </TopBar.Root>
   ),
 };
 
 export const WithLongTitleAndCompactActions: Story = {
   render: () => (
-    <TopBar>
+    <TopBar.Root>
       <TopBar.Left>
         <IconButton aria-label='Open menu' size='l'>
           <Menu />
@@ -100,6 +100,6 @@ export const WithLongTitleAndCompactActions: Story = {
           <Bell />
         </IconButton>
       </TopBar.Right>
-    </TopBar>
+    </TopBar.Root>
   ),
 };
