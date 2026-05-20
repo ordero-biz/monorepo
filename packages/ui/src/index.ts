@@ -138,6 +138,12 @@ export {
   useToastManager,
 } from './components/Toast';
 export type {
+  TopBarLeftProps,
+  TopBarProps,
+  TopBarRightProps,
+} from './components/TopBar';
+export { TopBar } from './components/TopBar';
+export type {
   TypographyColor,
   TypographyProps,
   TypographyVariant,

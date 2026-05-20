@@ -6,21 +6,67 @@ import {
   PasswordField,
   TextField,
   Typography,
+  useToastManager,
 } from '@ordero/ui';
 import { useForm } from '@tanstack/react-form';
+import { useQueryClient } from '@tanstack/react-query';
 import Link from 'next/link';
 import { getErrorMessage } from '@/features/sign-in/utils/error';
+import { signUp } from '@/lib/api/client';
+import { authQueryKeys } from '@/lib/hooks/useSessionQuery';
 import { signUpDefaultValues } from './constants';
 import {
+  type SignUpFormValues,
   validateAcceptTerms,
   validateSignUpEmail,
   validateSignUpPassword,
 } from './utils/validations';
 
+const submitSignUpToBackend = async (value: SignUpFormValues) => {
+  const result = await signUp({
+    email: value.email,
+    password: value.password,
+  });
+
+  if (!result.ok) {
+    return {
+      ok: false,
+      error: {
+        fieldErrors: result.error.fieldErrors,
+        formError: result.error.message,
+      },
+    } as const;
+  }
+
+  return {
+    ok: true,
+    data: result.data,
+  } as const;
+};
+
 export const SignUpForm = () => {
+  const queryClient = useQueryClient();
+  const { add: addToast } = useToastManager();
   const form = useForm({
     defaultValues: signUpDefaultValues,
     onSubmit: async ({ formApi, value }) => {
+      const result = await submitSignUpToBackend(value);
+
+      if (!result.ok) {
+        formApi.setErrorMap({
+          onSubmit: {
+            fields: result.error.fieldErrors ?? {},
+            form: result.error.formError,
+          },
+        });
+        addToast({
+          description: result.error.formError,
+          type: 'error',
+        });
+        return;
+      }
+
+      queryClient.setQueryData(authQueryKeys.session, result.data);
       formApi.reset({
         ...signUpDefaultValues,
         email: value.email,

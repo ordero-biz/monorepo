@@ -1,9 +1,18 @@
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { preparePlatformSetup } from '@/test/prepareSetup';
 import { SignUpLayout } from './SignUpLayout';
+
+vi.mock('@/lib/api/client', () => ({
+  signUp: vi.fn(),
+}));
+
+const { setup } = preparePlatformSetup({
+  component: SignUpLayout,
+});
 
 describe('SignUpLayout', () => {
   it('renders the auth layout copy, footer link, and sign-up form', () => {
-    render(<SignUpLayout />);
+    setup();
 
     expect(screen.getByRole('heading', { name: 'Get started' })).toBeVisible();
     expect(
@@ -23,9 +32,10 @@ describe('SignUpLayout', () => {
     expect(
       screen.queryByText('You must accept the terms to continue.')
     ).not.toBeInTheDocument();
-    expect(
-      screen.getByRole('link', { name: 'terms of use' })
-    ).toHaveAttribute('href', '/terms');
+    expect(screen.getByRole('link', { name: 'terms of use' })).toHaveAttribute(
+      'href',
+      '/terms'
+    );
     expect(
       screen.getByRole('link', { name: 'privacy policy' })
     ).toHaveAttribute('href', '/privacy');

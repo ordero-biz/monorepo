@@ -76,6 +76,11 @@ Good candidates:
 Do not use Playwright as the default layer for component-local behavior such as
 field blur timing. Cover that with unit/component tests instead.
 
+When an E2E test mocks an app-owned request with `page.route()` or
+`context.route()`, register the route before the user action that triggers it.
+If the request contract is part of the behavior under test, wait for the request
+and assert stable details such as method and JSON body.
+
 ## Commands
 
 Run all unit tests through Turbo:

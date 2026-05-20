@@ -1,10 +1,17 @@
 import type { RenderResult } from '@testing-library/react';
 import { render } from '@testing-library/react';
-import type { ComponentType } from 'react';
+import type { ComponentType, ReactNode } from 'react';
+
+type TestWrapperProps = {
+  children: ReactNode;
+};
+
+type TestWrapper = ComponentType<TestWrapperProps>;
 
 type PrepareSetupArgs<T extends object> = {
   component: ComponentType<T>;
   props?: T;
+  wrapper?: TestWrapper;
 };
 
 type CombinedProps<T extends object, U extends Partial<T>> = Omit<T, keyof U> &
@@ -24,6 +31,7 @@ type SetupResult<T extends object, U extends Partial<T>> = CombinedProps<T, U> &
 export const prepareSetup = <T extends object>({
   component,
   props = {} as T,
+  wrapper,
 }: PrepareSetupArgs<T>) => {
   const setup = <const U extends Partial<T>>(
     caseProps: U = {} as U
@@ -35,7 +43,8 @@ export const prepareSetup = <T extends object>({
 
     const CaseComponent = component;
     const renderResult = render(
-      <CaseComponent {...(combinedProps as unknown as T)} />
+      <CaseComponent {...(combinedProps as unknown as T)} />,
+      { wrapper }
     );
     const rerender = (rerenderProps: Partial<T> = {}) =>
       renderResult.rerender(
