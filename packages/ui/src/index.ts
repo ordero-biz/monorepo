@@ -6,6 +6,17 @@ export type {
 } from './components/Button';
 export { Button, buttonVariants } from './components/Button';
 export type {
+  CardContentProps,
+  CardDescriptionProps,
+  CardDividerProps,
+  CardFooterProps,
+  CardHeaderProps,
+  CardProps,
+  CardTitleProps,
+  CardVariant,
+} from './components/Card';
+export { Card } from './components/Card';
+export type {
   CheckboxColor,
   CheckboxProps,
   CheckboxSize,
