@@ -30,7 +30,7 @@ test.describe('SignInForm', () => {
   });
 
   test('shows validation feedback for invalid credentials', async ({ page }) => {
-    await page.route('**/api/auth/login', async (route) => {
+    await page.route('**/api/auth/sign-in', async (route) => {
       await route.fulfill({
         status: 422,
         json: {
@@ -75,7 +75,7 @@ test.describe('SignInForm', () => {
   test('keeps the email and clears the password after successful sign in', async ({
     page,
   }) => {
-    await page.route('**/api/auth/login', async (route) => {
+    await page.route('**/api/auth/sign-in', async (route) => {
       await route.fulfill({
         json: {
           authenticated: true,
@@ -99,5 +99,32 @@ test.describe('SignInForm', () => {
 
     await expect(emailField).toHaveValue('admin@gmail.com');
     await expect(passwordField).toHaveValue('');
+  });
+
+  test('shows a toast when sign in fails with a form-level backend error', async ({
+    page,
+  }) => {
+    await page.route('**/api/auth/sign-in', async (route) => {
+      await route.fulfill({
+        status: 401,
+        json: {
+          status: 401,
+          message: 'Invalid credentials.',
+        },
+      });
+    });
+
+    const emailField = page.getByRole('textbox', { name: 'Email address' });
+    const passwordField = page.getByRole('textbox', { name: 'Password' });
+
+    await emailField.pressSequentially('admin@gmail.com');
+    await passwordField.pressSequentially('123456');
+
+    await page.getByRole('button', { name: 'Sign in' }).click();
+
+    await expect(
+      page.getByRole('dialog', { name: 'Invalid credentials.' }),
+    ).toBeVisible();
+    await expect(passwordField).toHaveValue('123456');
   });
 });
