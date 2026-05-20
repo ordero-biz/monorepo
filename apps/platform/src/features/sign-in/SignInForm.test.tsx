@@ -4,7 +4,10 @@ import { signIn } from '@/lib/api/client';
 import { preparePlatformSetup } from '@/test/prepareSetup';
 import { SignInForm } from './SignInForm';
 
-vi.mock('@/lib/api/client', () => ({
+vi.mock('@/lib/api/client', async () => ({
+  ...(await vi.importActual<typeof import('@/lib/api/client')>(
+    '@/lib/api/client'
+  )),
   signIn: vi.fn(),
 }));
 
