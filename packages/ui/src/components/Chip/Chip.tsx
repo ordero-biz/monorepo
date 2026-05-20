@@ -42,41 +42,37 @@ const chipVariants = cva(
       {
         color: 'primary',
         variant: 'filled',
-        class:
-          'bg-[var(--primary-main)] text-[var(--figma-primary-contrast-text)]',
+        class: 'bg-[var(--primary-main)] text-[var(--primary-foreground)]',
       },
       {
         color: 'secondary',
         variant: 'filled',
-        class:
-          'bg-[var(--secondary-main)] text-[var(--figma-secondary-contrast-text)]',
+        class: 'bg-[var(--secondary-main)] text-[var(--white-main)]',
       },
       {
         color: 'info',
         variant: 'filled',
-        class: 'bg-[var(--info-main)] text-[var(--figma-info-contrast-text)]',
+        class: 'bg-[var(--info-main)] text-[var(--white-main)]',
       },
       {
         color: 'success',
         variant: 'filled',
-        class:
-          'bg-[var(--success-main)] text-[var(--figma-success-contrast-text)]',
+        class: 'bg-[var(--success-main)] text-[var(--white-main)]',
       },
       {
         color: 'warning',
         variant: 'filled',
-        class:
-          'bg-[var(--warning-main)] text-[var(--figma-warning-contrast-text)]',
+        class: 'bg-[var(--warning-main)] text-[var(--grey-800)]',
       },
       {
         color: 'error',
         variant: 'filled',
-        class: 'bg-[var(--error-main)] text-[var(--figma-error-contrast-text)]',
+        class: 'bg-[var(--error-main)] text-[var(--white-main)]',
       },
       {
         color: 'inherit',
         variant: 'outlined',
-        class: 'border-[var(--figma-button-outlined)] text-foreground',
+        class: 'border-[var(--button-outlined)] text-foreground',
       },
       {
         color: 'primary',
@@ -111,55 +107,55 @@ const chipVariants = cva(
       {
         color: 'inherit',
         variant: 'soft',
-        class: 'bg-[var(--figma-grey-12)] text-foreground',
+        class: 'bg-[var(--color-grey-12)] text-foreground',
       },
       {
         color: 'primary',
         variant: 'soft',
-        class: 'bg-[var(--figma-primary-16)] text-[var(--primary-dark)]',
+        class: 'bg-[var(--color-primary-16)] text-[var(--primary-dark)]',
       },
       {
         color: 'secondary',
         variant: 'soft',
-        class: 'bg-[var(--figma-secondary-16)] text-[var(--secondary-dark)]',
+        class: 'bg-[var(--color-secondary-16)] text-[var(--secondary-dark)]',
       },
       {
         color: 'info',
         variant: 'soft',
-        class: 'bg-[var(--figma-info-16)] text-[var(--info-dark)]',
+        class: 'bg-[var(--color-info-16)] text-[var(--info-dark)]',
       },
       {
         color: 'success',
         variant: 'soft',
-        class: 'bg-[var(--figma-success-16)] text-[var(--success-dark)]',
+        class: 'bg-[var(--color-success-16)] text-[var(--success-dark)]',
       },
       {
         color: 'warning',
         variant: 'soft',
-        class: 'bg-[var(--figma-warning-16)] text-[var(--warning-dark)]',
+        class: 'bg-[var(--color-warning-16)] text-[var(--warning-dark)]',
       },
       {
         color: 'error',
         variant: 'soft',
-        class: 'bg-[var(--figma-error-16)] text-[var(--error-dark)]',
+        class: 'bg-[var(--color-error-16)] text-[var(--error-dark)]',
       },
       {
         disabled: true,
         variant: 'filled',
         class:
-          'bg-[var(--figma-grey-20)] text-[var(--text-disabled)] [&_svg]:text-[var(--text-disabled)]',
+          'bg-[var(--color-grey-20)] text-[var(--text-disabled)] [&_svg]:text-[var(--text-disabled)]',
       },
       {
         disabled: true,
         variant: 'outlined',
         class:
-          'border-[var(--figma-grey-20)] text-[var(--text-disabled)] [&_svg]:text-[var(--text-disabled)]',
+          'border-[var(--color-grey-20)] text-[var(--text-disabled)] [&_svg]:text-[var(--text-disabled)]',
       },
       {
         disabled: true,
         variant: 'soft',
         class:
-          'bg-[var(--figma-grey-20)] text-[var(--text-disabled)] [&_svg]:text-[var(--text-disabled)]',
+          'bg-[var(--color-grey-20)] text-[var(--text-disabled)] [&_svg]:text-[var(--text-disabled)]',
       },
     ],
     defaultVariants: {

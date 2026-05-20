@@ -1,9 +1,16 @@
-import { prepareSetup } from '@ordero/test-config/react';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { signUp } from '@/lib/api/client';
+import { preparePlatformSetup } from '@/test/prepareSetup';
 import { SignUpForm } from './SignUpForm';
 
-const { setup } = prepareSetup({
+vi.mock('@/lib/api/client', () => ({
+  signUp: vi.fn(),
+}));
+
+const signUpMock = vi.mocked(signUp);
+
+const { setup } = preparePlatformSetup({
   component: SignUpForm,
 });
 
@@ -24,6 +31,9 @@ const setupSignUpForm = () => {
 };
 
 describe('SignUpForm', () => {
+  beforeEach(() => {
+    signUpMock.mockReset();
+  });
   it('renders the expected form controls', () => {
     const { emailField, passwordField, signUpButton, termsCheckbox } =
       setupSignUpForm();
@@ -32,9 +42,10 @@ describe('SignUpForm', () => {
     expect(passwordField).toBeVisible();
     expect(signUpButton).toHaveAttribute('type', 'submit');
     expect(termsCheckbox).not.toBeChecked();
-    expect(
-      screen.getByRole('link', { name: 'terms of use' })
-    ).toHaveAttribute('href', '/terms');
+    expect(screen.getByRole('link', { name: 'terms of use' })).toHaveAttribute(
+      'href',
+      '/terms'
+    );
     expect(
       screen.getByRole('link', { name: 'privacy policy' })
     ).toHaveAttribute('href', '/privacy');
@@ -168,6 +179,12 @@ describe('SignUpForm', () => {
   });
 
   it('keeps the email and clears the password after successful sign up', async () => {
+    signUpMock.mockResolvedValue({
+      ok: true,
+      data: {
+        authenticated: true,
+      },
+    });
     const { emailField, passwordField, signUpButton, termsCheckbox, user } =
       setupSignUpForm();
 
@@ -176,8 +193,35 @@ describe('SignUpForm', () => {
     await user.click(termsCheckbox);
     await user.click(signUpButton);
 
+    expect(signUpMock).toHaveBeenCalledWith({
+      email: 'admin@gmail.com',
+      password: '123456',
+    });
     expect(emailField).toHaveValue('admin@gmail.com');
     expect(passwordField).toHaveValue('');
     expect(termsCheckbox).not.toBeChecked();
+  });
+
+  it('shows a toast when sign up fails with a form-level backend error', async () => {
+    signUpMock.mockResolvedValue({
+      ok: false,
+      error: {
+        status: 500,
+        message: 'Unable to create account.',
+      },
+    });
+    const { emailField, passwordField, signUpButton, termsCheckbox, user } =
+      setupSignUpForm();
+
+    await user.type(emailField, 'admin@gmail.com');
+    await user.type(passwordField, '123456');
+    await user.click(termsCheckbox);
+    await user.click(signUpButton);
+
+    expect(
+      await screen.findByRole('dialog', { name: 'Unable to create account.' })
+    ).toBeVisible();
+    expect(passwordField).toHaveValue('123456');
+    expect(termsCheckbox).toBeChecked();
   });
 });
