@@ -1,10 +1,16 @@
 'use client';
 
-import { Button, PasswordField, TextField, Typography } from '@ordero/ui';
+import {
+  Button,
+  PasswordField,
+  TextField,
+  Typography,
+  useToastManager,
+} from '@ordero/ui';
 import { useForm } from '@tanstack/react-form';
 import { useQueryClient } from '@tanstack/react-query';
+import { signIn } from '@/lib/api/client';
 import { authQueryKeys } from '@/lib/hooks/useSessionQuery';
-import { login } from '@/lib/api/client';
 import { signInDefaultValues } from './constants';
 import { getErrorMessage } from './utils/error';
 import {
@@ -14,7 +20,7 @@ import {
 } from './utils/validations';
 
 const submitSignInToBackend = async (value: SignInFormValues) => {
-  const result = await login(value);
+  const result = await signIn(value);
 
   if (!result.ok) {
     return {
@@ -34,6 +40,7 @@ const submitSignInToBackend = async (value: SignInFormValues) => {
 
 export const SignInForm = () => {
   const queryClient = useQueryClient();
+  const { add: addToast } = useToastManager();
   const form = useForm({
     defaultValues: signInDefaultValues,
     onSubmit: async ({ formApi, value }) => {
@@ -46,6 +53,12 @@ export const SignInForm = () => {
             form: result.error.formError,
           },
         });
+        if (result.error.formError) {
+          addToast({
+            description: result.error.formError,
+            type: 'error',
+          });
+        }
         return;
       }
 

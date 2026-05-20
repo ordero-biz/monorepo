@@ -7,9 +7,10 @@ import {
 import { useSessionQuery } from './useSessionQuery';
 
 vi.mock('@/lib/api/client', async () => {
-  const actual = await vi.importActual<typeof import('@/lib/api/client')>(
-    '@/lib/api/client'
-  );
+  const actual =
+    await vi.importActual<typeof import('@/lib/api/client')>(
+      '@/lib/api/client'
+    );
 
   return {
     ...actual,

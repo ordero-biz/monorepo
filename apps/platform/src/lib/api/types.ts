@@ -14,7 +14,7 @@ export type AuthSession =
       authenticated: false;
     };
 
-export type AuthLoginInput = {
+export type AuthSignInInput = {
   email: string;
   password: string;
 };

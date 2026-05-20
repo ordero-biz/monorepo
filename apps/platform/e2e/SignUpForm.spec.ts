@@ -104,4 +104,36 @@ test.describe('SignUpForm', () => {
     await expect(passwordField).toHaveValue('');
     await expect(termsCheckbox).not.toBeChecked();
   });
+
+  test('shows a toast when sign up fails with a form-level backend error', async ({
+    page,
+  }) => {
+    await page.route('**/api/auth/sign-up', async (route) => {
+      await route.fulfill({
+        status: 500,
+        json: {
+          status: 500,
+          message: 'Unable to create account.',
+        },
+      });
+    });
+
+    const emailField = page.getByRole('textbox', { name: 'Email address' });
+    const passwordField = page.getByRole('textbox', { name: 'Password' });
+    const termsCheckbox = page.getByRole('checkbox', {
+      name: /by signing up, i agree to/i,
+    });
+
+    await emailField.pressSequentially('admin@gmail.com');
+    await passwordField.pressSequentially('123456');
+    await termsCheckbox.check();
+
+    await page.getByRole('button', { name: 'Sign up' }).click();
+
+    await expect(
+      page.getByRole('dialog', { name: 'Unable to create account.' }),
+    ).toBeVisible();
+    await expect(passwordField).toHaveValue('123456');
+    await expect(termsCheckbox).toBeChecked();
+  });
 });
