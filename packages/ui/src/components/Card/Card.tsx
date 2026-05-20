@@ -36,7 +36,7 @@ export const CardRoot = forwardRef<HTMLDivElement, CardProps>(
     const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
       if (onClick && (event.key === 'Enter' || event.key === ' ')) {
         event.preventDefault();
-        onClick(event as unknown as React.MouseEvent<HTMLDivElement>);
+        event.currentTarget.click();
       }
     };
 
