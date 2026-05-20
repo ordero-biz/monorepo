@@ -59,10 +59,12 @@ export const SignUpForm = () => {
             form: result.error.formError,
           },
         });
-        addToast({
-          description: result.error.formError,
-          type: 'error',
-        });
+        if (result.error.formError) {
+          addToast({
+            description: result.error.formError,
+            type: 'error',
+          });
+        }
         return;
       }
 
