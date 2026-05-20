@@ -24,9 +24,6 @@ describe('POST /api/auth/sign-in', () => {
       new Response(
         JSON.stringify({
           token: 'jwt-token',
-          user: {
-            email: 'admin@gmail.com',
-          },
         })
       )
     );
@@ -42,9 +39,6 @@ describe('POST /api/auth/sign-in', () => {
 
     await expect(getJson(response)).resolves.toStrictEqual({
       authenticated: true,
-      user: {
-        email: 'admin@gmail.com',
-      },
     });
     expect(response.headers.get('set-cookie')).toContain(
       `${AUTH_TOKEN_COOKIE_NAME}=jwt-token`
@@ -56,5 +50,49 @@ describe('POST /api/auth/sign-in', () => {
         method: 'POST',
       })
     );
+  });
+
+  it('forwards backend errors during sign-in', async () => {
+    fetchMock.mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          message: 'Invalid credentials.',
+        }),
+        {
+          status: 401,
+          statusText: 'Unauthorized',
+        }
+      )
+    );
+    const response = await signIn(
+      new NextRequest('http://localhost/api/auth/sign-in', {
+        body: JSON.stringify({
+          email: 'admin@gmail.com',
+          password: 'wrongPassword',
+        }),
+        method: 'POST',
+      })
+    );
+
+    expect(response.status).toBe(401);
+    await expect(getJson(response)).resolves.toStrictEqual({
+      status: 401,
+      message: 'Invalid credentials.',
+    });
+  });
+
+  it('returns 400 Bad Request when request body is malformed or invalid JSON', async () => {
+    const response = await signIn(
+      new NextRequest('http://localhost/api/auth/sign-in', {
+        body: 'invalid-json',
+        method: 'POST',
+      })
+    );
+
+    expect(response.status).toBe(400);
+    await expect(getJson(response)).resolves.toStrictEqual({
+      status: 400,
+      message: 'Invalid sign-in request.',
+    });
   });
 });

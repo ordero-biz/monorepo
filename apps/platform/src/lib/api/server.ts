@@ -3,12 +3,12 @@ import {
   AUTH_COOKIE_OPTIONS,
   AUTH_TOKEN_COOKIE_NAME,
 } from '@/lib/api/constants';
-import type { ApiError, ApiResult } from '@/lib/api/types';
+import type { ApiError, ApiResult, Token } from '@/lib/api/types';
 
 type BackendRequestArgs = {
   path: string;
   init?: RequestInit;
-  token?: string;
+  token?: Token;
   search?: string;
 };
 
@@ -212,10 +212,10 @@ export const backendFetch = async <T>({
   };
 };
 
-export const getTokenFromRequest = (request: NextRequest) =>
+export const getTokenFromRequest = (request: NextRequest): Token | undefined =>
   request.cookies.get(AUTH_TOKEN_COOKIE_NAME)?.value;
 
-export const setAuthCookie = (response: NextResponse, token: string) => {
+export const setAuthCookie = (response: NextResponse, token: Token) => {
   response.cookies.set({
     ...AUTH_COOKIE_OPTIONS,
     name: AUTH_TOKEN_COOKIE_NAME,

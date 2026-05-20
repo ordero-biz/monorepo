@@ -1,4 +1,4 @@
-import { apiFetch, getSession, logout, signIn } from './client';
+import { apiFetch, getSession, logout, signIn, signUp } from './client';
 
 describe('apiFetch', () => {
   beforeEach(() => {
@@ -349,6 +349,76 @@ describe('client auth helpers', () => {
         code: undefined,
         fieldErrors: {
           email: 'Use a gmail.com email address.',
+        },
+      },
+    });
+  });
+
+  it('signUp posts credentials to the sign-up route and returns the session on success', async () => {
+    const fetchMock = vi.mocked(fetch);
+
+    fetchMock.mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          authenticated: true,
+        })
+      )
+    );
+
+    await expect(
+      signUp({
+        email: 'new-user@gmail.com',
+        password: 'securePassword1',
+      })
+    ).resolves.toEqual({
+      ok: true,
+      data: {
+        authenticated: true,
+      },
+    });
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/auth/sign-up',
+      expect.objectContaining({
+        method: 'POST',
+        body: JSON.stringify({
+          email: 'new-user@gmail.com',
+          password: 'securePassword1',
+        }),
+        cache: 'no-store',
+      })
+    );
+  });
+
+  it('signUp returns normalized failures from the sign-up route', async () => {
+    vi.mocked(fetch).mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          message: 'Sign-up failed.',
+          fieldErrors: {
+            email: 'This email is already registered.',
+          },
+        }),
+        {
+          status: 409,
+          statusText: 'Conflict',
+        }
+      )
+    );
+
+    await expect(
+      signUp({
+        email: 'existing@gmail.com',
+        password: 'securePassword1',
+      })
+    ).resolves.toEqual({
+      ok: false,
+      error: {
+        status: 409,
+        message: 'Sign-up failed.',
+        code: undefined,
+        fieldErrors: {
+          email: 'This email is already registered.',
         },
       },
     });
