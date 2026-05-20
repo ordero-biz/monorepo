@@ -1,3 +1,5 @@
+export type Token = string;
+
 export type AuthUser = {
   id?: string;
   email?: string;
