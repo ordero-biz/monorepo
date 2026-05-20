@@ -92,7 +92,8 @@ Use this as the default shape unless a feature has a clear reason to differ:
 4. keep field components in `packages/ui` controlled and form-library agnostic
 5. reveal client validation errors after blur, then update them live during correction
 6. on submit, send the current form values to the backend
-7. map backend field or form errors back into TanStack Form in the feature
+7. map backend field errors back into TanStack Form in the feature
+8. show form-level backend errors through the shared toast surface
 
 This gives each form a predictable shape without introducing shared abstractions
 too early.
@@ -107,7 +108,8 @@ Submit flow should be:
 1. collect current field values from TanStack Form
 2. submit to the backend or feature submit adapter
 3. map backend field errors back into the form with `setErrorMap`
-4. keep backend validation authoritative
+4. show backend form errors through a toast
+5. keep backend validation authoritative
 
 Client validation should never be treated as a replacement for backend
 validation.
@@ -118,8 +120,8 @@ Treat client and submit errors as separate concerns.
 
 - client validation errors should support inline correction
 - submit or backend errors should be mapped back to fields when possible
-- form-level submit errors should be rendered in a form-level error area
-- form-level submit errors may also use an app-level notification when the feature needs a global failure surface
+- form-level backend errors should use the shared toast surface
+- do not add a separate form-level error area unless the feature has a documented reason to keep the message persistently inline
 - field-level submit errors should not depend on prior blur state to become visible
 - when both client and backend errors are present, prefer the error that best explains the current state of the field to the user
 - if backend error mapping needs normalization, keep that logic inside the feature until multiple forms share the same server contract
