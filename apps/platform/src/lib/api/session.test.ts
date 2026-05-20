@@ -1,7 +1,10 @@
 import { backendFetch } from '@/lib/api/server';
 import { getServerSession } from './session';
 
-vi.mock('@/lib/api/server', () => ({
+vi.mock('@/lib/api/server', async () => ({
+  ...(await vi.importActual<typeof import('@/lib/api/server')>(
+    '@/lib/api/server'
+  )),
   backendFetch: vi.fn(),
 }));
 

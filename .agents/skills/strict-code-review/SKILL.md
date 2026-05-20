@@ -132,6 +132,7 @@ When the diff touches UI components, styles, stories, or tests, also apply the r
 - check whether the change preserves the semantic token architecture described in `docs/ui-tokens.md`
 - for component tests across `apps` and `packages`, expect `prepareSetup` to be the default when the file has repeated default props or a stable wrapper; treat ad hoc render helpers as the exception
 - for `prepareSetup`-based tests, expect overridden props that are later asserted on to be destructured from `setup(...)` rather than tracked in separate local variables
+- for unit/component tests, expect mock configurations of any multi-export local or shared module to use inline async `vi.importActual` partial mocks to preserve all adjacent actual exports and prevent fragile test setups
 
 From `AGENTS.md` and local skills, pay particular attention to:
 
@@ -217,7 +218,7 @@ clear documented reason to differ:
 Review submit and error handling for:
 
 - backend field errors being mapped back into the form in the feature layer
-- form-level submit errors being rendered in a form-level error area
+- form-level submit errors being rendered in a toast or app-level notification
 - field-level submit errors not depending on prior blur state to become visible
 - client validation not being treated as a replacement for backend validation
 
@@ -278,6 +279,7 @@ Use these questions to sharpen the review before writing findings:
 - a shared component is added but not exported from `packages/ui/src/index.ts`
 - a `packages/ui` test file is placed away from the component instead of next to the file it covers
 - a shared component or story is added in a location that breaks the current `packages/ui` structure or import flow
+- a unit/component test mocks a local or shared multi-export module destructively (e.g. overriding the entire module) instead of preserving adjacent actual exports with an inline async `vi.importActual` partial mock
 
 ## What not to over-report
 

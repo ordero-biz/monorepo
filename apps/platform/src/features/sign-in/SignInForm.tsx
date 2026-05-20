@@ -50,7 +50,6 @@ export const SignInForm = () => {
         formApi.setErrorMap({
           onSubmit: {
             fields: result.error.fieldErrors ?? {},
-            form: result.error.formError,
           },
         });
         if (result.error.formError) {

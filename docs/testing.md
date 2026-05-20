@@ -41,6 +41,23 @@ For `input[type="password"]`, prefer `getByLabelText(...)` in jsdom tests.
 Password inputs do not expose the same role behavior in Testing Library that
 they do in a real browser.
 
+### Module Mocking
+
+When mocking local or shared modules that have multiple exports, avoid destructive full-module mocks like `vi.mock('@/path/to/module', () => ({ ... }))`. Full module mocks destroy all other actual exports inside the module, leading to fragile tests and high maintenance overhead when developers later import other helper functions from the same file.
+
+Instead, preserve the original implementation of other exported helpers by using an inline async partial mock with `vi.importActual`:
+
+```typescript
+vi.mock('@/path/to/module', async () => ({
+  ...(await vi.importActual<typeof import('@/path/to/module')>('@/path/to/module')),
+  targetExport: vi.fn(),
+}));
+```
+
+Using this pattern keeps all adjacent utilities fully operational while safely isolating your mock target.
+
+
+
 ### Storybook Browser Tests
 
 Use Storybook Vitest tests for shared UI stories in `packages/ui`.
