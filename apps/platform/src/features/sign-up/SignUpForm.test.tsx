@@ -224,4 +224,32 @@ describe('SignUpForm', () => {
     expect(passwordField).toHaveValue('123456');
     expect(termsCheckbox).toBeChecked();
   });
+
+  it('clears the backend email error when the user edits the email field after a failed submit', async () => {
+    signUpMock.mockResolvedValue({
+      ok: false,
+      error: {
+        status: 409,
+        message: 'Sign-up failed.',
+        fieldErrors: {
+          email: 'This email is already registered.',
+        },
+      },
+    });
+    const { emailField, passwordField, signUpButton, termsCheckbox, user } =
+      setupSignUpForm();
+
+    await user.type(emailField, 'existing@gmail.com');
+    await user.type(passwordField, '123456');
+    await user.click(termsCheckbox);
+    await user.click(signUpButton);
+
+    expect(screen.getByText('This email is already registered.')).toBeVisible();
+
+    await user.type(emailField, 'g');
+
+    expect(
+      screen.queryByText('This email is already registered.')
+    ).not.toBeInTheDocument();
+  });
 });

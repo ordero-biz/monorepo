@@ -160,6 +160,32 @@ describe('SignInForm', () => {
     expect(passwordField).toHaveValue('123456');
   });
 
+  it('clears the backend email error when the user edits the email field after a failed submit', async () => {
+    signInMock.mockResolvedValue({
+      ok: false,
+      error: {
+        status: 422,
+        message: 'Sign-in failed.',
+        fieldErrors: {
+          email: 'Use a gmail.com email address.',
+        },
+      },
+    });
+    const { emailField, passwordField, signInButton, user } = setupSignInForm();
+
+    await user.type(emailField, 'admin@mail.com');
+    await user.type(passwordField, '123456');
+    await user.click(signInButton);
+
+    expect(screen.getByText('Use a gmail.com email address.')).toBeVisible();
+
+    await user.type(emailField, 'g');
+
+    expect(
+      screen.queryByText('Use a gmail.com email address.')
+    ).not.toBeInTheDocument();
+  });
+
   it('submits credentials, keeps the email, and clears the password after successful sign in', async () => {
     signInMock.mockResolvedValue({
       ok: true,
