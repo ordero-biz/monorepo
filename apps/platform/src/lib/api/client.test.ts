@@ -1,4 +1,4 @@
-import { apiFetch, getSession, login, logout } from './client';
+import { apiFetch, getSession, logout, signIn } from './client';
 
 describe('apiFetch', () => {
   beforeEach(() => {
@@ -20,7 +20,7 @@ describe('apiFetch', () => {
       )
     );
 
-    await apiFetch('/api/auth/login', {
+    await apiFetch('/api/auth/sign-in', {
       method: 'POST',
       body: {
         email: 'admin@gmail.com',
@@ -29,7 +29,7 @@ describe('apiFetch', () => {
     });
 
     expect(fetchMock).toHaveBeenCalledWith(
-      '/api/auth/login',
+      '/api/auth/sign-in',
       expect.objectContaining({
         method: 'POST',
         body: JSON.stringify({
@@ -173,7 +173,7 @@ describe('apiFetch', () => {
       )
     );
 
-    await expect(apiFetch('/api/auth/login')).resolves.toEqual({
+    await expect(apiFetch('/api/auth/sign-in')).resolves.toEqual({
       ok: false,
       error: {
         status: 422,
@@ -200,7 +200,7 @@ describe('apiFetch', () => {
       )
     );
 
-    await expect(apiFetch('/api/auth/login')).resolves.toEqual({
+    await expect(apiFetch('/api/auth/sign-in')).resolves.toEqual({
       ok: false,
       error: {
         status: 400,
@@ -278,7 +278,7 @@ describe('client auth helpers', () => {
     vi.unstubAllGlobals();
   });
 
-  it('login posts credentials to the login route and returns the session on success', async () => {
+  it('signIn posts credentials to the sign-in route and returns the session on success', async () => {
     const fetchMock = vi.mocked(fetch);
 
     fetchMock.mockResolvedValue(
@@ -293,7 +293,7 @@ describe('client auth helpers', () => {
     );
 
     await expect(
-      login({
+      signIn({
         email: 'admin@gmail.com',
         password: '123456',
       })
@@ -308,7 +308,7 @@ describe('client auth helpers', () => {
     });
 
     expect(fetchMock).toHaveBeenCalledWith(
-      '/api/auth/login',
+      '/api/auth/sign-in',
       expect.objectContaining({
         method: 'POST',
         body: JSON.stringify({
@@ -320,7 +320,7 @@ describe('client auth helpers', () => {
     );
   });
 
-  it('login returns normalized failures from the login route', async () => {
+  it('signIn returns normalized failures from the sign-in route', async () => {
     vi.mocked(fetch).mockResolvedValue(
       new Response(
         JSON.stringify({
@@ -337,7 +337,7 @@ describe('client auth helpers', () => {
     );
 
     await expect(
-      login({
+      signIn({
         email: 'admin@mail.com',
         password: '123456',
       })

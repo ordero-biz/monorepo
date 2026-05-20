@@ -4,8 +4,8 @@ import { CLIENT_AUTH_PATHS } from '@/lib/api/constants';
 import type {
   ApiError,
   ApiResult,
-  AuthLoginInput,
   AuthSession,
+  AuthSignInInput,
   AuthSignUpInput,
 } from '@/lib/api/types';
 
@@ -99,7 +99,9 @@ export const apiFetch = async <T>(
       error: {
         status: 500,
         message:
-          error instanceof Error ? error.message : 'Unable to complete request.',
+          error instanceof Error
+            ? error.message
+            : 'Unable to complete request.',
       },
     };
   }
@@ -117,8 +119,8 @@ export const apiFetch = async <T>(
   };
 };
 
-export const login = (input: AuthLoginInput) =>
-  apiFetch<AuthSession>(CLIENT_AUTH_PATHS.login, {
+export const signIn = (input: AuthSignInInput) =>
+  apiFetch<AuthSession>(CLIENT_AUTH_PATHS.signIn, {
     method: 'POST',
     body: input,
   });

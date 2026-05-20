@@ -8,14 +8,14 @@ export const AUTH_COOKIE_OPTIONS = {
 } as const;
 
 export const BACKEND_AUTH_PATHS = {
-  login: '/auth/login',
+  signIn: '/api/v1/platform/owners/login',
   logout: '/auth/logout',
   me: '/me',
   signUp: '/api/v1/platform/owners/sign-up',
 } as const;
 
 export const CLIENT_AUTH_PATHS = {
-  login: '/api/auth/login',
+  signIn: '/api/auth/sign-in',
   logout: '/api/auth/logout',
   session: '/api/auth/session',
   signUp: '/api/auth/sign-up',

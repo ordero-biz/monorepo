@@ -1,14 +1,14 @@
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { login } from '@/lib/api/client';
+import { signIn } from '@/lib/api/client';
 import { preparePlatformSetup } from '@/test/prepareSetup';
 import { SignInForm } from './SignInForm';
 
 vi.mock('@/lib/api/client', () => ({
-  login: vi.fn(),
+  signIn: vi.fn(),
 }));
 
-const loginMock = vi.mocked(login);
+const signInMock = vi.mocked(signIn);
 
 const { setup } = preparePlatformSetup({
   component: SignInForm,
@@ -29,7 +29,7 @@ const setupSignInForm = () => {
 
 describe('SignInForm', () => {
   beforeEach(() => {
-    loginMock.mockReset();
+    signInMock.mockReset();
   });
 
   it('renders the expected form controls and secondary actions', () => {
@@ -133,7 +133,7 @@ describe('SignInForm', () => {
   });
 
   it('shows the backend email error for a valid rejected address on submit', async () => {
-    loginMock.mockResolvedValue({
+    signInMock.mockResolvedValue({
       ok: false,
       error: {
         status: 422,
@@ -149,7 +149,7 @@ describe('SignInForm', () => {
     await user.type(passwordField, '123456');
     await user.click(signInButton);
 
-    expect(loginMock).toHaveBeenCalledWith({
+    expect(signInMock).toHaveBeenCalledWith({
       email: 'admin@mail.com',
       password: '123456',
     });
@@ -161,7 +161,7 @@ describe('SignInForm', () => {
   });
 
   it('submits credentials, keeps the email, and clears the password after successful sign in', async () => {
-    loginMock.mockResolvedValue({
+    signInMock.mockResolvedValue({
       ok: true,
       data: {
         authenticated: true,
@@ -176,7 +176,7 @@ describe('SignInForm', () => {
     await user.type(passwordField, '123456');
     await user.click(signInButton);
 
-    expect(loginMock).toHaveBeenCalledWith({
+    expect(signInMock).toHaveBeenCalledWith({
       email: 'admin@gmail.com',
       password: '123456',
     });
@@ -186,10 +186,10 @@ describe('SignInForm', () => {
 
   it('shows a submitting state while login is in flight', async () => {
     let resolveLogin:
-      | ((value: Awaited<ReturnType<typeof login>>) => void)
+      | ((value: Awaited<ReturnType<typeof signIn>>) => void)
       | undefined;
 
-    loginMock.mockReturnValue(
+    signInMock.mockReturnValue(
       new Promise((resolve) => {
         resolveLogin = resolve;
       })
@@ -214,5 +214,25 @@ describe('SignInForm', () => {
     });
 
     await screen.findByRole('button', { name: 'Sign in' });
+  });
+
+  it('shows a toast when sign in fails with a form-level backend error', async () => {
+    signInMock.mockResolvedValue({
+      ok: false,
+      error: {
+        status: 401,
+        message: 'Invalid credentials.',
+      },
+    });
+    const { emailField, passwordField, signInButton, user } = setupSignInForm();
+
+    await user.type(emailField, 'admin@gmail.com');
+    await user.type(passwordField, '123456');
+    await user.click(signInButton);
+
+    expect(
+      await screen.findByRole('dialog', { name: 'Invalid credentials.' })
+    ).toBeVisible();
+    expect(passwordField).toHaveValue('123456');
   });
 });
