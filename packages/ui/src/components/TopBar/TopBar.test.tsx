@@ -1,12 +1,12 @@
 import { prepareSetup } from '@ordero/test-config/react';
 import { screen } from '@testing-library/react';
 import { Bell, Search } from 'lucide-react';
-import { TopBar } from './TopBar';
+import { TopBar } from '.';
 import type { TopBarProps } from './types';
 
 describe('TopBar', () => {
   const { setup } = prepareSetup<TopBarProps>({
-    component: TopBar,
+    component: TopBar.Root,
     props: {},
   });
 
@@ -51,9 +51,7 @@ describe('TopBar', () => {
       ),
     });
 
-    expect(
-      screen.getByRole('button', { name: 'Search' })
-    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Search' })).toBeInTheDocument();
     expect(
       screen.getByRole('button', { name: 'Notifications' })
     ).toBeInTheDocument();

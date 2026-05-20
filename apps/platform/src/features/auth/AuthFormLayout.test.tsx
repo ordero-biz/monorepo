@@ -25,8 +25,6 @@ describe('AuthFormLayout', () => {
     expect(
       screen.getByRole('link', { name: 'Create account' })
     ).toHaveAttribute('href', '/sign-up');
-    expect(
-      screen.getByRole('button', { name: 'Child action' })
-    ).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Child action' })).toBeVisible();
   });
 });

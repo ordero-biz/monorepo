@@ -33,6 +33,48 @@ Always also apply:
 - Put exported prop types in local `types.ts`.
 - Use single quotes in new TS/TSX code, except JSX attributes which should stay double-quoted.
 
+## Compound Component Namespace Pattern
+
+For shared `packages/ui` components with multiple public parts, prefer the Base UI-style namespace export pattern.
+
+Use this shape:
+
+- `[ComponentName].tsx` exports the root implementation as `[ComponentName]Root`
+- sibling files export named implementation parts, such as `[ComponentName]Trigger`, `[ComponentName]Content`, `[ComponentName]Left`
+- `index.parts.ts` maps implementation names to public part names
+- `index.ts` exports the namespace with `export * as [ComponentName] from './index.parts'`
+- `packages/ui/src/index.ts` exports only `{ [ComponentName] }` plus public prop types
+
+Example:
+
+```ts
+// Component/index.parts.ts
+export { ComponentRoot as Root } from './Component';
+export { ComponentLeft as Left } from './ComponentLeft';
+export { ComponentRight as Right } from './ComponentRight';
+
+// Component/index.ts
+export * as Component from './index.parts';
+export type {
+  ComponentLeftProps,
+  ComponentProps,
+  ComponentRightProps,
+} from './types';
+```
+
+Consumers should use:
+
+```tsx
+<Component.Root>
+  <Component.Left />
+  <Component.Right />
+</Component.Root>
+```
+
+Avoid `Object.assign(root, { Part })` for new shared compound components unless backward compatibility requires the callable shorthand `<Component><Component.Part /></Component>`.
+
+Do not use this namespace pattern for single-part components such as `Button`, `Input`, `IconButton`, or `Chip`.
+
 ## File Structure
 
 For each shared component, create or preserve:
@@ -40,6 +82,7 @@ For each shared component, create or preserve:
 - `packages/ui/src/components/[ComponentName]/[ComponentName].tsx`
 - `packages/ui/src/components/[ComponentName]/types.ts`
 - `packages/ui/src/components/[ComponentName]/index.ts`
+- `packages/ui/src/components/[ComponentName]/index.parts.ts` when the component has multiple public parts
 - `packages/ui/src/components/[ComponentName]/[ComponentName].test.tsx`
 - `packages/ui/stories/[ComponentName].stories.tsx`
 - `packages/ui/src/components/[ComponentName]/styles.css` only when the component needs component-specific CSS that cannot live cleanly in Tailwind class strings

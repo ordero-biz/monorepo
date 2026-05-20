@@ -1,17 +1,44 @@
 'use client';
 
 import { ToastProvider, ToastViewport } from '@ordero/ui';
+import {
+  environmentManager,
+  QueryClient,
+  QueryClientProvider,
+} from '@tanstack/react-query';
 import type { ReactNode } from 'react';
 
 type AppProvidersProps = {
   children: ReactNode;
 };
 
-export const AppProviders = ({ children }: AppProvidersProps) => {
-  return (
-    <ToastProvider>
-      {children}
-      <ToastViewport />
-    </ToastProvider>
-  );
+const makeQueryClient = () =>
+  new QueryClient({
+    defaultOptions: {
+      queries: {
+        retry: false,
+        staleTime: 60_000,
+      },
+    },
+  });
+
+let browserQueryClient: QueryClient | undefined;
+
+export const getQueryClient = () => {
+  if (environmentManager.isServer()) {
+    return makeQueryClient();
+  }
+
+  browserQueryClient ??= makeQueryClient();
+
+  return browserQueryClient;
 };
+
+export const AppProviders = ({ children }: AppProvidersProps) => (
+  <ToastProvider>
+    <QueryClientProvider client={getQueryClient()}>
+      {children}
+    </QueryClientProvider>
+    <ToastViewport />
+  </ToastProvider>
+);

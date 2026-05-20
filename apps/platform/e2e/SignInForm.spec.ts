@@ -30,6 +30,19 @@ test.describe('SignInForm', () => {
   });
 
   test('shows validation feedback for invalid credentials', async ({ page }) => {
+    await page.route('**/api/auth/login', async (route) => {
+      await route.fulfill({
+        status: 422,
+        json: {
+          status: 422,
+          message: 'Sign-in failed.',
+          fieldErrors: {
+            email: 'Use a gmail.com email address.',
+          },
+        },
+      });
+    });
+
     const emailField = page.getByRole('textbox', { name: 'Email address' });
     const passwordField = page.getByRole('textbox', { name: 'Password' });
 
@@ -62,6 +75,17 @@ test.describe('SignInForm', () => {
   test('keeps the email and clears the password after successful sign in', async ({
     page,
   }) => {
+    await page.route('**/api/auth/login', async (route) => {
+      await route.fulfill({
+        json: {
+          authenticated: true,
+          user: {
+            email: 'admin@gmail.com',
+          },
+        },
+      });
+    });
+
     const emailField = page.getByRole('textbox', { name: 'Email address' });
     const passwordField = page.getByRole('textbox', { name: 'Password' });
 

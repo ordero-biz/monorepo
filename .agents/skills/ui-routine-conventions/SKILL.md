@@ -83,7 +83,7 @@ Required tooling defaults across apps and packages:
 
 - `@testing-library/react`
 - `@testing-library/user-event`
-- `prepareSetup` from `@ordero/test-config/react` for component test setup, unless a one-off `render(...)` makes required surrounding structure clearer
+- `prepareSetup` from the app/package test helper, or from `@ordero/test-config/react` when no local helper exists, for component test setup
 - Vitest globals (`describe`, `it`, `expect`, `vi`, etc.) without per-file imports
 
 Testing layer split for `packages/ui`:
@@ -98,13 +98,18 @@ For app feature/component tests outside `packages/ui`:
 - use Playwright for routed/composed app flows, smoke coverage, browser integration, and behavior that depends on the real browser page
 - prefer role/name queries when available; use `getByLabelText` for inputs that do not expose a queryable role in jsdom, such as `input[type="password"]`
 - configure app TypeScript/Vitest so Vitest globals are available in test files; do not import Vitest globals per file as a workaround
+- when an app-level `prepareSetup` helper exists, always use it so app providers and test defaults stay consistent
+- if no app-level `prepareSetup` helper exists, use the shared helper from `@ordero/test-config/react`
 - use `prepareSetup` as the base render helper, and layer a small local `setup...` helper on top when the test needs named queried elements or a `userEvent` instance
+- avoid hand-rolled `render(...)` wrappers for provider setup; add missing providers to the local `prepareSetup` helper instead
+- for request-driven component and hook tests, mock the nearest app-owned request helper rather than transport details
+- for request-driven component tests, assert user-visible behavior and request-helper contract rather than internal cache or state-container data
 
 For the repo-specific accessibility testing workflow, see `references/accessibility-testing.md`.
 
 For shared component tests with repeated default props, use `prepareSetup`.
 When a `prepareSetup` test overrides a prop and later asserts on that prop, destructure the asserted value from the object returned by `setup(...)` instead of keeping a separate local variable for the same override.
-Use plain `render(...)` only for one-off tests that need surrounding structure such as forms, extra focus targets, or similar setup that would be less clear with `prepareSetup`.
+Use plain `render(...)` only for one-off tests that need test-local DOM around the component, such as a host form or extra focus targets, not for app/provider setup.
 See `references/prepare-setup-example.md` for the canonical pattern.
 
 ## CSS Variable Conventions
@@ -164,6 +169,7 @@ Do not promote every component token into Tailwind utilities up front. Revisit p
 
 For shared UI work across `packages` and `apps`:
 
+- keep app-level client context in a single `AppProviders` component near the app root; add new app-wide providers there instead of creating parallel provider wrappers in `layout.tsx`
 - prefer semantic HTML elements over generic `div` and `span` wrappers when the content has clear structural meaning such as navigation, lists, sections, headers, footers, or other landmark/sectioning roles
 - use non-semantic wrappers only when semantic elements would be incorrect for the content or when a library primitive constrains the rendered element
 - prefer Base UI primitives/components whenever a matching primitive/component exists
