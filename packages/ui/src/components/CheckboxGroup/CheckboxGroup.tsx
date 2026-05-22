@@ -3,14 +3,7 @@
 import { CheckboxGroup as CheckboxGroupPrimitive } from '@base-ui/react/checkbox-group';
 import { Field } from '@base-ui/react/field';
 import { cva } from 'class-variance-authority';
-import {
-  forwardRef,
-  useCallback,
-  useEffect,
-  useId,
-  useRef,
-  useState,
-} from 'react';
+import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { cn } from '@/ui/lib/utils';
 import type { CheckboxGroupProps } from './types';
 
@@ -66,151 +59,142 @@ const renderSupportText = ({
   </>
 );
 
-export const CheckboxGroup = forwardRef<HTMLDivElement, CheckboxGroupProps>(
-  (
-    {
-      'aria-describedby': ariaDescribedBy,
-      'aria-label': ariaLabel,
-      'aria-labelledby': ariaLabelledBy,
-      allValues,
-      children,
-      defaultValue,
-      disabled = false,
-      errorIcon,
-      errorText,
-      helperIcon,
-      helperText,
-      id,
-      invalid = false,
-      label,
-      name,
-      onValueChange,
-      orientation = 'vertical',
-      value,
+export const CheckboxGroup = ({
+  'aria-describedby': ariaDescribedBy,
+  'aria-label': ariaLabel,
+  'aria-labelledby': ariaLabelledBy,
+  allValues,
+  children,
+  defaultValue,
+  disabled = false,
+  errorIcon,
+  errorText,
+  helperIcon,
+  helperText,
+  id,
+  invalid = false,
+  label,
+  name,
+  onValueChange,
+  orientation = 'vertical',
+  ref,
+  value,
+}: CheckboxGroupProps) => {
+  const generatedLabelId = useId();
+  const supportTextId = useId();
+  const groupRef = useRef<HTMLDivElement | null>(null);
+  const [resetKey, setResetKey] = useState(0);
+  const hasErrorText = Boolean(invalid && errorText);
+  const hasHelperText = Boolean(helperText);
+  const labelId = label ? `${generatedLabelId}-label` : undefined;
+  const labelledBy =
+    [ariaLabelledBy, labelId].filter(Boolean).join(' ') || undefined;
+  const describedBy =
+    [ariaDescribedBy, hasErrorText || hasHelperText ? supportTextId : undefined]
+      .filter(Boolean)
+      .join(' ') || undefined;
+  const isParentMode = allValues !== undefined;
+  const isUncontrolledStandardGroup = !isParentMode && value === undefined;
+  const setRefs = useCallback(
+    (node: HTMLDivElement | null) => {
+      groupRef.current = node;
+
+      if (typeof ref === 'function') {
+        ref(node);
+        return;
+      }
+
+      if (ref) {
+        ref.current = node;
+      }
     },
-    ref
-  ) => {
-    const generatedLabelId = useId();
-    const supportTextId = useId();
-    const groupRef = useRef<HTMLDivElement | null>(null);
-    const [resetKey, setResetKey] = useState(0);
-    const hasErrorText = Boolean(invalid && errorText);
-    const hasHelperText = Boolean(helperText);
-    const labelId = label ? `${generatedLabelId}-label` : undefined;
-    const labelledBy =
-      [ariaLabelledBy, labelId].filter(Boolean).join(' ') || undefined;
-    const describedBy =
-      [
-        ariaDescribedBy,
-        hasErrorText || hasHelperText ? supportTextId : undefined,
-      ]
-        .filter(Boolean)
-        .join(' ') || undefined;
-    const isParentMode = allValues !== undefined;
-    const isUncontrolledStandardGroup = !isParentMode && value === undefined;
-    const setRefs = useCallback(
-      (node: HTMLDivElement | null) => {
-        groupRef.current = node;
+    [ref]
+  );
 
-        if (typeof ref === 'function') {
-          ref(node);
-          return;
-        }
+  useEffect(() => {
+    if (!isUncontrolledStandardGroup) {
+      return;
+    }
 
-        if (ref) {
-          ref.current = node;
-        }
-      },
-      [ref]
-    );
+    const form = groupRef.current?.closest('form');
 
-    useEffect(() => {
-      if (!isUncontrolledStandardGroup) {
-        return;
-      }
+    if (!form) {
+      return;
+    }
 
-      const form = groupRef.current?.closest('form');
+    const handleReset = () => {
+      setResetKey((currentKey) => currentKey + 1);
+    };
 
-      if (!form) {
-        return;
-      }
+    form.addEventListener('reset', handleReset);
 
-      const handleReset = () => {
-        setResetKey((currentKey) => currentKey + 1);
-      };
+    return () => {
+      form.removeEventListener('reset', handleReset);
+    };
+  }, [isUncontrolledStandardGroup]);
 
-      form.addEventListener('reset', handleReset);
-
-      return () => {
-        form.removeEventListener('reset', handleReset);
-      };
-    }, [isUncontrolledStandardGroup]);
-
-    return (
-      <Field.Root
-        className="flex w-full min-w-0 flex-col"
-        data-slot="checkbox-group"
-        disabled={disabled}
-        invalid={invalid}
-        name={name}
-      >
-        {label ? (
-          <div
-            className={cn(
-              labelClassName,
-              getLabelColorClassName({
-                disabled,
-                invalid,
-              })
-            )}
-            id={labelId}
-          >
-            {label}
-          </div>
-        ) : null}
-        <CheckboxGroupPrimitive
-          allValues={allValues}
-          aria-describedby={describedBy}
-          aria-label={ariaLabel}
-          aria-labelledby={labelledBy}
-          defaultValue={
-            isUncontrolledStandardGroup ? (defaultValue ?? []) : undefined
-          }
-          disabled={disabled}
-          id={id}
-          onValueChange={onValueChange}
-          key={isUncontrolledStandardGroup ? resetKey : undefined}
-          ref={setRefs}
-          value={value}
-          className={cn(checkboxGroupRootVariants({ orientation }))}
+  return (
+    <Field.Root
+      className="flex w-full min-w-0 flex-col"
+      data-slot="checkbox-group"
+      disabled={disabled}
+      invalid={invalid}
+      name={name}
+    >
+      {label ? (
+        <div
+          className={cn(
+            labelClassName,
+            getLabelColorClassName({
+              disabled,
+              invalid,
+            })
+          )}
+          id={labelId}
         >
-          {children}
-        </CheckboxGroupPrimitive>
-        {hasErrorText ? (
-          <p
-            className={cn(helperTextClassName, 'text-destructive')}
-            id={supportTextId}
-          >
-            {renderSupportText({
-              icon: errorIcon,
-              text: errorText,
-            })}
-          </p>
-        ) : null}
-        {hasHelperText && !hasErrorText ? (
-          <p
-            className={cn(helperTextClassName, 'text-text-secondary')}
-            id={supportTextId}
-          >
-            {renderSupportText({
-              icon: helperIcon,
-              text: helperText,
-            })}
-          </p>
-        ) : null}
-      </Field.Root>
-    );
-  }
-);
-
-CheckboxGroup.displayName = 'CheckboxGroup';
+          {label}
+        </div>
+      ) : null}
+      <CheckboxGroupPrimitive
+        allValues={allValues}
+        aria-describedby={describedBy}
+        aria-label={ariaLabel}
+        aria-labelledby={labelledBy}
+        defaultValue={
+          isUncontrolledStandardGroup ? (defaultValue ?? []) : undefined
+        }
+        disabled={disabled}
+        id={id}
+        onValueChange={onValueChange}
+        key={isUncontrolledStandardGroup ? resetKey : undefined}
+        ref={setRefs}
+        value={value}
+        className={cn(checkboxGroupRootVariants({ orientation }))}
+      >
+        {children}
+      </CheckboxGroupPrimitive>
+      {hasErrorText ? (
+        <p
+          className={cn(helperTextClassName, 'text-destructive')}
+          id={supportTextId}
+        >
+          {renderSupportText({
+            icon: errorIcon,
+            text: errorText,
+          })}
+        </p>
+      ) : null}
+      {hasHelperText && !hasErrorText ? (
+        <p
+          className={cn(helperTextClassName, 'text-text-secondary')}
+          id={supportTextId}
+        >
+          {renderSupportText({
+            icon: helperIcon,
+            text: helperText,
+          })}
+        </p>
+      ) : null}
+    </Field.Root>
+  );
+};

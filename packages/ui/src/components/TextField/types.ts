@@ -6,6 +6,7 @@ import type {
   HTMLInputTypeAttribute,
   KeyboardEventHandler,
   ReactNode,
+  Ref,
 } from 'react';
 
 export type TextFieldSize = 's' | 'm';
@@ -35,6 +36,7 @@ export type TextFieldProps = {
   onValueChange?: (value: string, details: InputChangeEventDetails) => void;
   placeholder?: string;
   readOnly?: boolean;
+  ref?: Ref<HTMLElement>;
   required?: boolean;
   size?: TextFieldSize;
   startAdornment?: ReactNode;

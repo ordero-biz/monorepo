@@ -3,14 +3,7 @@
 import { Field } from '@base-ui/react/field';
 import { RadioGroup as RadioGroupPrimitive } from '@base-ui/react/radio-group';
 import { cva } from 'class-variance-authority';
-import {
-  forwardRef,
-  useCallback,
-  useEffect,
-  useId,
-  useRef,
-  useState,
-} from 'react';
+import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { renderFieldLabelContent } from '@/ui/components/shared/renderFieldLabelContent';
 import { cn } from '@/ui/lib/utils';
 import type { RadioGroupProps } from './types';
@@ -67,154 +60,145 @@ const renderSupportText = ({
   </>
 );
 
-export const RadioGroup = forwardRef<HTMLDivElement, RadioGroupProps>(
-  (
-    {
-      'aria-describedby': ariaDescribedBy,
-      'aria-label': ariaLabel,
-      'aria-labelledby': ariaLabelledBy,
-      children,
-      defaultValue,
-      disabled = false,
-      errorIcon,
-      errorText,
-      helperIcon,
-      helperText,
-      id,
-      inputRef,
-      invalid = false,
-      label,
-      name,
-      onValueChange,
-      orientation = 'vertical',
-      readOnly = false,
-      required = false,
-      value,
+export const RadioGroup = ({
+  'aria-describedby': ariaDescribedBy,
+  'aria-label': ariaLabel,
+  'aria-labelledby': ariaLabelledBy,
+  children,
+  defaultValue,
+  disabled = false,
+  errorIcon,
+  errorText,
+  helperIcon,
+  helperText,
+  id,
+  inputRef,
+  invalid = false,
+  label,
+  name,
+  onValueChange,
+  orientation = 'vertical',
+  readOnly = false,
+  ref,
+  required = false,
+  value,
+}: RadioGroupProps) => {
+  const generatedLabelId = useId();
+  const supportTextId = useId();
+  const groupRef = useRef<HTMLDivElement | null>(null);
+  const [resetKey, setResetKey] = useState(0);
+  const hasErrorText = Boolean(invalid && errorText);
+  const hasHelperText = Boolean(helperText);
+  const labelId = label ? `${generatedLabelId}-label` : undefined;
+  const labelledBy =
+    [ariaLabelledBy, labelId].filter(Boolean).join(' ') || undefined;
+  const describedBy =
+    [ariaDescribedBy, hasErrorText || hasHelperText ? supportTextId : undefined]
+      .filter(Boolean)
+      .join(' ') || undefined;
+  const isUncontrolled = value === undefined;
+  const setRefs = useCallback(
+    (node: HTMLDivElement | null) => {
+      groupRef.current = node;
+
+      if (typeof ref === 'function') {
+        ref(node);
+        return;
+      }
+
+      if (ref) {
+        ref.current = node;
+      }
     },
-    ref
-  ) => {
-    const generatedLabelId = useId();
-    const supportTextId = useId();
-    const groupRef = useRef<HTMLDivElement | null>(null);
-    const [resetKey, setResetKey] = useState(0);
-    const hasErrorText = Boolean(invalid && errorText);
-    const hasHelperText = Boolean(helperText);
-    const labelId = label ? `${generatedLabelId}-label` : undefined;
-    const labelledBy =
-      [ariaLabelledBy, labelId].filter(Boolean).join(' ') || undefined;
-    const describedBy =
-      [
-        ariaDescribedBy,
-        hasErrorText || hasHelperText ? supportTextId : undefined,
-      ]
-        .filter(Boolean)
-        .join(' ') || undefined;
-    const isUncontrolled = value === undefined;
-    const setRefs = useCallback(
-      (node: HTMLDivElement | null) => {
-        groupRef.current = node;
+    [ref]
+  );
 
-        if (typeof ref === 'function') {
-          ref(node);
-          return;
-        }
+  useEffect(() => {
+    if (!isUncontrolled) {
+      return;
+    }
 
-        if (ref) {
-          ref.current = node;
-        }
-      },
-      [ref]
-    );
+    const form = groupRef.current?.closest('form');
 
-    useEffect(() => {
-      if (!isUncontrolled) {
-        return;
-      }
+    if (!form) {
+      return;
+    }
 
-      const form = groupRef.current?.closest('form');
+    const handleReset = () => {
+      setResetKey((currentKey) => currentKey + 1);
+    };
 
-      if (!form) {
-        return;
-      }
+    form.addEventListener('reset', handleReset);
 
-      const handleReset = () => {
-        setResetKey((currentKey) => currentKey + 1);
-      };
+    return () => {
+      form.removeEventListener('reset', handleReset);
+    };
+  }, [isUncontrolled]);
 
-      form.addEventListener('reset', handleReset);
-
-      return () => {
-        form.removeEventListener('reset', handleReset);
-      };
-    }, [isUncontrolled]);
-
-    return (
-      <Field.Root
-        className="flex w-full min-w-0 flex-col"
-        data-slot="radio-group-field"
-        disabled={disabled}
-        invalid={invalid}
-        name={name}
-      >
-        {label ? (
-          <Field.Label
-            className={cn(
-              labelClassName,
-              getLabelColorClassName({
-                disabled,
-                invalid,
-              })
-            )}
-            id={labelId}
-          >
-            {renderFieldLabelContent({ label, required })}
-          </Field.Label>
-        ) : null}
-        <RadioGroupPrimitive
-          aria-describedby={describedBy}
-          aria-label={ariaLabel}
-          aria-labelledby={labelledBy}
-          defaultValue={isUncontrolled ? defaultValue : undefined}
-          disabled={disabled}
-          id={id}
-          inputRef={inputRef}
-          key={isUncontrolled ? resetKey : undefined}
-          name={name}
-          onValueChange={onValueChange}
-          readOnly={readOnly}
-          ref={setRefs}
-          required={required}
-          value={value}
-          className={cn(radioGroupRootVariants({ orientation }))}
-          data-slot="radio-group"
+  return (
+    <Field.Root
+      className="flex w-full min-w-0 flex-col"
+      data-slot="radio-group-field"
+      disabled={disabled}
+      invalid={invalid}
+      name={name}
+    >
+      {label ? (
+        <Field.Label
+          className={cn(
+            labelClassName,
+            getLabelColorClassName({
+              disabled,
+              invalid,
+            })
+          )}
+          id={labelId}
         >
-          {children}
-        </RadioGroupPrimitive>
-        {hasErrorText ? (
-          <p
-            className={cn(helperTextClassName, 'text-destructive')}
-            id={supportTextId}
-          >
-            {renderSupportText({
-              icon: errorIcon,
-              text: errorText,
-            })}
-          </p>
-        ) : null}
-        {hasHelperText && !hasErrorText ? (
-          <p
-            className={cn(helperTextClassName, 'text-text-secondary')}
-            id={supportTextId}
-          >
-            {renderSupportText({
-              icon: helperIcon,
-              text: helperText,
-            })}
-          </p>
-        ) : null}
-      </Field.Root>
-    );
-  }
-);
-
-RadioGroup.displayName = 'RadioGroup';
+          {renderFieldLabelContent({ label, required })}
+        </Field.Label>
+      ) : null}
+      <RadioGroupPrimitive
+        aria-describedby={describedBy}
+        aria-label={ariaLabel}
+        aria-labelledby={labelledBy}
+        defaultValue={isUncontrolled ? defaultValue : undefined}
+        disabled={disabled}
+        id={id}
+        inputRef={inputRef}
+        key={isUncontrolled ? resetKey : undefined}
+        name={name}
+        onValueChange={onValueChange}
+        readOnly={readOnly}
+        ref={setRefs}
+        required={required}
+        value={value}
+        className={cn(radioGroupRootVariants({ orientation }))}
+        data-slot="radio-group"
+      >
+        {children}
+      </RadioGroupPrimitive>
+      {hasErrorText ? (
+        <p
+          className={cn(helperTextClassName, 'text-destructive')}
+          id={supportTextId}
+        >
+          {renderSupportText({
+            icon: errorIcon,
+            text: errorText,
+          })}
+        </p>
+      ) : null}
+      {hasHelperText && !hasErrorText ? (
+        <p
+          className={cn(helperTextClassName, 'text-text-secondary')}
+          id={supportTextId}
+        >
+          {renderSupportText({
+            icon: helperIcon,
+            text: helperText,
+          })}
+        </p>
+      ) : null}
+    </Field.Root>
+  );
+};

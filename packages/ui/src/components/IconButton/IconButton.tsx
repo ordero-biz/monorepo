@@ -2,7 +2,6 @@
 
 import { Button as ButtonPrimitive } from '@base-ui/react/button';
 import { cva } from 'class-variance-authority';
-import { forwardRef } from 'react';
 import { cn } from '@/ui/lib/utils';
 import type { IconButtonProps } from './types';
 
@@ -40,64 +39,58 @@ const iconSizeClassNames = {
   xs: 'size-[var(--icon-button-xs-icon)]',
 } as const;
 
-export const IconButton = forwardRef<HTMLElement, IconButtonProps>(
-  (
-    {
-      'aria-describedby': ariaDescribedBy,
-      'aria-label': ariaLabel,
-      'aria-labelledby': ariaLabelledBy,
-      children,
-      color,
-      disabled,
-      form,
-      id,
-      name,
-      onBlur,
-      onClick,
-      onFocus,
-      onKeyDown,
-      size,
-      tabIndex,
-      title,
-      type = 'button',
-    },
-    ref
-  ) => {
-    const iconClassName = iconSizeClassNames[size ?? 'm'];
+export const IconButton = ({
+  'aria-describedby': ariaDescribedBy,
+  'aria-label': ariaLabel,
+  'aria-labelledby': ariaLabelledBy,
+  children,
+  color,
+  disabled,
+  form,
+  id,
+  name,
+  onBlur,
+  onClick,
+  onFocus,
+  onKeyDown,
+  ref,
+  size,
+  tabIndex,
+  title,
+  type = 'button',
+}: IconButtonProps) => {
+  const iconClassName = iconSizeClassNames[size ?? 'm'];
 
-    return (
-      <ButtonPrimitive
-        ref={ref}
-        aria-describedby={ariaDescribedBy}
-        aria-label={ariaLabel}
-        aria-labelledby={ariaLabelledBy}
-        className={cn(iconButtonVariants({ color, size }))}
-        data-slot="icon-button"
-        disabled={disabled}
-        form={form}
-        id={id}
-        name={name}
-        onBlur={onBlur}
-        onClick={onClick}
-        onFocus={onFocus}
-        onKeyDown={onKeyDown}
-        tabIndex={tabIndex}
-        title={title}
-        type={type}
+  return (
+    <ButtonPrimitive
+      ref={ref}
+      aria-describedby={ariaDescribedBy}
+      aria-label={ariaLabel}
+      aria-labelledby={ariaLabelledBy}
+      className={cn(iconButtonVariants({ color, size }))}
+      data-slot="icon-button"
+      disabled={disabled}
+      form={form}
+      id={id}
+      name={name}
+      onBlur={onBlur}
+      onClick={onClick}
+      onFocus={onFocus}
+      onKeyDown={onKeyDown}
+      tabIndex={tabIndex}
+      title={title}
+      type={type}
+    >
+      <span
+        className={cn(
+          'inline-flex items-center justify-center [&_svg]:size-full',
+          iconClassName
+        )}
       >
-        <span
-          className={cn(
-            'inline-flex items-center justify-center [&_svg]:size-full',
-            iconClassName
-          )}
-        >
-          {children}
-        </span>
-      </ButtonPrimitive>
-    );
-  }
-);
-
-IconButton.displayName = 'IconButton';
+        {children}
+      </span>
+    </ButtonPrimitive>
+  );
+};
 
 export { iconButtonVariants };
