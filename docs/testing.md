@@ -23,16 +23,26 @@ Use these tools:
 
 - `@testing-library/react`
 - `@testing-library/user-event`
-- `prepareSetup` from `@ordero/test-config/react`
+- `prepareSetup` from the app/package test helper, or from `@ordero/test-config/react` when no local helper exists
 - Vitest globals such as `describe`, `it`, `expect`, and `vi`
 
 For component tests across `apps` and `packages`, default to `prepareSetup`
-when the file has repeated default props or a stable wrapper. Treat ad hoc
-render helpers as the exception, not the default.
+when the file has repeated default props, repeated providers, or a stable
+wrapper. Treat ad hoc render helpers as the exception, not the default.
+Do not hand-roll `render(...)` wrappers for provider setup; add missing
+providers to the local `prepareSetup` helper instead.
+
+When a `prepareSetup` test overrides a prop and later asserts on that prop,
+uses it in a Testing Library query, or uses it to prove callback behavior,
+destructure that prop from the object returned by `setup(...)`. Do not keep a
+separate local variable for the same override.
 
 Use plain `render(...)` directly only when a one-off test is clearer because it
 needs surrounding structure such as a form, extra focus targets, or similar
 test-local setup.
+
+For the canonical setup shape, see
+`.agents/skills/ui-routine-conventions/references/prepare-setup-example.md`.
 
 Do not import Vitest globals in individual test files. App and package
 TypeScript configs should expose them through a local Vitest shim.
@@ -43,9 +53,15 @@ they do in a real browser.
 
 ### Module Mocking
 
-When mocking local or shared modules that have multiple exports, avoid destructive full-module mocks like `vi.mock('@/path/to/module', () => ({ ... }))`. Full module mocks destroy all other actual exports inside the module, leading to fragile tests and high maintenance overhead when developers later import other helper functions from the same file.
+When mocking local or shared modules that have multiple exports, avoid
+destructive full-module mocks like
+`vi.mock('@/path/to/module', () => ({ ... }))`. Full module mocks destroy all
+other actual exports inside the module, leading to fragile tests and high
+maintenance overhead when developers later import other helper functions from
+the same file.
 
-Instead, preserve the original implementation of other exported helpers by using an inline async partial mock with `vi.importActual`:
+Instead, preserve the original implementation of other exported helpers by
+using an inline async partial mock with `vi.importActual`:
 
 ```typescript
 vi.mock('@/path/to/module', async () => ({
@@ -54,9 +70,8 @@ vi.mock('@/path/to/module', async () => ({
 }));
 ```
 
-Using this pattern keeps all adjacent utilities fully operational while safely isolating your mock target.
-
-
+Using this pattern keeps all adjacent utilities fully operational while safely
+isolating your mock target.
 
 ### Storybook Browser Tests
 
@@ -75,8 +90,6 @@ Run:
 ```bash
 pnpm --dir packages/ui test:storybook
 ```
-
-See `docs/accessibility-testing.md` for the shared UI accessibility workflow.
 
 ### Playwright E2E Tests
 
@@ -234,12 +247,6 @@ Use it to inspect the real page, generate locators, and debug interactions:
 pnpm exec playwright-cli open http://127.0.0.1:3000/log-in --headed
 pnpm exec playwright-cli snapshot
 pnpm exec playwright-cli generate-locator e19 --raw
-```
-
-Use Playwright Test for committed E2E tests and CI:
-
-```bash
-pnpm test:e2e
 ```
 
 ## Form Testing

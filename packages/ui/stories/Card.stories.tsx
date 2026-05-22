@@ -8,7 +8,7 @@ import {
   User,
   Users,
 } from 'lucide-react';
-import { Card } from '@/ui/components/Card';
+import { Card, type CardProps } from '@/ui/components/Card';
 import { IconButton } from '@/ui/components/IconButton';
 
 const meta = {
@@ -24,7 +24,7 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-const CardBalanceTemplate = (args: any) => (
+const CardBalanceTemplate = (args: CardProps) => (
   <div className="max-w-[344px]">
     <Card.Root {...args}>
       <Card.Content>
@@ -108,8 +108,7 @@ export const JobCardFigmaReplica: Story = {
         <div className="relative flex flex-col gap-[var(--spacing-2)] pt-[var(--card-content-p)] px-[var(--card-content-p)] pb-[var(--spacing-2)]">
           {/* Avatar */}
           <div
-            className="flex items-center justify-center rounded-[var(--avatar-rounded-radius)] size-[48px] overflow-hidden select-none"
-            style={{ backgroundColor: '#e60000' }}
+            className="flex items-center justify-center rounded-[var(--avatar-rounded-radius)] size-[48px] overflow-hidden select-none bg-[var(--error-dark)]"
           >
             <span className="text-white font-bold text-sm leading-none tracking-wider">TNF</span>
           </div>
@@ -201,7 +200,7 @@ export const ClickableWithCenterIconButton: Story = {
           </div>
         </Card.Header>
         <Card.Content>
-          <div className="flex flex-col items-center justify-center min-h-[140px] gap-[var(--spacing-1-5)] border border-dashed border-[var(--color-divider)] rounded-[var(--button-radius)] p-4 bg-[var(--figma-grey-8)]">
+          <div className="flex flex-col items-center justify-center min-h-[140px] gap-[var(--spacing-1-5)] border border-dashed border-[var(--color-divider)] rounded-[var(--button-radius)] p-4 bg-[var(--color-grey-8)]">
             <IconButton
               color="primary"
               size="m"
@@ -219,4 +218,3 @@ export const ClickableWithCenterIconButton: Story = {
     </div>
   ),
 };
-

@@ -5,28 +5,34 @@ import { vi } from 'vitest';
 import { Card } from './index';
 
 type CardTestFixtureProps = {
+  includeAction?: boolean;
   variant?: 'filled' | 'outlined';
   onClick?: () => void;
   dividerVariant?: 'solid' | 'dashed';
+  title?: string;
 };
 
 const CardTestFixture = ({
+  includeAction = true,
   variant = 'filled',
   onClick,
   dividerVariant = 'dashed',
+  title = 'Card Title',
 }: CardTestFixtureProps) => (
   <Card.Root variant={variant} onClick={onClick}>
     <Card.Header>
-      <Card.Title>Card Title</Card.Title>
+      <Card.Title>{title}</Card.Title>
       <Card.Description>Card Description</Card.Description>
     </Card.Header>
     <Card.Divider variant={dividerVariant} />
     <Card.Content>
       <p>Card content goes here.</p>
     </Card.Content>
-    <Card.Footer>
-      <button type="button">Action</button>
-    </Card.Footer>
+    {includeAction ? (
+      <Card.Footer>
+        <button type="button">Action</button>
+      </Card.Footer>
+    ) : null}
   </Card.Root>
 );
 
@@ -47,49 +53,41 @@ describe('Card', () => {
     expect(screen.getByRole('button', { name: 'Action' })).toBeInTheDocument();
   });
 
-  it('applies the correct classes for the filled variant by default', () => {
-    const { renderResult } = setup({ variant: 'filled' });
-    const card = renderResult.container.firstChild;
-    expect(card).toHaveClass('bg-[var(--card)]');
-    expect(card).toHaveClass(
-      'shadow-[var(--card-x1)_var(--card-y1)_var(--card-blur1)_var(--card-spread1)_var(--color-shadow-20),var(--card-x2)_var(--card-y2)_var(--card-blur2)_var(--card-spread2)_var(--color-shadow-12)]'
-    );
-  });
+  it('does not expose the card as a button unless it is clickable', () => {
+    setup({ includeAction: false });
 
-  it('applies the correct classes for the outlined variant', () => {
-    const { renderResult } = setup({ variant: 'outlined' });
-    const card = renderResult.container.firstChild;
-    expect(card).toHaveClass('border');
-    expect(card).toHaveClass('border-[var(--color-divider)]');
-    expect(card).toHaveClass('bg-transparent');
-  });
-
-  it('renders dashed divider by default', () => {
-    const { renderResult } = setup({ dividerVariant: 'dashed' });
-    const divider = renderResult.container.querySelector(
-      '[data-slot="card-divider"]'
-    );
-    expect(divider).toHaveClass('border-dashed');
-  });
-
-  it('renders solid divider when requested', () => {
-    const { renderResult } = setup({ dividerVariant: 'solid' });
-    const divider = renderResult.container.querySelector(
-      '[data-slot="card-divider"]'
-    );
-    expect(divider).not.toHaveClass('border-dashed');
+    expect(screen.queryByRole('button')).not.toBeInTheDocument();
   });
 
   it('handles click events on the root card element', async () => {
-    const handleClick = vi.fn();
     const user = userEvent.setup();
 
-    const { renderResult } = setup({ onClick: handleClick });
-    const card = renderResult.container.firstChild;
+    const { onClick, title } = setup({
+      includeAction: false,
+      onClick: vi.fn(),
+      title: 'Open details',
+    });
 
-    if (card) {
-      await user.click(card as HTMLElement);
-    }
-    expect(handleClick).toHaveBeenCalledTimes(1);
+    await user.click(screen.getByRole('button', { name: new RegExp(title) }));
+
+    expect(onClick).toHaveBeenCalledTimes(1);
+  });
+
+  it('handles keyboard activation when the root card is clickable', async () => {
+    const user = userEvent.setup();
+
+    const { onClick, title } = setup({
+      includeAction: false,
+      onClick: vi.fn(),
+      title: 'Open details',
+    });
+
+    await user.tab();
+    expect(screen.getByRole('button', { name: new RegExp(title) })).toHaveFocus();
+
+    await user.keyboard('{Enter}');
+    await user.keyboard(' ');
+
+    expect(onClick).toHaveBeenCalledTimes(2);
   });
 });

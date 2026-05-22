@@ -21,7 +21,7 @@ const cardVariants = cva(
         filled:
           'bg-[var(--card)] text-[var(--card-foreground)] shadow-[var(--card-x1)_var(--card-y1)_var(--card-blur1)_var(--card-spread1)_var(--color-shadow-20),var(--card-x2)_var(--card-y2)_var(--card-blur2)_var(--card-spread2)_var(--color-shadow-12)]',
         outlined:
-          'border border-[var(--color-divider)] bg-transparent text-foreground',
+          'border border-[var(--color-paper-outlined)] bg-[var(--card)] text-[var(--card-foreground)]',
       },
     },
     defaultVariants: {
