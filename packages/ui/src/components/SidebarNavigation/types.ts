@@ -1,4 +1,9 @@
-import type { HTMLAttributeAnchorTarget, MouseEvent, ReactNode } from 'react';
+import type {
+  HTMLAttributeAnchorTarget,
+  MouseEvent,
+  ReactNode,
+  Ref,
+} from 'react';
 
 type SidebarNavigationBaseItem = {
   active?: boolean;
@@ -58,6 +63,7 @@ export type SidebarNavigationItem =
 export type SidebarNavigationProps = {
   children: ReactNode;
   id?: string;
+  ref?: Ref<HTMLDivElement>;
 };
 
 export type SidebarNavigationHeaderProps = {
@@ -80,6 +86,7 @@ export type SidebarNavigationSectionProps = {
   hidden?: boolean;
   id: string;
   label?: string;
+  ref?: Ref<HTMLElement>;
 };
 
 export type SidebarNavigationSectionContentProps = {

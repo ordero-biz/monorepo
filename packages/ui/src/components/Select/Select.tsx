@@ -4,7 +4,7 @@ import { Field } from '@base-ui/react/field';
 import { Select as SelectPrimitive } from '@base-ui/react/select';
 import { ChevronDown } from 'lucide-react';
 import type { CSSProperties } from 'react';
-import { forwardRef, useId, useMemo, useState } from 'react';
+import { useId, useMemo, useState } from 'react';
 import { renderFieldLabelContent } from '@/ui/components/shared/renderFieldLabelContent';
 import { cn } from '@/ui/lib/utils';
 import type { SelectProps } from './types';
@@ -194,230 +194,221 @@ const renderSupportText = ({
   </>
 );
 
-export const Select = forwardRef<HTMLButtonElement, SelectProps>(
-  (
-    {
-      'aria-describedby': ariaDescribedBy,
-      'aria-label': ariaLabel,
-      'aria-labelledby': ariaLabelledBy,
-      alignItemWithTrigger = true,
-      autoComplete,
-      defaultOpen,
-      defaultValue,
-      disabled = false,
-      errorIcon,
-      errorText,
-      helperIcon,
-      helperText,
-      id,
-      invalid = false,
-      label,
-      name,
-      onBlur,
-      onFocus,
-      onKeyDown,
-      onOpenChange,
-      onValueChange,
-      options,
-      placeholder = 'Label',
-      readOnly,
-      required,
-      size = 'm',
-      startAdornment,
-      startIcon: StartIcon,
-      value,
-      variant = 'outlined',
-    },
-    ref
-  ) => {
-    const supportTextId = useId();
-    const [focused, setFocused] = useState(false);
-    const [open, setOpen] = useState(defaultOpen ?? false);
-    const hasErrorText = Boolean(invalid && errorText);
-    const hasHelperText = Boolean(helperText);
-    const describedBy =
-      [
-        ariaDescribedBy,
-        hasErrorText || hasHelperText ? supportTextId : undefined,
-      ]
-        .filter(Boolean)
-        .join(' ') || undefined;
-    const items = useMemo(
-      () =>
-        options.map((option) => ({
-          label: option.label,
-          value: option.value,
-        })),
-      [options]
-    );
-    const optionLabelMap = useMemo(
-      () => new Map(options.map((option) => [option.value, option.label])),
-      [options]
-    );
-    const isActive = focused || open;
+export const Select = ({
+  'aria-describedby': ariaDescribedBy,
+  'aria-label': ariaLabel,
+  'aria-labelledby': ariaLabelledBy,
+  alignItemWithTrigger = true,
+  autoComplete,
+  defaultOpen,
+  defaultValue,
+  disabled = false,
+  errorIcon,
+  errorText,
+  helperIcon,
+  helperText,
+  id,
+  invalid = false,
+  label,
+  name,
+  onBlur,
+  onFocus,
+  onKeyDown,
+  onOpenChange,
+  onValueChange,
+  options,
+  placeholder = 'Label',
+  readOnly,
+  ref,
+  required,
+  size = 'm',
+  startAdornment,
+  startIcon: StartIcon,
+  value,
+  variant = 'outlined',
+}: SelectProps) => {
+  const supportTextId = useId();
+  const [focused, setFocused] = useState(false);
+  const [open, setOpen] = useState(defaultOpen ?? false);
+  const hasErrorText = Boolean(invalid && errorText);
+  const hasHelperText = Boolean(helperText);
+  const describedBy =
+    [ariaDescribedBy, hasErrorText || hasHelperText ? supportTextId : undefined]
+      .filter(Boolean)
+      .join(' ') || undefined;
+  const items = useMemo(
+    () =>
+      options.map((option) => ({
+        label: option.label,
+        value: option.value,
+      })),
+    [options]
+  );
+  const optionLabelMap = useMemo(
+    () => new Map(options.map((option) => [option.value, option.label])),
+    [options]
+  );
+  const isActive = focused || open;
 
-    return (
-      <Field.Root
-        className="flex w-full min-w-0 flex-col"
-        data-slot="select"
-        disabled={disabled}
-        invalid={invalid}
-      >
-        {label ? (
-          <Field.Label
-            className={cn(
-              labelClassName,
-              getLabelColorClassName({
-                active: isActive,
-                disabled,
-                invalid,
-              })
-            )}
-          >
-            {renderFieldLabelContent({ label, required })}
-          </Field.Label>
-        ) : null}
-        <SelectPrimitive.Root
-          autoComplete={autoComplete}
-          defaultOpen={defaultOpen}
-          defaultValue={defaultValue}
-          disabled={disabled}
-          id={id}
-          items={items}
-          name={name}
-          onOpenChange={(nextOpen, details) => {
-            setOpen(nextOpen);
-            onOpenChange?.(nextOpen, details);
-          }}
-          onValueChange={onValueChange}
-          readOnly={readOnly}
-          required={required}
-          value={value}
-        >
-          <SelectPrimitive.Trigger
-            aria-describedby={describedBy}
-            aria-label={ariaLabel}
-            aria-labelledby={ariaLabelledBy}
-            className={cn(
-              triggerClassNames[variant],
-              triggerSizeClassNames[variant][size]
-            )}
-            onBlur={(event) => {
-              setFocused(false);
-              onBlur?.(event);
-            }}
-            onFocus={(event) => {
-              setFocused(true);
-              onFocus?.(event);
-            }}
-            onKeyDown={onKeyDown}
-            ref={ref}
-            style={getSelectStyle({
+  return (
+    <Field.Root
+      className="flex w-full min-w-0 flex-col"
+      data-slot="select"
+      disabled={disabled}
+      invalid={invalid}
+    >
+      {label ? (
+        <Field.Label
+          className={cn(
+            labelClassName,
+            getLabelColorClassName({
               active: isActive,
               disabled,
               invalid,
-              variant,
-            })}
+            })
+          )}
+        >
+          {renderFieldLabelContent({ label, required })}
+        </Field.Label>
+      ) : null}
+      <SelectPrimitive.Root
+        autoComplete={autoComplete}
+        defaultOpen={defaultOpen}
+        defaultValue={defaultValue}
+        disabled={disabled}
+        id={id}
+        items={items}
+        name={name}
+        onOpenChange={(nextOpen, details) => {
+          setOpen(nextOpen);
+          onOpenChange?.(nextOpen, details);
+        }}
+        onValueChange={onValueChange}
+        readOnly={readOnly}
+        required={required}
+        value={value}
+      >
+        <SelectPrimitive.Trigger
+          aria-describedby={describedBy}
+          aria-label={ariaLabel}
+          aria-labelledby={ariaLabelledBy}
+          className={cn(
+            triggerClassNames[variant],
+            triggerSizeClassNames[variant][size]
+          )}
+          onBlur={(event) => {
+            setFocused(false);
+            onBlur?.(event);
+          }}
+          onFocus={(event) => {
+            setFocused(true);
+            onFocus?.(event);
+          }}
+          onKeyDown={onKeyDown}
+          ref={ref}
+          style={getSelectStyle({
+            active: isActive,
+            disabled,
+            invalid,
+            variant,
+          })}
+        >
+          <SelectPrimitive.Value
+            className={valueContainerClassName}
+            placeholder={placeholder}
           >
-            <SelectPrimitive.Value
-              className={valueContainerClassName}
-              placeholder={placeholder}
-            >
-              {(selectedValue: string | null) => (
-                <>
-                  {startAdornment || StartIcon ? (
-                    <span
-                      className={cn(
-                        adornmentClassName,
-                        startAdornmentClassName,
-                        getAdornmentColorClassName({ disabled })
-                      )}
-                    >
-                      {startAdornment}
-                      {StartIcon ? (
-                        <StartIcon
-                          className={cn('shrink-0', iconSizeClassNames[size])}
-                        />
-                      ) : null}
-                    </span>
-                  ) : null}
+            {(selectedValue: string | null) => (
+              <>
+                {startAdornment || StartIcon ? (
                   <span
                     className={cn(
-                      valueTextClassName,
-                      getTextColorClassName({ disabled })
+                      adornmentClassName,
+                      startAdornmentClassName,
+                      getAdornmentColorClassName({ disabled })
                     )}
                   >
-                    {selectedValue === null
-                      ? placeholder
-                      : (optionLabelMap.get(selectedValue) ?? selectedValue)}
+                    {startAdornment}
+                    {StartIcon ? (
+                      <StartIcon
+                        className={cn('shrink-0', iconSizeClassNames[size])}
+                      />
+                    ) : null}
                   </span>
-                </>
-              )}
-            </SelectPrimitive.Value>
-            <SelectPrimitive.Icon
-              className={cn(
-                iconClassName,
-                getAdornmentColorClassName({ disabled })
-              )}
-            >
-              <ChevronDown aria-hidden="true" />
-            </SelectPrimitive.Icon>
-          </SelectPrimitive.Trigger>
-          <SelectPrimitive.Portal>
-            <SelectPrimitive.Positioner
-              align="start"
-              alignItemWithTrigger={alignItemWithTrigger}
-              className="z-50 min-w-[var(--anchor-width)]"
-            >
-              <SelectPrimitive.Popup className={popupClassName}>
-                <SelectPrimitive.List className={listClassName}>
-                  {options.map((option) => (
-                    <SelectPrimitive.Item
-                      className={cn(
-                        itemClassName,
-                        itemPaddingClassNames[variant],
-                        option.disabled ? 'cursor-not-allowed opacity-50' : ''
-                      )}
-                      disabled={option.disabled}
-                      key={option.value}
-                      value={option.value}
-                    >
-                      <SelectPrimitive.ItemText className={itemTextClassName}>
-                        {option.label}
-                      </SelectPrimitive.ItemText>
-                    </SelectPrimitive.Item>
-                  ))}
-                </SelectPrimitive.List>
-              </SelectPrimitive.Popup>
-            </SelectPrimitive.Positioner>
-          </SelectPrimitive.Portal>
-        </SelectPrimitive.Root>
-        {hasErrorText ? (
-          <Field.Error
-            className={cn(helperTextClassName, 'text-destructive')}
-            id={supportTextId}
-            match={true}
+                ) : null}
+                <span
+                  className={cn(
+                    valueTextClassName,
+                    getTextColorClassName({ disabled })
+                  )}
+                >
+                  {selectedValue === null
+                    ? placeholder
+                    : (optionLabelMap.get(selectedValue) ?? selectedValue)}
+                </span>
+              </>
+            )}
+          </SelectPrimitive.Value>
+          <SelectPrimitive.Icon
+            className={cn(
+              iconClassName,
+              getAdornmentColorClassName({ disabled })
+            )}
           >
-            {renderSupportText({
-              icon: errorIcon,
-              text: errorText,
-            })}
-          </Field.Error>
-        ) : null}
-        {hasHelperText && !hasErrorText ? (
-          <Field.Description
-            className={cn(helperTextClassName, 'text-text-secondary')}
-            id={supportTextId}
+            <ChevronDown aria-hidden="true" />
+          </SelectPrimitive.Icon>
+        </SelectPrimitive.Trigger>
+        <SelectPrimitive.Portal>
+          <SelectPrimitive.Positioner
+            align="start"
+            alignItemWithTrigger={alignItemWithTrigger}
+            className="z-50 min-w-[var(--anchor-width)]"
           >
-            {renderSupportText({
-              icon: helperIcon,
-              text: helperText,
-            })}
-          </Field.Description>
-        ) : null}
-      </Field.Root>
-    );
-  }
-);
-
-Select.displayName = 'Select';
+            <SelectPrimitive.Popup className={popupClassName}>
+              <SelectPrimitive.List className={listClassName}>
+                {options.map((option) => (
+                  <SelectPrimitive.Item
+                    className={cn(
+                      itemClassName,
+                      itemPaddingClassNames[variant],
+                      option.disabled ? 'cursor-not-allowed opacity-50' : ''
+                    )}
+                    disabled={option.disabled}
+                    key={option.value}
+                    value={option.value}
+                  >
+                    <SelectPrimitive.ItemText className={itemTextClassName}>
+                      {option.label}
+                    </SelectPrimitive.ItemText>
+                  </SelectPrimitive.Item>
+                ))}
+              </SelectPrimitive.List>
+            </SelectPrimitive.Popup>
+          </SelectPrimitive.Positioner>
+        </SelectPrimitive.Portal>
+      </SelectPrimitive.Root>
+      {hasErrorText ? (
+        <Field.Error
+          className={cn(helperTextClassName, 'text-destructive')}
+          id={supportTextId}
+          match={true}
+        >
+          {renderSupportText({
+            icon: errorIcon,
+            text: errorText,
+          })}
+        </Field.Error>
+      ) : null}
+      {hasHelperText && !hasErrorText ? (
+        <Field.Description
+          className={cn(helperTextClassName, 'text-text-secondary')}
+          id={supportTextId}
+        >
+          {renderSupportText({
+            icon: helperIcon,
+            text: helperText,
+          })}
+        </Field.Description>
+      ) : null}
+    </Field.Root>
+  );
+};

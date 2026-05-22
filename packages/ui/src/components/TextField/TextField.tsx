@@ -2,7 +2,7 @@
 
 import { Field } from '@base-ui/react/field';
 import { cva } from 'class-variance-authority';
-import { forwardRef, useId, useState } from 'react';
+import { useId, useState } from 'react';
 import { Input } from '@/ui/components/Input';
 import { renderFieldLabelContent } from '@/ui/components/shared/renderFieldLabelContent';
 import { cn } from '@/ui/lib/utils';
@@ -71,136 +71,127 @@ const renderSupportText = ({
   </>
 );
 
-export const TextField = forwardRef<HTMLElement, TextFieldProps>(
-  (
-    {
-      'aria-describedby': ariaDescribedBy,
-      'aria-label': ariaLabel,
-      'aria-labelledby': ariaLabelledBy,
-      autoComplete,
-      autoFocus,
-      defaultValue,
-      disabled = false,
-      endAdornment,
-      endIcon,
-      errorIcon,
-      errorText,
-      helperIcon,
-      helperText,
-      id,
-      invalid = false,
-      label,
-      name,
-      onBlur,
-      onFocus,
-      onKeyDown,
-      onValueChange,
-      placeholder,
-      readOnly,
-      required,
-      size = 'm',
-      startAdornment,
-      startIcon,
-      type = 'text',
-      value,
-      variant = 'outlined',
-    },
-    ref
-  ) => {
-    const supportTextId = useId();
-    const [focusedState, setFocusedState] = useState(false);
-    const hasErrorText = Boolean(invalid && errorText);
-    const hasHelperText = Boolean(helperText);
-    const describedBy =
-      [
-        ariaDescribedBy,
-        hasErrorText || hasHelperText ? supportTextId : undefined,
-      ]
-        .filter(Boolean)
-        .join(' ') || undefined;
+export const TextField = ({
+  'aria-describedby': ariaDescribedBy,
+  'aria-label': ariaLabel,
+  'aria-labelledby': ariaLabelledBy,
+  autoComplete,
+  autoFocus,
+  defaultValue,
+  disabled = false,
+  endAdornment,
+  endIcon,
+  errorIcon,
+  errorText,
+  helperIcon,
+  helperText,
+  id,
+  invalid = false,
+  label,
+  name,
+  onBlur,
+  onFocus,
+  onKeyDown,
+  onValueChange,
+  placeholder,
+  readOnly,
+  ref,
+  required,
+  size = 'm',
+  startAdornment,
+  startIcon,
+  type = 'text',
+  value,
+  variant = 'outlined',
+}: TextFieldProps) => {
+  const supportTextId = useId();
+  const [focusedState, setFocusedState] = useState(false);
+  const hasErrorText = Boolean(invalid && errorText);
+  const hasHelperText = Boolean(helperText);
+  const describedBy =
+    [ariaDescribedBy, hasErrorText || hasHelperText ? supportTextId : undefined]
+      .filter(Boolean)
+      .join(' ') || undefined;
 
-    return (
-      <Field.Root
-        className={cn(textFieldRootVariants({ size, variant }))}
-        data-slot="text-field"
+  return (
+    <Field.Root
+      className={cn(textFieldRootVariants({ size, variant }))}
+      data-slot="text-field"
+      disabled={disabled}
+      invalid={invalid}
+    >
+      {label ? (
+        <Field.Label
+          className={cn(
+            labelClassName,
+            getLabelColorClassName({
+              disabled,
+              focused: focusedState,
+              invalid,
+            })
+          )}
+        >
+          {renderFieldLabelContent({ label, required })}
+        </Field.Label>
+      ) : null}
+      <Input
+        aria-describedby={describedBy}
+        aria-label={ariaLabel}
+        aria-labelledby={ariaLabelledBy}
+        autoComplete={autoComplete}
+        autoFocus={autoFocus}
+        defaultValue={defaultValue}
         disabled={disabled}
+        endAdornment={endAdornment}
+        endIcon={endIcon}
+        focused={focusedState}
+        id={id}
         invalid={invalid}
-      >
-        {label ? (
-          <Field.Label
-            className={cn(
-              labelClassName,
-              getLabelColorClassName({
-                disabled,
-                focused: focusedState,
-                invalid,
-              })
-            )}
-          >
-            {renderFieldLabelContent({ label, required })}
-          </Field.Label>
-        ) : null}
-        <Input
-          aria-describedby={describedBy}
-          aria-label={ariaLabel}
-          aria-labelledby={ariaLabelledBy}
-          autoComplete={autoComplete}
-          autoFocus={autoFocus}
-          defaultValue={defaultValue}
-          disabled={disabled}
-          endAdornment={endAdornment}
-          endIcon={endIcon}
-          focused={focusedState}
-          id={id}
-          invalid={invalid}
-          name={name}
-          onBlur={(event) => {
-            setFocusedState(false);
-            onBlur?.(event);
-          }}
-          onFocus={(event) => {
-            setFocusedState(true);
-            onFocus?.(event);
-          }}
-          onKeyDown={onKeyDown}
-          onValueChange={onValueChange}
-          placeholder={placeholder}
-          readOnly={readOnly}
-          ref={ref}
-          required={required}
-          size={size}
-          startAdornment={startAdornment}
-          startIcon={startIcon}
-          type={type}
-          value={value}
-          variant={variant}
-        />
-        {hasErrorText ? (
-          <Field.Error
-            className={cn(helperTextClassName, 'text-destructive')}
-            id={supportTextId}
-            match={true}
-          >
-            {renderSupportText({
-              icon: errorIcon,
-              text: errorText,
-            })}
-          </Field.Error>
-        ) : null}
-        {hasHelperText && !hasErrorText ? (
-          <Field.Description
-            className={cn(helperTextClassName, 'text-text-secondary')}
-            id={supportTextId}
-          >
-            {renderSupportText({
-              icon: helperIcon,
-              text: helperText,
-            })}
-          </Field.Description>
-        ) : null}
-      </Field.Root>
-    );
-  }
-);
-
-TextField.displayName = 'TextField';
+        name={name}
+        onBlur={(event) => {
+          setFocusedState(false);
+          onBlur?.(event);
+        }}
+        onFocus={(event) => {
+          setFocusedState(true);
+          onFocus?.(event);
+        }}
+        onKeyDown={onKeyDown}
+        onValueChange={onValueChange}
+        placeholder={placeholder}
+        readOnly={readOnly}
+        ref={ref}
+        required={required}
+        size={size}
+        startAdornment={startAdornment}
+        startIcon={startIcon}
+        type={type}
+        value={value}
+        variant={variant}
+      />
+      {hasErrorText ? (
+        <Field.Error
+          className={cn(helperTextClassName, 'text-destructive')}
+          id={supportTextId}
+          match={true}
+        >
+          {renderSupportText({
+            icon: errorIcon,
+            text: errorText,
+          })}
+        </Field.Error>
+      ) : null}
+      {hasHelperText && !hasErrorText ? (
+        <Field.Description
+          className={cn(helperTextClassName, 'text-text-secondary')}
+          id={supportTextId}
+        >
+          {renderSupportText({
+            icon: helperIcon,
+            text: helperText,
+          })}
+        </Field.Description>
+      ) : null}
+    </Field.Root>
+  );
+};

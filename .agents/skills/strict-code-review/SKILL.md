@@ -130,8 +130,6 @@ When the diff touches UI components, styles, stories, or tests, also apply the r
 - favor accessible role and name coverage for user-facing behavior
 - avoid asserting class names, token names, or `cva` internals when a user-visible signal exists
 - check whether the change preserves the semantic token architecture described in `docs/ui-tokens.md`
-- for component tests across `apps` and `packages`, expect `prepareSetup` to be the default when the file has repeated default props or a stable wrapper; treat ad hoc render helpers as the exception
-- for `prepareSetup`-based tests, expect overridden props that are later asserted on to be destructured from `setup(...)` rather than tracked in separate local variables
 - for unit/component tests, expect mock configurations of any multi-export local or shared module to use inline async `vi.importActual` partial mocks to preserve all adjacent actual exports and prevent fragile test setups
 
 From `AGENTS.md` and local skills, pay particular attention to:
@@ -149,6 +147,17 @@ Read `docs/ui-tokens.md` when the review touches:
 - token files
 - Tailwind theme exposure
 - raw `--figma-*` usage
+
+### Component test setup rules
+
+Apply these rules strictly to component tests across `apps` and `packages`.
+
+- expect `prepareSetup` to be the default setup pattern when the file has repeated default props, repeated providers, or a stable wrapper
+- treat ad hoc render helpers as acceptable only when they are simpler than `prepareSetup` and do not duplicate setup state across tests
+- inspect every `setup({ ... })` override in `prepareSetup`-based tests
+- when an overridden prop is later asserted on, used in a Testing Library query, or used to prove callback behavior, expect that value to be destructured from `setup(...)`
+- raise a finding when a test keeps a separate local variable for an asserted overridden prop instead of using the `setup(...)` return value
+- after checking setup mechanics, still enforce behavior-first assertions through accessible roles, names, visible text, and user-visible outcomes
 
 ### For shared components in `packages/ui`
 
@@ -255,6 +264,20 @@ If checks were not run, note that as residual risk. If the diff changes runtime 
 6. Check whether the change preserves the repo architecture:
    types, exports, tokens, component APIs, and test philosophy.
 7. Report only findings that clear the evidence bar.
+
+## Changed test checklist
+
+When reviewing changed `*.test.tsx` files, explicitly scan for these patterns
+before finalizing the review:
+
+1. Apply the component test setup rules above whenever the test has repeated
+   default props, repeated providers, a stable wrapper, or existing
+   `prepareSetup` usage.
+2. Check that assertions stay behavior-first:
+   prefer accessible roles, names, visible text, and user-visible outcomes over
+   implementation details.
+3. Check that multi-export local or shared module mocks preserve adjacent actual
+   exports with inline async `vi.importActual` partial mocks.
 
 ## Review questions
 

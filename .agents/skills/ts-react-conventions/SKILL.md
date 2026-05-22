@@ -59,7 +59,12 @@ For shared UI component work in `packages/ui`, always also use:
 - Prefer the non-deprecated types that match the actual value, event, ref, or API shape being used.
 - When a library marks a broad alias or compatibility type as deprecated, use the more specific supported type instead.
 
-## 7. Keep TanStack Table inputs stable
+## 7. Avoid `forwardRef`
+
+- Do not use React `forwardRef` in new or touched code.
+- In React 19 components, pass `ref` as a normal prop instead.
+
+## 8. Keep TanStack Table inputs stable
 
 When touching `@tanstack/react-table` or `useReactTable` code:
 
