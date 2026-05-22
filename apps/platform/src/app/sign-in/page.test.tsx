@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { redirect } from 'next/navigation';
 import type { ReactNode } from 'react';
-import SignInPage from './sign-in/page';
+import SignInPage from './page';
 
 vi.mock('next/navigation', () => ({
   redirect: vi.fn(() => {
@@ -29,7 +29,7 @@ const getGuardMock = async () => {
   return vi.mocked(module.hasAuthenticatedServerSession);
 };
 
-describe('auth pages', () => {
+describe('SignInPage', () => {
   beforeEach(async () => {
     vi.mocked(redirect).mockClear();
     (await getGuardMock()).mockReset();

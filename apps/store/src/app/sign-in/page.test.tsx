@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { redirect } from 'next/navigation';
-import SignInPage from './sign-in/page';
-import SignUpPage from './sign-up/page';
+import type { ReactNode } from 'react';
+import SignInPage from './page';
 
 vi.mock('next/navigation', () => ({
   redirect: vi.fn(() => {
@@ -14,7 +14,7 @@ vi.mock('@/lib/api/authPageGuard', () => ({
 }));
 
 vi.mock('@/features/auth/AuthPageShell', () => ({
-  AuthPageShell: ({ children }: { children: React.ReactNode }) => (
+  AuthPageShell: ({ children }: { children: ReactNode }) => (
     <div data-testid="auth-shell">{children}</div>
   ),
 }));
@@ -23,17 +23,13 @@ vi.mock('@/features/sign-in/SignInLayout', () => ({
   SignInFormLayout: () => <div>Sign in form</div>,
 }));
 
-vi.mock('@/features/sign-up/SignUpLayout', () => ({
-  SignUpLayout: () => <div>Sign up form</div>,
-}));
-
 const getGuardMock = async () => {
   const module = await import('@/lib/api/authPageGuard');
 
   return vi.mocked(module.hasAuthenticatedServerSession);
 };
 
-describe('auth pages', () => {
+describe('SignInPage', () => {
   beforeEach(async () => {
     vi.mocked(redirect).mockClear();
     (await getGuardMock()).mockReset();
@@ -53,21 +49,5 @@ describe('auth pages', () => {
 
     expect(screen.getByTestId('auth-shell')).toBeVisible();
     expect(screen.getByText('Sign in form')).toBeVisible();
-  });
-
-  it('redirects authenticated users away from the sign-up page', async () => {
-    (await getGuardMock()).mockResolvedValue(true);
-
-    await expect(SignUpPage()).rejects.toThrow('redirect');
-    expect(redirect).toHaveBeenCalledWith('/');
-  });
-
-  it('renders the sign-up page for signed-out users', async () => {
-    (await getGuardMock()).mockResolvedValue(false);
-
-    render(await SignUpPage());
-
-    expect(screen.getByTestId('auth-shell')).toBeVisible();
-    expect(screen.getByText('Sign up form')).toBeVisible();
   });
 });
