@@ -8,8 +8,8 @@ import { cn } from '@/ui/lib/utils';
 import {
   backdropClassName,
   contentClassName,
-  contentScrollableClassName,
   contentScrollableBodyClassName,
+  contentScrollableClassName,
   contentScrollableRootClassName,
   contentScrollableViewportClassName,
   descriptionClassName,
@@ -128,7 +128,10 @@ const Popup = ({
 
 const Content = ({ children, id, scrollable = false }: DialogContentProps) => (
   <section
-    className={cn(contentClassName, scrollable ? contentScrollableClassName : null)}
+    className={cn(
+      contentClassName,
+      scrollable ? contentScrollableClassName : null
+    )}
     data-slot="dialog-content"
     id={id}
   >

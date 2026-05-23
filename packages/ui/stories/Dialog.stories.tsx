@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { expect, userEvent, within } from 'storybook/test';
 import { Button } from '@/ui/components/Button';
 import { Dialog } from '@/ui/components/Dialog';
 
@@ -40,6 +41,34 @@ const CONTENT_SECTIONS = [
   {
     title: 'Content guidelines',
     body: 'Lead with outcome-oriented copy and keep supporting text concise and actionable.',
+  },
+  {
+    title: 'Controlled state',
+    body: 'Use controlled state when other page regions need to react to dialog open or close changes.',
+  },
+  {
+    title: 'Close affordances',
+    body: 'Provide a clear close action so users do not need to rely only on Escape or outside pointer presses.',
+  },
+  {
+    title: 'Forms inside dialogs',
+    body: 'Keep forms short, validate inline, and make the primary action specific to the outcome.',
+  },
+  {
+    title: 'Internationalization',
+    body: 'Plan for longer translated labels and copy so headings and buttons can wrap gracefully.',
+  },
+  {
+    title: 'Performance',
+    body: 'Keep heavy dialog content lazy unless the same dialog is reopened often enough to justify keeping it mounted.',
+  },
+  {
+    title: 'When a popover is better',
+    body: 'Use a popover or menu for lightweight anchored actions that should not interrupt the current workflow.',
+  },
+  {
+    title: 'Follow-up and cleanup',
+    body: 'After a successful action, close the dialog and show the result in the surrounding page context.',
   },
 ];
 
@@ -145,5 +174,26 @@ export const Scrollable: Story = {
   ),
   args: {
     size: 'sm',
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const documentBody = canvasElement.ownerDocument.body;
+
+    await userEvent.click(
+      canvas.getByRole('button', { name: 'Open long content' })
+    );
+
+    const dialog = within(documentBody).getByRole('dialog', {
+      name: 'Terms and conditions',
+    });
+    const footerAction = within(dialog).getByRole('button', { name: 'Accept' });
+    const finalSection = within(dialog).getByText('Follow-up and cleanup');
+
+    expect(footerAction).toBeVisible();
+
+    finalSection.scrollIntoView({ block: 'nearest' });
+
+    await expect(finalSection).toBeVisible();
+    await expect(footerAction).toBeVisible();
   },
 };

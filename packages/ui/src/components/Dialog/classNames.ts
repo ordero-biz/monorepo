@@ -8,7 +8,8 @@ export const viewportClassName =
   'fixed inset-0 z-50 flex items-center justify-center overflow-hidden p-[var(--dialog-content-px)]';
 
 export const popupClassName = `${rootClassName} p-[var(--dialog-content-px)] transition-all duration-150 data-[ending-style]:scale-95 data-[ending-style]:opacity-0 data-[starting-style]:scale-95 data-[starting-style]:opacity-0`;
-export const popupScrollableLayoutClassName = 'flex max-h-full min-h-0 flex-col';
+export const popupScrollableLayoutClassName =
+  'flex max-h-full min-h-0 flex-col';
 
 export const popupWidthClassNames = {
   md: 'max-w-[var(--dialog-width-md)]',
@@ -23,7 +24,7 @@ export const contentClassName = 'min-h-0 mt-[var(--space-2)]';
 export const contentScrollableClassName = 'flex min-h-0 flex-auto flex-col';
 
 export const contentScrollableRootClassName =
-  'relative flex min-h-0 flex-auto overflow-hidden has-[>_:first-child:focus-visible]:outline-2 has-[>_:first-child:focus-visible]:outline-offset-0 has-[>_:first-child:focus-visible]:outline-neutral-950 dark:has-[>_:first-child:focus-visible]:outline-white';
+  'relative flex min-h-0 flex-auto overflow-hidden has-[>_:first-child:focus-visible]:outline-2 has-[>_:first-child:focus-visible]:outline-offset-0 has-[>_:first-child:focus-visible]:outline-ring';
 
 export const contentScrollableViewportClassName =
   'flex-auto min-h-0 overflow-y-auto overscroll-contain outline-none';

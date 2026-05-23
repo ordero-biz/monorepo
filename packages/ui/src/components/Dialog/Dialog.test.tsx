@@ -131,7 +131,7 @@ describe('Dialog', () => {
     );
   });
 
-  it('applies scrollable popup behavior when enabled', () => {
+  it('renders scrollable content with the dialog actions', () => {
     render(
       <Dialog.Root defaultOpen>
         <Dialog.Portal>
@@ -157,18 +157,10 @@ describe('Dialog', () => {
       </Dialog.Root>
     );
 
-    const popupElement = screen.getByRole('dialog');
-    const popupContentElement = popupElement.querySelector(
-      '[data-slot="dialog-content"]'
-    );
-    const popupScrollableContentElement = popupElement.querySelector(
-      '[data-scrollable="true"]'
-    );
-
-    expect(popupElement).not.toHaveAttribute('data-scrollable');
-    expect(popupContentElement).not.toBeNull();
-    expect(popupContentElement).not.toHaveAttribute('data-scrollable');
-    expect(popupScrollableContentElement).not.toBeNull();
+    expect(screen.getByRole('dialog', { name: 'Dialog' })).toBeInTheDocument();
+    expect(screen.getByText('Row 1')).toBeInTheDocument();
+    expect(screen.getByText('Row 20')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Close' })).toBeInTheDocument();
   });
 
   it('renders footer children alongside the default close action', () => {
