@@ -1,6 +1,7 @@
 'use client';
 
 import { Dialog as DialogPrimitive } from '@base-ui/react/dialog';
+import { ScrollArea } from '@base-ui/react/scroll-area';
 import type { ReactElement } from 'react';
 import { Button } from '@/ui/components/Button';
 import { cn } from '@/ui/lib/utils';
@@ -8,10 +9,14 @@ import {
   backdropClassName,
   contentClassName,
   contentScrollableClassName,
+  contentScrollableBodyClassName,
+  contentScrollableRootClassName,
+  contentScrollableViewportClassName,
   descriptionClassName,
   footerClassName,
   popupClassName,
   popupFullScreenClassName,
+  popupScrollableLayoutClassName,
   popupWidthClassNames,
   titleClassName,
   viewportClassName,
@@ -112,6 +117,7 @@ const Popup = ({
   <DialogPrimitive.Popup
     className={cn(
       popupClassName,
+      popupScrollableLayoutClassName,
       fullscreen ? popupFullScreenClassName : popupWidthClassNames[size]
     )}
     id={id}
@@ -122,15 +128,24 @@ const Popup = ({
 
 const Content = ({ children, id, scrollable = false }: DialogContentProps) => (
   <section
-    className={cn(
-      contentClassName,
-      scrollable ? contentScrollableClassName : null
-    )}
-    data-scrollable={scrollable ? 'true' : undefined}
+    className={cn(contentClassName, scrollable ? contentScrollableClassName : null)}
     data-slot="dialog-content"
     id={id}
   >
-    {children}
+    {scrollable ? (
+      <ScrollArea.Root
+        className={contentScrollableRootClassName}
+        data-scrollable="true"
+      >
+        <ScrollArea.Viewport className={contentScrollableViewportClassName}>
+          <ScrollArea.Content className={contentScrollableBodyClassName}>
+            {children}
+          </ScrollArea.Content>
+        </ScrollArea.Viewport>
+      </ScrollArea.Root>
+    ) : (
+      children
+    )}
   </section>
 );
 

@@ -161,10 +161,14 @@ describe('Dialog', () => {
     const popupContentElement = popupElement.querySelector(
       '[data-slot="dialog-content"]'
     );
+    const popupScrollableContentElement = popupElement.querySelector(
+      '[data-scrollable="true"]'
+    );
 
     expect(popupElement).not.toHaveAttribute('data-scrollable');
     expect(popupContentElement).not.toBeNull();
-    expect(popupContentElement).toHaveAttribute('data-scrollable', 'true');
+    expect(popupContentElement).not.toHaveAttribute('data-scrollable');
+    expect(popupScrollableContentElement).not.toBeNull();
   });
 
   it('renders footer children alongside the default close action', () => {
