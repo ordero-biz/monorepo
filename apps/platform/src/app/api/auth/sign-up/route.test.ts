@@ -82,4 +82,19 @@ describe('POST /api/auth/sign-up', () => {
       fieldErrors: { email: 'This email is already registered.' },
     });
   });
+
+  it('returns 400 Bad Request when request body is malformed or invalid JSON', async () => {
+    const response = await signUpHandler(
+      new NextRequest('http://localhost/api/auth/sign-up', {
+        body: 'invalid-json',
+        method: 'POST',
+      })
+    );
+
+    expect(response.status).toBe(400);
+    await expect(getJson(response)).resolves.toStrictEqual({
+      status: 400,
+      message: 'Invalid sign-up request.',
+    });
+  });
 });

@@ -17,14 +17,14 @@ type PrepareSetupArgs<T extends object> = {
 type CombinedProps<T extends object, U extends Partial<T>> = Omit<T, keyof U> &
   U;
 
-type SetupRenderResult<T extends object> = Omit<
-  RenderResult,
-  'rerender'
-> & {
+type SetupRenderResult<T extends object> = Omit<RenderResult, 'rerender'> & {
   rerender: (rerenderProps?: Partial<T>) => void;
 };
 
-type SetupResult<T extends object, U extends Partial<T>> = CombinedProps<T, U> & {
+type SetupResult<T extends object, U extends Partial<T>> = CombinedProps<
+  T,
+  U
+> & {
   renderResult: SetupRenderResult<T>;
 };
 

@@ -3,6 +3,7 @@ import type {
   KeyboardEventHandler,
   MouseEventHandler,
   ReactNode,
+  Ref,
 } from 'react';
 
 export type IconButtonColor =
@@ -30,6 +31,7 @@ export type IconButtonProps = {
   onClick?: MouseEventHandler<HTMLButtonElement>;
   onFocus?: FocusEventHandler<HTMLButtonElement>;
   onKeyDown?: KeyboardEventHandler<HTMLButtonElement>;
+  ref?: Ref<HTMLElement>;
   size?: IconButtonSize;
   tabIndex?: number;
   title?: string;

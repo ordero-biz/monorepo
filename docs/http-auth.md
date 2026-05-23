@@ -86,7 +86,7 @@ type ServerSessionResult =
     };
 ```
 
-## Login Flow
+## Sign-In Flow
 
 The sign-in form submits credentials through the client API. The backend returns
 a token, but the browser only receives safe session data.
@@ -95,16 +95,16 @@ a token, but the browser only receives safe session data.
 sequenceDiagram
   participant User
   participant Form as SignInForm
-  participant Client as login()
-  participant Route as POST /api/auth/login
-  participant Backend as POST /auth/login
+  participant Client as signIn()
+  participant Route as POST /api/auth/sign-in
+  participant Backend as POST /api/v1/platform/owners/login
   participant Cookie as HttpOnly cookie
   participant Query as Session query cache
 
   User->>Form: Submit email and password
-  Form->>Client: login(credentials)
-  Client->>Route: POST /api/auth/login
-  Route->>Backend: POST /auth/login
+  Form->>Client: signIn(credentials)
+  Client->>Route: POST /api/auth/sign-in
+  Route->>Backend: POST /api/v1/platform/owners/login
   Backend-->>Route: token + optional user
   Route->>Cookie: Set ordero_access_token
   Route-->>Client: AuthSession without token
@@ -118,6 +118,7 @@ Failure behavior:
 - invalid JSON returns `400`
 - backend errors are normalized as `ApiError`
 - backend `fieldErrors` are mapped back into TanStack Form
+- backend form-level errors are shown through the shared toast surface
 - a missing `token` from the backend returns `502`
 
 ## Logout Flow

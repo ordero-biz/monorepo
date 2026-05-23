@@ -31,6 +31,7 @@ export type RadioProps = {
   onFocus?: FocusEventHandler<HTMLElement>;
   onKeyDown?: KeyboardEventHandler<HTMLElement>;
   readOnly?: boolean;
+  ref?: Ref<HTMLElement>;
   required?: boolean;
   size?: RadioSize;
   tabIndex?: number;

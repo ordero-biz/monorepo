@@ -174,8 +174,6 @@ Do not:
 - test low-level primitive behavior from a wrapper component that does not own that behavior
 - duplicate coverage already owned by a lower-level shared component unless the wrapper changes the user-visible contract
 
-For the canonical shared setup example, see `../ui-routine-conventions/references/prepare-setup-example.md`.
-
 ## Validation
 
 Run these when possible:

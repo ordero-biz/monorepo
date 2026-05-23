@@ -25,6 +25,7 @@ export type RadioGroupProps = {
   ) => void;
   orientation?: RadioGroupOrientation;
   readOnly?: boolean;
+  ref?: Ref<HTMLDivElement>;
   required?: boolean;
   value?: string;
 };

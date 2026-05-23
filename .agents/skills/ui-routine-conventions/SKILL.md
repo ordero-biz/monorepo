@@ -86,6 +86,23 @@ Required tooling defaults across apps and packages:
 - `prepareSetup` from the app/package test helper, or from `@ordero/test-config/react` when no local helper exists, for component test setup
 - Vitest globals (`describe`, `it`, `expect`, `vi`, etc.) without per-file imports
 
+### `prepareSetup` rules
+
+Apply these rules strictly to component tests across `apps` and `packages`.
+
+- use the app or package-level `prepareSetup` helper when one exists so providers and test defaults stay consistent
+- if no local `prepareSetup` helper exists, use the shared helper from `@ordero/test-config/react`
+- expect `prepareSetup` to be the default setup pattern when a test file has repeated default props, repeated providers, or a stable wrapper
+- layer a small local `setup...` helper on top of `prepareSetup` only when the test needs named queried elements, a `userEvent` instance, or another behavior-oriented return value
+- avoid hand-rolled `render(...)` wrappers for provider setup; add missing providers to the local `prepareSetup` helper instead
+- use plain `render(...)` directly only for one-off tests that need test-local DOM around the component, such as a host form or extra focus targets
+- inspect every `setup({ ... })` override in `prepareSetup`-based tests
+- when an overridden prop is later asserted on, used in a Testing Library query, or used to prove callback behavior, destructure that value from `setup(...)`
+- do not keep a separate local variable for the same overridden prop when the value is available from `setup(...)`
+- after checking setup mechanics, keep assertions behavior-first through accessible roles, names, visible text, and user-visible outcomes
+
+See `references/prepare-setup-example.md` for the canonical pattern.
+
 Testing layer split for `packages/ui`:
 
 - use `pnpm --dir packages/ui test` for the `unit` Vitest project
@@ -98,19 +115,10 @@ For app feature/component tests outside `packages/ui`:
 - use Playwright for routed/composed app flows, smoke coverage, browser integration, and behavior that depends on the real browser page
 - prefer role/name queries when available; use `getByLabelText` for inputs that do not expose a queryable role in jsdom, such as `input[type="password"]`
 - configure app TypeScript/Vitest so Vitest globals are available in test files; do not import Vitest globals per file as a workaround
-- when an app-level `prepareSetup` helper exists, always use it so app providers and test defaults stay consistent
-- if no app-level `prepareSetup` helper exists, use the shared helper from `@ordero/test-config/react`
-- use `prepareSetup` as the base render helper, and layer a small local `setup...` helper on top when the test needs named queried elements or a `userEvent` instance
-- avoid hand-rolled `render(...)` wrappers for provider setup; add missing providers to the local `prepareSetup` helper instead
 - for request-driven component and hook tests, mock the nearest app-owned request helper rather than transport details
 - for request-driven component tests, assert user-visible behavior and request-helper contract rather than internal cache or state-container data
 
 For the repo-specific accessibility testing workflow, see `references/accessibility-testing.md`.
-
-For shared component tests with repeated default props, use `prepareSetup`.
-When a `prepareSetup` test overrides a prop and later asserts on that prop, destructure the asserted value from the object returned by `setup(...)` instead of keeping a separate local variable for the same override.
-Use plain `render(...)` only for one-off tests that need test-local DOM around the component, such as a host form or extra focus targets, not for app/provider setup.
-See `references/prepare-setup-example.md` for the canonical pattern.
 
 ## CSS Variable Conventions
 

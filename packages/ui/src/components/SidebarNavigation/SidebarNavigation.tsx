@@ -1,14 +1,14 @@
 'use client';
 
-import { forwardRef } from 'react';
 import './styles.css';
 import { shellClassName } from './classNames';
 import type { SidebarNavigationProps } from './types';
 
-export const SidebarNavigation = forwardRef<
-  HTMLDivElement,
-  SidebarNavigationProps
->(({ children, id }, ref) => (
+export const SidebarNavigation = ({
+  children,
+  id,
+  ref,
+}: SidebarNavigationProps) => (
   <aside
     className={shellClassName}
     data-slot="sidebar-navigation"
@@ -17,6 +17,4 @@ export const SidebarNavigation = forwardRef<
   >
     {children}
   </aside>
-));
-
-SidebarNavigation.displayName = 'SidebarNavigation';
+);

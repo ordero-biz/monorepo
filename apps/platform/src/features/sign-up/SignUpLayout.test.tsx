@@ -2,7 +2,10 @@ import { screen } from '@testing-library/react';
 import { preparePlatformSetup } from '@/test/prepareSetup';
 import { SignUpLayout } from './SignUpLayout';
 
-vi.mock('@/lib/api/client', () => ({
+vi.mock('@/lib/api/client', async () => ({
+  ...(await vi.importActual<typeof import('@/lib/api/client')>(
+    '@/lib/api/client'
+  )),
   signUp: vi.fn(),
 }));
 

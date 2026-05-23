@@ -3,6 +3,7 @@ import type {
   KeyboardEventHandler,
   MouseEventHandler,
   ReactNode,
+  Ref,
 } from 'react';
 
 export type ButtonVariant = 'contained' | 'outlined' | 'text' | 'soft';
@@ -34,6 +35,7 @@ export type ButtonProps = {
   onClick?: MouseEventHandler<HTMLButtonElement>;
   onFocus?: FocusEventHandler<HTMLButtonElement>;
   onKeyDown?: KeyboardEventHandler<HTMLButtonElement>;
+  ref?: Ref<HTMLElement>;
   size?: ButtonSize;
   startIcon?: ReactNode;
   tabIndex?: number;

@@ -4,6 +4,7 @@ import type {
   FocusEventHandler,
   KeyboardEventHandler,
   ReactNode,
+  Ref,
 } from 'react';
 
 export type SelectSize = 's' | 'm';
@@ -46,6 +47,7 @@ export type SelectProps = {
   options: SelectOption[];
   placeholder?: ReactNode;
   readOnly?: boolean;
+  ref?: Ref<HTMLButtonElement>;
   required?: boolean;
   size?: SelectSize;
   startAdornment?: ReactNode;

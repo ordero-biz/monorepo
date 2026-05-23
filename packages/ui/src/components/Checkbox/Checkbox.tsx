@@ -3,7 +3,7 @@
 import { Checkbox as CheckboxPrimitive } from '@base-ui/react/checkbox';
 import { cva } from 'class-variance-authority';
 import { Check, Minus } from 'lucide-react';
-import { forwardRef, useCallback, useId, useState } from 'react';
+import { useCallback, useId, useState } from 'react';
 import { cn } from '@/ui/lib/utils';
 import type { CheckboxColor, CheckboxProps, CheckboxSize } from './types';
 
@@ -134,162 +134,156 @@ const getCheckboxBoxStateClassName = ({
 const getLabelColorClassName = ({ disabled }: { disabled: boolean }) =>
   disabled ? 'text-[var(--text-disabled)]' : 'text-[var(--text-primary)]';
 
-export const Checkbox = forwardRef<HTMLElement, CheckboxProps>(
-  (
-    {
-      'aria-describedby': ariaDescribedBy,
-      'aria-label': ariaLabel,
-      'aria-labelledby': ariaLabelledBy,
-      checked,
-      children,
-      color = 'primary',
-      defaultChecked,
-      disabled = false,
-      id,
-      indeterminate = false,
-      inputRef,
-      name,
-      onBlur,
-      onCheckedChange,
-      onClick,
-      onFocus,
-      onKeyDown,
-      parent = false,
-      readOnly = false,
-      required = false,
-      size = 'm',
-      tabIndex,
-      title,
-      uncheckedValue,
-      value,
+export const Checkbox = ({
+  'aria-describedby': ariaDescribedBy,
+  'aria-label': ariaLabel,
+  'aria-labelledby': ariaLabelledBy,
+  checked,
+  children,
+  color = 'primary',
+  defaultChecked,
+  disabled = false,
+  id,
+  indeterminate = false,
+  inputRef,
+  name,
+  onBlur,
+  onCheckedChange,
+  onClick,
+  onFocus,
+  onKeyDown,
+  parent = false,
+  readOnly = false,
+  ref,
+  required = false,
+  size = 'm',
+  tabIndex,
+  title,
+  uncheckedValue,
+  value,
+}: CheckboxProps) => {
+  const generatedId = useId();
+  const controlId = id ?? generatedId;
+  const generatedLabelId = useId();
+  const [inputId, setInputId] = useState(controlId);
+  const checkboxLabelId = children ? `${generatedLabelId}-label` : undefined;
+  const labelledBy =
+    [ariaLabelledBy, checkboxLabelId].filter(Boolean).join(' ') || undefined;
+  const setInputRefs = useCallback(
+    (node: HTMLInputElement | null) => {
+      setInputId(node?.id ?? controlId);
+
+      if (typeof inputRef === 'function') {
+        inputRef(node);
+        return;
+      }
+
+      if (inputRef) {
+        inputRef.current = node;
+      }
     },
-    ref
-  ) => {
-    const generatedId = useId();
-    const controlId = id ?? generatedId;
-    const generatedLabelId = useId();
-    const [inputId, setInputId] = useState(controlId);
-    const checkboxLabelId = children ? `${generatedLabelId}-label` : undefined;
-    const labelledBy =
-      [ariaLabelledBy, checkboxLabelId].filter(Boolean).join(' ') || undefined;
-    const setInputRefs = useCallback(
-      (node: HTMLInputElement | null) => {
-        setInputId(node?.id ?? controlId);
+    [controlId, inputRef]
+  );
 
-        if (typeof inputRef === 'function') {
-          inputRef(node);
-          return;
-        }
-
-        if (inputRef) {
-          inputRef.current = node;
-        }
-      },
-      [controlId, inputRef]
-    );
-
-    return (
-      <label
-        className={cn(
-          'inline-flex max-w-fit items-center gap-0 align-top',
-          disabled ? 'cursor-not-allowed' : 'cursor-pointer'
-        )}
-        htmlFor={inputId}
-      >
-        <CheckboxPrimitive.Root
-          ref={ref}
-          aria-describedby={ariaDescribedBy}
-          aria-label={ariaLabel}
-          aria-labelledby={labelledBy}
-          checked={checked}
-          defaultChecked={defaultChecked}
-          disabled={disabled}
-          id={controlId}
-          indeterminate={indeterminate}
-          inputRef={setInputRefs}
-          name={name}
-          onBlur={onBlur}
-          onCheckedChange={onCheckedChange}
-          onClick={onClick}
-          onFocus={onFocus}
-          onKeyDown={onKeyDown}
-          parent={parent}
-          readOnly={readOnly}
-          render={(rootProps, state) => (
-            <span
-              {...rootProps}
-              className={cn(
-                rootProps.className,
-                checkboxRootVariants({ size }),
-                getCheckboxRootStateClassName({
-                  checked: state.checked,
-                  color,
-                  disabled: state.disabled,
-                  indeterminate: state.indeterminate,
-                })
-              )}
-              data-slot="checkbox"
-              tabIndex={state.disabled ? -1 : (tabIndex ?? 0)}
-            >
-              <span className={cn(checkboxIconViewportVariants({ size }))}>
-                <span
-                  className={cn(
-                    checkboxBoxVariants({ size }),
-                    getCheckboxBoxStateClassName({
-                      checked: state.checked,
-                      color,
-                      disabled: state.disabled,
-                      indeterminate: state.indeterminate,
-                    })
-                  )}
-                >
-                  {state.checked || state.indeterminate ? (
-                    <span className="absolute inset-0 flex items-center justify-center">
-                      {state.indeterminate ? (
-                        <Minus
-                          aria-hidden="true"
-                          className={cn(
-                            'shrink-0',
-                            indicatorSizeClassNames[size]
-                          )}
-                          strokeWidth={3}
-                        />
-                      ) : (
-                        <Check
-                          aria-hidden="true"
-                          className={cn(
-                            'shrink-0',
-                            indicatorSizeClassNames[size]
-                          )}
-                          strokeWidth={3}
-                        />
-                      )}
-                    </span>
-                  ) : null}
-                </span>
+  return (
+    <label
+      className={cn(
+        'inline-flex max-w-fit items-center gap-0 align-top',
+        disabled ? 'cursor-not-allowed' : 'cursor-pointer'
+      )}
+      htmlFor={inputId}
+    >
+      <CheckboxPrimitive.Root
+        ref={ref}
+        aria-describedby={ariaDescribedBy}
+        aria-label={ariaLabel}
+        aria-labelledby={labelledBy}
+        checked={checked}
+        defaultChecked={defaultChecked}
+        disabled={disabled}
+        id={controlId}
+        indeterminate={indeterminate}
+        inputRef={setInputRefs}
+        name={name}
+        onBlur={onBlur}
+        onCheckedChange={onCheckedChange}
+        onClick={onClick}
+        onFocus={onFocus}
+        onKeyDown={onKeyDown}
+        parent={parent}
+        readOnly={readOnly}
+        render={(rootProps, state) => (
+          <span
+            {...rootProps}
+            className={cn(
+              rootProps.className,
+              checkboxRootVariants({ size }),
+              getCheckboxRootStateClassName({
+                checked: state.checked,
+                color,
+                disabled: state.disabled,
+                indeterminate: state.indeterminate,
+              })
+            )}
+            data-slot="checkbox"
+            tabIndex={state.disabled ? -1 : (tabIndex ?? 0)}
+          >
+            <span className={cn(checkboxIconViewportVariants({ size }))}>
+              <span
+                className={cn(
+                  checkboxBoxVariants({ size }),
+                  getCheckboxBoxStateClassName({
+                    checked: state.checked,
+                    color,
+                    disabled: state.disabled,
+                    indeterminate: state.indeterminate,
+                  })
+                )}
+              >
+                {state.checked || state.indeterminate ? (
+                  <span className="absolute inset-0 flex items-center justify-center">
+                    {state.indeterminate ? (
+                      <Minus
+                        aria-hidden="true"
+                        className={cn(
+                          'shrink-0',
+                          indicatorSizeClassNames[size]
+                        )}
+                        strokeWidth={3}
+                      />
+                    ) : (
+                      <Check
+                        aria-hidden="true"
+                        className={cn(
+                          'shrink-0',
+                          indicatorSizeClassNames[size]
+                        )}
+                        strokeWidth={3}
+                      />
+                    )}
+                  </span>
+                ) : null}
               </span>
             </span>
-          )}
-          required={required}
-          tabIndex={tabIndex}
-          title={title}
-          uncheckedValue={uncheckedValue}
-          value={value}
-        />
-        {children ? (
-          <span
-            className={cn(labelClassName, getLabelColorClassName({ disabled }))}
-            data-slot="checkbox-label"
-            id={checkboxLabelId}
-          >
-            {children}
           </span>
-        ) : null}
-      </label>
-    );
-  }
-);
-
-Checkbox.displayName = 'Checkbox';
+        )}
+        required={required}
+        tabIndex={tabIndex}
+        title={title}
+        uncheckedValue={uncheckedValue}
+        value={value}
+      />
+      {children ? (
+        <span
+          className={cn(labelClassName, getLabelColorClassName({ disabled }))}
+          data-slot="checkbox-label"
+          id={checkboxLabelId}
+        >
+          {children}
+        </span>
+      ) : null}
+    </label>
+  );
+};
 
 export { checkboxRootVariants };

@@ -5,7 +5,7 @@ import {
   Input as InputPrimitive,
 } from '@base-ui/react/input';
 import type { CSSProperties } from 'react';
-import { forwardRef, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { cn } from '@/ui/lib/utils';
 import type { InputProps } from './types';
 
@@ -138,132 +138,124 @@ const getAdornmentColorClassName = () => 'text-[var(--text-secondary)]';
 const getInputTextColorClassName = ({ disabled }: { disabled: boolean }) =>
   disabled ? 'text-[var(--text-disabled)]' : 'text-foreground';
 
-export const Input = forwardRef<HTMLElement, InputProps>(
-  (
-    {
-      'aria-describedby': ariaDescribedBy,
-      'aria-label': ariaLabel,
-      'aria-labelledby': ariaLabelledBy,
-      autoComplete,
-      autoFocus,
-      defaultValue,
-      disabled = false,
-      endAdornment,
-      endIcon: EndIcon,
-      focused,
-      id,
-      invalid = false,
-      name,
-      onBlur,
-      onFocus,
-      onKeyDown,
-      onValueChange,
-      placeholder,
-      readOnly,
-      required,
-      size = 'm',
-      startAdornment,
-      startIcon: StartIcon,
-      type = 'text',
-      value,
-      variant = 'outlined',
-    },
-    ref
-  ) => {
-    const [focusedState, setFocusedState] = useState(false);
-    const isFocused = focused ?? focusedState;
+export const Input = ({
+  'aria-describedby': ariaDescribedBy,
+  'aria-label': ariaLabel,
+  'aria-labelledby': ariaLabelledBy,
+  autoComplete,
+  autoFocus,
+  defaultValue,
+  disabled = false,
+  endAdornment,
+  endIcon: EndIcon,
+  focused,
+  id,
+  invalid = false,
+  name,
+  onBlur,
+  onFocus,
+  onKeyDown,
+  onValueChange,
+  placeholder,
+  readOnly,
+  ref,
+  required,
+  size = 'm',
+  startAdornment,
+  startIcon: StartIcon,
+  type = 'text',
+  value,
+  variant = 'outlined',
+}: InputProps) => {
+  const [focusedState, setFocusedState] = useState(false);
+  const isFocused = focused ?? focusedState;
 
-    useEffect(() => {
-      if (focused !== undefined) {
-        setFocusedState(focused);
-      }
-    }, [focused]);
+  useEffect(() => {
+    if (focused !== undefined) {
+      setFocusedState(focused);
+    }
+  }, [focused]);
 
-    return (
-      <div
-        className={cn(
-          inputFrameClassNames[variant],
-          inputFrameSizeClassNames[variant][size]
-        )}
-        data-slot="input"
-        style={getInputStyle({
-          disabled,
-          focused: isFocused,
-          invalid,
-          variant,
-        })}
-      >
-        <div className={cn(inputContentRowClassNames[variant][size])}>
-          {startAdornment || StartIcon ? (
-            <span
-              className={cn(
-                adornmentClassName,
-                startAdornmentClassName,
-                getAdornmentColorClassName()
-              )}
-            >
-              {startAdornment}
-              {StartIcon ? (
-                <StartIcon
-                  className={cn('shrink-0', iconSizeClassNames[size])}
-                />
-              ) : null}
-            </span>
-          ) : null}
-          <InputPrimitive
-            ref={ref}
-            aria-describedby={ariaDescribedBy}
-            aria-label={ariaLabel}
-            aria-labelledby={ariaLabelledBy}
-            autoComplete={autoComplete}
-            autoFocus={autoFocus}
+  return (
+    <div
+      className={cn(
+        inputFrameClassNames[variant],
+        inputFrameSizeClassNames[variant][size]
+      )}
+      data-slot="input"
+      style={getInputStyle({
+        disabled,
+        focused: isFocused,
+        invalid,
+        variant,
+      })}
+    >
+      <div className={cn(inputContentRowClassNames[variant][size])}>
+        {startAdornment || StartIcon ? (
+          <span
             className={cn(
-              inputClassName,
-              getInputTextColorClassName({ disabled })
+              adornmentClassName,
+              startAdornmentClassName,
+              getAdornmentColorClassName()
             )}
-            defaultValue={defaultValue}
-            disabled={disabled}
-            id={id}
-            name={name}
-            onBlur={(event) => {
-              setFocusedState(false);
-              onBlur?.(event);
-            }}
-            onFocus={(event) => {
-              setFocusedState(true);
-              onFocus?.(event);
-            }}
-            onKeyDown={onKeyDown}
-            onValueChange={(
-              nextValue: string,
-              details: InputChangeEventDetails
-            ) => {
-              onValueChange?.(nextValue, details);
-            }}
-            placeholder={placeholder}
-            readOnly={readOnly}
-            required={required}
-            type={type}
-            value={value}
-          />
-          {endAdornment || EndIcon ? (
-            <span
-              className={cn(
-                adornmentClassName,
-                endAdornmentClassName,
-                getAdornmentColorClassName()
-              )}
-            >
-              {endAdornment}
-              {EndIcon ? (
-                <EndIcon className={cn('shrink-0', iconSizeClassNames[size])} />
-              ) : null}
-            </span>
-          ) : null}
-        </div>
+          >
+            {startAdornment}
+            {StartIcon ? (
+              <StartIcon className={cn('shrink-0', iconSizeClassNames[size])} />
+            ) : null}
+          </span>
+        ) : null}
+        <InputPrimitive
+          ref={ref}
+          aria-describedby={ariaDescribedBy}
+          aria-label={ariaLabel}
+          aria-labelledby={ariaLabelledBy}
+          autoComplete={autoComplete}
+          autoFocus={autoFocus}
+          className={cn(
+            inputClassName,
+            getInputTextColorClassName({ disabled })
+          )}
+          defaultValue={defaultValue}
+          disabled={disabled}
+          id={id}
+          name={name}
+          onBlur={(event) => {
+            setFocusedState(false);
+            onBlur?.(event);
+          }}
+          onFocus={(event) => {
+            setFocusedState(true);
+            onFocus?.(event);
+          }}
+          onKeyDown={onKeyDown}
+          onValueChange={(
+            nextValue: string,
+            details: InputChangeEventDetails
+          ) => {
+            onValueChange?.(nextValue, details);
+          }}
+          placeholder={placeholder}
+          readOnly={readOnly}
+          required={required}
+          type={type}
+          value={value}
+        />
+        {endAdornment || EndIcon ? (
+          <span
+            className={cn(
+              adornmentClassName,
+              endAdornmentClassName,
+              getAdornmentColorClassName()
+            )}
+          >
+            {endAdornment}
+            {EndIcon ? (
+              <EndIcon className={cn('shrink-0', iconSizeClassNames[size])} />
+            ) : null}
+          </span>
+        ) : null}
       </div>
-    );
-  }
-);
-
-Input.displayName = 'Input';
+    </div>
+  );
+};

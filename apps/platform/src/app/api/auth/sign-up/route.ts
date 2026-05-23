@@ -1,10 +1,10 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { BACKEND_AUTH_PATHS } from '@/lib/api/constants';
 import { backendFetch, setAuthCookie } from '@/lib/api/server';
-import type { AuthSession, AuthSignUpInput } from '@/lib/api/types';
+import type { AuthSession, AuthSignUpInput, Token } from '@/lib/api/types';
 
 type BackendSignUpResponse = {
-  token?: string;
+  token?: Token;
 };
 
 export const POST = async (request: NextRequest) => {
