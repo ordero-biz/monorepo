@@ -1,9 +1,10 @@
 'use client';
 
+import { Button as ButtonPrimitive } from '@base-ui/react/button';
 import { Dialog as DialogPrimitive } from '@base-ui/react/dialog';
 import { ScrollArea } from '@base-ui/react/scroll-area';
 import type { ReactElement } from 'react';
-import { Button } from '@/ui/components/Button';
+import { buttonVariants } from '@/ui/components/Button';
 import { cn } from '@/ui/lib/utils';
 import {
   backdropClassName,
@@ -73,20 +74,15 @@ const Trigger = ({ children, disabled, id, title }: DialogTriggerProps) => (
     disabled={disabled}
     id={id}
     render={(props) => (
-      <Button
-        aria-label={props['aria-label']}
+      <ButtonPrimitive
+        {...props}
+        className={cn(buttonVariants({ variant: 'outlined' }), props.className)}
         disabled={disabled}
         id={id}
-        onBlur={props.onBlur}
-        onClick={props.onClick}
-        onFocus={props.onFocus}
-        onKeyDown={props.onKeyDown}
-        tabIndex={props.tabIndex}
         title={title}
-        variant="outlined"
       >
         {children}
-      </Button>
+      </ButtonPrimitive>
     )}
     title={title}
   >
@@ -179,22 +175,18 @@ const Close = ({
     disabled={disabled}
     id={id}
     render={(props) => (
-      <Button
-        aria-label={props['aria-label']}
-        color={color}
+      <ButtonPrimitive
+        {...props}
+        className={cn(
+          buttonVariants({ color, size, variant }),
+          props.className
+        )}
         disabled={disabled}
         id={id}
-        onBlur={props.onBlur}
-        onClick={props.onClick}
-        onFocus={props.onFocus}
-        onKeyDown={props.onKeyDown}
-        size={size}
-        tabIndex={props.tabIndex}
         title={title}
-        variant={variant}
       >
         {children}
-      </Button>
+      </ButtonPrimitive>
     )}
     title={title}
   >

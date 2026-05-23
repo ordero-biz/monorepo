@@ -60,14 +60,13 @@ describe('Dialog', () => {
     const user = userEvent.setup();
 
     setup({});
+    const trigger = screen.getByRole('button', { name: 'View notifications' });
 
     expect(
       screen.queryByText('You are all caught up. Good job!')
     ).not.toBeInTheDocument();
 
-    await user.click(
-      screen.getByRole('button', { name: 'View notifications' })
-    );
+    await user.click(trigger);
 
     expect(
       screen.getByRole('heading', { name: 'Notifications' })
@@ -81,6 +80,7 @@ describe('Dialog', () => {
     expect(
       screen.queryByText('You are all caught up. Good job!')
     ).not.toBeInTheDocument();
+    expect(trigger).toHaveFocus();
   });
 
   it('applies fullscreen mode when enabled', () => {
