@@ -39,7 +39,7 @@ describe('SignInPage', () => {
     (await getGuardMock()).mockResolvedValue(true);
 
     await expect(SignInPage()).rejects.toThrow('redirect');
-    expect(redirect).toHaveBeenCalledWith('/');
+    expect(redirect).toHaveBeenCalledWith('/stores');
   });
 
   it('renders the sign-in page for signed-out users', async () => {

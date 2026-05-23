@@ -9,6 +9,7 @@ import {
 } from '@ordero/ui';
 import { useForm } from '@tanstack/react-form';
 import { useQueryClient } from '@tanstack/react-query';
+import { useRouter } from 'next/navigation';
 import { signIn } from '@/lib/api/client';
 import { authQueryKeys } from '@/lib/hooks/useSessionQuery';
 import { signInDefaultValues } from './constants';
@@ -40,6 +41,7 @@ const submitSignInToBackend = async (value: SignInFormValues) => {
 
 export const SignInForm = () => {
   const queryClient = useQueryClient();
+  const router = useRouter();
   const { add: addToast } = useToastManager();
   const form = useForm({
     defaultValues: signInDefaultValues,
@@ -66,6 +68,7 @@ export const SignInForm = () => {
         ...signInDefaultValues,
         email: value.email,
       });
+      router.push('/stores');
     },
   });
 

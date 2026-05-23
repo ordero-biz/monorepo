@@ -5,7 +5,7 @@ import { hasAuthenticatedServerSession } from '@/lib/api/authPageGuard';
 
 export default async function SignInPage() {
   if (await hasAuthenticatedServerSession()) {
-    redirect('/');
+    redirect('/stores');
   }
 
   return (

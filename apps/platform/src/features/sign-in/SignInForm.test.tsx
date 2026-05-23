@@ -4,6 +4,14 @@ import { signIn } from '@/lib/api/client';
 import { preparePlatformSetup } from '@/test/prepareSetup';
 import { SignInForm } from './SignInForm';
 
+const routerPushMock = vi.fn();
+
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({
+    push: routerPushMock,
+  }),
+}));
+
 vi.mock('@/lib/api/client', async () => ({
   ...(await vi.importActual<typeof import('@/lib/api/client')>(
     '@/lib/api/client'
@@ -33,6 +41,7 @@ const setupSignInForm = () => {
 describe('SignInForm', () => {
   beforeEach(() => {
     signInMock.mockReset();
+    routerPushMock.mockClear();
   });
 
   it('renders the expected form controls and secondary actions', () => {
@@ -189,7 +198,7 @@ describe('SignInForm', () => {
     ).not.toBeInTheDocument();
   });
 
-  it('submits credentials, keeps the email, and clears the password after successful sign in', async () => {
+  it('submits credentials, keeps the email, clears the password, and redirects to stores after successful sign in', async () => {
     signInMock.mockResolvedValue({
       ok: true,
       data: {
@@ -211,6 +220,7 @@ describe('SignInForm', () => {
     });
     expect(emailField).toHaveValue('admin@gmail.com');
     expect(passwordField).toHaveValue('');
+    expect(routerPushMock).toHaveBeenCalledWith('/stores');
   });
 
   it('shows a submitting state while login is in flight', async () => {
