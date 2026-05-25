@@ -9,7 +9,7 @@ export const viewportClassName =
 
 export const popupClassName = `${rootClassName} p-[var(--dialog-content-px)] transition-all duration-150 data-[ending-style]:scale-95 data-[ending-style]:opacity-0 data-[starting-style]:scale-95 data-[starting-style]:opacity-0`;
 export const popupScrollableLayoutClassName =
-  'flex max-h-full min-h-0 flex-col';
+  'flex max-h-[calc(100dvh-var(--dialog-content-px)-var(--dialog-content-px))] min-h-0 flex-col';
 
 export const popupWidthClassNames = {
   md: 'max-w-[var(--dialog-width-md)]',

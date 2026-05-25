@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { expect, userEvent, within } from 'storybook/test';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { Button } from '@/ui/components/Button';
 import { Dialog } from '@/ui/components/Dialog';
 
@@ -189,11 +189,11 @@ export const Scrollable: Story = {
     const footerAction = within(dialog).getByRole('button', { name: 'Accept' });
     const finalSection = within(dialog).getByText('Follow-up and cleanup');
 
-    expect(footerAction).toBeVisible();
+    await waitFor(() => expect(footerAction).toBeVisible());
 
     finalSection.scrollIntoView({ block: 'nearest' });
 
-    await expect(finalSection).toBeVisible();
-    await expect(footerAction).toBeVisible();
+    await waitFor(() => expect(finalSection).toBeVisible());
+    await waitFor(() => expect(footerAction).toBeVisible());
   },
 };
