@@ -1,6 +1,7 @@
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { getStores } from '@/lib/api/client';
+import { getStores } from '@/lib/client/api';
+import { clientRoutes } from '@/lib/client/routes';
 import { preparePlatformSetup } from '@/test/prepareSetup';
 import { StoresListPage } from './StoresListPage';
 
@@ -12,9 +13,9 @@ vi.mock('next/navigation', () => ({
   }),
 }));
 
-vi.mock('@/lib/api/client', async () => ({
-  ...(await vi.importActual<typeof import('@/lib/api/client')>(
-    '@/lib/api/client'
+vi.mock('@/lib/client/api', async () => ({
+  ...(await vi.importActual<typeof import('@/lib/client/api')>(
+    '@/lib/client/api'
   )),
   getStores: vi.fn(),
 }));
@@ -29,6 +30,47 @@ describe('StoresListPage', () => {
   beforeEach(() => {
     getStoresMock.mockReset();
     routerPushMock.mockClear();
+  });
+
+  it('renders a loading state while stores are loading', () => {
+    getStoresMock.mockReturnValue(new Promise(() => {}));
+
+    setup();
+
+    expect(screen.getByText('Loading stores...')).toBeVisible();
+  });
+
+  it('renders an error state and retries loading stores', async () => {
+    getStoresMock
+      .mockResolvedValueOnce({
+        ok: false,
+        error: {
+          status: 500,
+          message: 'Could not load stores.',
+        },
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        data: [
+          {
+            id: 1,
+            name: 'North Shop',
+            subDomain: 'north-shop',
+          },
+        ],
+      });
+
+    const user = userEvent.setup();
+    setup();
+
+    expect(
+      await screen.findByText("We couldn't load your stores right now.")
+    ).toBeVisible();
+
+    await user.click(screen.getByRole('button', { name: 'Retry' }));
+
+    expect(await screen.findByText('North Shop')).toBeVisible();
+    expect(getStoresMock).toHaveBeenCalledTimes(2);
   });
 
   it('renders an empty store card that opens the add-store page', async () => {
@@ -49,7 +91,7 @@ describe('StoresListPage', () => {
 
     await user.click(addStoreCard);
 
-    expect(routerPushMock).toHaveBeenCalledWith('/stores/add');
+    expect(routerPushMock).toHaveBeenCalledWith(clientRoutes.addStore);
   });
 
   it('renders the stores returned by the current owner list endpoint', async () => {

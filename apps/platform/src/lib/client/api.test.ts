@@ -6,7 +6,7 @@ import {
   logout,
   signIn,
   signUp,
-} from './client';
+} from './api';
 
 describe('apiFetch', () => {
   beforeEach(() => {

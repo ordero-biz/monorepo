@@ -1,6 +1,7 @@
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { signIn } from '@/lib/api/client';
+import { signIn } from '@/lib/client/api';
+import { clientRoutes } from '@/lib/client/routes';
 import { preparePlatformSetup } from '@/test/prepareSetup';
 import { SignInForm } from './SignInForm';
 
@@ -12,9 +13,9 @@ vi.mock('next/navigation', () => ({
   }),
 }));
 
-vi.mock('@/lib/api/client', async () => ({
-  ...(await vi.importActual<typeof import('@/lib/api/client')>(
-    '@/lib/api/client'
+vi.mock('@/lib/client/api', async () => ({
+  ...(await vi.importActual<typeof import('@/lib/client/api')>(
+    '@/lib/client/api'
   )),
   signIn: vi.fn(),
 }));
@@ -220,7 +221,7 @@ describe('SignInForm', () => {
     });
     expect(emailField).toHaveValue('admin@gmail.com');
     expect(passwordField).toHaveValue('');
-    expect(routerPushMock).toHaveBeenCalledWith('/stores');
+    expect(routerPushMock).toHaveBeenCalledWith(clientRoutes.stores);
   });
 
   it('shows a submitting state while login is in flight', async () => {

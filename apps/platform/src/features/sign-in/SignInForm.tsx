@@ -10,7 +10,8 @@ import {
 import { useForm } from '@tanstack/react-form';
 import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
-import { signIn } from '@/lib/api/client';
+import { signIn } from '@/lib/client/api';
+import { clientRoutes } from '@/lib/client/routes';
 import { authQueryKeys } from '@/lib/hooks/useSessionQuery';
 import { signInDefaultValues } from './constants';
 import { getErrorMessage } from './utils/error';
@@ -68,7 +69,7 @@ export const SignInForm = () => {
         ...signInDefaultValues,
         email: value.email,
       });
-      router.push('/stores');
+      router.push(clientRoutes.stores);
     },
   });
 
@@ -160,10 +161,8 @@ export const SignInForm = () => {
         </button>
       </div>
 
-      <form.Subscribe
-        selector={(state) => [state.values, state.isSubmitting] as const}
-      >
-        {([_, isSubmitting]) => (
+      <form.Subscribe selector={(state) => state.isSubmitting}>
+        {(isSubmitting) => (
           <Button
             color="inherit"
             disabled={isSubmitting}

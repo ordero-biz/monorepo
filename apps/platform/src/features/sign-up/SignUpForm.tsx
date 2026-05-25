@@ -12,7 +12,8 @@ import { useForm } from '@tanstack/react-form';
 import { useQueryClient } from '@tanstack/react-query';
 import Link from 'next/link';
 import { getErrorMessage } from '@/features/sign-in/utils/error';
-import { signUp } from '@/lib/api/client';
+import { signUp } from '@/lib/client/api';
+import { clientRoutes } from '@/lib/client/routes';
 import { authQueryKeys } from '@/lib/hooks/useSessionQuery';
 import { signUpDefaultValues } from './constants';
 import {
@@ -187,14 +188,14 @@ export const SignUpForm = () => {
                     By signing up, I agree to{' '}
                     <Link
                       className="text-[var(--text-secondary)] underline underline-offset-[3px]"
-                      href="/terms"
+                      href={clientRoutes.terms}
                     >
                       terms of use
                     </Link>{' '}
                     and{' '}
                     <Link
                       className="text-[var(--text-secondary)] underline underline-offset-[3px]"
-                      href="/privacy"
+                      href={clientRoutes.privacy}
                     >
                       privacy policy
                     </Link>

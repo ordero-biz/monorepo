@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { getStores } from '@/lib/api/client';
+import { getStores } from '@/lib/client/api';
 
 export const storesQueryKeys = {
   list: ['stores', 'list'] as const,

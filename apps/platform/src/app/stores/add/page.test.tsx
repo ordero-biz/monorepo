@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { redirect } from 'next/navigation';
+import { clientRoutes } from '@/lib/client/routes';
 import AddStoreRoutePage from './page';
 
 vi.mock('next/navigation', () => ({
@@ -12,7 +13,7 @@ vi.mock('@/lib/api/authPageGuard', () => ({
   hasAuthenticatedServerSession: vi.fn(),
 }));
 
-vi.mock('@/features/stores/AddStorePage', () => ({
+vi.mock('@/features/stores/add/AddStorePage', () => ({
   AddStorePage: () => <div>Add store form</div>,
 }));
 
@@ -32,7 +33,7 @@ describe('AddStoreRoutePage', () => {
     (await getGuardMock()).mockResolvedValue(false);
 
     await expect(AddStoreRoutePage()).rejects.toThrow('redirect');
-    expect(redirect).toHaveBeenCalledWith('/sign-in');
+    expect(redirect).toHaveBeenCalledWith(clientRoutes.signIn);
   });
 
   it('renders the add-store form for authenticated users', async () => {

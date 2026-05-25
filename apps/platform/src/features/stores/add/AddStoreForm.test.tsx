@@ -1,9 +1,10 @@
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { createStore } from '@/lib/api/client';
+import { createStore } from '@/lib/client/api';
+import { clientRoutes } from '@/lib/client/routes';
 import { storesQueryKeys } from '@/lib/hooks/useStoresQuery';
 import { preparePlatformSetup } from '@/test/prepareSetup';
-import { AddStorePage } from './AddStorePage';
+import { AddStoreForm } from './AddStoreForm';
 
 const routerPushMock = vi.fn();
 
@@ -13,9 +14,9 @@ vi.mock('next/navigation', () => ({
   }),
 }));
 
-vi.mock('@/lib/api/client', async () => ({
-  ...(await vi.importActual<typeof import('@/lib/api/client')>(
-    '@/lib/api/client'
+vi.mock('@/lib/client/api', async () => ({
+  ...(await vi.importActual<typeof import('@/lib/client/api')>(
+    '@/lib/client/api'
   )),
   createStore: vi.fn(),
 }));
@@ -23,10 +24,10 @@ vi.mock('@/lib/api/client', async () => ({
 const createStoreMock = vi.mocked(createStore);
 
 const { setup } = preparePlatformSetup({
-  component: AddStorePage,
+  component: AddStoreForm,
 });
 
-const setupAddStorePage = () => {
+const setupAddStoreForm = () => {
   const user = userEvent.setup();
   const result = setup();
 
@@ -39,7 +40,7 @@ const setupAddStorePage = () => {
   };
 };
 
-describe('AddStorePage', () => {
+describe('AddStoreForm', () => {
   beforeEach(() => {
     createStoreMock.mockReset();
     routerPushMock.mockClear();
@@ -47,9 +48,8 @@ describe('AddStorePage', () => {
 
   it('renders the store domain and name form fields', async () => {
     const { subDomainField, nameField, submitButton, user } =
-      setupAddStorePage();
+      setupAddStoreForm();
 
-    expect(screen.getByRole('heading', { name: 'Add store' })).toBeVisible();
     expect(subDomainField).toBeVisible();
     expect(screen.getByText('.ordero.biz')).toBeVisible();
     expect(nameField).toBeVisible();
@@ -60,6 +60,55 @@ describe('AddStorePage', () => {
 
     expect(subDomainField).toHaveValue('north-shop');
     expect(nameField).toHaveValue('North Shop');
+  });
+
+  it('shows submit validation when the user submits the untouched form', async () => {
+    const { subDomainField, nameField, submitButton, user } =
+      setupAddStoreForm();
+
+    await user.click(submitButton);
+
+    expect(screen.getAllByText('This field is required.')).toHaveLength(2);
+    expect(subDomainField).toHaveAccessibleDescription(
+      'This field is required.'
+    );
+    expect(nameField).toHaveAccessibleDescription('This field is required.');
+    expect(createStoreMock).not.toHaveBeenCalled();
+  });
+
+  it('does not show client validation on the first keystroke', async () => {
+    const { subDomainField, user } = setupAddStoreForm();
+
+    await user.type(subDomainField, ' ');
+
+    expect(
+      screen.queryByText('This field is required.')
+    ).not.toBeInTheDocument();
+  });
+
+  it('shows client validation after a field is blurred once', async () => {
+    const { subDomainField, nameField, user } = setupAddStoreForm();
+
+    await user.type(subDomainField, ' ');
+    await user.click(nameField);
+
+    expect(screen.getByText('This field is required.')).toBeVisible();
+  });
+
+  it('updates client validation live after an invalid field has been revealed', async () => {
+    const { subDomainField, nameField, user } = setupAddStoreForm();
+
+    await user.type(subDomainField, ' ');
+    await user.click(nameField);
+
+    expect(screen.getByText('This field is required.')).toBeVisible();
+
+    await user.clear(subDomainField);
+    await user.type(subDomainField, 'north-shop');
+
+    expect(
+      screen.queryByText('This field is required.')
+    ).not.toBeInTheDocument();
   });
 
   it('submits the swagger payload, shows a success toast, invalidates stores, and redirects', async () => {
@@ -73,11 +122,11 @@ describe('AddStorePage', () => {
     });
 
     const { subDomainField, nameField, queryClient, submitButton, user } =
-      setupAddStorePage();
+      setupAddStoreForm();
     const invalidateQueriesSpy = vi.spyOn(queryClient, 'invalidateQueries');
 
-    await user.type(subDomainField, 'north-shop');
-    await user.type(nameField, 'North Shop');
+    await user.type(subDomainField, ' north-shop ');
+    await user.type(nameField, ' North Shop ');
     await user.click(submitButton);
 
     expect(createStoreMock).toHaveBeenCalledWith({
@@ -87,7 +136,7 @@ describe('AddStorePage', () => {
     expect(invalidateQueriesSpy).toHaveBeenCalledWith({
       queryKey: storesQueryKeys.list,
     });
-    expect(routerPushMock).toHaveBeenCalledWith('/stores');
+    expect(routerPushMock).toHaveBeenCalledWith(clientRoutes.stores);
     expect(
       await screen.findByRole('dialog', { name: 'Store created.' })
     ).toBeVisible();
@@ -106,7 +155,7 @@ describe('AddStorePage', () => {
     });
 
     const { subDomainField, nameField, submitButton, user } =
-      setupAddStorePage();
+      setupAddStoreForm();
 
     await user.type(subDomainField, 'north-shop');
     await user.type(nameField, 'North Shop');

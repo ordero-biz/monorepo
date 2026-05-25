@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react';
+import { clientRoutes } from '@/lib/client/routes';
 import {
   createTestQueryClient,
   createTestQueryProvider,
@@ -30,7 +31,7 @@ describe('SignInFormLayout', () => {
     ).toBeVisible();
     expect(
       screen.getByRole('link', { name: 'Create account' })
-    ).toHaveAttribute('href', '/sign-up');
+    ).toHaveAttribute('href', clientRoutes.signUp);
     expect(
       screen.getByRole('textbox', { name: 'Email address' })
     ).toBeVisible();

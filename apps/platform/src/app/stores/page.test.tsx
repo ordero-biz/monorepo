@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { redirect } from 'next/navigation';
+import { clientRoutes } from '@/lib/client/routes';
 import StoresPage from './page';
 
 vi.mock('next/navigation', () => ({
@@ -12,7 +13,7 @@ vi.mock('@/lib/api/authPageGuard', () => ({
   hasAuthenticatedServerSession: vi.fn(),
 }));
 
-vi.mock('@/features/stores/StoresListPage', () => ({
+vi.mock('@/features/stores/list/StoresListPage', () => ({
   StoresListPage: () => <div>Stores list</div>,
 }));
 
@@ -32,7 +33,7 @@ describe('StoresPage', () => {
     (await getGuardMock()).mockResolvedValue(false);
 
     await expect(StoresPage()).rejects.toThrow('redirect');
-    expect(redirect).toHaveBeenCalledWith('/sign-in');
+    expect(redirect).toHaveBeenCalledWith(clientRoutes.signIn);
   });
 
   it('renders the stores list for authenticated users', async () => {
