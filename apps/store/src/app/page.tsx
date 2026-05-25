@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { clientRoutes } from '@/lib/routes';
+import { clientRoutes } from '@/lib/client/routes';
 
 export default function Home() {
   return (

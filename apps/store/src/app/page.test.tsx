@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import { clientRoutes } from '@/lib/routes';
+import { clientRoutes } from '@/lib/client/routes';
 import Home from './page';
 
 describe('store Home', () => {

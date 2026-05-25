@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { redirect } from 'next/navigation';
 import type { ReactNode } from 'react';
-import { clientRoutes } from '@/lib/routes';
+import { clientRoutes } from '@/lib/client/routes';
 import SignInPage from './page';
 
 vi.mock('next/navigation', () => ({

@@ -1,4 +1,4 @@
-import { apiFetch, getSession, logout, signIn } from './client';
+import { apiFetch, getSession, logout, signIn } from './api';
 
 describe('apiFetch', () => {
   beforeEach(() => {
@@ -126,6 +126,24 @@ describe('apiFetch', () => {
     });
   });
 
+  it('returns plain text for successful non-JSON responses', async () => {
+    vi.mocked(fetch).mockResolvedValue(new Response('plain text body'));
+
+    await expect(apiFetch<string>('/api/ping')).resolves.toEqual({
+      ok: true,
+      data: 'plain text body',
+    });
+  });
+
+  it('returns undefined for successful empty responses', async () => {
+    vi.mocked(fetch).mockResolvedValue(new Response(null));
+
+    await expect(apiFetch('/api/logout')).resolves.toEqual({
+      ok: true,
+      data: undefined,
+    });
+  });
+
   it('returns a normalized error when the request throws', async () => {
     vi.mocked(fetch).mockRejectedValue(new Error('Failed to fetch'));
 
@@ -168,6 +186,31 @@ describe('apiFetch', () => {
     });
   });
 
+  it('ignores invalid fieldErrors shapes in error responses', async () => {
+    vi.mocked(fetch).mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          message: 'Validation failed.',
+          fieldErrors: ['email is invalid'],
+        }),
+        {
+          status: 400,
+          statusText: 'Bad Request',
+        }
+      )
+    );
+
+    await expect(apiFetch('/api/auth/sign-in')).resolves.toEqual({
+      ok: false,
+      error: {
+        status: 400,
+        message: 'Validation failed.',
+        code: undefined,
+        fieldErrors: undefined,
+      },
+    });
+  });
+
   it('falls back to the response status text when an error body has no message', async () => {
     vi.mocked(fetch).mockResolvedValue(
       new Response(JSON.stringify({ code: 'AUTH_REQUIRED' }), {
@@ -182,6 +225,44 @@ describe('apiFetch', () => {
         status: 401,
         message: 'Unauthorized',
         code: 'AUTH_REQUIRED',
+        fieldErrors: undefined,
+      },
+    });
+  });
+
+  it('falls back to the default status message when an error response has no body or status text', async () => {
+    vi.mocked(fetch).mockResolvedValue(
+      new Response(null, {
+        status: 500,
+        statusText: '',
+      })
+    );
+
+    await expect(apiFetch('/api/auth/logout')).resolves.toEqual({
+      ok: false,
+      error: {
+        status: 500,
+        message: 'Request failed with status 500.',
+        code: undefined,
+        fieldErrors: undefined,
+      },
+    });
+  });
+
+  it('uses plain text error bodies only when they are the status text fallback source', async () => {
+    vi.mocked(fetch).mockResolvedValue(
+      new Response('Backend exploded', {
+        status: 502,
+        statusText: 'Bad Gateway',
+      })
+    );
+
+    await expect(apiFetch('/api/backend/orders')).resolves.toEqual({
+      ok: false,
+      error: {
+        status: 502,
+        message: 'Bad Gateway',
+        code: undefined,
         fieldErrors: undefined,
       },
     });
@@ -239,6 +320,40 @@ describe('client auth helpers', () => {
     );
   });
 
+  it('signIn returns normalized failures from the sign-in route', async () => {
+    vi.mocked(fetch).mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          message: 'Sign-in failed.',
+          fieldErrors: {
+            email: 'Use a gmail.com email address.',
+          },
+        }),
+        {
+          status: 422,
+          statusText: 'Unprocessable Entity',
+        }
+      )
+    );
+
+    await expect(
+      signIn({
+        email: 'admin@mail.com',
+        password: '123456',
+      })
+    ).resolves.toEqual({
+      ok: false,
+      error: {
+        status: 422,
+        message: 'Sign-in failed.',
+        code: undefined,
+        fieldErrors: {
+          email: 'Use a gmail.com email address.',
+        },
+      },
+    });
+  });
+
   it('logout posts to the logout route and returns a signed-out session on success', async () => {
     const fetchMock = vi.mocked(fetch);
 
@@ -264,6 +379,31 @@ describe('client auth helpers', () => {
         cache: 'no-store',
       })
     );
+  });
+
+  it('logout returns normalized failures from the logout route', async () => {
+    vi.mocked(fetch).mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          message: 'Logout failed.',
+          code: 'LOGOUT_FAILED',
+        }),
+        {
+          status: 503,
+          statusText: 'Service Unavailable',
+        }
+      )
+    );
+
+    await expect(logout()).resolves.toEqual({
+      ok: false,
+      error: {
+        status: 503,
+        message: 'Logout failed.',
+        code: 'LOGOUT_FAILED',
+        fieldErrors: undefined,
+      },
+    });
   });
 
   it('gets the current session from the session route on success', async () => {
@@ -297,5 +437,30 @@ describe('client auth helpers', () => {
         cache: 'no-store',
       })
     );
+  });
+
+  it('returns normalized failures from the session route', async () => {
+    vi.mocked(fetch).mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          message: 'Session lookup failed.',
+          code: 'SESSION_LOOKUP_FAILED',
+        }),
+        {
+          status: 500,
+          statusText: 'Internal Server Error',
+        }
+      )
+    );
+
+    await expect(getSession()).resolves.toEqual({
+      ok: false,
+      error: {
+        status: 500,
+        message: 'Session lookup failed.',
+        code: 'SESSION_LOOKUP_FAILED',
+        fieldErrors: undefined,
+      },
+    });
   });
 });
