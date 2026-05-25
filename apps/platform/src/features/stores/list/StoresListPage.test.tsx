@@ -94,7 +94,7 @@ describe('StoresListPage', () => {
     expect(routerPushMock).toHaveBeenCalledWith(clientRoutes.addStore);
   });
 
-  it('renders the stores returned by the current owner list endpoint', async () => {
+  it('renders stores and keeps the add-store card available', async () => {
     getStoresMock.mockResolvedValue({
       ok: true,
       data: [
@@ -111,7 +111,7 @@ describe('StoresListPage', () => {
     expect(await screen.findByText('North Shop')).toBeVisible();
     expect(screen.getByText('north-shop.ordero.biz')).toBeVisible();
     expect(
-      screen.queryByRole('button', { name: /add your first store/i })
-    ).not.toBeInTheDocument();
+      screen.getByRole('button', { name: /add your first store/i })
+    ).toBeVisible();
   });
 });

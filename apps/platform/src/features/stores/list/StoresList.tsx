@@ -49,19 +49,14 @@ export const StoresList = () => {
     );
   }
 
-  if (storesQuery.data.length === 0) {
-    return (
-      <div className="flex flex-col gap-[var(--space-2)]">
-        <AddStoreCard onClick={() => router.push(clientRoutes.addStore)} />
-      </div>
-    );
-  }
+  const stores = storesQuery.data ?? [];
 
   return (
     <div className="flex flex-col gap-[var(--space-2)]">
-      {storesQuery.data.map((store) => (
+      {stores.map((store) => (
         <StoreCard key={store.id} store={store} />
       ))}
+      <AddStoreCard onClick={() => router.push(clientRoutes.addStore)} />
     </div>
   );
 };

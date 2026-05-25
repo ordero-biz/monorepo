@@ -7,8 +7,8 @@ import { useRouter } from 'next/navigation';
 import { createStore } from '@/lib/client/api';
 import { clientRoutes } from '@/lib/client/routes';
 import { storesQueryKeys } from '@/lib/hooks/useStoresQuery';
+import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error';
 import { addStoreDefaultValues } from './constants';
-import { getErrorMessage } from './utils/error';
 import {
   type AddStoreFormValues,
   addStoreSchema,
@@ -90,16 +90,7 @@ export const AddStoreForm = () => {
         }}
       >
         {(field) => {
-          const submitError = field.state.meta.errorMap.onSubmit;
-          const changeError = field.state.meta.errorMap.onChange;
-          const submitErrorText = submitError
-            ? getErrorMessage(submitError)
-            : undefined;
-          const changeErrorText =
-            !submitErrorText && field.state.meta.isBlurred && changeError
-              ? getErrorMessage(changeError)
-              : undefined;
-          const errorText = submitErrorText ?? changeErrorText;
+          const errorText = getFieldSubmitChangeErrorText(field.state.meta);
 
           return (
             <TextField
@@ -128,16 +119,7 @@ export const AddStoreForm = () => {
         }}
       >
         {(field) => {
-          const submitError = field.state.meta.errorMap.onSubmit;
-          const changeError = field.state.meta.errorMap.onChange;
-          const submitErrorText = submitError
-            ? getErrorMessage(submitError)
-            : undefined;
-          const changeErrorText =
-            !submitErrorText && field.state.meta.isBlurred && changeError
-              ? getErrorMessage(changeError)
-              : undefined;
-          const errorText = submitErrorText ?? changeErrorText;
+          const errorText = getFieldSubmitChangeErrorText(field.state.meta);
 
           return (
             <TextField

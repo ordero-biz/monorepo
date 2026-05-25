@@ -11,10 +11,13 @@ import {
 import { useForm } from '@tanstack/react-form';
 import { useQueryClient } from '@tanstack/react-query';
 import Link from 'next/link';
-import { getErrorMessage } from '@/features/sign-in/utils/error';
 import { signUp } from '@/lib/client/api';
 import { clientRoutes } from '@/lib/client/routes';
 import { authQueryKeys } from '@/lib/hooks/useSessionQuery';
+import {
+  getErrorMessage,
+  getFieldSubmitChangeErrorText,
+} from '@/lib/utils/form/error';
 import { signUpDefaultValues } from './constants';
 import {
   type SignUpFormValues,
@@ -93,16 +96,7 @@ export const SignUpForm = () => {
         }}
       >
         {(field) => {
-          const submitError = field.state.meta.errorMap.onSubmit;
-          const changeError = field.state.meta.errorMap.onChange;
-          const submitErrorText = submitError
-            ? getErrorMessage(submitError)
-            : undefined;
-          const changeErrorText =
-            !submitErrorText && field.state.meta.isBlurred && changeError
-              ? getErrorMessage(changeError)
-              : undefined;
-          const errorText = submitErrorText ?? changeErrorText;
+          const errorText = getFieldSubmitChangeErrorText(field.state.meta);
 
           return (
             <TextField
@@ -131,16 +125,7 @@ export const SignUpForm = () => {
           }}
         >
           {(field) => {
-            const submitError = field.state.meta.errorMap.onSubmit;
-            const changeError = field.state.meta.errorMap.onChange;
-            const submitErrorText = submitError
-              ? getErrorMessage(submitError)
-              : undefined;
-            const changeErrorText =
-              !submitErrorText && field.state.meta.isBlurred && changeError
-                ? getErrorMessage(changeError)
-                : undefined;
-            const errorText = submitErrorText ?? changeErrorText;
+            const errorText = getFieldSubmitChangeErrorText(field.state.meta);
 
             return (
               <PasswordField
