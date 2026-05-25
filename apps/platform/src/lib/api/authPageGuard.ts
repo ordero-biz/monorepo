@@ -5,7 +5,10 @@ import { getServerSession } from '@/lib/api/session';
 export const hasAuthenticatedServerSession = async () => {
   const cookieStore = await cookies();
   const token = cookieStore.get(AUTH_TOKEN_COOKIE_NAME)?.value;
-  const result = await getServerSession(token);
+  // TODO: Uncomment when we have a shared session lookup
+  // const result = await getServerSession(token);
 
-  return result.ok && result.session.authenticated;
+  // return result.ok && result.session.authenticated;
+
+  return !!token;
 };

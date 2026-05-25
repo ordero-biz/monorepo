@@ -1,12 +1,14 @@
 'use client';
 
-import { CLIENT_AUTH_PATHS } from '@/lib/api/constants';
+import { CLIENT_AUTH_PATHS, CLIENT_BACKEND_PATHS } from '@/lib/api/constants';
 import type {
   ApiError,
   ApiResult,
   AuthSession,
   AuthSignInInput,
   AuthSignUpInput,
+  CreateStoreInput,
+  Store,
 } from '@/lib/api/types';
 
 type ApiFetchOptions = Omit<RequestInit, 'body'> & {
@@ -139,4 +141,15 @@ export const logout = () =>
 export const getSession = () =>
   apiFetch<AuthSession>(CLIENT_AUTH_PATHS.session, {
     method: 'GET',
+  });
+
+export const getStores = () =>
+  apiFetch<Store[]>(CLIENT_BACKEND_PATHS.stores, {
+    method: 'GET',
+  });
+
+export const createStore = (input: CreateStoreInput) =>
+  apiFetch<Store>(CLIENT_BACKEND_PATHS.stores, {
+    method: 'POST',
+    body: input,
   });
