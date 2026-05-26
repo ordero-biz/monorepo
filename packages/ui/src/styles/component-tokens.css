@@ -99,6 +99,9 @@
   --figma-dialog-action-px: var(--figma-spacing-3);
   --figma-dialog-action-py: var(--figma-spacing-3);
   --figma-dialog-action-spacing: var(--figma-spacing-1-5);
+  --figma-dialog-width-xs: 444px;
+  --figma-dialog-width-sm: 600px;
+  --figma-dialog-width-md: 720px;
 
   /* switch */
   --figma-switch-p: 3px;
@@ -378,6 +381,14 @@
   --dialog-action-px-token: var(--figma-dialog-action-px);
   --dialog-action-py-token: var(--figma-dialog-action-py);
   --dialog-action-spacing-token: var(--figma-dialog-action-spacing);
+  --dialog-backdrop-token: var(--color-backdrop);
+  --dialog-scrollbar-color-token: var(--color-grey-24);
+  --dialog-title-size-token: var(--h6-size-desktop);
+  --dialog-title-line-height-token: var(--h6-line-height-desktop);
+  --dialog-title-weight-token: var(--h6-weight);
+  --dialog-width-xs-token: var(--figma-dialog-width-xs);
+  --dialog-width-sm-token: var(--figma-dialog-width-sm);
+  --dialog-width-md-token: var(--figma-dialog-width-md);
 
   /* switch bridge */
   --switch-p-token: var(--figma-switch-p);
@@ -701,6 +712,14 @@
   --dialog-action-px: var(--dialog-action-px-token);
   --dialog-action-py: var(--dialog-action-py-token);
   --dialog-action-spacing: var(--dialog-action-spacing-token);
+  --dialog-backdrop: var(--dialog-backdrop-token);
+  --dialog-scrollbar-color: var(--dialog-scrollbar-color-token);
+  --dialog-title-size: var(--dialog-title-size-token);
+  --dialog-title-line-height: var(--dialog-title-line-height-token);
+  --dialog-title-weight: var(--dialog-title-weight-token);
+  --dialog-width-xs: var(--dialog-width-xs-token);
+  --dialog-width-sm: var(--dialog-width-sm-token);
+  --dialog-width-md: var(--dialog-width-md-token);
 
   /* switch */
   --switch-p: var(--switch-p-token);
