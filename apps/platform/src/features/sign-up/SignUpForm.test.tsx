@@ -1,12 +1,13 @@
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { signUp } from '@/lib/api/client';
+import { signUp } from '@/lib/client/api';
+import { clientRoutes } from '@/lib/client/routes';
 import { preparePlatformSetup } from '@/test/prepareSetup';
 import { SignUpForm } from './SignUpForm';
 
-vi.mock('@/lib/api/client', async () => ({
-  ...(await vi.importActual<typeof import('@/lib/api/client')>(
-    '@/lib/api/client'
+vi.mock('@/lib/client/api', async () => ({
+  ...(await vi.importActual<typeof import('@/lib/client/api')>(
+    '@/lib/client/api'
   )),
   signUp: vi.fn(),
 }));
@@ -47,11 +48,11 @@ describe('SignUpForm', () => {
     expect(termsCheckbox).not.toBeChecked();
     expect(screen.getByRole('link', { name: 'terms of use' })).toHaveAttribute(
       'href',
-      '/terms'
+      clientRoutes.terms
     );
     expect(
       screen.getByRole('link', { name: 'privacy policy' })
-    ).toHaveAttribute('href', '/privacy');
+    ).toHaveAttribute('href', clientRoutes.privacy);
   });
 
   it('does not show client email validation on the first keystroke', async () => {

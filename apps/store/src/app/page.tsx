@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { clientRoutes } from '@/lib/client/routes';
 
 export default function Home() {
   return (
@@ -17,7 +18,7 @@ export default function Home() {
         </div>
         <Link
           className="inline-flex items-center justify-center rounded-[var(--radius)] bg-primary px-[var(--space-3)] py-[var(--space-1-5)] text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-          href="/sign-in"
+          href={clientRoutes.signIn}
         >
           Go to sign in
         </Link>

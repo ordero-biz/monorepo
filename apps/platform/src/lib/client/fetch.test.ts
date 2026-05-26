@@ -1,4 +1,4 @@
-import { apiFetch, getSession, logout, signIn } from './client';
+import { apiFetch } from './fetch';
 
 describe('apiFetch', () => {
   beforeEach(() => {
@@ -126,6 +126,24 @@ describe('apiFetch', () => {
     });
   });
 
+  it('returns plain text for successful non-JSON responses', async () => {
+    vi.mocked(fetch).mockResolvedValue(new Response('plain text body'));
+
+    await expect(apiFetch<string>('/api/ping')).resolves.toEqual({
+      ok: true,
+      data: 'plain text body',
+    });
+  });
+
+  it('returns undefined for successful empty responses', async () => {
+    vi.mocked(fetch).mockResolvedValue(new Response(null));
+
+    await expect(apiFetch('/api/logout')).resolves.toEqual({
+      ok: true,
+      data: undefined,
+    });
+  });
+
   it('returns a normalized error when the request throws', async () => {
     vi.mocked(fetch).mockRejectedValue(new Error('Failed to fetch'));
 
@@ -168,6 +186,31 @@ describe('apiFetch', () => {
     });
   });
 
+  it('ignores invalid fieldErrors shapes in error responses', async () => {
+    vi.mocked(fetch).mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          message: 'Validation failed.',
+          fieldErrors: ['email is invalid'],
+        }),
+        {
+          status: 400,
+          statusText: 'Bad Request',
+        }
+      )
+    );
+
+    await expect(apiFetch('/api/auth/sign-in')).resolves.toEqual({
+      ok: false,
+      error: {
+        status: 400,
+        message: 'Validation failed.',
+        code: undefined,
+        fieldErrors: undefined,
+      },
+    });
+  });
+
   it('falls back to the response status text when an error body has no message', async () => {
     vi.mocked(fetch).mockResolvedValue(
       new Response(JSON.stringify({ code: 'AUTH_REQUIRED' }), {
@@ -186,116 +229,42 @@ describe('apiFetch', () => {
       },
     });
   });
-});
 
-describe('client auth helpers', () => {
-  beforeEach(() => {
-    vi.stubGlobal('fetch', vi.fn());
-  });
-
-  afterEach(() => {
-    vi.unstubAllGlobals();
-  });
-
-  it('signIn posts credentials to the sign-in route and returns the session on success', async () => {
-    const fetchMock = vi.mocked(fetch);
-
-    fetchMock.mockResolvedValue(
-      new Response(
-        JSON.stringify({
-          authenticated: true,
-          user: {
-            email: 'admin@gmail.com',
-          },
-        })
-      )
+  it('falls back to the default status message when an error response has no body or status text', async () => {
+    vi.mocked(fetch).mockResolvedValue(
+      new Response(null, {
+        status: 500,
+        statusText: '',
+      })
     );
 
-    await expect(
-      signIn({
-        email: 'admin@gmail.com',
-        password: '123456',
-      })
-    ).resolves.toEqual({
-      ok: true,
-      data: {
-        authenticated: true,
-        user: {
-          email: 'admin@gmail.com',
-        },
+    await expect(apiFetch('/api/auth/logout')).resolves.toEqual({
+      ok: false,
+      error: {
+        status: 500,
+        message: 'Request failed with status 500.',
+        code: undefined,
+        fieldErrors: undefined,
       },
     });
-
-    expect(fetchMock).toHaveBeenCalledWith(
-      '/api/auth/sign-in',
-      expect.objectContaining({
-        method: 'POST',
-        body: JSON.stringify({
-          email: 'admin@gmail.com',
-          password: '123456',
-        }),
-        cache: 'no-store',
-      })
-    );
   });
 
-  it('logout posts to the logout route and returns a signed-out session on success', async () => {
-    const fetchMock = vi.mocked(fetch);
-
-    fetchMock.mockResolvedValue(
-      new Response(
-        JSON.stringify({
-          authenticated: false,
-        })
-      )
-    );
-
-    await expect(logout()).resolves.toEqual({
-      ok: true,
-      data: {
-        authenticated: false,
-      },
-    });
-
-    expect(fetchMock).toHaveBeenCalledWith(
-      '/api/auth/logout',
-      expect.objectContaining({
-        method: 'POST',
-        cache: 'no-store',
+  it('uses plain text error bodies only when they are the status text fallback source', async () => {
+    vi.mocked(fetch).mockResolvedValue(
+      new Response('Backend exploded', {
+        status: 502,
+        statusText: 'Bad Gateway',
       })
     );
-  });
 
-  it('gets the current session from the session route on success', async () => {
-    const fetchMock = vi.mocked(fetch);
-
-    fetchMock.mockResolvedValue(
-      new Response(
-        JSON.stringify({
-          authenticated: true,
-          user: {
-            email: 'admin@gmail.com',
-          },
-        })
-      )
-    );
-
-    await expect(getSession()).resolves.toEqual({
-      ok: true,
-      data: {
-        authenticated: true,
-        user: {
-          email: 'admin@gmail.com',
-        },
+    await expect(apiFetch('/api/backend/orders')).resolves.toEqual({
+      ok: false,
+      error: {
+        status: 502,
+        message: 'Bad Gateway',
+        code: undefined,
+        fieldErrors: undefined,
       },
     });
-
-    expect(fetchMock).toHaveBeenCalledWith(
-      '/api/auth/session',
-      expect.objectContaining({
-        method: 'GET',
-        cache: 'no-store',
-      })
-    );
   });
 });

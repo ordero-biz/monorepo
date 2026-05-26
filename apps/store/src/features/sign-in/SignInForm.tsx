@@ -9,7 +9,7 @@ import {
 } from '@ordero/ui';
 import { useForm } from '@tanstack/react-form';
 import { useQueryClient } from '@tanstack/react-query';
-import { signIn } from '@/lib/api/client';
+import { signIn } from '@/lib/client/api';
 import { authQueryKeys } from '@/lib/hooks/useSessionQuery';
 import { signInDefaultValues } from './constants';
 import { getErrorMessage } from './utils/error';

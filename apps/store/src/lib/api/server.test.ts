@@ -67,6 +67,20 @@ describe('getApiErrorFromResponse', () => {
       fieldErrors: undefined,
     });
   });
+
+  it('falls back to the default message when the response has no body or status text', async () => {
+    const response = new Response(null, {
+      status: 500,
+      statusText: '',
+    });
+
+    await expect(getApiErrorFromResponse(response)).resolves.toEqual({
+      status: 500,
+      message: 'Request failed with status 500.',
+      code: undefined,
+      fieldErrors: undefined,
+    });
+  });
 });
 
 describe('backend request helpers', () => {
@@ -204,6 +218,19 @@ describe('backend request helpers', () => {
       data: {
         id: 'order-1',
       },
+    });
+  });
+
+  it('returns plain text backend data from backendFetch when JSON parsing fails', async () => {
+    vi.mocked(fetch).mockResolvedValue(new Response('plain text body'));
+
+    await expect(
+      backendFetch<string>({
+        path: '/health',
+      })
+    ).resolves.toEqual({
+      ok: true,
+      data: 'plain text body',
     });
   });
 });

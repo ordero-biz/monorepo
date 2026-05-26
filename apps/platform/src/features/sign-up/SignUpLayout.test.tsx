@@ -1,10 +1,11 @@
 import { screen } from '@testing-library/react';
+import { clientRoutes } from '@/lib/client/routes';
 import { preparePlatformSetup } from '@/test/prepareSetup';
 import { SignUpLayout } from './SignUpLayout';
 
-vi.mock('@/lib/api/client', async () => ({
-  ...(await vi.importActual<typeof import('@/lib/api/client')>(
-    '@/lib/api/client'
+vi.mock('@/lib/client/api', async () => ({
+  ...(await vi.importActual<typeof import('@/lib/client/api')>(
+    '@/lib/client/api'
   )),
   signUp: vi.fn(),
 }));
@@ -23,7 +24,7 @@ describe('SignUpLayout', () => {
     ).toBeVisible();
     expect(screen.getByRole('link', { name: 'Sign in' })).toHaveAttribute(
       'href',
-      '/sign-in'
+      clientRoutes.signIn
     );
     expect(
       screen.getByRole('textbox', { name: 'Email address' })
@@ -37,11 +38,11 @@ describe('SignUpLayout', () => {
     ).not.toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'terms of use' })).toHaveAttribute(
       'href',
-      '/terms'
+      clientRoutes.terms
     );
     expect(
       screen.getByRole('link', { name: 'privacy policy' })
-    ).toHaveAttribute('href', '/privacy');
+    ).toHaveAttribute('href', clientRoutes.privacy);
     expect(screen.getByRole('button', { name: 'Sign up' })).toBeVisible();
   });
 });

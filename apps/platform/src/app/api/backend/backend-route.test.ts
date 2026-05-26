@@ -78,6 +78,7 @@ describe('backend proxy route handler', () => {
     );
 
     expect(fetchMock.mock.calls[0][1].body).toBeInstanceOf(ReadableStream);
+    expect(fetchMock.mock.calls[0][1].duplex).toBe('half');
     expect(fetchMock.mock.calls[0][1].headers.get('Content-Type')).toBe(
       'application/json'
     );
@@ -143,6 +144,7 @@ describe('backend proxy route handler', () => {
     );
 
     expect(fetchMock.mock.calls[0][1].body).toBe(body);
+    expect(fetchMock.mock.calls[0][1].duplex).toBe('half');
     expect(fetchMock.mock.calls[0][1].headers.get('Content-Type')).toBe(
       'multipart/form-data; boundary=boundary'
     );

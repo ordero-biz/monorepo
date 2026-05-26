@@ -35,8 +35,7 @@ feature-folder/
 ├── constants.ts          # 1. Default values and static configs
 ├── Form.tsx              # 2. TanStack Form instance & feature layout
 └── utils/
-    ├── validations.ts    # 3. Zod schema & client-side helper functions
-    └── error.ts          # 4. Submission & error normalization helpers
+    └── validations.ts    # 3. Zod schema & client-side helper functions
 ```
 
 ### Flow Lifecycle
@@ -66,13 +65,22 @@ Ensure these field-level interaction rules are covered by unit/component tests, 
 Treat client validation and backend/submit errors as separate concerns:
 
 - **Client Errors**: Focused on inline correction guided by the Zod schema.
-- **Submit/Backend Errors**: centralize translation logic in `utils/error.ts`.
+- **Submit/Backend Errors**: use the shared helpers from
+  `@/lib/utils/form/error` for common field-message parsing and
+  submit/change precedence.
   - **Field-level errors** must be mapped back to fields using `setErrorMap`.
+  - Use `getFieldSubmitChangeErrorText(...)` when a field needs the standard
+    behavior: submit/backend errors win, while change errors are shown only
+    after blur.
+  - Use `getErrorMessage(...)` for single submit-only controls such as
+    checkbox agreement fields.
   - **Form-level errors** must use the shared toast surface. Persistent inline form-level error elements are discouraged unless explicitly required by the workflow design.
   - **Precedence**: When client and backend errors overlap, show the error message that best explains the current interactive state.
 
 > [!NOTE]
-> We do not yet define a shared backend error payload shape. Introduce a shared adapter only after multiple forms share the same server contract.
+> We do not yet define a shared backend submit adapter. Keep request-specific
+> backend error mapping in the feature, and use the shared form error helpers
+> only for common display/message behavior.
 
 ---
 

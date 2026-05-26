@@ -1,15 +1,15 @@
 import { render, screen, waitFor } from '@testing-library/react';
-import { getSession } from '@/lib/api/client';
+import { getSession } from '@/lib/client/api';
 import {
   createTestQueryClient,
   createTestQueryProvider,
 } from '@/test/prepareSetup';
 import { useSessionQuery } from './useSessionQuery';
 
-vi.mock('@/lib/api/client', async () => {
+vi.mock('@/lib/client/api', async () => {
   const actual =
-    await vi.importActual<typeof import('@/lib/api/client')>(
-      '@/lib/api/client'
+    await vi.importActual<typeof import('@/lib/client/api')>(
+      '@/lib/client/api'
     );
 
   return {

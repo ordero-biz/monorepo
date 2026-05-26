@@ -12,7 +12,8 @@ through a shared session helper instead of relying on middleware redirects.
 flowchart LR
   browser["Browser UI"]
   authPage["Server auth pages<br/>/sign-in and /sign-up"]
-  clientApi["Client API helpers<br/>src/lib/api/client.ts"]
+  clientApi["Client request helpers<br/>src/lib/client/api.ts"]
+  clientFetch["Client fetch helper<br/>src/lib/client/fetch.ts"]
   query["TanStack Query<br/>Providers + auth queries"]
   nextApi["Next.js route handlers<br/>/api/auth/* and /api/backend/*"]
   cookie["HttpOnly cookie<br/>ordero_access_token"]
@@ -24,7 +25,8 @@ flowchart LR
   browser --> clientApi
   browser --> query
   query --> clientApi
-  clientApi --> nextApi
+  clientApi --> clientFetch
+  clientFetch --> nextApi
   nextApi --> cookie
   nextApi --> session
   session --> serverApi
@@ -198,38 +200,44 @@ Caching rules:
 ## Authenticated Backend Request Flow
 
 Feature code should call `/api/backend/*` when it needs authenticated REST data
-from the backend.
+from the backend. Keep feature-facing request helpers in `src/lib/client/api.ts`
+and the generic `apiFetch()` transport/error-normalization helper in
+`src/lib/client/fetch.ts`.
 
 ```mermaid
 sequenceDiagram
   participant UI as Client UI
-  participant Client as apiFetch()
+  participant Helper as client request helper
+  participant Fetch as apiFetch()
   participant Proxy as /api/backend/[...path]
   participant Cookie as HttpOnly cookie
   participant Server as backendFetch()
   participant Backend as REST backend
 
-  UI->>Client: apiFetch('/api/backend/orders')
-  Client->>Proxy: Same-origin request
+  UI->>Helper: getStores() or another request helper
+  Helper->>Fetch: apiFetch('/api/backend/...')
+  Fetch->>Proxy: Same-origin request
   Proxy->>Cookie: Read ordero_access_token
   alt no token
-    Proxy-->>Client: 401 Authentication required
+    Proxy-->>Fetch: 401 Authentication required
   else token exists
     Proxy->>Server: backendFetch(path, method, body, search, token)
     Server->>Backend: Forward request with Bearer token
     Backend-->>Server: REST response
     alt backend returns success
       Server-->>Proxy: raw Response
-      Proxy-->>Client: original status, headers, and body
+      Proxy-->>Fetch: original status, headers, and body
     else backend returns 401
       Server-->>Proxy: ApiError 401
       Proxy->>Cookie: Clear ordero_access_token
-      Proxy-->>Client: ApiError 401
+      Proxy-->>Fetch: ApiError 401
     else backend returns other error
       Server-->>Proxy: normalized ApiError
-      Proxy-->>Client: normalized ApiError
+      Proxy-->>Fetch: normalized ApiError
     end
   end
+  Fetch-->>Helper: ApiResult
+  Helper-->>UI: domain result
 ```
 
 Forwarding rules:
@@ -308,9 +316,13 @@ When present, sign-in and sign-up map them into TanStack Form submit errors.
   decisions.
 - Review `src/lib/api/server.ts` for backend URL handling, Bearer header logic,
   cookie helpers, error normalization, and raw-response forwarding.
+- Review `src/lib/client/fetch.ts` for browser-side request serialization and
+  `ApiError` normalization.
+- Review `src/lib/client/api.ts` for feature-facing same-origin request
+  helpers.
 - Review `/api/auth/*` route handlers for cookie ownership and safe session
   responses.
 - Review `src/lib/api/authPageGuard.ts` and the auth pages for redirect
   decisions before render.
 - Review `/api/backend/[...path]` for request forwarding and 401 cleanup.
-- Review `SignInForm.tsx` for the first feature integration.
+- Review the relevant feature form or query hook for the current integration.

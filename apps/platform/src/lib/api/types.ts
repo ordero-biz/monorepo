@@ -26,6 +26,17 @@ export type AuthSignUpInput = {
   password: string;
 };
 
+export type CreateStoreInput = {
+  name: string;
+  subDomain: string;
+};
+
+export type Store = {
+  id: number;
+  name: string;
+  subDomain: string;
+};
+
 export type ApiError = {
   status: number;
   message: string;

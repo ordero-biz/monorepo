@@ -229,6 +229,8 @@ Review submit and error handling for:
 - backend field errors being mapped back into the form in the feature layer
 - form-level submit errors being rendered in a toast or app-level notification
 - field-level submit errors not depending on prior blur state to become visible
+- repeated submit/change field error display logic using the shared helpers from
+  `@/lib/utils/form/error` instead of feature-local copies
 - client validation not being treated as a replacement for backend validation
 
 When form behavior changes, expect targeted tests that cover the user-visible

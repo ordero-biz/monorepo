@@ -1,12 +1,12 @@
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { signIn } from '@/lib/api/client';
+import { signIn } from '@/lib/client/api';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { SignInForm } from './SignInForm';
 
-vi.mock('@/lib/api/client', async () => ({
-  ...(await vi.importActual<typeof import('@/lib/api/client')>(
-    '@/lib/api/client'
+vi.mock('@/lib/client/api', async () => ({
+  ...(await vi.importActual<typeof import('@/lib/client/api')>(
+    '@/lib/client/api'
   )),
   signIn: vi.fn(),
 }));
