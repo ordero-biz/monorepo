@@ -202,7 +202,7 @@ const SidebarNavigationStory = ({
   header = true,
   items,
 }: SidebarNavigationStoryProps) => (
-  <div className="h-[960px] bg-[var(--background-paper)]">
+  <div className="bg-[var(--background-paper)]">
     <SidebarShell footer={footer} header={header} items={items} />
   </div>
 );
@@ -297,7 +297,7 @@ export const DeeplyNestedBranches: Story = {
 
 export const FrameworkAgnosticLinks: Story = {
   render: () => (
-    <div className="h-[480px] bg-[var(--background-paper)]">
+    <div className="bg-[var(--background-paper)]">
       <SidebarNavigation>
         <SidebarNavigationContent>
           <SidebarNavigationSections
@@ -346,7 +346,7 @@ export const FrameworkAgnosticLinks: Story = {
 
 export const DisabledItems: Story = {
   render: () => (
-    <div className="h-[560px] bg-[var(--background-paper)]">
+    <div className="bg-[var(--background-paper)]">
       <SidebarNavigation>
         <SidebarNavigationContent>
           <SidebarNavigationSections

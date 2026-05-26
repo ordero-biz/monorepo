@@ -4,17 +4,15 @@ import { StoreBaseLayoutBox } from '../StoreBaseLayoutBox/StoreBaseLayoutBox';
 import type { StoreBaseLayoutProps } from './types';
 
 export const StoreBaseLayout = ({ children }: StoreBaseLayoutProps) => (
-  <div className="min-h-screen bg-background text-foreground">
-    <div className="mx-auto flex min-h-screen w-full">
-      <StoreSidebar />
-      <main className="flex w-full flex-col">
-        <TopBar.Root id="store-page-header">
-          <TopBar.Left>
-            <Typography variant="h6">Store</Typography>
-          </TopBar.Left>
-        </TopBar.Root>
-        <StoreBaseLayoutBox>{children}</StoreBaseLayoutBox>
-      </main>
-    </div>
+  <div className="mx-auto flex min-h-screen w-full">
+    <StoreSidebar />
+    <main className="flex w-full flex-col">
+      <TopBar.Root id="store-page-header">
+        <TopBar.Left>
+          <Typography variant="h6">Store</Typography>
+        </TopBar.Left>
+      </TopBar.Root>
+      <StoreBaseLayoutBox>{children}</StoreBaseLayoutBox>
+    </main>
   </div>
 );
