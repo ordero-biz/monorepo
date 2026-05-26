@@ -60,7 +60,7 @@ const buttonVariants = cva(
         color: 'primary',
         variant: 'contained',
         class:
-          'bg-[var(--primary-dark)] text-[var(--figma-primary-contrast-text)] hover:bg-[var(--primary-darker)] disabled:border-transparent disabled:bg-[var(--figma-grey-20)] disabled:text-[var(--text-disabled)]',
+          'bg-[var(--primary-main)] text-[var(--figma-primary-contrast-text)] hover:bg-[var(--primary-dark)] disabled:border-transparent disabled:bg-[var(--figma-grey-20)] disabled:text-[var(--text-disabled)]',
       },
       {
         color: 'secondary',
@@ -102,7 +102,7 @@ const buttonVariants = cva(
         color: 'primary',
         variant: 'outlined',
         class:
-          'border-[var(--primary-dark)] text-[var(--primary-dark)] hover:border-[var(--primary-dark)] hover:bg-[var(--figma-primary-8)] disabled:border-[var(--figma-grey-24)] disabled:text-[var(--text-disabled)]',
+          'border-[var(--primary-main)] text-[var(--primary-main)] hover:border-[var(--primary-main)] hover:bg-[var(--figma-primary-8)] disabled:border-[var(--figma-grey-24)] disabled:text-[var(--text-disabled)]',
       },
       {
         color: 'secondary',
@@ -144,7 +144,7 @@ const buttonVariants = cva(
         color: 'primary',
         variant: 'text',
         class:
-          'text-[var(--primary-dark)] hover:bg-[var(--figma-primary-8)] disabled:text-[var(--text-disabled)]',
+          'text-[var(--primary-main)] hover:bg-[var(--figma-primary-8)] disabled:text-[var(--text-disabled)]',
       },
       {
         color: 'secondary',
@@ -186,7 +186,7 @@ const buttonVariants = cva(
         color: 'primary',
         variant: 'soft',
         class:
-          'bg-[var(--figma-primary-8)] text-[var(--primary-dark)] hover:bg-[var(--figma-primary-16)] disabled:bg-[var(--figma-grey-20)] disabled:text-[var(--text-disabled)]',
+          'bg-[var(--figma-primary-8)] text-[var(--primary-main)] hover:bg-[var(--figma-primary-16)] disabled:bg-[var(--figma-grey-20)] disabled:text-[var(--text-disabled)]',
       },
       {
         color: 'secondary',
