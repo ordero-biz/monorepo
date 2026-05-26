@@ -1,9 +1,9 @@
 import { TopBar, Typography } from '@ordero/ui';
 import { StoreSidebar } from '@/components/StoreSidebar/StoreSidebar';
-import { StoreBaseLayoutBox } from '../StoreBaseLayoutBox/StoreBaseLayoutBox';
-import type { StoreBaseLayoutProps } from './types';
+import { BaseLayoutBox } from '../BaseLayoutBox/BaseLayoutBox';
+import type { BaseLayoutProps } from './types';
 
-export const StoreBaseLayout = ({ children }: StoreBaseLayoutProps) => (
+export const BaseLayout = ({ children }: BaseLayoutProps) => (
   <div className="mx-auto flex min-h-screen w-full">
     <StoreSidebar />
     <main className="flex w-full flex-col">
@@ -12,7 +12,7 @@ export const StoreBaseLayout = ({ children }: StoreBaseLayoutProps) => (
           <Typography variant="h6">Store</Typography>
         </TopBar.Left>
       </TopBar.Root>
-      <StoreBaseLayoutBox>{children}</StoreBaseLayoutBox>
+      <BaseLayoutBox>{children}</BaseLayoutBox>
     </main>
   </div>
 );

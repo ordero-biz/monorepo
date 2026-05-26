@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
 
-export type StoreBaseLayoutBoxProps = {
+export type BaseLayoutProps = {
   children: ReactNode;
 };

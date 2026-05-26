@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 import type { ReactNode } from 'react';
-import { StoreBaseLayout } from '@/components/StoreBaseLayout';
+import { BaseLayout } from '@/components/BaseLayout';
 import { hasAuthenticatedServerSession } from '@/lib/api/authPageGuard';
 
 type ProtectedLayoutProps = {
@@ -14,5 +14,5 @@ export default async function ProtectedLayout({
     redirect('/sign-in');
   }
 
-  return <StoreBaseLayout>{children}</StoreBaseLayout>;
+  return <BaseLayout>{children}</BaseLayout>;
 }
