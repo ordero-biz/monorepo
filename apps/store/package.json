@@ -21,7 +21,8 @@
     "@ordero/ui": "workspace:*",
     "@tanstack/react-form": "^1.29.1",
     "@tanstack/react-query": "^5.100.9",
-    "next": "16.1.6",
+    "lucide-react": "^0.541.0",
+    "next": "16.2.6",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "zod": "^4.3.6"
