@@ -1,9 +1,16 @@
 import { render, screen } from '@testing-library/react';
+import { clientRoutes } from '@/lib/client/routes';
 import {
   createTestQueryClient,
   createTestQueryProvider,
 } from '@/test/prepareSetup';
 import { SignInFormLayout } from './SignInLayout';
+
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({
+    push: vi.fn(),
+  }),
+}));
 
 describe('SignInFormLayout', () => {
   it('renders the auth layout copy, footer link, and sign-in form', () => {
@@ -24,7 +31,7 @@ describe('SignInFormLayout', () => {
     ).toBeVisible();
     expect(
       screen.getByRole('link', { name: 'Create account' })
-    ).toHaveAttribute('href', '/sign-up');
+    ).toHaveAttribute('href', clientRoutes.signUp);
     expect(
       screen.getByRole('textbox', { name: 'Email address' })
     ).toBeVisible();

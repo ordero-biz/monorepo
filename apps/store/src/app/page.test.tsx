@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react';
+import { clientRoutes } from '@/lib/client/routes';
 import Home from './page';
 
 describe('store Home', () => {
@@ -9,6 +10,6 @@ describe('store Home', () => {
     ).toBeInTheDocument();
     expect(
       screen.getByRole('link', { name: /go to sign in/i })
-    ).toHaveAttribute('href', '/sign-in');
+    ).toHaveAttribute('href', clientRoutes.signIn);
   });
 });

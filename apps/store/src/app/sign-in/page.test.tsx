@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { redirect } from 'next/navigation';
 import type { ReactNode } from 'react';
+import { clientRoutes } from '@/lib/client/routes';
 import SignInPage from './page';
 
 vi.mock('next/navigation', () => ({
@@ -39,7 +40,7 @@ describe('SignInPage', () => {
     (await getGuardMock()).mockResolvedValue(true);
 
     await expect(SignInPage()).rejects.toThrow('redirect');
-    expect(redirect).toHaveBeenCalledWith('/');
+    expect(redirect).toHaveBeenCalledWith(clientRoutes.home);
   });
 
   it('renders the sign-in page for signed-out users', async () => {

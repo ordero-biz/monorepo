@@ -35,8 +35,8 @@ Use the existing architecture unless the user explicitly asks for a redesign.
 
 For uncached calls:
 
-- add or reuse a helper in `src/lib/api/client.ts`
-- call `apiFetch<T>()`
+- add or reuse a feature-facing request helper in `src/lib/client/api.ts`
+- call `apiFetch<T>()` from `src/lib/client/fetch.ts`
 - point it at a same-origin `/api/*` route
 - return `ApiResult<T>`
 
@@ -91,15 +91,19 @@ When adding `/api/auth/*` or `/api/backend/*` behavior:
 
 Choose the smallest layer that proves the behavior:
 
-- client helpers that call `fetch` directly: Vitest with mocked `fetch`
+- generic `apiFetch` transport/error behavior: `src/lib/client/fetch.test.ts`
+  with mocked `fetch`
+- feature-facing client request helpers: `src/lib/client/api.test.ts`, covering
+  the stable same-origin path, method, body, and result shape through `apiFetch`
 - query hooks, form hooks, and components that call app-owned request helpers: mock the nearest app-owned request helper rather than `fetch`
 - route handlers: Vitest with `NextRequest` and mocked nearest app-owned server request helper; mock backend `fetch` only when the route handler itself calls backend `fetch` directly
 - form integration: Testing Library component tests
 - routed browser flows: Playwright
 
 Mock the closest app-owned request boundary that the unit under test depends on.
-Do not mock a lower transport layer when production code already wraps that layer
-in an app-owned helper.
+Outside the client request-helper tests themselves, do not mock a lower
+transport layer when production code already wraps that layer in an app-owned
+helper.
 
 For Playwright tests that mock an app-owned route with `page.route()` or
 `context.route()`, register the route before the user action that triggers it.

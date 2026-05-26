@@ -29,8 +29,23 @@ type BackendErrorBody = {
   fieldErrors?: unknown;
 };
 
+type RequestInitWithDuplex = RequestInit & {
+  duplex?: 'half';
+};
+
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   Boolean(value) && typeof value === 'object' && !Array.isArray(value);
+
+const withOptionalDuplex = (init?: RequestInit): RequestInitWithDuplex => {
+  if (!(init?.body instanceof ReadableStream)) {
+    return { ...init };
+  }
+
+  return {
+    ...init,
+    duplex: 'half',
+  };
+};
 
 const getBackendBaseUrl = () => {
   const backendBaseUrl = process.env.BACKEND_API_URL;
@@ -138,7 +153,7 @@ const sendBackendRequest = async ({
     }
 
     response = await fetch(getBackendUrl({ path, search }), {
-      ...init,
+      ...withOptionalDuplex(init),
       headers,
       cache: 'no-store',
     });

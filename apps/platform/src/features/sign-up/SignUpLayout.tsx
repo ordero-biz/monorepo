@@ -1,12 +1,13 @@
 'use client';
 
 import { AuthFormLayout } from '@/features/auth/AuthFormLayout';
+import { clientRoutes } from '@/lib/client/routes';
 import { SignUpForm } from './SignUpForm';
 
 export const SignUpLayout = () => {
   return (
     <AuthFormLayout
-      footerHref="/sign-in"
+      footerHref={clientRoutes.signIn}
       footerLabel="Sign in"
       footerPrompt="Already have an account?"
       subtitle="Please enter your details to get started"
