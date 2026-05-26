@@ -18,9 +18,9 @@ export const popupWidthClassNames = {
 } as const;
 
 export const popupFullScreenClassName =
-  'max-w-none rounded-[var(--dialog-radius)] p-[var(--space-3)]';
+  'fixed inset-0 h-dvh max-h-dvh w-dvw max-w-none rounded-none p-[var(--space-3)] shadow-none';
 
-export const contentClassName = 'min-h-0 mt-[var(--space-2)]';
+export const contentClassName = 'min-h-0 mt-[var(--space-2)] flex-auto';
 export const contentScrollableClassName = 'flex min-h-0 flex-auto flex-col';
 
 export const contentScrollableRootClassName =

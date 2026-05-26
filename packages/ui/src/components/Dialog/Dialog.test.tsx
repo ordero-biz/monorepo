@@ -1,9 +1,9 @@
 import { prepareSetup } from '@ordero/test-config/react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { ReactNode } from 'react';
 import { Button } from '@/ui/components/Button';
-import { Dialog } from './Dialog';
+import { Dialog } from '.';
 import type { DialogFooterProps, DialogPopupProps } from './types';
 
 type DialogTestFixtureProps = {
@@ -103,7 +103,14 @@ describe('Dialog', () => {
       </Dialog.Root>
     );
 
-    expect(screen.getByRole('dialog')).toHaveClass('max-w-none');
+    expect(screen.getByRole('dialog')).toHaveClass(
+      'fixed',
+      'inset-0',
+      'h-dvh',
+      'w-dvw',
+      'max-w-none',
+      'rounded-none'
+    );
   });
 
   it('applies the selected popup size width class', () => {
@@ -131,7 +138,7 @@ describe('Dialog', () => {
     );
   });
 
-  it('renders scrollable content with the dialog actions', () => {
+  it('renders scrollable content with the dialog actions', async () => {
     render(
       <Dialog.Root defaultOpen>
         <Dialog.Portal>
@@ -157,7 +164,11 @@ describe('Dialog', () => {
       </Dialog.Root>
     );
 
-    expect(screen.getByRole('dialog', { name: 'Dialog' })).toBeInTheDocument();
+    await waitFor(() => {
+      expect(
+        screen.getByRole('dialog', { name: 'Dialog' })
+      ).toBeInTheDocument();
+    });
     expect(screen.getByText('Row 1')).toBeInTheDocument();
     expect(screen.getByText('Row 20')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Close' })).toBeInTheDocument();

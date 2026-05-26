@@ -83,7 +83,9 @@ describe('Card', () => {
     });
 
     await user.tab();
-    expect(screen.getByRole('button', { name: new RegExp(title) })).toHaveFocus();
+    expect(
+      screen.getByRole('button', { name: new RegExp(title) })
+    ).toHaveFocus();
 
     await user.keyboard('{Enter}');
     await user.keyboard(' ');

@@ -133,6 +133,31 @@ export const FullscreenDefault: Story = {
     fullscreen: true,
     size: 'sm',
   },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const documentBody = canvasElement.ownerDocument.body;
+    const viewport = canvasElement.ownerDocument.defaultView;
+
+    await userEvent.click(
+      canvas.getByRole('button', { name: 'View notifications' })
+    );
+
+    const dialog = within(documentBody).getByRole('dialog', {
+      name: 'Notifications',
+    });
+
+    await waitFor(() => {
+      const rect = dialog.getBoundingClientRect();
+      const footer = dialog.querySelector('footer');
+      const footerRect = footer?.getBoundingClientRect();
+
+      expect(rect.top).toBe(0);
+      expect(rect.left).toBe(0);
+      expect(Math.round(rect.width)).toBe(viewport?.innerWidth);
+      expect(Math.round(rect.height)).toBe(viewport?.innerHeight);
+      expect(Math.round(footerRect?.bottom ?? 0)).toBe(viewport?.innerHeight);
+    });
+  },
 };
 
 export const Scrollable: Story = {

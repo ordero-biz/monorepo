@@ -1,4 +1,4 @@
-export { Dialog } from './Dialog';
+export * as Dialog from './index.parts';
 export type {
   DialogBackdropProps,
   DialogCloseProps,

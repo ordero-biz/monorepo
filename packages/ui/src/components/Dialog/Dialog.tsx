@@ -3,7 +3,6 @@
 import { Button as ButtonPrimitive } from '@base-ui/react/button';
 import { Dialog as DialogPrimitive } from '@base-ui/react/dialog';
 import { ScrollArea } from '@base-ui/react/scroll-area';
-import type { ReactElement } from 'react';
 import { buttonVariants } from '@/ui/components/Button';
 import { cn } from '@/ui/lib/utils';
 import {
@@ -37,22 +36,7 @@ import type {
   DialogViewportProps,
 } from './types';
 
-type DialogCompoundComponent = {
-  Backdrop: (props: DialogBackdropProps) => ReactElement;
-  Close: (props: DialogCloseProps) => ReactElement;
-  Content: (props: DialogContentProps) => ReactElement;
-  Description: (props: DialogDescriptionProps) => ReactElement;
-  Footer: (props: DialogFooterProps) => ReactElement;
-  Header: (props: DialogHeaderProps) => ReactElement;
-  Popup: (props: DialogPopupProps) => ReactElement;
-  Portal: (props: DialogPortalProps) => ReactElement;
-  Root: (props: DialogRootProps) => ReactElement;
-  Title: (props: DialogTitleProps) => ReactElement;
-  Trigger: (props: DialogTriggerProps) => ReactElement;
-  Viewport: (props: DialogViewportProps) => ReactElement;
-};
-
-const Root = ({
+export const DialogRoot = ({
   children,
   defaultOpen,
   modal,
@@ -69,7 +53,12 @@ const Root = ({
   </DialogPrimitive.Root>
 );
 
-const Trigger = ({ children, disabled, id, title }: DialogTriggerProps) => (
+export const DialogTrigger = ({
+  children,
+  disabled,
+  id,
+  title,
+}: DialogTriggerProps) => (
   <DialogPrimitive.Trigger
     disabled={disabled}
     id={id}
@@ -90,21 +79,21 @@ const Trigger = ({ children, disabled, id, title }: DialogTriggerProps) => (
   </DialogPrimitive.Trigger>
 );
 
-const Portal = ({ children }: DialogPortalProps) => (
+export const DialogPortal = ({ children }: DialogPortalProps) => (
   <DialogPrimitive.Portal>{children}</DialogPrimitive.Portal>
 );
 
-const Backdrop = ({ id }: DialogBackdropProps) => (
+export const DialogBackdrop = ({ id }: DialogBackdropProps) => (
   <DialogPrimitive.Backdrop className={backdropClassName} id={id} />
 );
 
-const Viewport = ({ children }: DialogViewportProps) => (
+export const DialogViewport = ({ children }: DialogViewportProps) => (
   <DialogPrimitive.Viewport className={viewportClassName}>
     {children}
   </DialogPrimitive.Viewport>
 );
 
-const Popup = ({
+export const DialogPopup = ({
   children,
   fullscreen = false,
   id,
@@ -122,7 +111,11 @@ const Popup = ({
   </DialogPrimitive.Popup>
 );
 
-const Content = ({ children, id, scrollable = false }: DialogContentProps) => (
+export const DialogContent = ({
+  children,
+  id,
+  scrollable = false,
+}: DialogContentProps) => (
   <section
     className={cn(
       contentClassName,
@@ -148,21 +141,23 @@ const Content = ({ children, id, scrollable = false }: DialogContentProps) => (
   </section>
 );
 
-const Header = ({ children }: DialogHeaderProps) => <header>{children}</header>;
+export const DialogHeader = ({ children }: DialogHeaderProps) => (
+  <header>{children}</header>
+);
 
-const Title = ({ children, id }: DialogTitleProps) => (
+export const DialogTitle = ({ children, id }: DialogTitleProps) => (
   <DialogPrimitive.Title className={titleClassName} id={id}>
     {children}
   </DialogPrimitive.Title>
 );
 
-const Description = ({ children, id }: DialogDescriptionProps) => (
+export const DialogDescription = ({ children, id }: DialogDescriptionProps) => (
   <DialogPrimitive.Description className={descriptionClassName} id={id}>
     {children}
   </DialogPrimitive.Description>
 );
 
-const Close = ({
+export const DialogClose = ({
   children,
   color,
   disabled,
@@ -194,7 +189,7 @@ const Close = ({
   </DialogPrimitive.Close>
 );
 
-const Footer = ({
+export const DialogFooter = ({
   children,
   closeButtonColor,
   closeButtonLabel = 'Close',
@@ -206,29 +201,14 @@ const Footer = ({
   <footer className={footerClassName}>
     {children}
     {hideCloseButton ? null : (
-      <Close
+      <DialogClose
         color={closeButtonColor}
         disabled={closeDisabled}
         size={closeButtonSize}
         variant={closeButtonVariant}
       >
         {closeButtonLabel}
-      </Close>
+      </DialogClose>
     )}
   </footer>
 );
-
-export const Dialog: DialogCompoundComponent = {
-  Backdrop,
-  Close,
-  Content,
-  Description,
-  Footer,
-  Header,
-  Popup,
-  Portal,
-  Root,
-  Title,
-  Trigger,
-  Viewport,
-};
