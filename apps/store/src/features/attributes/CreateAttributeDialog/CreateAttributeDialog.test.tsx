@@ -1,7 +1,7 @@
 import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { CreateAttributeDialog } from '@/features/attributes';
 import { prepareStoreSetup } from '@/test/prepareSetup';
-import { CreateAttributeDialog } from './CreateAttributeDialog';
 
 const { setup } = prepareStoreSetup({
   component: CreateAttributeDialog,
