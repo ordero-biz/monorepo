@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { AUTH_TOKEN_COOKIE_NAME } from '@/lib/api/constants';
 import {
-  backendFetch,
-  backendRequest,
+  fetchBackendData,
+  fetchBackendResponse,
   clearAuthCookie,
   getApiErrorFromResponse,
   getTokenFromRequest,
@@ -105,7 +105,7 @@ describe('backend request helpers', () => {
       )
     );
 
-    const result = await backendRequest({
+    const result = await fetchBackendResponse({
       path: '/orders',
       search: '?status=open',
       token: 'jwt-token',
@@ -142,7 +142,7 @@ describe('backend request helpers', () => {
     vi.mocked(fetch).mockRejectedValue(new Error('connect ECONNREFUSED'));
 
     await expect(
-      backendRequest({
+      fetchBackendResponse({
         path: '/orders',
       })
     ).resolves.toEqual({
@@ -169,7 +169,7 @@ describe('backend request helpers', () => {
     );
 
     await expect(
-      backendRequest({
+      fetchBackendResponse({
         path: 'orders',
       })
     ).resolves.toEqual({
@@ -188,7 +188,7 @@ describe('backend request helpers', () => {
     vi.mocked(fetch).mockResolvedValue(new Response('{}'));
 
     await expect(
-      backendRequest({
+      fetchBackendResponse({
         path: '/orders',
       })
     ).resolves.toEqual({
@@ -200,7 +200,7 @@ describe('backend request helpers', () => {
     });
   });
 
-  it('returns parsed backend JSON data from backendFetch', async () => {
+  it('returns parsed backend JSON data from fetchBackendData', async () => {
     vi.mocked(fetch).mockResolvedValue(
       new Response(
         JSON.stringify({
@@ -210,7 +210,7 @@ describe('backend request helpers', () => {
     );
 
     await expect(
-      backendFetch<{ id: string }>({
+      fetchBackendData<{ id: string }>({
         path: '/orders/order-1',
       })
     ).resolves.toEqual({
@@ -221,11 +221,11 @@ describe('backend request helpers', () => {
     });
   });
 
-  it('returns plain text backend data from backendFetch when JSON parsing fails', async () => {
+  it('returns plain text backend data from fetchBackendData when JSON parsing fails', async () => {
     vi.mocked(fetch).mockResolvedValue(new Response('plain text body'));
 
     await expect(
-      backendFetch<string>({
+      fetchBackendData<string>({
         path: '/health',
       })
     ).resolves.toEqual({

@@ -174,7 +174,7 @@ const sendBackendRequest = async ({
   } as const;
 };
 
-export const backendRequest = async ({
+export const fetchBackendResponse = async ({
   path,
   init,
   token,
@@ -204,13 +204,13 @@ export const backendRequest = async ({
   };
 };
 
-export const backendFetch = async <T>({
+export const fetchBackendData = async <T>({
   path,
   init,
   token,
   search,
 }: BackendRequestArgs): Promise<ApiResult<T>> => {
-  const requestResult = await backendRequest({
+  const requestResult = await fetchBackendResponse({
     path,
     init,
     token,

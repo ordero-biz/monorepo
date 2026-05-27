@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { BACKEND_AUTH_PATHS } from '@/lib/api/constants';
-import { backendFetch, setAuthCookie } from '@/lib/api/server';
+import { fetchBackendData, setAuthCookie } from '@/lib/api/server';
 import type { AuthSession, AuthSignInInput, Token } from '@/lib/api/types';
 
 type BackendLoginResponse = {
@@ -22,7 +22,7 @@ export const POST = async (request: NextRequest) => {
     );
   }
 
-  const result = await backendFetch<BackendLoginResponse>({
+  const result = await fetchBackendData<BackendLoginResponse>({
     path: BACKEND_AUTH_PATHS.signIn,
     init: {
       method: 'POST',

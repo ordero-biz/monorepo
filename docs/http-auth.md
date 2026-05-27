@@ -211,7 +211,7 @@ sequenceDiagram
   participant Fetch as apiFetch()
   participant Proxy as /api/backend/[...path]
   participant Cookie as HttpOnly cookie
-  participant Server as backendFetch()
+  participant Server as fetchBackendResponse()
   participant Backend as REST backend
 
   UI->>Helper: getStores() or another request helper
@@ -221,7 +221,7 @@ sequenceDiagram
   alt no token
     Proxy-->>Fetch: 401 Authentication required
   else token exists
-    Proxy->>Server: backendFetch(path, method, body, search, token)
+    Proxy->>Server: fetchBackendResponse(path, method, body, search, token)
     Server->>Backend: Forward request with Bearer token
     Backend-->>Server: REST response
     alt backend returns success
@@ -245,7 +245,10 @@ Forwarding rules:
 - supports `GET`, `POST`, `PUT`, `PATCH`, and `DELETE`
 - preserves successful backend response status codes and headers
 - preserves query string search params
-- forwards only selected headers: `accept` and `content-type`
+- forwards only selected headers: `accept`, `content-type`, and `origin`
+- forwards `origin` intentionally because the backend uses it for
+  tenant/domain resolution; do not add other browser headers unless they become
+  explicit backend contracts
 - forwards bodies for non-`GET` and non-`HEAD` methods
 - never forwards browser-readable JWT state because the browser cannot read the
   HttpOnly cookie

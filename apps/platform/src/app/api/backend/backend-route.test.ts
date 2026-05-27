@@ -29,6 +29,8 @@ describe('backend proxy route handler', () => {
     const response = await GET(
       new NextRequest('http://localhost/api/backend/orders?status=open', {
         headers: {
+          origin: 'https://tenant.example.test',
+          'x-forwarded-host': 'tenant.example.test',
           cookie: `${AUTH_TOKEN_COOKIE_NAME}=jwt-token`,
         },
       }),
@@ -47,6 +49,12 @@ describe('backend proxy route handler', () => {
     );
     expect(fetchMock.mock.calls[0][1].headers.get('Authorization')).toBe(
       'Bearer jwt-token'
+    );
+    expect(fetchMock.mock.calls[0][1].headers.get('Origin')).toBe(
+      'https://tenant.example.test'
+    );
+    expect(fetchMock.mock.calls[0][1].headers.get('x-forwarded-host')).toBe(
+      null
     );
   });
 

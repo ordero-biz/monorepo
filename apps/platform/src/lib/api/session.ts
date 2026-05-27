@@ -1,5 +1,5 @@
 import { BACKEND_AUTH_PATHS } from '@/lib/api/constants';
-import { backendFetch } from '@/lib/api/server';
+import { fetchBackendData } from '@/lib/api/server';
 import type { ApiError, AuthSession, AuthUser } from '@/lib/api/types';
 
 export type ServerSessionResult =
@@ -25,7 +25,7 @@ export const getServerSession = async (
     };
   }
 
-  const result = await backendFetch<AuthUser>({
+  const result = await fetchBackendData<AuthUser>({
     path: BACKEND_AUTH_PATHS.me,
     init: {
       method: 'GET',

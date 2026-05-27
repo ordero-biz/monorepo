@@ -82,10 +82,13 @@ When adding `/api/auth/*` or `/api/backend/*` behavior:
 
 - keep token access server-side
 - use helpers from `src/lib/api/server.ts` when possible
+- use `fetchBackendData<T>()` for typed app-owned JSON/text responses
+- use `fetchBackendResponse()` when proxying raw backend responses
 - return safe JSON to the browser, never the JWT
 - clear `ordero_access_token` on backend `401` when the token is no longer trusted
 - preserve request method, body, and search params when forwarding backend proxy calls
-- forward only intentional headers
+- forward only intentional headers; `/api/backend/[...path]` forwards `origin`
+  because the backend uses it for tenant/domain resolution
 
 ## Tests
 

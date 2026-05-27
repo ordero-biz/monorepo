@@ -1,18 +1,18 @@
-import { backendFetch } from '@/lib/api/server';
+import { fetchBackendData } from '@/lib/api/server';
 import { getServerSession } from './session';
 
 vi.mock('@/lib/api/server', async () => ({
   ...(await vi.importActual<typeof import('@/lib/api/server')>(
     '@/lib/api/server'
   )),
-  backendFetch: vi.fn(),
+  fetchBackendData: vi.fn(),
 }));
 
-const backendFetchMock = vi.mocked(backendFetch);
+const fetchBackendDataMock = vi.mocked(fetchBackendData);
 
 describe('getServerSession', () => {
   beforeEach(() => {
-    backendFetchMock.mockReset();
+    fetchBackendDataMock.mockReset();
   });
 
   it('returns a signed-out session when there is no token', async () => {
@@ -23,11 +23,11 @@ describe('getServerSession', () => {
       },
       shouldClearAuthCookie: false,
     });
-    expect(backendFetchMock).not.toHaveBeenCalled();
+    expect(fetchBackendDataMock).not.toHaveBeenCalled();
   });
 
   it('returns an authenticated session when the backend accepts the token', async () => {
-    backendFetchMock.mockResolvedValue({
+    fetchBackendDataMock.mockResolvedValue({
       ok: true,
       data: {
         email: 'admin@gmail.com',
@@ -44,7 +44,7 @@ describe('getServerSession', () => {
       },
       shouldClearAuthCookie: false,
     });
-    expect(backendFetchMock).toHaveBeenCalledWith({
+    expect(fetchBackendDataMock).toHaveBeenCalledWith({
       path: '/me',
       init: {
         method: 'GET',
@@ -54,7 +54,7 @@ describe('getServerSession', () => {
   });
 
   it('returns a signed-out session and marks the cookie for clearing on 401', async () => {
-    backendFetchMock.mockResolvedValue({
+    fetchBackendDataMock.mockResolvedValue({
       ok: false,
       error: {
         status: 401,
@@ -72,7 +72,7 @@ describe('getServerSession', () => {
   });
 
   it('returns non-auth backend errors unchanged', async () => {
-    backendFetchMock.mockResolvedValue({
+    fetchBackendDataMock.mockResolvedValue({
       ok: false,
       error: {
         status: 500,
