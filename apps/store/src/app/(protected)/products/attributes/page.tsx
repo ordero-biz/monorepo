@@ -1,14 +1,10 @@
-import { Button, Typography } from '@ordero/ui';
+import { AtrributeDataTable, AttributeHeader } from '@/features/attributes';
 
 export default function AttributesPage() {
   return (
-    <section className="p-[var(--space-1-25)]">
-      <div className="flex items-start justify-between gap-[var(--space-2)]">
-        <Typography variant="h5">Attributes list</Typography>
-        <Button color="primary" size="m">
-          Create Attribute
-        </Button>
-      </div>
-    </section>
+    <div className="flex flex-col gap-[var(--space-2)]">
+      <AttributeHeader />
+      <AtrributeDataTable />
+    </div>
   );
 }

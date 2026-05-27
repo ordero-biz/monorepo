@@ -152,6 +152,7 @@ const sendBackendRequest = async ({
       headers.set('Authorization', `Bearer ${token}`);
     }
 
+    headers.set('TargetHost', 'test1.ordero.local');
     response = await fetch(getBackendUrl({ path, search }), {
       ...withOptionalDuplex(init),
       headers,

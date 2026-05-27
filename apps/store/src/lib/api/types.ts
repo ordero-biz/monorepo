@@ -37,3 +37,24 @@ export type ApiResult<T> =
       ok: false;
       error: ApiError;
     };
+
+export type Attribute = {
+  id: number;
+  name: string;
+  sortOrder: number;
+  createdAt: string;
+};
+
+export type PageMetadata = {
+  size: number;
+  number: number;
+  totalElements: number;
+  totalPages: number;
+};
+
+export type PaginatedResponse<T> = {
+  content: T[];
+  page: PageMetadata;
+};
+
+export type AttributesListResponse = PaginatedResponse<Attribute>;
