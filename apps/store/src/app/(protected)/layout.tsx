@@ -10,9 +10,9 @@ type ProtectedLayoutProps = {
 export default async function ProtectedLayout({
   children,
 }: ProtectedLayoutProps) {
-  // if (!(await hasAuthenticatedServerSession())) {
-  //   redirect('/sign-in');
-  // }
+  if (!(await hasAuthenticatedServerSession())) {
+    redirect('/sign-in');
+  }
 
   return <BaseLayout>{children}</BaseLayout>;
 }
