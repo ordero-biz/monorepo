@@ -28,6 +28,9 @@ const columns: DataTableColumnDef<Attribute>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Name" />
     ),
+    meta: {
+      width: '20%',
+    },
   },
   {
     accessorKey: 'values',
@@ -41,7 +44,7 @@ const columns: DataTableColumnDef<Attribute>[] = [
       <DataTableColumnHeader column={column} title="Attribute values" />
     ),
     meta: {
-      wrap: 'nowrap',
+      width: '60%',
     },
   },
   {
@@ -53,6 +56,7 @@ const columns: DataTableColumnDef<Attribute>[] = [
       <DataTableColumnHeader column={column} title="Created at" />
     ),
     meta: {
+      width: '20%',
       wrap: 'nowrap',
     },
   },
