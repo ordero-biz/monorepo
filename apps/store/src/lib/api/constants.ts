@@ -8,9 +8,9 @@ export const AUTH_COOKIE_OPTIONS = {
 } as const;
 
 export const BACKEND_AUTH_PATHS = {
-  signIn: '/api/v1/employees/login',
+  signIn: '/api/v1/employees/sign-in',
   logout: '/auth/logout',
-  me: '/me',
+  me: '/api/v1/employees/me',
 } as const;
 
 export const CLIENT_AUTH_PATHS = {

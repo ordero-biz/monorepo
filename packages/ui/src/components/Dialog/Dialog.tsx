@@ -199,7 +199,6 @@ export const DialogFooter = ({
   hideCloseButton = false,
 }: DialogFooterProps) => (
   <footer className={footerClassName}>
-    {children}
     {hideCloseButton ? null : (
       <DialogClose
         color={closeButtonColor}
@@ -210,5 +209,6 @@ export const DialogFooter = ({
         {closeButtonLabel}
       </DialogClose>
     )}
+    {children}
   </footer>
 );

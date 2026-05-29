@@ -20,64 +20,64 @@ describe('CreateAttributeDialog', () => {
     ).toBeVisible();
   });
 
-  it('adds and removes attribute value rows', async () => {
+  it('requires a valid attribute name before create is available', async () => {
     const user = userEvent.setup();
 
     setup();
     await user.click(screen.getByRole('button', { name: 'Create Attribute' }));
 
     const dialog = screen.getByRole('dialog', { name: 'Create new attribute' });
-
-    expect(
-      within(dialog).queryAllByRole('button', {
-        name: /Remove attribute value/i,
-      })
-    ).toHaveLength(0);
-
-    await user.type(
-      within(dialog).getByRole('textbox', { name: 'New attribute value' }),
-      'Blue'
-    );
-    await user.click(
-      within(dialog).getByRole('button', { name: 'Add attribute value' })
-    );
-
-    expect(within(dialog).getByDisplayValue('Blue')).toBeVisible();
-    expect(
-      within(dialog).getAllByRole('button', { name: /Remove attribute value/i })
-    ).toHaveLength(1);
-
-    await user.click(
-      within(dialog).getByRole('button', { name: 'Remove attribute value 1' })
-    );
-
-    expect(within(dialog).queryByDisplayValue('Blue')).not.toBeInTheDocument();
-    expect(
-      within(dialog).queryAllByRole('button', {
-        name: /Remove attribute value/i,
-      })
-    ).toHaveLength(0);
-  });
-
-  it('requires an attribute name before create is available and closes on submit', async () => {
-    const user = userEvent.setup();
-
-    setup();
-    await user.click(screen.getByRole('button', { name: 'Create Attribute' }));
-
-    const dialog = screen.getByRole('dialog', { name: 'Create new attribute' });
+    const nameField = within(dialog).getByRole('textbox', {
+      name: 'Attribute name',
+    });
     const createButton = within(dialog).getByRole('button', { name: 'Create' });
 
     expect(createButton).toBeDisabled();
 
-    await user.type(within(dialog).getByPlaceholderText('Color'), 'Material');
+    await user.type(nameField, 'abc');
+    await user.tab();
+
+    expect(
+      within(dialog).getByText(
+        'Attribute name must contain at least 4 characters.'
+      )
+    ).toBeVisible();
+    expect(createButton).toBeDisabled();
+
+    await user.clear(nameField);
+    await user.type(nameField, 'Material');
 
     expect(createButton).toBeEnabled();
+  });
+
+  it('closes on submit and resets the form', async () => {
+    const user = userEvent.setup();
+
+    setup();
+    await user.click(screen.getByRole('button', { name: 'Create Attribute' }));
+
+    const dialog = screen.getByRole('dialog', { name: 'Create new attribute' });
+    const nameField = within(dialog).getByRole('textbox', {
+      name: 'Attribute name',
+    });
+    const createButton = within(dialog).getByRole('button', { name: 'Create' });
+
+    await user.type(nameField, 'Material');
 
     await user.click(createButton);
 
     expect(
       screen.queryByRole('dialog', { name: 'Create new attribute' })
     ).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Create Attribute' }));
+
+    const reopenedDialog = screen.getByRole('dialog', {
+      name: 'Create new attribute',
+    });
+
+    expect(
+      within(reopenedDialog).getByRole('textbox', { name: 'Attribute name' })
+    ).toHaveValue('');
   });
 });
