@@ -4,6 +4,7 @@ import { format, parseISO } from 'date-fns';
 import { Chip } from '@/ui/components/Chip';
 import {
   DataTable,
+  DataTableCell,
   DataTableColumnHeader,
   DataTableSelectionCell,
   DataTableSelectionColumnHeader,
@@ -158,14 +159,6 @@ const productColumnCell = ({ row }: CellContext<ProductRow, unknown>) => (
   </DataTableSelectionCell>
 );
 
-const renderTextCell = (value: string) => (
-  <div className="flex items-center py-[var(--spacing-2)]">
-    <div className="px-[var(--spacing-2)]">
-      <p className="whitespace-nowrap text-card-foreground">{value}</p>
-    </div>
-  </div>
-);
-
 const columns: DataTableColumnDef<ProductRow>[] = [
   {
     accessorKey: 'name',
@@ -174,7 +167,9 @@ const columns: DataTableColumnDef<ProductRow>[] = [
   },
   {
     accessorKey: 'createdAt',
-    cell: ({ row }) => renderTextCell(formatCreatedAt(row.original.createdAt)),
+    cell: ({ row }) => (
+      <DataTableCell>{formatCreatedAt(row.original.createdAt)}</DataTableCell>
+    ),
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Create at" />
     ),
@@ -217,7 +212,9 @@ const columns: DataTableColumnDef<ProductRow>[] = [
   },
   {
     accessorKey: 'price',
-    cell: ({ row }) => renderTextCell(formatPrice(row.original.price)),
+    cell: ({ row }) => (
+      <DataTableCell>{formatPrice(row.original.price)}</DataTableCell>
+    ),
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Price" />
     ),

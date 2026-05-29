@@ -35,6 +35,7 @@ export type {
 } from './components/Chip';
 export { Chip, chipVariants } from './components/Chip';
 export type {
+  DataTableCellProps,
   DataTableColumnAlignment,
   DataTableColumnDef,
   DataTableColumnHeaderProps,
@@ -48,6 +49,7 @@ export type {
 } from './components/DataTable';
 export {
   DataTable,
+  DataTableCell,
   DataTableColumnHeader,
   DataTableSelectionCell,
   DataTableSelectionColumnHeader,

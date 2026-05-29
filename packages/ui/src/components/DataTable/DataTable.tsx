@@ -10,6 +10,7 @@ import type { CSSProperties } from 'react';
 import { useState } from 'react';
 import { cn } from '@/ui/lib/utils';
 import type {
+  DataTableCellProps,
   DataTableColumnAlignment,
   DataTableProps,
   DataTableRowSelectionState,
@@ -81,6 +82,14 @@ const getColumnStyle = ({
     width: resolvedWidth,
   } satisfies CSSProperties;
 };
+
+export const DataTableCell = ({ children }: DataTableCellProps) => (
+  <div className="flex items-center py-[var(--spacing-2)]">
+    <div className="px-[var(--spacing-2)]">
+      <p className="text-card-foreground">{children}</p>
+    </div>
+  </div>
+);
 
 export const DataTable = <TData,>({
   ariaLabel,

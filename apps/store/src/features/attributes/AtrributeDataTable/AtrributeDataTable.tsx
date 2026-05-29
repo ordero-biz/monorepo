@@ -4,6 +4,7 @@ import {
   Button,
   Card,
   DataTable,
+  DataTableCell,
   type DataTableColumnDef,
   DataTableColumnHeader,
   Typography,
@@ -12,25 +13,17 @@ import type { Attribute } from '@/lib/api/types';
 import { useAttributesQuery } from '@/lib/hooks/useAttributesQuery';
 import { formatDate } from '@/utils/formatDate';
 
-const renderTextCell = (value: string | number) => (
-  <div className="flex items-center py-[var(--spacing-2)]">
-    <div className="px-[var(--spacing-2)]">
-      <p className="text-card-foreground">{value}</p>
-    </div>
-  </div>
-);
-
 const columns: DataTableColumnDef<Attribute>[] = [
   {
     accessorKey: 'name',
-    cell: ({ row }) => renderTextCell(row.original.name),
+    cell: ({ row }) => <DataTableCell>{row.original.name}</DataTableCell>,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Name" />
     ),
   },
   {
     accessorKey: 'sortOrder',
-    cell: ({ row }) => renderTextCell(row.original.sortOrder),
+    cell: ({ row }) => <DataTableCell>{row.original.sortOrder}</DataTableCell>,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Sort order" />
     ),
@@ -41,7 +34,9 @@ const columns: DataTableColumnDef<Attribute>[] = [
   },
   {
     accessorKey: 'createdAt',
-    cell: ({ row }) => renderTextCell(formatDate(row.original.createdAt)),
+    cell: ({ row }) => (
+      <DataTableCell>{formatDate(row.original.createdAt)}</DataTableCell>
+    ),
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Created at" />
     ),
