@@ -47,6 +47,7 @@ describe('AtrributeDataTable', () => {
               id: 1,
               name: 'Size',
               sortOrder: 10,
+              values: ['S', 'M', 'L'],
               createdAt: '2026-05-26T20:55:51.542Z',
             },
           ],
@@ -70,6 +71,7 @@ describe('AtrributeDataTable', () => {
     await user.click(screen.getByRole('button', { name: 'Retry' }));
 
     expect(await screen.findByText('Size')).toBeVisible();
+    expect(screen.getByText('S, M, L')).toBeVisible();
     expect(getAttributesMock).toHaveBeenCalledTimes(2);
   });
 
@@ -82,6 +84,7 @@ describe('AtrributeDataTable', () => {
             id: 1,
             name: 'Size',
             sortOrder: 10,
+            values: ['S', 'M', 'L'],
             createdAt: '2026-05-26T20:55:51.542Z',
           },
         ],
@@ -99,8 +102,17 @@ describe('AtrributeDataTable', () => {
     expect(
       await screen.findByRole('table', { name: 'Attributes list' })
     ).toBeVisible();
+    expect(
+      screen.getByRole('columnheader', { name: 'Attribute values' })
+    ).toBeVisible();
+    expect(
+      screen.queryByRole('columnheader', { name: 'Sort order' })
+    ).not.toBeInTheDocument();
     expect(screen.getByText('Size')).toBeVisible();
-    expect(screen.getByText('10')).toBeVisible();
+    expect(screen.getByText('S, M, L')).toBeVisible();
     expect(screen.getByText('26 May 2026')).toBeVisible();
+    expect(
+      screen.queryByRole('button', { name: /attribute values/i })
+    ).not.toBeInTheDocument();
   });
 });

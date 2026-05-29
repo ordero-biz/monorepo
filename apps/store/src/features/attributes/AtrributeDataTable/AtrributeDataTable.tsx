@@ -13,6 +13,14 @@ import type { Attribute } from '@/lib/api/types';
 import { useAttributesQuery } from '@/lib/hooks/useAttributesQuery';
 import { formatDate } from '@/utils/formatDate';
 
+const formatAttributeValues = (values?: string[]) => {
+  if (!values?.length) {
+    return '—';
+  }
+
+  return values.join(', ');
+};
+
 const columns: DataTableColumnDef<Attribute>[] = [
   {
     accessorKey: 'name',
@@ -22,13 +30,17 @@ const columns: DataTableColumnDef<Attribute>[] = [
     ),
   },
   {
-    accessorKey: 'sortOrder',
-    cell: ({ row }) => <DataTableCell>{row.original.sortOrder}</DataTableCell>,
+    accessorKey: 'values',
+    cell: ({ row }) => (
+      <DataTableCell>
+        {formatAttributeValues(row.original.values)}
+      </DataTableCell>
+    ),
+    enableSorting: false,
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Sort order" />
+      <DataTableColumnHeader column={column} title="Attribute values" />
     ),
     meta: {
-      align: 'right',
       wrap: 'nowrap',
     },
   },
