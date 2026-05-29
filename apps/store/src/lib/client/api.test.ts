@@ -240,7 +240,7 @@ describe('client auth helpers', () => {
     });
 
     expect(fetchMock).toHaveBeenCalledWith(
-      '/api/backend/attributes',
+      '/api/backend/api/v1/attributes',
       expect.objectContaining({
         method: 'GET',
         cache: 'no-store',

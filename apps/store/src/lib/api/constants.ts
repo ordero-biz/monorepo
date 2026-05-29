@@ -21,4 +21,5 @@ export const CLIENT_AUTH_PATHS = {
 
 export const BACKEND_ATTRIBUTE_PATHS = {
   getAttributes: '/api/backend/api/v1/attributes',
+  postAttribute: '/api/backend/api/v1/attributes',
 } as const;

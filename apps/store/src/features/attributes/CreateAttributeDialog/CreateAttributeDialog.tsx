@@ -1,22 +1,72 @@
 'use client';
 
-import { Button, Dialog, TextField } from '@ordero/ui';
+import { Button, Dialog, TextField, useToastManager } from '@ordero/ui';
 import { useForm } from '@tanstack/react-form';
+import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
+import { attributesQueryKeys } from '@/lib/hooks/useAttributesQuery';
+import { createAttribute } from './api';
 import {
   attributeNameDefaultValue,
+  attributeNameSchema,
   validateAttributeName,
 } from './validations';
 
+const submitCreateAttribute = async (value: { name: string }) => {
+  const result = await createAttribute({
+    name: attributeNameSchema.parse(value.name),
+    sortOrder: 0,
+  });
+
+  if (!result.ok) {
+    return {
+      ok: false,
+      error: {
+        fieldErrors: result.error.fieldErrors,
+        formError: result.error.message,
+      },
+    } as const;
+  }
+
+  return {
+    ok: true,
+    data: result.data,
+  } as const;
+};
+
 export const CreateAttributeDialog = () => {
+  const queryClient = useQueryClient();
+  const { add: addToast } = useToastManager();
   const [open, setOpen] = useState(false);
   const form = useForm({
     defaultValues: {
       name: attributeNameDefaultValue,
     },
-    onSubmit: ({ formApi }) => {
+    onSubmit: async ({ formApi, value }) => {
+      const result = await submitCreateAttribute(value);
+
+      if (!result.ok) {
+        formApi.setErrorMap({
+          onSubmit: {
+            fields: result.error.fieldErrors ?? {},
+          },
+        });
+
+        if (result.error.formError) {
+          addToast({
+            description: result.error.formError,
+            type: 'error',
+          });
+        }
+
+        return;
+      }
+
       setOpen(false);
       formApi.reset();
+      await queryClient.invalidateQueries({
+        queryKey: attributesQueryKeys.list,
+      });
     },
   });
 

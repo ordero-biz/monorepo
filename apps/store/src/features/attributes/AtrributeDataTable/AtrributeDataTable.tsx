@@ -10,33 +10,7 @@ import {
 } from '@ordero/ui';
 import type { Attribute } from '@/lib/api/types';
 import { useAttributesQuery } from '@/lib/hooks/useAttributesQuery';
-
-const formatCreatedAt = (value: string) => {
-  const createdAt = new Date(value);
-
-  if (Number.isNaN(createdAt.getTime())) {
-    return value;
-  }
-
-  const day = String(createdAt.getUTCDate()).padStart(2, '0');
-  const month = [
-    'Jan',
-    'Feb',
-    'Mar',
-    'Apr',
-    'May',
-    'Jun',
-    'Jul',
-    'Aug',
-    'Sep',
-    'Oct',
-    'Nov',
-    'Dec',
-  ][createdAt.getUTCMonth()];
-  const year = createdAt.getUTCFullYear();
-
-  return `${day} ${month} ${year}`;
-};
+import { formatDate } from '@/utils/formatDate';
 
 const renderTextCell = (value: string | number) => (
   <div className="flex items-center py-[var(--spacing-2)]">
@@ -67,7 +41,7 @@ const columns: DataTableColumnDef<Attribute>[] = [
   },
   {
     accessorKey: 'createdAt',
-    cell: ({ row }) => renderTextCell(formatCreatedAt(row.original.createdAt)),
+    cell: ({ row }) => renderTextCell(formatDate(row.original.createdAt)),
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Created at" />
     ),
