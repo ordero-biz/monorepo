@@ -42,6 +42,7 @@ export type {
   DataTableColumnMeta,
   DataTableColumnWrap,
   DataTableProps,
+  DataTableRowClickArgs,
   DataTableRowSelectionState,
   DataTableSelectionCellProps,
   DataTableSelectionColumnHeaderProps,

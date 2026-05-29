@@ -160,6 +160,56 @@ describe('DataTable', () => {
     ).toBeChecked();
   });
 
+  it('calls onRowClick with the clicked row data', async () => {
+    const user = userEvent.setup();
+    const onRowClick = vi.fn();
+
+    setup({
+      onRowClick,
+    });
+
+    await user.click(screen.getByText('INV-001'));
+
+    expect(onRowClick).toHaveBeenCalledWith({
+      index: 0,
+      row: {
+        amount: '$250.00',
+        id: 'INV-001',
+        status: 'Paid',
+      },
+      tableRow: expect.objectContaining({
+        id: '0',
+        index: 0,
+      }),
+    });
+  });
+
+  it('does not call onRowClick when a nested interactive element is clicked', async () => {
+    const user = userEvent.setup();
+    const onRowClick = vi.fn();
+    const onActionClick = vi.fn();
+
+    setup({
+      columns: [
+        {
+          accessorKey: 'id',
+          cell: ({ row }) => (
+            <button onClick={onActionClick} type="button">
+              {`Open ${row.original.id}`}
+            </button>
+          ),
+          header: 'Invoice',
+        },
+      ],
+      onRowClick,
+    });
+
+    await user.click(screen.getByRole('button', { name: 'Open INV-001' }));
+
+    expect(onActionClick).toHaveBeenCalledTimes(1);
+    expect(onRowClick).not.toHaveBeenCalled();
+  });
+
   it('supports row selection with reusable selection wrappers', async () => {
     const user = userEvent.setup();
 

@@ -1,4 +1,4 @@
-import { getAttributes, getSession, logout, signIn } from './api';
+import { getAttribute, getAttributes, getSession, logout, signIn } from './api';
 
 describe('client auth helpers', () => {
   beforeEach(() => {
@@ -268,6 +268,66 @@ describe('client auth helpers', () => {
         status: 503,
         message: 'Attributes lookup failed.',
         code: 'ATTRIBUTES_LOOKUP_FAILED',
+        fieldErrors: undefined,
+      },
+    });
+  });
+
+  it('gets a single attribute from the backend proxy on success', async () => {
+    const fetchMock = vi.mocked(fetch);
+
+    fetchMock.mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          id: 1,
+          name: 'Size',
+          sortOrder: 10,
+          values: ['S', 'M', 'L'],
+          createdAt: '2026-05-26T20:55:51.542Z',
+        })
+      )
+    );
+
+    await expect(getAttribute('1')).resolves.toEqual({
+      ok: true,
+      data: {
+        id: 1,
+        name: 'Size',
+        sortOrder: 10,
+        values: ['S', 'M', 'L'],
+        createdAt: '2026-05-26T20:55:51.542Z',
+      },
+    });
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/backend/api/v1/attributes/1',
+      expect.objectContaining({
+        method: 'GET',
+        cache: 'no-store',
+      })
+    );
+  });
+
+  it('returns normalized failures from the attribute detail route', async () => {
+    vi.mocked(fetch).mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          message: 'Attribute detail lookup failed.',
+          code: 'ATTRIBUTE_DETAIL_LOOKUP_FAILED',
+        }),
+        {
+          status: 404,
+          statusText: 'Not Found',
+        }
+      )
+    );
+
+    await expect(getAttribute('1')).resolves.toEqual({
+      ok: false,
+      error: {
+        status: 404,
+        message: 'Attribute detail lookup failed.',
+        code: 'ATTRIBUTE_DETAIL_LOOKUP_FAILED',
         fieldErrors: undefined,
       },
     });

@@ -9,7 +9,9 @@ import {
   DataTableColumnHeader,
   Typography,
 } from '@ordero/ui';
+import { useRouter } from 'next/navigation';
 import type { Attribute } from '@/lib/api/types';
+import { clientRoutes } from '@/lib/client/routes';
 import { useAttributesQuery } from '@/lib/hooks/useAttributesQuery';
 import { formatDate } from '@/utils/formatDate';
 
@@ -62,7 +64,8 @@ const columns: DataTableColumnDef<Attribute>[] = [
   },
 ];
 
-export const AtrributeDataTable = () => {
+export const AttributeDataTable = () => {
+  const router = useRouter();
   const attributesQuery = useAttributesQuery();
 
   if (attributesQuery.isPending) {
@@ -108,6 +111,9 @@ export const AtrributeDataTable = () => {
       data={attributesQuery.data.content}
       emptyMessage="No attributes found."
       getRowId={(row) => String(row.id)}
+      onRowClick={({ row }) => {
+        router.push(clientRoutes.attributeDetail(row.id));
+      }}
     />
   );
 };

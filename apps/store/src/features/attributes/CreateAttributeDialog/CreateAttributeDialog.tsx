@@ -2,9 +2,9 @@
 
 import { Button, Dialog, TextField, useToastManager } from '@ordero/ui';
 import { useForm } from '@tanstack/react-form';
-import { useQueryClient } from '@tanstack/react-query';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { attributesQueryKeys } from '@/lib/hooks/useAttributesQuery';
+import { clientRoutes } from '@/lib/client/routes';
 import { createAttribute } from './api';
 import {
   attributeNameDefaultValue,
@@ -35,7 +35,7 @@ const submitCreateAttribute = async (value: { name: string }) => {
 };
 
 export const CreateAttributeDialog = () => {
-  const queryClient = useQueryClient();
+  const router = useRouter();
   const { add: addToast } = useToastManager();
   const [open, setOpen] = useState(false);
   const form = useForm({
@@ -64,9 +64,7 @@ export const CreateAttributeDialog = () => {
 
       setOpen(false);
       formApi.reset();
-      await queryClient.invalidateQueries({
-        queryKey: attributesQueryKeys.list,
-      });
+      router.push(clientRoutes.attributeDetail(result.data.id));
     },
   });
 

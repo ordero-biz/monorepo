@@ -1,8 +1,17 @@
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getAttributes } from '@/lib/client/api';
+import { clientRoutes } from '@/lib/client/routes';
 import { prepareStoreSetup } from '@/test/prepareSetup';
-import { AtrributeDataTable } from './AtrributeDataTable';
+import { AttributeDataTable } from './AttributeDataTable';
+
+const routerPushMock = vi.fn();
+
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({
+    push: routerPushMock,
+  }),
+}));
 
 vi.mock('@/lib/client/api', async () => ({
   ...(await vi.importActual<typeof import('@/lib/client/api')>(
@@ -14,12 +23,13 @@ vi.mock('@/lib/client/api', async () => ({
 const getAttributesMock = vi.mocked(getAttributes);
 
 const { setup } = prepareStoreSetup({
-  component: AtrributeDataTable,
+  component: AttributeDataTable,
 });
 
-describe('AtrributeDataTable', () => {
+describe('AttributeDataTable', () => {
   beforeEach(() => {
     getAttributesMock.mockReset();
+    routerPushMock.mockClear();
   });
 
   it('renders a loading state while attributes are loading', () => {
@@ -114,5 +124,38 @@ describe('AtrributeDataTable', () => {
     expect(
       screen.queryByRole('button', { name: /attribute values/i })
     ).not.toBeInTheDocument();
+  });
+
+  it('opens the attribute detail page when a row item is clicked', async () => {
+    const user = userEvent.setup();
+
+    getAttributesMock.mockResolvedValue({
+      ok: true,
+      data: {
+        content: [
+          {
+            id: 1,
+            name: 'Size',
+            sortOrder: 10,
+            values: ['S', 'M', 'L'],
+            createdAt: '2026-05-26T20:55:51.542Z',
+          },
+        ],
+        page: {
+          size: 25,
+          number: 0,
+          totalElements: 1,
+          totalPages: 1,
+        },
+      },
+    });
+
+    setup();
+
+    await user.click(await screen.findByText('Size'));
+
+    expect(routerPushMock).toHaveBeenCalledWith(
+      clientRoutes.attributeDetail(1)
+    );
   });
 });

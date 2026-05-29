@@ -1,9 +1,17 @@
 import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { CreateAttributeDialog } from '@/features/attributes';
-import { attributesQueryKeys } from '@/lib/hooks/useAttributesQuery';
+import { clientRoutes } from '@/lib/client/routes';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { createAttribute } from './api';
+
+const routerPushMock = vi.fn();
+
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({
+    push: routerPushMock,
+  }),
+}));
 
 vi.mock('./api', async () => ({
   ...(await vi.importActual<typeof import('./api')>('./api')),
@@ -19,6 +27,7 @@ const { setup } = prepareStoreSetup({
 describe('CreateAttributeDialog', () => {
   beforeEach(() => {
     createAttributeMock.mockReset();
+    routerPushMock.mockClear();
   });
 
   it('opens the dialog from the create attribute trigger', async () => {
@@ -75,8 +84,7 @@ describe('CreateAttributeDialog', () => {
       },
     });
 
-    const { queryClient } = setup();
-    const invalidateQueriesSpy = vi.spyOn(queryClient, 'invalidateQueries');
+    setup();
     await user.click(screen.getByRole('button', { name: 'Create Attribute' }));
 
     const dialog = screen.getByRole('dialog', { name: 'Create new attribute' });
@@ -91,10 +99,11 @@ describe('CreateAttributeDialog', () => {
 
     expect(createAttributeMock).toHaveBeenCalledWith({
       name: 'Material',
+      sortOrder: 0,
     });
-    expect(invalidateQueriesSpy).toHaveBeenCalledWith({
-      queryKey: attributesQueryKeys.list,
-    });
+    expect(routerPushMock).toHaveBeenCalledWith(
+      clientRoutes.attributeDetail(1)
+    );
     expect(
       screen.queryByRole('dialog', { name: 'Create new attribute' })
     ).not.toBeInTheDocument();
