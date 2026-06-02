@@ -81,6 +81,30 @@ describe('POST /api/auth/sign-in', () => {
     });
   });
 
+  it.each([
+    ['empty body', () => new Response(null)],
+    ['JSON null body', () => new Response('null')],
+    ['missing token body', () => new Response(JSON.stringify({}))],
+  ])('returns 502 when the backend returns a success response with %s', async (_caseName, makeResponse) => {
+    fetchMock.mockResolvedValue(makeResponse());
+    const response = await signIn(
+      new NextRequest('http://localhost/api/auth/sign-in', {
+        body: JSON.stringify({
+          email: 'admin@gmail.com',
+          password: '123456',
+        }),
+        method: 'POST',
+      })
+    );
+
+    expect(response.status).toBe(502);
+    expect(response.headers.get('set-cookie')).toBeNull();
+    await expect(getJson(response)).resolves.toStrictEqual({
+      status: 502,
+      message: 'Backend did not return a token.',
+    });
+  });
+
   it('returns 400 Bad Request when request body is malformed or invalid JSON', async () => {
     const response = await signIn(
       new NextRequest('http://localhost/api/auth/sign-in', {

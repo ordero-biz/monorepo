@@ -37,7 +37,7 @@ export const POST = async (request: NextRequest) => {
     return NextResponse.json(result.error, { status: result.error.status });
   }
 
-  if (typeof result.data.token !== 'string') {
+  if (typeof result.data?.token !== 'string') {
     return NextResponse.json(
       {
         status: 502,

@@ -1,11 +1,7 @@
-export const AUTH_TOKEN_COOKIE_NAME = 'ordero_access_token';
-
-export const AUTH_COOKIE_OPTIONS = {
-  httpOnly: true,
-  sameSite: 'lax',
-  secure: process.env.NODE_ENV === 'production',
-  path: '/',
-} as const;
+export {
+  AUTH_COOKIE_OPTIONS,
+  AUTH_TOKEN_COOKIE_NAME,
+} from '@ordero/next-api/server';
 
 export const BACKEND_AUTH_PATHS = {
   signIn: '/api/v1/platform/owners/login',

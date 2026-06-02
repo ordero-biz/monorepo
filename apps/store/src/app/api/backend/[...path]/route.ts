@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import {
-  fetchBackendResponse,
   clearAuthCookie,
+  fetchBackendResponse,
   getTokenFromRequest,
 } from '@/lib/api/server';
 

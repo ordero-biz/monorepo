@@ -95,6 +95,8 @@ Use this map to load the smallest relevant source of truth for the diff:
 
 - forms and validation: `docs/forms.md`, `docs/testing.md`
 - shared UI components in `packages/ui`: `ui-component-build`, `ui-routine-conventions`
+- shared workspace/package boundaries: `docs/packages.md`, `AGENTS.md`
+- HTTP/auth shared package changes: `docs/http-auth.md`, `platform-http-requests`
 - shared UI component API shape: `docs/ui-components.md`
 - tokens, CSS variables, and Tailwind exposure: `docs/ui-tokens.md`, `ui-routine-conventions`
 - TS and TSX authoring conventions: `ts-react-conventions`
@@ -237,6 +239,27 @@ When form behavior changes, expect targeted tests that cover the user-visible
 validation and submit behavior. Use `docs/testing.md` as the source of truth for
 the testing split between component tests and Playwright flows.
 
+## Shared package review rules
+
+When the diff touches `packages/api-types`, `packages/api-client`,
+`packages/next-api`, or app wrappers under `src/lib/api/*` and
+`src/lib/client/*`, review against `docs/packages.md`, `docs/http-auth.md`, and
+`AGENTS.md`.
+
+Expect these boundaries:
+
+- shared HTTP/auth contracts live in `@ordero/api-types`
+- browser-safe request transport lives in `@ordero/api-client`
+- Next.js server/BFF helpers live in `@ordero/next-api`
+- browser code does not import `@ordero/next-api`
+- app-domain schemas, app routes, form payloads, and feature request helpers
+  stay app-owned unless multiple apps truly need them
+
+Raise a finding when a change crosses these boundaries without a clear reason,
+such as putting a platform-only store model into `@ordero/api-types`, importing
+server-only helpers into Client Components, or adding direct browser calls to
+`BACKEND_API_URL`.
+
 ## Validation expectations
 
 A strict review should mention whether the author ran the smallest relevant checks for the touched area.
@@ -247,6 +270,7 @@ Prefer these commands as the validation baseline:
 
 - repo-wide formatting expectations: `pnpm format` or `pnpm format:write`
 - repo-wide type expectations: `pnpm typecheck`
+- shared package changes: relevant `pnpm --dir packages/[package] typecheck`
 - `packages/ui`: `pnpm --dir packages/ui format`, `pnpm --dir packages/ui typecheck`, and targeted `pnpm --dir packages/ui test ...`
 - `apps/platform`: `pnpm --dir apps/platform format`, `pnpm --dir apps/platform typecheck`, and targeted `pnpm --dir apps/platform test ...`
 - `apps/store`: `pnpm --dir apps/store format`, `pnpm --dir apps/store typecheck`, and targeted `pnpm --dir apps/store test ...`
