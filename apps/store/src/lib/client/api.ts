@@ -5,9 +5,7 @@ import {
   CLIENT_AUTH_PATHS,
 } from '@/lib/api/constants';
 import type {
-  Attribute,
   AttributesListResponse,
-  AttributeValue,
   AuthSession,
   AuthSignInInput,
 } from '@/lib/api/types';
@@ -33,16 +31,3 @@ export const getAttributes = () =>
   apiFetch<AttributesListResponse>(BACKEND_ATTRIBUTE_PATHS.getAttributes, {
     method: 'GET',
   });
-
-export const getAttribute = (attributeId: string) =>
-  apiFetch<Attribute>(BACKEND_ATTRIBUTE_PATHS.getAttribute(attributeId), {
-    method: 'GET',
-  });
-
-export const getAttributeValues = (attributeId: string) =>
-  apiFetch<AttributeValue[]>(
-    BACKEND_ATTRIBUTE_PATHS.getAttributeValues(attributeId),
-    {
-      method: 'GET',
-    }
-  );
