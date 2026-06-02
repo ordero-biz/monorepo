@@ -7,6 +7,7 @@ import {
 import type {
   Attribute,
   AttributesListResponse,
+  AttributeValue,
   AuthSession,
   AuthSignInInput,
 } from '@/lib/api/types';
@@ -37,3 +38,11 @@ export const getAttribute = (attributeId: string) =>
   apiFetch<Attribute>(BACKEND_ATTRIBUTE_PATHS.getAttribute(attributeId), {
     method: 'GET',
   });
+
+export const getAttributeValues = (attributeId: string) =>
+  apiFetch<AttributeValue[]>(
+    BACKEND_ATTRIBUTE_PATHS.getAttributeValues(attributeId),
+    {
+      method: 'GET',
+    }
+  );

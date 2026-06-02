@@ -24,4 +24,6 @@ export const BACKEND_ATTRIBUTE_PATHS = {
   postAttribute: '/api/backend/api/v1/attributes',
   getAttribute: (attributeId: string | number) =>
     `/api/backend/api/v1/attributes/${attributeId}`,
+  getAttributeValues: (attributeId: string | number) =>
+    `/api/backend/api/v1/attributes/${attributeId}/values`,
 } as const;

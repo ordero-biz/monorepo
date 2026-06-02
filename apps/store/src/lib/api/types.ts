@@ -46,6 +46,11 @@ export type Attribute = {
   createdAt: string;
 };
 
+export type AttributeValue = {
+  name: string;
+  sortOrder: number;
+};
+
 export type PageMetadata = {
   size: number;
   number: number;
