@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import {
-  backendRequest,
   clearAuthCookie,
+  fetchBackendResponse,
   getTokenFromRequest,
 } from '@/lib/api/server';
 
@@ -11,12 +11,13 @@ type BackendRouteContext = {
   }>;
 };
 
+const FORWARDED_HEADER_NAMES = new Set(['accept', 'content-type', 'origin']);
+
 const getForwardHeaders = (request: NextRequest) => {
   const headers = new Headers();
-  const allowList = ['accept', 'content-type'];
 
   for (const [key, value] of request.headers.entries()) {
-    if (allowList.includes(key.toLowerCase())) {
+    if (FORWARDED_HEADER_NAMES.has(key.toLowerCase())) {
       headers.set(key, value);
     }
   }
@@ -41,7 +42,7 @@ const handleBackendRequest = async (
   }
 
   const { path } = await context.params;
-  const result = await backendRequest({
+  const result = await fetchBackendResponse({
     path: path.join('/'),
     search: request.nextUrl.search,
     token,
