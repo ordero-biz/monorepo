@@ -81,7 +81,6 @@ describe('AttributeDataTable', () => {
     await user.click(screen.getByRole('button', { name: 'Retry' }));
 
     expect(await screen.findByText('Size')).toBeVisible();
-    expect(screen.getByText('S, M, L')).toBeVisible();
     expect(getAttributesMock).toHaveBeenCalledTimes(2);
   });
 
@@ -113,17 +112,10 @@ describe('AttributeDataTable', () => {
       await screen.findByRole('table', { name: 'Attributes list' })
     ).toBeVisible();
     expect(
-      screen.getByRole('columnheader', { name: 'Attribute values' })
-    ).toBeVisible();
-    expect(
       screen.queryByRole('columnheader', { name: 'Sort order' })
     ).not.toBeInTheDocument();
     expect(screen.getByText('Size')).toBeVisible();
-    expect(screen.getByText('S, M, L')).toBeVisible();
     expect(screen.getByText('26 May 2026')).toBeVisible();
-    expect(
-      screen.queryByRole('button', { name: /attribute values/i })
-    ).not.toBeInTheDocument();
   });
 
   it('opens the attribute detail page when a row item is clicked', async () => {

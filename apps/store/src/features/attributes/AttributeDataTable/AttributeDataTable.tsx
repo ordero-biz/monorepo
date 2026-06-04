@@ -15,14 +15,6 @@ import { clientRoutes } from '@/lib/client/routes';
 import { useAttributesQuery } from '@/lib/hooks/useAttributesQuery';
 import { formatDate } from '@/utils/formatDate';
 
-const formatAttributeValues = (values?: string[]) => {
-  if (!values?.length) {
-    return '—';
-  }
-
-  return values.join(', ');
-};
-
 const columns: DataTableColumnDef<Attribute>[] = [
   {
     accessorKey: 'name',
@@ -31,22 +23,7 @@ const columns: DataTableColumnDef<Attribute>[] = [
       <DataTableColumnHeader column={column} title="Name" />
     ),
     meta: {
-      width: '20%',
-    },
-  },
-  {
-    accessorKey: 'values',
-    cell: ({ row }) => (
-      <DataTableCell>
-        {formatAttributeValues(row.original.values)}
-      </DataTableCell>
-    ),
-    enableSorting: false,
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Attribute values" />
-    ),
-    meta: {
-      width: '60%',
+      width: '50%',
     },
   },
   {
@@ -58,8 +35,7 @@ const columns: DataTableColumnDef<Attribute>[] = [
       <DataTableColumnHeader column={column} title="Created at" />
     ),
     meta: {
-      width: '20%',
-      wrap: 'nowrap',
+      width: '50%',
     },
   },
 ];

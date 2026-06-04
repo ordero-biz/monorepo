@@ -1,10 +1,15 @@
 'use client';
 
-import { Button, Dialog, TextField, useToastManager } from '@ordero/ui';
+import {
+  Button,
+  Dialog,
+  TextField,
+  Typography,
+  useToastManager,
+} from '@ordero/ui';
 import { useForm } from '@tanstack/react-form';
-import { useRouter } from 'next/navigation';
+import { Minus, Plus } from 'lucide-react';
 import { useState } from 'react';
-import { clientRoutes } from '@/lib/client/routes';
 import { createAttribute } from './api';
 import {
   attributeNameDefaultValue,
@@ -12,17 +17,46 @@ import {
   validateAttributeName,
 } from './validations';
 
-const submitCreateAttribute = async (value: { name: string }) => {
+type CreateAttributeFormValues = {
+  name: string;
+  attributeValues: string[];
+};
+
+const attributeValuesDefaultValue = [''];
+
+const normalizeAttributeValues = (attributeValues: string[]) =>
+  attributeValues.map((value) => value.trim()).filter(Boolean);
+
+const mapCreateAttributeFieldErrors = (
+  fieldErrors?: Record<string, string>
+) => {
+  if (!fieldErrors) {
+    return {};
+  }
+
+  return Object.fromEntries(
+    Object.entries(fieldErrors).map(([fieldName, message]) => {
+      if (/^(values|attributeValues)\[\d+\]$/.test(fieldName)) {
+        return [fieldName.replace(/^values/, 'attributeValues'), message];
+      }
+
+      return [fieldName.replace(/^values(?=$|\[)/, 'attributeValues'), message];
+    })
+  );
+};
+
+const submitCreateAttribute = async (value: CreateAttributeFormValues) => {
   const result = await createAttribute({
     name: attributeNameSchema.parse(value.name),
     sortOrder: 0,
+    attributeValues: normalizeAttributeValues(value.attributeValues),
   });
 
   if (!result.ok) {
     return {
       ok: false,
       error: {
-        fieldErrors: result.error.fieldErrors,
+        fieldErrors: mapCreateAttributeFieldErrors(result.error.fieldErrors),
         formError: result.error.message,
       },
     } as const;
@@ -35,12 +69,12 @@ const submitCreateAttribute = async (value: { name: string }) => {
 };
 
 export const CreateAttributeDialog = () => {
-  const router = useRouter();
   const { add: addToast } = useToastManager();
   const [open, setOpen] = useState(false);
   const form = useForm({
     defaultValues: {
       name: attributeNameDefaultValue,
+      attributeValues: attributeValuesDefaultValue,
     },
     onSubmit: async ({ formApi, value }) => {
       const result = await submitCreateAttribute(value);
@@ -64,7 +98,6 @@ export const CreateAttributeDialog = () => {
 
       setOpen(false);
       formApi.reset();
-      router.push(clientRoutes.attributeDetail(result.data.id));
     },
   });
 
@@ -131,6 +164,94 @@ export const CreateAttributeDialog = () => {
                         />
                       );
                     }}
+                  </form.Field>
+
+                  <form.Field name="attributeValues" mode="array">
+                    {(field) => (
+                      <section className="flex flex-col gap-[var(--space-1-5)] rounded-[var(--radius)] bg-[var(--color-grey-8)] p-[var(--space-1-25)]">
+                        <div className="flex flex-col gap-[var(--space-0-5)]">
+                          <Typography variant="body1">
+                            Attribute values
+                          </Typography>
+
+                          {field.state.value.map((attributeValue, index) => {
+                            const isLastItem =
+                              index === field.state.value.length - 1;
+
+                            return (
+                              <div
+                                className="flex items-start gap-[var(--space-0-5)]"
+                                key={`${index}-${attributeValue}`}
+                              >
+                                <form.Field
+                                  name={`attributeValues[${index}]` as const}
+                                >
+                                  {(subField) => {
+                                    const fieldError =
+                                      subField.state.meta.errorMap.onSubmit;
+                                    const isAddButtonDisabled =
+                                      isLastItem &&
+                                      !subField.state.value.trim();
+
+                                    return (
+                                      <>
+                                        <TextField
+                                          aria-label={`Attribute value ${index + 1}`}
+                                          errorText={fieldError}
+                                          invalid={Boolean(fieldError)}
+                                          name={subField.name}
+                                          onBlur={subField.handleBlur}
+                                          onValueChange={(value) =>
+                                            subField.handleChange(value)
+                                          }
+                                          placeholder="Attribute value"
+                                          size="s"
+                                          value={subField.state.value}
+                                        />
+
+                                        <Button
+                                          aria-label={
+                                            isLastItem
+                                              ? 'Add attribute value'
+                                              : `Remove attribute value ${index + 1}`
+                                          }
+                                          disabled={isAddButtonDisabled}
+                                          variant="outlined"
+                                          color="primary"
+                                          onClick={() => {
+                                            if (isLastItem) {
+                                              if (
+                                                !subField.state.value.trim()
+                                              ) {
+                                                return;
+                                              }
+
+                                              field.pushValue('');
+
+                                              return;
+                                            }
+
+                                            field.removeValue(index);
+                                          }}
+                                          size="m"
+                                          type="button"
+                                        >
+                                          {isLastItem ? (
+                                            <Plus aria-hidden="true" />
+                                          ) : (
+                                            <Minus aria-hidden="true" />
+                                          )}
+                                        </Button>
+                                      </>
+                                    );
+                                  }}
+                                </form.Field>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </section>
+                    )}
                   </form.Field>
                 </div>
               </Dialog.Content>

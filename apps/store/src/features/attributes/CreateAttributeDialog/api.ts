@@ -7,6 +7,7 @@ import { apiFetch } from '@/lib/client/fetch';
 type CreateAttributeInput = {
   name: string;
   sortOrder: number;
+  attributeValues: string[];
 };
 
 export const createAttribute = (input: CreateAttributeInput) =>

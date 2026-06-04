@@ -27,6 +27,7 @@ describe('createAttribute', () => {
       createAttribute({
         name: 'Material',
         sortOrder: 0,
+        values: ['Green', 'Blue'],
       })
     ).resolves.toEqual({
       ok: true,
@@ -45,6 +46,7 @@ describe('createAttribute', () => {
         body: JSON.stringify({
           name: 'Material',
           sortOrder: 0,
+          values: ['Green', 'Blue'],
         }),
         cache: 'no-store',
       })
@@ -71,6 +73,7 @@ describe('createAttribute', () => {
       createAttribute({
         name: 'Material',
         sortOrder: 0,
+        values: ['Green'],
       })
     ).resolves.toEqual({
       ok: false,

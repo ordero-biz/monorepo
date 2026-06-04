@@ -72,6 +72,48 @@ describe('CreateAttributeDialog', () => {
     expect(createButton).toBeEnabled();
   });
 
+  it('adds and removes attribute value fields dynamically', async () => {
+    const user = userEvent.setup();
+
+    setup();
+    await user.click(screen.getByRole('button', { name: 'Create Attribute' }));
+
+    const dialog = screen.getByRole('dialog', { name: 'Create new attribute' });
+    const addButton = within(dialog).getByRole('button', {
+      name: 'Add attribute value',
+    });
+    const firstValueField = within(dialog).getByRole('textbox', {
+      name: 'Attribute value 1',
+    });
+
+    expect(
+      within(dialog).queryByRole('textbox', { name: 'Attribute value 2' })
+    ).not.toBeInTheDocument();
+
+    await user.type(firstValueField, 'Green');
+    await user.click(addButton);
+
+    const secondValueField = within(dialog).getByRole('textbox', {
+      name: 'Attribute value 2',
+    });
+
+    expect(secondValueField).toHaveValue('');
+    expect(
+      within(dialog).getByRole('button', { name: 'Remove attribute value 1' })
+    ).toBeVisible();
+
+    await user.click(
+      within(dialog).getByRole('button', { name: 'Remove attribute value 1' })
+    );
+
+    expect(
+      within(dialog).queryByRole('textbox', { name: 'Attribute value 2' })
+    ).not.toBeInTheDocument();
+    expect(
+      within(dialog).getByRole('textbox', { name: 'Attribute value 1' })
+    ).toHaveValue('');
+  });
+
   it('closes on submit and resets the form', async () => {
     const user = userEvent.setup();
     createAttributeMock.mockResolvedValue({
@@ -91,15 +133,28 @@ describe('CreateAttributeDialog', () => {
     const nameField = within(dialog).getByRole('textbox', {
       name: 'Attribute name',
     });
+    const firstValueField = within(dialog).getByRole('textbox', {
+      name: 'Attribute value 1',
+    });
     const createButton = within(dialog).getByRole('button', { name: 'Create' });
+    const addValueButton = within(dialog).getByRole('button', {
+      name: 'Add attribute value',
+    });
 
     await user.type(nameField, 'Material');
+    await user.type(firstValueField, 'Green');
+    await user.click(addValueButton);
+    await user.type(
+      within(dialog).getByRole('textbox', { name: 'Attribute value 2' }),
+      'Blue'
+    );
 
     await user.click(createButton);
 
     expect(createAttributeMock).toHaveBeenCalledWith({
       name: 'Material',
       sortOrder: 0,
+      values: ['Green', 'Blue'],
     });
     expect(routerPushMock).toHaveBeenCalledWith(
       clientRoutes.attributeDetail(1)
@@ -117,6 +172,14 @@ describe('CreateAttributeDialog', () => {
     expect(
       within(reopenedDialog).getByRole('textbox', { name: 'Attribute name' })
     ).toHaveValue('');
+    expect(
+      within(reopenedDialog).getByRole('textbox', { name: 'Attribute value 1' })
+    ).toHaveValue('');
+    expect(
+      within(reopenedDialog).queryByRole('textbox', {
+        name: 'Attribute value 2',
+      })
+    ).not.toBeInTheDocument();
   });
 
   it('shows the backend field error and keeps the dialog open when submit fails', async () => {
