@@ -1,5 +1,5 @@
+import { AUTH_TOKEN_COOKIE_NAME } from '@ordero/next-api/server';
 import { NextRequest } from 'next/server';
-import { AUTH_TOKEN_COOKIE_NAME } from '@/lib/api/constants';
 import { POST as signIn } from './route';
 
 const fetchMock = vi.fn();

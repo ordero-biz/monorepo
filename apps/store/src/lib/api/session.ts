@@ -2,7 +2,7 @@ import {
   resolveServerSession,
   type ServerSessionResult as SharedServerSessionResult,
 } from '@ordero/next-api/session';
-import { BACKEND_AUTH_PATHS } from '@/lib/api/constants';
+import { BACKEND_AUTH_PATHS } from '@/lib/api/backendPaths';
 import { fetchBackendData } from '@/lib/api/server';
 import type { AuthUser } from '@/lib/api/types';
 

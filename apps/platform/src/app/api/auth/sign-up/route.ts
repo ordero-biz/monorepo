@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from 'next/server';
-import { BACKEND_AUTH_PATHS } from '@/lib/api/constants';
+import { BACKEND_AUTH_PATHS } from '@/lib/api/backendPaths';
 import { fetchBackendData, setAuthCookie } from '@/lib/api/server';
 import type { AuthSession, AuthSignUpInput, Token } from '@/lib/api/types';
 

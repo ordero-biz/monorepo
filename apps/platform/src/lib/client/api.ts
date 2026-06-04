@@ -1,6 +1,5 @@
 'use client';
 
-import { CLIENT_AUTH_PATHS, CLIENT_BACKEND_PATHS } from '@/lib/api/constants';
 import type {
   AuthSession,
   AuthSignInInput,
@@ -8,6 +7,7 @@ import type {
   CreateStoreInput,
   Store,
 } from '@/lib/api/types';
+import { CLIENT_AUTH_PATHS, CLIENT_BACKEND_PATHS } from './apiPaths';
 import { apiFetch } from './fetch';
 
 export const signIn = (input: AuthSignInInput) =>
