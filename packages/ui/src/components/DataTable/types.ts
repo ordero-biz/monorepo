@@ -6,6 +6,7 @@ import type {
   RowSelectionState,
   SortingState,
   Table,
+  Row as TanStackRow,
 } from '@tanstack/react-table';
 import type { ReactNode } from 'react';
 
@@ -45,6 +46,16 @@ export type DataTableSelectionCellProps<TData extends RowData> = {
   row: Row<TData>;
 };
 
+export type DataTableCellProps = {
+  children: ReactNode;
+};
+
+export type DataTableRowClickArgs<TData> = {
+  index: number;
+  row: TData;
+  tableRow: TanStackRow<TData>;
+};
+
 export type DataTableRowSelectionState = RowSelectionState;
 export type DataTableSortingState = SortingState;
 
@@ -56,6 +67,7 @@ export type DataTableProps<TData> = {
   getRowCanSelect?: (row: TData, index: number) => boolean;
   getRowId?: (originalRow: TData, index: number, parent?: Row<TData>) => string;
   manualSorting?: boolean;
+  onRowClick?: (args: DataTableRowClickArgs<TData>) => void;
   onRowSelectionChange?: (rowSelection: DataTableRowSelectionState) => void;
   onSortingChange?: (sorting: DataTableSortingState) => void;
   rowSelection?: DataTableRowSelectionState;
