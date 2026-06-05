@@ -628,6 +628,13 @@
 @theme inline {
   /* Component token exports */
 
+  /* breakpoints */
+  --breakpoint-sm: var(--breakpoint-sm-token);
+  --breakpoint-md: var(--breakpoint-md-token);
+  --breakpoint-lg: var(--breakpoint-lg-token);
+  --breakpoint-xl: var(--breakpoint-xl-token);
+  --breakpoint-2xl: initial;
+
   /* fab */
   --fab-icon: var(--fab-icon-token);
   --fab-radius: var(--fab-radius-token);

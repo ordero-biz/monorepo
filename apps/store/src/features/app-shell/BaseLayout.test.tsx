@@ -1,6 +1,6 @@
 import { screen, within } from '@testing-library/react';
-import { BaseLayout } from '@/features/app-shell';
 import { prepareStoreSetup } from '@/test/prepareSetup';
+import { BaseLayout } from './BaseLayout';
 
 const { setup } = prepareStoreSetup({
   component: BaseLayout,
@@ -10,12 +10,13 @@ const { setup } = prepareStoreSetup({
 });
 
 describe('BaseLayout', () => {
-  it('displays the side navigation, header, and page content', () => {
+  it('renders the sidebar, page header, and page content', () => {
     setup();
 
     const sidebar = screen.getByRole('complementary');
     const main = screen.getByRole('main');
 
+    expect(within(sidebar).getByText('Ordero')).toBeVisible();
     expect(
       within(sidebar).getByRole('link', { name: 'Dashboard' })
     ).toBeVisible();
