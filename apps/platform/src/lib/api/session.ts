@@ -1,60 +1,19 @@
-import { BACKEND_AUTH_PATHS } from '@/lib/api/constants';
-import { backendFetch } from '@/lib/api/server';
-import type { ApiError, AuthSession, AuthUser } from '@/lib/api/types';
+import {
+  resolveServerSession,
+  type ServerSessionResult as SharedServerSessionResult,
+} from '@ordero/next-api/session';
+import { BACKEND_AUTH_PATHS } from '@/lib/api/backendPaths';
+import { fetchBackendData } from '@/lib/api/server';
+import type { AuthUser } from '@/lib/api/types';
 
-export type ServerSessionResult =
-  | {
-      ok: true;
-      session: AuthSession;
-      shouldClearAuthCookie: boolean;
-    }
-  | {
-      ok: false;
-      error: ApiError;
-      shouldClearAuthCookie: false;
-    };
+export type ServerSessionResult = SharedServerSessionResult<AuthUser>;
 
 export const getServerSession = async (
   token?: string
 ): Promise<ServerSessionResult> => {
-  if (!token) {
-    return {
-      ok: true,
-      session: { authenticated: false },
-      shouldClearAuthCookie: false,
-    };
-  }
-
-  const result = await backendFetch<AuthUser>({
-    path: BACKEND_AUTH_PATHS.me,
-    init: {
-      method: 'GET',
-    },
+  return resolveServerSession<AuthUser>({
     token,
+    mePath: BACKEND_AUTH_PATHS.me,
+    fetchBackendData,
   });
-
-  if (!result.ok) {
-    if (result.error.status === 401) {
-      return {
-        ok: true,
-        session: { authenticated: false },
-        shouldClearAuthCookie: true,
-      };
-    }
-
-    return {
-      ok: false,
-      error: result.error,
-      shouldClearAuthCookie: false,
-    };
-  }
-
-  return {
-    ok: true,
-    session: {
-      authenticated: true,
-      user: result.data,
-    },
-    shouldClearAuthCookie: false,
-  };
 };
