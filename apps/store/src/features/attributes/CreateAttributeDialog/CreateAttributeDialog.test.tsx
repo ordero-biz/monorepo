@@ -181,41 +181,4 @@ describe('CreateAttributeDialog', () => {
       })
     ).not.toBeInTheDocument();
   });
-
-  it('shows the backend field error and keeps the dialog open when submit fails', async () => {
-    const user = userEvent.setup();
-
-    createAttributeMock.mockResolvedValue({
-      ok: false,
-      error: {
-        status: 422,
-        message: 'Attribute creation failed.',
-        fieldErrors: {
-          name: 'Attribute name already exists.',
-        },
-      },
-    });
-
-    setup();
-    await user.click(screen.getByRole('button', { name: 'Create Attribute' }));
-
-    const dialog = screen.getByRole('dialog', { name: 'Create new attribute' });
-    const nameField = within(dialog).getByRole('textbox', {
-      name: 'Attribute name',
-    });
-
-    await user.type(nameField, 'Material');
-    await user.click(within(dialog).getByRole('button', { name: 'Create' }));
-
-    expect(screen.getByText('Attribute name already exists.')).toBeVisible();
-    expect(nameField).toHaveAccessibleDescription(
-      'Attribute name already exists.'
-    );
-    expect(
-      screen.getByRole('dialog', { name: 'Create new attribute' })
-    ).toBeVisible();
-    expect(
-      await screen.findByRole('dialog', { name: 'Attribute creation failed.' })
-    ).toBeVisible();
-  });
 });

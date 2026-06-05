@@ -24,11 +24,14 @@ type CreateAttributeFormValues = {
   attributeValues: string[];
 };
 
+const normalizeAttributeValues = (attributeValues: string[]) =>
+  attributeValues.map((value) => value.trim()).filter(Boolean);
+
 const submitCreateAttribute = async (value: CreateAttributeFormValues) => {
   const result = await createAttribute({
     name: attributeNameSchema.parse(value.name),
     sortOrder: 0,
-    attributeValues: value.attributeValues,
+    attributeValues: normalizeAttributeValues(value.attributeValues),
   });
 
   if (!result.ok) {
