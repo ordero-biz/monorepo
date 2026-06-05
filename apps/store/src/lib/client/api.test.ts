@@ -1,9 +1,4 @@
-import {
-  getAttributes,
-  getSession,
-  logout,
-  signIn,
-} from './api';
+import { getAttributes, getSession, logout, signIn } from './api';
 
 describe('client auth helpers', () => {
   beforeEach(() => {
