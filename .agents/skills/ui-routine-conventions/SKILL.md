@@ -141,6 +141,12 @@ Required rules:
 - Do not make up new semantic or bridged tokens until you have reviewed the existing token files.
 - If an existing semantic or bridged token covers the need, reuse it.
 - Only add a new token mapping when the needed value truly does not exist in the current token layers.
+- Keep viewport breakpoint tokens and layout sizing tokens semantically separate.
+  Tailwind `--breakpoint-*` theme values are viewport switch points and must be
+  literal lengths because Tailwind emits them into media queries, where
+  `var(...)` is invalid. Container widths, page max widths, and shell sizing
+  should use semantic layout tokens such as `--layout-container-*`, even if
+  they currently share values with breakpoints.
 
 For Figma-driven implementation:
 

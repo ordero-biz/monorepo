@@ -1,0 +1,50 @@
+import type { SidebarNavigationSectionConfig } from '@ordero/ui';
+import { LayoutDashboard, Package } from 'lucide-react';
+
+export const sidebarSections: SidebarNavigationSectionConfig[] = [
+  {
+    id: 'overview',
+    label: 'Overview',
+    items: [
+      {
+        id: 'dashboard',
+        kind: 'link',
+        label: 'Dashboard',
+        href: '/dashboard',
+        icon: <LayoutDashboard />,
+      },
+      {
+        id: 'product',
+        kind: 'collapse',
+        label: 'Product',
+        icon: <Package />,
+        items: [
+          {
+            id: 'product-all',
+            kind: 'link',
+            label: 'Product',
+            href: '/products',
+          },
+          {
+            id: 'product-categories',
+            kind: 'link',
+            label: 'Categories',
+            href: '/products/categories',
+          },
+          {
+            id: 'product-attributes',
+            kind: 'link',
+            label: 'Attributes',
+            href: '/products/attributes',
+          },
+          {
+            id: 'product-warehouse',
+            kind: 'link',
+            label: 'Warehouse',
+            href: '/products/warehouse',
+          },
+        ],
+      },
+    ],
+  },
+];

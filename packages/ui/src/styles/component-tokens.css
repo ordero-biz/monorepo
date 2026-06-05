@@ -283,6 +283,13 @@
   --figma-form-helper-text-icon: 16px;
   --figma-form-helper-text-spacing: var(--figma-spacing-0-5);
 
+  /* breakpoints */
+  --figma-breakpoint-xs: 0px;
+  --figma-breakpoint-sm: 600px;
+  --figma-breakpoint-md: 900px;
+  --figma-breakpoint-lg: 1200px;
+  --figma-breakpoint-xl: 1536px;
+
   /* fab bridge */
   --fab-icon-token: var(--figma-fab-icon);
   --fab-radius-token: var(--figma-fab-radius);
@@ -609,10 +616,29 @@
   --form-helper-text-pt-token: var(--figma-form-helper-text-pt);
   --form-helper-text-icon-token: var(--figma-form-helper-text-icon);
   --form-helper-text-spacing-token: var(--figma-form-helper-text-spacing);
+
+  /* layout containers */
+  --layout-container-xs: var(--figma-breakpoint-xs);
+  --layout-container-sm: var(--figma-breakpoint-sm);
+  --layout-container-md: var(--figma-breakpoint-md);
+  --layout-container-lg: var(--figma-breakpoint-lg);
+  --layout-container-xl: var(--figma-breakpoint-xl);
 }
 
 @theme inline {
   /* Component token exports */
+
+  /* breakpoints */
+  /*
+   * Tailwind emits breakpoint tokens into media queries, where CSS custom
+   * properties are invalid. Keep these values literal and synchronized with
+   * the Figma breakpoint tokens above.
+   */
+  --breakpoint-sm: 600px;
+  --breakpoint-md: 900px;
+  --breakpoint-lg: 1200px;
+  --breakpoint-xl: 1536px;
+  --breakpoint-2xl: initial;
 
   /* fab */
   --fab-icon: var(--fab-icon-token);
