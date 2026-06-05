@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import { BaseLayout } from '@/components/BaseLayout';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 
@@ -11,12 +11,15 @@ const { setup } = prepareStoreSetup({
 
 describe('BaseLayout', () => {
   it('displays the side navigation, header, and page content', () => {
-    const { renderResult } = setup();
+    setup();
 
-    expect(renderResult.container.querySelector('#store-sidebar')).toBeVisible();
+    const sidebar = screen.getByRole('complementary');
+    const main = screen.getByRole('main');
+
     expect(
-      renderResult.container.querySelector('#store-page-header')
+      within(sidebar).getByRole('link', { name: 'Dashboard' })
     ).toBeVisible();
-    expect(screen.getByText('Store content')).toBeVisible();
+    expect(within(main).getByRole('heading', { name: 'Store' })).toBeVisible();
+    expect(within(main).getByText('Store content')).toBeVisible();
   });
 });
