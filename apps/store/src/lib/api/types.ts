@@ -1,4 +1,4 @@
-export type Token = string;
+import type { AuthSession as SharedAuthSession } from '@ordero/api-types';
 
 export type AuthUser = {
   id?: string;
@@ -7,36 +7,12 @@ export type AuthUser = {
   [key: string]: unknown;
 };
 
-export type AuthSession =
-  | {
-      authenticated: true;
-      user?: AuthUser;
-    }
-  | {
-      authenticated: false;
-    };
+export type AuthSession = SharedAuthSession<AuthUser>;
 
 export type AuthSignInInput = {
   email: string;
   password: string;
 };
-
-export type ApiError = {
-  status: number;
-  message: string;
-  code?: string;
-  fieldErrors?: Record<string, string>;
-};
-
-export type ApiResult<T> =
-  | {
-      ok: true;
-      data: T;
-    }
-  | {
-      ok: false;
-      error: ApiError;
-    };
 
 export type Attribute = {
   id: number;
@@ -59,3 +35,4 @@ export type PaginatedResponse<T> = {
 };
 
 export type AttributesListResponse = PaginatedResponse<Attribute>;
+export type { ApiError, ApiResult, Token } from '@ordero/api-types';

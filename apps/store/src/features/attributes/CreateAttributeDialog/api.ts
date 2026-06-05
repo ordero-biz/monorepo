@@ -1,7 +1,7 @@
 'use client';
 
-import { BACKEND_ATTRIBUTE_PATHS } from '@/lib/api/constants';
 import type { Attribute } from '@/lib/api/types';
+import { CLIENT_BACKEND_PATHS } from '@/lib/client/apiPaths';
 import { apiFetch } from '@/lib/client/fetch';
 
 type CreateAttributeInput = {
@@ -11,7 +11,7 @@ type CreateAttributeInput = {
 };
 
 export const createAttribute = (input: CreateAttributeInput) =>
-  apiFetch<Attribute>(BACKEND_ATTRIBUTE_PATHS.postAttribute, {
+  apiFetch<Attribute>(CLIENT_BACKEND_PATHS.attributes, {
     method: 'POST',
     body: input,
   });

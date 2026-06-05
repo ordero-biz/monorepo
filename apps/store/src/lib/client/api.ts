@@ -1,14 +1,11 @@
 'use client';
 
-import {
-  BACKEND_ATTRIBUTE_PATHS,
-  CLIENT_AUTH_PATHS,
-} from '@/lib/api/constants';
 import type {
   AttributesListResponse,
   AuthSession,
   AuthSignInInput,
 } from '@/lib/api/types';
+import { CLIENT_AUTH_PATHS, CLIENT_BACKEND_PATHS } from './apiPaths';
 import { apiFetch } from './fetch';
 
 export const signIn = (input: AuthSignInInput) =>
@@ -28,6 +25,6 @@ export const getSession = () =>
   });
 
 export const getAttributes = () =>
-  apiFetch<AttributesListResponse>(BACKEND_ATTRIBUTE_PATHS.getAttributes, {
+  apiFetch<AttributesListResponse>(CLIENT_BACKEND_PATHS.attributes, {
     method: 'GET',
   });

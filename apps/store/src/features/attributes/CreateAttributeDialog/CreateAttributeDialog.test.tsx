@@ -154,7 +154,7 @@ describe('CreateAttributeDialog', () => {
     expect(createAttributeMock).toHaveBeenCalledWith({
       name: 'Material',
       sortOrder: 0,
-      values: ['Green', 'Blue'],
+      attributeValues: ['Green', 'Blue'],
     });
     expect(routerPushMock).toHaveBeenCalledWith(
       clientRoutes.attributeDetail(1)

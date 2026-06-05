@@ -1,76 +1,48 @@
-import { cookies } from 'next/headers';
+import { hasAuthenticatedServerSession as resolveAuthenticatedServerSession } from '@ordero/next-api/authPageGuard';
 import { getServerSession } from '@/lib/api/session';
 import { hasAuthenticatedServerSession } from './authPageGuard';
 
-vi.mock('next/headers', () => ({
-  cookies: vi.fn(),
-}));
+vi.mock('@ordero/next-api/authPageGuard', async () => {
+  const actual = await vi.importActual<
+    typeof import('@ordero/next-api/authPageGuard')
+  >('@ordero/next-api/authPageGuard');
 
-vi.mock('@/lib/api/session', () => ({
-  getServerSession: vi.fn(),
-}));
+  return {
+    ...actual,
+    hasAuthenticatedServerSession: vi.fn(),
+  };
+});
 
-const cookiesMock = vi.mocked(cookies);
-const getServerSessionMock = vi.mocked(getServerSession);
+vi.mock('@/lib/api/session', async () => {
+  const actual =
+    await vi.importActual<typeof import('@/lib/api/session')>(
+      '@/lib/api/session'
+    );
+
+  return {
+    ...actual,
+    getServerSession: vi.fn(),
+  };
+});
+
+const resolveAuthenticatedServerSessionMock = vi.mocked(
+  resolveAuthenticatedServerSession
+);
 
 describe('authPageGuard', () => {
   beforeEach(() => {
-    cookiesMock.mockReset();
-    getServerSessionMock.mockReset();
+    resolveAuthenticatedServerSessionMock.mockReset();
   });
 
-  it('returns false when the auth cookie is missing', async () => {
-    cookiesMock.mockResolvedValue({
-      get: vi.fn().mockReturnValue(undefined),
-    } as never);
+  it.each([
+    true,
+    false,
+  ])('returns %s from authenticated server session checks with the app session lookup', async (authenticated) => {
+    resolveAuthenticatedServerSessionMock.mockResolvedValue(authenticated);
 
-    getServerSessionMock.mockResolvedValue({
-      ok: true,
-      session: {
-        authenticated: false,
-      },
-      shouldClearAuthCookie: false,
+    await expect(hasAuthenticatedServerSession()).resolves.toBe(authenticated);
+    expect(resolveAuthenticatedServerSessionMock).toHaveBeenCalledWith({
+      getServerSession,
     });
-
-    await expect(hasAuthenticatedServerSession()).resolves.toBe(false);
-    expect(getServerSessionMock).toHaveBeenCalledWith(undefined);
-  });
-
-  it('returns true when the shared session lookup is authenticated', async () => {
-    cookiesMock.mockResolvedValue({
-      get: vi.fn().mockReturnValue({
-        value: 'jwt-token',
-      }),
-    } as never);
-    getServerSessionMock.mockResolvedValue({
-      ok: true,
-      session: {
-        authenticated: true,
-        user: {
-          email: 'admin@gmail.com',
-        },
-      },
-      shouldClearAuthCookie: false,
-    });
-
-    await expect(hasAuthenticatedServerSession()).resolves.toBe(true);
-    expect(getServerSessionMock).toHaveBeenCalledWith('jwt-token');
-  });
-
-  it('returns false when the shared session lookup is signed out', async () => {
-    cookiesMock.mockResolvedValue({
-      get: vi.fn().mockReturnValue({
-        value: 'stale-token',
-      }),
-    } as never);
-    getServerSessionMock.mockResolvedValue({
-      ok: true,
-      session: {
-        authenticated: false,
-      },
-      shouldClearAuthCookie: true,
-    });
-
-    await expect(hasAuthenticatedServerSession()).resolves.toBe(false);
   });
 });

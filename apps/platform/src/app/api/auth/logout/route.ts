@@ -1,8 +1,8 @@
 import { type NextRequest, NextResponse } from 'next/server';
-import { BACKEND_AUTH_PATHS } from '@/lib/api/constants';
+import { BACKEND_AUTH_PATHS } from '@/lib/api/backendPaths';
 import {
-  backendFetch,
   clearAuthCookie,
+  fetchBackendData,
   getTokenFromRequest,
 } from '@/lib/api/server';
 import type { AuthSession } from '@/lib/api/types';
@@ -11,7 +11,7 @@ export const POST = async (request: NextRequest) => {
   const token = getTokenFromRequest(request);
 
   if (token) {
-    await backendFetch({
+    await fetchBackendData({
       path: BACKEND_AUTH_PATHS.logout,
       init: {
         method: 'POST',

@@ -1,10 +1,11 @@
 # HTTP and Auth Architecture
 
-`apps/platform` uses a BFF-style HTTP architecture for authenticated REST
-requests. The browser never reads the JWT directly. Next.js route handlers own
-the token cookie and forward authenticated requests to the backend with a Bearer
-header. Server-rendered auth pages reuse the same backend validation rules
-through a shared session helper instead of relying on middleware redirects.
+`apps/platform` and `apps/store` use a BFF-style HTTP architecture for
+authenticated REST requests. The browser never reads the JWT directly. Next.js
+route handlers own the token cookie and forward authenticated requests to the
+backend with a Bearer header. Server-rendered auth pages reuse the same backend
+validation rules through shared server helpers instead of relying on middleware
+redirects.
 
 ## Boundaries
 
@@ -13,12 +14,13 @@ flowchart LR
   browser["Browser UI"]
   authPage["Server auth pages<br/>/sign-in and /sign-up"]
   clientApi["Client request helpers<br/>src/lib/client/api.ts"]
-  clientFetch["Client fetch helper<br/>src/lib/client/fetch.ts"]
+  clientFetch["@ordero/api-client<br/>apiFetch()"]
   query["TanStack Query<br/>Providers + auth queries"]
   nextApi["Next.js route handlers<br/>/api/auth/* and /api/backend/*"]
   cookie["HttpOnly cookie<br/>ordero_access_token"]
-  session["Shared session helper<br/>src/lib/api/session.ts"]
-  serverApi["Server REST client<br/>src/lib/api/server.ts"]
+  session["@ordero/next-api<br/>server-session helpers"]
+  serverApi["@ordero/next-api<br/>server REST helpers"]
+  types["@ordero/api-types<br/>ApiResult, ApiError, AuthSession"]
   backend["REST backend<br/>BACKEND_API_URL"]
 
   authPage --> session
@@ -31,6 +33,9 @@ flowchart LR
   nextApi --> session
   session --> serverApi
   nextApi --> serverApi
+  clientFetch --> types
+  session --> types
+  serverApi --> types
   serverApi --> backend
 ```
 
@@ -42,10 +47,14 @@ Key rules:
 - Server auth pages use the shared `getServerSession()` helper before render.
 - Cached reads use TanStack Query. Auth actions and mutations use direct
   uncached calls.
+- App-owned request helpers and route handlers may use local wrappers under
+  `src/lib/api/*` and `src/lib/client/*`, but shared transport behavior lives in
+  `@ordero/api-client`, `@ordero/api-types`, and `@ordero/next-api`.
 
 ## Core Schemas
 
-Public auth and error shapes live in `src/lib/api/types.ts`.
+Shared auth/result/error contracts live in `@ordero/api-types`. App-specific
+user and payload types stay in each app.
 
 ```ts
 type AuthUser = {
@@ -55,14 +64,7 @@ type AuthUser = {
   [key: string]: unknown;
 };
 
-type AuthSession =
-  | {
-      authenticated: true;
-      user?: AuthUser;
-    }
-  | {
-      authenticated: false;
-    };
+type AuthSession = SharedAuthSession<AuthUser>;
 
 type ApiError = {
   status: number;
@@ -75,10 +77,10 @@ type ApiError = {
 Server-side session resolution uses a separate internal result shape:
 
 ```ts
-type ServerSessionResult =
+type ServerSessionResult<TUser = unknown> =
   | {
       ok: true;
-      session: AuthSession;
+      session: AuthSession<TUser>;
       shouldClearAuthCookie: boolean;
     }
   | {
@@ -197,12 +199,24 @@ Caching rules:
 - the session key is `authQueryKeys.session`
 - login seeds the session cache after success
 
+## Shared Package Roles
+
+- `@ordero/api-types` owns `Token`, generic `AuthSession<TUser = unknown>`,
+  `ApiError`, and `ApiResult<T>`.
+- `@ordero/api-client` owns browser-safe `apiFetch<T>()` behavior.
+- `@ordero/next-api` owns server-only backend fetch, auth cookie, token,
+  session-resolution, and auth-page guard primitives.
+- Apps own domain request helpers, route constants, form payloads, user shapes,
+  and feature-specific backend resource types.
+
+See `docs/packages.md` for the package boundary reference.
+
 ## Authenticated Backend Request Flow
 
 Feature code should call `/api/backend/*` when it needs authenticated REST data
 from the backend. Keep feature-facing request helpers in `src/lib/client/api.ts`
-and the generic `apiFetch()` transport/error-normalization helper in
-`src/lib/client/fetch.ts`.
+and use the generic `apiFetch()` transport/error-normalization helper from
+`@ordero/api-client` through `src/lib/client/fetch.ts`.
 
 ```mermaid
 sequenceDiagram
@@ -211,7 +225,7 @@ sequenceDiagram
   participant Fetch as apiFetch()
   participant Proxy as /api/backend/[...path]
   participant Cookie as HttpOnly cookie
-  participant Server as backendFetch()
+  participant Server as fetchBackendResponse()
   participant Backend as REST backend
 
   UI->>Helper: getStores() or another request helper
@@ -221,7 +235,7 @@ sequenceDiagram
   alt no token
     Proxy-->>Fetch: 401 Authentication required
   else token exists
-    Proxy->>Server: backendFetch(path, method, body, search, token)
+    Proxy->>Server: fetchBackendResponse(path, method, body, search, token)
     Server->>Backend: Forward request with Bearer token
     Backend-->>Server: REST response
     alt backend returns success
@@ -245,7 +259,10 @@ Forwarding rules:
 - supports `GET`, `POST`, `PUT`, `PATCH`, and `DELETE`
 - preserves successful backend response status codes and headers
 - preserves query string search params
-- forwards only selected headers: `accept` and `content-type`
+- forwards only selected headers: `accept`, `content-type`, and `origin`
+- forwards `origin` intentionally because the backend uses it for
+  tenant/domain resolution; do not add other browser headers unless they become
+  explicit backend contracts
 - forwards bodies for non-`GET` and non-`HEAD` methods
 - never forwards browser-readable JWT state because the browser cannot read the
   HttpOnly cookie
@@ -295,7 +312,7 @@ Route handlers and client helpers normalize backend failures into `ApiError`.
 ```mermaid
 flowchart LR
   backendError["Backend error response"]
-  normalize["getApiErrorFromResponse()<br/>or client getApiError()"]
+  normalize["@ordero/next-api getApiErrorFromResponse()<br/>or @ordero/api-client getApiError()"]
   apiError["ApiError<br/>status, message, code?, fieldErrors?"]
   form["TanStack Form errors"]
   client["Client caller"]
@@ -311,13 +328,15 @@ When present, sign-in and sign-up map them into TanStack Form submit errors.
 
 ## Review Checklist
 
-- Start with `src/lib/api/types.ts` to confirm the public shapes.
-- Review `src/lib/api/session.ts` for shared session resolution and cookie-clear
-  decisions.
-- Review `src/lib/api/server.ts` for backend URL handling, Bearer header logic,
-  cookie helpers, error normalization, and raw-response forwarding.
-- Review `src/lib/client/fetch.ts` for browser-side request serialization and
-  `ApiError` normalization.
+- Start with `@ordero/api-types` and the app-local `src/lib/api/types.ts` to
+  confirm shared vs app-owned shapes.
+- Review `@ordero/next-api` and the app-local `src/lib/api/session.ts` for
+  session resolution and cookie-clear decisions.
+- Review `@ordero/next-api` and the app-local `src/lib/api/server.ts` for
+  backend URL handling, Bearer header logic, cookie helpers, error
+  normalization, and raw-response forwarding.
+- Review `@ordero/api-client` and the app-local `src/lib/client/fetch.ts` for
+  browser-side request serialization and `ApiError` normalization.
 - Review `src/lib/client/api.ts` for feature-facing same-origin request
   helpers.
 - Review `/api/auth/*` route handlers for cookie ownership and safe session
