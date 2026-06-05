@@ -9,7 +9,9 @@ import {
 } from '@ordero/ui';
 import { useForm } from '@tanstack/react-form';
 import { Minus, Plus } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { clientRoutes } from '@/lib/client/routes';
 import { createAttribute } from './api';
 import {
   attributeNameDefaultValue,
@@ -22,41 +24,18 @@ type CreateAttributeFormValues = {
   attributeValues: string[];
 };
 
-const attributeValuesDefaultValue = [''];
-
-const normalizeAttributeValues = (attributeValues: string[]) =>
-  attributeValues.map((value) => value.trim()).filter(Boolean);
-
-const mapCreateAttributeFieldErrors = (
-  fieldErrors?: Record<string, string>
-) => {
-  if (!fieldErrors) {
-    return {};
-  }
-
-  return Object.fromEntries(
-    Object.entries(fieldErrors).map(([fieldName, message]) => {
-      if (/^(values|attributeValues)\[\d+\]$/.test(fieldName)) {
-        return [fieldName.replace(/^values/, 'attributeValues'), message];
-      }
-
-      return [fieldName.replace(/^values(?=$|\[)/, 'attributeValues'), message];
-    })
-  );
-};
-
 const submitCreateAttribute = async (value: CreateAttributeFormValues) => {
   const result = await createAttribute({
     name: attributeNameSchema.parse(value.name),
     sortOrder: 0,
-    attributeValues: normalizeAttributeValues(value.attributeValues),
+    attributeValues: value.attributeValues,
   });
 
   if (!result.ok) {
     return {
       ok: false,
       error: {
-        fieldErrors: mapCreateAttributeFieldErrors(result.error.fieldErrors),
+        fieldErrors: result.error.fieldErrors,
         formError: result.error.message,
       },
     } as const;
@@ -70,11 +49,12 @@ const submitCreateAttribute = async (value: CreateAttributeFormValues) => {
 
 export const CreateAttributeDialog = () => {
   const { add: addToast } = useToastManager();
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const form = useForm({
     defaultValues: {
       name: attributeNameDefaultValue,
-      attributeValues: attributeValuesDefaultValue,
+      attributeValues: [''],
     },
     onSubmit: async ({ formApi, value }) => {
       const result = await submitCreateAttribute(value);
@@ -98,6 +78,7 @@ export const CreateAttributeDialog = () => {
 
       setOpen(false);
       formApi.reset();
+      router.push(clientRoutes.attributeDetail(result.data.id));
     },
   });
 

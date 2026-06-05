@@ -168,7 +168,7 @@ const sendBackendRequest = async ({
 
   try {
     const headers = new Headers(init?.headers);
-
+    headers.set('TargetHost', `test1.ordero.local`);
     if (token) {
       headers.set('Authorization', `Bearer ${token}`);
     }
