@@ -96,11 +96,7 @@ const isInteractiveTarget = (target: EventTarget | null) => {
 };
 
 export const DataTableCell = ({ children }: DataTableCellProps) => (
-  <div className="flex items-center py-[var(--spacing-2)]">
-    <div className="px-[var(--spacing-2)]">
-      <p className="text-card-foreground">{children}</p>
-    </div>
-  </div>
+  <div className="flex items-center p-[var(--spacing-2)] text-card-foreground">{children}</div>
 );
 
 export const DataTable = <TData,>({

@@ -9,16 +9,25 @@ import {
   DataTableColumnHeader,
   Typography,
 } from '@ordero/ui';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import type { Attribute } from '@/lib/api/types';
-import { clientRoutes } from '@/lib/client/routes';
+import { getAttributeDetailRoute } from '@/lib/client/routes';
 import { useAttributesQuery } from '@/lib/hooks/useAttributesQuery';
 import { formatDate } from '@/utils/formatDate';
 
 const columns: DataTableColumnDef<Attribute>[] = [
   {
     accessorKey: 'name',
-    cell: ({ row }) => <DataTableCell>{row.original.name}</DataTableCell>,
+    cell: ({ row }) => (
+      <DataTableCell>
+        <Link
+          className="inline-flex max-w-full rounded-[var(--radius-sm)] text-[var(--primary-dark)] outline-none transition-colors hover:text-[var(--primary-darker)] hover:underline focus-visible:ring-3 focus-visible:ring-ring/50"
+          href={getAttributeDetailRoute(row.original.id)}
+        >
+          {row.original.name}
+        </Link>
+      </DataTableCell>
+    ),
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Name" />
     ),
@@ -41,7 +50,6 @@ const columns: DataTableColumnDef<Attribute>[] = [
 ];
 
 export const AttributeDataTable = () => {
-  const router = useRouter();
   const attributesQuery = useAttributesQuery();
 
   if (attributesQuery.isPending) {
@@ -87,9 +95,6 @@ export const AttributeDataTable = () => {
       data={attributesQuery.data.content}
       emptyMessage="No attributes found."
       getRowId={(row) => String(row.id)}
-      onRowClick={({ row }) => {
-        router.push(clientRoutes.attributeDetail(row.id));
-      }}
     />
   );
 };

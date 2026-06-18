@@ -3,8 +3,8 @@ export const clientRoutes = {
   signIn: '/sign-in',
   dashboard: '/dashboard',
   attributes: '/products/attributes',
-  attributeDetail: (attributeId: string | number) =>
-    `/products/attributes/${attributeId}`,
 } as const;
+
+export const getAttributeDetailRoute = (attributeId: string | number) => `/products/attributes/${attributeId}`;
 
 export type ClientRoute = (typeof clientRoutes)[keyof typeof clientRoutes];

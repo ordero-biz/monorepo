@@ -1,7 +1,7 @@
 import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { CreateAttributeDialog } from '@/features/attributes';
-import { clientRoutes } from '@/lib/client/routes';
+import { getAttributeDetailRoute } from '@/lib/client/routes';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { createAttribute } from './api';
 
@@ -157,7 +157,7 @@ describe('CreateAttributeDialog', () => {
       attributeValues: ['Green', 'Blue'],
     });
     expect(routerPushMock).toHaveBeenCalledWith(
-      clientRoutes.attributeDetail(1)
+      getAttributeDetailRoute(1)
     );
     expect(
       screen.queryByRole('dialog', { name: 'Create new attribute' })

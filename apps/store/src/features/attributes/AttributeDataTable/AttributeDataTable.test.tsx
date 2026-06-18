@@ -1,17 +1,9 @@
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getAttributes } from '@/lib/client/api';
-import { clientRoutes } from '@/lib/client/routes';
+import { getAttributeDetailRoute } from '@/lib/client/routes';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { AttributeDataTable } from './AttributeDataTable';
-
-const routerPushMock = vi.fn();
-
-vi.mock('next/navigation', () => ({
-  useRouter: () => ({
-    push: routerPushMock,
-  }),
-}));
 
 vi.mock('@/lib/client/api', async () => ({
   ...(await vi.importActual<typeof import('@/lib/client/api')>(
@@ -29,7 +21,6 @@ const { setup } = prepareStoreSetup({
 describe('AttributeDataTable', () => {
   beforeEach(() => {
     getAttributesMock.mockReset();
-    routerPushMock.mockClear();
   });
 
   it('renders a loading state while attributes are loading', () => {
@@ -118,9 +109,7 @@ describe('AttributeDataTable', () => {
     expect(screen.getByText('26 May 2026')).toBeVisible();
   });
 
-  it('opens the attribute detail page when a row item is clicked', async () => {
-    const user = userEvent.setup();
-
+  it('renders attribute names as detail page links', async () => {
     getAttributesMock.mockResolvedValue({
       ok: true,
       data: {
@@ -144,10 +133,9 @@ describe('AttributeDataTable', () => {
 
     setup();
 
-    await user.click(await screen.findByText('Size'));
-
-    expect(routerPushMock).toHaveBeenCalledWith(
-      clientRoutes.attributeDetail(1)
+    expect(await screen.findByRole('link', { name: 'Size' })).toHaveAttribute(
+      'href',
+      getAttributeDetailRoute(1)
     );
   });
 });

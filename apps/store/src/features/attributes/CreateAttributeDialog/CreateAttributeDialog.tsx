@@ -12,7 +12,7 @@ import { useForm } from '@tanstack/react-form';
 import { Minus, Plus } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { clientRoutes } from '@/lib/client/routes';
+import { getAttributeDetailRoute } from '@/lib/client/routes';
 import { createAttribute } from './api';
 import {
   attributeNameDefaultValue,
@@ -82,7 +82,7 @@ export const CreateAttributeDialog = () => {
 
       setOpen(false);
       formApi.reset();
-      router.push(clientRoutes.attributeDetail(result.data.id));
+      router.push(getAttributeDetailRoute(result.data.id));
     },
   });
 
