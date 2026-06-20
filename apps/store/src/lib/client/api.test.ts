@@ -1,4 +1,4 @@
-import { getAttributes, getSession, logout, signIn } from './api';
+import { getSession, logout, signIn } from './api';
 
 describe('client auth helpers', () => {
   beforeEach(() => {
@@ -190,84 +190,6 @@ describe('client auth helpers', () => {
         status: 500,
         message: 'Session lookup failed.',
         code: 'SESSION_LOOKUP_FAILED',
-        fieldErrors: undefined,
-      },
-    });
-  });
-
-  it('gets attributes from the backend proxy on success', async () => {
-    const fetchMock = vi.mocked(fetch);
-
-    fetchMock.mockResolvedValue(
-      new Response(
-        JSON.stringify({
-          content: [
-            {
-              id: 1,
-              name: 'Size',
-              sortOrder: 10,
-              createdAt: '2026-05-26T20:55:51.542Z',
-            },
-          ],
-          page: {
-            size: 25,
-            number: 0,
-            totalElements: 1,
-            totalPages: 1,
-          },
-        })
-      )
-    );
-
-    await expect(getAttributes()).resolves.toEqual({
-      ok: true,
-      data: {
-        content: [
-          {
-            id: 1,
-            name: 'Size',
-            sortOrder: 10,
-            createdAt: '2026-05-26T20:55:51.542Z',
-          },
-        ],
-        page: {
-          size: 25,
-          number: 0,
-          totalElements: 1,
-          totalPages: 1,
-        },
-      },
-    });
-
-    expect(fetchMock).toHaveBeenCalledWith(
-      '/api/backend/api/v1/attributes',
-      expect.objectContaining({
-        method: 'GET',
-        cache: 'no-store',
-      })
-    );
-  });
-
-  it('returns normalized failures from the attributes route', async () => {
-    vi.mocked(fetch).mockResolvedValue(
-      new Response(
-        JSON.stringify({
-          message: 'Attributes lookup failed.',
-          code: 'ATTRIBUTES_LOOKUP_FAILED',
-        }),
-        {
-          status: 503,
-          statusText: 'Service Unavailable',
-        }
-      )
-    );
-
-    await expect(getAttributes()).resolves.toEqual({
-      ok: false,
-      error: {
-        status: 503,
-        message: 'Attributes lookup failed.',
-        code: 'ATTRIBUTES_LOOKUP_FAILED',
         fieldErrors: undefined,
       },
     });

@@ -10,10 +10,10 @@ import {
   Typography,
 } from '@ordero/ui';
 import Link from 'next/link';
-import type { Attribute } from '@/lib/api/types';
 import { getAttributeDetailRoute } from '@/lib/client/routes';
 import { useAttributesQuery } from '@/lib/hooks/useAttributesQuery';
 import { formatDate } from '@/utils/formatDate';
+import type { Attribute } from '../types';
 
 const columns: DataTableColumnDef<Attribute>[] = [
   {

@@ -12,57 +12,25 @@ import { useForm } from '@tanstack/react-form';
 import { useQueryClient } from '@tanstack/react-query';
 import { Minus, Plus } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { getAttributeDetailRoute } from '@/lib/client/routes';
 import { attributesQueryKeys } from '@/lib/hooks/useAttributesQuery';
-import { createAttribute } from './api';
+import { createAttributeDefaultValues } from './constants';
 import {
-  attributeNameDefaultValue,
-  attributeNameSchema,
-  validateAttributeName,
-} from './validations';
-
-type CreateAttributeFormValues = {
-  name: string;
-  attributeValues: string[];
-};
-
-const normalizeAttributeValues = (attributeValues: string[]) =>
-  attributeValues.map((value) => value.trim()).filter(Boolean);
-
-const submitCreateAttribute = async (value: CreateAttributeFormValues) => {
-  const result = await createAttribute({
-    name: attributeNameSchema.parse(value.name),
-    sortOrder: 0,
-    attributeValues: normalizeAttributeValues(value.attributeValues),
-  });
-
-  if (!result.ok) {
-    return {
-      ok: false,
-      error: {
-        fieldErrors: result.error.fieldErrors,
-        formError: result.error.message,
-      },
-    } as const;
-  }
-
-  return {
-    ok: true,
-    data: result.data,
-  } as const;
-};
+  getAttributeValueFieldId,
+  getEmptyAttributeValueField,
+} from './utils/fields';
+import { submitCreateAttribute } from './utils/submitAction';
+import { validateAttributeName } from './utils/validations';
 
 export const CreateAttributeDialog = () => {
   const { add: addToast } = useToastManager();
   const queryClient = useQueryClient();
   const router = useRouter();
+  const nextAttributeValueFieldId = useRef(1);
   const [open, setOpen] = useState(false);
   const form = useForm({
-    defaultValues: {
-      name: attributeNameDefaultValue,
-      attributeValues: [''],
-    },
+    defaultValues: createAttributeDefaultValues,
     onSubmit: async ({ formApi, value }) => {
       const result = await submitCreateAttribute(value);
 
@@ -91,6 +59,16 @@ export const CreateAttributeDialog = () => {
       router.push(getAttributeDetailRoute(result.data.id));
     },
   });
+
+  const createAttributeValue = () => {
+    const attributeValue = getEmptyAttributeValueField(
+      nextAttributeValueFieldId.current
+    );
+
+    nextAttributeValueFieldId.current += 1;
+
+    return attributeValue;
+  };
 
   const resetForm = () => {
     form.reset();
@@ -168,21 +146,27 @@ export const CreateAttributeDialog = () => {
                           {field.state.value.map((attributeValue, index) => {
                             const isLastItem =
                               index === field.state.value.length - 1;
+                            const fieldId =
+                              attributeValue?.id ??
+                              getAttributeValueFieldId(index);
 
                             return (
                               <div
                                 className="flex items-start gap-[var(--space-0-5)]"
-                                key={`${index}-${attributeValue}`}
+                                key={fieldId}
                               >
                                 <form.Field
-                                  name={`attributeValues[${index}]` as const}
+                                  name={
+                                    `attributeValues[${index}].value` as const
+                                  }
                                 >
                                   {(subField) => {
                                     const fieldError =
                                       subField.state.meta.errorMap.onSubmit;
+                                    const attributeValue =
+                                      subField.state.value ?? '';
                                     const isAddButtonDisabled =
-                                      isLastItem &&
-                                      !subField.state.value.trim();
+                                      isLastItem && !attributeValue.trim();
 
                                     return (
                                       <TextField
@@ -198,13 +182,13 @@ export const CreateAttributeDialog = () => {
                                             disabled={isAddButtonDisabled}
                                             onClick={() => {
                                               if (isLastItem) {
-                                                if (
-                                                  !subField.state.value.trim()
-                                                ) {
+                                                if (!attributeValue.trim()) {
                                                   return;
                                                 }
 
-                                                field.pushValue('');
+                                                field.pushValue(
+                                                  createAttributeValue()
+                                                );
 
                                                 return;
                                               }
@@ -230,7 +214,7 @@ export const CreateAttributeDialog = () => {
                                         }
                                         placeholder="Attribute value"
                                         size="s"
-                                        value={subField.state.value}
+                                        value={attributeValue}
                                       />
                                     );
                                   }}

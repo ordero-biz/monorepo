@@ -1,13 +1,13 @@
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { getAttributes } from '@/lib/client/api';
+import { getAttributes } from '@/lib/client/api/attributes';
 import { getAttributeDetailRoute } from '@/lib/client/routes';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { AttributeDataTable } from './AttributeDataTable';
 
-vi.mock('@/lib/client/api', async () => ({
-  ...(await vi.importActual<typeof import('@/lib/client/api')>(
-    '@/lib/client/api'
+vi.mock('@/lib/client/api/attributes', async () => ({
+  ...(await vi.importActual<typeof import('@/lib/client/api/attributes')>(
+    '@/lib/client/api/attributes'
   )),
   getAttributes: vi.fn(),
 }));

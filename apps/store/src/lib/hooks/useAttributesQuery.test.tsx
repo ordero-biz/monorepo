@@ -1,16 +1,15 @@
 import { render, screen, waitFor } from '@testing-library/react';
-import { getAttributes } from '@/lib/client/api';
+import { getAttributes } from '@/lib/client/api/attributes';
 import {
   createTestQueryClient,
   createTestQueryProvider,
 } from '@/test/prepareSetup';
 import { useAttributesQuery } from './useAttributesQuery';
 
-vi.mock('@/lib/client/api', async () => {
-  const actual =
-    await vi.importActual<typeof import('@/lib/client/api')>(
-      '@/lib/client/api'
-    );
+vi.mock('@/lib/client/api/attributes', async () => {
+  const actual = await vi.importActual<
+    typeof import('@/lib/client/api/attributes')
+  >('@/lib/client/api/attributes');
 
   return {
     ...actual,

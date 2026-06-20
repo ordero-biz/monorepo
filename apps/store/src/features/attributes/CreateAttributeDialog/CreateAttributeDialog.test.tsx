@@ -1,10 +1,10 @@
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { CreateAttributeDialog } from '@/features/attributes';
+import { createAttribute } from '@/lib/client/api/attributes';
 import { getAttributeDetailRoute } from '@/lib/client/routes';
 import { attributesQueryKeys } from '@/lib/hooks/useAttributesQuery';
 import { prepareStoreSetup } from '@/test/prepareSetup';
-import { createAttribute } from './api';
 
 const routerPushMock = vi.fn();
 
@@ -14,8 +14,10 @@ vi.mock('next/navigation', () => ({
   }),
 }));
 
-vi.mock('./api', async () => ({
-  ...(await vi.importActual<typeof import('./api')>('./api')),
+vi.mock('@/lib/client/api/attributes', async () => ({
+  ...(await vi.importActual<typeof import('@/lib/client/api/attributes')>(
+    '@/lib/client/api/attributes'
+  )),
   createAttribute: vi.fn(),
 }));
 
@@ -43,7 +45,7 @@ describe('CreateAttributeDialog', () => {
     ).toBeVisible();
   });
 
-  it('requires a valid attribute name before create is available', async () => {
+  it('requires an attribute name before create is available', async () => {
     const user = userEvent.setup();
 
     setup();
@@ -57,13 +59,11 @@ describe('CreateAttributeDialog', () => {
 
     expect(createButton).toBeDisabled();
 
-    await user.type(nameField, 'abc');
+    await user.type(nameField, '   ');
     await user.tab();
 
     expect(
-      within(dialog).getByText(
-        'Attribute name must contain at least 4 characters.'
-      )
+      within(dialog).getByText('Attribute name is required')
     ).toBeVisible();
     expect(createButton).toBeDisabled();
 
