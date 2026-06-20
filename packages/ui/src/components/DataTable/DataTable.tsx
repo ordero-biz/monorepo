@@ -83,18 +83,6 @@ const getColumnStyle = ({
   } satisfies CSSProperties;
 };
 
-const isInteractiveTarget = (target: EventTarget | null) => {
-  if (!(target instanceof Element)) {
-    return false;
-  }
-
-  return Boolean(
-    target.closest(
-      'a, button, input, select, textarea, label, [role="button"], [role="link"]'
-    )
-  );
-};
-
 export const DataTableCell = ({ children }: DataTableCellProps) => (
   <div className="flex items-center p-[var(--spacing-2)] text-card-foreground">{children}</div>
 );
@@ -107,7 +95,6 @@ export const DataTable = <TData,>({
   getRowCanSelect,
   getRowId,
   manualSorting = false,
-  onRowClick,
   onRowSelectionChange,
   onSortingChange,
   rowSelection,
@@ -209,23 +196,8 @@ export const DataTable = <TData,>({
               table.getRowModel().rows.map((row) => (
                 <tr
                   key={row.id}
-                  className={cn(
-                    'bg-card last:[&_td]:border-b-0 data-[state=selected]:bg-[var(--color-primary-8)]',
-                    onRowClick &&
-                      'cursor-pointer transition-colors hover:bg-[var(--background-neutral)]'
-                  )}
+                  className="bg-card last:[&_td]:border-b-0 data-[state=selected]:bg-[var(--color-primary-8)]"
                   data-state={row.getIsSelected() ? 'selected' : undefined}
-                  onClick={(event) => {
-                    if (!onRowClick || isInteractiveTarget(event.target)) {
-                      return;
-                    }
-
-                    onRowClick({
-                      index: row.index,
-                      row: row.original,
-                      tableRow: row,
-                    });
-                  }}
                 >
                   {row.getVisibleCells().map((cell) => {
                     const meta = cell.column.columnDef.meta;
