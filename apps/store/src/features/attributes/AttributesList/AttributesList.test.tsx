@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { getAttributes } from '@/lib/client/api/attributes';
 import { getAttributeDetailRoute } from '@/lib/client/routes';
 import { prepareStoreSetup } from '@/test/prepareSetup';
-import { AttributeDataTable } from './AttributeDataTable';
+import { AttributesList } from './AttributesList';
 
 vi.mock('@/lib/client/api/attributes', async () => ({
   ...(await vi.importActual<typeof import('@/lib/client/api/attributes')>(
@@ -15,10 +15,10 @@ vi.mock('@/lib/client/api/attributes', async () => ({
 const getAttributesMock = vi.mocked(getAttributes);
 
 const { setup } = prepareStoreSetup({
-  component: AttributeDataTable,
+  component: AttributesList,
 });
 
-describe('AttributeDataTable', () => {
+describe('AttributesList', () => {
   beforeEach(() => {
     getAttributesMock.mockReset();
   });

@@ -49,7 +49,7 @@ const columns: DataTableColumnDef<Attribute>[] = [
   },
 ];
 
-export const AttributeDataTable = () => {
+export const AttributesList = () => {
   const attributesQuery = useAttributesQuery();
 
   if (attributesQuery.isPending) {
