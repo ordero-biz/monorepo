@@ -9,10 +9,12 @@ import {
   useToastManager,
 } from '@ordero/ui';
 import { useForm } from '@tanstack/react-form';
+import { useQueryClient } from '@tanstack/react-query';
 import { Minus, Plus } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { getAttributeDetailRoute } from '@/lib/client/routes';
+import { attributesQueryKeys } from '@/lib/hooks/useAttributesQuery';
 import { createAttribute } from './api';
 import {
   attributeNameDefaultValue,
@@ -53,6 +55,7 @@ const submitCreateAttribute = async (value: CreateAttributeFormValues) => {
 
 export const CreateAttributeDialog = () => {
   const { add: addToast } = useToastManager();
+  const queryClient = useQueryClient();
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const form = useForm({
@@ -82,6 +85,9 @@ export const CreateAttributeDialog = () => {
 
       setOpen(false);
       formApi.reset();
+      await queryClient.invalidateQueries({
+        queryKey: attributesQueryKeys.list,
+      });
       router.push(getAttributeDetailRoute(result.data.id));
     },
   });

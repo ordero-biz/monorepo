@@ -74,6 +74,8 @@ For writes:
 - use a direct client helper or `useMutation`
 - keep the underlying request uncached
 - invalidate affected query keys after success
+- after creating a new entity, invalidate the relevant list query key unless the
+  new entity is deliberately seeded into every affected cached list
 - seed query data when the mutation result is the new source of truth
 - keep form backend errors mapped into TanStack Form submit errors when applicable
 
@@ -129,7 +131,9 @@ Required coverage for new request flows:
 - normalized backend error shape
 - field error mapping when forms are involved
 - Bearer header forwarding for authenticated backend calls
-- cache seeding or invalidation when cached state is affected, but verify that at the cache/helper integration layer rather than in library-agnostic form tests
+- cache seeding or invalidation when cached state is affected, including list
+  invalidation after create flows; verify this at the cache/helper integration
+  layer rather than in library-agnostic form tests
 - auth cookie clearing on backend `401` when relevant
 
 ## Validation

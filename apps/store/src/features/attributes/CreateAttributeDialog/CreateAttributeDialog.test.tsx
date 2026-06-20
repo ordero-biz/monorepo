@@ -1,7 +1,8 @@
-import { screen, within } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { CreateAttributeDialog } from '@/features/attributes';
 import { getAttributeDetailRoute } from '@/lib/client/routes';
+import { attributesQueryKeys } from '@/lib/hooks/useAttributesQuery';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { createAttribute } from './api';
 
@@ -126,7 +127,9 @@ describe('CreateAttributeDialog', () => {
       },
     });
 
-    setup();
+    const { queryClient } = setup();
+    const invalidateQueriesSpy = vi.spyOn(queryClient, 'invalidateQueries');
+
     await user.click(screen.getByRole('button', { name: 'Create Attribute' }));
 
     const dialog = screen.getByRole('dialog', { name: 'Create new attribute' });
@@ -156,9 +159,12 @@ describe('CreateAttributeDialog', () => {
       sortOrder: 0,
       attributeValues: ['Green', 'Blue'],
     });
-    expect(routerPushMock).toHaveBeenCalledWith(
-      getAttributeDetailRoute(1)
+    await waitFor(() =>
+      expect(invalidateQueriesSpy).toHaveBeenCalledWith({
+        queryKey: attributesQueryKeys.list,
+      })
     );
+    expect(routerPushMock).toHaveBeenCalledWith(getAttributeDetailRoute(1));
     expect(
       screen.queryByRole('dialog', { name: 'Create new attribute' })
     ).not.toBeInTheDocument();
