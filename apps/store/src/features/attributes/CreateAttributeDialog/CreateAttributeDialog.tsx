@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import { useRef, useState } from 'react';
 import { getAttributeDetailRoute } from '@/lib/client/routes';
 import { attributesQueryKeys } from '@/lib/hooks/useAttributesQuery';
+import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error';
 import { INITIAL_ATTRIBUTE_VALUE_FIELD_INDEX } from './constants';
 import { useCreateAttributeForm } from './hooks/useCreateAttributeForm';
 import {
@@ -80,13 +81,9 @@ export const CreateAttributeDialog = () => {
                     }}
                   >
                     {(field) => {
-                      const submitError = field.state.meta.errorMap.onSubmit;
-                      const changeError = field.state.meta.errorMap.onChange;
-                      const errorText = submitError
-                        ? submitError
-                        : field.state.meta.isBlurred
-                          ? changeError
-                          : undefined;
+                      const errorText = getFieldSubmitChangeErrorText(
+                        field.state.meta
+                      );
 
                       return (
                         <TextField
