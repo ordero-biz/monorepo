@@ -208,8 +208,9 @@ When the diff touches `@tanstack/react-table`, `useReactTable`, shared table pri
 
 ## Form review rules
 
-When the diff touches feature forms, form validation, submit handling, or
-backend error mapping, also review against `docs/forms.md` and `docs/testing.md`.
+When the diff touches feature forms, form validation, submit handling, backend
+error mapping, or a `useCreateXForm`/`useUpdateXForm` hook, also review against
+`docs/forms.md`, `docs/testing.md`, and `feature-form-architecture`.
 
 Expect the form architecture to preserve these boundaries:
 
@@ -217,6 +218,17 @@ Expect the form architecture to preserve these boundaries:
 - Zod schemas and validation helpers stay feature-owned
 - shared UI fields remain presentational and form-library agnostic
 - backend validation remains authoritative over client validation
+- feature workflow shells own dialog/page/drawer state, navigation, query
+  invalidation, and UI-lifecycle reset behavior
+- feature form components own `<form>` markup, layout, field composition,
+  validation message placement, submit buttons, and controlled props passed to
+  presentational UI components
+- feature form hooks own form initialization, submit orchestration, backend
+  error mapping, submit toasts, and narrow success callbacks
+- field sections own dense field groups, field-array row factories, local row
+  ids, add/remove behavior, and section-specific layout
+- success callbacks such as `onCreated`, `onUpdated`, or `onSuccess` carry the
+  smallest useful result back to the workflow layer for side effects
 
 Expect the validation UX to preserve these defaults unless the feature has a
 clear documented reason to differ:
@@ -238,6 +250,16 @@ Review submit and error handling for:
 When form behavior changes, expect targeted tests that cover the user-visible
 validation and submit behavior. Use `docs/testing.md` as the source of truth for
 the testing split between component tests and Playwright flows.
+
+For form-hook tests that only need to submit the hook and assert submit-side
+effects, expect the app-local generic helper instead of one-off fixture
+components. In `apps/store`, this means importing `prepareFormHookTestSetup`
+from `@/test/prepareFormHookTestSetup`, mocking the feature submit action, and
+asserting hook-specific behavior such as success callbacks, submit-error toasts,
+and no success callback on failure. Treat feature-specific fixture forms,
+hardcoded fields, custom submit labels, or field UI assertions in these hook
+tests as a likely maintainability finding unless the test is intentionally
+covering field rendering behavior.
 
 ## Shared package review rules
 
