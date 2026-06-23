@@ -11,8 +11,8 @@ import { useForm } from '@tanstack/react-form';
 import { useQueryClient } from '@tanstack/react-query';
 import { signIn } from '@/lib/client/api';
 import { authQueryKeys } from '@/lib/hooks/useSessionQuery';
+import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error';
 import { signInDefaultValues } from './constants';
-import { getErrorMessage } from './utils/error';
 import {
   type SignInFormValues,
   validateSignInEmail,
@@ -86,16 +86,7 @@ export const SignInForm = () => {
         }}
       >
         {(field) => {
-          const submitError = field.state.meta.errorMap.onSubmit;
-          const changeError = field.state.meta.errorMap.onChange;
-          const submitErrorText = submitError
-            ? getErrorMessage(submitError)
-            : undefined;
-          const changeErrorText =
-            !submitErrorText && field.state.meta.isBlurred && changeError
-              ? getErrorMessage(changeError)
-              : undefined;
-          const errorText = submitErrorText ?? changeErrorText;
+          const errorText = getFieldSubmitChangeErrorText(field.state.meta);
 
           return (
             <TextField
@@ -124,16 +115,7 @@ export const SignInForm = () => {
           }}
         >
           {(field) => {
-            const submitError = field.state.meta.errorMap.onSubmit;
-            const changeError = field.state.meta.errorMap.onChange;
-            const submitErrorText = submitError
-              ? getErrorMessage(submitError)
-              : undefined;
-            const changeErrorText =
-              !submitErrorText && field.state.meta.isBlurred && changeError
-                ? getErrorMessage(changeError)
-                : undefined;
-            const errorText = submitErrorText ?? changeErrorText;
+            const errorText = getFieldSubmitChangeErrorText(field.state.meta);
 
             return (
               <PasswordField

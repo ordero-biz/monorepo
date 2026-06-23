@@ -187,4 +187,50 @@ describe('CreateAttributeDialog', () => {
       })
     ).not.toBeInTheDocument();
   });
+
+  it('shows backend errors and keeps the dialog open when submit fails', async () => {
+    const user = userEvent.setup();
+    createAttributeMock.mockResolvedValue({
+      ok: false,
+      error: {
+        status: 422,
+        message: 'Attribute creation failed.',
+        fieldErrors: {
+          name: 'Attribute name already exists.',
+        },
+      },
+    });
+
+    setup();
+
+    await user.click(screen.getByRole('button', { name: 'Create Attribute' }));
+
+    const dialog = screen.getByRole('dialog', { name: 'Create new attribute' });
+    const nameField = within(dialog).getByRole('textbox', {
+      name: 'Attribute name',
+    });
+
+    await user.type(nameField, 'Material');
+    await user.click(within(dialog).getByRole('button', { name: 'Create' }));
+
+    expect(createAttributeMock).toHaveBeenCalledWith({
+      name: 'Material',
+      sortOrder: 0,
+      attributeValues: [],
+    });
+    expect(
+      await within(dialog).findByText('Attribute name already exists.')
+    ).toBeVisible();
+    expect(nameField).toHaveAccessibleDescription(
+      'Attribute name already exists.'
+    );
+    expect(
+      await screen.findByRole('dialog', { name: 'Attribute creation failed.' })
+    ).toBeVisible();
+    expect(
+      screen.getByRole('dialog', { name: 'Create new attribute' })
+    ).toBeVisible();
+    expect(nameField).toHaveValue('Material');
+    expect(routerPushMock).not.toHaveBeenCalled();
+  });
 });

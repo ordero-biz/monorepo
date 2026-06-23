@@ -1,85 +1,55 @@
 'use client';
 
-import {
-  Button,
-  Dialog,
-  IconButton,
-  TextField,
-  Typography,
-  useToastManager,
-} from '@ordero/ui';
-import { useForm } from '@tanstack/react-form';
+import { Button, Dialog, IconButton, TextField, Typography } from '@ordero/ui';
 import { useQueryClient } from '@tanstack/react-query';
 import { Minus, Plus } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useRef, useState } from 'react';
 import { getAttributeDetailRoute } from '@/lib/client/routes';
 import { attributesQueryKeys } from '@/lib/hooks/useAttributesQuery';
-import { createAttributeDefaultValues } from './constants';
+import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error';
+import { INITIAL_ATTRIBUTE_VALUE_FIELD_INDEX } from './constants';
+import { useCreateAttributeForm } from './hooks/useCreateAttributeForm';
 import {
   getAttributeValueFieldId,
   getEmptyAttributeValueField,
 } from './utils/fields';
-import { submitCreateAttribute } from './utils/submitAction';
 import { validateAttributeName } from './utils/validations';
 
 export const CreateAttributeDialog = () => {
-  const { add: addToast } = useToastManager();
   const queryClient = useQueryClient();
   const router = useRouter();
-  const nextAttributeValueFieldId = useRef(1);
+  const nextAttributeValueFieldIndex = useRef(
+    INITIAL_ATTRIBUTE_VALUE_FIELD_INDEX + 1
+  );
   const [open, setOpen] = useState(false);
-  const form = useForm({
-    defaultValues: createAttributeDefaultValues,
-    onSubmit: async ({ formApi, value }) => {
-      const result = await submitCreateAttribute(value);
 
-      if (!result.ok) {
-        formApi.setErrorMap({
-          onSubmit: {
-            fields: result.error.fieldErrors ?? {},
-          },
-        });
-
-        if (result.error.formError) {
-          addToast({
-            description: result.error.formError,
-            type: 'error',
-          });
-        }
-
-        return;
-      }
-
+  const { form } = useCreateAttributeForm({
+    onCreated: async (attributeId) => {
       setOpen(false);
-      formApi.reset();
       await queryClient.invalidateQueries({
         queryKey: attributesQueryKeys.list,
       });
-      router.push(getAttributeDetailRoute(result.data.id));
+      router.push(getAttributeDetailRoute(attributeId));
     },
   });
-
-  const createAttributeValue = () => {
-    const attributeValue = getEmptyAttributeValueField(
-      nextAttributeValueFieldId.current
-    );
-
-    nextAttributeValueFieldId.current += 1;
-
-    return attributeValue;
-  };
-
-  const resetForm = () => {
-    form.reset();
-  };
 
   const handleOpenChange = (nextOpen: boolean) => {
     setOpen(nextOpen);
 
     if (!nextOpen) {
-      resetForm();
+      form.reset();
     }
+  };
+
+  const createAttributeValue = () => {
+    const attributeValue = getEmptyAttributeValueField(
+      nextAttributeValueFieldIndex.current
+    );
+
+    nextAttributeValueFieldIndex.current += 1;
+
+    return attributeValue;
   };
 
   return (
@@ -111,13 +81,9 @@ export const CreateAttributeDialog = () => {
                     }}
                   >
                     {(field) => {
-                      const submitError = field.state.meta.errorMap.onSubmit;
-                      const changeError = field.state.meta.errorMap.onChange;
-                      const errorText = submitError
-                        ? submitError
-                        : field.state.meta.isBlurred
-                          ? changeError
-                          : undefined;
+                      const errorText = getFieldSubmitChangeErrorText(
+                        field.state.meta
+                      );
 
                       return (
                         <TextField

@@ -1,5 +1,5 @@
-import { Typography } from '@ordero/ui';
-import { CreateAttributeDialog } from '@/features/attributes';
+import { Typography } from '@/ui/index';
+import { CreateAttributeDialog } from '../CreateAttributeDialog/CreateAttributeDialog';
 
 export const AttributesListHeader = () => (
   <div className="p-[var(--space-1-25)]">
