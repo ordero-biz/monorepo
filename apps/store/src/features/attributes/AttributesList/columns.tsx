@@ -14,7 +14,7 @@ export const columns: DataTableColumnDef<Attribute>[] = [
     cell: ({ row }) => (
       <DataTableCell>
         <Link
-          className="inline-flex max-w-full rounded-[var(--radius-sm)] text-[var(--primary-dark)] outline-none transition-colors hover:text-[var(--primary-darker)] hover:underline focus-visible:ring-3 focus-visible:ring-ring/50"
+          className="w-full font-600 rounded-[var(--radius-sm)] outline-none transition-colors hover:text-[var(--color-text-body)] hover:underline"
           href={getAttributeDetailRoute(row.original.id)}
         >
           {row.original.name}
