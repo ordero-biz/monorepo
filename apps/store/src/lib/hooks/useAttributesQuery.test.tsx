@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { renderHook, waitFor } from '@testing-library/react';
 import { getAttributes } from '@/lib/client/api/attributes';
 import {
   createTestQueryClient,
@@ -19,53 +19,68 @@ vi.mock('@/lib/client/api/attributes', async () => {
 
 const getAttributesMock = vi.mocked(getAttributes);
 
-const AttributesStatus = () => {
-  const attributes = useAttributesQuery();
-
-  if (attributes.isPending) {
-    return <span>Loading</span>;
-  }
-
-  return <span>{attributes.data?.content.length ?? 0} attributes</span>;
-};
-
 describe('attributes queries', () => {
   beforeEach(() => {
     getAttributesMock.mockReset();
   });
 
-  it('caches the attributes query while data is fresh', async () => {
+  it('returns attributes data and caches the query while data is fresh', async () => {
+    const attributes = {
+      content: [
+        {
+          id: 1,
+          name: 'Size',
+          sortOrder: 10,
+          createdAt: '2026-05-26T20:55:51.542Z',
+        },
+      ],
+      page: {
+        size: 25,
+        number: 0,
+        totalElements: 1,
+        totalPages: 1,
+      },
+    };
+
     getAttributesMock.mockResolvedValue({
       ok: true,
-      data: {
-        content: [
-          {
-            id: 1,
-            name: 'Size',
-            sortOrder: 10,
-            createdAt: '2026-05-26T20:55:51.542Z',
-          },
-        ],
-        page: {
-          size: 25,
-          number: 0,
-          totalElements: 1,
-          totalPages: 1,
-        },
-      },
+      data: attributes,
     });
 
     const queryClient = createTestQueryClient();
     const TestQueryProvider = createTestQueryProvider(queryClient);
-    const { rerender } = render(<AttributesStatus />, {
+    const { result, rerender } = renderHook(() => useAttributesQuery(), {
       wrapper: TestQueryProvider,
     });
 
-    await waitFor(() => expect(screen.getByText('1 attributes')).toBeVisible());
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(result.current.data).toEqual(attributes);
 
-    rerender(<AttributesStatus />);
+    rerender();
 
-    await waitFor(() => expect(screen.getByText('1 attributes')).toBeVisible());
+    expect(result.current.data).toEqual(attributes);
+    expect(getAttributesMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('exposes the attributes request error without retrying', async () => {
+    const error = {
+      status: 500,
+      message: 'Unable to load attributes',
+    };
+
+    getAttributesMock.mockResolvedValue({
+      ok: false,
+      error,
+    });
+
+    const queryClient = createTestQueryClient();
+    const TestQueryProvider = createTestQueryProvider(queryClient);
+    const { result } = renderHook(() => useAttributesQuery(), {
+      wrapper: TestQueryProvider,
+    });
+
+    await waitFor(() => expect(result.current.isError).toBe(true));
+    expect(result.current.error).toEqual(error);
     expect(getAttributesMock).toHaveBeenCalledTimes(1);
   });
 });
