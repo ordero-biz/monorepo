@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { renderHook, waitFor } from '@testing-library/react';
 import { getStores } from '@/lib/client/api';
 import {
   createTestQueryClient,
@@ -20,44 +20,59 @@ vi.mock('@/lib/client/api', async () => {
 
 const getStoresMock = vi.mocked(getStores);
 
-const StoresStatus = () => {
-  const stores = useStoresQuery();
-
-  if (stores.isPending) {
-    return <span>Loading</span>;
-  }
-
-  return <span>{stores.data?.length ?? 0} stores</span>;
-};
-
 describe('stores queries', () => {
   beforeEach(() => {
     getStoresMock.mockReset();
   });
 
-  it('caches the stores query while data is fresh', async () => {
+  it('returns stores data and caches the query while data is fresh', async () => {
+    const stores = [
+      {
+        id: 1,
+        name: 'North Shop',
+        subDomain: 'north-shop',
+      },
+    ];
+
     getStoresMock.mockResolvedValue({
       ok: true,
-      data: [
-        {
-          id: 1,
-          name: 'North Shop',
-          subDomain: 'north-shop',
-        },
-      ],
+      data: stores,
     });
 
     const queryClient = createTestQueryClient();
     const TestQueryProvider = createTestQueryProvider(queryClient);
-    const { rerender } = render(<StoresStatus />, {
+    const { result, rerender } = renderHook(() => useStoresQuery(), {
       wrapper: TestQueryProvider,
     });
 
-    await waitFor(() => expect(screen.getByText('1 stores')).toBeVisible());
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(result.current.data).toEqual(stores);
 
-    rerender(<StoresStatus />);
+    rerender();
 
-    await waitFor(() => expect(screen.getByText('1 stores')).toBeVisible());
+    expect(result.current.data).toEqual(stores);
+    expect(getStoresMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('exposes the stores request error without retrying', async () => {
+    const error = {
+      status: 500,
+      message: 'Unable to load stores',
+    };
+
+    getStoresMock.mockResolvedValue({
+      ok: false,
+      error,
+    });
+
+    const queryClient = createTestQueryClient();
+    const TestQueryProvider = createTestQueryProvider(queryClient);
+    const { result } = renderHook(() => useStoresQuery(), {
+      wrapper: TestQueryProvider,
+    });
+
+    await waitFor(() => expect(result.current.isError).toBe(true));
+    expect(result.current.error).toEqual(error);
     expect(getStoresMock).toHaveBeenCalledTimes(1);
   });
 });

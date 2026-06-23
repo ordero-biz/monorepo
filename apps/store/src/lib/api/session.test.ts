@@ -45,7 +45,7 @@ describe('getServerSession', () => {
       shouldClearAuthCookie: false,
     });
     expect(fetchBackendDataMock).toHaveBeenCalledWith({
-      path: '/me',
+      path: '/api/v1/employees/me',
       init: {
         method: 'GET',
       },

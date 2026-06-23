@@ -45,7 +45,12 @@ export type DataTableSelectionCellProps<TData extends RowData> = {
   row: Row<TData>;
 };
 
+export type DataTableCellProps = {
+  children: ReactNode;
+};
+
 export type DataTableRowSelectionState = RowSelectionState;
+
 export type DataTableSortingState = SortingState;
 
 export type DataTableProps<TData> = {

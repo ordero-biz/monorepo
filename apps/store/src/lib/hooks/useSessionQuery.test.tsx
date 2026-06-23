@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { renderHook, waitFor } from '@testing-library/react';
 import { getSession } from '@/lib/client/api';
 import {
   createTestQueryClient,
@@ -20,45 +20,58 @@ vi.mock('@/lib/client/api', async () => {
 
 const getSessionMock = vi.mocked(getSession);
 
-const SessionStatus = () => {
-  const session = useSessionQuery();
-
-  if (session.isPending) {
-    return <span>Loading</span>;
-  }
-
-  return (
-    <span>{session.data?.authenticated ? 'Signed in' : 'Signed out'}</span>
-  );
-};
-
 describe('auth queries', () => {
   beforeEach(() => {
     getSessionMock.mockReset();
   });
 
-  it('caches the session query while data is fresh', async () => {
+  it('returns session data and caches the query while data is fresh', async () => {
+    const session = {
+      authenticated: true,
+      user: {
+        email: 'admin@gmail.com',
+      },
+    } as const;
+
     getSessionMock.mockResolvedValue({
       ok: true,
-      data: {
-        authenticated: true,
-        user: {
-          email: 'admin@gmail.com',
-        },
-      },
+      data: session,
     });
 
     const queryClient = createTestQueryClient();
     const TestQueryProvider = createTestQueryProvider(queryClient);
-    const { rerender } = render(<SessionStatus />, {
+    const { result, rerender } = renderHook(() => useSessionQuery(), {
       wrapper: TestQueryProvider,
     });
 
-    await waitFor(() => expect(screen.getByText('Signed in')).toBeVisible());
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(result.current.data).toEqual(session);
 
-    rerender(<SessionStatus />);
+    rerender();
 
-    await waitFor(() => expect(screen.getByText('Signed in')).toBeVisible());
+    expect(result.current.data).toEqual(session);
+    expect(getSessionMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('exposes the session request error without retrying', async () => {
+    const error = {
+      status: 401,
+      message: 'Unauthorized',
+    };
+
+    getSessionMock.mockResolvedValue({
+      ok: false,
+      error,
+    });
+
+    const queryClient = createTestQueryClient();
+    const TestQueryProvider = createTestQueryProvider(queryClient);
+    const { result } = renderHook(() => useSessionQuery(), {
+      wrapper: TestQueryProvider,
+    });
+
+    await waitFor(() => expect(result.current.isError).toBe(true));
+    expect(result.current.error).toEqual(error);
     expect(getSessionMock).toHaveBeenCalledTimes(1);
   });
 });

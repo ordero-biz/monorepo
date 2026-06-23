@@ -45,7 +45,7 @@ describe('POST /api/auth/sign-in', () => {
     );
     expect(response.headers.get('set-cookie')).toContain('HttpOnly');
     expect(fetchMock).toHaveBeenCalledWith(
-      new URL('/api/v1/platform/owners/login', backendApiUrl),
+      new URL('/api/v1/platform/owners/sign-in', backendApiUrl),
       expect.objectContaining({
         method: 'POST',
       })

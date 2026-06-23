@@ -4,6 +4,7 @@ import { format, parseISO } from 'date-fns';
 import { Chip } from '@/ui/components/Chip';
 import {
   DataTable,
+  DataTableCell,
   DataTableColumnHeader,
   DataTableSelectionCell,
   DataTableSelectionColumnHeader,
@@ -166,6 +167,17 @@ const renderTextCell = (value: string) => (
   </div>
 );
 
+const renderLinkCell = (row: ProductRow) => (
+  <DataTableCell>
+    <a
+      className="inline-flex max-w-full rounded-[var(--radius-sm)] text-[var(--primary-dark)] outline-none transition-colors hover:text-[var(--primary-darker)] hover:underline focus-visible:ring-3 focus-visible:ring-ring/50"
+      href={`/products/${row.id}`}
+    >
+      {row.name}
+    </a>
+  </DataTableCell>
+);
+
 const columns: DataTableColumnDef<ProductRow>[] = [
   {
     accessorKey: 'name',
@@ -298,5 +310,37 @@ export const Empty: Story = {
   args: {
     data: [],
     emptyMessage: 'No matching products found.',
+  },
+};
+
+export const WithLinkCell: Story = {
+  args: {
+    columns: [
+      {
+        accessorKey: 'name',
+        cell: ({ row }) => renderLinkCell(row.original),
+        header: ({ column }) => (
+          <DataTableColumnHeader column={column} title="Product" />
+        ),
+      },
+      {
+        accessorKey: 'createdAt',
+        cell: ({ row }) =>
+          renderTextCell(formatCreatedAt(row.original.createdAt)),
+        header: ({ column }) => (
+          <DataTableColumnHeader column={column} title="Create at" />
+        ),
+        meta: { wrap: 'nowrap' },
+      },
+      {
+        accessorKey: 'price',
+        cell: ({ row }) => renderTextCell(formatPrice(row.original.price)),
+        header: ({ column }) => (
+          <DataTableColumnHeader column={column} title="Price" />
+        ),
+        meta: { wrap: 'nowrap' },
+      },
+    ],
+    selectable: false,
   },
 };

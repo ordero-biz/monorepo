@@ -14,4 +14,16 @@ export type AuthSignInInput = {
   password: string;
 };
 
+export type PageMetadata = {
+  size: number;
+  number: number;
+  totalElements: number;
+  totalPages: number;
+};
+
+export type PaginatedResponse<T> = {
+  content: T[];
+  page: PageMetadata;
+};
+
 export type { ApiError, ApiResult, Token } from '@ordero/api-types';
