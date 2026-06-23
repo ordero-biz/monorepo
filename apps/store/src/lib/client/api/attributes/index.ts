@@ -1,7 +1,7 @@
 'use client';
 
-import type { Attribute } from '@/features/attributes/types';
 import type { PaginatedResponse } from '@/lib/api/types';
+import type { Attribute } from '@/lib/domain/attributes';
 import { CLIENT_BACKEND_PATHS } from '../../apiPaths';
 import { apiFetch } from '../../fetch';
 

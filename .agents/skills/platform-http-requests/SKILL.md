@@ -36,6 +36,13 @@ Use the existing architecture unless the user explicitly asks for a redesign.
 - Keep browser-safe request transport in `@ordero/api-client`.
 - Keep Next.js server/BFF helpers in `@ordero/next-api`.
 - Keep app-domain schemas, routes, form payloads, and feature request helpers app-owned unless multiple apps truly need them.
+- Keep shared app-owned domain entity types outside feature folders when both
+  features and request helpers need them, for example in
+  `src/lib/domain/[resource].ts`; avoid making `src/lib` import from
+  `src/features`.
+- Keep request/response DTOs near the API helper when backend wire shapes
+  differ from domain entities, and map DTOs to domain entities before returning
+  them to feature code.
 - Browser code must not import server-only packages such as `@ordero/next-api`.
 
 ## Adding A Client Request

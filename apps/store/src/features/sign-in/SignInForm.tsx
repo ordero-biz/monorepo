@@ -1,71 +1,20 @@
 'use client';
 
-import {
-  Button,
-  PasswordField,
-  TextField,
-  Typography,
-  useToastManager,
-} from '@ordero/ui';
-import { useForm } from '@tanstack/react-form';
+import { Button, PasswordField, TextField, Typography } from '@ordero/ui';
 import { useQueryClient } from '@tanstack/react-query';
-import { signIn } from '@/lib/client/api';
 import { authQueryKeys } from '@/lib/hooks/useSessionQuery';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error';
-import { signInDefaultValues } from './constants';
+import { useSignInForm } from './hooks/useSignInForm';
 import {
-  type SignInFormValues,
   validateSignInEmail,
   validateSignInPassword,
 } from './utils/validations';
 
-const submitSignInToBackend = async (value: SignInFormValues) => {
-  const result = await signIn(value);
-
-  if (!result.ok) {
-    return {
-      ok: false,
-      error: {
-        fieldErrors: result.error.fieldErrors,
-        formError: result.error.message,
-      },
-    } as const;
-  }
-
-  return {
-    ok: true,
-    data: result.data,
-  } as const;
-};
-
 export const SignInForm = () => {
   const queryClient = useQueryClient();
-  const { add: addToast } = useToastManager();
-  const form = useForm({
-    defaultValues: signInDefaultValues,
-    onSubmit: async ({ formApi, value }) => {
-      const result = await submitSignInToBackend(value);
-
-      if (!result.ok) {
-        formApi.setErrorMap({
-          onSubmit: {
-            fields: result.error.fieldErrors ?? {},
-          },
-        });
-        if (result.error.formError) {
-          addToast({
-            description: result.error.formError,
-            type: 'error',
-          });
-        }
-        return;
-      }
-
-      queryClient.setQueryData(authQueryKeys.session, result.data);
-      formApi.reset({
-        ...signInDefaultValues,
-        email: value.email,
-      });
+  const { form } = useSignInForm({
+    onSignedIn: (session) => {
+      queryClient.setQueryData(authQueryKeys.session, session);
     },
   });
 
