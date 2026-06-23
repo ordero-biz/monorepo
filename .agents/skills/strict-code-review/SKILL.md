@@ -87,6 +87,9 @@ Keep the human review focus on issues that configs do not judge well, such as:
 - unsafe type escapes like `as any`, `@ts-ignore`, or broad assertions used to dodge modeling work
 - signatures or APIs that are technically valid but awkward, ambiguous, or easy to misuse
 - broken imports, exports, or alias usage that suggest structural drift
+- lower-level `src/lib` app code importing app-owned types from `src/features`;
+  prefer a shared domain module such as `src/lib/domain/[resource].ts`, with
+  separate API DTO types only when wire and domain shapes differ
 - convention breaks from `AGENTS.md` and local skills that reflect architecture, not formatting
 
 ## Docs to consult by change type
