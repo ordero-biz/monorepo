@@ -3,9 +3,9 @@
 `apps/platform` and `apps/store` use a BFF-style HTTP architecture for
 authenticated REST requests. The browser never reads the JWT directly. Next.js
 route handlers own the token cookie and forward authenticated requests to the
-backend with a Bearer header. Server-rendered auth pages reuse the same backend
-validation rules through shared server helpers instead of relying on middleware
-redirects.
+backend with a Bearer header. Server-rendered auth pages and protected route
+groups reuse the same backend validation rules through shared server helpers
+instead of relying on middleware redirects.
 
 ## Boundaries
 
@@ -13,6 +13,7 @@ redirects.
 flowchart LR
   browser["Browser UI"]
   authPage["Server auth pages<br/>/sign-in and /sign-up"]
+  protectedPage["Protected pages/layouts<br/>route groups and server pages"]
   clientApi["Client request helpers<br/>src/lib/client/api.ts"]
   clientFetch["@ordero/api-client<br/>apiFetch()"]
   query["TanStack Query<br/>Providers + auth queries"]
@@ -24,6 +25,7 @@ flowchart LR
   backend["REST backend<br/>BACKEND_API_URL"]
 
   authPage --> session
+  protectedPage --> session
   browser --> clientApi
   browser --> query
   query --> clientApi
@@ -45,6 +47,7 @@ Key rules:
 - The JWT is stored in the `ordero_access_token` HttpOnly cookie.
 - Server route handlers read the cookie and attach `Authorization: Bearer ...`.
 - Server auth pages use the shared `getServerSession()` helper before render.
+- Protected pages and layouts use the same server-session guard before render.
 - Cached reads use TanStack Query. Auth actions and mutations use direct
   uncached calls.
 - App-owned request helpers and route handlers may use local wrappers under
@@ -269,7 +272,7 @@ Forwarding rules:
 
 ## Auth Page Guard Flow
 
-Auth-page redirects now happen in the server page layer, not in `proxy.ts`.
+Auth-page redirects happen in the server page layer, not in `proxy.ts`.
 `/sign-in` and `/sign-up` call `hasAuthenticatedServerSession()`, which reads
 the cookie through `next/headers` and reuses `getServerSession()`.
 
@@ -303,7 +306,45 @@ Current guard behavior:
 - authenticated users are redirected away from `/sign-in` and `/sign-up`
 - stale cookies do not block access to auth pages
 - backend outages do not block auth-page rendering
-- protected application routes are intentionally not guarded yet
+
+## Protected Route Guard Flow
+
+Protected app routes are guarded in the server page or layout that owns the
+route. The guard should call the app-local `hasAuthenticatedServerSession()`
+wrapper and redirect unauthenticated users to the app-owned sign-in route.
+Examples in this branch include platform store pages and the store app
+`(protected)` route group layout.
+
+```mermaid
+sequenceDiagram
+  participant Browser
+  participant Page as Protected page/layout
+  participant Guard as hasAuthenticatedServerSession()
+  participant Cookie as next/headers cookies()
+  participant Session as getServerSession()
+  participant Backend as GET /me
+
+  Browser->>Page: Request protected route
+  Page->>Guard: Check server session
+  Guard->>Cookie: Read ordero_access_token
+  Guard->>Session: getServerSession(token)
+  alt valid token
+    Session->>Backend: GET /me with Bearer token
+    Backend-->>Session: AuthUser
+    Session-->>Page: authenticated
+    Page-->>Browser: render protected content
+  else no token, stale token, or backend error
+    Session-->>Page: unauthenticated
+    Page-->>Browser: redirect('/sign-in')
+  end
+```
+
+Current protected-route behavior:
+
+- protected route checks live in server pages or layouts, not middleware
+- unauthenticated users are redirected to the app-owned sign-in route
+- platform currently guards store pages individually
+- store currently guards the `(protected)` route group layout
 
 ## Error Shape
 
@@ -337,11 +378,15 @@ When present, sign-in and sign-up map them into TanStack Form submit errors.
   normalization, and raw-response forwarding.
 - Review `@ordero/api-client` and the app-local `src/lib/client/fetch.ts` for
   browser-side request serialization and `ApiError` normalization.
-- Review `src/lib/client/api.ts` for feature-facing same-origin request
-  helpers.
+- Review `src/lib/client/apiPaths.ts` and `src/lib/api/backendPaths.ts` for
+  app-owned route constants and repeated path strings.
+- Review `src/lib/client/api.ts` and resource modules under
+  `src/lib/client/api/*` for feature-facing same-origin request helpers.
 - Review `/api/auth/*` route handlers for cookie ownership and safe session
   responses.
 - Review `src/lib/api/authPageGuard.ts` and the auth pages for redirect
   decisions before render.
+- Review protected pages and route-group layouts for the same server-session
+  guard before render.
 - Review `/api/backend/[...path]` for request forwarding and 401 cleanup.
 - Review the relevant feature form or query hook for the current integration.

@@ -28,22 +28,35 @@ Owns form-specific layouts, behavior, and states:
 
 ## Recommended Structure & Canonical Flow
 
-To keep forms predictable and consistent, adopt the following folder structure and step-by-step lifecycle:
+To keep forms predictable and consistent, start with the smallest readable
+feature-owned structure and split along responsibility boundaries as the flow
+grows:
 
 ```
 feature-folder/
-├── constants.ts          # 1. Default values and static configs
-├── Form.tsx              # 2. TanStack Form instance & feature layout
+├── FeatureFlow.tsx            # dialog/page/drawer workflow and side effects
+├── FeatureForm.tsx            # <form>, layout, fields, submit button
+├── hooks/
+│   └── useFeatureForm.ts      # form setup, submit orchestration, errors
+├── constants.ts               # default values and static configs
 └── utils/
-    └── validations.ts    # 3. Zod schema & client-side helper functions
+    ├── submitAction.ts        # request call and backend error normalization
+    └── validations.ts         # Zod schema and client validators
 ```
+
+The actual names should stay domain-specific. A simple page form may combine
+the workflow, form component, and hook responsibilities while it remains easy
+to read. Extract a form hook or field section when submit handling, backend
+error mapping, query invalidation, navigation, dialog reset, or dense field
+groups start competing inside the same component.
 
 ### Flow Lifecycle
 1. **Initialize**: Define defaults in `constants.ts` and Zod schema in `validations.ts`.
-2. **Setup**: Instantiate TanStack Form inside `Form.tsx`, passing controlled props to presentational fields from `packages/ui`.
+2. **Setup**: Instantiate TanStack Form inside the feature form or feature hook, passing controlled props to presentational fields from `packages/ui`.
 3. **Validate UX**: Reveal client validation errors on **blur**, then update validation state **live** during correction.
-4. **Submit**: Collect values via `onSubmit` and dispatch to the API.
-5. **Handle Errors**: Map backend field errors to the form state using `setErrorMap`, and show form-level errors via a toast notification.
+4. **Submit**: Collect values via `onSubmit` and call the feature-owned submit action or client request helper.
+5. **Handle Errors**: Map backend field errors to the form state using `setErrorMap`, and show form-level errors through the shared toast surface.
+6. **Finish Workflow**: Keep route navigation, dialog close/reset, and TanStack Query cache invalidation in the workflow layer or the simple route form that owns the workflow.
 
 ---
 
@@ -92,6 +105,22 @@ Common controls can be moved into `packages/ui` as shared presentational compone
 - Complex presentational interactive states decoupled from form-library schemas.
 
 Keep the component in the local feature if it requires knowledge of TanStack Form state, submit state, schema knowledge, or backend response formats.
+
+## Form Hook Tests
+
+Use the app-local `prepareFormHookTestSetup` helper when a hook test only needs
+to submit the form and assert submit-side effects. Both `apps/platform` and
+`apps/store` provide this helper under `src/test/prepareFormHookTestSetup`.
+
+Use hook tests for behavior such as:
+
+- success callbacks receiving the smallest useful result
+- backend field errors being mapped through `setErrorMap`
+- form-level submit errors being shown through toasts
+- success callbacks not firing on failure
+
+Keep field labels, visible validation messages, and field-array interactions in
+feature form/component tests instead.
 
 ---
 

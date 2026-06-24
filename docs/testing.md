@@ -129,7 +129,7 @@ pnpm --dir apps/store test
 Run a specific app unit test file:
 
 ```bash
-pnpm --dir apps/platform test src/features/log-in/LogInForm.test.tsx
+pnpm --dir apps/platform test src/features/sign-in/SignInForm.test.tsx
 ```
 
 Run all app E2E tests through Turbo:
@@ -154,7 +154,7 @@ pnpm --dir apps/store test:e2e
 Run a specific E2E file:
 
 ```bash
-pnpm --dir apps/platform test:e2e:file e2e/LogInForm.spec.ts
+pnpm --dir apps/platform test:e2e:file e2e/SignInForm.spec.ts
 pnpm --dir apps/store test:e2e:file e2e/Home.spec.ts
 ```
 
@@ -168,7 +168,7 @@ pnpm --dir apps/store test:e2e:grep "renders the starter page"
 Pass extra Playwright flags after the script arguments when needed:
 
 ```bash
-pnpm --dir apps/platform test:e2e:file e2e/LogInForm.spec.ts --project=chromium
+pnpm --dir apps/platform test:e2e:file e2e/SignInForm.spec.ts --project=chromium
 ```
 
 ## App Test Setup
@@ -244,7 +244,7 @@ exploration. It is not the CI runner.
 Use it to inspect the real page, generate locators, and debug interactions:
 
 ```bash
-pnpm exec playwright-cli open http://127.0.0.1:3000/log-in --headed
+pnpm exec playwright-cli open http://127.0.0.1:3000/sign-in --headed
 pnpm exec playwright-cli snapshot
 pnpm exec playwright-cli generate-locator e19 --raw
 ```
@@ -261,3 +261,14 @@ Feature forms should use unit/component tests for field-level UX rules:
 
 Use Playwright for the routed form flows that prove browser integration and
 submit behavior on the real page.
+
+For form-hook tests that only need to submit the hook and assert submit-side
+effects, use the app-local helper:
+
+- `apps/platform/src/test/prepareFormHookTestSetup`
+- `apps/store/src/test/prepareFormHookTestSetup`
+
+Mock the feature submit action, submit through the helper form, and assert
+hook-owned behavior such as success callbacks, toast errors, and no success
+callback on failure. Keep field rendering, labels, visible validation messages,
+and field-array interactions in component tests.
