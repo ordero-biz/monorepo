@@ -8,7 +8,7 @@ type BackendSignInResponse = {
   ownerResponse: {
     id: string;
     email: string;
-  }
+  };
 };
 
 export const POST = async (request: NextRequest) => {

@@ -45,8 +45,8 @@ export const SignUpForm = () => {
       <form.Field
         name="email"
         validators={{
-          onChange: ({ value }) => validateSignUpEmail(value),
-          onSubmit: ({ value }) => validateSignUpEmail(value),
+          onChange: validateSignUpEmail,
+          onSubmit: validateSignUpEmail,
         }}
       >
         {(field) => {
@@ -60,7 +60,7 @@ export const SignUpForm = () => {
               label="Email address"
               name={field.name}
               onBlur={field.handleBlur}
-              onValueChange={(value) => field.handleChange(value)}
+              onValueChange={field.handleChange}
               placeholder="example@gmail.com"
               required
               size="s"
@@ -74,8 +74,8 @@ export const SignUpForm = () => {
         <form.Field
           name="password"
           validators={{
-            onChange: ({ value }) => validateSignUpPassword(value),
-            onSubmit: ({ value }) => validateSignUpPassword(value),
+            onChange: validateSignUpPassword,
+            onSubmit: validateSignUpPassword,
           }}
         >
           {(field) => {
@@ -89,7 +89,7 @@ export const SignUpForm = () => {
                 label="Password"
                 name={field.name}
                 onBlur={field.handleBlur}
-                onValueChange={(value) => field.handleChange(value)}
+                onValueChange={field.handleChange}
                 placeholder="6+ characters"
                 required
                 size="s"
@@ -102,7 +102,7 @@ export const SignUpForm = () => {
         <form.Field
           name="acceptTerms"
           validators={{
-            onSubmit: ({ value }) => validateAcceptTerms(value),
+            onSubmit: validateAcceptTerms,
           }}
         >
           {(field) => {
@@ -118,9 +118,7 @@ export const SignUpForm = () => {
                   color="primary"
                   name={field.name}
                   onBlur={field.handleBlur}
-                  onCheckedChange={(checked) =>
-                    field.handleChange(checked)
-                  }
+                  onCheckedChange={field.handleChange}
                   size="s"
                 >
                   <span className="text-[var(--text-secondary)]">
@@ -141,11 +139,11 @@ export const SignUpForm = () => {
                     .
                   </span>
                 </Checkbox>
-                {errorText ? (
+                {errorText && (
                   <Typography color="error" variant="caption">
                     {errorText}
                   </Typography>
-                ) : null}
+                )}
               </div>
             );
           }}

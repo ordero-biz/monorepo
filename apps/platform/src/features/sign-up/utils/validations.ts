@@ -3,6 +3,7 @@ import {
   signInEmailSchema,
   signInPasswordSchema,
 } from '@/features/sign-in/utils/validations';
+import type { ValidationArgs } from '@/lib/utils/form/validation/types';
 
 export const acceptTermsSchema = z
   .boolean()
@@ -16,19 +17,19 @@ export const signUpSchema = z.object({
 
 export type SignUpFormValues = z.infer<typeof signUpSchema>;
 
-export const validateSignUpEmail = (value: string) => {
+export const validateSignUpEmail = ({ value }: ValidationArgs<string>) => {
   const result = signInEmailSchema.safeParse(value);
 
   return result.success ? undefined : result.error.issues[0]?.message;
 };
 
-export const validateSignUpPassword = (value: string) => {
+export const validateSignUpPassword = ({ value }: ValidationArgs<string>) => {
   const result = signInPasswordSchema.safeParse(value);
 
   return result.success ? undefined : result.error.issues[0]?.message;
 };
 
-export const validateAcceptTerms = (value: boolean) => {
+export const validateAcceptTerms = ({ value }: ValidationArgs<boolean>) => {
   const result = acceptTermsSchema.safeParse(value);
 
   return result.success ? undefined : result.error.issues[0]?.message;

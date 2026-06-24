@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { ValidationArgs } from '@/lib/utils/form/validation/types';
 
 const requiredStoreFieldMessage = 'This field is required.';
 
@@ -19,13 +20,13 @@ export const addStoreSchema = z.object({
 
 export type AddStoreFormValues = z.infer<typeof addStoreSchema>;
 
-export const validateStoreName = (value: string) => {
+export const validateStoreName = ({ value }: ValidationArgs<string>) => {
   const result = storeNameSchema.safeParse(value);
 
   return result.success ? undefined : result.error.issues[0]?.message;
 };
 
-export const validateStoreSubDomain = (value: string) => {
+export const validateStoreSubDomain = ({ value }: ValidationArgs<string>) => {
   const result = storeSubDomainSchema.safeParse(value);
 
   return result.success ? undefined : result.error.issues[0]?.message;
