@@ -5,3 +5,8 @@ export type Attribute = {
   values?: string[];
   createdAt: string;
 };
+
+export type AttributeValue = Pick<
+  Attribute,
+  'id' | 'name' | 'sortOrder' | 'createdAt'
+>;
