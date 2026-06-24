@@ -21,7 +21,11 @@ utils/validations.ts             # schemas and client validators
 utils/submitAction.ts            # feature-owned request normalization and submit call
 ```
 
-Keep the actual names domain-specific. For a small feature, `CreateAttributeDialog.tsx` can be both workflow shell and form component until extracting a separate `CreateAttributeForm.tsx` buys clarity.
+Keep the actual names domain-specific. A small page form can combine workflow,
+form component, and hook duties while it remains easy to read. Extract a
+separate hook, submit action, or field section when backend error mapping,
+toasts, query invalidation, navigation, dialog reset, or dense field groups
+start competing in one component.
 
 ## Responsibility Boundaries
 
@@ -130,7 +134,13 @@ Use shared form error helpers when repeated submit/change precedence logic appea
 
 Cover user-visible form behavior with component tests: validation timing, disabled states, submit/reset behavior, backend field errors, and visible toast/form errors.
 
-For tests that focus on form-hook submit behavior rather than field rendering, use the app-local generic form-hook setup helper instead of creating a one-off test component for each hook. In `apps/store`, import `prepareFormHookTestSetup` from `@/test/prepareFormHookTestSetup`. Use it to render a submit-only form, mock the feature submit action, and assert hook-specific behavior such as calling `onCreated`, not calling success callbacks on failure, and showing submit-error toasts.
+For tests that focus on form-hook submit behavior rather than field rendering,
+use the app-local generic form-hook setup helper instead of creating a one-off
+test component for each hook. In both `apps/platform` and `apps/store`, import
+`prepareFormHookTestSetup` from `@/test/prepareFormHookTestSetup`. Use it to
+render a submit-only form, mock the feature submit action, and assert
+hook-specific behavior such as calling `onCreated`, not calling success
+callbacks on failure, and showing submit-error toasts.
 
 Do not add fields, labels, custom submit text, or feature-specific fixture components to a form-hook test unless that test is intentionally covering field UI behavior. Put field rendering, accessible labels, visible validation messages, and field-array interactions in the feature form/component tests.
 

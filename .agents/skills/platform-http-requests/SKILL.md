@@ -30,6 +30,8 @@ Use the existing architecture unless the user explicitly asks for a redesign.
 - Next.js route handlers own cookie reads/writes and backend forwarding.
 - Server-side backend requests attach `Authorization: Bearer <token>`.
 - Use `BACKEND_API_URL` only from server-side code.
+- Keep same-origin client route constants in `src/lib/client/apiPaths.ts`.
+- Keep backend endpoint constants in `src/lib/api/backendPaths.ts`.
 - Normalize backend failures into the shared `ApiError` shape.
 - Use `ApiResult<T>` for client helper return values instead of throwing for ordinary HTTP failures.
 - Keep shared HTTP/auth contracts in `@ordero/api-types`.
@@ -44,6 +46,9 @@ Use the existing architecture unless the user explicitly asks for a redesign.
   differ from domain entities, and map DTOs to domain entities before returning
   them to feature code.
 - Browser code must not import server-only packages such as `@ordero/next-api`.
+- Keep app-wide client providers in `src/app/AppProviders.tsx`; add Query,
+  toast, or other app-wide providers there instead of nesting parallel wrappers
+  in layouts and pages.
 
 ## Adding A Client Request
 
@@ -54,9 +59,15 @@ For uncached calls:
 - point it at a same-origin `/api/*` route
 - return `ApiResult<T>`
 
+For larger app-owned resources, a nested resource helper under
+`src/lib/client/api/[resource]/index.ts` is acceptable. Keep app-level auth and
+small shared helpers in `src/lib/client/api.ts` unless a resource-specific
+module improves ownership.
+
 For authenticated backend REST calls:
 
-- call `/api/backend/[resource]` from the client
+- call an app-owned `CLIENT_BACKEND_PATHS` entry under `/api/backend/...` from
+  the client
 - let `app/api/backend/[...path]/route.ts` attach the Bearer token
 - do not introduce direct browser calls to `BACKEND_API_URL`
 
@@ -70,7 +81,8 @@ Required shape:
 - call a client API helper from the `queryFn`
 - throw `result.error` only after receiving `{ ok: false }`
 - keep auth-sensitive queries on `retry: false` unless there is a clear reason to opt in
-- rely on the app provider defaults before adding per-query options
+- rely on `AppProviders` defaults before adding per-query options; the current
+  default query behavior is `retry: false` and `staleTime: 60_000`
 
 Do not use `useQuery` for writes, login, logout, or submit actions.
 
@@ -106,6 +118,20 @@ When adding `/api/auth/*` or `/api/backend/*` behavior:
 - forward only intentional headers; `/api/backend/[...path]` forwards `origin`
   because the backend uses it for tenant/domain resolution
 
+## Adding Server Guards
+
+Use server pages or layouts for auth redirects and protected route checks.
+
+- Auth pages such as `/sign-in` and `/sign-up` should call the app-local
+  `hasAuthenticatedServerSession()` wrapper and redirect authenticated users
+  before rendering the form.
+- Protected pages or route-group layouts should call the same wrapper and
+  redirect unauthenticated users to `clientRoutes.signIn`.
+- Do not move these checks into middleware or browser-only effects unless the
+  routing architecture changes intentionally.
+- Keep the app-local wrapper in `src/lib/api/authPageGuard.ts`; it delegates to
+  `@ordero/next-api/authPageGuard`.
+
 ## Tests
 
 Choose the smallest layer that proves the behavior:
@@ -118,6 +144,9 @@ Choose the smallest layer that proves the behavior:
   package behavior changes; keep app route-handler tests focused on app wiring
 - query hooks, form hooks, and components that call app-owned request helpers: mock the nearest app-owned request helper rather than `fetch`
 - route handlers: Vitest with `NextRequest` and mocked nearest app-owned server request helper; mock backend `fetch` only when the route handler itself calls backend `fetch` directly
+- server guards: test the server page or layout with a mocked app-local
+  `hasAuthenticatedServerSession()` wrapper and assert the redirect/render
+  decision
 - form integration: Testing Library component tests
 - routed browser flows: Playwright
 
@@ -165,4 +194,5 @@ Run E2E tests when route guards or routed browser flows change:
 
 ```bash
 pnpm --dir apps/platform test:e2e
+pnpm --dir apps/store test:e2e
 ```

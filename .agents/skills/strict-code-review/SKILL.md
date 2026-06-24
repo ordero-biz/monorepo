@@ -256,13 +256,13 @@ the testing split between component tests and Playwright flows.
 
 For form-hook tests that only need to submit the hook and assert submit-side
 effects, expect the app-local generic helper instead of one-off fixture
-components. In `apps/store`, this means importing `prepareFormHookTestSetup`
-from `@/test/prepareFormHookTestSetup`, mocking the feature submit action, and
-asserting hook-specific behavior such as success callbacks, submit-error toasts,
-and no success callback on failure. Treat feature-specific fixture forms,
-hardcoded fields, custom submit labels, or field UI assertions in these hook
-tests as a likely maintainability finding unless the test is intentionally
-covering field rendering behavior.
+components. In both `apps/platform` and `apps/store`, this means importing
+`prepareFormHookTestSetup` from `@/test/prepareFormHookTestSetup`, mocking the
+feature submit action, and asserting hook-specific behavior such as success
+callbacks, submit-error toasts, and no success callback on failure. Treat
+feature-specific fixture forms, hardcoded fields, custom submit labels, or
+field UI assertions in these hook tests as a likely maintainability finding
+unless the test is intentionally covering field rendering behavior.
 
 ## Shared package review rules
 
@@ -277,13 +277,22 @@ Expect these boundaries:
 - browser-safe request transport lives in `@ordero/api-client`
 - Next.js server/BFF helpers live in `@ordero/next-api`
 - browser code does not import `@ordero/next-api`
+- same-origin client route constants live in `src/lib/client/apiPaths.ts`
+- backend endpoint constants live in `src/lib/api/backendPaths.ts`
 - app-domain schemas, app routes, form payloads, and feature request helpers
   stay app-owned unless multiple apps truly need them
+- app-wide Query, toast, and similar providers are added through
+  `src/app/AppProviders.tsx`
 
 Raise a finding when a change crosses these boundaries without a clear reason,
 such as putting a platform-only store model into `@ordero/api-types`, importing
 server-only helpers into Client Components, or adding direct browser calls to
 `BACKEND_API_URL`.
+
+For server guards, expect auth pages and protected pages/layouts to use the
+app-local `hasAuthenticatedServerSession()` wrapper before render. Review route
+guard changes for stale-cookie behavior, backend-error behavior, and redirect
+targets owned by `clientRoutes`.
 
 ## Validation expectations
 

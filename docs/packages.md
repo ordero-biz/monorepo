@@ -34,6 +34,9 @@ It must stay safe for Client Components and browser bundles:
 
 Apps should keep feature-facing helpers in `apps/*/src/lib/client/api.ts`.
 Those helpers call same-origin `/api/*` routes through `apiFetch<T>()`.
+Keep same-origin API path constants in `apps/*/src/lib/client/apiPaths.ts`.
+Resource-specific helper modules under `src/lib/client/api/*` are acceptable
+when a resource grows beyond the flat app helper.
 
 ### `@ordero/next-api`
 
@@ -52,6 +55,8 @@ This package is server-only. Browser code and Client Components must not import
 it. Apps keep their route handlers under `apps/*/src/app/api/*` and can expose
 thin local wrappers from `apps/*/src/lib/api/*` when that preserves stable app
 imports.
+Keep backend endpoint constants in `apps/*/src/lib/api/backendPaths.ts` so route
+handlers and session helpers do not repeat backend path strings.
 
 ### `@ordero/ui`
 
@@ -68,6 +73,7 @@ Shared Vitest configuration helpers.
 Keep these in the app that owns the behavior:
 
 - app routes and navigation constants
+- same-origin API path constants and backend endpoint constants
 - feature-facing client API helpers
 - form payloads and validation schemas
 - app-specific user shapes
