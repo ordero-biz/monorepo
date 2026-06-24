@@ -54,7 +54,7 @@ export const CreateAttributeDialog = () => {
 
   return (
     <Dialog.Root onOpenChange={handleOpenChange} open={open}>
-      <Dialog.Trigger>Create attribute</Dialog.Trigger>
+      <Dialog.Trigger>Create Attribute</Dialog.Trigger>
 
       <Dialog.Portal>
         <Dialog.Backdrop />

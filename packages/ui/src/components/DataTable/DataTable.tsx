@@ -84,7 +84,9 @@ const getColumnStyle = ({
 };
 
 export const DataTableCell = ({ children }: DataTableCellProps) => (
-  <div className="flex items-center p-[var(--spacing-2)] text-card-foreground">{children}</div>
+  <div className="flex items-center p-[var(--spacing-2)] text-card-foreground">
+    {children}
+  </div>
 );
 
 export const DataTable = <TData,>({

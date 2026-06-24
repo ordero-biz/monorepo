@@ -1,11 +1,13 @@
-import { Typography } from '@/ui/index';
-import { CreateAttributeDialog } from '../CreateAttributeDialog/CreateAttributeDialog';
+import { PageHeader, Typography } from '@ordero/ui';
+import { CreateAttributeDialog } from '@/features/attributes';
 
 export const AttributesListHeader = () => (
-  <div className="p-[var(--space-1-25)]">
-    <div className="flex items-start justify-between gap-[var(--space-2)]">
+  <PageHeader.Root>
+    <PageHeader.Left>
       <Typography variant="h5">Attributes list</Typography>
+    </PageHeader.Left>
+    <PageHeader.Right>
       <CreateAttributeDialog />
-    </div>
-  </div>
+    </PageHeader.Right>
+  </PageHeader.Root>
 );
