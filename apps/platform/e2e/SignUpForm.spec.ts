@@ -66,7 +66,7 @@ test.describe('SignUpForm', () => {
     ).toBeVisible();
   });
 
-  test('keeps the email and clears the password and checkbox after successful sign up', async ({
+  test('submits account credentials after successful sign up', async ({
     page,
   }) => {
     const expectedCredentials = {
@@ -78,6 +78,9 @@ test.describe('SignUpForm', () => {
       await route.fulfill({
         json: {
           authenticated: true,
+          user: {
+            email: expectedCredentials.email,
+          },
         },
       });
     });
@@ -100,9 +103,6 @@ test.describe('SignUpForm', () => {
 
     expect(signUpRequest.method()).toBe('POST');
     expect(signUpRequest.postDataJSON()).toEqual(expectedCredentials);
-    await expect(emailField).toHaveValue(expectedCredentials.email);
-    await expect(passwordField).toHaveValue('');
-    await expect(termsCheckbox).not.toBeChecked();
   });
 
   test('shows a toast when sign up fails with a form-level backend error', async ({

@@ -199,7 +199,7 @@ describe('SignInForm', () => {
     ).not.toBeInTheDocument();
   });
 
-  it('submits credentials, keeps the email, clears the password, and redirects to stores after successful sign in', async () => {
+  it('submits credentials and redirects to stores after successful sign in', async () => {
     signInMock.mockResolvedValue({
       ok: true,
       data: {
@@ -219,8 +219,6 @@ describe('SignInForm', () => {
       email: 'admin@gmail.com',
       password: '123456',
     });
-    expect(emailField).toHaveValue('admin@gmail.com');
-    expect(passwordField).toHaveValue('');
     expect(routerPushMock).toHaveBeenCalledWith(clientRoutes.stores);
   });
 

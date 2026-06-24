@@ -33,10 +33,6 @@ export const useSignUpForm = ({ onSignedUp }: UseSignUpFormArgs) => {
       }
 
       await onSignedUp(result.data);
-      formApi.reset({
-        ...signUpDefaultValues,
-        email: value.email,
-      });
     },
   });
 

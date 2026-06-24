@@ -3,8 +3,12 @@ import { BACKEND_AUTH_PATHS } from '@/lib/api/backendPaths';
 import { fetchBackendData, setAuthCookie } from '@/lib/api/server';
 import type { AuthSession, AuthSignInInput, Token } from '@/lib/api/types';
 
-type BackendLoginResponse = {
+type BackendSignInResponse = {
   token?: Token;
+  ownerResponse: {
+    id: string;
+    email: string;
+  }
 };
 
 export const POST = async (request: NextRequest) => {
@@ -22,7 +26,7 @@ export const POST = async (request: NextRequest) => {
     );
   }
 
-  const result = await fetchBackendData<BackendLoginResponse>({
+  const result = await fetchBackendData<BackendSignInResponse>({
     path: BACKEND_AUTH_PATHS.signIn,
     init: {
       method: 'POST',
@@ -49,6 +53,7 @@ export const POST = async (request: NextRequest) => {
 
   const response = NextResponse.json<AuthSession>({
     authenticated: true,
+    user: result.data.ownerResponse,
   });
 
   setAuthCookie(response, result.data.token);

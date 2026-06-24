@@ -24,6 +24,10 @@ describe('POST /api/auth/sign-in', () => {
       new Response(
         JSON.stringify({
           token: 'jwt-token',
+          ownerResponse: {
+            id: 'owner-id',
+            email: 'admin@gmail.com',
+          },
         })
       )
     );
@@ -39,6 +43,10 @@ describe('POST /api/auth/sign-in', () => {
 
     await expect(getJson(response)).resolves.toStrictEqual({
       authenticated: true,
+      user: {
+        id: 'owner-id',
+        email: 'admin@gmail.com',
+      },
     });
     expect(response.headers.get('set-cookie')).toContain(
       `${AUTH_TOKEN_COOKIE_NAME}=jwt-token`

@@ -9,6 +9,7 @@ import {
 } from '@ordero/ui';
 import { useQueryClient } from '@tanstack/react-query';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { clientRoutes } from '@/lib/client/routes';
 import { authQueryKeys } from '@/lib/hooks/useSessionQuery';
 import {
@@ -24,9 +25,11 @@ import {
 
 export const SignUpForm = () => {
   const queryClient = useQueryClient();
+  const router = useRouter();
   const { form } = useSignUpForm({
     onSignedUp: (session) => {
       queryClient.setQueryData(authQueryKeys.session, session);
+      router.push(clientRoutes.stores);
     },
   });
 
@@ -116,7 +119,7 @@ export const SignUpForm = () => {
                   name={field.name}
                   onBlur={field.handleBlur}
                   onCheckedChange={(checked) =>
-                    field.handleChange(checked === true)
+                    field.handleChange(checked)
                   }
                   size="s"
                 >
