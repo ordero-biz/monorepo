@@ -38,7 +38,7 @@ describe('POST /api/auth/sign-up', () => {
           password: 'securePassword1',
         }),
         headers: {
-          'content-type': 'application/json',
+          'content-type': 'text/plain',
           cookie: `${AUTH_TOKEN_COOKIE_NAME}=browser-cookie`,
         },
         method: 'POST',

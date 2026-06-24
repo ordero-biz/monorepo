@@ -30,11 +30,14 @@ export const POST = async (request: NextRequest) => {
     );
   }
 
+  const backendHeaders = new Headers(request.headers);
+  backendHeaders.set('Content-Type', 'application/json');
+
   const result = await fetchBackendResponse({
     path: BACKEND_AUTH_PATHS.signIn,
     init: {
       method: 'POST',
-      headers: request.headers,
+      headers: backendHeaders,
       body: JSON.stringify(input),
     },
   });
