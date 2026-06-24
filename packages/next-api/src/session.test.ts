@@ -3,12 +3,12 @@ import { resolveServerSession } from './session';
 
 describe('resolveServerSession', () => {
   it('returns a signed-out session when there is no token', async () => {
-    const fetchBackendData = vi.fn();
+    const fetchBackendResponse = vi.fn();
 
     await expect(
       resolveServerSession({
         mePath: '/me',
-        fetchBackendData,
+        fetchBackendResponse,
       })
     ).resolves.toStrictEqual({
       ok: true,
@@ -17,22 +17,24 @@ describe('resolveServerSession', () => {
       },
       shouldClearAuthCookie: false,
     });
-    expect(fetchBackendData).not.toHaveBeenCalled();
+    expect(fetchBackendResponse).not.toHaveBeenCalled();
   });
 
   it('returns an authenticated session when the backend accepts the token', async () => {
-    const fetchBackendData = vi.fn().mockResolvedValue({
+    const fetchBackendResponse = vi.fn().mockResolvedValue({
       ok: true,
-      data: {
-        email: 'admin@gmail.com',
-      },
+      data: new Response(
+        JSON.stringify({
+          email: 'admin@gmail.com',
+        })
+      ),
     });
 
     await expect(
       resolveServerSession({
         token: 'jwt-token',
         mePath: '/me',
-        fetchBackendData,
+        fetchBackendResponse,
       })
     ).resolves.toStrictEqual({
       ok: true,
@@ -44,7 +46,7 @@ describe('resolveServerSession', () => {
       },
       shouldClearAuthCookie: false,
     });
-    expect(fetchBackendData).toHaveBeenCalledWith({
+    expect(fetchBackendResponse).toHaveBeenCalledWith({
       path: '/me',
       init: {
         method: 'GET',
@@ -54,7 +56,7 @@ describe('resolveServerSession', () => {
   });
 
   it('returns a signed-out session and marks the cookie for clearing on 401', async () => {
-    const fetchBackendData = vi.fn().mockResolvedValue({
+    const fetchBackendResponse = vi.fn().mockResolvedValue({
       ok: false,
       error: {
         status: 401,
@@ -66,7 +68,7 @@ describe('resolveServerSession', () => {
       resolveServerSession({
         token: 'stale-token',
         mePath: '/me',
-        fetchBackendData,
+        fetchBackendResponse,
       })
     ).resolves.toStrictEqual({
       ok: true,
@@ -78,7 +80,7 @@ describe('resolveServerSession', () => {
   });
 
   it('returns non-auth backend errors unchanged', async () => {
-    const fetchBackendData = vi.fn().mockResolvedValue({
+    const fetchBackendResponse = vi.fn().mockResolvedValue({
       ok: false,
       error: {
         status: 500,
@@ -90,7 +92,7 @@ describe('resolveServerSession', () => {
       resolveServerSession({
         token: 'jwt-token',
         mePath: '/me',
-        fetchBackendData,
+        fetchBackendResponse,
       })
     ).resolves.toStrictEqual({
       ok: false,

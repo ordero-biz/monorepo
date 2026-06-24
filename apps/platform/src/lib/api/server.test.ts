@@ -2,10 +2,10 @@ import { AUTH_TOKEN_COOKIE_NAME } from '@ordero/next-api/server';
 import { NextRequest, NextResponse } from 'next/server';
 import {
   clearAuthCookie,
-  fetchBackendData,
   fetchBackendResponse,
   getApiErrorFromResponse,
   getTokenFromRequest,
+  parseBackendResponseData,
   setAuthCookie,
 } from './server';
 
@@ -200,37 +200,48 @@ describe('backend request helpers', () => {
     });
   });
 
-  it('returns parsed backend JSON data from fetchBackendData', async () => {
-    vi.mocked(fetch).mockResolvedValue(
-      new Response(
-        JSON.stringify({
-          id: 'order-1',
-        })
-      )
-    );
-
+  it('returns parsed backend JSON data', async () => {
     await expect(
-      fetchBackendData<{ id: string }>({
-        path: '/orders/order-1',
-      })
+      parseBackendResponseData<{ id: string }>(
+        new Response(
+          JSON.stringify({
+            id: 'order-1',
+          })
+        )
+      )
     ).resolves.toEqual({
-      ok: true,
-      data: {
-        id: 'order-1',
-      },
+      id: 'order-1',
     });
   });
 
-  it('returns plain text backend data from fetchBackendData when JSON parsing fails', async () => {
-    vi.mocked(fetch).mockResolvedValue(new Response('plain text body'));
-
+  it('returns plain text backend data when JSON parsing fails', async () => {
     await expect(
-      fetchBackendData<string>({
-        path: '/health',
-      })
-    ).resolves.toEqual({
-      ok: true,
-      data: 'plain text body',
+      parseBackendResponseData<string>(new Response('plain text body'))
+    ).resolves.toBe('plain text body');
+  });
+
+  it('uses the app forwarded header names for backend responses', async () => {
+    vi.mocked(fetch).mockResolvedValue(new Response('{}'));
+
+    await fetchBackendResponse({
+      path: '/orders',
+      init: {
+        headers: {
+          accept: 'application/json',
+          authorization: 'Bearer browser-token',
+          cookie: `${AUTH_TOKEN_COOKIE_NAME}=jwt-token`,
+          origin: 'https://tenant.example.test',
+          'x-forwarded-host': 'tenant.example.test',
+        },
+      },
+    });
+
+    const [, request] = vi.mocked(fetch).mock.calls[0] ?? [];
+    const headers = new Headers(request?.headers);
+
+    expect(Object.fromEntries(headers.entries())).toEqual({
+      accept: 'application/json',
+      origin: 'https://tenant.example.test',
     });
   });
 });

@@ -11,20 +11,6 @@ type BackendRouteContext = {
   }>;
 };
 
-const FORWARDED_HEADER_NAMES = new Set(['accept', 'content-type', 'origin']);
-
-const getForwardHeaders = (request: NextRequest) => {
-  const headers = new Headers();
-
-  for (const [key, value] of request.headers.entries()) {
-    if (FORWARDED_HEADER_NAMES.has(key.toLowerCase())) {
-      headers.set(key, value);
-    }
-  }
-
-  return headers;
-};
-
 const handleBackendRequest = async (
   request: NextRequest,
   context: BackendRouteContext
@@ -48,7 +34,7 @@ const handleBackendRequest = async (
     token,
     init: {
       method: request.method,
-      headers: getForwardHeaders(request),
+      headers: request.headers,
       body: request.body ?? undefined,
     },
   });

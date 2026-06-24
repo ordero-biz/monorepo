@@ -46,6 +46,8 @@ Use this package for:
 
 - backend REST calls from server code
 - backend error normalization
+- filtered backend header forwarding
+- shared backend response body parsing
 - auth cookie helpers
 - token reads from `NextRequest`
 - server-session resolution

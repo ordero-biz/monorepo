@@ -1,6 +1,10 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { BACKEND_AUTH_PATHS } from '@/lib/api/backendPaths';
-import { fetchBackendData, setAuthCookie } from '@/lib/api/server';
+import {
+  fetchBackendResponse,
+  parseBackendResponseData,
+  setAuthCookie,
+} from '@/lib/api/server';
 import type { AuthSession, AuthSignInInput, Token } from '@/lib/api/types';
 
 type BackendSignInResponse = {
@@ -26,13 +30,14 @@ export const POST = async (request: NextRequest) => {
     );
   }
 
-  const result = await fetchBackendData<BackendSignInResponse>({
+  const backendHeaders = new Headers(request.headers);
+  backendHeaders.set('Content-Type', 'application/json');
+
+  const result = await fetchBackendResponse({
     path: BACKEND_AUTH_PATHS.signIn,
     init: {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: backendHeaders,
       body: JSON.stringify(input),
     },
   });
@@ -41,7 +46,11 @@ export const POST = async (request: NextRequest) => {
     return NextResponse.json(result.error, { status: result.error.status });
   }
 
-  if (typeof result.data?.token !== 'string') {
+  const data = await parseBackendResponseData<BackendSignInResponse>(
+    result.data
+  );
+
+  if (typeof data?.token !== 'string') {
     return NextResponse.json(
       {
         status: 502,
@@ -53,10 +62,10 @@ export const POST = async (request: NextRequest) => {
 
   const response = NextResponse.json<AuthSession>({
     authenticated: true,
-    user: result.data.ownerResponse,
+    user: data.ownerResponse,
   });
 
-  setAuthCookie(response, result.data.token);
+  setAuthCookie(response, data.token);
 
   return response;
 };

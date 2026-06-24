@@ -238,8 +238,8 @@ sequenceDiagram
   alt no token
     Proxy-->>Fetch: 401 Authentication required
   else token exists
-    Proxy->>Server: fetchBackendResponse(path, method, body, search, token)
-    Server->>Backend: Forward request with Bearer token
+    Proxy->>Server: fetchBackendResponse(path, init with headers/body, search, token)
+    Server->>Backend: Forward filtered headers with Bearer token
     Backend-->>Server: REST response
     alt backend returns success
       Server-->>Proxy: raw Response
@@ -266,6 +266,10 @@ Forwarding rules:
 - forwards `origin` intentionally because the backend uses it for
   tenant/domain resolution; do not add other browser headers unless they become
   explicit backend contracts
+- route handlers pass request headers through `init.headers`; `fetchBackendResponse()`
+  always filters them through `getForwardHeaders()` before calling the backend
+- do not create alternate forwarding inputs that can bypass the shared
+  `FORWARDED_HEADER_NAMES` allow-list
 - forwards bodies for non-`GET` and non-`HEAD` methods
 - never forwards browser-readable JWT state because the browser cannot read the
   HttpOnly cookie
@@ -375,7 +379,8 @@ When present, sign-in and sign-up map them into TanStack Form submit errors.
   session resolution and cookie-clear decisions.
 - Review `@ordero/next-api` and the app-local `src/lib/api/server.ts` for
   backend URL handling, Bearer header logic, cookie helpers, error
-  normalization, and raw-response forwarding.
+  normalization, body parsing through `parseBackendResponseData()`, and
+  filtered raw-response forwarding.
 - Review `@ordero/api-client` and the app-local `src/lib/client/fetch.ts` for
   browser-side request serialization and `ApiError` normalization.
 - Review `src/lib/client/apiPaths.ts` and `src/lib/api/backendPaths.ts` for
@@ -389,4 +394,6 @@ When present, sign-in and sign-up map them into TanStack Form submit errors.
 - Review protected pages and route-group layouts for the same server-session
   guard before render.
 - Review `/api/backend/[...path]` for request forwarding and 401 cleanup.
+  Forward browser request headers through `init.headers` only; the shared
+  helper must own header filtering.
 - Review the relevant feature form or query hook for the current integration.
