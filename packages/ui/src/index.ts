@@ -81,6 +81,12 @@ export type {
   InputVariant,
 } from './components/Input/index';
 export { Input } from './components/Input/index';
+export type {
+  PageHeaderLeftProps,
+  PageHeaderProps,
+  PageHeaderRightProps,
+} from './components/PageHeader';
+export { PageHeader } from './components/PageHeader';
 export type { PasswordFieldProps } from './components/PasswordField';
 export { PasswordField } from './components/PasswordField';
 export type { RadioColor, RadioProps, RadioSize } from './components/Radio';
