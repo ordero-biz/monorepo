@@ -99,6 +99,9 @@ describe('client auth helpers', () => {
       new Response(
         JSON.stringify({
           authenticated: true,
+          user: {
+            email: 'new-user@gmail.com',
+          },
         })
       )
     );
@@ -112,6 +115,9 @@ describe('client auth helpers', () => {
       ok: true,
       data: {
         authenticated: true,
+        user: {
+          email: 'new-user@gmail.com',
+        },
       },
     });
 

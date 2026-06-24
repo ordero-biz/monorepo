@@ -72,15 +72,20 @@ test.describe('SignInForm', () => {
     ).toBeVisible();
   });
 
-  test('keeps the email and clears the password after successful sign in', async ({
+  test('submits credentials after successful sign in', async ({
     page,
   }) => {
+    const expectedCredentials = {
+      email: 'admin@gmail.com',
+      password: '123456',
+    };
+
     await page.route('**/api/auth/sign-in', async (route) => {
       await route.fulfill({
         json: {
           authenticated: true,
           user: {
-            email: 'admin@gmail.com',
+            email: expectedCredentials.email,
           },
         },
       });
@@ -89,16 +94,19 @@ test.describe('SignInForm', () => {
     const emailField = page.getByRole('textbox', { name: 'Email address' });
     const passwordField = page.getByRole('textbox', { name: 'Password' });
 
-    await emailField.pressSequentially('admin@gmail.com');
-    await passwordField.pressSequentially('123456');
+    await emailField.pressSequentially(expectedCredentials.email);
+    await passwordField.pressSequentially(expectedCredentials.password);
 
-    await expect(emailField).toHaveValue('admin@gmail.com');
-    await expect(passwordField).toHaveValue('123456');
+    await expect(emailField).toHaveValue(expectedCredentials.email);
+    await expect(passwordField).toHaveValue(expectedCredentials.password);
 
+    const signInRequestPromise = page.waitForRequest('**/api/auth/sign-in');
     await page.getByRole('button', { name: 'Sign in' }).click();
 
-    await expect(emailField).toHaveValue('admin@gmail.com');
-    await expect(passwordField).toHaveValue('');
+    const signInRequest = await signInRequestPromise;
+
+    expect(signInRequest.method()).toBe('POST');
+    expect(signInRequest.postDataJSON()).toEqual(expectedCredentials);
   });
 
   test('shows a toast when sign in fails with a form-level backend error', async ({

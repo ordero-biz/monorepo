@@ -5,6 +5,14 @@ import { clientRoutes } from '@/lib/client/routes';
 import { preparePlatformSetup } from '@/test/prepareSetup';
 import { SignUpForm } from './SignUpForm';
 
+const routerPushMock = vi.fn();
+
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({
+    push: routerPushMock,
+  }),
+}));
+
 vi.mock('@/lib/client/api', async () => ({
   ...(await vi.importActual<typeof import('@/lib/client/api')>(
     '@/lib/client/api'
@@ -37,6 +45,7 @@ const setupSignUpForm = () => {
 describe('SignUpForm', () => {
   beforeEach(() => {
     signUpMock.mockReset();
+    routerPushMock.mockClear();
   });
   it('renders the expected form controls', () => {
     const { emailField, passwordField, signUpButton, termsCheckbox } =
@@ -182,11 +191,14 @@ describe('SignUpForm', () => {
     ).not.toBeInTheDocument();
   });
 
-  it('keeps the email and clears the password after successful sign up', async () => {
+  it('submits account credentials and redirects to stores after successful sign up', async () => {
     signUpMock.mockResolvedValue({
       ok: true,
       data: {
         authenticated: true,
+        user: {
+          email: 'admin@gmail.com',
+        },
       },
     });
     const { emailField, passwordField, signUpButton, termsCheckbox, user } =
@@ -201,9 +213,7 @@ describe('SignUpForm', () => {
       email: 'admin@gmail.com',
       password: '123456',
     });
-    expect(emailField).toHaveValue('admin@gmail.com');
-    expect(passwordField).toHaveValue('');
-    expect(termsCheckbox).not.toBeChecked();
+    expect(routerPushMock).toHaveBeenCalledWith(clientRoutes.stores);
   });
 
   it('shows a toast when sign up fails with a form-level backend error', async () => {

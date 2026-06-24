@@ -5,6 +5,10 @@ import type { AuthSession, AuthSignUpInput, Token } from '@/lib/api/types';
 
 type BackendSignUpResponse = {
   token?: Token;
+  ownerResponse: {
+    id: string;
+    email: string;
+  };
 };
 
 export const POST = async (request: NextRequest) => {
@@ -49,6 +53,7 @@ export const POST = async (request: NextRequest) => {
 
   const response = NextResponse.json<AuthSession>({
     authenticated: true,
+    user: result.data.ownerResponse,
   });
 
   setAuthCookie(response, result.data.token);

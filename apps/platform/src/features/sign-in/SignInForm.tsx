@@ -34,8 +34,8 @@ export const SignInForm = () => {
       <form.Field
         name="email"
         validators={{
-          onChange: ({ value }) => validateSignInEmail(value),
-          onSubmit: ({ value }) => validateSignInEmail(value),
+          onChange: validateSignInEmail,
+          onSubmit: validateSignInEmail,
         }}
       >
         {(field) => {
@@ -49,7 +49,7 @@ export const SignInForm = () => {
               label="Email address"
               name={field.name}
               onBlur={field.handleBlur}
-              onValueChange={(value) => field.handleChange(value)}
+              onValueChange={field.handleChange}
               placeholder="example@gmail.com"
               required
               value={field.state.value}
@@ -63,8 +63,8 @@ export const SignInForm = () => {
         <form.Field
           name="password"
           validators={{
-            onChange: ({ value }) => validateSignInPassword(value),
-            onSubmit: ({ value }) => validateSignInPassword(value),
+            onChange: validateSignInPassword,
+            onSubmit: validateSignInPassword,
           }}
         >
           {(field) => {
@@ -77,7 +77,7 @@ export const SignInForm = () => {
                 label="Password"
                 name={field.name}
                 onBlur={field.handleBlur}
-                onValueChange={(value) => field.handleChange(value)}
+                onValueChange={field.handleChange}
                 placeholder="6+ characters"
                 required
                 value={field.state.value}

@@ -85,8 +85,8 @@ export const AddStoreForm = () => {
       <form.Field
         name="subDomain"
         validators={{
-          onChange: ({ value }) => validateStoreSubDomain(value),
-          onSubmit: ({ value }) => validateStoreSubDomain(value),
+          onChange: validateStoreSubDomain,
+          onSubmit: validateStoreSubDomain,
         }}
       >
         {(field) => {
@@ -101,7 +101,7 @@ export const AddStoreForm = () => {
               label="Subdomain"
               name={field.name}
               onBlur={field.handleBlur}
-              onValueChange={(value) => field.handleChange(value)}
+              onValueChange={field.handleChange}
               placeholder="my-store"
               required
               size="s"
@@ -114,8 +114,8 @@ export const AddStoreForm = () => {
       <form.Field
         name="name"
         validators={{
-          onChange: ({ value }) => validateStoreName(value),
-          onSubmit: ({ value }) => validateStoreName(value),
+          onChange: validateStoreName,
+          onSubmit: validateStoreName,
         }}
       >
         {(field) => {
@@ -129,7 +129,7 @@ export const AddStoreForm = () => {
               label="Name"
               name={field.name}
               onBlur={field.handleBlur}
-              onValueChange={(value) => field.handleChange(value)}
+              onValueChange={field.handleChange}
               placeholder="My Store"
               required
               size="s"
