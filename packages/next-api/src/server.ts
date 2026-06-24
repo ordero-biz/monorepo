@@ -29,7 +29,6 @@ export type BackendRequestArgs = {
   token?: Token;
   search?: string;
   backendBaseUrl?: string;
-  forwardHeadersFrom?: HeaderSource;
   forwardedHeadersNames?: ForwardedHeadersNames;
 };
 
@@ -54,10 +53,6 @@ type RequestInitWithDuplex = RequestInit & {
   duplex?: 'half';
 };
 
-type HeaderSource = {
-  headers: Headers;
-};
-
 export const FORWARDED_HEADER_NAMES = new Set([
   'accept',
   'content-type',
@@ -70,12 +65,12 @@ const isRecord = (value: unknown): value is Record<string, unknown> =>
   Boolean(value) && typeof value === 'object' && !Array.isArray(value);
 
 export const getForwardHeaders = (
-  request: HeaderSource,
+  sourceHeaders: HeadersInit,
   forwardedHeadersNames: ForwardedHeadersNames = FORWARDED_HEADER_NAMES
 ) => {
   const headers = new Headers();
 
-  for (const [key, value] of request.headers.entries()) {
+  for (const [key, value] of new Headers(sourceHeaders).entries()) {
     if (forwardedHeadersNames.has(key.toLowerCase())) {
       headers.set(key, value);
     }
@@ -123,20 +118,6 @@ const getBackendUrl = ({
   return url;
 };
 
-const readJson = async (response: Response) => {
-  const text = await response.text();
-
-  if (!text) {
-    return undefined;
-  }
-
-  try {
-    return JSON.parse(text) as unknown;
-  } catch {
-    return text;
-  }
-};
-
 const normalizeFieldErrors = (fieldErrors: unknown) => {
   if (!isRecord(fieldErrors)) {
     return undefined;
@@ -170,7 +151,7 @@ const getMessageFromBody = (body: unknown, fallback: string) => {
 export const getApiErrorFromResponse = async (
   response: Response
 ): Promise<ApiError> => {
-  const body = await readJson(response);
+  const body = await parseBackendResponseData<unknown>(response);
   const fallbackMessage =
     response.statusText || `Request failed with status ${response.status}.`;
 
@@ -188,7 +169,19 @@ export const getApiErrorFromResponse = async (
 
 export const parseBackendResponseData = async <T>(
   response: Response
-): Promise<T> => (await readJson(response)) as T;
+): Promise<T> => {
+  const text = await response.text();
+
+  if (!text) {
+    return undefined as T;
+  }
+
+  try {
+    return JSON.parse(text) as T;
+  } catch {
+    return text as T;
+  }
+};
 
 const sendBackendRequest = async ({
   path,
@@ -196,15 +189,15 @@ const sendBackendRequest = async ({
   token,
   search,
   backendBaseUrl,
-  forwardHeadersFrom,
   forwardedHeadersNames,
 }: BackendRequestArgs): Promise<BackendRequestResult> => {
   let response: Response;
 
   try {
-    const headers = forwardHeadersFrom
-      ? getForwardHeaders(forwardHeadersFrom, forwardedHeadersNames)
-      : new Headers(init?.headers);
+    const headers = getForwardHeaders(
+      init?.headers ?? {},
+      forwardedHeadersNames
+    );
 
     if (token) {
       headers.set('Authorization', `Bearer ${token}`);
@@ -238,7 +231,6 @@ export const fetchBackendResponse = async ({
   token,
   search,
   backendBaseUrl,
-  forwardHeadersFrom,
   forwardedHeadersNames,
 }: BackendRequestArgs): Promise<ApiResult<Response>> => {
   const requestResult = await sendBackendRequest({
@@ -247,7 +239,6 @@ export const fetchBackendResponse = async ({
     token,
     search,
     backendBaseUrl,
-    forwardHeadersFrom,
     forwardedHeadersNames,
   });
 

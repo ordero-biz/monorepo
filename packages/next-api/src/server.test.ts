@@ -164,14 +164,14 @@ describe('backend request helpers', () => {
     await fetchBackendResponse({
       path: '/orders',
       token: 'jwt-token',
-      forwardHeadersFrom: {
-        headers: new Headers({
+      init: {
+        headers: {
           accept: 'application/json',
           authorization: 'Bearer browser-token',
           'content-type': 'application/json',
           cookie: 'ordero_access_token=browser-cookie',
           origin: 'https://store.example.test',
-        }),
+        },
       },
     });
 
@@ -191,12 +191,12 @@ describe('backend request helpers', () => {
 
     await fetchBackendResponse({
       path: '/orders',
-      forwardHeadersFrom: {
-        headers: new Headers({
+      init: {
+        headers: {
           accept: 'application/json',
           origin: 'https://store.example.test',
           'x-tenant-id': 'tenant-1',
-        }),
+        },
       },
       forwardedHeadersNames: new Set(['origin', 'x-tenant-id']),
     });
@@ -305,16 +305,16 @@ describe('parseBackendResponseData', () => {
 
 describe('getForwardHeaders', () => {
   it('keeps only backend proxy headers with case-insensitive matching', () => {
-    const headers = getForwardHeaders({
-      headers: new Headers({
+    const headers = getForwardHeaders(
+      new Headers({
         accept: 'application/json',
         authorization: 'Bearer browser-token',
         'content-type': 'application/json',
         cookie: 'ordero_access_token=browser-cookie',
         Origin: 'https://store.example.test',
         referer: 'https://store.example.test/orders',
-      }),
-    });
+      })
+    );
 
     expect(Object.fromEntries(headers.entries())).toEqual({
       accept: 'application/json',
@@ -325,13 +325,11 @@ describe('getForwardHeaders', () => {
 
   it('uses custom forwarded header names with case-insensitive matching', () => {
     const headers = getForwardHeaders(
-      {
-        headers: new Headers({
-          accept: 'application/json',
-          origin: 'https://store.example.test',
-          'x-tenant-id': 'tenant-1',
-        }),
-      },
+      new Headers({
+        accept: 'application/json',
+        origin: 'https://store.example.test',
+        'x-tenant-id': 'tenant-1',
+      }),
       new Set(['origin', 'x-tenant-id'])
     );
 

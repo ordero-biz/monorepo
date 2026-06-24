@@ -33,6 +33,10 @@ describe('POST /api/auth/sign-in', () => {
           email: 'admin@gmail.com',
           password: '123456',
         }),
+        headers: {
+          'content-type': 'application/json',
+          cookie: `${AUTH_TOKEN_COOKIE_NAME}=browser-cookie`,
+        },
         method: 'POST',
       })
     );
@@ -47,9 +51,15 @@ describe('POST /api/auth/sign-in', () => {
     expect(fetchMock).toHaveBeenCalledWith(
       new URL('/api/v1/employees/sign-in', backendApiUrl),
       expect.objectContaining({
+        headers: expect.any(Headers),
         method: 'POST',
       })
     );
+    const [, backendRequest] = fetchMock.mock.calls[0] ?? [];
+    const headers = new Headers(backendRequest?.headers);
+
+    expect(headers.get('content-type')).toBe('application/json');
+    expect(headers.get('cookie')).toBeNull();
   });
 
   it('forwards backend errors during sign-in', async () => {
@@ -70,6 +80,9 @@ describe('POST /api/auth/sign-in', () => {
           email: 'admin@gmail.com',
           password: 'wrongPassword',
         }),
+        headers: {
+          'content-type': 'application/json',
+        },
         method: 'POST',
       })
     );
@@ -93,6 +106,9 @@ describe('POST /api/auth/sign-in', () => {
           email: 'admin@gmail.com',
           password: '123456',
         }),
+        headers: {
+          'content-type': 'application/json',
+        },
         method: 'POST',
       })
     );

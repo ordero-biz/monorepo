@@ -225,14 +225,14 @@ describe('backend request helpers', () => {
 
     await fetchBackendResponse({
       path: '/orders',
-      forwardHeadersFrom: {
-        headers: new Headers({
+      init: {
+        headers: {
           accept: 'application/json',
           authorization: 'Bearer browser-token',
           cookie: `${AUTH_TOKEN_COOKIE_NAME}=jwt-token`,
           origin: 'https://tenant.example.test',
           'x-forwarded-host': 'tenant.example.test',
-        }),
+        },
       },
     });
 

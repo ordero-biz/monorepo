@@ -37,6 +37,10 @@ describe('POST /api/auth/sign-up', () => {
           email: 'new-user@gmail.com',
           password: 'securePassword1',
         }),
+        headers: {
+          'content-type': 'application/json',
+          cookie: `${AUTH_TOKEN_COOKIE_NAME}=browser-cookie`,
+        },
         method: 'POST',
       })
     );
@@ -55,9 +59,15 @@ describe('POST /api/auth/sign-up', () => {
     expect(fetchMock).toHaveBeenCalledWith(
       new URL('/api/v1/platform/owners/sign-up', backendApiUrl),
       expect.objectContaining({
+        headers: expect.any(Headers),
         method: 'POST',
       })
     );
+    const [, backendRequest] = fetchMock.mock.calls[0] ?? [];
+    const headers = new Headers(backendRequest?.headers);
+
+    expect(headers.get('content-type')).toBe('application/json');
+    expect(headers.get('cookie')).toBeNull();
   });
 
   it('forwards backend errors during sign-up', async () => {
@@ -79,6 +89,9 @@ describe('POST /api/auth/sign-up', () => {
           email: 'existing@gmail.com',
           password: 'securePassword1',
         }),
+        headers: {
+          'content-type': 'application/json',
+        },
         method: 'POST',
       })
     );
@@ -103,6 +116,9 @@ describe('POST /api/auth/sign-up', () => {
           email: 'new-user@gmail.com',
           password: 'securePassword1',
         }),
+        headers: {
+          'content-type': 'application/json',
+        },
         method: 'POST',
       })
     );

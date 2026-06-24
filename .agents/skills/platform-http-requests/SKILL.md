@@ -115,8 +115,16 @@ When adding `/api/auth/*` or `/api/backend/*` behavior:
 - return safe JSON to the browser, never the JWT
 - clear `ordero_access_token` on backend `401` when the token is no longer trusted
 - preserve request method, body, and search params when forwarding backend proxy calls
-- forward only intentional headers; `/api/backend/[...path]` forwards `origin`
-  because the backend uses it for tenant/domain resolution
+- pass browser request headers through `init.headers` when calling
+  `fetchBackendResponse()`; do not add alternate header-forwarding arguments
+- rely on `@ordero/next-api` to filter `init.headers` through
+  `getForwardHeaders()` before backend fetch
+- forward only intentional headers; the shared allow-list is `accept`,
+  `content-type`, and `origin`
+- forward `origin` because the backend uses it for tenant/domain resolution;
+  do not add other browser headers unless they become explicit backend contracts
+- use `parseBackendResponseData<T>()` for shared JSON/text response body parsing
+  and avoid adding duplicate private body-parsing wrappers
 
 ## Adding Server Guards
 
@@ -142,6 +150,9 @@ Choose the smallest layer that proves the behavior:
   the stable same-origin path, method, body, and result shape through `apiFetch`
 - shared server helpers: test package behavior in `packages/next-api` when the
   package behavior changes; keep app route-handler tests focused on app wiring
+- header forwarding changes: cover `packages/next-api` allow-list behavior and
+  focused route-handler tests that prove cookies and unsafe browser headers are
+  not sent to the backend
 - query hooks, form hooks, and components that call app-owned request helpers: mock the nearest app-owned request helper rather than `fetch`
 - route handlers: Vitest with `NextRequest` and mocked nearest app-owned server request helper; mock backend `fetch` only when the route handler itself calls backend `fetch` directly
 - server guards: test the server page or layout with a mocked app-local

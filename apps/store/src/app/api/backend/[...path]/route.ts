@@ -32,9 +32,9 @@ const handleBackendRequest = async (
     path: path.join('/'),
     search: request.nextUrl.search,
     token,
-    forwardHeadersFrom: request,
     init: {
       method: request.method,
+      headers: request.headers,
       body: request.body ?? undefined,
     },
   });

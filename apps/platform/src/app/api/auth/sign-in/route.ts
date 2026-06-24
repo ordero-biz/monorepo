@@ -34,9 +34,7 @@ export const POST = async (request: NextRequest) => {
     path: BACKEND_AUTH_PATHS.signIn,
     init: {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: request.headers,
       body: JSON.stringify(input),
     },
   });

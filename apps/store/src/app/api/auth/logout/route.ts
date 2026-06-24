@@ -15,6 +15,7 @@ export const POST = async (request: NextRequest) => {
       path: BACKEND_AUTH_PATHS.logout,
       init: {
         method: 'POST',
+        headers: request.headers,
       },
       token,
     });
