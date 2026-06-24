@@ -24,14 +24,5 @@
     "@types/node": "^20",
     "tailwindcss": "^4.3.1",
     "turbo": "^2.8.10"
-  },
-  "pnpm": {
-    "packageExtensions": {
-      "@playwright/cli@*": {
-        "dependencies": {
-          "playwright-core": "1.60.0-alpha-1777077614000"
-        }
-      }
-    }
   }
 }

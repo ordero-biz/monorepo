@@ -1,3 +1,9 @@
 packages:
   - apps/*
   - packages/*
+
+packageExtensions:
+  '@playwright/cli@*':
+    dependencies:
+      playwright-core: '1.60.0-alpha-1777077614000'
+
