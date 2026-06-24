@@ -29,6 +29,8 @@ export type BackendRequestArgs = {
   token?: Token;
   search?: string;
   backendBaseUrl?: string;
+  forwardHeadersFrom?: HeaderSource;
+  forwardedHeadersNames?: ForwardedHeadersNames;
 };
 
 export type BackendRequestResult =
@@ -52,8 +54,35 @@ type RequestInitWithDuplex = RequestInit & {
   duplex?: 'half';
 };
 
+type HeaderSource = {
+  headers: Headers;
+};
+
+export const FORWARDED_HEADER_NAMES = new Set([
+  'accept',
+  'content-type',
+  'origin',
+]);
+
+export type ForwardedHeadersNames = ReadonlySet<string>;
+
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   Boolean(value) && typeof value === 'object' && !Array.isArray(value);
+
+export const getForwardHeaders = (
+  request: HeaderSource,
+  forwardedHeadersNames: ForwardedHeadersNames = FORWARDED_HEADER_NAMES
+) => {
+  const headers = new Headers();
+
+  for (const [key, value] of request.headers.entries()) {
+    if (forwardedHeadersNames.has(key.toLowerCase())) {
+      headers.set(key, value);
+    }
+  }
+
+  return headers;
+};
 
 const withOptionalDuplex = (init?: RequestInit): RequestInitWithDuplex => {
   if (!(init?.body instanceof ReadableStream)) {
@@ -157,17 +186,25 @@ export const getApiErrorFromResponse = async (
   };
 };
 
+export const parseBackendResponseData = async <T>(
+  response: Response
+): Promise<T> => (await readJson(response)) as T;
+
 const sendBackendRequest = async ({
   path,
   init,
   token,
   search,
   backendBaseUrl,
+  forwardHeadersFrom,
+  forwardedHeadersNames,
 }: BackendRequestArgs): Promise<BackendRequestResult> => {
   let response: Response;
 
   try {
-    const headers = new Headers(init?.headers);
+    const headers = forwardHeadersFrom
+      ? getForwardHeaders(forwardHeadersFrom, forwardedHeadersNames)
+      : new Headers(init?.headers);
 
     if (token) {
       headers.set('Authorization', `Bearer ${token}`);
@@ -201,6 +238,8 @@ export const fetchBackendResponse = async ({
   token,
   search,
   backendBaseUrl,
+  forwardHeadersFrom,
+  forwardedHeadersNames,
 }: BackendRequestArgs): Promise<ApiResult<Response>> => {
   const requestResult = await sendBackendRequest({
     path,
@@ -208,6 +247,8 @@ export const fetchBackendResponse = async ({
     token,
     search,
     backendBaseUrl,
+    forwardHeadersFrom,
+    forwardedHeadersNames,
   });
 
   if (!requestResult.ok) {
@@ -224,31 +265,6 @@ export const fetchBackendResponse = async ({
   return {
     ok: true,
     data: requestResult.response,
-  };
-};
-
-export const fetchBackendData = async <T>({
-  path,
-  init,
-  token,
-  search,
-  backendBaseUrl,
-}: BackendRequestArgs): Promise<ApiResult<T>> => {
-  const requestResult = await fetchBackendResponse({
-    path,
-    init,
-    token,
-    search,
-    backendBaseUrl,
-  });
-
-  if (!requestResult.ok) {
-    return requestResult;
-  }
-
-  return {
-    ok: true,
-    data: (await readJson(requestResult.data)) as T,
   };
 };
 

@@ -4,6 +4,7 @@ import type {
   AuthSession,
   Token,
 } from '@ordero/api-types';
+import { parseBackendResponseData } from './server';
 
 export type ServerSessionResult<TUser = unknown> =
   | {
@@ -17,23 +18,23 @@ export type ServerSessionResult<TUser = unknown> =
       shouldClearAuthCookie: false;
     };
 
-export type FetchBackendData = <T>(args: {
+export type FetchBackendResponse = (args: {
   path: string;
   init?: RequestInit;
   token?: Token;
   search?: string;
-}) => Promise<ApiResult<T>>;
+}) => Promise<ApiResult<Response>>;
 
 export type ResolveServerSessionArgs = {
   token?: Token;
   mePath: string;
-  fetchBackendData: FetchBackendData;
+  fetchBackendResponse: FetchBackendResponse;
 };
 
 export const resolveServerSession = async <TUser = unknown>({
   token,
   mePath,
-  fetchBackendData,
+  fetchBackendResponse,
 }: ResolveServerSessionArgs): Promise<ServerSessionResult<TUser>> => {
   if (!token) {
     return {
@@ -43,7 +44,7 @@ export const resolveServerSession = async <TUser = unknown>({
     };
   }
 
-  const result = await fetchBackendData<TUser>({
+  const result = await fetchBackendResponse({
     path: mePath,
     init: {
       method: 'GET',
@@ -71,7 +72,7 @@ export const resolveServerSession = async <TUser = unknown>({
     ok: true,
     session: {
       authenticated: true,
-      user: result.data,
+      user: await parseBackendResponseData<TUser>(result.data),
     },
     shouldClearAuthCookie: false,
   };

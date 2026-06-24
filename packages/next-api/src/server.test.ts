@@ -3,10 +3,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   AUTH_TOKEN_COOKIE_NAME,
   clearAuthCookie,
-  fetchBackendData,
   fetchBackendResponse,
   getApiErrorFromResponse,
+  getForwardHeaders,
   getTokenFromRequest,
+  parseBackendResponseData,
   setAuthCookie,
 } from './server';
 
@@ -157,6 +158,58 @@ describe('backend request helpers', () => {
     );
   });
 
+  it('filters forwarded proxy headers when a header source is provided', async () => {
+    vi.mocked(fetch).mockResolvedValue(new Response('{}'));
+
+    await fetchBackendResponse({
+      path: '/orders',
+      token: 'jwt-token',
+      forwardHeadersFrom: {
+        headers: new Headers({
+          accept: 'application/json',
+          authorization: 'Bearer browser-token',
+          'content-type': 'application/json',
+          cookie: 'ordero_access_token=browser-cookie',
+          origin: 'https://store.example.test',
+        }),
+      },
+    });
+
+    const [, request] = vi.mocked(fetch).mock.calls[0] ?? [];
+    const headers = new Headers(request?.headers);
+
+    expect(Object.fromEntries(headers.entries())).toEqual({
+      accept: 'application/json',
+      authorization: 'Bearer jwt-token',
+      'content-type': 'application/json',
+      origin: 'https://store.example.test',
+    });
+  });
+
+  it('uses custom forwarded proxy header names when provided', async () => {
+    vi.mocked(fetch).mockResolvedValue(new Response('{}'));
+
+    await fetchBackendResponse({
+      path: '/orders',
+      forwardHeadersFrom: {
+        headers: new Headers({
+          accept: 'application/json',
+          origin: 'https://store.example.test',
+          'x-tenant-id': 'tenant-1',
+        }),
+      },
+      forwardedHeadersNames: new Set(['origin', 'x-tenant-id']),
+    });
+
+    const [, request] = vi.mocked(fetch).mock.calls[0] ?? [];
+    const headers = new Headers(request?.headers);
+
+    expect(Object.fromEntries(headers.entries())).toEqual({
+      origin: 'https://store.example.test',
+      'x-tenant-id': 'tenant-1',
+    });
+  });
+
   it('returns normalized errors for thrown requests and unsuccessful responses', async () => {
     vi.mocked(fetch)
       .mockRejectedValueOnce(new Error('connect ECONNREFUSED'))
@@ -213,37 +266,6 @@ describe('backend request helpers', () => {
     );
   });
 
-  it('returns parsed JSON and plain text backend data', async () => {
-    vi.mocked(fetch)
-      .mockResolvedValueOnce(
-        new Response(
-          JSON.stringify({
-            id: 'order-1',
-          })
-        )
-      )
-      .mockResolvedValueOnce(new Response('plain text body'));
-
-    await expect(
-      fetchBackendData<{ id: string }>({
-        path: '/orders/order-1',
-      })
-    ).resolves.toEqual({
-      ok: true,
-      data: {
-        id: 'order-1',
-      },
-    });
-    await expect(
-      fetchBackendData<string>({
-        path: '/health',
-      })
-    ).resolves.toEqual({
-      ok: true,
-      data: 'plain text body',
-    });
-  });
-
   it('normalizes a missing BACKEND_API_URL as a backend error', async () => {
     delete process.env.BACKEND_API_URL;
     vi.mocked(fetch).mockResolvedValue(new Response('{}'));
@@ -258,6 +280,64 @@ describe('backend request helpers', () => {
         status: 500,
         message: 'BACKEND_API_URL is not configured.',
       },
+    });
+  });
+});
+
+describe('parseBackendResponseData', () => {
+  it('returns parsed JSON and plain text backend data', async () => {
+    await expect(
+      parseBackendResponseData<{ id: string }>(
+        new Response(
+          JSON.stringify({
+            id: 'order-1',
+          })
+        )
+      )
+    ).resolves.toEqual({
+      id: 'order-1',
+    });
+    await expect(
+      parseBackendResponseData<string>(new Response('plain text body'))
+    ).resolves.toBe('plain text body');
+  });
+});
+
+describe('getForwardHeaders', () => {
+  it('keeps only backend proxy headers with case-insensitive matching', () => {
+    const headers = getForwardHeaders({
+      headers: new Headers({
+        accept: 'application/json',
+        authorization: 'Bearer browser-token',
+        'content-type': 'application/json',
+        cookie: 'ordero_access_token=browser-cookie',
+        Origin: 'https://store.example.test',
+        referer: 'https://store.example.test/orders',
+      }),
+    });
+
+    expect(Object.fromEntries(headers.entries())).toEqual({
+      accept: 'application/json',
+      'content-type': 'application/json',
+      origin: 'https://store.example.test',
+    });
+  });
+
+  it('uses custom forwarded header names with case-insensitive matching', () => {
+    const headers = getForwardHeaders(
+      {
+        headers: new Headers({
+          accept: 'application/json',
+          origin: 'https://store.example.test',
+          'x-tenant-id': 'tenant-1',
+        }),
+      },
+      new Set(['origin', 'x-tenant-id'])
+    );
+
+    expect(Object.fromEntries(headers.entries())).toEqual({
+      origin: 'https://store.example.test',
+      'x-tenant-id': 'tenant-1',
     });
   });
 });

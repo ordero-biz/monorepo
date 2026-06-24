@@ -1,18 +1,18 @@
-import { fetchBackendData } from '@/lib/api/server';
+import { fetchBackendResponse } from '@/lib/api/server';
 import { getServerSession } from './session';
 
 vi.mock('@/lib/api/server', async () => ({
   ...(await vi.importActual<typeof import('@/lib/api/server')>(
     '@/lib/api/server'
   )),
-  fetchBackendData: vi.fn(),
+  fetchBackendResponse: vi.fn(),
 }));
 
-const fetchBackendDataMock = vi.mocked(fetchBackendData);
+const fetchBackendResponseMock = vi.mocked(fetchBackendResponse);
 
 describe('getServerSession', () => {
   beforeEach(() => {
-    fetchBackendDataMock.mockReset();
+    fetchBackendResponseMock.mockReset();
   });
 
   it('returns a signed-out session when there is no token', async () => {
@@ -23,15 +23,17 @@ describe('getServerSession', () => {
       },
       shouldClearAuthCookie: false,
     });
-    expect(fetchBackendDataMock).not.toHaveBeenCalled();
+    expect(fetchBackendResponseMock).not.toHaveBeenCalled();
   });
 
   it('returns an authenticated session when the backend accepts the token', async () => {
-    fetchBackendDataMock.mockResolvedValue({
+    fetchBackendResponseMock.mockResolvedValue({
       ok: true,
-      data: {
-        email: 'admin@gmail.com',
-      },
+      data: new Response(
+        JSON.stringify({
+          email: 'admin@gmail.com',
+        })
+      ),
     });
 
     await expect(getServerSession('jwt-token')).resolves.toStrictEqual({
@@ -44,7 +46,7 @@ describe('getServerSession', () => {
       },
       shouldClearAuthCookie: false,
     });
-    expect(fetchBackendDataMock).toHaveBeenCalledWith({
+    expect(fetchBackendResponseMock).toHaveBeenCalledWith({
       path: '/api/v1/employees/me',
       init: {
         method: 'GET',
@@ -54,7 +56,7 @@ describe('getServerSession', () => {
   });
 
   it('returns a signed-out session and marks the cookie for clearing on 401', async () => {
-    fetchBackendDataMock.mockResolvedValue({
+    fetchBackendResponseMock.mockResolvedValue({
       ok: false,
       error: {
         status: 401,
@@ -72,7 +74,7 @@ describe('getServerSession', () => {
   });
 
   it('returns non-auth backend errors unchanged', async () => {
-    fetchBackendDataMock.mockResolvedValue({
+    fetchBackendResponseMock.mockResolvedValue({
       ok: false,
       error: {
         status: 500,
