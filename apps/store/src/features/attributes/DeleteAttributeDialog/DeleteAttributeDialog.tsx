@@ -1,0 +1,65 @@
+'use client';
+
+import { Button, Dialog, Typography } from '@ordero/ui';
+import { useState } from 'react';
+import type { Attribute } from '@/lib/domain/attributes';
+import { useDeleteAttribute } from './hooks/useDeleteAttribute';
+
+type DeleteAttributeDialogProps = {
+  attribute: Attribute;
+};
+
+export const DeleteAttributeDialog = ({
+  attribute,
+}: DeleteAttributeDialogProps) => {
+  const [open, setOpen] = useState(false);
+  const { handleDelete, isDeleting } = useDeleteAttribute({
+    attributeId: attribute.id,
+    attributeName: attribute.name,
+    onDeleted: () => setOpen(false),
+  });
+
+  return (
+    <>
+      <Button
+        color="error"
+        onClick={() => setOpen(true)}
+        type="button"
+        variant="outlined"
+      >
+        Delete Attribute
+      </Button>
+
+      <Dialog.Root onOpenChange={setOpen} open={open}>
+        <Dialog.Portal>
+          <Dialog.Backdrop />
+          <Dialog.Viewport>
+            <Dialog.Popup size="xs">
+              <Dialog.Header>
+                <Dialog.Title>Delete attribute</Dialog.Title>
+              </Dialog.Header>
+
+              <Dialog.Content>
+                <Typography variant="body1">
+                  Are you sure you want delete <strong>{attribute.name}</strong>{' '}
+                  attribute?
+                </Typography>
+              </Dialog.Content>
+
+              <Dialog.Footer closeDisabled={isDeleting}>
+                <Button
+                  color="error"
+                  disabled={isDeleting}
+                  onClick={handleDelete}
+                  type="button"
+                >
+                  Delete
+                </Button>
+              </Dialog.Footer>
+            </Dialog.Popup>
+          </Dialog.Viewport>
+        </Dialog.Portal>
+      </Dialog.Root>
+    </>
+  );
+};

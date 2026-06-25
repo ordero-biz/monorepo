@@ -1,4 +1,13 @@
-import { createAttribute, getAttributes } from '.';
+import {
+  createAttribute,
+  deleteAttributes,
+  deleteAttributeValues,
+  getAttribute,
+  getAttributes,
+  getAttributeValues,
+  updateAttribute,
+  updateAttributeValue,
+} from '.';
 
 describe('attribute client helpers', () => {
   beforeEach(() => {
@@ -87,6 +96,125 @@ describe('attribute client helpers', () => {
     });
   });
 
+  it('gets an attribute by id from the backend proxy', async () => {
+    const fetchMock = vi.mocked(fetch);
+
+    fetchMock.mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          id: 7,
+          name: 'Color',
+          sortOrder: 20,
+          createdAt: '2026-06-24T20:07:32.467Z',
+        })
+      )
+    );
+
+    await expect(getAttribute(7)).resolves.toEqual({
+      ok: true,
+      data: {
+        id: 7,
+        name: 'Color',
+        sortOrder: 20,
+        createdAt: '2026-06-24T20:07:32.467Z',
+      },
+    });
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/backend/api/v1/attributes/7',
+      expect.objectContaining({
+        method: 'GET',
+        cache: 'no-store',
+      })
+    );
+  });
+
+  it('gets attribute values by attribute id from the backend proxy', async () => {
+    const fetchMock = vi.mocked(fetch);
+
+    fetchMock.mockResolvedValue(
+      new Response(
+        JSON.stringify([
+          {
+            id: 3,
+            name: 'Blue',
+            sortOrder: 0,
+            createdAt: '2026-06-24T20:07:32.467Z',
+          },
+        ])
+      )
+    );
+
+    await expect(getAttributeValues(7)).resolves.toEqual({
+      ok: true,
+      data: [
+        {
+          id: 3,
+          name: 'Blue',
+          sortOrder: 0,
+          createdAt: '2026-06-24T20:07:32.467Z',
+        },
+      ],
+    });
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/backend/api/v1/attributes/7/values',
+      expect.objectContaining({
+        method: 'GET',
+        cache: 'no-store',
+      })
+    );
+  });
+
+  it('returns normalized failures from the attribute detail route', async () => {
+    vi.mocked(fetch).mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          message: 'Attribute lookup failed.',
+          code: 'ATTRIBUTE_LOOKUP_FAILED',
+        }),
+        {
+          status: 404,
+          statusText: 'Not Found',
+        }
+      )
+    );
+
+    await expect(getAttribute(7)).resolves.toEqual({
+      ok: false,
+      error: {
+        status: 404,
+        message: 'Attribute lookup failed.',
+        code: 'ATTRIBUTE_LOOKUP_FAILED',
+        fieldErrors: undefined,
+      },
+    });
+  });
+
+  it('returns normalized failures from the attribute values route', async () => {
+    vi.mocked(fetch).mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          message: 'Attribute values lookup failed.',
+        }),
+        {
+          status: 503,
+          statusText: 'Service Unavailable',
+        }
+      )
+    );
+
+    await expect(getAttributeValues(7)).resolves.toEqual({
+      ok: false,
+      error: {
+        status: 503,
+        message: 'Attribute values lookup failed.',
+        code: undefined,
+        fieldErrors: undefined,
+      },
+    });
+  });
+
   it('posts a new attribute through the backend proxy', async () => {
     const fetchMock = vi.mocked(fetch);
 
@@ -125,6 +253,142 @@ describe('attribute client helpers', () => {
           name: 'Material',
           sortOrder: 0,
           attributeValues: ['Green', 'Blue'],
+        }),
+        cache: 'no-store',
+      })
+    );
+  });
+
+  it('patches an attribute through the backend proxy', async () => {
+    const fetchMock = vi.mocked(fetch);
+
+    fetchMock.mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          id: 7,
+          name: 'Material',
+          sortOrder: 10,
+          createdAt: '2026-06-25T18:13:29.608Z',
+        })
+      )
+    );
+
+    await expect(
+      updateAttribute({
+        attributeId: 7,
+        name: 'Material',
+      })
+    ).resolves.toEqual({
+      ok: true,
+      data: {
+        id: 7,
+        name: 'Material',
+        sortOrder: 10,
+        createdAt: '2026-06-25T18:13:29.608Z',
+      },
+    });
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/backend/api/v1/attributes/7',
+      expect.objectContaining({
+        method: 'PATCH',
+        body: JSON.stringify({
+          name: 'Material',
+        }),
+        cache: 'no-store',
+      })
+    );
+  });
+
+  it('patches an attribute value through the backend proxy', async () => {
+    const fetchMock = vi.mocked(fetch);
+
+    fetchMock.mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          id: 3,
+          name: 'Navy',
+          sortOrder: 0,
+          createdAt: '2026-06-25T18:13:29.608Z',
+        })
+      )
+    );
+
+    await expect(
+      updateAttributeValue({
+        attributeValueId: 3,
+        name: 'Navy',
+        sortOrder: 0,
+      })
+    ).resolves.toEqual({
+      ok: true,
+      data: {
+        id: 3,
+        name: 'Navy',
+        sortOrder: 0,
+        createdAt: '2026-06-25T18:13:29.608Z',
+      },
+    });
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/backend/api/v1/attributes/values/3',
+      expect.objectContaining({
+        method: 'PATCH',
+        body: JSON.stringify({
+          name: 'Navy',
+          sortOrder: 0,
+        }),
+        cache: 'no-store',
+      })
+    );
+  });
+
+  it('deletes attributes through the backend proxy', async () => {
+    const fetchMock = vi.mocked(fetch);
+
+    fetchMock.mockResolvedValue(new Response(null, { status: 204 }));
+
+    await expect(
+      deleteAttributes({
+        attributeIds: [7],
+      })
+    ).resolves.toEqual({
+      ok: true,
+      data: undefined,
+    });
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/backend/api/v1/attributes',
+      expect.objectContaining({
+        method: 'DELETE',
+        body: JSON.stringify({
+          attributeIds: [7],
+        }),
+        cache: 'no-store',
+      })
+    );
+  });
+
+  it('deletes attribute values through the backend proxy', async () => {
+    const fetchMock = vi.mocked(fetch);
+
+    fetchMock.mockResolvedValue(new Response(null, { status: 204 }));
+
+    await expect(
+      deleteAttributeValues({
+        attributeValueIds: [3],
+      })
+    ).resolves.toEqual({
+      ok: true,
+      data: undefined,
+    });
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/backend/api/v1/attributes/values',
+      expect.objectContaining({
+        method: 'DELETE',
+        body: JSON.stringify({
+          attributeValueIds: [3],
         }),
         cache: 'no-store',
       })

@@ -1,5 +1,5 @@
 import { PageHeader, Typography } from '@ordero/ui';
-import { CreateAttributeDialog } from '@/features/attributes';
+import { CreateAttributeDialog } from '../CreateAttributeDialog/CreateAttributeDialog';
 
 export const AttributesListHeader = () => (
   <PageHeader.Root>
