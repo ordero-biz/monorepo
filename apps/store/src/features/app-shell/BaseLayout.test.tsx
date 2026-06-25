@@ -2,9 +2,10 @@ import { screen, within } from '@testing-library/react';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { BaseLayout } from './BaseLayout';
 
-vi.mock('next/navigation', () => ({
-  useRouter: () => ({
-    replace: vi.fn(),
+vi.mock('@/lib/hooks/useLogOut', () => ({
+  useLogOut: () => ({
+    isLoggingOut: false,
+    logOut: vi.fn(),
   }),
 }));
 
