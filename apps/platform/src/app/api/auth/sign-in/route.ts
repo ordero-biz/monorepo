@@ -1,11 +1,12 @@
-import { type NextRequest, NextResponse } from 'next/server';
-import { BACKEND_AUTH_PATHS } from '@/lib/api/backendPaths';
+import type { Token } from '@ordero/api-types';
 import {
-  fetchBackendResponse,
   parseBackendResponseData,
   setAuthCookie,
-} from '@/lib/api/server';
-import type { AuthSession, AuthSignInInput, Token } from '@/lib/api/types';
+} from '@ordero/next-api/server';
+import { type NextRequest, NextResponse } from 'next/server';
+import { BACKEND_AUTH_PATHS } from '@/lib/api/backendPaths';
+import { fetchBackendResponse } from '@/lib/api/server';
+import type { AuthSession, AuthSignInInput } from '@/lib/api/types';
 
 type BackendSignInResponse = {
   token?: Token;

@@ -1,5 +1,5 @@
 import { screen, within } from '@testing-library/react';
-import { BaseLayout } from '@/features/app-shell';
+import { BaseLayout } from '@/features/app-shell/BaseLayout';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 
 const { setup } = prepareStoreSetup({

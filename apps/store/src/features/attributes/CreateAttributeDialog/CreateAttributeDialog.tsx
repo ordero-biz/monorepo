@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 import { useRef, useState } from 'react';
 import { getAttributeDetailRoute } from '@/lib/client/routes';
 import { attributesQueryKeys } from '@/lib/hooks/useAttributesQuery';
-import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error';
+import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
 import { INITIAL_ATTRIBUTE_VALUE_FIELD_INDEX } from './constants';
 import { useCreateAttributeForm } from './hooks/useCreateAttributeForm';
 import {

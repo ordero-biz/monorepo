@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 import type { ReactNode } from 'react';
-import { BaseLayout } from '@/features/app-shell';
+import { BaseLayout } from '@/features/app-shell/BaseLayout';
 import { hasAuthenticatedServerSession } from '@/lib/api/authPageGuard';
 import { clientRoutes } from '@/lib/client/routes';
 

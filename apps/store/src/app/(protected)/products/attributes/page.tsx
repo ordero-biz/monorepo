@@ -1,4 +1,5 @@
-import { AttributesList, AttributesListHeader } from '@/features/attributes';
+import { AttributesList } from '@/features/attributes/AttributesList/AttributesList';
+import { AttributesListHeader } from '@/features/attributes/AttributesList/AttributesListHeader';
 
 export default function AttributesPage() {
   return (
