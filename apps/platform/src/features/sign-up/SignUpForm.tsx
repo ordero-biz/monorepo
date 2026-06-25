@@ -12,10 +12,8 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { clientRoutes } from '@/lib/client/routes';
 import { authQueryKeys } from '@/lib/hooks/useSessionQuery';
-import {
-  getErrorMessage,
-  getFieldSubmitChangeErrorText,
-} from '@/lib/utils/form/error';
+import { getErrorMessage } from '@/lib/utils/form/error/error';
+import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
 import { useSignUpForm } from './hooks/useSignUpForm';
 import {
   validateAcceptTerms,

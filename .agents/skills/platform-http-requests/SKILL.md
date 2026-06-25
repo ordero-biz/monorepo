@@ -55,7 +55,7 @@ Use the existing architecture unless the user explicitly asks for a redesign.
 For uncached calls:
 
 - add or reuse a feature-facing request helper in `src/lib/client/api.ts`
-- call `apiFetch<T>()` from `src/lib/client/fetch.ts`, which re-exports `@ordero/api-client`
+- call `apiFetch<T>()` from `@ordero/api-client`
 - point it at a same-origin `/api/*` route
 - return `ApiResult<T>`
 
@@ -144,8 +144,8 @@ Use server pages or layouts for auth redirects and protected route checks.
 
 Choose the smallest layer that proves the behavior:
 
-- generic `apiFetch` transport/error behavior: `src/lib/client/fetch.test.ts`
-  or `packages/api-client`, with mocked `fetch`
+- generic `apiFetch` transport/error behavior: `packages/api-client`, with
+  mocked `fetch`
 - feature-facing client request helpers: `src/lib/client/api.test.ts`, covering
   the stable same-origin path, method, body, and result shape through `apiFetch`
 - shared server helpers: test package behavior in `packages/next-api` when the

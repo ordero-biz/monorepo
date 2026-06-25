@@ -5,7 +5,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { clientRoutes } from '@/lib/client/routes';
 import { authQueryKeys } from '@/lib/hooks/useSessionQuery';
-import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error';
+import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
 import { useSignInForm } from './hooks/useSignInForm';
 import {
   validateSignInEmail,

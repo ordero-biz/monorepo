@@ -1,10 +1,7 @@
+import { clearAuthCookie, getTokenFromRequest } from '@ordero/next-api/server';
 import { type NextRequest, NextResponse } from 'next/server';
 import { BACKEND_AUTH_PATHS } from '@/lib/api/backendPaths';
-import {
-  clearAuthCookie,
-  fetchBackendResponse,
-  getTokenFromRequest,
-} from '@/lib/api/server';
+import { fetchBackendResponse } from '@/lib/api/server';
 import type { AuthSession } from '@/lib/api/types';
 
 export const POST = async (request: NextRequest) => {

@@ -29,5 +29,3 @@ export type Store = {
   name: string;
   subDomain: string;
 };
-
-export type { ApiError, ApiResult, Token } from '@ordero/api-types';
