@@ -1,10 +1,10 @@
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { CreateAttributeDialog } from '@/features/attributes';
 import { createAttribute } from '@/lib/client/api/attributes';
 import { getAttributeDetailRoute } from '@/lib/client/routes';
 import { attributesQueryKeys } from '@/lib/hooks/useAttributesQuery';
 import { prepareStoreSetup } from '@/test/prepareSetup';
+import { CreateAttributeDialog } from './CreateAttributeDialog';
 
 const routerPushMock = vi.fn();
 
@@ -38,7 +38,7 @@ describe('CreateAttributeDialog', () => {
 
     setup();
 
-    await user.click(screen.getByRole('button', { name: 'Create Attribute' }));
+    await user.click(screen.getByRole('button', { name: 'Create attribute' }));
 
     expect(
       screen.getByRole('dialog', { name: 'Create new attribute' })
@@ -49,7 +49,7 @@ describe('CreateAttributeDialog', () => {
     const user = userEvent.setup();
 
     setup();
-    await user.click(screen.getByRole('button', { name: 'Create Attribute' }));
+    await user.click(screen.getByRole('button', { name: 'Create attribute' }));
 
     const dialog = screen.getByRole('dialog', { name: 'Create new attribute' });
     const nameField = within(dialog).getByRole('textbox', {
@@ -77,7 +77,7 @@ describe('CreateAttributeDialog', () => {
     const user = userEvent.setup();
 
     setup();
-    await user.click(screen.getByRole('button', { name: 'Create Attribute' }));
+    await user.click(screen.getByRole('button', { name: 'Create attribute' }));
 
     const dialog = screen.getByRole('dialog', { name: 'Create new attribute' });
     const addButton = within(dialog).getByRole('button', {
@@ -130,7 +130,7 @@ describe('CreateAttributeDialog', () => {
     const { queryClient } = setup();
     const invalidateQueriesSpy = vi.spyOn(queryClient, 'invalidateQueries');
 
-    await user.click(screen.getByRole('button', { name: 'Create Attribute' }));
+    await user.click(screen.getByRole('button', { name: 'Create attribute' }));
 
     const dialog = screen.getByRole('dialog', { name: 'Create new attribute' });
     const nameField = within(dialog).getByRole('textbox', {
@@ -169,7 +169,7 @@ describe('CreateAttributeDialog', () => {
       screen.queryByRole('dialog', { name: 'Create new attribute' })
     ).not.toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', { name: 'Create Attribute' }));
+    await user.click(screen.getByRole('button', { name: 'Create attribute' }));
 
     const reopenedDialog = screen.getByRole('dialog', {
       name: 'Create new attribute',
@@ -203,7 +203,7 @@ describe('CreateAttributeDialog', () => {
 
     setup();
 
-    await user.click(screen.getByRole('button', { name: 'Create Attribute' }));
+    await user.click(screen.getByRole('button', { name: 'Create attribute' }));
 
     const dialog = screen.getByRole('dialog', { name: 'Create new attribute' });
     const nameField = within(dialog).getByRole('textbox', {

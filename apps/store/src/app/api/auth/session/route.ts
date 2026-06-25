@@ -1,5 +1,5 @@
+import { clearAuthCookie, getTokenFromRequest } from '@ordero/next-api/server';
 import { type NextRequest, NextResponse } from 'next/server';
-import { clearAuthCookie, getTokenFromRequest } from '@/lib/api/server';
 import { getServerSession } from '@/lib/api/session';
 import type { AuthSession } from '@/lib/api/types';
 

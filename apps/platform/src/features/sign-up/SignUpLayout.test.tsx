@@ -10,6 +10,12 @@ vi.mock('@/lib/client/api', async () => ({
   signUp: vi.fn(),
 }));
 
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({
+    push: vi.fn(),
+  }),
+}));
+
 const { setup } = preparePlatformSetup({
   component: SignUpLayout,
 });

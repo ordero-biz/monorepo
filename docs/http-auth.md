@@ -219,7 +219,7 @@ See `docs/packages.md` for the package boundary reference.
 Feature code should call `/api/backend/*` when it needs authenticated REST data
 from the backend. Keep feature-facing request helpers in `src/lib/client/api.ts`
 and use the generic `apiFetch()` transport/error-normalization helper from
-`@ordero/api-client` through `src/lib/client/fetch.ts`.
+`@ordero/api-client`.
 
 ```mermaid
 sequenceDiagram
@@ -381,8 +381,8 @@ When present, sign-in and sign-up map them into TanStack Form submit errors.
   backend URL handling, Bearer header logic, cookie helpers, error
   normalization, body parsing through `parseBackendResponseData()`, and
   filtered raw-response forwarding.
-- Review `@ordero/api-client` and the app-local `src/lib/client/fetch.ts` for
-  browser-side request serialization and `ApiError` normalization.
+- Review `@ordero/api-client` for browser-side request serialization and
+  `ApiError` normalization.
 - Review `src/lib/client/apiPaths.ts` and `src/lib/api/backendPaths.ts` for
   app-owned route constants and repeated path strings.
 - Review `src/lib/client/api.ts` and resource modules under

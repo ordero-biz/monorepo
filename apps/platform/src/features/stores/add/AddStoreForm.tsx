@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 import { createStore } from '@/lib/client/api';
 import { clientRoutes } from '@/lib/client/routes';
 import { storesQueryKeys } from '@/lib/hooks/useStoresQuery';
-import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error';
+import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
 import { addStoreDefaultValues } from './constants';
 import {
   type AddStoreFormValues,
