@@ -1,26 +1,16 @@
 import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { logout } from '@/lib/client/api';
-import { authQueryKeys } from '@/lib/hooks/useSessionQuery';
+import { useLogOut } from '@/lib/hooks/useLogOut';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { Sidebar } from './Sidebar';
 
-const routerReplaceMock = vi.fn();
+const logOutMock = vi.fn();
 
-vi.mock('next/navigation', () => ({
-  useRouter: () => ({
-    replace: routerReplaceMock,
-  }),
+vi.mock('@/lib/hooks/useLogOut', () => ({
+  useLogOut: vi.fn(),
 }));
 
-vi.mock('@/lib/client/api', async () => ({
-  ...(await vi.importActual<typeof import('@/lib/client/api')>(
-    '@/lib/client/api'
-  )),
-  logout: vi.fn(),
-}));
-
-const logoutMock = vi.mocked(logout);
+const useLogOutMock = vi.mocked(useLogOut);
 
 const { setup } = prepareStoreSetup({
   component: Sidebar,
@@ -28,8 +18,11 @@ const { setup } = prepareStoreSetup({
 
 describe('Sidebar', () => {
   beforeEach(() => {
-    logoutMock.mockReset();
-    routerReplaceMock.mockClear();
+    logOutMock.mockReset();
+    useLogOutMock.mockReturnValue({
+      isLoggingOut: false,
+      logOut: logOutMock,
+    });
   });
 
   it('renders the store navigation links', async () => {
@@ -64,31 +57,31 @@ describe('Sidebar', () => {
     ).toHaveAttribute('href', '/products/warehouse');
   });
 
-  it('logs out from the footer and redirects to sign in', async () => {
+  it('calls the logout handler from the footer', async () => {
     const user = userEvent.setup();
-    logoutMock.mockResolvedValue({
-      ok: true,
-      data: {
-        authenticated: false,
-      },
-    });
 
-    const { queryClient } = setup();
-    queryClient.setQueryData(authQueryKeys.session, {
-      authenticated: true,
-      user: {
-        email: 'admin@gmail.com',
-      },
-    });
+    setup();
 
     const sidebar = screen.getByRole('complementary');
 
     await user.click(within(sidebar).getByRole('button', { name: 'Sign out' }));
 
-    expect(logoutMock).toHaveBeenCalledTimes(1);
-    expect(queryClient.getQueryData(authQueryKeys.session)).toStrictEqual({
-      authenticated: false,
+    expect(logOutMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('shows the pending sign-out state', () => {
+    useLogOutMock.mockReturnValue({
+      isLoggingOut: true,
+      logOut: logOutMock,
     });
-    expect(routerReplaceMock).toHaveBeenCalledWith('/sign-in');
+
+    setup();
+
+    const sidebar = screen.getByRole('complementary');
+    const signOutButton = within(sidebar).getByRole('button', {
+      name: 'Signing out',
+    });
+
+    expect(signOutButton).toBeDisabled();
   });
 });

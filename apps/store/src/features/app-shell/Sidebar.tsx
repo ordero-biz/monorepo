@@ -40,9 +40,7 @@ export const Sidebar = () => {
               id: 'logout',
               kind: 'action',
               label: isLoggingOut ? 'Signing out' : 'Sign out',
-              onSelect: () => {
-                void logOut();
-              },
+              onSelect: logOut,
             },
           ]}
         />
