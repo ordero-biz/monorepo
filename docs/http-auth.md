@@ -130,8 +130,9 @@ Failure behavior:
 
 ## Logout Flow
 
-Logout clears the local auth cookie even if the backend logout endpoint is
-unavailable or returns an error.
+Logout is local-only for the store app. It clears the local auth cookie without
+calling a backend logout service, then the client redirects the user to
+`/sign-in`.
 
 ```mermaid
 sequenceDiagram
@@ -139,17 +140,12 @@ sequenceDiagram
   participant Client as logout()
   participant Route as POST /api/auth/logout
   participant Cookie as HttpOnly cookie
-  participant Backend as POST /auth/logout
 
   UI->>Client: logout()
   Client->>Route: POST /api/auth/logout
-  Route->>Cookie: Read ordero_access_token
-  alt token exists
-    Route->>Backend: POST /auth/logout with Bearer token
-  end
   Route->>Cookie: Clear ordero_access_token
   Route-->>Client: { authenticated: false }
-  Client-->>UI: signed-out session state
+  Client-->>UI: signed-out session state + redirect to /sign-in
 ```
 
 ## Session Read and Cache Flow
