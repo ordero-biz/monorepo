@@ -32,26 +32,10 @@ export const getAttributeValues = (attributeId: string | number) =>
 type CreateAttributeInput = {
   name: string;
   sortOrder: number;
-  attributeValues: string[];
-};
-
-type UpdateAttributeInput = {
-  attributeId: string | number;
-  name: string;
-};
-
-type UpdateAttributeValueInput = {
-  attributeValueId: string | number;
-  name: string;
-  sortOrder: number;
-};
-
-type DeleteAttributesInput = {
-  attributeIds: number[];
-};
-
-type DeleteAttributeValuesInput = {
-  attributeValueIds: number[];
+  attributeValues: {
+    name: string;
+    sortOrder: number;
+  }[];
 };
 
 export const createAttribute = (input: CreateAttributeInput) =>
@@ -59,6 +43,11 @@ export const createAttribute = (input: CreateAttributeInput) =>
     method: 'POST',
     body: input,
   });
+
+type UpdateAttributeInput = {
+    attributeId: string | number;
+    name: string;
+};
 
 export const updateAttribute = ({ attributeId, name }: UpdateAttributeInput) =>
   apiFetch<Attribute>(
@@ -70,6 +59,12 @@ export const updateAttribute = ({ attributeId, name }: UpdateAttributeInput) =>
       },
     }
   );
+
+type UpdateAttributeValueInput = {
+    attributeValueId: string | number;
+    name: string;
+    sortOrder: number;
+};
 
 export const updateAttributeValue = ({
   attributeValueId,
@@ -87,11 +82,19 @@ export const updateAttributeValue = ({
     }
   );
 
+type DeleteAttributesInput = {
+    attributeIds: number[];
+};
+
 export const deleteAttributes = (input: DeleteAttributesInput) =>
   apiFetch<void>(CLIENT_BACKEND_PATHS.attributes, {
     method: 'DELETE',
     body: input,
   });
+
+type DeleteAttributeValuesInput = {
+    attributeValueIds: number[];
+};
 
 export const deleteAttributeValues = (input: DeleteAttributeValuesInput) =>
   apiFetch<void>(CLIENT_BACKEND_PATHS.attributeValuesCollection, {

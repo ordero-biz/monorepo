@@ -233,7 +233,16 @@ describe('attribute client helpers', () => {
       createAttribute({
         name: 'Material',
         sortOrder: 0,
-        attributeValues: ['Green', 'Blue'],
+        attributeValues: [
+          {
+            name: 'Green',
+            sortOrder: 0,
+          },
+          {
+            name: 'Blue',
+            sortOrder: 1,
+          },
+        ],
       })
     ).resolves.toEqual({
       ok: true,
@@ -252,7 +261,16 @@ describe('attribute client helpers', () => {
         body: JSON.stringify({
           name: 'Material',
           sortOrder: 0,
-          attributeValues: ['Green', 'Blue'],
+          attributeValues: [
+            {
+              name: 'Green',
+              sortOrder: 0,
+            },
+            {
+              name: 'Blue',
+              sortOrder: 1,
+            },
+          ],
         }),
         cache: 'no-store',
       })
@@ -415,7 +433,12 @@ describe('attribute client helpers', () => {
       createAttribute({
         name: 'Material',
         sortOrder: 0,
-        attributeValues: ['Green'],
+        attributeValues: [
+          {
+            name: 'Green',
+            sortOrder: 0,
+          },
+        ],
       })
     ).resolves.toEqual({
       ok: false,
