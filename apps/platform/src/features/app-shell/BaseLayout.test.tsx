@@ -1,5 +1,5 @@
 import { screen, within } from '@testing-library/react';
-import { prepareStoreSetup } from '@/test/prepareSetup';
+import { preparePlatformSetup } from '@/test/prepareSetup';
 import { BaseLayout } from './BaseLayout';
 
 vi.mock('@/lib/hooks/useLogOut', () => ({
@@ -9,10 +9,10 @@ vi.mock('@/lib/hooks/useLogOut', () => ({
   }),
 }));
 
-const { setup } = prepareStoreSetup({
+const { setup } = preparePlatformSetup({
   component: BaseLayout,
   props: {
-    children: <div>Store content</div>,
+    children: <div>Platform content</div>,
   },
 });
 
@@ -24,10 +24,10 @@ describe('BaseLayout', () => {
     const main = screen.getByRole('main');
 
     expect(within(sidebar).getByText('Ordero')).toBeVisible();
+    expect(within(sidebar).getByRole('link', { name: 'Stores' })).toBeVisible();
     expect(
-      within(sidebar).getByRole('link', { name: 'Dashboard' })
+      within(main).getByRole('heading', { name: 'Platform' })
     ).toBeVisible();
-    expect(within(main).getByRole('heading', { name: 'Store' })).toBeVisible();
-    expect(within(main).getByText('Store content')).toBeVisible();
+    expect(within(main).getByText('Platform content')).toBeVisible();
   });
 });
