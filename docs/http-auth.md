@@ -130,9 +130,9 @@ Failure behavior:
 
 ## Logout Flow
 
-Logout is local-only for the store app. It clears the local auth cookie without
-calling a backend logout service, then the client redirects the user to
-`/sign-in`.
+Logout is local-only for both the platform and store apps. It clears the local
+auth cookie without calling a backend logout service, then the client redirects
+the user to `/sign-in`.
 
 ```mermaid
 sequenceDiagram
