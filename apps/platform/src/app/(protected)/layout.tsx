@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { BaseLayout } from '@/features/app-shell/BaseLayout';
 import { requireAuthenticatedRoute } from '@/lib/api/authPageGuard';
 
 type ProtectedLayoutProps = {
@@ -10,5 +11,5 @@ export default async function ProtectedLayout({
 }: ProtectedLayoutProps) {
   await requireAuthenticatedRoute();
 
-  return children;
+  return <BaseLayout>{children}</BaseLayout>;
 }
