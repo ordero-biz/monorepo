@@ -338,6 +338,9 @@ before finalizing the review:
    implementation details.
 3. Check that multi-export local or shared module mocks preserve adjacent actual
    exports with inline async `vi.importActual` partial mocks.
+4. Check that `vi.mock()` factories that reference shared mock functions use
+   `vi.hoisted()` instead of async `await import(...)` helper functions solely
+   to recover hoisted mock references.
 
 ## Review questions
 
@@ -363,6 +366,8 @@ Use these questions to sharpen the review before writing findings:
 - a `packages/ui` test file is placed away from the component instead of next to the file it covers
 - a shared component or story is added in a location that breaks the current `packages/ui` structure or import flow
 - a unit/component test mocks a local or shared multi-export module destructively (e.g. overriding the entire module) instead of preserving adjacent actual exports with an inline async `vi.importActual` partial mock
+- a test adds an async helper that imports a mocked module only to retrieve a
+  mock function that should have been declared with `vi.hoisted()`
 
 ## What not to over-report
 
