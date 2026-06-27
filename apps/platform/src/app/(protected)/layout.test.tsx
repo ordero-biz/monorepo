@@ -5,13 +5,6 @@ const { requireAuthenticatedRouteMock } = vi.hoisted(() => ({
   requireAuthenticatedRouteMock: vi.fn<() => Promise<void>>(),
 }));
 
-vi.mock('@/lib/hooks/useLogOut', () => ({
-  useLogOut: () => ({
-    isLoggingOut: false,
-    logOut: vi.fn(),
-  }),
-}));
-
 vi.mock('@/lib/api/authPageGuard', () => ({
   requireAuthenticatedRoute: requireAuthenticatedRouteMock,
 }));
@@ -21,12 +14,12 @@ describe('ProtectedLayout', () => {
     requireAuthenticatedRouteMock.mockReset();
   });
 
-  it('checks authentication before rendering the app shell', async () => {
+  it('checks authentication before rendering protected content', async () => {
     requireAuthenticatedRouteMock.mockResolvedValue(undefined);
 
-    render(await ProtectedLayout({ children: <div>Store content</div> }));
+    render(await ProtectedLayout({ children: <div>Protected content</div> }));
 
     expect(requireAuthenticatedRouteMock).toHaveBeenCalledTimes(1);
-    expect(screen.getByText('Store content')).toBeVisible();
+    expect(screen.getByText('Protected content')).toBeVisible();
   });
 });

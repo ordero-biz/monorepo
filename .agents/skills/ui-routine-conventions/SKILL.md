@@ -85,6 +85,9 @@ Required tooling defaults across apps and packages:
 - `@testing-library/user-event`
 - `prepareSetup` from the app/package test helper, or from `@ordero/test-config/react` when no local helper exists, for component test setup
 - Vitest globals (`describe`, `it`, `expect`, `vi`, etc.) without per-file imports
+- use `vi.hoisted()` when a `vi.mock()` factory needs to reference a shared mock
+  function from the test file; do not add async `await import(...)` helpers just
+  to recover hoisted mock references
 
 ### `prepareSetup` rules
 

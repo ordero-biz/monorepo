@@ -1,6 +1,17 @@
 import { hasAuthenticatedServerSession as resolveAuthenticatedServerSession } from '@ordero/next-api/authPageGuard';
+import { redirect } from 'next/navigation';
 import { getServerSession } from '@/lib/api/session';
-import { hasAuthenticatedServerSession } from './authPageGuard';
+import { clientRoutes } from '@/lib/client/routes';
+import {
+  hasAuthenticatedServerSession,
+  requireAuthenticatedRoute,
+} from './authPageGuard';
+
+vi.mock('next/navigation', () => ({
+  redirect: vi.fn(() => {
+    throw new Error('redirect');
+  }),
+}));
 
 vi.mock('@ordero/next-api/authPageGuard', async () => {
   const actual = await vi.importActual<
@@ -31,6 +42,7 @@ const resolveAuthenticatedServerSessionMock = vi.mocked(
 
 describe('authPageGuard', () => {
   beforeEach(() => {
+    vi.mocked(redirect).mockClear();
     resolveAuthenticatedServerSessionMock.mockReset();
   });
 
@@ -44,5 +56,19 @@ describe('authPageGuard', () => {
     expect(resolveAuthenticatedServerSessionMock).toHaveBeenCalledWith({
       getServerSession,
     });
+  });
+
+  it('redirects signed-out protected route requests to sign in', async () => {
+    resolveAuthenticatedServerSessionMock.mockResolvedValue(false);
+
+    await expect(requireAuthenticatedRoute()).rejects.toThrow('redirect');
+    expect(redirect).toHaveBeenCalledWith(clientRoutes.signIn);
+  });
+
+  it('allows authenticated protected route requests to continue', async () => {
+    resolveAuthenticatedServerSessionMock.mockResolvedValue(true);
+
+    await expect(requireAuthenticatedRoute()).resolves.toBeUndefined();
+    expect(redirect).not.toHaveBeenCalled();
   });
 });
