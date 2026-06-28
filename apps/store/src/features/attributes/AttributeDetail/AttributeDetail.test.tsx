@@ -1,4 +1,4 @@
-import { screen, waitFor } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {
   getAttribute,
@@ -161,10 +161,12 @@ describe('AttributeDetail', () => {
       await screen.findByRole('button', { name: 'Delete Blue' })
     );
 
-    expect(
-      screen.getByRole('dialog', { name: 'Delete attribute value' })
-    ).toBeVisible();
-    expect(screen.getByText('Blue')).toBeVisible();
+    const dialog = screen.getByRole('dialog', {
+      name: 'Delete attribute value',
+    });
+
+    expect(dialog).toBeVisible();
+    expect(within(dialog).getByText('Blue')).toBeVisible();
   });
 
   it('refetches the attribute detail after updating the attribute name', async () => {
