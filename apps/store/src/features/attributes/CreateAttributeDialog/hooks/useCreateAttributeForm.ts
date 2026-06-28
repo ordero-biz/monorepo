@@ -33,6 +33,10 @@ export const useCreateAttributeForm = ({
         return;
       }
 
+      addToast({
+        description: `Attribute ${result.data.name} was created`,
+        type: 'success',
+      });
       formApi.reset();
       await onCreated(result.data.id);
     },

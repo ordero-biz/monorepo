@@ -69,6 +69,10 @@ describe('useCreateAttributeForm', () => {
     await user.click(submitButton);
 
     await waitFor(() => expect(onCreated).toHaveBeenCalledWith(7));
+    expect(addToastMock).toHaveBeenCalledWith({
+      description: 'Attribute Material was created',
+      type: 'success',
+    });
   });
 
   it('shows a toast when submit fails with a form-level error', async () => {
