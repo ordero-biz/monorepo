@@ -3,24 +3,25 @@
 import { Button, Card, DataTable, Typography } from '@ordero/ui';
 import { useMemo, useState } from 'react';
 import type { AttributeValue } from '@/lib/domain/attributes';
-import type { useAttributeValuesQuery } from '@/lib/hooks/useAttributesQuery';
+import { useAttributeValuesQuery } from '@/lib/hooks/useAttributesQuery';
 import { DeleteAttributeValueDialog } from '../DeleteAttributeValueDialog/DeleteAttributeValueDialog';
 import { UpdateAttributeValueDialog } from '../UpdateAttributeValueDialog/UpdateAttributeValueDialog';
 import { getColumns } from './columns';
 
 type AttributeDetailValuesProps = {
   attributeId: string | number;
-  attributeValuesQuery: ReturnType<typeof useAttributeValuesQuery>;
 };
 
 export const AttributeDetailValues = ({
   attributeId,
-  attributeValuesQuery,
 }: AttributeDetailValuesProps) => {
+  const attributeValuesQuery = useAttributeValuesQuery(attributeId);
+
   const [updatingAttributeValue, setUpdatingAttributeValue] =
     useState<AttributeValue | null>(null);
   const [deletingAttributeValue, setDeletingAttributeValue] =
     useState<AttributeValue | null>(null);
+
   const columns = useMemo(
     () =>
       getColumns({
@@ -76,7 +77,7 @@ export const AttributeDetailValues = ({
         getRowId={(row) => String(row.id)}
       />
 
-      {updatingAttributeValue ? (
+      {updatingAttributeValue && (
         <UpdateAttributeValueDialog
           attributeId={attributeId}
           attributeValue={updatingAttributeValue}
@@ -87,9 +88,9 @@ export const AttributeDetailValues = ({
           }}
           open={Boolean(updatingAttributeValue)}
         />
-      ) : null}
+      )}
 
-      {deletingAttributeValue ? (
+      {deletingAttributeValue && (
         <DeleteAttributeValueDialog
           attributeId={attributeId}
           attributeValue={deletingAttributeValue}
@@ -100,7 +101,7 @@ export const AttributeDetailValues = ({
           }}
           open={Boolean(deletingAttributeValue)}
         />
-      ) : null}
+      )}
     </>
   );
 };

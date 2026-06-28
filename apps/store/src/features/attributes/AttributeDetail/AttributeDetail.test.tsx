@@ -1,4 +1,4 @@
-import { screen, waitFor } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {
   getAttribute,
@@ -161,10 +161,12 @@ describe('AttributeDetail', () => {
       await screen.findByRole('button', { name: 'Delete Blue' })
     );
 
-    expect(
-      screen.getByRole('dialog', { name: 'Delete attribute value' })
-    ).toBeVisible();
-    expect(screen.getByText('Blue')).toBeVisible();
+    const dialog = screen.getByRole('dialog', {
+      name: 'Delete attribute value',
+    });
+
+    expect(dialog).toBeVisible();
+    expect(within(dialog).getByText('Blue')).toBeVisible();
   });
 
   it('refetches the attribute detail after updating the attribute name', async () => {
@@ -226,7 +228,7 @@ describe('AttributeDetail', () => {
     expect(getAttributeMock).toHaveBeenCalledTimes(2);
   });
 
-  it('renders an attribute error state and retries loading the attribute', async () => {
+  it('renders an attribute error state without blocking the values section', async () => {
     getAttributeMock
       .mockResolvedValueOnce({
         ok: false,
@@ -256,6 +258,7 @@ describe('AttributeDetail', () => {
     expect(
       await screen.findByText("We couldn't load this attribute right now.")
     ).toBeVisible();
+    expect(await screen.findByText('No attribute values found.')).toBeVisible();
 
     await user.click(screen.getByRole('button', { name: 'Retry' }));
 
@@ -263,7 +266,7 @@ describe('AttributeDetail', () => {
     expect(getAttributeMock).toHaveBeenCalledTimes(2);
   });
 
-  it('renders a values error state and retries loading the values', async () => {
+  it('renders a values error state without blocking the attribute header', async () => {
     getAttributeMock.mockResolvedValue({
       ok: true,
       data: {
@@ -302,6 +305,7 @@ describe('AttributeDetail', () => {
         "We couldn't load this attribute's values right now."
       )
     ).toBeVisible();
+    expect(screen.getByRole('heading', { name: 'Color' })).toBeVisible();
 
     await user.click(screen.getByRole('button', { name: 'Retry' }));
 
