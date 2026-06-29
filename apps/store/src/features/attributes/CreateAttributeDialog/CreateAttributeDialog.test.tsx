@@ -2,7 +2,7 @@ import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createAttribute } from '@/lib/client/api/attributes';
 import { getAttributeDetailRoute } from '@/lib/client/routes';
-import { attributesQueryKeys } from '@/lib/hooks/useAttributesQuery';
+import { attributesQueryKeys } from '@/lib/query/attributes/attributesQueryKeys';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { CreateAttributeDialog } from './CreateAttributeDialog';
 

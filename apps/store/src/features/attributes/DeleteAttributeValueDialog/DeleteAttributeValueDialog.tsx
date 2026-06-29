@@ -3,7 +3,7 @@
 import { Button, Dialog, Typography } from '@ordero/ui';
 import { useQueryClient } from '@tanstack/react-query';
 import type { AttributeValue } from '@/lib/domain/attributes';
-import { attributesQueryKeys } from '@/lib/hooks/useAttributesQuery';
+import { attributesQueryKeys } from '@/lib/query/attributes/attributesQueryKeys';
 import { useDeleteAttributeValue } from './hooks/useDeleteAttributeValue';
 
 type DeleteAttributeValueDialogProps = {

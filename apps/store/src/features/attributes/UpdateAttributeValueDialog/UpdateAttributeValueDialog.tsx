@@ -3,7 +3,7 @@
 import { Button, Dialog, TextField } from '@ordero/ui';
 import { useQueryClient } from '@tanstack/react-query';
 import type { AttributeValue } from '@/lib/domain/attributes';
-import { attributesQueryKeys } from '@/lib/hooks/useAttributesQuery';
+import { attributesQueryKeys } from '@/lib/query/attributes/attributesQueryKeys';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
 import { useUpdateAttributeValueForm } from './hooks/useUpdateAttributeValueForm';
 import { validateUpdateAttributeValueName } from './utils/validations';
@@ -95,10 +95,7 @@ export const UpdateAttributeValueDialog = ({
               <Dialog.Footer>
                 <form.Subscribe selector={(state) => state.isSubmitting}>
                   {(isSubmitting) => (
-                    <Button
-                      disabled={isSubmitting}
-                      type="submit"
-                    >
+                    <Button disabled={isSubmitting} type="submit">
                       {isSubmitting ? 'Saving...' : 'Save'}
                     </Button>
                   )}

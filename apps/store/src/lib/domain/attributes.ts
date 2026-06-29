@@ -6,7 +6,9 @@ export type Attribute = {
   createdAt: string;
 };
 
-export type AttributeValue = Pick<
-  Attribute,
-  'id' | 'name' | 'sortOrder' | 'createdAt'
->;
+export type AttributeValue = {
+  id: number;
+  name: string;
+  sortOrder: number;
+  createdAt: string;
+};

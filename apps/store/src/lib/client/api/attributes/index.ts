@@ -97,7 +97,7 @@ type DeleteAttributeValuesInput = {
 };
 
 export const deleteAttributeValues = (input: DeleteAttributeValuesInput) =>
-  apiFetch<void>(CLIENT_BACKEND_PATHS.attributeValuesCollection, {
+  apiFetch<void>(CLIENT_BACKEND_PATHS.attributeValuesDelete, {
     method: 'DELETE',
     body: input,
   });

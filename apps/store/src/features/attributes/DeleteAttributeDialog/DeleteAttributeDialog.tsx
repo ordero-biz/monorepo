@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { clientRoutes } from '@/lib/client/routes';
 import type { Attribute } from '@/lib/domain/attributes';
-import { attributesQueryKeys } from '@/lib/hooks/useAttributesQuery';
+import { attributesQueryKeys } from '@/lib/query/attributes/attributesQueryKeys';
 import { useDeleteAttribute } from './hooks/useDeleteAttribute';
 
 type DeleteAttributeDialogProps = {

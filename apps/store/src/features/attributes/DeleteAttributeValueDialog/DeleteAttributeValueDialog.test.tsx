@@ -1,7 +1,7 @@
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { deleteAttributeValues } from '@/lib/client/api/attributes';
-import { attributesQueryKeys } from '@/lib/hooks/useAttributesQuery';
+import { attributesQueryKeys } from '@/lib/query/attributes/attributesQueryKeys';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { DeleteAttributeValueDialog } from './DeleteAttributeValueDialog';
 

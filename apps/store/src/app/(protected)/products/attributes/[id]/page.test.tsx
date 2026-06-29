@@ -2,8 +2,8 @@ import { render, screen } from '@testing-library/react';
 import {
   getServerAttribute,
   getServerAttributeValues,
-} from '@/lib/api/attributes';
-import { attributesQueryKeys } from '@/lib/hooks/attributesQueryKeys';
+} from '@/lib/api/api/attributes';
+import { attributesQueryKeys } from '@/lib/query/attributes/attributesQueryKeys';
 import {
   createTestQueryClient,
   createTestQueryProvider,

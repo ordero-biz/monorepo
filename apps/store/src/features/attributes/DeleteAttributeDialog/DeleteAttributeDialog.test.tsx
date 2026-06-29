@@ -2,7 +2,7 @@ import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { deleteAttributes } from '@/lib/client/api/attributes';
 import { clientRoutes } from '@/lib/client/routes';
-import { attributesQueryKeys } from '@/lib/hooks/useAttributesQuery';
+import { attributesQueryKeys } from '@/lib/query/attributes/attributesQueryKeys';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { DeleteAttributeDialog } from './DeleteAttributeDialog';
 

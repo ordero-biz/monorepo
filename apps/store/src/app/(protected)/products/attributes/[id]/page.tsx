@@ -3,11 +3,11 @@ import { AttributeDetail } from '@/features/attributes';
 import {
   getServerAttribute,
   getServerAttributeValues,
-} from '@/lib/api/attributes';
+} from '@/lib/api/api/attributes';
 import {
   attributeQueryOptions,
   attributeValuesQueryOptions,
-} from '@/lib/hooks/attributesQueryOptions';
+} from '@/lib/query/attributes/attributesQueryOptions';
 import { makeQueryClient } from '@/lib/query/queryClient';
 
 type AttributeDetailPageProps = {

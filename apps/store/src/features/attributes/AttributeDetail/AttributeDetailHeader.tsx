@@ -1,7 +1,7 @@
 'use client';
 
 import { Button, Card, PageHeader, Typography } from '@ordero/ui';
-import { useAttributeQuery } from '@/lib/hooks/useAttributesQuery';
+import { useAttributeQuery } from '@/lib/hooks/attributes/useAttributeQuery';
 import { DeleteAttributeDialog } from '../DeleteAttributeDialog/DeleteAttributeDialog';
 import { UpdateAttributeDialog } from '../UpdateAttributeDialog/UpdateAttributeDialog';
 

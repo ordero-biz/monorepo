@@ -6,7 +6,7 @@ import { Minus, Plus } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useRef, useState } from 'react';
 import { getAttributeDetailRoute } from '@/lib/client/routes';
-import { attributesQueryKeys } from '@/lib/hooks/useAttributesQuery';
+import { attributesQueryKeys } from '@/lib/query/attributes/attributesQueryKeys';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
 import { INITIAL_ATTRIBUTE_VALUE_FIELD_INDEX } from './constants';
 import { useCreateAttributeForm } from './hooks/useCreateAttributeForm';
@@ -203,10 +203,7 @@ export const CreateAttributeDialog = () => {
                 <Dialog.Footer>
                   <form.Subscribe selector={(state) => state.isSubmitting}>
                     {(isSubmitting) => (
-                      <Button
-                        disabled={isSubmitting}
-                        type="submit"
-                      >
+                      <Button disabled={isSubmitting} type="submit">
                         {isSubmitting ? 'Creating...' : 'Create'}
                       </Button>
                     )}
