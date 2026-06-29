@@ -37,7 +37,7 @@ export const useCreateAttributeForm = ({
         description: `Attribute ${result.data.name} was created`,
         type: 'success',
       });
-      formApi.reset();
+
       await onCreated(result.data.id);
     },
   });

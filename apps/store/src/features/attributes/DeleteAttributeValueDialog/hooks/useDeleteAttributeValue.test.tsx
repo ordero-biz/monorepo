@@ -1,8 +1,9 @@
-import { screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { act, renderHook, waitFor } from '@testing-library/react';
 import { deleteAttributeValues } from '@/lib/client/api/attributes';
-import { attributesQueryKeys } from '@/lib/hooks/useAttributesQuery';
-import { prepareStoreSetup } from '@/test/prepareSetup';
+import {
+  createTestQueryClient,
+  createTestQueryProvider,
+} from '@/test/prepareSetup';
 import { useDeleteAttributeValue } from './useDeleteAttributeValue';
 
 const { addToastMock } = vi.hoisted(() => ({
@@ -25,55 +26,24 @@ vi.mock('@/lib/client/api/attributes', async () => ({
 
 const deleteAttributeValuesMock = vi.mocked(deleteAttributeValues);
 
-type DeleteAttributeValueHookTestProps = {
-  attributeId: number;
-  attributeValueId: number;
-  attributeValueName: string;
-  onDeleted: () => Promise<void> | void;
-};
-
-const DeleteAttributeValueHookTest = ({
-  attributeId,
-  attributeValueId,
-  attributeValueName,
-  onDeleted,
-}: DeleteAttributeValueHookTestProps) => {
-  const { handleDelete, isDeleting } = useDeleteAttributeValue({
-    attributeId,
-    attributeValueId,
-    attributeValueName,
-    onDeleted,
-  });
-
-  return (
-    <button disabled={isDeleting} onClick={handleDelete} type="button">
-      Delete
-    </button>
-  );
-};
-
-const { setup } = prepareStoreSetup({
-  component: DeleteAttributeValueHookTest,
-  props: {
-    attributeId: 7,
-    attributeValueId: 3,
-    attributeValueName: 'Blue',
-    onDeleted: vi.fn(),
-  },
-});
-
 const setupDeleteAttributeValueHook = () => {
-  const user = userEvent.setup();
   const onDeleted = vi.fn();
-  const result = setup({
-    onDeleted,
-  });
+  const TestQueryProvider = createTestQueryProvider(createTestQueryClient());
+  const { result } = renderHook(
+    () =>
+      useDeleteAttributeValue({
+        attributeValueId: 3,
+        attributeValueName: 'Blue',
+        onDeleted,
+      }),
+    {
+      wrapper: TestQueryProvider,
+    }
+  );
 
   return {
-    ...result,
-    deleteButton: screen.getByRole('button', { name: 'Delete' }),
+    result,
     onDeleted,
-    user,
   };
 };
 
@@ -83,28 +53,30 @@ describe('useDeleteAttributeValue', () => {
     deleteAttributeValuesMock.mockReset();
   });
 
-  it('deletes the attribute value, runs success cleanup, and invalidates the values list', async () => {
+  it('deletes the attribute value and runs success cleanup', async () => {
     deleteAttributeValuesMock.mockResolvedValue({
       ok: true,
       data: undefined,
     });
-    const { deleteButton, onDeleted, queryClient, user } =
-      setupDeleteAttributeValueHook();
-    const invalidateQueriesSpy = vi.spyOn(queryClient, 'invalidateQueries');
+    const { onDeleted, result } = setupDeleteAttributeValueHook();
 
-    await user.click(deleteButton);
+    expect(result.current.isDeleting).toBe(false);
 
-    expect(deleteAttributeValuesMock).toHaveBeenCalledWith({
-      attributeValueIds: [3],
+    act(() => {
+      result.current.handleDelete();
     });
+
+    await waitFor(() =>
+      expect(deleteAttributeValuesMock).toHaveBeenCalledWith({
+        attributeValueIds: [3],
+      })
+    );
     await waitFor(() => expect(onDeleted).toHaveBeenCalled());
     expect(addToastMock).toHaveBeenCalledWith({
       description: 'Attribute value Blue was deleted.',
       type: 'success',
     });
-    expect(invalidateQueriesSpy).toHaveBeenCalledWith({
-      queryKey: attributesQueryKeys.values(7),
-    });
+    expect(result.current.isDeleting).toBe(false);
   });
 
   it('shows a toast and skips success cleanup when delete fails', async () => {
@@ -115,9 +87,11 @@ describe('useDeleteAttributeValue', () => {
         message: 'Attribute value delete failed.',
       },
     });
-    const { deleteButton, onDeleted, user } = setupDeleteAttributeValueHook();
+    const { onDeleted, result } = setupDeleteAttributeValueHook();
 
-    await user.click(deleteButton);
+    act(() => {
+      result.current.handleDelete();
+    });
 
     await waitFor(() =>
       expect(addToastMock).toHaveBeenCalledWith({
@@ -126,5 +100,6 @@ describe('useDeleteAttributeValue', () => {
       })
     );
     expect(onDeleted).not.toHaveBeenCalled();
+    expect(result.current.isDeleting).toBe(false);
   });
 });

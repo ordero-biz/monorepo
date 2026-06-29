@@ -41,9 +41,6 @@ export const useUpdateAttributeForm = ({
         return;
       }
 
-      formApi.reset({
-        name: result.data.name,
-      });
       await onUpdated();
     },
   });

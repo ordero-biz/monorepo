@@ -1,10 +1,7 @@
+import type { ApiError } from '@ordero/api-types';
 import { useToastManager } from '@ordero/ui';
-import { useQueryClient } from '@tanstack/react-query';
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useMutation } from '@tanstack/react-query';
 import { deleteAttributes } from '@/lib/client/api/attributes';
-import { clientRoutes } from '@/lib/client/routes';
-import { attributesQueryKeys } from '@/lib/hooks/useAttributesQuery';
 
 type UseDeleteAttributeArgs = {
   attributeId: number;
@@ -18,46 +15,34 @@ export const useDeleteAttribute = ({
   onDeleted,
 }: UseDeleteAttributeArgs) => {
   const { add: addToast } = useToastManager();
-  const queryClient = useQueryClient();
-  const router = useRouter();
-  const [isDeleting, setIsDeleting] = useState(false);
 
-  const handleDelete = async () => {
-    setIsDeleting(true);
+  const deleteAttributeMutation = useMutation<void, ApiError>({
+    mutationFn: async () => {
+      const result = await deleteAttributes({
+        attributeIds: [attributeId],
+      });
 
-    const result = await deleteAttributes({
-      attributeIds: [attributeId],
-    });
-
-    setIsDeleting(false);
-
-    if (!result.ok) {
+      if (!result.ok) {
+        throw result.error;
+      }
+    },
+    onError: (error) => {
       addToast({
-        description: result.error.message,
+        description: error.message,
         type: 'error',
       });
-      return;
-    }
-
-    addToast({
-      description: `Attribute ${attributeName} was deleted.`,
-      type: 'success',
-    });
-    await onDeleted();
-    queryClient.removeQueries({
-      queryKey: attributesQueryKeys.detail(attributeId),
-    });
-    queryClient.removeQueries({
-      queryKey: attributesQueryKeys.values(attributeId),
-    });
-    await queryClient.invalidateQueries({
-      queryKey: attributesQueryKeys.list,
-    });
-    router.push(clientRoutes.attributes);
-  };
+    },
+    onSuccess: async () => {
+      addToast({
+        description: `Attribute ${attributeName} was deleted.`,
+        type: 'success',
+      });
+      await onDeleted();
+    },
+  });
 
   return {
-    handleDelete,
-    isDeleting,
+    handleDelete: () => deleteAttributeMutation.mutate(),
+    isDeleting: deleteAttributeMutation.isPending,
   };
 };

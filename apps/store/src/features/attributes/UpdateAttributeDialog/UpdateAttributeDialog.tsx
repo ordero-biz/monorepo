@@ -34,9 +34,12 @@ export const UpdateAttributeDialog = ({
 
   const handleOpenChange = (nextOpen: boolean) => {
     setOpen(nextOpen);
-    form.reset({
-      name: attribute.name,
-    });
+
+    if (!nextOpen) {
+      form.reset({
+        name: attribute.name,
+      });
+    }
   };
 
   return (
@@ -70,10 +73,8 @@ export const UpdateAttributeDialog = ({
                   <form.Field
                     name="name"
                     validators={{
-                      onChange: ({ value }) =>
-                        validateUpdateAttributeName(value),
-                      onSubmit: ({ value }) =>
-                        validateUpdateAttributeName(value),
+                      onChange: validateUpdateAttributeName,
+                      onSubmit: validateUpdateAttributeName,
                     }}
                   >
                     {(field) => {
@@ -88,7 +89,7 @@ export const UpdateAttributeDialog = ({
                           invalid={Boolean(errorText)}
                           name={field.name}
                           onBlur={field.handleBlur}
-                          onValueChange={(value) => field.handleChange(value)}
+                          onValueChange={field.handleChange}
                           placeholder="Color"
                           required
                           value={field.state.value}
@@ -99,20 +100,13 @@ export const UpdateAttributeDialog = ({
                 </Dialog.Content>
 
                 <Dialog.Footer>
-                  <form.Subscribe
-                    selector={(state) =>
-                      [state.values.name, state.isSubmitting] as const
-                    }
-                  >
-                    {([name, isSubmitting]) => (
+                  <form.Subscribe selector={(state) => state.isSubmitting}>
+                    {(isSubmitting) => (
                       <Button
-                        disabled={
-                          Boolean(validateUpdateAttributeName(name)) ||
-                          isSubmitting
-                        }
+                        disabled={isSubmitting}
                         type="submit"
                       >
-                        Save
+                        {isSubmitting ? 'Saving...' : 'Save'}
                       </Button>
                     )}
                   </form.Subscribe>

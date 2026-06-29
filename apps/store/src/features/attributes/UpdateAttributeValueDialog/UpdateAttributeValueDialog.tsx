@@ -36,10 +36,13 @@ export const UpdateAttributeValueDialog = ({
 
   const handleOpenChange = (nextOpen: boolean) => {
     onOpenChange(nextOpen);
-    form.reset({
-      name: attributeValue.name,
-      sortOrder: attributeValue.sortOrder,
-    });
+
+    if (!nextOpen) {
+      form.reset({
+        name: attributeValue.name,
+        sortOrder: attributeValue.sortOrder,
+      });
+    }
   };
 
   return (
@@ -63,10 +66,8 @@ export const UpdateAttributeValueDialog = ({
                 <form.Field
                   name="name"
                   validators={{
-                    onChange: ({ value }) =>
-                      validateUpdateAttributeValueName(value),
-                    onSubmit: ({ value }) =>
-                      validateUpdateAttributeValueName(value),
+                    onChange: validateUpdateAttributeValueName,
+                    onSubmit: validateUpdateAttributeValueName,
                   }}
                 >
                   {(field) => {
@@ -81,7 +82,7 @@ export const UpdateAttributeValueDialog = ({
                         invalid={Boolean(errorText)}
                         name={field.name}
                         onBlur={field.handleBlur}
-                        onValueChange={(value) => field.handleChange(value)}
+                        onValueChange={field.handleChange}
                         placeholder="Blue"
                         required
                         value={field.state.value}
@@ -92,20 +93,13 @@ export const UpdateAttributeValueDialog = ({
               </Dialog.Content>
 
               <Dialog.Footer>
-                <form.Subscribe
-                  selector={(state) =>
-                    [state.values.name, state.isSubmitting] as const
-                  }
-                >
-                  {([name, isSubmitting]) => (
+                <form.Subscribe selector={(state) => state.isSubmitting}>
+                  {(isSubmitting) => (
                     <Button
-                      disabled={
-                        Boolean(validateUpdateAttributeValueName(name)) ||
-                        isSubmitting
-                      }
+                      disabled={isSubmitting}
                       type="submit"
                     >
-                      Save
+                      {isSubmitting ? 'Saving...' : 'Save'}
                     </Button>
                   )}
                 </form.Subscribe>

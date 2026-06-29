@@ -44,10 +44,6 @@ export const useUpdateAttributeValueForm = ({
         return;
       }
 
-      formApi.reset({
-        name: result.data.name,
-        sortOrder: result.data.sortOrder,
-      });
       await onUpdated();
     },
   });

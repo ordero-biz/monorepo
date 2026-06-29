@@ -52,7 +52,7 @@ describe('DeleteAttributeDialog', () => {
       screen.getByRole('dialog', { name: 'Delete attribute' })
     ).toBeVisible();
     expect(
-      screen.getByText('Are you sure you want delete', { exact: false })
+      screen.getByText('Are you sure you want to delete', { exact: false })
     ).toBeVisible();
     expect(screen.getByText('Color')).toBeVisible();
   });

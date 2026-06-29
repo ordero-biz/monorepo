@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { ValidationArgs } from '@/lib/utils/form/validation/types';
 
 export const updateAttributeValueNameSchema = z
   .string()
@@ -14,7 +15,7 @@ export type UpdateAttributeValueFormValues = z.infer<
   typeof updateAttributeValueSchema
 >;
 
-export const validateUpdateAttributeValueName = (value: string) => {
+export const validateUpdateAttributeValueName = ({ value }: ValidationArgs<string>) => {
   const result = updateAttributeValueNameSchema.safeParse(value);
 
   return result.success ? undefined : result.error.issues[0]?.message;

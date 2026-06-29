@@ -1,7 +1,9 @@
 'use client';
 
 import { Button, Dialog, Typography } from '@ordero/ui';
+import { useQueryClient } from '@tanstack/react-query';
 import type { AttributeValue } from '@/lib/domain/attributes';
+import { attributesQueryKeys } from '@/lib/hooks/useAttributesQuery';
 import { useDeleteAttributeValue } from './hooks/useDeleteAttributeValue';
 
 type DeleteAttributeValueDialogProps = {
@@ -17,11 +19,16 @@ export const DeleteAttributeValueDialog = ({
   onOpenChange,
   open,
 }: DeleteAttributeValueDialogProps) => {
+  const queryClient = useQueryClient();
   const { handleDelete, isDeleting } = useDeleteAttributeValue({
-    attributeId,
     attributeValueId: attributeValue.id,
     attributeValueName: attributeValue.name,
-    onDeleted: () => onOpenChange(false),
+    onDeleted: async () => {
+      onOpenChange(false);
+      await queryClient.invalidateQueries({
+        queryKey: attributesQueryKeys.values(attributeId),
+      });
+    },
   });
 
   return (
@@ -48,7 +55,7 @@ export const DeleteAttributeValueDialog = ({
                 onClick={handleDelete}
                 type="button"
               >
-                Delete
+                {isDeleting ? 'Deleting...' : 'Delete'}
               </Button>
             </Dialog.Footer>
           </Dialog.Popup>
