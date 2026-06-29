@@ -2,8 +2,8 @@
 
 import { apiFetch } from '@ordero/api-client';
 import type { PaginatedResponse } from '@/lib/api/types';
-import { tokenizePath } from '@/lib/client/utils/helpers/tokenizePath';
 import type { Attribute, AttributeValue } from '@/lib/domain/attributes';
+import { tokenizePath } from '@/lib/utils/tokenizePath';
 import { CLIENT_BACKEND_PATHS } from '../../apiPaths';
 
 type AttributesListResponse = PaginatedResponse<Attribute>;
@@ -45,8 +45,8 @@ export const createAttribute = (input: CreateAttributeInput) =>
   });
 
 type UpdateAttributeInput = {
-    attributeId: string | number;
-    name: string;
+  attributeId: string | number;
+  name: string;
 };
 
 export const updateAttribute = ({ attributeId, name }: UpdateAttributeInput) =>
@@ -61,9 +61,9 @@ export const updateAttribute = ({ attributeId, name }: UpdateAttributeInput) =>
   );
 
 type UpdateAttributeValueInput = {
-    attributeValueId: string | number;
-    name: string;
-    sortOrder: number;
+  attributeValueId: string | number;
+  name: string;
+  sortOrder: number;
 };
 
 export const updateAttributeValue = ({
@@ -83,7 +83,7 @@ export const updateAttributeValue = ({
   );
 
 type DeleteAttributesInput = {
-    attributeIds: number[];
+  attributeIds: number[];
 };
 
 export const deleteAttributes = (input: DeleteAttributesInput) =>
@@ -93,7 +93,7 @@ export const deleteAttributes = (input: DeleteAttributesInput) =>
   });
 
 type DeleteAttributeValuesInput = {
-    attributeValueIds: number[];
+  attributeValueIds: number[];
 };
 
 export const deleteAttributeValues = (input: DeleteAttributeValuesInput) =>

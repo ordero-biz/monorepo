@@ -9,6 +9,7 @@ import {
   createTestQueryProvider,
 } from '@/test/prepareSetup';
 import {
+  attributesQueryKeys,
   useAttributeQuery,
   useAttributesQuery,
   useAttributeValuesQuery,
@@ -120,6 +121,27 @@ describe('attributes queries', () => {
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(result.current.data).toEqual(attribute);
     expect(getAttributeMock).toHaveBeenCalledWith('1');
+  });
+
+  it('reads hydrated attribute detail from the cache without a client request', async () => {
+    const attribute = {
+      id: 1,
+      name: 'Size',
+      sortOrder: 10,
+      createdAt: '2026-05-26T20:55:51.542Z',
+    };
+    const queryClient = createTestQueryClient();
+    const TestQueryProvider = createTestQueryProvider(queryClient);
+
+    queryClient.setQueryData(attributesQueryKeys.detail('1'), attribute);
+
+    const { result } = renderHook(() => useAttributeQuery('1'), {
+      wrapper: TestQueryProvider,
+    });
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(result.current.data).toEqual(attribute);
+    expect(getAttributeMock).not.toHaveBeenCalled();
   });
 
   it('exposes the attribute detail request error without retrying', async () => {
