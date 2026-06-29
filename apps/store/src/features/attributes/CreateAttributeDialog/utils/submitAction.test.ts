@@ -60,7 +60,7 @@ describe('submitCreateAttribute', () => {
         },
         {
           name: 'Linen',
-          sortOrder: 1,
+          sortOrder: 0,
         },
       ],
     });

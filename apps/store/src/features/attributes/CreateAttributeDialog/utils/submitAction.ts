@@ -8,9 +8,9 @@ const normalizeAttributeValues = (attributeValues: AttributeValueFormValue[]) =>
   attributeValues
     .map((attributeValue) => attributeValue.value.trim())
     .filter(Boolean)
-    .map((name, sortOrder) => ({
+    .map((name) => ({
       name,
-      sortOrder,
+      sortOrder: 0,
     }));
 
 export const submitCreateAttribute = async (

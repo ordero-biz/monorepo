@@ -83,8 +83,8 @@ export const CreateAttributeDialog = () => {
                     <form.Field
                       name="name"
                       validators={{
-                        onChange: ({ value }) => validateAttributeName(value),
-                        onSubmit: ({ value }) => validateAttributeName(value),
+                        onChange: validateAttributeName,
+                        onSubmit: validateAttributeName,
                       }}
                     >
                       {(field) => {
@@ -99,7 +99,7 @@ export const CreateAttributeDialog = () => {
                             invalid={Boolean(errorText)}
                             name={field.name}
                             onBlur={field.handleBlur}
-                            onValueChange={(value) => field.handleChange(value)}
+                            onValueChange={field.handleChange}
                             placeholder="Color"
                             required
                             value={field.state.value}
@@ -182,9 +182,7 @@ export const CreateAttributeDialog = () => {
                                           invalid={Boolean(fieldError)}
                                           name={subField.name}
                                           onBlur={subField.handleBlur}
-                                          onValueChange={(value) =>
-                                            subField.handleChange(value)
-                                          }
+                                          onValueChange={subField.handleChange}
                                           placeholder="Attribute value"
                                           size="s"
                                           value={attributeValue}
@@ -203,19 +201,13 @@ export const CreateAttributeDialog = () => {
                 </Dialog.Content>
 
                 <Dialog.Footer>
-                  <form.Subscribe
-                    selector={(state) =>
-                      [state.values.name, state.isSubmitting] as const
-                    }
-                  >
-                    {([name, isSubmitting]) => (
+                  <form.Subscribe selector={(state) => state.isSubmitting}>
+                    {(isSubmitting) => (
                       <Button
-                        disabled={
-                          Boolean(validateAttributeName(name)) || isSubmitting
-                        }
+                        disabled={isSubmitting}
                         type="submit"
                       >
-                        Create
+                        {isSubmitting ? 'Creating...' : 'Create'}
                       </Button>
                     )}
                   </form.Subscribe>

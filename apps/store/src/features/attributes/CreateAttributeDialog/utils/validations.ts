@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { ValidationArgs } from '@/lib/utils/form/validation/types';
 
 export const attributeNameSchema = z
   .string()
@@ -18,7 +19,7 @@ export const createAttributeSchema = z.object({
 export type AttributeValueFormValue = z.infer<typeof attributeValueSchema>;
 export type CreateAttributeFormValues = z.infer<typeof createAttributeSchema>;
 
-export const validateAttributeName = (value: string) => {
+export const validateAttributeName = ({ value }: ValidationArgs<string>) => {
   const result = attributeNameSchema.safeParse(value);
 
   return result.success ? undefined : result.error.issues[0]?.message;
