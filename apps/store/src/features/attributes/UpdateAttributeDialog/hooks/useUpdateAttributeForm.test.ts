@@ -1,8 +1,8 @@
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { prepareFormHookTestSetup } from '@/test/prepareFormHookTestSetup';
-import { submitCreateAttribute } from '../utils/submitAction';
-import { useCreateAttributeForm } from './useCreateAttributeForm';
+import { submitUpdateAttribute } from '../utils/submitAction';
+import { useUpdateAttributeForm } from './useUpdateAttributeForm';
 
 const { addToastMock } = vi.hoisted(() => ({
   addToastMock: vi.fn(),
@@ -19,78 +19,90 @@ vi.mock('../utils/submitAction', async () => ({
   ...(await vi.importActual<typeof import('../utils/submitAction')>(
     '../utils/submitAction'
   )),
-  submitCreateAttribute: vi.fn(),
+  submitUpdateAttribute: vi.fn(),
 }));
 
-const submitCreateAttributeMock = vi.mocked(submitCreateAttribute);
+const submitUpdateAttributeMock = vi.mocked(submitUpdateAttribute);
 
 const { setup } = prepareFormHookTestSetup({
   hookProps: {
-    onCreated: vi.fn(),
+    attributeId: 7,
+    initialName: 'Color',
+    onUpdated: vi.fn(),
   },
-  useFormHook: useCreateAttributeForm,
+  useFormHook: useUpdateAttributeForm,
 });
 
-const setupCreateAttributeFormHook = () => {
+const setupUpdateAttributeFormHook = () => {
   const user = userEvent.setup();
   const hookProps = {
-    onCreated: vi.fn(),
+    attributeId: 7,
+    initialName: 'Color',
+    onUpdated: vi.fn(),
   };
   const result = setup({
     hookProps,
   });
 
   return {
-    onCreated: result.hookProps.onCreated,
+    onUpdated: result.hookProps.onUpdated,
     submitButton: screen.getByRole('button', { name: 'Submit' }),
     user,
     ...result,
   };
 };
 
-describe('useCreateAttributeForm', () => {
+describe('useUpdateAttributeForm', () => {
   beforeEach(() => {
     addToastMock.mockClear();
-    submitCreateAttributeMock.mockReset();
+    submitUpdateAttributeMock.mockReset();
   });
 
-  it('reports the created id after a successful submit', async () => {
-    submitCreateAttributeMock.mockResolvedValue({
+  it('submits the attribute id and default form values before reporting success', async () => {
+    submitUpdateAttributeMock.mockResolvedValue({
       ok: true,
       data: {
         id: 7,
         name: 'Material',
         sortOrder: 10,
-        createdAt: '2026-05-26T20:55:51.542Z',
+        createdAt: '2026-06-25T18:13:29.608Z',
       },
     });
-    const { onCreated, submitButton, user } = setupCreateAttributeFormHook();
+    const { onUpdated, submitButton, user } = setupUpdateAttributeFormHook();
 
     await user.click(submitButton);
 
-    await waitFor(() => expect(onCreated).toHaveBeenCalledWith(7));
+    await waitFor(() =>
+      expect(submitUpdateAttributeMock).toHaveBeenCalledWith({
+        attributeId: 7,
+        value: {
+          name: 'Color',
+        },
+      })
+    );
+    expect(onUpdated).toHaveBeenCalled();
   });
 
   it('shows a toast when submit fails with a form-level error', async () => {
-    submitCreateAttributeMock.mockResolvedValue({
+    submitUpdateAttributeMock.mockResolvedValue({
       ok: false,
       error: {
         fieldErrors: {
           name: 'Attribute name already exists.',
         },
-        formError: 'Attribute creation failed.',
+        formError: 'Attribute update failed.',
       },
     });
-    const { onCreated, submitButton, user } = setupCreateAttributeFormHook();
+    const { onUpdated, submitButton, user } = setupUpdateAttributeFormHook();
 
     await user.click(submitButton);
 
     await waitFor(() =>
       expect(addToastMock).toHaveBeenCalledWith({
-        description: 'Attribute creation failed.',
+        description: 'Attribute update failed.',
         type: 'error',
       })
     );
-    expect(onCreated).not.toHaveBeenCalled();
+    expect(onUpdated).not.toHaveBeenCalled();
   });
 });

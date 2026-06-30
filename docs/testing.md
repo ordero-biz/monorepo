@@ -111,6 +111,34 @@ When an E2E test mocks an app-owned request with `page.route()` or
 If the request contract is part of the behavior under test, wait for the request
 and assert stable details such as method and JSON body.
 
+## Server-State Testing
+
+For TanStack Query reads, mock the nearest app-owned request helper rather than
+`fetch` unless the helper itself is under test.
+
+Good coverage targets:
+
+- query hooks call the expected app-owned client helper and expose success and
+  error states
+- shared `queryOptions(...)` factories unwrap `ApiResult` success data and throw
+  normalized `ApiError` failures
+- server-prefetched pages pass server-only fetchers into the same query options
+  used by client hooks
+- hydrated pages render the client feature inside `HydrationBoundary` after
+  prefetching the expected query keys
+
+For writes, keep tests aligned with the caller shape:
+
+- form submit hooks mock the feature submit action and assert field-error,
+  toast, and success-callback behavior
+- `useMutation` wrappers mock the client helper and assert loading state,
+  success toasts, error toasts, and narrow success callbacks
+- workflow component tests assert cache side effects such as
+  `invalidateQueries`, `removeQueries`, and route navigation after the mutation
+  succeeds
+- request-helper tests assert the same-origin path, HTTP method, body shape,
+  and normalized `ApiResult`
+
 ## Commands
 
 Run all unit tests through Turbo:

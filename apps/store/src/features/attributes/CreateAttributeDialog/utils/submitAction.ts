@@ -7,7 +7,11 @@ import type {
 const normalizeAttributeValues = (attributeValues: AttributeValueFormValue[]) =>
   attributeValues
     .map((attributeValue) => attributeValue.value.trim())
-    .filter(Boolean);
+    .filter(Boolean)
+    .map((name) => ({
+      name,
+      sortOrder: 0,
+    }));
 
 export const submitCreateAttribute = async (
   value: CreateAttributeFormValues

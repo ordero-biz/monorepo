@@ -86,16 +86,41 @@ Required shape:
 
 Do not use `useQuery` for writes, login, logout, or submit actions.
 
+For reads that need both server prefetch and client reuse:
+
+- put query keys and `queryOptions(...)` factories under
+  `src/lib/query/[resource]/*` instead of inside a client hook
+- let the query option accept a fetcher so server pages can pass a server-only
+  fetcher and client hooks can pass the same-origin client helper
+- keep server-only fetchers under `src/lib/api/*`; they may read the HttpOnly
+  cookie and call backend helpers, but they must not be imported by client code
+- in the server page, create a fresh query client with `makeQueryClient()`,
+  `prefetchQuery(...)`, then render the client feature inside
+  `HydrationBoundary` with `dehydrate(queryClient)`
+- use the same query keys for SSR prefetch, client hooks, invalidation,
+  removal, and cache seeding
+- keep `getQueryClient()` in `AppProviders`; server code should use
+  `makeQueryClient()` so request caches are not shared across users
+
 ## Adding A Mutation Or Write
 
 For writes:
 
-- use a direct client helper or `useMutation`
+- use a direct client helper for TanStack Form submit actions that need field
+  error mapping; use `useMutation` for button/menu/dialog writes such as delete,
+  archive, publish, and other non-form commands
 - keep the underlying request uncached
 - invalidate affected query keys after success
 - after creating a new entity, invalidate the relevant list query key unless the
   new entity is deliberately seeded into every affected cached list
 - seed query data when the mutation result is the new source of truth
+- remove detail or child-resource queries when the mutation makes cached data
+  invalid by definition, such as deleting the current entity
+- keep navigation, dialog close/reset, query invalidation/removal, and route
+  redirects in the workflow component or success callback, not hidden inside a
+  generic request helper
+- show mutation errors through the shared toast surface unless the failure maps
+  to visible form fields
 - keep form backend errors mapped into TanStack Form submit errors when applicable
 
 For auth:

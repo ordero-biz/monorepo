@@ -1,7 +1,7 @@
 'use client';
 
 import { Button, Card, DataTable, Typography } from '@ordero/ui';
-import { useAttributesQuery } from '@/lib/hooks/useAttributesQuery';
+import { useAttributesQuery } from '@/lib/hooks/attributes/useAttributesQuery';
 import { columns } from './columns';
 
 export const AttributesList = () => {

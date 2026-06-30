@@ -53,7 +53,16 @@ describe('submitCreateAttribute', () => {
     expect(createAttributeMock).toHaveBeenCalledWith({
       name: 'Material',
       sortOrder: 0,
-      attributeValues: ['Cotton', 'Linen'],
+      attributeValues: [
+        {
+          name: 'Cotton',
+          sortOrder: 0,
+        },
+        {
+          name: 'Linen',
+          sortOrder: 0,
+        },
+      ],
     });
   });
 
