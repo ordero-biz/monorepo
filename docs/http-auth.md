@@ -48,8 +48,10 @@ Key rules:
 - Server route handlers read the cookie and attach `Authorization: Bearer ...`.
 - Server auth pages use the shared `getServerSession()` helper before render.
 - Protected pages and layouts use the same server-session guard before render.
-- Cached reads use TanStack Query. Auth actions and mutations use direct
-  uncached calls.
+- Cached reads use TanStack Query. Server-prefetched reads should hydrate the
+  same query keys used by client hooks.
+- Auth actions and form submits use direct uncached calls. Non-form commands
+  such as delete/archive/publish should usually use `useMutation`.
 - App-owned request helpers and route handlers may use local wrappers under
   `src/lib/api/*` and `src/lib/client/*`, but shared transport behavior lives in
   `@ordero/api-client`, `@ordero/api-types`, and `@ordero/next-api`.
@@ -269,6 +271,67 @@ Forwarding rules:
 - forwards bodies for non-`GET` and non-`HEAD` methods
 - never forwards browser-readable JWT state because the browser cannot read the
   HttpOnly cookie
+
+## Server-Prefetched Query Flow
+
+Use server prefetch for protected detail pages or other first-render data that
+should be available before the client feature hydrates. Keep the cache contract
+shared between server and client rather than duplicating fetch logic inside the
+page.
+
+```mermaid
+sequenceDiagram
+  participant Page as Server page
+  participant Query as per-request QueryClient
+  participant ServerHelper as server resource helper
+  participant Cookie as HttpOnly cookie
+  participant Backend as REST backend
+  participant Client as Client feature
+
+  Page->>Query: makeQueryClient()
+  Page->>Query: prefetchQuery(shared query options)
+  Query->>ServerHelper: getServerResource(id)
+  ServerHelper->>Cookie: Read ordero_access_token
+  ServerHelper->>Backend: GET resource with Bearer token
+  Backend-->>ServerHelper: Resource data or ApiError
+  ServerHelper-->>Query: ApiResult
+  Page-->>Client: HydrationBoundary(dehydrate(queryClient))
+  Client->>Query: useQuery(same query key)
+```
+
+Required shape:
+
+- put query keys and `queryOptions(...)` factories under
+  `src/lib/query/[resource]/*`
+- have query options accept a fetcher so server pages and client hooks share the
+  same keys, stale behavior, and `ApiResult` unwrapping
+- keep browser helpers under `src/lib/client/api/*`; they call same-origin
+  `/api/backend/*` paths through `apiFetch()`
+- keep server prefetch helpers under `src/lib/api/*`; they may read the
+  HttpOnly cookie and call server-only backend helpers
+- server pages create a fresh `makeQueryClient()`, call `prefetchQuery(...)`,
+  then render a client feature inside `HydrationBoundary`
+- client providers use `getQueryClient()` from `src/app/AppProviders.tsx`; do
+  not reuse a browser singleton for server prefetch
+
+Use the same query keys for reads, SSR prefetch, invalidation, cache seeding,
+and `removeQueries()`. After deleting an entity, remove its detail and child
+resource queries, invalidate the affected list, then navigate away from pages
+that can no longer render that entity.
+
+## Write And Mutation Flow
+
+Backend writes remain uncached. Choose the caller shape based on the UI:
+
+- TanStack Form submit actions call client helpers directly so backend
+  `fieldErrors` can be mapped into form submit errors.
+- Non-form commands such as delete, archive, publish, or one-click state changes
+  should usually wrap the same client helper in `useMutation`.
+- Workflow components own dialog close/reset, route navigation, and query
+  invalidation/removal after success.
+- Hooks that wrap `useMutation` may own loading state and toast errors, but
+  should expose narrow callbacks such as `onDeleted` or `onUpdated` for
+  workflow side effects.
 
 ## Auth Page Guard Flow
 

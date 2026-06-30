@@ -99,7 +99,8 @@ Use this map to load the smallest relevant source of truth for the diff:
 - forms and validation: `docs/forms.md`, `docs/testing.md`
 - shared UI components in `packages/ui`: `ui-component-build`, `ui-routine-conventions`
 - shared workspace/package boundaries: `docs/packages.md`, `AGENTS.md`
-- HTTP/auth shared package changes: `docs/http-auth.md`, `platform-http-requests`
+- HTTP/auth, server-state queries, and mutation changes:
+  `docs/http-auth.md`, `docs/testing.md`, `platform-http-requests`
 - shared UI component API shape: `docs/ui-components.md`
 - tokens, CSS variables, and Tailwind exposure: `docs/ui-tokens.md`, `ui-routine-conventions`
 - TS and TSX authoring conventions: `ts-react-conventions`
@@ -196,6 +197,69 @@ Current import and export patterns to review against:
 - keep consumer-facing exports flowing through `packages/ui/src/index.ts`
 
 Missing exports, misplaced files, tests not colocated with the file they cover, overly broad prop passthrough, absent tests for interactive behavior, or styling that bypasses the token system should usually be findings.
+
+## Server-state and mutation review rules
+
+When the diff touches TanStack Query hooks, `QueryClientProvider`,
+`HydrationBoundary`, `dehydrate`, `prefetchQuery`, app-owned request helpers,
+query keys, cache invalidation, or `useMutation`, review against
+`docs/http-auth.md`, `docs/testing.md`, and `platform-http-requests`.
+
+For cached reads, expect:
+
+- stable query keys under `src/lib/query/[resource]/*`, using `as const`
+- shared `queryOptions(...)` factories when the same resource is read by both
+  server pages and client hooks
+- query option factories to accept a fetcher so server pages can use
+  server-only helpers while client hooks use same-origin client helpers
+- `ApiResult` failures to be unwrapped by throwing `result.error` from the
+  query function, not by treating failed results as successful query data
+- app-wide Query defaults to live in `src/app/AppProviders.tsx` and
+  `src/lib/query/queryClient.ts`, rather than adding page-local providers
+
+For SSR prefetch and hydration, expect:
+
+- server pages to create a fresh per-request client with `makeQueryClient()`
+- server pages to call `prefetchQuery(...)` with the same query options and
+  keys used by the client hook
+- server pages to render client features inside `HydrationBoundary` with
+  `dehydrate(queryClient)`
+- server-only fetchers to stay under `src/lib/api/*` and avoid imports from
+  Client Components or browser-safe modules
+- server prefetch helpers to read the HttpOnly cookie only from server code and
+  use backend path constants from `src/lib/api/backendPaths.ts`
+
+Raise a finding when server-prefetched data uses different keys from the client
+hook, a server page imports browser-only helpers, client code imports server-only
+helpers, a singleton browser query client is reused for server prefetch, or a
+detail page duplicates query logic instead of sharing query options.
+
+For writes and mutations, expect:
+
+- TanStack Form submit actions to call direct client helpers when backend
+  `fieldErrors` need to map into form submit errors
+- button/menu/dialog commands such as delete, archive, publish, and other
+  non-form writes to use `useMutation` when loading/error/success state is part
+  of the UI
+- mutation functions to keep the underlying request uncached and throw the
+  normalized `ApiError` only after receiving `{ ok: false }`
+- workflow components or narrow success callbacks to own dialog close/reset,
+  route navigation, and cache invalidation/removal
+- affected list queries to be invalidated after create/update/delete flows
+- detail and child-resource queries to be removed when deleting the entity that
+  made those cache entries invalid
+- mutation errors to be surfaced through the shared toast surface unless they
+  are mapped to visible form fields
+
+For tests, expect coverage at the nearest useful boundary:
+
+- query hooks and query options cover success and normalized error behavior
+- server-prefetched pages prove the expected query keys/options are prefetched
+  and hydrated
+- `useMutation` wrappers cover success callbacks, loading state, and error toast
+  behavior
+- workflow component tests cover `invalidateQueries`, `removeQueries`, and
+  navigation when those are part of the user-visible flow
 
 ## TanStack Table review rules
 
