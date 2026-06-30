@@ -46,7 +46,7 @@ describe('DeleteAttributeDialog', () => {
 
     setup();
 
-    await user.click(screen.getByRole('button', { name: 'Delete Attribute' }));
+    await user.click(screen.getByRole('button', { name: 'Delete Color' }));
 
     expect(
       screen.getByRole('dialog', { name: 'Delete attribute' })
@@ -67,7 +67,7 @@ describe('DeleteAttributeDialog', () => {
     const invalidateQueriesSpy = vi.spyOn(queryClient, 'invalidateQueries');
     const removeQueriesSpy = vi.spyOn(queryClient, 'removeQueries');
 
-    await user.click(screen.getByRole('button', { name: 'Delete Attribute' }));
+    await user.click(screen.getByRole('button', { name: 'Delete Color' }));
     await user.click(screen.getByRole('button', { name: 'Delete' }));
 
     expect(deleteAttributesMock).toHaveBeenCalledWith({
@@ -99,7 +99,7 @@ describe('DeleteAttributeDialog', () => {
 
     setup();
 
-    await user.click(screen.getByRole('button', { name: 'Delete Attribute' }));
+    await user.click(screen.getByRole('button', { name: 'Delete Color' }));
     await user.click(screen.getByRole('button', { name: 'Delete' }));
 
     expect(

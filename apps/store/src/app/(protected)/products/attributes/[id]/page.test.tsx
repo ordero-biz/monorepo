@@ -16,7 +16,7 @@ vi.mock('@/features/attributes', () => ({
   ),
 }));
 
-vi.mock('@/lib/api/attributes', () => ({
+vi.mock('@/lib/api/api/attributes', () => ({
   getServerAttribute: vi.fn(),
   getServerAttributeValues: vi.fn(),
 }));

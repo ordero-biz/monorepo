@@ -164,7 +164,7 @@ describe('CreateAttributeDialog', () => {
         },
         {
           name: 'Blue',
-          sortOrder: 1,
+          sortOrder: 0,
         },
       ],
     });

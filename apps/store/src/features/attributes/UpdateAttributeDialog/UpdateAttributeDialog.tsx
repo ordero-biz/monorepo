@@ -101,9 +101,19 @@ export const UpdateAttributeDialog = ({
                 </Dialog.Content>
 
                 <Dialog.Footer>
-                  <form.Subscribe selector={(state) => state.isSubmitting}>
-                    {(isSubmitting) => (
-                      <Button disabled={isSubmitting} type="submit">
+                  <form.Subscribe
+                    selector={(state) =>
+                      [
+                        state.values.name,
+                        state.isSubmitting,
+                      ] as const
+                    }
+                  >
+                    {([name, isSubmitting]) => (
+                      <Button
+                        disabled={isSubmitting || !name.trim()}
+                        type="submit"
+                      >
                         {isSubmitting ? 'Saving...' : 'Save'}
                       </Button>
                     )}

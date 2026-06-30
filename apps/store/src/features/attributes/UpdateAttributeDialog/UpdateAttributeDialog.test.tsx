@@ -49,7 +49,7 @@ describe('UpdateAttributeDialog', () => {
   it('opens with the current attribute name', async () => {
     const { user } = setupUpdateAttributeDialog();
 
-    await user.click(screen.getByRole('button', { name: 'Edit Attribute' }));
+    await user.click(screen.getByRole('button', { name: 'Edit Color' }));
 
     const dialog = screen.getByRole('dialog', { name: 'Edit Attribute' });
 
@@ -71,7 +71,7 @@ describe('UpdateAttributeDialog', () => {
     });
     const invalidateQueriesSpy = vi.spyOn(queryClient, 'invalidateQueries');
 
-    await user.click(screen.getByRole('button', { name: 'Edit Attribute' }));
+    await user.click(screen.getByRole('button', { name: 'Edit Color' }));
 
     const dialog = screen.getByRole('dialog', { name: 'Edit Attribute' });
     const nameField = within(dialog).getByRole('textbox', {
@@ -97,6 +97,28 @@ describe('UpdateAttributeDialog', () => {
     ).not.toBeInTheDocument();
   });
 
+  it('requires an attribute name before save is available', async () => {
+    const { user } = setupUpdateAttributeDialog();
+
+    await user.click(screen.getByRole('button', { name: 'Edit Color' }));
+
+    const dialog = screen.getByRole('dialog', { name: 'Edit Attribute' });
+    const nameField = within(dialog).getByRole('textbox', {
+      name: 'Attribute name',
+    });
+    const saveButton = within(dialog).getByRole('button', { name: 'Save' });
+
+    expect(saveButton).toBeEnabled();
+
+    await user.clear(nameField);
+
+    expect(saveButton).toBeDisabled();
+
+    await user.type(nameField, 'Material');
+
+    expect(saveButton).toBeEnabled();
+  });
+
   it('shows backend errors and keeps the dialog open when submit fails', async () => {
     const { onUpdated, user } = setupUpdateAttributeDialog();
     updateAttributeMock.mockResolvedValue({
@@ -110,7 +132,7 @@ describe('UpdateAttributeDialog', () => {
       },
     });
 
-    await user.click(screen.getByRole('button', { name: 'Edit Attribute' }));
+    await user.click(screen.getByRole('button', { name: 'Edit Color' }));
 
     const dialog = screen.getByRole('dialog', { name: 'Edit Attribute' });
     const nameField = within(dialog).getByRole('textbox', {

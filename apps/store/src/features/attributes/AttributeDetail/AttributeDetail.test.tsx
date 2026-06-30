@@ -85,7 +85,7 @@ describe('AttributeDetail', () => {
     ).toBeVisible();
     expect(screen.getByText('Name')).toBeVisible();
     expect(screen.getByText('Blue')).toBeVisible();
-    expect(screen.getByRole('button', { name: 'Update Blue' })).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Edit Blue' })).toBeVisible();
     expect(screen.getByRole('button', { name: 'Delete Blue' })).toBeVisible();
     expect(
       screen.queryByRole('columnheader', { name: 'Created at' })
@@ -121,7 +121,7 @@ describe('AttributeDetail', () => {
     setup();
 
     await user.click(
-      await screen.findByRole('button', { name: 'Update Blue' })
+      await screen.findByRole('button', { name: 'Edit Blue' })
     );
 
     expect(
@@ -208,7 +208,7 @@ describe('AttributeDetail', () => {
 
     expect(await screen.findByRole('heading', { name: 'Color' })).toBeVisible();
 
-    await user.click(screen.getByRole('button', { name: 'Edit Attribute' }));
+    await user.click(screen.getByRole('button', { name: 'Edit Color' }));
 
     const nameField = screen.getByRole('textbox', {
       name: 'Attribute name',

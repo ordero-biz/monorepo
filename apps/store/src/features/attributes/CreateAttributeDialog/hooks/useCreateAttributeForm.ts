@@ -38,6 +38,7 @@ export const useCreateAttributeForm = ({
         type: 'success',
       });
 
+      formApi.reset();
       await onCreated(result.data.id);
     },
   });

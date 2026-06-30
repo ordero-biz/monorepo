@@ -75,6 +75,30 @@ describe('UpdateAttributeValueDialog', () => {
     expect(onOpenChangeMock).toHaveBeenCalledWith(false);
   });
 
+  it('requires an attribute value name before save is available', async () => {
+    const user = userEvent.setup();
+
+    setup();
+
+    const dialog = screen.getByRole('dialog', {
+      name: 'Edit Attribute Value',
+    });
+    const nameField = within(dialog).getByRole('textbox', {
+      name: 'Attribute value name',
+    });
+    const saveButton = within(dialog).getByRole('button', { name: 'Save' });
+
+    expect(saveButton).toBeEnabled();
+
+    await user.clear(nameField);
+
+    expect(saveButton).toBeDisabled();
+
+    await user.type(nameField, 'Navy');
+
+    expect(saveButton).toBeEnabled();
+  });
+
   it('shows backend errors and keeps the dialog open when submit fails', async () => {
     updateAttributeValueMock.mockResolvedValue({
       ok: false,
