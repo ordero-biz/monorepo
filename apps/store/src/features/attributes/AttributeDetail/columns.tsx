@@ -30,22 +30,18 @@ export const getColumns = ({
     cell: ({ row }) => (
       <DataTableCell>
         <IconButton
-          aria-label={`Update ${row.original.name}`}
-          color="primary"
+          aria-label={`Edit ${row.original.name}`}
           onClick={() => onUpdateAttributeValue(row.original)}
           size="s"
-          title="Update"
-          type="button"
+          title={`Edit ${row.original.name}`}
         >
           <Pencil aria-hidden="true" />
         </IconButton>
         <IconButton
           aria-label={`Delete ${row.original.name}`}
-          color="error"
           onClick={() => onDeleteAttributeValue(row.original)}
           size="s"
-          title="Delete"
-          type="button"
+          title={`Delete ${row.original.name}`}
         >
           <Trash2 aria-hidden="true" />
         </IconButton>

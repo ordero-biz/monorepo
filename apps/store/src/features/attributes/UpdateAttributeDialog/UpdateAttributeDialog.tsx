@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, Dialog, TextField } from '@ordero/ui';
+import {Button, Dialog, IconButton, TextField} from '@ordero/ui';
 import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import type { Attribute } from '@/lib/domain/attributes';
@@ -8,6 +8,7 @@ import { attributesQueryKeys } from '@/lib/query/attributes/attributesQueryKeys'
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
 import { useUpdateAttributeForm } from './hooks/useUpdateAttributeForm';
 import { validateUpdateAttributeName } from './utils/validations';
+import { Pencil } from "lucide-react";
 
 type UpdateAttributeDialogProps = {
   attribute: Attribute;
@@ -44,14 +45,14 @@ export const UpdateAttributeDialog = ({
 
   return (
     <>
-      <Button
-        color="primary"
+      <IconButton
+        aria-label={`Edit ${attribute.name}`}
         onClick={() => handleOpenChange(true)}
-        type="button"
-        variant="outlined"
+        size="s"
+        title={`Edit ${attribute.name}`}
       >
-        Edit Attribute
-      </Button>
+        <Pencil aria-hidden="true" />
+      </IconButton>
 
       <Dialog.Root onOpenChange={handleOpenChange} open={open}>
         <Dialog.Portal>

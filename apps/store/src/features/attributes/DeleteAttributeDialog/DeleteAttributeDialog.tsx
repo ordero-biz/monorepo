@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, Dialog, Typography } from '@ordero/ui';
+import {Button, Dialog, IconButton, Typography} from '@ordero/ui';
 import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -8,6 +8,7 @@ import { clientRoutes } from '@/lib/client/routes';
 import type { Attribute } from '@/lib/domain/attributes';
 import { attributesQueryKeys } from '@/lib/query/attributes/attributesQueryKeys';
 import { useDeleteAttribute } from './hooks/useDeleteAttribute';
+import {Trash2} from "lucide-react";
 
 type DeleteAttributeDialogProps = {
   attribute: Attribute;
@@ -39,14 +40,14 @@ export const DeleteAttributeDialog = ({
 
   return (
     <>
-      <Button
-        color="error"
+      <IconButton
+        aria-label={`Delete ${attribute.name}`}
         onClick={() => setOpen(true)}
-        type="button"
-        variant="outlined"
+        size="s"
+        title={`Delete ${attribute.name}`}
       >
-        Delete Attribute
-      </Button>
+        <Trash2 aria-hidden="true" />
+      </IconButton>
 
       <Dialog.Root onOpenChange={setOpen} open={open}>
         <Dialog.Portal>
