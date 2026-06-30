@@ -120,9 +120,7 @@ describe('AttributeDetail', () => {
 
     setup();
 
-    await user.click(
-      await screen.findByRole('button', { name: 'Edit Blue' })
-    );
+    await user.click(await screen.findByRole('button', { name: 'Edit Blue' }));
 
     expect(
       screen.getByRole('dialog', { name: 'Edit Attribute Value' })

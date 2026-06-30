@@ -1,14 +1,14 @@
 'use client';
 
-import {Button, Dialog, IconButton, TextField} from '@ordero/ui';
+import { Button, Dialog, IconButton, TextField } from '@ordero/ui';
 import { useQueryClient } from '@tanstack/react-query';
+import { Pencil } from 'lucide-react';
 import { useState } from 'react';
 import type { Attribute } from '@/lib/domain/attributes';
 import { attributesQueryKeys } from '@/lib/query/attributes/attributesQueryKeys';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
 import { useUpdateAttributeForm } from './hooks/useUpdateAttributeForm';
 import { validateUpdateAttributeName } from './utils/validations';
-import { Pencil } from "lucide-react";
 
 type UpdateAttributeDialogProps = {
   attribute: Attribute;
@@ -103,10 +103,7 @@ export const UpdateAttributeDialog = ({
                 <Dialog.Footer>
                   <form.Subscribe
                     selector={(state) =>
-                      [
-                        state.values.name,
-                        state.isSubmitting,
-                      ] as const
+                      [state.values.name, state.isSubmitting] as const
                     }
                   >
                     {([name, isSubmitting]) => (

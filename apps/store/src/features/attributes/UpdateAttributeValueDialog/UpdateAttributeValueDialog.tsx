@@ -95,10 +95,7 @@ export const UpdateAttributeValueDialog = ({
               <Dialog.Footer>
                 <form.Subscribe
                   selector={(state) =>
-                    [
-                      state.values.name,
-                      state.isSubmitting,
-                    ] as const
+                    [state.values.name, state.isSubmitting] as const
                   }
                 >
                   {([name, isSubmitting]) => (

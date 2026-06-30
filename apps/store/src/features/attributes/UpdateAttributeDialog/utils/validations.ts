@@ -12,7 +12,9 @@ export const updateAttributeSchema = z.object({
 
 export type UpdateAttributeFormValues = z.infer<typeof updateAttributeSchema>;
 
-export const validateUpdateAttributeName = ({ value }: ValidationArgs<string>) => {
+export const validateUpdateAttributeName = ({
+  value,
+}: ValidationArgs<string>) => {
   const result = updateAttributeNameSchema.safeParse(value);
 
   return result.success ? undefined : result.error.issues[0]?.message;

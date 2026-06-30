@@ -55,17 +55,16 @@ export const AttributeDetailHeader = ({
       <PageHeader.Left>
         <Typography variant="h5">{attributeQuery.data.name}</Typography>
         <div>
-            <UpdateAttributeDialog
-              attribute={attributeQuery.data}
-              onUpdated={async () => {
-                await attributeQuery.refetch();
-              }}
-            />
-            <DeleteAttributeDialog attribute={attributeQuery.data} />
+          <UpdateAttributeDialog
+            attribute={attributeQuery.data}
+            onUpdated={async () => {
+              await attributeQuery.refetch();
+            }}
+          />
+          <DeleteAttributeDialog attribute={attributeQuery.data} />
         </div>
       </PageHeader.Left>
-      <PageHeader.Right>
-      </PageHeader.Right>
+      <PageHeader.Right></PageHeader.Right>
     </PageHeader.Root>
   );
 };
