@@ -3,7 +3,7 @@
 import { Button, Card, Typography } from '@ordero/ui';
 import { useRouter } from 'next/navigation';
 import { clientRoutes } from '@/lib/client/routes';
-import { useStoresQuery } from '@/lib/hooks/useStoresQuery';
+import { useStoresQuery } from '@/lib/hooks/stores/useStoresQuery';
 import { AddStoreCard } from './AddStoreCard';
 import { StoreCard } from './StoreCard';
 

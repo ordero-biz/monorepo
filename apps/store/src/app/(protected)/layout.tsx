@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { BaseLayout } from '@/features/app-shell/BaseLayout';
-import { requireAuthenticatedRoute } from '@/lib/api/authPageGuard';
+import { requireAuthenticatedRoute } from '@/lib/server/authPageGuard';
 
 type ProtectedLayoutProps = {
   children: ReactNode;

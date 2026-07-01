@@ -1,4 +1,4 @@
-import { signUp } from '@/lib/client/api';
+import { signUp } from '@/lib/client/api/auth';
 import type { SignUpFormValues } from './validations';
 
 export const submitSignUp = async (value: SignUpFormValues) => {

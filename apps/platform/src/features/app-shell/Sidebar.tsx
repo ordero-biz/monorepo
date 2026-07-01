@@ -9,7 +9,7 @@ import {
   SidebarNavigationSections,
 } from '@ordero/ui';
 import { Building2, LogOut } from 'lucide-react';
-import { useLogOut } from '@/lib/hooks/useLogOut';
+import { useLogOut } from '@/lib/hooks/auth/useLogOut';
 import { sidebarSections } from './sidebarSections';
 
 export const Sidebar = () => {

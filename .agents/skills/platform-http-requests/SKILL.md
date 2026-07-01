@@ -30,8 +30,8 @@ Use the existing architecture unless the user explicitly asks for a redesign.
 - Next.js route handlers own cookie reads/writes and backend forwarding.
 - Server-side backend requests attach `Authorization: Bearer <token>`.
 - Use `BACKEND_API_URL` only from server-side code.
-- Keep same-origin client route constants in `src/lib/client/apiPaths.ts`.
-- Keep backend endpoint constants in `src/lib/api/backendPaths.ts`.
+- Keep same-origin client route constants in `src/lib/client/api/path.ts`.
+- Keep backend endpoint constants in `src/lib/server/api/path.ts`.
 - Normalize backend failures into the shared `ApiError` shape.
 - Use `ApiResult<T>` for client helper return values instead of throwing for ordinary HTTP failures.
 - Keep shared HTTP/auth contracts in `@ordero/api-types`.
@@ -54,15 +54,15 @@ Use the existing architecture unless the user explicitly asks for a redesign.
 
 For uncached calls:
 
-- add or reuse a feature-facing request helper in `src/lib/client/api.ts`
+- add or reuse a feature-facing request helper under
+  `src/lib/client/api/[resource]/index.ts`
 - call `apiFetch<T>()` from `@ordero/api-client`
 - point it at a same-origin `/api/*` route
 - return `ApiResult<T>`
 
-For larger app-owned resources, a nested resource helper under
-`src/lib/client/api/[resource]/index.ts` is acceptable. Keep app-level auth and
-small shared helpers in `src/lib/client/api.ts` unless a resource-specific
-module improves ownership.
+Keep app-owned client request helpers resource-scoped, for example
+`src/lib/client/api/auth/index.ts`, `src/lib/client/api/stores/index.ts`, or
+`src/lib/client/api/attributes/index.ts`.
 
 For authenticated backend REST calls:
 
@@ -92,7 +92,7 @@ For reads that need both server prefetch and client reuse:
   `src/lib/query/[resource]/*` instead of inside a client hook
 - let the query option accept a fetcher so server pages can pass a server-only
   fetcher and client hooks can pass the same-origin client helper
-- keep server-only fetchers under `src/lib/api/*`; they may read the HttpOnly
+- keep server-only fetchers under `src/lib/server/*`; they may read the HttpOnly
   cookie and call backend helpers, but they must not be imported by client code
 - in the server page, create a fresh query client with `makeQueryClient()`,
   `prefetchQuery(...)`, then render the client feature inside
@@ -134,7 +134,7 @@ For auth:
 When adding `/api/auth/*` or `/api/backend/*` behavior:
 
 - keep token access server-side
-- use helpers from `src/lib/api/server.ts` when possible; it wraps `@ordero/next-api`
+- use helpers from `src/lib/server/fetch.ts` when possible; it wraps `@ordero/next-api`
 - use `fetchBackendData<T>()` for typed app-owned JSON/text responses
 - use `fetchBackendResponse()` when proxying raw backend responses
 - return safe JSON to the browser, never the JWT
@@ -162,7 +162,7 @@ Use server pages or layouts for auth redirects and protected route checks.
   redirect unauthenticated users to `clientRoutes.signIn`.
 - Do not move these checks into middleware or browser-only effects unless the
   routing architecture changes intentionally.
-- Keep the app-local wrapper in `src/lib/api/authPageGuard.ts`; it delegates to
+- Keep the app-local wrapper in `src/lib/server/authPageGuard.ts`; it delegates to
   `@ordero/next-api/authPageGuard`.
 
 ## Tests
@@ -171,8 +171,9 @@ Choose the smallest layer that proves the behavior:
 
 - generic `apiFetch` transport/error behavior: `packages/api-client`, with
   mocked `fetch`
-- feature-facing client request helpers: `src/lib/client/api.test.ts`, covering
-  the stable same-origin path, method, body, and result shape through `apiFetch`
+- feature-facing client request helpers:
+  `src/lib/client/api/[resource]/index.test.ts`, covering the stable
+  same-origin path, method, body, and result shape through `apiFetch`
 - shared server helpers: test package behavior in `packages/next-api` when the
   package behavior changes; keep app route-handler tests focused on app wiring
 - header forwarding changes: cover `packages/next-api` allow-list behavior and

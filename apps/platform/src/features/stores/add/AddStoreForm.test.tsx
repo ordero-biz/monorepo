@@ -1,8 +1,8 @@
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { createStore } from '@/lib/client/api';
+import { createStore } from '@/lib/client/api/stores';
 import { clientRoutes } from '@/lib/client/routes';
-import { storesQueryKeys } from '@/lib/hooks/useStoresQuery';
+import { storesQueryKeys } from '@/lib/hooks/stores/useStoresQuery';
 import { preparePlatformSetup } from '@/test/prepareSetup';
 import { AddStoreForm } from './AddStoreForm';
 
@@ -14,9 +14,9 @@ vi.mock('next/navigation', () => ({
   }),
 }));
 
-vi.mock('@/lib/client/api', async () => ({
-  ...(await vi.importActual<typeof import('@/lib/client/api')>(
-    '@/lib/client/api'
+vi.mock('@/lib/client/api/stores', async () => ({
+  ...(await vi.importActual<typeof import('@/lib/client/api/stores')>(
+    '@/lib/client/api/stores'
   )),
   createStore: vi.fn(),
 }));

@@ -1,14 +1,14 @@
 import { dehydrate, HydrationBoundary } from '@tanstack/react-query';
 import { AttributeDetail } from '@/features/attributes';
 import {
-  getServerAttribute,
-  getServerAttributeValues,
-} from '@/lib/api/api/attributes';
-import {
   attributeQueryOptions,
   attributeValuesQueryOptions,
 } from '@/lib/query/attributes/attributesQueryOptions';
 import { makeQueryClient } from '@/lib/query/queryClient';
+import {
+  getServerAttribute,
+  getServerAttributeValues,
+} from '@/lib/server/api/attributes';
 
 type AttributeDetailPageProps = {
   params: Promise<{

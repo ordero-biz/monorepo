@@ -4,9 +4,9 @@ import {
   setAuthCookie,
 } from '@ordero/next-api/server';
 import { type NextRequest, NextResponse } from 'next/server';
-import { BACKEND_AUTH_PATHS } from '@/lib/api/backendPaths';
-import { fetchBackendResponse } from '@/lib/api/server';
-import type { AuthSession, AuthSignInInput } from '@/lib/api/types';
+import { BACKEND_AUTH_PATHS } from '@/lib/server/api/path';
+import { fetchBackendResponse } from '@/lib/server/fetch';
+import type { AuthSession, AuthSignInInput } from '@/lib/server/types';
 
 type BackendSignInResponse = {
   token?: Token;
