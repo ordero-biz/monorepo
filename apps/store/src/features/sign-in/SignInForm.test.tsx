@@ -1,8 +1,17 @@
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { signIn } from '@/lib/client/api/auth';
+import { clientRoutes } from '@/lib/client/routes';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { SignInForm } from './SignInForm';
+
+const routerReplaceMock = vi.hoisted(() => vi.fn());
+
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({
+    replace: routerReplaceMock,
+  }),
+}));
 
 vi.mock('@/lib/client/api/auth', async () => ({
   ...(await vi.importActual<typeof import('@/lib/client/api/auth')>(
@@ -32,6 +41,7 @@ const setupSignInForm = () => {
 
 describe('SignInForm', () => {
   beforeEach(() => {
+    routerReplaceMock.mockClear();
     signInMock.mockReset();
   });
 
@@ -109,6 +119,7 @@ describe('SignInForm', () => {
       email: 'admin@gmail.com',
       password: '123456',
     });
+    expect(routerReplaceMock).toHaveBeenCalledWith(clientRoutes.attributes);
     expect(emailField).toHaveValue('admin@gmail.com');
     expect(passwordField).toHaveValue('');
   });
