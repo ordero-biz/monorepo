@@ -50,8 +50,10 @@ Key rules:
 - Protected pages and layouts use the same server-session guard before render.
 - Cached reads use TanStack Query. Server-prefetched reads should hydrate the
   same query keys used by client hooks.
-- Auth actions and form submits use direct uncached calls. Non-form commands
-  such as delete/archive/publish should usually use `useMutation`.
+- Client helpers for writes stay uncached and return `ApiResult`. TanStack Form
+  submit actions call those helpers directly so backend field errors can map
+  into the form. Non-form commands such as logout, delete, archive, or publish
+  should usually wrap the same helper in `useMutation`.
 - App-owned request helpers and route handlers may use local wrappers under
   `src/lib/server/*` and `src/lib/client/*`, but shared transport behavior lives in
   `@ordero/api-client`, `@ordero/api-types`, and `@ordero/next-api`.
@@ -325,13 +327,17 @@ Backend writes remain uncached. Choose the caller shape based on the UI:
 
 - TanStack Form submit actions call client helpers directly so backend
   `fieldErrors` can be mapped into form submit errors.
-- Non-form commands such as delete, archive, publish, or one-click state changes
-  should usually wrap the same client helper in `useMutation`.
+- Non-form commands such as logout, delete, archive, publish, or one-click state
+  changes should usually wrap the same client helper in `useMutation`.
+- Mutation functions unwrap `ApiResult`: return `data` for `{ ok: true }` and
+  throw the normalized `ApiError` after `{ ok: false }`.
 - Workflow components own dialog close/reset, route navigation, and query
   invalidation/removal after success.
 - Hooks that wrap `useMutation` may own loading state and toast errors, but
   should expose narrow callbacks such as `onDeleted` or `onUpdated` for
   workflow side effects.
+- Auth mutations such as logout should clear, invalidate, or seed
+  `authQueryKeys.session` and any session-dependent query state after success.
 
 ## Auth Page Guard Flow
 

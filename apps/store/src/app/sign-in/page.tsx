@@ -6,7 +6,7 @@ import { hasAuthenticatedServerSession } from '@/lib/server/authPageGuard';
 
 export default async function SignInPage() {
   if (await hasAuthenticatedServerSession()) {
-    redirect(clientRoutes.home);
+    redirect(clientRoutes.attributes);
   }
 
   return (

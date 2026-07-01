@@ -107,9 +107,11 @@ For reads that need both server prefetch and client reuse:
 For writes:
 
 - use a direct client helper for TanStack Form submit actions that need field
-  error mapping; use `useMutation` for button/menu/dialog writes such as delete,
-  archive, publish, and other non-form commands
+  error mapping; use `useMutation` for button/menu/dialog writes such as logout,
+  delete, archive, publish, and other non-form commands
 - keep the underlying request uncached
+- in mutation functions, unwrap `ApiResult`: return `data` for `{ ok: true }`
+  and throw the normalized `ApiError` after `{ ok: false }`
 - invalidate affected query keys after success
 - after creating a new entity, invalidate the relevant list query key unless the
   new entity is deliberately seeded into every affected cached list
@@ -126,7 +128,8 @@ For writes:
 For auth:
 
 - login should set or seed `authQueryKeys.session` when a session is returned
-- logout should clear or invalidate session-dependent queries
+- logout should usually be a command-style `useMutation` and should clear or
+  invalidate session-dependent queries after success
 - route handlers should clear the auth cookie on token rejection
 
 ## Adding Route Handlers
