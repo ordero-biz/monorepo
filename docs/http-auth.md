@@ -14,7 +14,7 @@ flowchart LR
   browser["Browser UI"]
   authPage["Server auth pages<br/>/sign-in and /sign-up"]
   protectedPage["Protected pages/layouts<br/>route groups and server pages"]
-  clientApi["Client request helpers<br/>src/lib/client/api.ts"]
+  clientApi["Client request helpers<br/>src/lib/client/api/*"]
   clientFetch["@ordero/api-client<br/>apiFetch()"]
   query["TanStack Query<br/>Providers + auth queries"]
   nextApi["Next.js route handlers<br/>/api/auth/* and /api/backend/*"]
@@ -53,7 +53,7 @@ Key rules:
 - Auth actions and form submits use direct uncached calls. Non-form commands
   such as delete/archive/publish should usually use `useMutation`.
 - App-owned request helpers and route handlers may use local wrappers under
-  `src/lib/api/*` and `src/lib/client/*`, but shared transport behavior lives in
+  `src/lib/server/*` and `src/lib/client/*`, but shared transport behavior lives in
   `@ordero/api-client`, `@ordero/api-types`, and `@ordero/next-api`.
 
 ## Core Schemas
@@ -215,9 +215,9 @@ See `docs/packages.md` for the package boundary reference.
 ## Authenticated Backend Request Flow
 
 Feature code should call `/api/backend/*` when it needs authenticated REST data
-from the backend. Keep feature-facing request helpers in `src/lib/client/api.ts`
-and use the generic `apiFetch()` transport/error-normalization helper from
-`@ordero/api-client`.
+from the backend. Keep feature-facing request helpers under
+`src/lib/client/api/[resource]/index.ts` and use the generic `apiFetch()`
+transport/error-normalization helper from `@ordero/api-client`.
 
 ```mermaid
 sequenceDiagram
@@ -307,7 +307,7 @@ Required shape:
   same keys, stale behavior, and `ApiResult` unwrapping
 - keep browser helpers under `src/lib/client/api/*`; they call same-origin
   `/api/backend/*` paths through `apiFetch()`
-- keep server prefetch helpers under `src/lib/api/*`; they may read the
+- keep server prefetch helpers under `src/lib/server/*`; they may read the
   HttpOnly cookie and call server-only backend helpers
 - server pages create a fresh `makeQueryClient()`, call `prefetchQuery(...)`,
   then render a client feature inside `HydrationBoundary`
@@ -432,23 +432,23 @@ When present, sign-in and sign-up map them into TanStack Form submit errors.
 
 ## Review Checklist
 
-- Start with `@ordero/api-types` and the app-local `src/lib/api/types.ts` to
+- Start with `@ordero/api-types` and the app-local `src/lib/server/types.ts` to
   confirm shared vs app-owned shapes.
-- Review `@ordero/next-api` and the app-local `src/lib/api/session.ts` for
+- Review `@ordero/next-api` and the app-local `src/lib/server/session.ts` for
   session resolution and cookie-clear decisions.
-- Review `@ordero/next-api` and the app-local `src/lib/api/server.ts` for
+- Review `@ordero/next-api` and the app-local `src/lib/server/fetch.ts` for
   backend URL handling, Bearer header logic, cookie helpers, error
   normalization, body parsing through `parseBackendResponseData()`, and
   filtered raw-response forwarding.
 - Review `@ordero/api-client` for browser-side request serialization and
   `ApiError` normalization.
-- Review `src/lib/client/apiPaths.ts` and `src/lib/api/backendPaths.ts` for
+- Review `src/lib/client/api/path.ts` and `src/lib/server/api/path.ts` for
   app-owned route constants and repeated path strings.
-- Review `src/lib/client/api.ts` and resource modules under
-  `src/lib/client/api/*` for feature-facing same-origin request helpers.
+- Review resource modules under `src/lib/client/api/*` for feature-facing
+  same-origin request helpers.
 - Review `/api/auth/*` route handlers for cookie ownership and safe session
   responses.
-- Review `src/lib/api/authPageGuard.ts` and the auth pages for redirect
+- Review `src/lib/server/authPageGuard.ts` and the auth pages for redirect
   decisions before render.
 - Review protected pages and route-group layouts for the same server-session
   guard before render.

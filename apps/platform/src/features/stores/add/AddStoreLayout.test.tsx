@@ -8,9 +8,9 @@ vi.mock('next/navigation', () => ({
   }),
 }));
 
-vi.mock('@/lib/client/api', async () => ({
-  ...(await vi.importActual<typeof import('@/lib/client/api')>(
-    '@/lib/client/api'
+vi.mock('@/lib/client/api/stores', async () => ({
+  ...(await vi.importActual<typeof import('@/lib/client/api/stores')>(
+    '@/lib/client/api/stores'
   )),
   createStore: vi.fn(),
 }));

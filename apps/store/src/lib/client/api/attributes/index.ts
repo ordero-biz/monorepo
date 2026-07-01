@@ -1,10 +1,10 @@
 'use client';
 
 import { apiFetch } from '@ordero/api-client';
-import type { PaginatedResponse } from '@/lib/api/types';
 import type { Attribute, AttributeValue } from '@/lib/domain/attributes';
+import type { PaginatedResponse } from '@/lib/server/types';
 import { tokenizePath } from '@/lib/utils/tokenizePath';
-import { CLIENT_BACKEND_PATHS } from '../../apiPaths';
+import { CLIENT_BACKEND_PATHS } from '../path';
 
 type AttributesListResponse = PaginatedResponse<Attribute>;
 

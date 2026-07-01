@@ -1,7 +1,7 @@
 import type { ApiResult } from '@ordero/api-types';
 import { queryOptions } from '@tanstack/react-query';
-import type { PaginatedResponse } from '@/lib/api/types';
 import type { Attribute, AttributeValue } from '@/lib/domain/attributes';
+import type { PaginatedResponse } from '@/lib/server/types';
 import { attributesQueryKeys } from './attributesQueryKeys';
 
 type AttributeId = string | number;

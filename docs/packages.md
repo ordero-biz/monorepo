@@ -32,11 +32,10 @@ It must stay safe for Client Components and browser bundles:
 - no `BACKEND_API_URL`
 - no direct backend calls
 
-Apps should keep feature-facing helpers in `apps/*/src/lib/client/api.ts`.
-Those helpers call same-origin `/api/*` routes through `apiFetch<T>()`.
-Keep same-origin API path constants in `apps/*/src/lib/client/apiPaths.ts`.
-Resource-specific helper modules under `src/lib/client/api/*` are acceptable
-when a resource grows beyond the flat app helper.
+Apps should keep feature-facing helpers under
+`apps/*/src/lib/client/api/[resource]/index.ts`. Those helpers call
+same-origin `/api/*` routes through `apiFetch<T>()`.
+Keep same-origin API path constants in `apps/*/src/lib/client/api/path.ts`.
 
 ### `@ordero/next-api`
 
@@ -55,9 +54,9 @@ Use this package for:
 
 This package is server-only. Browser code and Client Components must not import
 it. Apps keep their route handlers under `apps/*/src/app/api/*` and can expose
-thin local wrappers from `apps/*/src/lib/api/*` when that preserves stable app
-imports.
-Keep backend endpoint constants in `apps/*/src/lib/api/backendPaths.ts` so route
+thin local server wrappers from `apps/*/src/lib/server/*` when that preserves
+stable app imports.
+Keep backend endpoint constants in `apps/*/src/lib/server/api/path.ts` so route
 handlers and session helpers do not repeat backend path strings.
 
 ### `@ordero/ui`

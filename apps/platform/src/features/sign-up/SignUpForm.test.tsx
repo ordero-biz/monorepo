@@ -1,6 +1,6 @@
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { signUp } from '@/lib/client/api';
+import { signUp } from '@/lib/client/api/auth';
 import { clientRoutes } from '@/lib/client/routes';
 import { preparePlatformSetup } from '@/test/prepareSetup';
 import { SignUpForm } from './SignUpForm';
@@ -13,9 +13,9 @@ vi.mock('next/navigation', () => ({
   }),
 }));
 
-vi.mock('@/lib/client/api', async () => ({
-  ...(await vi.importActual<typeof import('@/lib/client/api')>(
-    '@/lib/client/api'
+vi.mock('@/lib/client/api/auth', async () => ({
+  ...(await vi.importActual<typeof import('@/lib/client/api/auth')>(
+    '@/lib/client/api/auth'
   )),
   signUp: vi.fn(),
 }));

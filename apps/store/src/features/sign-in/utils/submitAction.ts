@@ -1,4 +1,4 @@
-import { signIn } from '@/lib/client/api';
+import { signIn } from '@/lib/client/api/auth';
 import type { SignInFormValues } from './validations';
 
 export const submitSignIn = async (value: SignInFormValues) => {

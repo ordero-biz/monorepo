@@ -10,7 +10,7 @@ vi.mock('next/navigation', () => ({
   }),
 }));
 
-vi.mock('@/lib/api/authPageGuard', () => ({
+vi.mock('@/lib/server/authPageGuard', () => ({
   hasAuthenticatedServerSession: vi.fn(),
 }));
 
@@ -25,7 +25,7 @@ vi.mock('@/features/sign-in/SignInLayout', () => ({
 }));
 
 const getGuardMock = async () => {
-  const module = await import('@/lib/api/authPageGuard');
+  const module = await import('@/lib/server/authPageGuard');
 
   return vi.mocked(module.hasAuthenticatedServerSession);
 };

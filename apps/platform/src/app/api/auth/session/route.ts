@@ -1,7 +1,7 @@
 import { clearAuthCookie, getTokenFromRequest } from '@ordero/next-api/server';
 import { type NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from '@/lib/api/session';
-import type { AuthSession } from '@/lib/api/types';
+import { getServerSession } from '@/lib/server/session';
+import type { AuthSession } from '@/lib/server/types';
 
 export const GET = async (request: NextRequest) => {
   const token = getTokenFromRequest(request);

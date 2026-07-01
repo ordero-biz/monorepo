@@ -1,9 +1,9 @@
-import { signIn } from '@/lib/client/api';
+import { signIn } from '@/lib/client/api/auth';
 import { submitSignIn } from './submitAction';
 
-vi.mock('@/lib/client/api', async () => ({
-  ...(await vi.importActual<typeof import('@/lib/client/api')>(
-    '@/lib/client/api'
+vi.mock('@/lib/client/api/auth', async () => ({
+  ...(await vi.importActual<typeof import('@/lib/client/api/auth')>(
+    '@/lib/client/api/auth'
   )),
   signIn: vi.fn(),
 }));

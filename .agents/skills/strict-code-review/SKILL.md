@@ -224,10 +224,10 @@ For SSR prefetch and hydration, expect:
   keys used by the client hook
 - server pages to render client features inside `HydrationBoundary` with
   `dehydrate(queryClient)`
-- server-only fetchers to stay under `src/lib/api/*` and avoid imports from
+- server-only fetchers to stay under `src/lib/server/*` and avoid imports from
   Client Components or browser-safe modules
 - server prefetch helpers to read the HttpOnly cookie only from server code and
-  use backend path constants from `src/lib/api/backendPaths.ts`
+  use backend path constants from `src/lib/server/api/path.ts`
 
 Raise a finding when server-prefetched data uses different keys from the client
 hook, a server page imports browser-only helpers, client code imports server-only
@@ -331,7 +331,7 @@ unless the test is intentionally covering field rendering behavior.
 ## Shared package review rules
 
 When the diff touches `packages/api-types`, `packages/api-client`,
-`packages/next-api`, or app wrappers under `src/lib/api/*` and
+`packages/next-api`, or app wrappers under `src/lib/server/*` and
 `src/lib/client/*`, review against `docs/packages.md`, `docs/http-auth.md`, and
 `AGENTS.md`.
 
@@ -341,8 +341,8 @@ Expect these boundaries:
 - browser-safe request transport lives in `@ordero/api-client`
 - Next.js server/BFF helpers live in `@ordero/next-api`
 - browser code does not import `@ordero/next-api`
-- same-origin client route constants live in `src/lib/client/apiPaths.ts`
-- backend endpoint constants live in `src/lib/api/backendPaths.ts`
+- same-origin client route constants live in `src/lib/client/api/path.ts`
+- backend endpoint constants live in `src/lib/server/api/path.ts`
 - app-domain schemas, app routes, form payloads, and feature request helpers
   stay app-owned unless multiple apps truly need them
 - app-wide Query, toast, and similar providers are added through

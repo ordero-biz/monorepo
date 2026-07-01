@@ -3,9 +3,9 @@ import { clientRoutes } from '@/lib/client/routes';
 import { preparePlatformSetup } from '@/test/prepareSetup';
 import { SignUpLayout } from './SignUpLayout';
 
-vi.mock('@/lib/client/api', async () => ({
-  ...(await vi.importActual<typeof import('@/lib/client/api')>(
-    '@/lib/client/api'
+vi.mock('@/lib/client/api/auth', async () => ({
+  ...(await vi.importActual<typeof import('@/lib/client/api/auth')>(
+    '@/lib/client/api/auth'
   )),
   signUp: vi.fn(),
 }));

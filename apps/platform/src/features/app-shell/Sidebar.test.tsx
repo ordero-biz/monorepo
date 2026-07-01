@@ -1,13 +1,13 @@
 import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { clientRoutes } from '@/lib/client/routes';
-import { useLogOut } from '@/lib/hooks/useLogOut';
+import { useLogOut } from '@/lib/hooks/auth/useLogOut';
 import { preparePlatformSetup } from '@/test/prepareSetup';
 import { Sidebar } from './Sidebar';
 
 const logOutMock = vi.fn();
 
-vi.mock('@/lib/hooks/useLogOut', () => ({
+vi.mock('@/lib/hooks/auth/useLogOut', () => ({
   useLogOut: vi.fn(),
 }));
 

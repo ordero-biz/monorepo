@@ -1,6 +1,6 @@
 import { useToastManager } from '@ordero/ui';
 import { useForm } from '@tanstack/react-form';
-import type { AuthSession } from '@/lib/api/types';
+import type { AuthSession } from '@/lib/server/types';
 import { signInDefaultValues } from '../constants';
 import { submitSignIn } from '../utils/submitAction';
 

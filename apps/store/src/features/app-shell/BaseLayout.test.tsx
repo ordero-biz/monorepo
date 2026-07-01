@@ -2,7 +2,7 @@ import { screen, within } from '@testing-library/react';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { BaseLayout } from './BaseLayout';
 
-vi.mock('@/lib/hooks/useLogOut', () => ({
+vi.mock('@/lib/hooks/auth/useLogOut', () => ({
   useLogOut: () => ({
     isLoggingOut: false,
     logOut: vi.fn(),

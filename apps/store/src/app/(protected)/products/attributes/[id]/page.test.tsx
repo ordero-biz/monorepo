@@ -1,9 +1,9 @@
 import { render, screen } from '@testing-library/react';
+import { attributesQueryKeys } from '@/lib/query/attributes/attributesQueryKeys';
 import {
   getServerAttribute,
   getServerAttributeValues,
-} from '@/lib/api/api/attributes';
-import { attributesQueryKeys } from '@/lib/query/attributes/attributesQueryKeys';
+} from '@/lib/server/api/attributes';
 import {
   createTestQueryClient,
   createTestQueryProvider,
@@ -16,7 +16,7 @@ vi.mock('@/features/attributes', () => ({
   ),
 }));
 
-vi.mock('@/lib/api/api/attributes', () => ({
+vi.mock('@/lib/server/api/attributes', () => ({
   getServerAttribute: vi.fn(),
   getServerAttributeValues: vi.fn(),
 }));

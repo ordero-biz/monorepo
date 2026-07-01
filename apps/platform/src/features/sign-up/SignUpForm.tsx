@@ -11,7 +11,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { clientRoutes } from '@/lib/client/routes';
-import { authQueryKeys } from '@/lib/hooks/useSessionQuery';
+import { authQueryKeys } from '@/lib/hooks/auth/useSessionQuery';
 import { getErrorMessage } from '@/lib/utils/form/error/error';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
 import { useSignUpForm } from './hooks/useSignUpForm';

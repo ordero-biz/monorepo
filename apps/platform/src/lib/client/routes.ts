@@ -7,5 +7,3 @@ export const clientRoutes = {
   terms: '/terms',
   privacy: '/privacy',
 } as const;
-
-export type ClientRoute = (typeof clientRoutes)[keyof typeof clientRoutes];

@@ -1,5 +1,5 @@
 import { screen } from '@testing-library/react';
-import { getStores } from '@/lib/client/api';
+import { getStores } from '@/lib/client/api/stores';
 import { preparePlatformSetup } from '@/test/prepareSetup';
 import StoresPage from './page';
 
@@ -11,9 +11,9 @@ vi.mock('next/navigation', () => ({
   }),
 }));
 
-vi.mock('@/lib/client/api', async () => ({
-  ...(await vi.importActual<typeof import('@/lib/client/api')>(
-    '@/lib/client/api'
+vi.mock('@/lib/client/api/stores', async () => ({
+  ...(await vi.importActual<typeof import('@/lib/client/api/stores')>(
+    '@/lib/client/api/stores'
   )),
   getStores: vi.fn(),
 }));

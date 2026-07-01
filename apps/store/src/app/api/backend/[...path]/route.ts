@@ -1,6 +1,6 @@
 import { clearAuthCookie, getTokenFromRequest } from '@ordero/next-api/server';
 import { type NextRequest, NextResponse } from 'next/server';
-import { fetchBackendResponse } from '@/lib/api/server';
+import { fetchBackendResponse } from '@/lib/server/fetch';
 
 type BackendRouteContext = {
   params: Promise<{

@@ -5,14 +5,14 @@ const { requireAuthenticatedRouteMock } = vi.hoisted(() => ({
   requireAuthenticatedRouteMock: vi.fn<() => Promise<void>>(),
 }));
 
-vi.mock('@/lib/hooks/useLogOut', () => ({
+vi.mock('@/lib/hooks/auth/useLogOut', () => ({
   useLogOut: () => ({
     isLoggingOut: false,
     logOut: vi.fn(),
   }),
 }));
 
-vi.mock('@/lib/api/authPageGuard', () => ({
+vi.mock('@/lib/server/authPageGuard', () => ({
   requireAuthenticatedRoute: requireAuthenticatedRouteMock,
 }));
 

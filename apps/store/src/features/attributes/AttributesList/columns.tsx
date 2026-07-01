@@ -6,7 +6,7 @@ import {
 import Link from 'next/link';
 import { getAttributeDetailRoute } from '@/lib/client/routes';
 import type { Attribute } from '@/lib/domain/attributes';
-import { formatDate } from '@/utils/formatDate';
+import { formatDate } from '@/lib/utils/formatDate';
 
 export const columns: DataTableColumnDef<Attribute>[] = [
   {

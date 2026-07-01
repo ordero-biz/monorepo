@@ -1,5 +1,5 @@
 import { Card, IconButton } from '@ordero/ui';
-import type { Store } from '@/lib/api/types';
+import type { Store } from '@/lib/server/types';
 
 type StoreCardProps = {
   store: Store;
