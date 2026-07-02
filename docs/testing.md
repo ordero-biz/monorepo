@@ -133,6 +133,8 @@ For writes, keep tests aligned with the caller shape:
   toast, and success-callback behavior
 - `useMutation` wrappers mock the client helper and assert loading state,
   success toasts, error toasts, and narrow success callbacks
+- auth mutation wrappers also assert session cache updates, query clearing or
+  invalidation, and route navigation after success
 - workflow component tests assert cache side effects such as
   `invalidateQueries`, `removeQueries`, and route navigation after the mutation
   succeeds

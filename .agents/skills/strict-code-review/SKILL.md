@@ -238,7 +238,7 @@ For writes and mutations, expect:
 
 - TanStack Form submit actions to call direct client helpers when backend
   `fieldErrors` need to map into form submit errors
-- button/menu/dialog commands such as delete, archive, publish, and other
+- button/menu/dialog commands such as logout, delete, archive, publish, and other
   non-form writes to use `useMutation` when loading/error/success state is part
   of the UI
 - mutation functions to keep the underlying request uncached and throw the

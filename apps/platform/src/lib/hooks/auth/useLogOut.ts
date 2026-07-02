@@ -1,36 +1,52 @@
 'use client';
 
-import { useQueryClient } from '@tanstack/react-query';
+import type { ApiError, ApiResult } from '@ordero/api-types';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
-import { useCallback, useState } from 'react';
 import { logout } from '@/lib/client/api/auth';
 import { clientRoutes } from '@/lib/client/routes';
+import type { AuthSession } from '@/lib/server/types';
 import { authQueryKeys } from './useSessionQuery';
 
 export const useLogOut = () => {
   const queryClient = useQueryClient();
   const router = useRouter();
-  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
-  const logOut = useCallback(async () => {
-    setIsLoggingOut(true);
+  const logoutMutation = useMutation<AuthSession, ApiError>({
+    mutationFn: async () => {
+      const result = await logout();
 
-    const result = await logout();
+      if (!result.ok) {
+        throw result.error;
+      }
 
-    if (!result.ok) {
-      setIsLoggingOut(false);
-      return result;
+      return result.data;
+    },
+    onSuccess: (session) => {
+      queryClient.clear();
+      queryClient.setQueryData(authQueryKeys.session, session);
+      router.replace(clientRoutes.signIn);
+    },
+  });
+
+  const logOut = async (): Promise<ApiResult<AuthSession>> => {
+    try {
+      const data = await logoutMutation.mutateAsync();
+
+      return {
+        ok: true,
+        data,
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        error: error as ApiError,
+      };
     }
-
-    queryClient.clear();
-    queryClient.setQueryData(authQueryKeys.session, result.data);
-    router.replace(clientRoutes.signIn);
-
-    return result;
-  }, [queryClient, router]);
+  };
 
   return {
-    isLoggingOut,
+    isLoggingOut: logoutMutation.isPending,
     logOut,
   };
 };
