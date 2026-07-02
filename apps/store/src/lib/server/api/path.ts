@@ -11,3 +11,7 @@ export const BACKEND_ATTRIBUTE_PATHS = {
 export const BACKEND_WAREHOUSE_PATHS = {
   warehouses: '/api/v1/warehouses',
 } as const;
+
+export const BACKEND_UNITS_OF_MEASUREMENT_PATHS = {
+  unitsOfMeasurement: '/api/v1/units-of-measurement',
+} as const;
