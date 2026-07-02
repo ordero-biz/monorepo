@@ -3,6 +3,7 @@ export const clientRoutes = {
   signIn: '/sign-in',
   dashboard: '/dashboard',
   attributes: '/products/attributes',
+  warehouses: '/products/warehouse',
 } as const;
 
 export const getAttributeDetailRoute = (attributeId: string | number) =>

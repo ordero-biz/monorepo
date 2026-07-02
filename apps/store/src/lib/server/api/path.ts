@@ -7,3 +7,7 @@ export const BACKEND_ATTRIBUTE_PATHS = {
   attribute: '/api/v1/attributes/{id}',
   attributeValues: '/api/v1/attributes/{id}/values',
 } as const;
+
+export const BACKEND_WAREHOUSE_PATHS = {
+  warehouses: '/api/v1/warehouses',
+} as const;
