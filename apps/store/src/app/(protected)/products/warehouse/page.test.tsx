@@ -10,7 +10,10 @@ import WarehousePage from './page';
 
 const warehousesListMock = vi.hoisted(() => vi.fn());
 
-vi.mock('@/features/warehouses', () => ({
+vi.mock('@/features/warehouses', async () => ({
+  ...(await vi.importActual<typeof import('@/features/warehouses')>(
+    '@/features/warehouses'
+  )),
   WarehousesList: (props: { paginationInput?: PaginationSearchInput }) => {
     warehousesListMock(props);
 

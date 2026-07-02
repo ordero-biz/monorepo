@@ -41,13 +41,13 @@ describe('CreateWarehouseDialog', () => {
 
     const dialog = screen.getByRole('dialog', { name: 'Add warehouse' });
     const codeField = within(dialog).getByRole('textbox', {
-      name: 'Warehouse code',
+      name: 'Code',
     });
     const nameField = within(dialog).getByRole('textbox', {
-      name: 'Warehouse name',
+      name: 'Name',
     });
     const addressField = within(dialog).getByRole('textbox', {
-      name: 'Warehouse address',
+      name: 'Address',
     });
     const addButton = within(dialog).getByRole('button', { name: 'Add' });
 
@@ -92,19 +92,19 @@ describe('CreateWarehouseDialog', () => {
     const dialog = screen.getByRole('dialog', { name: 'Add warehouse' });
 
     await user.type(
-      within(dialog).getByRole('textbox', { name: 'Warehouse code' }),
+      within(dialog).getByRole('textbox', { name: 'Code' }),
       ' WH-001 '
     );
     await user.type(
-      within(dialog).getByRole('textbox', { name: 'Warehouse name' }),
+      within(dialog).getByRole('textbox', { name: 'Name' }),
       ' Main Warehouse '
     );
     await user.type(
-      within(dialog).getByRole('textbox', { name: 'Warehouse address' }),
+      within(dialog).getByRole('textbox', { name: 'Address' }),
       ' 123 Commerce Ave '
     );
     await user.type(
-      within(dialog).getByRole('textbox', { name: 'Warehouse comment' }),
+      within(dialog).getByRole('textbox', { name: 'Comment' }),
       ' Primary stock location '
     );
     await user.click(within(dialog).getByRole('button', { name: 'Add' }));
@@ -131,16 +131,16 @@ describe('CreateWarehouseDialog', () => {
     });
 
     expect(
-      within(reopenedDialog).getByRole('textbox', { name: 'Warehouse code' })
+      within(reopenedDialog).getByRole('textbox', { name: 'Code' })
     ).toHaveValue('');
     expect(
-      within(reopenedDialog).getByRole('textbox', { name: 'Warehouse name' })
+      within(reopenedDialog).getByRole('textbox', { name: 'Name' })
     ).toHaveValue('');
     expect(
-      within(reopenedDialog).getByRole('textbox', { name: 'Warehouse address' })
+      within(reopenedDialog).getByRole('textbox', { name: 'Address' })
     ).toHaveValue('');
     expect(
-      within(reopenedDialog).getByRole('textbox', { name: 'Warehouse comment' })
+      within(reopenedDialog).getByRole('textbox', { name: 'Comment' })
     ).toHaveValue('');
   });
 
@@ -163,16 +163,16 @@ describe('CreateWarehouseDialog', () => {
 
     const dialog = screen.getByRole('dialog', { name: 'Add warehouse' });
     const codeField = within(dialog).getByRole('textbox', {
-      name: 'Warehouse code',
+      name: 'Code',
     });
 
     await user.type(codeField, 'WH-001');
     await user.type(
-      within(dialog).getByRole('textbox', { name: 'Warehouse name' }),
+      within(dialog).getByRole('textbox', { name: 'Name' }),
       'Main Warehouse'
     );
     await user.type(
-      within(dialog).getByRole('textbox', { name: 'Warehouse address' }),
+      within(dialog).getByRole('textbox', { name: 'Address' }),
       '123 Commerce Ave'
     );
     await user.click(within(dialog).getByRole('button', { name: 'Add' }));
