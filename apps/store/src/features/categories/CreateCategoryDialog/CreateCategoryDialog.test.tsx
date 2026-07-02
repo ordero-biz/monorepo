@@ -54,7 +54,7 @@ describe('CreateCategoryDialog', () => {
 
     const dialog = screen.getByRole('dialog', { name: 'Create new category' });
     const nameField = within(dialog).getByRole('textbox', {
-      name: 'Category name',
+      name: 'Name',
     });
     const createButton = within(dialog).getByRole('button', { name: 'Create' });
 
@@ -97,7 +97,7 @@ describe('CreateCategoryDialog', () => {
     const dialog = screen.getByRole('dialog', { name: 'Create new category' });
 
     await user.type(
-      within(dialog).getByRole('textbox', { name: 'Category name' }),
+      within(dialog).getByRole('textbox', { name: 'Name' }),
       'Sneakers'
     );
     await user.click(
@@ -139,7 +139,7 @@ describe('CreateCategoryDialog', () => {
 
     const dialog = screen.getByRole('dialog', { name: 'Create new category' });
     const nameField = within(dialog).getByRole('textbox', {
-      name: 'Category name',
+      name: 'Name',
     });
 
     await user.type(nameField, 'Sneakers');

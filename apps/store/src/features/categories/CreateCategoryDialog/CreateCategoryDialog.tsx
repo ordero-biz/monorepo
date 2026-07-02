@@ -94,15 +94,15 @@ export const CreateCategoryDialog = ({
 
                         return (
                           <TextField
-                            aria-label="Category name"
                             errorText={errorText}
                             invalid={Boolean(errorText)}
+                            label="Name"
                             name={field.name}
                             onBlur={field.handleBlur}
                             onValueChange={field.handleChange}
-                            placeholder="Shoes"
                             required
                             value={field.state.value}
+                            size="s"
                           />
                         );
                       }}
@@ -122,17 +122,18 @@ export const CreateCategoryDialog = ({
 
                         return (
                           <Select
-                            aria-label="Parent category"
                             errorText={errorText}
                             invalid={Boolean(errorText)}
+                            label="Parent category"
                             name={field.name}
                             onBlur={field.handleBlur}
                             onValueChange={(value) =>
                               field.handleChange(value || null)
                             }
                             options={parentCategoryOptions}
-                            placeholder="Select parent category"
+                            placeholder=""
                             value={field.state.value}
+                            size="s"
                           />
                         );
                       }}

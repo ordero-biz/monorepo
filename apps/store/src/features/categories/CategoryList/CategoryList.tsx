@@ -12,49 +12,44 @@ type CategoryListProps = {
 
 export const CategoryList = ({ paginationInput }: CategoryListProps) => {
   const categoriesQuery = useCategoriesQuery(paginationInput);
-  const availableCategories = categoriesQuery.data?.content ?? [];
 
   if (categoriesQuery.isPending) {
     return (
-      <div className="flex flex-col gap-[var(--space-2)]">
-        <CategoryListHeader availableCategories={availableCategories} />
-        <Card.Root variant="filled">
-          <Card.Content>
-            <Typography color="text-secondary" variant="body2">
-              Loading categories...
-            </Typography>
-          </Card.Content>
-        </Card.Root>
-      </div>
+      <Card.Root variant="filled">
+        <Card.Content>
+          <Typography color="text-secondary" variant="body2">
+            Loading categories...
+          </Typography>
+        </Card.Content>
+      </Card.Root>
     );
   }
 
   if (categoriesQuery.isError) {
     return (
-      <div className="flex flex-col gap-[var(--space-2)]">
-        <CategoryListHeader availableCategories={availableCategories} />
-        <Card.Root variant="filled">
-          <Card.Content>
-            <div className="flex flex-col gap-[var(--space-2)]">
-              <Typography variant="body2">
-                We couldn&apos;t load your categories right now.
-              </Typography>
-              <div>
-                <Button
-                  color="inherit"
-                  onClick={() => categoriesQuery.refetch()}
-                  size="s"
-                  type="button"
-                >
-                  Retry
-                </Button>
-              </div>
+      <Card.Root variant="filled">
+        <Card.Content>
+          <div className="flex flex-col gap-[var(--space-2)]">
+            <Typography variant="body2">
+              We couldn&apos;t load your categories right now.
+            </Typography>
+            <div>
+              <Button
+                color="inherit"
+                onClick={() => categoriesQuery.refetch()}
+                size="s"
+                type="button"
+              >
+                Retry
+              </Button>
             </div>
-          </Card.Content>
-        </Card.Root>
-      </div>
+          </div>
+        </Card.Content>
+      </Card.Root>
     );
   }
+
+  const availableCategories = categoriesQuery.data?.content ?? [];
 
   return (
     <div className="flex flex-col gap-[var(--space-2)]">
