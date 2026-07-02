@@ -12,6 +12,10 @@ export const BACKEND_CATEGORY_PATHS = {
   categories: '/api/v1/categories',
 } as const;
 
+export const BACKEND_SUPPLIER_PATHS = {
+  suppliers: '/api/v1/suppliers',
+} as const;
+
 export const BACKEND_UNITS_OF_MEASUREMENT_PATHS = {
   unitsOfMeasurement: '/api/v1/units-of-measurement',
 } as const;

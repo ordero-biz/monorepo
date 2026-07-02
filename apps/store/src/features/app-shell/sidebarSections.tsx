@@ -45,6 +45,12 @@ export const sidebarSections: SidebarNavigationSectionConfig[] = [
             href: clientRoutes.unitsOfMeasurement,
           },
           {
+            id: 'product-suppliers',
+            kind: 'link',
+            label: 'Suppliers',
+            href: clientRoutes.suppliers,
+          },
+          {
             id: 'product-warehouse',
             kind: 'link',
             label: 'Warehouse',

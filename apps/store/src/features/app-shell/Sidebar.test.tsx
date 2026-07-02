@@ -56,6 +56,9 @@ describe('Sidebar', () => {
       within(sidebar).getByRole('link', { name: 'Units of measurement' })
     ).toHaveAttribute('href', '/products/units-of-measurement');
     expect(
+      within(sidebar).getByRole('link', { name: 'Suppliers' })
+    ).toHaveAttribute('href', '/products/suppliers');
+    expect(
       within(sidebar).getByRole('link', { name: 'Warehouse' })
     ).toHaveAttribute('href', '/products/warehouse');
   });
