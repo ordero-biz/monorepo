@@ -94,13 +94,12 @@ export const CreateAttributeDialog = () => {
 
                         return (
                           <TextField
-                            aria-label="Attribute name"
                             errorText={errorText}
                             invalid={Boolean(errorText)}
+                            label="Name"
                             name={field.name}
                             onBlur={field.handleBlur}
                             onValueChange={field.handleChange}
-                            placeholder="Color"
                             required
                             value={field.state.value}
                           />
@@ -183,7 +182,6 @@ export const CreateAttributeDialog = () => {
                                           name={subField.name}
                                           onBlur={subField.handleBlur}
                                           onValueChange={subField.handleChange}
-                                          placeholder="Attribute value"
                                           size="s"
                                           value={attributeValue}
                                         />

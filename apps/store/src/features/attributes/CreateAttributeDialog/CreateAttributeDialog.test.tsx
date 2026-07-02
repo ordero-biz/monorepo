@@ -53,7 +53,7 @@ describe('CreateAttributeDialog', () => {
 
     const dialog = screen.getByRole('dialog', { name: 'Create new attribute' });
     const nameField = within(dialog).getByRole('textbox', {
-      name: 'Attribute name',
+      name: 'Name',
     });
     const createButton = within(dialog).getByRole('button', { name: 'Create' });
 
@@ -134,7 +134,7 @@ describe('CreateAttributeDialog', () => {
 
     const dialog = screen.getByRole('dialog', { name: 'Create new attribute' });
     const nameField = within(dialog).getByRole('textbox', {
-      name: 'Attribute name',
+      name: 'Name',
     });
     const firstValueField = within(dialog).getByRole('textbox', {
       name: 'Attribute value 1',
@@ -185,7 +185,7 @@ describe('CreateAttributeDialog', () => {
     });
 
     expect(
-      within(reopenedDialog).getByRole('textbox', { name: 'Attribute name' })
+      within(reopenedDialog).getByRole('textbox', { name: 'Name' })
     ).toHaveValue('');
     expect(
       within(reopenedDialog).getByRole('textbox', { name: 'Attribute value 1' })
@@ -216,7 +216,7 @@ describe('CreateAttributeDialog', () => {
 
     const dialog = screen.getByRole('dialog', { name: 'Create new attribute' });
     const nameField = within(dialog).getByRole('textbox', {
-      name: 'Attribute name',
+      name: 'Name',
     });
 
     await user.type(nameField, 'Material');
