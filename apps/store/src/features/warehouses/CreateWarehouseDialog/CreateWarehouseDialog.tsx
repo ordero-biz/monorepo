@@ -75,15 +75,15 @@ export const CreateWarehouseDialog = () => {
 
                         return (
                           <TextField
-                            aria-label="Warehouse code"
                             errorText={errorText}
                             invalid={Boolean(errorText)}
+                            label="Code"
                             name={field.name}
                             onBlur={field.handleBlur}
                             onValueChange={field.handleChange}
-                            placeholder="WH-001"
                             required
                             value={field.state.value}
+                            size="s"
                           />
                         );
                       }}
@@ -103,15 +103,15 @@ export const CreateWarehouseDialog = () => {
 
                         return (
                           <TextField
-                            aria-label="Warehouse name"
                             errorText={errorText}
                             invalid={Boolean(errorText)}
+                            label="Name"
                             name={field.name}
                             onBlur={field.handleBlur}
                             onValueChange={field.handleChange}
-                            placeholder="Main Warehouse"
                             required
                             value={field.state.value}
+                            size="s"
                           />
                         );
                       }}
@@ -131,15 +131,15 @@ export const CreateWarehouseDialog = () => {
 
                         return (
                           <TextField
-                            aria-label="Warehouse address"
                             errorText={errorText}
                             invalid={Boolean(errorText)}
+                            label="Address"
                             name={field.name}
                             onBlur={field.handleBlur}
                             onValueChange={field.handleChange}
-                            placeholder="123 Commerce Ave"
                             required
                             value={field.state.value}
+                            size="s"
                           />
                         );
                       }}
@@ -153,14 +153,14 @@ export const CreateWarehouseDialog = () => {
 
                         return (
                           <TextField
-                            aria-label="Warehouse comment"
                             errorText={errorText}
                             invalid={Boolean(errorText)}
+                            label="Comment"
                             name={field.name}
                             onBlur={field.handleBlur}
                             onValueChange={field.handleChange}
-                            placeholder="Comment"
                             value={field.state.value}
+                            size="s"
                           />
                         );
                       }}
