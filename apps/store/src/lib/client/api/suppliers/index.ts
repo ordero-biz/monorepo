@@ -1,0 +1,34 @@
+'use client';
+
+import { apiFetch } from '@ordero/api-client';
+import type { Supplier } from '@/lib/domain/suppliers';
+import type { PaginatedResponse } from '@/lib/server/types';
+import {
+  getPaginationSearch,
+  type PaginationSearchInput,
+} from '@/lib/utils/url';
+import { CLIENT_BACKEND_PATHS } from '../path';
+
+type SuppliersListResponse = PaginatedResponse<Supplier>;
+
+type CreateSupplierInput = {
+  name: string;
+  email: string;
+  phone: string;
+  address: string;
+  comment: string;
+};
+
+export const getSuppliersPath = (input?: PaginationSearchInput) =>
+  `${CLIENT_BACKEND_PATHS.suppliers}?${getPaginationSearch(input)}`;
+
+export const getSuppliers = (input?: PaginationSearchInput) =>
+  apiFetch<SuppliersListResponse>(getSuppliersPath(input), {
+    method: 'GET',
+  });
+
+export const createSupplier = (input: CreateSupplierInput) =>
+  apiFetch<Supplier>(CLIENT_BACKEND_PATHS.suppliers, {
+    method: 'POST',
+    body: input,
+  });

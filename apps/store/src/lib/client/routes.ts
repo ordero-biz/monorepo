@@ -3,6 +3,7 @@ export const clientRoutes = {
   signIn: '/sign-in',
   dashboard: '/dashboard',
   attributes: '/products/attributes',
+  suppliers: '/products/suppliers',
   unitsOfMeasurement: '/products/units-of-measurement',
   warehouses: '/products/warehouse',
 } as const;
