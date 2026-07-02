@@ -2,10 +2,15 @@
 
 import { Button, Card, DataTable, Typography } from '@ordero/ui';
 import { useWarehousesQuery } from '@/lib/hooks/warehouses/useWarehousesQuery';
+import type { PaginationSearchInput } from '@/lib/utils/url';
 import { columns } from './columns';
 
-export const WarehousesList = () => {
-  const warehousesQuery = useWarehousesQuery();
+type WarehousesListProps = {
+  paginationInput?: PaginationSearchInput;
+};
+
+export const WarehousesList = ({ paginationInput }: WarehousesListProps) => {
+  const warehousesQuery = useWarehousesQuery(paginationInput);
 
   if (warehousesQuery.isPending) {
     return (

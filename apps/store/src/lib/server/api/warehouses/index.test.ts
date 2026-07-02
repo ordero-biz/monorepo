@@ -72,6 +72,39 @@ describe('warehouse server helpers', () => {
     });
   });
 
+  it('gets warehouses with pagination input', async () => {
+    mockAuthCookie('server-token');
+    fetchBackendResponseMock.mockResolvedValue({
+      ok: true,
+      data: new Response(
+        JSON.stringify({
+          content: [],
+          page: {
+            size: 10,
+            number: 2,
+            totalElements: 0,
+            totalPages: 0,
+          },
+        })
+      ),
+    });
+
+    await getServerWarehouses({
+      page: 2,
+      size: 10,
+      sort: ['name,asc', 'code,desc'],
+    });
+
+    expect(fetchBackendResponseMock).toHaveBeenCalledWith({
+      path: '/api/v1/warehouses',
+      search: 'page=2&size=10&sort=name%2Casc&sort=code%2Cdesc',
+      token: 'server-token',
+      init: {
+        method: 'GET',
+      },
+    });
+  });
+
   it('returns an authentication error without a server token', async () => {
     mockAuthCookie();
 

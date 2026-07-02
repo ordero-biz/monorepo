@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getWarehouses } from '@/lib/client/api/warehouses';
 import { prepareStoreSetup } from '@/test/prepareSetup';
@@ -105,5 +105,34 @@ describe('WarehousesList', () => {
     expect(screen.getByText('Main Warehouse')).toBeVisible();
     expect(screen.getByText('123 Commerce Ave')).toBeVisible();
     expect(screen.getByText('Primary stock location')).toBeVisible();
+  });
+
+  it('requests warehouses with pagination input', async () => {
+    const paginationInput = {
+      page: 2,
+      size: 10,
+      sort: ['name,asc'],
+    };
+
+    getWarehousesMock.mockResolvedValue({
+      ok: true,
+      data: {
+        content: [],
+        page: {
+          size: 10,
+          number: 2,
+          totalElements: 0,
+          totalPages: 0,
+        },
+      },
+    });
+
+    setup({
+      paginationInput,
+    });
+
+    await waitFor(() => {
+      expect(getWarehousesMock).toHaveBeenCalledWith(paginationInput);
+    });
   });
 });

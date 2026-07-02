@@ -1,4 +1,3 @@
-import { getWarehousesSearch } from '@/lib/domain/warehouses';
 import { createWarehouse, getWarehouses, getWarehousesPath } from '.';
 
 describe('warehouse client helpers', () => {
@@ -11,7 +10,6 @@ describe('warehouse client helpers', () => {
   });
 
   it('builds warehouse pageable search params', () => {
-    expect(getWarehousesSearch()).toBe('page=0&size=25');
     expect(
       getWarehousesPath({
         page: 2,

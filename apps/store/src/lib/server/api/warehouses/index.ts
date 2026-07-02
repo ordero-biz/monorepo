@@ -4,10 +4,14 @@ import {
   parseBackendResponseData,
 } from '@ordero/next-api/server';
 import { cookies } from 'next/headers';
-import { getWarehousesSearch, type Warehouse } from '@/lib/domain/warehouses';
+import type { Warehouse } from '@/lib/domain/warehouses';
 import { BACKEND_WAREHOUSE_PATHS } from '@/lib/server/api/path';
 import { fetchBackendResponse } from '@/lib/server/fetch';
 import type { PaginatedResponse } from '@/lib/server/types';
+import {
+  getPaginationSearch,
+  type PaginationSearchInput,
+} from '@/lib/utils/url';
 
 const getServerToken = async () =>
   (await cookies()).get(AUTH_TOKEN_COOKIE_NAME)?.value;
@@ -47,8 +51,8 @@ const fetchWarehouseResource = async <T>(
   };
 };
 
-export const getServerWarehouses = () =>
+export const getServerWarehouses = (input?: PaginationSearchInput) =>
   fetchWarehouseResource<PaginatedResponse<Warehouse>>(
     BACKEND_WAREHOUSE_PATHS.warehouses,
-    getWarehousesSearch()
+    getPaginationSearch(input)
   );
