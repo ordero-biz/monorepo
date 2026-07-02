@@ -2,9 +2,12 @@ import type { ApiResult } from '@ordero/api-types';
 import { queryOptions } from '@tanstack/react-query';
 import type { Category } from '@/lib/domain/categories';
 import type { PaginatedResponse } from '@/lib/server/types';
+import type { PaginationSearchInput } from '@/lib/utils/url';
 import { categoriesQueryKeys } from './categoriesQueryKeys';
 
-type CategoriesFetcher = () => Promise<ApiResult<PaginatedResponse<Category>>>;
+type CategoriesFetcher = (
+  input?: PaginationSearchInput
+) => Promise<ApiResult<PaginatedResponse<Category>>>;
 
 const unwrapApiResult = async <T>(request: Promise<ApiResult<T>>) => {
   const result = await request;
@@ -17,9 +20,10 @@ const unwrapApiResult = async <T>(request: Promise<ApiResult<T>>) => {
 };
 
 export const categoriesListQueryOptions = (
-  fetchCategories: CategoriesFetcher
+  fetchCategories: CategoriesFetcher,
+  input?: PaginationSearchInput
 ) =>
   queryOptions({
-    queryKey: categoriesQueryKeys.list,
-    queryFn: () => unwrapApiResult(fetchCategories()),
+    queryKey: categoriesQueryKeys.listPage(input),
+    queryFn: () => unwrapApiResult(fetchCategories(input)),
   });

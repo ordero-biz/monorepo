@@ -104,19 +104,11 @@ describe('CreateCategoryDialog', () => {
       within(dialog).getByRole('combobox', { name: 'Parent category' })
     );
     await user.click(screen.getByRole('option', { name: 'Shoes' }));
-    await user.clear(
-      within(dialog).getByRole('spinbutton', { name: 'Sort order' })
-    );
-    await user.type(
-      within(dialog).getByRole('spinbutton', { name: 'Sort order' }),
-      '15'
-    );
     await user.click(within(dialog).getByRole('button', { name: 'Create' }));
 
     expect(createCategoryMock).toHaveBeenCalledWith({
       name: 'Sneakers',
       parentId: 1,
-      sortOrder: 15,
     });
     await waitFor(() =>
       expect(invalidateQueriesSpy).toHaveBeenCalledWith({
@@ -156,7 +148,6 @@ describe('CreateCategoryDialog', () => {
     expect(createCategoryMock).toHaveBeenCalledWith({
       name: 'Sneakers',
       parentId: null,
-      sortOrder: 0,
     });
     expect(
       await within(dialog).findByText('Category name already exists.')

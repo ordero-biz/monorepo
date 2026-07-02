@@ -65,6 +65,36 @@ describe('categories queries', () => {
     expect(getCategoriesMock).toHaveBeenCalledTimes(1);
   });
 
+  it('requests categories with pagination input', async () => {
+    const paginationInput = {
+      page: 2,
+      size: 10,
+      sort: ['name,asc'],
+    };
+
+    getCategoriesMock.mockResolvedValue({
+      ok: true,
+      data: {
+        content: [],
+        page: {
+          size: 10,
+          number: 2,
+          totalElements: 0,
+          totalPages: 0,
+        },
+      },
+    });
+
+    const queryClient = createTestQueryClient();
+    const TestQueryProvider = createTestQueryProvider(queryClient);
+    const { result } = renderHook(() => useCategoriesQuery(paginationInput), {
+      wrapper: TestQueryProvider,
+    });
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(getCategoriesMock).toHaveBeenCalledWith(paginationInput);
+  });
+
   it('exposes the categories request error without retrying', async () => {
     const error = {
       status: 500,

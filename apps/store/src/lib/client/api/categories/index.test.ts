@@ -1,4 +1,4 @@
-import { createCategory, getCategories } from '.';
+import { createCategory, getCategories, getCategoriesPath } from '.';
 
 describe('category client helpers', () => {
   beforeEach(() => {
@@ -7,6 +7,18 @@ describe('category client helpers', () => {
 
   afterEach(() => {
     vi.unstubAllGlobals();
+  });
+
+  it('builds category pageable search params', () => {
+    expect(
+      getCategoriesPath({
+        page: 2,
+        size: 10,
+        sort: ['name,asc', 'sortOrder,desc'],
+      })
+    ).toBe(
+      '/api/backend/api/v1/categories?page=2&size=10&sort=name%2Casc&sort=sortOrder%2Cdesc'
+    );
   });
 
   it('gets categories from the backend proxy on success', async () => {
@@ -66,7 +78,7 @@ describe('category client helpers', () => {
     });
 
     expect(fetchMock).toHaveBeenCalledWith(
-      '/api/backend/api/v1/categories',
+      '/api/backend/api/v1/categories?page=0&size=25',
       expect.objectContaining({
         method: 'GET',
         cache: 'no-store',
@@ -123,7 +135,6 @@ describe('category client helpers', () => {
       createCategory({
         name: 'Sneakers',
         parentId: 1,
-        sortOrder: 15,
       })
     ).resolves.toEqual({
       ok: true,
@@ -148,7 +159,6 @@ describe('category client helpers', () => {
         body: JSON.stringify({
           name: 'Sneakers',
           parentId: 1,
-          sortOrder: 15,
         }),
         cache: 'no-store',
       })
@@ -175,7 +185,6 @@ describe('category client helpers', () => {
       createCategory({
         name: 'Sneakers',
         parentId: 1,
-        sortOrder: 15,
       })
     ).resolves.toEqual({
       ok: false,

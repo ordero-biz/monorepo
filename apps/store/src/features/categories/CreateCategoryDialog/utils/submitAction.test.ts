@@ -37,7 +37,6 @@ describe('submitCreateCategory', () => {
       submitCreateCategory({
         name: '  Sneakers  ',
         parentId: '1',
-        sortOrder: '15',
       })
     ).resolves.toEqual({
       ok: true,
@@ -47,7 +46,6 @@ describe('submitCreateCategory', () => {
     expect(createCategoryMock).toHaveBeenCalledWith({
       name: 'Sneakers',
       parentId: 1,
-      sortOrder: 15,
     });
   });
 
@@ -67,7 +65,6 @@ describe('submitCreateCategory', () => {
       submitCreateCategory({
         name: 'Sneakers',
         parentId: '1',
-        sortOrder: '15',
       })
     ).resolves.toEqual({
       ok: false,
@@ -97,7 +94,6 @@ describe('submitCreateCategory', () => {
       submitCreateCategory({
         name: 'Sneakers',
         parentId: null,
-        sortOrder: '15',
       })
     ).resolves.toEqual({
       ok: true,
@@ -107,7 +103,6 @@ describe('submitCreateCategory', () => {
     expect(createCategoryMock).toHaveBeenCalledWith({
       name: 'Sneakers',
       parentId: null,
-      sortOrder: 15,
     });
   });
 });

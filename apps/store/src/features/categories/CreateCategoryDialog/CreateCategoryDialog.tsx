@@ -11,7 +11,6 @@ import { useCreateCategoryForm } from './hooks/useCreateCategoryForm';
 import {
   validateCategoryName,
   validateCategoryParentId,
-  validateCategorySortOrder,
 } from './utils/validations';
 
 type CreateCategoryDialogProps = {
@@ -138,51 +137,17 @@ export const CreateCategoryDialog = ({
                         );
                       }}
                     </form.Field>
-
-                    <form.Field
-                      name="sortOrder"
-                      validators={{
-                        onChange: validateCategorySortOrder,
-                        onSubmit: validateCategorySortOrder,
-                      }}
-                    >
-                      {(field) => {
-                        const errorText = getFieldSubmitChangeErrorText(
-                          field.state.meta
-                        );
-
-                        return (
-                          <TextField
-                            aria-label="Sort order"
-                            errorText={errorText}
-                            invalid={Boolean(errorText)}
-                            name={field.name}
-                            onBlur={field.handleBlur}
-                            onValueChange={field.handleChange}
-                            placeholder="0"
-                            required
-                            type="number"
-                            value={field.state.value}
-                          />
-                        );
-                      }}
-                    </form.Field>
                   </div>
                 </Dialog.Content>
 
                 <Dialog.Footer>
                   <form.Subscribe
                     selector={(state) =>
-                      [
-                        state.values.name,
-                        state.values.sortOrder,
-                        state.isSubmitting,
-                      ] as const
+                      [state.values.name, state.isSubmitting] as const
                     }
                   >
-                    {([name, sortOrder, isSubmitting]) => {
-                      const isCreateDisabled =
-                        isSubmitting || !name.trim() || !sortOrder.trim();
+                    {([name, isSubmitting]) => {
+                      const isCreateDisabled = isSubmitting || !name.trim();
 
                       return (
                         <Button disabled={isCreateDisabled} type="submit">

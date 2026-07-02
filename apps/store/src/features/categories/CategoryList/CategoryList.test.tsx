@@ -137,4 +137,30 @@ describe('CategoryList', () => {
 
     expect(await screen.findByText('No categories found.')).toBeVisible();
   });
+
+  it('requests categories with pagination input', async () => {
+    const paginationInput = {
+      page: 2,
+      size: 10,
+      sort: ['name,asc'],
+    };
+
+    getCategoriesMock.mockResolvedValue({
+      ok: true,
+      data: {
+        content: [],
+        page: {
+          size: 10,
+          number: 2,
+          totalElements: 0,
+          totalPages: 0,
+        },
+      },
+    });
+
+    setup({ paginationInput });
+
+    expect(await screen.findByText('No categories found.')).toBeVisible();
+    expect(getCategoriesMock).toHaveBeenCalledWith(paginationInput);
+  });
 });
