@@ -1,0 +1,31 @@
+'use client';
+
+import { apiFetch } from '@ordero/api-client';
+import type { Category } from '@/lib/domain/categories';
+import type { PaginatedResponse } from '@/lib/server/types';
+import {
+  getPaginationSearch,
+  type PaginationSearchInput,
+} from '@/lib/utils/url';
+import { CLIENT_BACKEND_PATHS } from '../path';
+
+type CategoriesListResponse = PaginatedResponse<Category>;
+
+export const getCategoriesPath = (input?: PaginationSearchInput) =>
+  `${CLIENT_BACKEND_PATHS.categories}?${getPaginationSearch(input)}`;
+
+export const getCategories = (input?: PaginationSearchInput) =>
+  apiFetch<CategoriesListResponse>(getCategoriesPath(input), {
+    method: 'GET',
+  });
+
+type CreateCategoryInput = {
+  name: string;
+  parentId: number | null;
+};
+
+export const createCategory = (input: CreateCategoryInput) =>
+  apiFetch<Category>(CLIENT_BACKEND_PATHS.categories, {
+    method: 'POST',
+    body: input,
+  });
