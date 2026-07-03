@@ -23,6 +23,20 @@ export type {
 } from './components/Checkbox';
 export { Checkbox, checkboxRootVariants } from './components/Checkbox';
 export type {
+  CheckboxChipColor,
+  CheckboxChipProps,
+  CheckboxChipSize,
+} from './components/CheckboxChip';
+export {
+  CheckboxChip,
+  checkboxChipVariants,
+} from './components/CheckboxChip';
+export type {
+  CheckboxChipGroupOrientation,
+  CheckboxChipGroupProps,
+} from './components/CheckboxChipGroup';
+export { CheckboxChipGroup } from './components/CheckboxChipGroup';
+export type {
   CheckboxGroupOrientation,
   CheckboxGroupProps,
 } from './components/CheckboxGroup';
