@@ -10,9 +10,11 @@ import {
 } from '@ordero/ui';
 import { useForm } from '@tanstack/react-form';
 import { Plus } from 'lucide-react';
+import { useProductsCategoriesQuery } from '@/lib/hooks/products/useProductsCategoriesQuery';
 import { productAddDefaultValues } from './constants';
 
 export const ProductAddForm = () => {
+  const categoriesQuery = useProductsCategoriesQuery();
   const form = useForm({
     defaultValues: productAddDefaultValues,
     onSubmit: () => undefined,
@@ -54,7 +56,19 @@ export const ProductAddForm = () => {
                       name={field.name}
                       onBlur={field.handleBlur}
                       onValueChange={field.handleChange}
-                      options={[]}
+                      disabled={categoriesQuery.isPending}
+                      errorText={
+                        categoriesQuery.isError
+                          ? "We couldn't load categories right now."
+                          : undefined
+                      }
+                      helperText={
+                        categoriesQuery.isPending
+                          ? 'Loading categories...'
+                          : undefined
+                      }
+                      invalid={categoriesQuery.isError}
+                      options={categoriesQuery.categoryOptions}
                       placeholder="Select category"
                       size="s"
                       value={field.state.value}
