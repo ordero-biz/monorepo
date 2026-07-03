@@ -8,6 +8,14 @@ import {
 } from '@/test/prepareSetup';
 import AddProductPage from './page';
 
+const routerPushMock = vi.fn();
+
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({
+    push: routerPushMock,
+  }),
+}));
+
 vi.mock('@/lib/server/api/categories', () => ({
   getServerCategories: vi.fn(),
 }));
@@ -17,6 +25,7 @@ const getServerCategoriesMock = vi.mocked(getServerCategories);
 describe('AddProductPage', () => {
   beforeEach(() => {
     getServerCategoriesMock.mockReset();
+    routerPushMock.mockReset();
   });
 
   it('renders the add product form with category options', async () => {

@@ -8,16 +8,26 @@ import {
   TextField,
   Typography,
 } from '@ordero/ui';
-import { useForm } from '@tanstack/react-form';
+import { useQueryClient } from '@tanstack/react-query';
 import { Plus } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { clientRoutes } from '@/lib/client/routes';
 import { useProductsCategoriesQuery } from '@/lib/hooks/products/useProductsCategoriesQuery';
-import { productAddDefaultValues } from './constants';
+import { productsQueryKeys } from '@/lib/query/products/productsQueryKeys';
+import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
+import { useCreateProductForm } from './hooks/useCreateProductForm';
 
 export const ProductAddForm = () => {
+  const queryClient = useQueryClient();
+  const router = useRouter();
   const categoriesQuery = useProductsCategoriesQuery();
-  const form = useForm({
-    defaultValues: productAddDefaultValues,
-    onSubmit: () => undefined,
+  const { form } = useCreateProductForm({
+    onCreated: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: productsQueryKeys.list,
+      });
+      router.push(clientRoutes.products);
+    },
   });
 
   return (
@@ -36,44 +46,57 @@ export const ProductAddForm = () => {
             <div className="grid gap-[var(--space-3)] lg:grid-cols-3 lg:items-start">
               <div className="flex flex-col gap-[var(--space-2)]">
                 <form.Field name="productName">
-                  {(field) => (
-                    <TextField
-                      label="Product name"
-                      name={field.name}
-                      onBlur={field.handleBlur}
-                      onValueChange={field.handleChange}
-                      placeholder="Product name"
-                      size="s"
-                      value={field.state.value}
-                    />
-                  )}
+                  {(field) => {
+                    const errorText = getFieldSubmitChangeErrorText(
+                      field.state.meta
+                    );
+
+                    return (
+                      <TextField
+                        errorText={errorText}
+                        invalid={Boolean(errorText)}
+                        label="Product name"
+                        name={field.name}
+                        onBlur={field.handleBlur}
+                        onValueChange={field.handleChange}
+                        placeholder="Product name"
+                        size="s"
+                        value={field.state.value}
+                      />
+                    );
+                  }}
                 </form.Field>
 
                 <form.Field name="category">
-                  {(field) => (
-                    <Select
-                      label="Category"
-                      name={field.name}
-                      onBlur={field.handleBlur}
-                      onValueChange={field.handleChange}
-                      disabled={categoriesQuery.isPending}
-                      errorText={
-                        categoriesQuery.isError
-                          ? "We couldn't load categories right now."
-                          : undefined
-                      }
-                      helperText={
-                        categoriesQuery.isPending
-                          ? 'Loading categories...'
-                          : undefined
-                      }
-                      invalid={categoriesQuery.isError}
-                      options={categoriesQuery.categoryOptions}
-                      placeholder="Select category"
-                      size="s"
-                      value={field.state.value}
-                    />
-                  )}
+                  {(field) => {
+                    const errorText = getFieldSubmitChangeErrorText(
+                      field.state.meta
+                    );
+                    const categoryErrorText = categoriesQuery.isError
+                      ? "We couldn't load categories right now."
+                      : errorText;
+
+                    return (
+                      <Select
+                        disabled={categoriesQuery.isPending}
+                        errorText={categoryErrorText}
+                        helperText={
+                          categoriesQuery.isPending
+                            ? 'Loading categories...'
+                            : undefined
+                        }
+                        invalid={categoriesQuery.isError || Boolean(errorText)}
+                        label="Category"
+                        name={field.name}
+                        onBlur={field.handleBlur}
+                        onValueChange={field.handleChange}
+                        options={categoriesQuery.categoryOptions}
+                        placeholder="Select category"
+                        size="s"
+                        value={field.state.value}
+                      />
+                    );
+                  }}
                 </form.Field>
               </div>
 
@@ -109,17 +132,30 @@ export const ProductAddForm = () => {
             </div>
 
             <div className="flex justify-end">
-              <form.Subscribe selector={(state) => state.isSubmitting}>
-                {(isSubmitting) => (
-                  <Button
-                    color="primary"
-                    disabled={isSubmitting}
-                    size="l"
-                    type="submit"
-                  >
-                    Add product
-                  </Button>
-                )}
+              <form.Subscribe
+                selector={(state) =>
+                  [
+                    state.values.productName,
+                    state.values.category,
+                    state.isSubmitting,
+                  ] as const
+                }
+              >
+                {([productName, category, isSubmitting]) => {
+                  const isSubmitDisabled =
+                    isSubmitting || !productName.trim() || !category;
+
+                  return (
+                    <Button
+                      color="primary"
+                      disabled={isSubmitDisabled}
+                      size="l"
+                      type="submit"
+                    >
+                      {isSubmitting ? 'Adding product...' : 'Add product'}
+                    </Button>
+                  );
+                }}
               </form.Subscribe>
             </div>
           </div>
