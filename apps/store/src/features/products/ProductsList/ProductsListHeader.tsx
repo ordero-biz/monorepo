@@ -17,7 +17,6 @@ export const ProductsListHeader = () => {
         <Button
           color="primary"
           onClick={() => router.push(clientRoutes.addProduct)}
-          startIcon={<Plus />}
           type="button"
         >
           Add Product

@@ -4,6 +4,7 @@ export const clientRoutes = {
   dashboard: '/dashboard',
   products: '/products',
   addProduct: '/products/add',
+  categories: '/products/categories',
   attributes: '/products/attributes',
   suppliers: '/products/suppliers',
   unitsOfMeasurement: '/products/units-of-measurement',
