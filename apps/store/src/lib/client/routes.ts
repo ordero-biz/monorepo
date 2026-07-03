@@ -2,6 +2,8 @@ export const clientRoutes = {
   home: '/',
   signIn: '/sign-in',
   dashboard: '/dashboard',
+  products: '/products',
+  addProduct: '/products/add',
   attributes: '/products/attributes',
   suppliers: '/products/suppliers',
   unitsOfMeasurement: '/products/units-of-measurement',

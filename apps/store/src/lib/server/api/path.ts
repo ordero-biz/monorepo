@@ -12,6 +12,10 @@ export const BACKEND_CATEGORY_PATHS = {
   categories: '/api/v1/categories',
 } as const;
 
+export const BACKEND_PRODUCT_PATHS = {
+  products: '/api/v1/products',
+} as const;
+
 export const BACKEND_SUPPLIER_PATHS = {
   suppliers: '/api/v1/suppliers',
 } as const;
