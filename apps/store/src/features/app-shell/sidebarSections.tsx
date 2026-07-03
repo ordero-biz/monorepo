@@ -11,7 +11,7 @@ export const sidebarSections: SidebarNavigationSectionConfig[] = [
         id: 'dashboard',
         kind: 'link',
         label: 'Dashboard',
-        href: '/dashboard',
+        href: clientRoutes.dashboard,
         icon: <LayoutDashboard />,
       },
       {
@@ -24,19 +24,19 @@ export const sidebarSections: SidebarNavigationSectionConfig[] = [
             id: 'product-all',
             kind: 'link',
             label: 'Product',
-            href: '/products',
+            href: clientRoutes.products,
           },
           {
             id: 'product-categories',
             kind: 'link',
             label: 'Categories',
-            href: '/products/categories',
+            href: clientRoutes.categories,
           },
           {
             id: 'product-attributes',
             kind: 'link',
             label: 'Attributes',
-            href: '/products/attributes',
+            href: clientRoutes.attributes,
           },
           {
             id: 'product-units-of-measurement',

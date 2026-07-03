@@ -59,7 +59,7 @@ describe('AttributesPage', () => {
       screen.getByRole('heading', { name: 'Attributes list' })
     ).toBeVisible();
     expect(
-      screen.getByRole('button', { name: 'Create attribute' })
+      screen.getByRole('button', { name: 'Create Attribute' })
     ).toBeVisible();
     expect(
       await screen.findByRole('table', { name: 'Attributes list' })

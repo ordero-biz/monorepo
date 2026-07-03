@@ -5,6 +5,12 @@ import {
 } from '@/test/prepareSetup';
 import { SignInFormLayout } from './SignInLayout';
 
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({
+    replace: vi.fn(),
+  }),
+}));
+
 describe('SignInFormLayout', () => {
   it('renders the auth layout copy and sign-in form without sign-up navigation', () => {
     const queryClient = createTestQueryClient();
