@@ -74,6 +74,15 @@ describe('AddProductPage', () => {
     expect(
       screen.getByRole('combobox', { name: 'Attributes' })
     ).toHaveTextContent('Select attributes');
+    expect(
+      screen.getByRole('radiogroup', { name: 'Product generating mode' })
+    ).toBeVisible();
+    expect(
+      screen.getByRole('radio', { name: 'Generate one product' })
+    ).toBeChecked();
+    expect(
+      screen.getByRole('radio', { name: 'Generate many products' })
+    ).not.toBeChecked();
     await user.click(screen.getByRole('combobox', { name: 'Category' }));
     expect(screen.getByRole('option', { name: 'Shoes' })).toBeVisible();
     expect(

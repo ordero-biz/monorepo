@@ -15,7 +15,7 @@ describe('submitCreateProduct', () => {
     createProductMock.mockReset();
   });
 
-  it('creates a product with the submitted description', async () => {
+  it('creates a product with the submitted values', async () => {
     createProductMock.mockResolvedValue({
       ok: true,
       data: {
@@ -35,7 +35,6 @@ describe('submitCreateProduct', () => {
       submitCreateProduct({
         productName: ' Running Shoes ',
         category: '2',
-        description: ' Lightweight daily trainer ',
       })
     ).resolves.toEqual({
       ok: true,
@@ -54,7 +53,7 @@ describe('submitCreateProduct', () => {
 
     expect(createProductMock).toHaveBeenCalledWith({
       categoryId: 2,
-      description: 'Lightweight daily trainer',
+      description: '',
       name: 'Running Shoes',
     });
   });
@@ -67,7 +66,6 @@ describe('submitCreateProduct', () => {
         message: 'Product creation failed.',
         fieldErrors: {
           categoryId: 'Category is required.',
-          description: 'Description is too long.',
           name: 'Product name already exists.',
         },
       },
@@ -77,14 +75,12 @@ describe('submitCreateProduct', () => {
       submitCreateProduct({
         productName: 'Running Shoes',
         category: '2',
-        description: '',
       })
     ).resolves.toEqual({
       ok: false,
       error: {
         fieldErrors: {
           category: 'Category is required.',
-          description: 'Description is too long.',
           productName: 'Product name already exists.',
         },
         formError: 'Product creation failed.',
