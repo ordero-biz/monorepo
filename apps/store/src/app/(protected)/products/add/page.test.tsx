@@ -71,9 +71,11 @@ describe('AddProductPage', () => {
     expect(
       screen.getByRole('combobox', { name: 'Category' })
     ).toHaveTextContent('Select category');
+    expect(
+      screen.getByRole('combobox', { name: 'Attributes' })
+    ).toHaveTextContent('Select attributes');
     await user.click(screen.getByRole('combobox', { name: 'Category' }));
     expect(screen.getByRole('option', { name: 'Shoes' })).toBeVisible();
-    expect(screen.getByRole('region', { name: 'Tips section' })).toBeVisible();
     expect(
       screen.getByRole('button', { name: 'Add product image' })
     ).toBeVisible();

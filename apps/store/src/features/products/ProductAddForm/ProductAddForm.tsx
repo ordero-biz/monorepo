@@ -44,60 +44,84 @@ export const ProductAddForm = () => {
             <Typography variant="h4">Add product</Typography>
 
             <div className="grid gap-[var(--space-3)] lg:grid-cols-3 lg:items-start">
-              <div className="flex flex-col gap-[var(--space-2)]">
-                <form.Field name="productName">
-                  {(field) => {
-                    const errorText = getFieldSubmitChangeErrorText(
-                      field.state.meta
-                    );
+              <div className="grid gap-[var(--space-3)] lg:col-span-2 lg:grid-cols-2 lg:items-stretch">
+                <div className="flex flex-col gap-[var(--space-2)]">
+                  <form.Field name="productName">
+                    {(field) => {
+                      const errorText = getFieldSubmitChangeErrorText(
+                        field.state.meta
+                      );
 
-                    return (
-                      <TextField
-                        errorText={errorText}
-                        invalid={Boolean(errorText)}
-                        label="Product name"
-                        name={field.name}
-                        onBlur={field.handleBlur}
-                        onValueChange={field.handleChange}
-                        placeholder="Product name"
-                        size="s"
-                        value={field.state.value}
-                      />
-                    );
-                  }}
-                </form.Field>
+                      return (
+                        <TextField
+                          errorText={errorText}
+                          invalid={Boolean(errorText)}
+                          label="Product name"
+                          name={field.name}
+                          onBlur={field.handleBlur}
+                          onValueChange={field.handleChange}
+                          placeholder="Product name"
+                          size="s"
+                          value={field.state.value}
+                        />
+                      );
+                    }}
+                  </form.Field>
 
-                <form.Field name="category">
-                  {(field) => {
-                    const errorText = getFieldSubmitChangeErrorText(
-                      field.state.meta
-                    );
-                    const categoryErrorText = categoriesQuery.isError
-                      ? "We couldn't load categories right now."
-                      : errorText;
+                  <form.Field name="category">
+                    {(field) => {
+                      const errorText = getFieldSubmitChangeErrorText(
+                        field.state.meta
+                      );
+                      const categoryErrorText = categoriesQuery.isError
+                        ? "We couldn't load categories right now."
+                        : errorText;
 
-                    return (
-                      <Select
-                        disabled={categoriesQuery.isPending}
-                        errorText={categoryErrorText}
-                        helperText={
-                          categoriesQuery.isPending
-                            ? 'Loading categories...'
-                            : undefined
-                        }
-                        invalid={categoriesQuery.isError || Boolean(errorText)}
-                        label="Category"
-                        name={field.name}
-                        onBlur={field.handleBlur}
-                        onValueChange={field.handleChange}
-                        options={categoriesQuery.categoryOptions}
-                        placeholder="Select category"
-                        size="s"
-                        value={field.state.value}
-                      />
-                    );
-                  }}
-                </form.Field>
+                      return (
+                        <Select
+                          disabled={categoriesQuery.isPending}
+                          errorText={categoryErrorText}
+                          helperText={
+                            categoriesQuery.isPending
+                              ? 'Loading categories...'
+                              : undefined
+                          }
+                          invalid={
+                            categoriesQuery.isError || Boolean(errorText)
+                          }
+                          label="Category"
+                          name={field.name}
+                          onBlur={field.handleBlur}
+                          onValueChange={field.handleChange}
+                          options={categoriesQuery.categoryOptions}
+                          placeholder="Select category"
+                          size="s"
+                          value={field.state.value}
+                        />
+                      );
+                    }}
+                  </form.Field>
+
+                  <Select
+                    label="Attributes"
+                    options={[]}
+                    placeholder="Select attributes"
+                    size="s"
+                  />
+                </div>
+
+                <div className="flex min-w-0 flex-col">
+                  <p
+                    className="mb-[6px] text-[length:var(--input-label-size-desktop)] leading-[var(--input-label-line-height-desktop)] font-[var(--input-label-weight)] text-[var(--text-secondary)]"
+                    id="product-add-description-title"
+                  >
+                    Description
+                  </p>
+                  <section
+                    aria-labelledby="product-add-description-title"
+                    className="min-h-[var(--space-20)] flex-1 rounded-[var(--radius)] border border-input bg-background p-[var(--space-3)]"
+                  />
+                </div>
               </div>
 
               <section
@@ -118,15 +142,6 @@ export const ProductAddForm = () => {
                   variant="caption"
                 >
                   Add product image
-                </Typography>
-              </section>
-
-              <section
-                aria-labelledby="product-add-tips-title"
-                className="flex aspect-square min-h-[var(--space-20)] items-center justify-center rounded-[var(--radius)] border border-input bg-background p-[var(--space-3)]"
-              >
-                <Typography id="product-add-tips-title" variant="subtitle1">
-                  Tips section
                 </Typography>
               </section>
             </div>
