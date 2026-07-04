@@ -1,6 +1,6 @@
 import { PageHeader, Typography } from '@ordero/ui';
 import type { Category } from '@/lib/domain/categories';
-import { CreateCategoryDialog } from '../CreateCategoryDialog/CreateCategoryDialog';
+import { CreateCategoryDialogTrigger } from '../CreateCategoryDialog/CreateCategoryDialogTrigger';
 
 type CategoryListHeaderProps = {
   availableCategories: Category[];
@@ -14,7 +14,7 @@ export const CategoryListHeader = ({
       <Typography variant="h5">Category list</Typography>
     </PageHeader.Left>
     <PageHeader.Right>
-      <CreateCategoryDialog availableCategories={availableCategories} />
+      <CreateCategoryDialogTrigger availableCategories={availableCategories} />
     </PageHeader.Right>
   </PageHeader.Root>
 );

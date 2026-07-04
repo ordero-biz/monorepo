@@ -1,5 +1,5 @@
 import { PageHeader, Typography } from '@ordero/ui';
-import { CreateSupplierDialog } from '../CreateSupplierDialog/CreateSupplierDialog';
+import { CreateSupplierDialogTrigger } from '../CreateSupplierDialog/CreateSupplierDialogTrigger';
 
 export const SuppliersListHeader = () => (
   <PageHeader.Root>
@@ -7,7 +7,7 @@ export const SuppliersListHeader = () => (
       <Typography variant="h5">Suppliers list</Typography>
     </PageHeader.Left>
     <PageHeader.Right>
-      <CreateSupplierDialog />
+      <CreateSupplierDialogTrigger />
     </PageHeader.Right>
   </PageHeader.Root>
 );

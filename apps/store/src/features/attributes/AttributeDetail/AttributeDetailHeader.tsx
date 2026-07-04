@@ -2,8 +2,8 @@
 
 import { Button, Card, PageHeader, Typography } from '@ordero/ui';
 import { useAttributeQuery } from '@/lib/hooks/attributes/useAttributeQuery';
-import { DeleteAttributeDialog } from '../DeleteAttributeDialog/DeleteAttributeDialog';
-import { UpdateAttributeDialog } from '../UpdateAttributeDialog/UpdateAttributeDialog';
+import { DeleteAttributeDialogTrigger } from '../DeleteAttributeDialog/DeleteAttributeDialogTrigger';
+import { UpdateAttributeDialogTrigger } from '../UpdateAttributeDialog/UpdateAttributeDialogTrigger';
 
 type AttributeDetailHeaderProps = {
   attributeId: string | number;
@@ -55,13 +55,13 @@ export const AttributeDetailHeader = ({
       <PageHeader.Left>
         <Typography variant="h5">{attributeQuery.data.name}</Typography>
         <div>
-          <UpdateAttributeDialog
+          <UpdateAttributeDialogTrigger
             attribute={attributeQuery.data}
             onUpdated={async () => {
               await attributeQuery.refetch();
             }}
           />
-          <DeleteAttributeDialog attribute={attributeQuery.data} />
+          <DeleteAttributeDialogTrigger attribute={attributeQuery.data} />
         </div>
       </PageHeader.Left>
       <PageHeader.Right></PageHeader.Right>

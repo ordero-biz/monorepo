@@ -4,7 +4,7 @@ import { deleteAttributes } from '@/lib/client/api/attributes';
 import { clientRoutes } from '@/lib/client/routes';
 import { attributesQueryKeys } from '@/lib/query/attributes/attributesQueryKeys';
 import { prepareStoreSetup } from '@/test/prepareSetup';
-import { DeleteAttributeDialog } from './DeleteAttributeDialog';
+import { DeleteAttributeDialogTrigger } from './DeleteAttributeDialogTrigger';
 
 const routerPushMock = vi.fn();
 
@@ -24,7 +24,7 @@ vi.mock('@/lib/client/api/attributes', async () => ({
 const deleteAttributesMock = vi.mocked(deleteAttributes);
 
 const { setup } = prepareStoreSetup({
-  component: DeleteAttributeDialog,
+  component: DeleteAttributeDialogTrigger,
   props: {
     attribute: {
       id: 7,

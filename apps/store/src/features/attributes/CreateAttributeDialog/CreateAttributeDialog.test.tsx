@@ -4,7 +4,7 @@ import { createAttribute } from '@/lib/client/api/attributes';
 import { getAttributeDetailRoute } from '@/lib/client/routes';
 import { attributesQueryKeys } from '@/lib/query/attributes/attributesQueryKeys';
 import { prepareStoreSetup } from '@/test/prepareSetup';
-import { CreateAttributeDialog } from './CreateAttributeDialog';
+import { CreateAttributeDialogTrigger } from './CreateAttributeDialogTrigger';
 
 const routerPushMock = vi.fn();
 
@@ -24,7 +24,7 @@ vi.mock('@/lib/client/api/attributes', async () => ({
 const createAttributeMock = vi.mocked(createAttribute);
 
 const { setup } = prepareStoreSetup({
-  component: CreateAttributeDialog,
+  component: CreateAttributeDialogTrigger,
 });
 
 describe('CreateAttributeDialog', () => {
