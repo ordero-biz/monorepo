@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { createCategory } from '@/lib/client/api/categories';
 import { categoriesQueryKeys } from '@/lib/query/categories/categoriesQueryKeys';
 import { prepareStoreSetup } from '@/test/prepareSetup';
-import { CreateCategoryDialog } from './CreateCategoryDialog';
+import { CreateCategoryDialogTrigger } from './CreateCategoryDialogTrigger';
 
 vi.mock('@/lib/client/api/categories', async () => ({
   ...(await vi.importActual<typeof import('@/lib/client/api/categories')>(
@@ -15,7 +15,7 @@ vi.mock('@/lib/client/api/categories', async () => ({
 const createCategoryMock = vi.mocked(createCategory);
 
 const { setup } = prepareStoreSetup({
-  component: CreateCategoryDialog,
+  component: CreateCategoryDialogTrigger,
   props: {
     availableCategories: [
       {

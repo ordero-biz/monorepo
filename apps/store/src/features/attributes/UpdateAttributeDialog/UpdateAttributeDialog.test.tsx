@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { updateAttribute } from '@/lib/client/api/attributes';
 import { attributesQueryKeys } from '@/lib/query/attributes/attributesQueryKeys';
 import { prepareStoreSetup } from '@/test/prepareSetup';
-import { UpdateAttributeDialog } from './UpdateAttributeDialog';
+import { UpdateAttributeDialogTrigger } from './UpdateAttributeDialogTrigger';
 
 vi.mock('@/lib/client/api/attributes', async () => ({
   ...(await vi.importActual<typeof import('@/lib/client/api/attributes')>(
@@ -15,7 +15,7 @@ vi.mock('@/lib/client/api/attributes', async () => ({
 const updateAttributeMock = vi.mocked(updateAttribute);
 
 const { setup } = prepareStoreSetup({
-  component: UpdateAttributeDialog,
+  component: UpdateAttributeDialogTrigger,
   props: {
     attribute: {
       id: 7,

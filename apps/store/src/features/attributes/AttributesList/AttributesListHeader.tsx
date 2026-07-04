@@ -1,5 +1,5 @@
 import { PageHeader, Typography } from '@ordero/ui';
-import { CreateAttributeDialog } from '../CreateAttributeDialog/CreateAttributeDialog';
+import { CreateAttributeDialogTrigger } from '../CreateAttributeDialog/CreateAttributeDialogTrigger';
 
 export const AttributesListHeader = () => (
   <PageHeader.Root>
@@ -7,7 +7,7 @@ export const AttributesListHeader = () => (
       <Typography variant="h5">Attributes list</Typography>
     </PageHeader.Left>
     <PageHeader.Right>
-      <CreateAttributeDialog />
+      <CreateAttributeDialogTrigger />
     </PageHeader.Right>
   </PageHeader.Root>
 );
