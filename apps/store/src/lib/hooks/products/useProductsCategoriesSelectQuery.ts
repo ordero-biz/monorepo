@@ -5,7 +5,7 @@ import { useMemo } from 'react';
 import { useCategoriesQuery } from '@/lib/hooks/categories/useCategoriesQuery';
 import { productsCategoriesQueryInput } from './productsCategoriesQueryConfig';
 
-export const useProductsCategoriesQuery = () => {
+export const useProductsCategoriesSelectQuery = () => {
   const categoriesQuery = useCategoriesQuery(productsCategoriesQueryInput);
   const categoryOptions = useMemo<SelectOption[]>(
     () =>

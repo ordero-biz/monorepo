@@ -1,7 +1,7 @@
 import { renderHook } from '@testing-library/react';
 import { useCategoriesQuery } from '@/lib/hooks/categories/useCategoriesQuery';
 import { productsCategoriesQueryInput } from './productsCategoriesQueryConfig';
-import { useProductsCategoriesQuery } from './useProductsCategoriesQuery';
+import { useProductsCategoriesSelectQuery } from './useProductsCategoriesSelectQuery';
 
 vi.mock('@/lib/hooks/categories/useCategoriesQuery', () => ({
   useCategoriesQuery: vi.fn(),
@@ -9,7 +9,7 @@ vi.mock('@/lib/hooks/categories/useCategoriesQuery', () => ({
 
 const useCategoriesQueryMock = vi.mocked(useCategoriesQuery);
 
-describe('useProductsCategoriesQuery', () => {
+describe('useProductsCategoriesSelectQuery', () => {
   beforeEach(() => {
     useCategoriesQueryMock.mockReset();
   });
@@ -31,7 +31,7 @@ describe('useProductsCategoriesQuery', () => {
       isPending: false,
     } as ReturnType<typeof useCategoriesQuery>);
 
-    const { result } = renderHook(() => useProductsCategoriesQuery());
+    const { result } = renderHook(() => useProductsCategoriesSelectQuery());
 
     expect(useCategoriesQueryMock).toHaveBeenCalledWith(
       productsCategoriesQueryInput

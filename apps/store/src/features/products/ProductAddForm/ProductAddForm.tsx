@@ -14,7 +14,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { Plus } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { clientRoutes } from '@/lib/client/routes';
-import { useProductsCategoriesQuery } from '@/lib/hooks/products/useProductsCategoriesQuery';
+import { useProductsCategoriesSelectQuery } from '@/lib/hooks/products/useProductsCategoriesSelectQuery';
 import { productsQueryKeys } from '@/lib/query/products/productsQueryKeys';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
 import { useCreateProductForm } from './hooks/useCreateProductForm';
@@ -22,7 +22,7 @@ import { useCreateProductForm } from './hooks/useCreateProductForm';
 export const ProductAddForm = () => {
   const queryClient = useQueryClient();
   const router = useRouter();
-  const categoriesQuery = useProductsCategoriesQuery();
+  const categoriesQuery = useProductsCategoriesSelectQuery();
   const { form } = useCreateProductForm({
     onCreated: async () => {
       await queryClient.invalidateQueries({
