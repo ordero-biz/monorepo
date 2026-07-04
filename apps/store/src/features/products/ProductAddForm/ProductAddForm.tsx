@@ -70,6 +70,15 @@ export const ProductAddForm = () => {
                     }}
                   </form.Field>
 
+                  <RadioGroup
+                    defaultValue="generate-one"
+                    label="Product generating mode"
+                    name="productGeneratingMode"
+                  >
+                    <Radio value="generate-one">Generate one product</Radio>
+                    <Radio value="generate-many">Generate many products</Radio>
+                  </RadioGroup>
+
                   <form.Field name="category">
                     {(field) => {
                       const errorText = getFieldSubmitChangeErrorText(
@@ -113,14 +122,6 @@ export const ProductAddForm = () => {
                 </div>
 
                 <div className="flex min-w-0 flex-col gap-[var(--space-2)]">
-                  <RadioGroup
-                    defaultValue="generate-one"
-                    label="Product generating mode"
-                    name="productGeneratingMode"
-                  >
-                    <Radio value="generate-one">Generate one product</Radio>
-                    <Radio value="generate-many">Generate many products</Radio>
-                  </RadioGroup>
                   <div>
                     <p
                       className="mb-[6px] text-[length:var(--input-label-size-desktop)] leading-[var(--input-label-line-height-desktop)] font-[var(--input-label-weight)] text-[var(--text-secondary)]"
@@ -130,7 +131,7 @@ export const ProductAddForm = () => {
                     </p>
                     <section
                       aria-labelledby="product-add-description-title"
-                      className="h-[var(--space-11)] max-h-[var(--space-20)] rounded-[var(--radius)] border border-input bg-background p-[var(--space-3)]"
+                      className="h-[var(--space-20)] max-h-[var(--space-20)] rounded-[var(--radius)] border border-input bg-background p-[var(--space-3)]"
                     />
                   </div>
                 </div>
