@@ -146,6 +146,13 @@ export {
   SidebarNavigationSections,
 } from './components/SidebarNavigation';
 export type {
+  TextareaChangeEventDetails,
+  TextareaProps,
+  TextareaResize,
+  TextareaVariant,
+} from './components/Textarea';
+export { Textarea } from './components/Textarea';
+export type {
   TextFieldProps,
   TextFieldSize,
   TextFieldVariant,
