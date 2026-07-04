@@ -1,5 +1,5 @@
 import { PageHeader, Typography } from '@ordero/ui';
-import { CreateWarehouseDialog } from '../CreateWarehouseDialog/CreateWarehouseDialog';
+import { CreateWarehouseDialogTrigger } from '../CreateWarehouseDialog/CreateWarehouseDialogTrigger';
 
 export const WarehousesListHeader = () => (
   <PageHeader.Root>
@@ -7,7 +7,7 @@ export const WarehousesListHeader = () => (
       <Typography variant="h5">Warehouses list</Typography>
     </PageHeader.Left>
     <PageHeader.Right>
-      <CreateWarehouseDialog />
+      <CreateWarehouseDialogTrigger />
     </PageHeader.Right>
   </PageHeader.Root>
 );

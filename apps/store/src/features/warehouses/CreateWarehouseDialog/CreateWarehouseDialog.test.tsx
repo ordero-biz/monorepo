@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { createWarehouse } from '@/lib/client/api/warehouses';
 import { warehousesQueryKeys } from '@/lib/query/warehouses/warehousesQueryKeys';
 import { prepareStoreSetup } from '@/test/prepareSetup';
-import { CreateWarehouseDialog } from './CreateWarehouseDialog';
+import { CreateWarehouseDialogTrigger } from './CreateWarehouseDialogTrigger';
 
 vi.mock('@/lib/client/api/warehouses', async () => ({
   ...(await vi.importActual<typeof import('@/lib/client/api/warehouses')>(
@@ -15,7 +15,7 @@ vi.mock('@/lib/client/api/warehouses', async () => ({
 const createWarehouseMock = vi.mocked(createWarehouse);
 
 const { setup } = prepareStoreSetup({
-  component: CreateWarehouseDialog,
+  component: CreateWarehouseDialogTrigger,
 });
 
 describe('CreateWarehouseDialog', () => {

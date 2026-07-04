@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { createUnitOfMeasurement } from '@/lib/client/api/units-of-measurement';
 import { unitsOfMeasurementQueryKeys } from '@/lib/query/units-of-measurement/unitsOfMeasurementQueryKeys';
 import { prepareStoreSetup } from '@/test/prepareSetup';
-import { CreateUnitOfMeasurementDialog } from './CreateUnitOfMeasurementDialog';
+import { CreateUnitOfMeasurementDialogTrigger } from './CreateUnitOfMeasurementDialogTrigger';
 
 vi.mock('@/lib/client/api/units-of-measurement', async () => ({
   ...(await vi.importActual<
@@ -15,7 +15,7 @@ vi.mock('@/lib/client/api/units-of-measurement', async () => ({
 const createUnitOfMeasurementMock = vi.mocked(createUnitOfMeasurement);
 
 const { setup } = prepareStoreSetup({
-  component: CreateUnitOfMeasurementDialog,
+  component: CreateUnitOfMeasurementDialogTrigger,
 });
 
 describe('CreateUnitOfMeasurementDialog', () => {

@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { createSupplier } from '@/lib/client/api/suppliers';
 import { suppliersQueryKeys } from '@/lib/query/suppliers/suppliersQueryKeys';
 import { prepareStoreSetup } from '@/test/prepareSetup';
-import { CreateSupplierDialog } from './CreateSupplierDialog';
+import { CreateSupplierDialogTrigger } from './CreateSupplierDialogTrigger';
 
 vi.mock('@/lib/client/api/suppliers', async () => ({
   ...(await vi.importActual<typeof import('@/lib/client/api/suppliers')>(
@@ -15,7 +15,7 @@ vi.mock('@/lib/client/api/suppliers', async () => ({
 const createSupplierMock = vi.mocked(createSupplier);
 
 const { setup } = prepareStoreSetup({
-  component: CreateSupplierDialog,
+  component: CreateSupplierDialogTrigger,
 });
 
 describe('CreateSupplierDialog', () => {
