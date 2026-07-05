@@ -1,4 +1,4 @@
-export { CheckboxChip, checkboxChipVariants } from './CheckboxChip';
+export { CheckboxChip } from './CheckboxChip';
 export type {
   CheckboxChipColor,
   CheckboxChipProps,

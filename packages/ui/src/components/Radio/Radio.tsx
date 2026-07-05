@@ -260,5 +260,3 @@ export const Radio = ({
     </label>
   );
 };
-
-export { radioRootVariants };

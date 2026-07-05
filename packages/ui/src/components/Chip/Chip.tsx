@@ -281,5 +281,3 @@ export const Chip = ({
     </div>
   );
 };
-
-export { chipVariants };

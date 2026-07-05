@@ -4,7 +4,7 @@ export type {
   ButtonSize,
   ButtonVariant,
 } from './components/Button';
-export { Button, buttonVariants } from './components/Button';
+export { Button } from './components/Button';
 export type {
   CardContentProps,
   CardDescriptionProps,
@@ -21,16 +21,13 @@ export type {
   CheckboxProps,
   CheckboxSize,
 } from './components/Checkbox';
-export { Checkbox, checkboxRootVariants } from './components/Checkbox';
+export { Checkbox } from './components/Checkbox';
 export type {
   CheckboxChipColor,
   CheckboxChipProps,
   CheckboxChipSize,
 } from './components/CheckboxChip';
-export {
-  CheckboxChip,
-  checkboxChipVariants,
-} from './components/CheckboxChip';
+export { CheckboxChip } from './components/CheckboxChip';
 export type {
   CheckboxChipGroupOrientation,
   CheckboxChipGroupProps,
@@ -47,7 +44,7 @@ export type {
   ChipSize,
   ChipVariant,
 } from './components/Chip';
-export { Chip, chipVariants } from './components/Chip';
+export { Chip } from './components/Chip';
 export type {
   DataTableCellProps,
   DataTableColumnAlignment,
@@ -88,7 +85,7 @@ export type {
   IconButtonProps,
   IconButtonSize,
 } from './components/IconButton';
-export { IconButton, iconButtonVariants } from './components/IconButton';
+export { IconButton } from './components/IconButton';
 export type {
   InputProps,
   InputSize,
@@ -104,7 +101,7 @@ export { PageHeader } from './components/PageHeader';
 export type { PasswordFieldProps } from './components/PasswordField';
 export { PasswordField } from './components/PasswordField';
 export type { RadioColor, RadioProps, RadioSize } from './components/Radio';
-export { Radio, radioRootVariants } from './components/Radio';
+export { Radio } from './components/Radio';
 export type {
   RadioGroupOrientation,
   RadioGroupProps,
@@ -170,6 +167,14 @@ export {
   ToastViewport,
   useToastManager,
 } from './components/Toast';
+export type {
+  ToggleButtonColor,
+  ToggleButtonGroupProps,
+  ToggleButtonItemProps,
+  ToggleButtonOrientation,
+  ToggleButtonSize,
+} from './components/ToggleButton';
+export { ToggleButton } from './components/ToggleButton';
 export type {
   TopBarLeftProps,
   TopBarProps,
