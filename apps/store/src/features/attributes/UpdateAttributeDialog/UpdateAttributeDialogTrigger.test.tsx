@@ -24,6 +24,8 @@ describe('UpdateAttributeDialogTrigger', () => {
 
     await user.click(screen.getByRole('button', { name: 'Edit Color' }));
 
-    expect(screen.getByRole('dialog', { name: 'Edit Attribute' })).toBeVisible();
+    expect(
+      screen.getByRole('dialog', { name: 'Edit Attribute' })
+    ).toBeVisible();
   });
 });
