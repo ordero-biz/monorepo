@@ -3,7 +3,7 @@
 import { Button as ButtonPrimitive } from '@base-ui/react/button';
 import { Dialog as DialogPrimitive } from '@base-ui/react/dialog';
 import { ScrollArea } from '@base-ui/react/scroll-area';
-import { buttonVariants } from '@/ui/components/Button';
+import { buttonVariants } from '@/ui/components/Button/classNames';
 import { cn } from '@/ui/lib/utils';
 import {
   backdropClassName,
