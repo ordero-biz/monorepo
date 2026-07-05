@@ -92,5 +92,3 @@ export const IconButton = ({
     </ButtonPrimitive>
   );
 };
-
-export { iconButtonVariants };
