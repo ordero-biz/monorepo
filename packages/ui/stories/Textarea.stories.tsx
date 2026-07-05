@@ -1,8 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Textarea, type TextareaProps } from '@/ui/components/Textarea';
+import { cn } from '@/ui/lib/utils';
 
 const previewGridClassName = 'grid gap-8 md:grid-cols-2';
 const previewColumnClassName = 'min-w-0';
+const helperTextClassName =
+  'flex items-start gap-[var(--form-helper-text-spacing)] pl-[var(--form-helper-text-pl)] pt-[var(--form-helper-text-pt)] text-[length:var(--caption-size-desktop)] leading-[var(--caption-line-height-desktop)] font-[var(--caption-weight)]';
 
 const renderPair = ({
   filled,
@@ -83,20 +86,39 @@ export const Disabled: Story = {
 };
 
 export const Invalid: Story = {
-  render: (args) =>
-    renderPair({
-      filled: {
-        ...args,
-        defaultValue: 'Incorrect value',
-        invalid: true,
-        variant: 'filled',
-      },
-      outlined: {
-        ...args,
-        defaultValue: 'Incorrect value',
-        invalid: true,
-      },
-    }),
+  render: (args) => (
+    <div className={previewGridClassName}>
+      <div className={previewColumnClassName}>
+        <Textarea
+          {...args}
+          aria-describedby="outlined-textarea-error"
+          defaultValue="Incorrect value"
+          invalid={true}
+        />
+        <p
+          className={cn(helperTextClassName, 'text-destructive')}
+          id="outlined-textarea-error"
+        >
+          Textarea value is invalid.
+        </p>
+      </div>
+      <div className={previewColumnClassName}>
+        <Textarea
+          {...args}
+          aria-describedby="filled-textarea-error"
+          defaultValue="Incorrect value"
+          invalid={true}
+          variant="filled"
+        />
+        <p
+          className={cn(helperTextClassName, 'text-destructive')}
+          id="filled-textarea-error"
+        >
+          Textarea value is invalid.
+        </p>
+      </div>
+    </div>
+  ),
 };
 
 export const WithAccessibleDescription: Story = {
@@ -109,7 +131,7 @@ export const WithAccessibleDescription: Story = {
           defaultValue="Value"
         />
         <p
-          className="pt-2 text-[length:var(--caption-size-desktop)] leading-[var(--caption-line-height-desktop)] text-[var(--text-secondary)]"
+          className={cn(helperTextClassName, 'text-[var(--text-secondary)]')}
           id="outlined-textarea-description"
         >
           The outlined textarea is described by supporting text outside the
@@ -124,7 +146,7 @@ export const WithAccessibleDescription: Story = {
           variant="filled"
         />
         <p
-          className="pt-2 text-[length:var(--caption-size-desktop)] leading-[var(--caption-line-height-desktop)] text-[var(--text-secondary)]"
+          className={cn(helperTextClassName, 'text-[var(--text-secondary)]')}
           id="filled-textarea-description"
         >
           The filled textarea is described by supporting text outside the

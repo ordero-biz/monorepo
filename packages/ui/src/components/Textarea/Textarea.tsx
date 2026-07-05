@@ -1,15 +1,14 @@
 'use client';
 
-import type { CSSProperties } from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { cn } from '@/ui/lib/utils';
 import type { TextareaProps, TextareaResize } from './types';
 
 const textareaFrameClassNames = {
   outlined:
-    'relative flex w-full min-w-0 rounded-[var(--textfield-outlined-radius)] bg-background px-[var(--textarea-outlined-px)] py-[var(--textarea-outlined-py)] shadow-[var(--_textarea-outline-shadow)] transition-[box-shadow] hover:shadow-[var(--_textarea-hover-outline-shadow)]',
+    'relative flex w-full min-w-0 rounded-[var(--textfield-outlined-radius)] bg-background px-[var(--textarea-outlined-px)] py-[var(--textarea-outlined-py)] transition-[box-shadow]',
   filled:
-    'relative flex w-full min-w-0 rounded-[var(--textfield-filled-radius)] bg-[var(--_textarea-background)] px-[var(--textarea-filled-px)] py-[var(--textarea-filled-py)] transition-[background-color] hover:bg-[var(--_textarea-hover-background)]',
+    'relative flex w-full min-w-0 rounded-[var(--textfield-filled-radius)] px-[var(--textarea-filled-px)] py-[var(--textarea-filled-py)] transition-[background-color]',
 } as const;
 
 const textareaClassName =
@@ -20,14 +19,59 @@ const resizeClassNames: Record<TextareaResize, string> = {
   vertical: 'resize-y',
 };
 
-type TextareaStyle = CSSProperties & {
-  '--_textarea-background'?: string;
-  '--_textarea-hover-background'?: string;
-  '--_textarea-outline-shadow'?: string;
-  '--_textarea-hover-outline-shadow'?: string;
+const getFilledFrameStateClassName = ({
+  disabled,
+  focused,
+  invalid,
+}: {
+  disabled: boolean;
+  focused: boolean;
+  invalid: boolean;
+}) => {
+  if (invalid) {
+    return 'bg-[var(--color-error-8)] hover:bg-[var(--color-error-8)]';
+  }
+
+  if (focused) {
+    return 'bg-[var(--color-grey-16)] hover:bg-[var(--color-grey-16)]';
+  }
+
+  if (disabled) {
+    return 'bg-[var(--color-grey-8)] hover:bg-[var(--color-grey-8)]';
+  }
+
+  return 'bg-[var(--color-grey-8)] hover:bg-[var(--color-grey-16)]';
 };
 
-const getTextareaStyle = ({
+const getOutlinedFrameStateClassName = ({
+  disabled,
+  focused,
+  invalid,
+}: {
+  disabled: boolean;
+  focused: boolean;
+  invalid: boolean;
+}) => {
+  if (disabled) {
+    return 'shadow-[inset_0_0_0_1px_var(--color-grey-20)] hover:shadow-[inset_0_0_0_1px_var(--color-grey-20)]';
+  }
+
+  if (invalid && focused) {
+    return 'shadow-[inset_0_0_0_2px_var(--destructive)] hover:shadow-[inset_0_0_0_2px_var(--destructive)]';
+  }
+
+  if (invalid) {
+    return 'shadow-[inset_0_0_0_1px_var(--destructive)] hover:shadow-[inset_0_0_0_1px_var(--destructive)]';
+  }
+
+  if (focused) {
+    return 'shadow-[inset_0_0_0_2px_var(--foreground)] hover:shadow-[inset_0_0_0_2px_var(--foreground)]';
+  }
+
+  return 'shadow-[inset_0_0_0_1px_var(--input)] hover:shadow-[inset_0_0_0_1px_var(--foreground)]';
+};
+
+const getTextareaFrameStateClassName = ({
   disabled,
   focused,
   invalid,
@@ -37,68 +81,12 @@ const getTextareaStyle = ({
   focused: boolean;
   invalid: boolean;
   variant: NonNullable<TextareaProps['variant']>;
-}): TextareaStyle => {
+}) => {
   if (variant === 'filled') {
-    if (invalid) {
-      return {
-        '--_textarea-background': 'var(--color-error-8)',
-        '--_textarea-hover-background': 'var(--color-error-8)',
-      };
-    }
-
-    if (focused) {
-      return {
-        '--_textarea-background': 'var(--color-grey-16)',
-        '--_textarea-hover-background': 'var(--color-grey-16)',
-      };
-    }
-
-    if (disabled) {
-      return {
-        '--_textarea-background': 'var(--color-grey-8)',
-        '--_textarea-hover-background': 'var(--color-grey-8)',
-      };
-    }
-
-    return {
-      '--_textarea-background': 'var(--color-grey-8)',
-      '--_textarea-hover-background': 'var(--color-grey-16)',
-    };
+    return getFilledFrameStateClassName({ disabled, focused, invalid });
   }
 
-  if (disabled) {
-    return {
-      '--_textarea-outline-shadow': 'inset 0 0 0 1px var(--color-grey-20)',
-      '--_textarea-hover-outline-shadow':
-        'inset 0 0 0 1px var(--color-grey-20)',
-    };
-  }
-
-  if (invalid && focused) {
-    return {
-      '--_textarea-outline-shadow': 'inset 0 0 0 2px var(--destructive)',
-      '--_textarea-hover-outline-shadow': 'inset 0 0 0 2px var(--destructive)',
-    };
-  }
-
-  if (invalid) {
-    return {
-      '--_textarea-outline-shadow': 'inset 0 0 0 1px var(--destructive)',
-      '--_textarea-hover-outline-shadow': 'inset 0 0 0 1px var(--destructive)',
-    };
-  }
-
-  if (focused) {
-    return {
-      '--_textarea-outline-shadow': 'inset 0 0 0 2px var(--foreground)',
-      '--_textarea-hover-outline-shadow': 'inset 0 0 0 2px var(--foreground)',
-    };
-  }
-
-  return {
-    '--_textarea-outline-shadow': 'inset 0 0 0 1px var(--input)',
-    '--_textarea-hover-outline-shadow': 'inset 0 0 0 1px var(--foreground)',
-  };
+  return getOutlinedFrameStateClassName({ disabled, focused, invalid });
 };
 
 const getTextareaTextColorClassName = ({ disabled }: { disabled: boolean }) =>
@@ -165,14 +153,16 @@ export const Textarea = ({
 
   return (
     <div
-      className={cn(textareaFrameClassNames[variant])}
+      className={cn(
+        textareaFrameClassNames[variant],
+        getTextareaFrameStateClassName({
+          disabled,
+          focused: isFocused,
+          invalid,
+          variant,
+        })
+      )}
       data-slot="textarea"
-      style={getTextareaStyle({
-        disabled,
-        focused: isFocused,
-        invalid,
-        variant,
-      })}
     >
       <textarea
         ref={setTextareaRef}
