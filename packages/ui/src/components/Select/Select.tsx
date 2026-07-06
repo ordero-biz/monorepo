@@ -5,7 +5,8 @@ import { Select as SelectPrimitive } from '@base-ui/react/select';
 import { ChevronDown } from 'lucide-react';
 import type { CSSProperties } from 'react';
 import { useId, useMemo, useState } from 'react';
-import { renderFieldLabelContent } from '@/ui/components/shared/renderFieldLabelContent';
+import { FieldHelperText } from '@/ui/components/FieldHelperText';
+import { FieldLabel } from '@/ui/components/FieldLabel';
 import { cn } from '@/ui/lib/utils';
 import type { SelectProps } from './types';
 
@@ -26,15 +27,6 @@ const triggerSizeClassNames = {
     s: 'h-[var(--textfield-sm-height)]',
   },
 } as const;
-
-const labelClassName =
-  'mb-[6px] text-[length:var(--input-label-size-desktop)] leading-[var(--input-label-line-height-desktop)] font-[var(--input-label-weight)]';
-
-const helperTextClassName =
-  'flex items-start gap-[var(--form-helper-text-spacing)] pl-[var(--form-helper-text-pl)] pt-[var(--form-helper-text-pt)] text-[length:var(--caption-size-desktop)] leading-[var(--caption-line-height-desktop)] font-[var(--caption-weight)]';
-
-const helperIconClassName =
-  'mt-px shrink-0 [&_svg]:size-[var(--form-helper-text-icon)]';
 
 const adornmentClassName =
   'flex shrink-0 items-center justify-center leading-none text-[length:var(--input-value-size-desktop)] font-[var(--input-value-weight)]';
@@ -76,30 +68,6 @@ type SelectStyle = CSSProperties & {
   '--_select-hover-background'?: string;
   '--_select-outline-shadow'?: string;
   '--_select-hover-outline-shadow'?: string;
-};
-
-const getLabelColorClassName = ({
-  active,
-  disabled,
-  invalid,
-}: {
-  active: boolean;
-  disabled: boolean;
-  invalid: boolean;
-}) => {
-  if (disabled) {
-    return 'text-[var(--text-disabled)]';
-  }
-
-  if (invalid) {
-    return 'text-destructive';
-  }
-
-  if (active) {
-    return 'text-foreground';
-  }
-
-  return 'text-[var(--text-secondary)]';
 };
 
 const getSelectStyle = ({
@@ -181,19 +149,6 @@ const getTextColorClassName = ({ disabled }: { disabled: boolean }) =>
 const getAdornmentColorClassName = ({ disabled }: { disabled: boolean }) =>
   disabled ? 'text-[var(--text-disabled)]' : 'text-[var(--text-secondary)]';
 
-const renderSupportText = ({
-  icon,
-  text,
-}: {
-  icon?: SelectProps['helperIcon'];
-  text: SelectProps['helperText'];
-}) => (
-  <>
-    {icon ? <span className={helperIconClassName}>{icon}</span> : null}
-    <span className="min-w-0 flex-1">{text}</span>
-  </>
-);
-
 export const Select = ({
   'aria-describedby': ariaDescribedBy,
   'aria-label': ariaLabel,
@@ -227,11 +182,15 @@ export const Select = ({
   value,
   variant = 'outlined',
 }: SelectProps) => {
+  const generatedLabelId = useId();
   const supportTextId = useId();
   const [focused, setFocused] = useState(false);
   const [open, setOpen] = useState(defaultOpen ?? false);
   const hasErrorText = Boolean(invalid && errorText);
   const hasHelperText = Boolean(helperText);
+  const labelId = label && !ariaLabel ? `${generatedLabelId}-label` : undefined;
+  const labelledBy =
+    [ariaLabelledBy, labelId].filter(Boolean).join(' ') || undefined;
   const describedBy =
     [ariaDescribedBy, hasErrorText || hasHelperText ? supportTextId : undefined]
       .filter(Boolean)
@@ -258,18 +217,16 @@ export const Select = ({
       invalid={invalid}
     >
       {label ? (
-        <Field.Label
-          className={cn(
-            labelClassName,
-            getLabelColorClassName({
-              active: isActive,
-              disabled,
-              invalid,
-            })
-          )}
+        <FieldLabel
+          active={isActive}
+          disabled={disabled}
+          id={labelId}
+          invalid={invalid}
+          nativeLabel={false}
+          required={required}
         >
-          {renderFieldLabelContent({ label, required })}
-        </Field.Label>
+          {label}
+        </FieldLabel>
       ) : null}
       <SelectPrimitive.Root
         autoComplete={autoComplete}
@@ -291,7 +248,7 @@ export const Select = ({
         <SelectPrimitive.Trigger
           aria-describedby={describedBy}
           aria-label={ariaLabel}
-          aria-labelledby={ariaLabelledBy}
+          aria-labelledby={labelledBy}
           className={cn(
             triggerClassNames[variant],
             triggerSizeClassNames[variant][size]
@@ -338,7 +295,9 @@ export const Select = ({
                 <span
                   className={cn(
                     valueTextClassName,
-                    getTextColorClassName({ disabled })
+                    selectedValue === null
+                      ? 'text-[var(--text-disabled)]'
+                      : getTextColorClassName({ disabled })
                   )}
                 >
                   {selectedValue === null
@@ -387,27 +346,24 @@ export const Select = ({
         </SelectPrimitive.Portal>
       </SelectPrimitive.Root>
       {hasErrorText ? (
-        <Field.Error
-          className={cn(helperTextClassName, 'text-destructive')}
+        <FieldHelperText
+          as="field-error"
+          icon={errorIcon}
           id={supportTextId}
+          invalid
           match={true}
         >
-          {renderSupportText({
-            icon: errorIcon,
-            text: errorText,
-          })}
-        </Field.Error>
+          {errorText}
+        </FieldHelperText>
       ) : null}
       {hasHelperText && !hasErrorText ? (
-        <Field.Description
-          className={cn(helperTextClassName, 'text-text-secondary')}
+        <FieldHelperText
+          as="field-description"
+          icon={helperIcon}
           id={supportTextId}
         >
-          {renderSupportText({
-            icon: helperIcon,
-            text: helperText,
-          })}
-        </Field.Description>
+          {helperText}
+        </FieldHelperText>
       ) : null}
     </Field.Root>
   );

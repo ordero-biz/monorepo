@@ -80,6 +80,23 @@ describe('Select', () => {
     ).toHaveTextContent('List');
   });
 
+  it('uses the label as the accessible name without opening when users click the label', async () => {
+    const user = userEvent.setup();
+
+    const { label } = setup({
+      'aria-label': undefined,
+      label: 'Mode',
+    });
+
+    expect(screen.getByRole('combobox', { name: label })).toBeInTheDocument();
+
+    await user.click(screen.getByText(label));
+
+    expect(
+      screen.queryByRole('option', { name: 'List' })
+    ).not.toBeInTheDocument();
+  });
+
   it('renders error text when invalid', () => {
     const { errorText } = setup({
       defaultValue: 'create',

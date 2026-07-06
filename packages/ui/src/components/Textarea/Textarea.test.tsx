@@ -4,6 +4,18 @@ import userEvent from '@testing-library/user-event';
 import { Textarea } from './Textarea';
 import type { TextareaProps } from './types';
 
+const TestHelperIcon = () => (
+  <span aria-hidden="true" data-testid="helper-icon">
+    helper
+  </span>
+);
+
+const TestErrorIcon = () => (
+  <span aria-hidden="true" data-testid="error-icon">
+    error
+  </span>
+);
+
 describe('Textarea', () => {
   const { setup } = prepareSetup<TextareaProps>({
     component: Textarea,
@@ -22,6 +34,39 @@ describe('Textarea', () => {
     expect(
       screen.getByRole('textbox', { name: ariaLabel })
     ).toBeInTheDocument();
+  });
+
+  it('labels the textbox and wires helper text as the accessible description', () => {
+    const { helperText, label } = setup({
+      'aria-label': undefined,
+      helperText: 'Use a concise product description.',
+      label: 'Description',
+    });
+
+    const textarea = screen.getByRole('textbox', { name: label });
+
+    expect(textarea).toBeInTheDocument();
+    expect(textarea).toHaveAccessibleDescription(helperText);
+  });
+
+  it('shows error text instead of helper text when invalid', () => {
+    const { errorText, helperText, label } = setup({
+      'aria-label': undefined,
+      errorIcon: <TestErrorIcon />,
+      errorText: 'Description is required.',
+      helperIcon: <TestHelperIcon />,
+      helperText: 'Use a concise product description.',
+      invalid: true,
+      label: 'Description',
+    });
+
+    const textarea = screen.getByRole('textbox', { name: label });
+
+    expect(screen.getByText(errorText)).toBeInTheDocument();
+    expect(screen.getByTestId('error-icon')).toBeInTheDocument();
+    expect(screen.queryByText(helperText)).not.toBeInTheDocument();
+    expect(screen.queryByTestId('helper-icon')).not.toBeInTheDocument();
+    expect(textarea).toHaveAccessibleDescription(errorText);
   });
 
   it('renders the initial value and supports readonly and required states', () => {
@@ -71,6 +116,17 @@ describe('Textarea', () => {
     });
 
     expect(screen.getByRole('textbox', { name: ariaLabel })).toBeInvalid();
+  });
+
+  it('shows a visual asterisk for required fields without changing the accessible name', () => {
+    const { label } = setup({
+      'aria-label': undefined,
+      label: 'Description',
+      required: true,
+    });
+
+    expect(screen.getByRole('textbox', { name: label })).toBeRequired();
+    expect(screen.getByText('*')).toHaveAttribute('aria-hidden', 'true');
   });
 
   it('calls focus, blur, and keydown handlers for user interactions', async () => {

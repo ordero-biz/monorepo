@@ -3,7 +3,8 @@
 import { Toggle as TogglePrimitive } from '@base-ui/react/toggle';
 import { ToggleGroup as ToggleGroupPrimitive } from '@base-ui/react/toggle-group';
 import { cva } from 'class-variance-authority';
-import { createContext, useContext } from 'react';
+import { createContext, useContext, useId } from 'react';
+import { FieldLabel } from '@/ui/components/FieldLabel';
 import { cn } from '@/ui/lib/utils';
 import type {
   ToggleButtonColor,
@@ -202,6 +203,7 @@ export const ToggleButtonGroup = ({
   defaultValue,
   disabled = false,
   id,
+  label,
   loopFocus,
   multiple,
   onValueChange,
@@ -210,13 +212,17 @@ export const ToggleButtonGroup = ({
   size = 'm',
   value,
 }: ToggleButtonGroupProps) => {
-  return (
+  const generatedLabelId = useId();
+  const labelId = label ? `${generatedLabelId}-label` : undefined;
+  const labelledBy =
+    [ariaLabelledBy, labelId].filter(Boolean).join(' ') || undefined;
+  const group = (
     <ToggleButtonGroupContext.Provider value={{ color, size }}>
       <ToggleGroupPrimitive
         ref={ref}
         aria-describedby={ariaDescribedBy}
         aria-label={ariaLabel}
-        aria-labelledby={ariaLabelledBy}
+        aria-labelledby={labelledBy}
         className={cn(toggleButtonGroupVariants({ orientation }))}
         data-slot="toggle-button-group"
         defaultValue={defaultValue}
@@ -231,6 +237,19 @@ export const ToggleButtonGroup = ({
         {children}
       </ToggleGroupPrimitive>
     </ToggleButtonGroupContext.Provider>
+  );
+
+  if (!label) {
+    return group;
+  }
+
+  return (
+    <div className="flex w-full min-w-0 flex-col">
+      <FieldLabel as="div" disabled={disabled} id={labelId}>
+        {label}
+      </FieldLabel>
+      {group}
+    </div>
   );
 };
 
