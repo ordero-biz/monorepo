@@ -27,16 +27,26 @@ const switchThumbClassName =
 
 const labelClassName = 'whitespace-nowrap text-card-foreground';
 
-const rowsPerPageSelectWrapperClassName = 'w-[72px] shrink-0';
+const rowsPerPageSelectWrapperClassName = 'min-w-[72px] shrink-0';
 
 const actionsClassName = 'flex shrink-0 items-center';
 
-const getBoundedPage = ({ count, page }: { count: number; page: number }) => {
+const getBoundedPage = ({
+  count,
+  page,
+  rowsPerPage,
+}: {
+  count: number;
+  page: number;
+  rowsPerPage: number;
+}) => {
   if (count <= 0) {
     return 0;
   }
 
-  return Math.max(0, page);
+  const lastPage = Math.max(0, Math.ceil(count / rowsPerPage) - 1);
+
+  return Math.min(Math.max(0, page), lastPage);
 };
 
 const getDefaultRangeLabel = ({
@@ -61,7 +71,7 @@ const getRange = ({
     };
   }
 
-  const boundedPage = getBoundedPage({ count, page });
+  const boundedPage = getBoundedPage({ count, page, rowsPerPage });
   const from = boundedPage * rowsPerPage + 1;
   const to = Math.min(count, (boundedPage + 1) * rowsPerPage);
 
@@ -113,7 +123,7 @@ export const TablePagination = ({
     },
     [switchId]
   );
-  const boundedPage = getBoundedPage({ count, page });
+  const boundedPage = getBoundedPage({ count, page, rowsPerPage });
   const { from, to } = getRange({ count, page: boundedPage, rowsPerPage });
   const canGoPrevious = !disabled && boundedPage > 0;
   const canGoNext = !disabled && count > 0 && to < count;
@@ -186,6 +196,7 @@ export const TablePagination = ({
           size="s"
           value={selectedRowsPerPage}
           variant="outlined"
+          width="content"
         />
       </div>
       <span className={labelClassName}>{rangeLabel}</span>

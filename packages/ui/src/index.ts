@@ -112,6 +112,7 @@ export type {
   SelectProps,
   SelectSize,
   SelectVariant,
+  SelectWidth,
 } from './components/Select';
 export { Select } from './components/Select';
 export type {

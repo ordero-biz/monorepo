@@ -62,6 +62,15 @@ describe('TablePagination', () => {
     ).toBeDisabled();
   });
 
+  it('clamps an out-of-range page to the last available page', () => {
+    setup({ count: 10, page: 5, rowsPerPage: 5 });
+
+    expect(screen.getByText('6-10 of 10')).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Go to next page' })
+    ).toBeDisabled();
+  });
+
   it('calls onRowsPerPageChange when the user picks an option', async () => {
     const user = userEvent.setup();
     const onRowsPerPageChange = vi.fn();

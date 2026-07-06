@@ -113,6 +113,16 @@ export const LastPage: Story = {
   render: (args) => <TablePaginationPreview {...args} />,
 };
 
+export const WideRowsPerPageValue: Story = {
+  args: {
+    count: 250,
+    page: 0,
+    rowsPerPage: 250,
+    rowsPerPageOptions: [5, 10, 25, 100, 250],
+  },
+  render: (args) => <TablePaginationPreview {...args} />,
+};
+
 export const Empty: Story = {
   args: {
     count: 0,

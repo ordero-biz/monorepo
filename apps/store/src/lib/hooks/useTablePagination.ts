@@ -27,6 +27,7 @@ export const useTablePagination = ({
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
+
   const currentPaginationInput = useMemo(
     () =>
       searchParams.has('page') || searchParams.has('size')

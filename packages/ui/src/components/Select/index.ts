@@ -4,4 +4,5 @@ export type {
   SelectProps,
   SelectSize,
   SelectVariant,
+  SelectWidth,
 } from './types';
