@@ -112,7 +112,7 @@ describe('ProductsList', () => {
     expect(screen.getByText('Running Shoes')).toBeVisible();
     expect(screen.getByText('Lightweight daily trainer')).toBeVisible();
     expect(screen.getByText('Footwear')).toBeVisible();
-    expect(screen.getByText('2026-07-03T07:20:30.291Z')).toBeVisible();
+    expect(screen.getByText('03 Jul 2026')).toBeVisible();
   });
 
   it('requests products with pagination input', async () => {
