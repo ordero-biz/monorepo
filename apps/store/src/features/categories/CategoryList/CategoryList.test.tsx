@@ -133,6 +133,40 @@ describe('CategoryList', () => {
     expect(screen.getByText('1-1 of 1')).toBeVisible();
   });
 
+  it('renders current server page rows without client-side pagination', async () => {
+    getCategoriesMock.mockResolvedValue({
+      ok: true,
+      data: {
+        content: [
+          {
+            id: 2,
+            name: 'Accessories',
+            sortOrder: 20,
+            color: '#16a34a',
+            createdAt: '2026-07-02T10:54:34.839Z',
+            parentCategory: null,
+          },
+        ],
+        page: {
+          size: 1,
+          number: 1,
+          totalElements: 2,
+          totalPages: 2,
+        },
+      },
+    });
+
+    setup({
+      paginationInput: {
+        page: 1,
+        size: 1,
+      },
+    });
+
+    expect(await screen.findByText('Accessories')).toBeVisible();
+    expect(screen.getByText('2-2 of 2')).toBeVisible();
+  });
+
   it('renders an empty state when there are no categories', async () => {
     getCategoriesMock.mockResolvedValue({
       ok: true,

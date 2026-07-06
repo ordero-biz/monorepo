@@ -4,7 +4,6 @@ import {
   Button,
   Card,
   DataTable,
-  TablePagination,
   Typography,
 } from '@ordero/ui';
 import { useCategoriesQuery } from '@/lib/hooks/categories/useCategoriesQuery';
@@ -71,8 +70,9 @@ export const CategoryList = ({ paginationInput }: CategoryListProps) => {
         data={categoriesQuery.data.content}
         emptyMessage="No categories found."
         getRowId={(row) => String(row.id)}
+        manualPagination
+        pagination={tablePagination}
       />
-      <TablePagination {...tablePagination} />
     </div>
   );
 };
