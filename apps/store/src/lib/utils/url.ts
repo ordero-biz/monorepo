@@ -12,7 +12,7 @@ type SearchParamsLike =
 
 export const DEFAULT_PAGE = {
   page: 0,
-  size: 5,
+  size: 10,
 } as const;
 
 const hasUrlSearchParamsApi = (

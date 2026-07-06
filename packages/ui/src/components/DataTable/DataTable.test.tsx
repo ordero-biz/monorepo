@@ -97,6 +97,62 @@ describe('DataTable', () => {
     expect(screen.getByText('Nothing to show here.')).toBeInTheDocument();
   });
 
+  it('renders pagination controls and pages client-side rows', async () => {
+    const user = userEvent.setup();
+    const onPageChange = vi.fn();
+
+    setup({
+      data: [
+        ...data,
+        {
+          amount: '$75.00',
+          id: 'INV-003',
+          status: 'Overdue',
+        },
+      ],
+      pagination: {
+        onPageChange,
+        page: 0,
+        rowsPerPage: 2,
+      },
+    });
+
+    expect(
+      screen.getByRole('navigation', { name: 'Table pagination' })
+    ).toHaveTextContent('1-2 of 3');
+    expect(screen.getByText('INV-001')).toBeInTheDocument();
+    expect(screen.getByText('INV-002')).toBeInTheDocument();
+    expect(screen.queryByText('INV-003')).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Go to next page' }));
+
+    expect(onPageChange).toHaveBeenCalledWith(1);
+  });
+
+  it('supports manual pagination with current-page rows', () => {
+    setup({
+      data: [
+        {
+          amount: '$180.00',
+          id: 'INV-002',
+          status: 'Pending',
+        },
+      ],
+      manualPagination: true,
+      pagination: {
+        count: 3,
+        onPageChange: vi.fn(),
+        page: 1,
+        rowsPerPage: 1,
+      },
+    });
+
+    expect(
+      screen.getByRole('navigation', { name: 'Table pagination' })
+    ).toHaveTextContent('2-2 of 3');
+    expect(screen.getByText('INV-002')).toBeInTheDocument();
+  });
+
   it('supports row selection with row and header checkboxes', async () => {
     const user = userEvent.setup();
     const onRowSelectionChange = vi.fn();

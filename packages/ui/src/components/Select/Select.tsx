@@ -11,9 +11,9 @@ import type { SelectProps } from './types';
 
 const triggerClassNames = {
   outlined:
-    'relative flex w-full min-w-0 cursor-pointer items-center rounded-[var(--textfield-outlined-radius)] bg-background px-[var(--textfield-outlined-px)] shadow-[var(--_select-outline-shadow)] transition-[box-shadow] hover:shadow-[var(--_select-hover-outline-shadow)] disabled:cursor-not-allowed',
+    'relative flex w-full min-w-0 cursor-pointer items-center justify-between rounded-[var(--textfield-outlined-radius)] bg-background px-[var(--textfield-outlined-px)] shadow-[var(--_select-outline-shadow)] transition-[box-shadow] hover:shadow-[var(--_select-hover-outline-shadow)] disabled:cursor-not-allowed',
   filled:
-    'relative flex w-full min-w-0 cursor-pointer items-center rounded-[var(--textfield-filled-radius)] bg-[var(--_select-background)] px-[var(--textfield-filled-pl)] pr-[var(--textfield-filled-pr)] transition-[background-color] hover:bg-[var(--_select-hover-background)] disabled:cursor-not-allowed',
+    'relative flex w-full min-w-0 cursor-pointer items-center justify-between rounded-[var(--textfield-filled-radius)] bg-[var(--_select-background)] px-[var(--textfield-filled-pl)] pr-[var(--textfield-filled-pr)] transition-[background-color] hover:bg-[var(--_select-hover-background)] disabled:cursor-not-allowed',
 } as const;
 
 const triggerSizeClassNames = {

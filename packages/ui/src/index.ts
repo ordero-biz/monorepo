@@ -52,6 +52,8 @@ export type {
   DataTableColumnHeaderProps,
   DataTableColumnMeta,
   DataTableColumnWrap,
+  DataTablePaginationProps,
+  DataTablePaginationState,
   DataTableProps,
   DataTableRowSelectionState,
   DataTableSelectionCellProps,

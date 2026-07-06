@@ -1,6 +1,7 @@
 import type {
   Column,
   ColumnDef,
+  PaginationState,
   Row,
   RowData,
   RowSelectionState,
@@ -8,6 +9,7 @@ import type {
   Table,
 } from '@tanstack/react-table';
 import type { ReactNode } from 'react';
+import type { TablePaginationProps } from '@/ui/components/TablePagination';
 
 export type DataTableColumnAlignment = 'left' | 'center' | 'right';
 
@@ -51,6 +53,12 @@ export type DataTableCellProps = {
 
 export type DataTableRowSelectionState = RowSelectionState;
 
+export type DataTablePaginationState = PaginationState;
+
+export type DataTablePaginationProps = Omit<TablePaginationProps, 'count'> & {
+  count?: number;
+};
+
 export type DataTableSortingState = SortingState;
 
 export type DataTableProps<TData> = {
@@ -60,9 +68,11 @@ export type DataTableProps<TData> = {
   emptyMessage?: string;
   getRowCanSelect?: (row: TData, index: number) => boolean;
   getRowId?: (originalRow: TData, index: number, parent?: Row<TData>) => string;
+  manualPagination?: boolean;
   manualSorting?: boolean;
   onRowSelectionChange?: (rowSelection: DataTableRowSelectionState) => void;
   onSortingChange?: (sorting: DataTableSortingState) => void;
+  pagination?: DataTablePaginationProps;
   rowSelection?: DataTableRowSelectionState;
   sorting?: DataTableSortingState;
   selectable?: boolean;

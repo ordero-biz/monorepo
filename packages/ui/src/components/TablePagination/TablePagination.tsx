@@ -16,7 +16,7 @@ const rootClassName =
 
 const labelClassName = 'whitespace-nowrap text-card-foreground';
 
-const rowsPerPageSelectWrapperClassName = 'min-w-[72px] shrink-0';
+const rowsPerPageSelectWrapperClassName = 'min-w-[75px] shrink-0';
 
 const actionsClassName = 'flex shrink-0 items-center';
 
