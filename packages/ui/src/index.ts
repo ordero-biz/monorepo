@@ -143,6 +143,11 @@ export {
   SidebarNavigationSections,
 } from './components/SidebarNavigation';
 export type {
+  TablePaginationProps,
+  TablePaginationRangeLabelArgs,
+} from './components/TablePagination';
+export { TablePagination } from './components/TablePagination';
+export type {
   TextareaChangeEventDetails,
   TextareaProps,
   TextareaResize,

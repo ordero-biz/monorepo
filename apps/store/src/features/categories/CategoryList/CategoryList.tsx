@@ -1,7 +1,14 @@
 'use client';
 
-import { Button, Card, DataTable, Typography } from '@ordero/ui';
+import {
+  Button,
+  Card,
+  DataTable,
+  TablePagination,
+  Typography,
+} from '@ordero/ui';
 import { useCategoriesQuery } from '@/lib/hooks/categories/useCategoriesQuery';
+import { useTablePagination } from '@/lib/hooks/useTablePagination';
 import type { PaginationSearchInput } from '@/lib/utils/url';
 import { CategoryListHeader } from './CategoryListHeader';
 import { columns } from './columns';
@@ -12,6 +19,10 @@ type CategoryListProps = {
 
 export const CategoryList = ({ paginationInput }: CategoryListProps) => {
   const categoriesQuery = useCategoriesQuery(paginationInput);
+  const tablePagination = useTablePagination({
+    pageMetadata: categoriesQuery.data?.page,
+    paginationInput,
+  });
 
   if (categoriesQuery.isPending) {
     return (
@@ -61,6 +72,7 @@ export const CategoryList = ({ paginationInput }: CategoryListProps) => {
         emptyMessage="No categories found."
         getRowId={(row) => String(row.id)}
       />
+      <TablePagination {...tablePagination} />
     </div>
   );
 };

@@ -7,6 +7,17 @@ import { CategoryList } from './CategoryList';
 const mocks = vi.hoisted(() => ({
   createCategory: vi.fn(),
   getCategories: vi.fn(),
+  pathname: '/products/categories',
+  push: vi.fn(),
+  searchParams: new URLSearchParams(),
+}));
+
+vi.mock('next/navigation', () => ({
+  usePathname: () => mocks.pathname,
+  useRouter: () => ({
+    push: mocks.push,
+  }),
+  useSearchParams: () => mocks.searchParams,
 }));
 
 vi.mock('@/lib/client/api/categories', () => ({
@@ -23,6 +34,8 @@ const { setup } = prepareStoreSetup({
 describe('CategoryList', () => {
   beforeEach(() => {
     getCategoriesMock.mockReset();
+    mocks.push.mockReset();
+    mocks.searchParams = new URLSearchParams();
   });
 
   it('renders a loading state while categories are loading', () => {
@@ -117,6 +130,7 @@ describe('CategoryList', () => {
     expect(screen.getByText('Shoes')).toBeVisible();
     expect(screen.getByText('Fashion')).toBeVisible();
     expect(screen.getByText('01 Jul 2026')).toBeVisible();
+    expect(screen.getByText('1-1 of 1')).toBeVisible();
   });
 
   it('renders an empty state when there are no categories', async () => {
@@ -162,5 +176,40 @@ describe('CategoryList', () => {
 
     expect(await screen.findByText('No categories found.')).toBeVisible();
     expect(getCategoriesMock).toHaveBeenCalledWith(paginationInput);
+  });
+
+  it('pushes pagination changes to the URL', async () => {
+    mocks.searchParams = new URLSearchParams('page=0&size=25&sort=name%2Casc');
+    getCategoriesMock.mockResolvedValue({
+      ok: true,
+      data: {
+        content: [],
+        page: {
+          size: 25,
+          number: 0,
+          totalElements: 51,
+          totalPages: 3,
+        },
+      },
+    });
+
+    const user = userEvent.setup();
+
+    setup({
+      paginationInput: {
+        page: 0,
+        size: 25,
+        sort: ['name,asc'],
+      },
+    });
+
+    await user.click(
+      await screen.findByRole('button', { name: 'Go to next page' })
+    );
+
+    expect(mocks.push).toHaveBeenCalledWith(
+      '/products/categories?page=1&size=25&sort=name%2Casc',
+      { scroll: false }
+    );
   });
 });
