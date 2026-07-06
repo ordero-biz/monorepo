@@ -99,9 +99,8 @@ describe('DataTable', () => {
 
   it('renders pagination controls and pages client-side rows', async () => {
     const user = userEvent.setup();
-    const onPageChange = vi.fn();
 
-    setup({
+    const { pagination } = setup({
       data: [
         ...data,
         {
@@ -111,7 +110,7 @@ describe('DataTable', () => {
         },
       ],
       pagination: {
-        onPageChange,
+        onPageChange: vi.fn(),
         page: 0,
         rowsPerPage: 2,
       },
@@ -126,7 +125,7 @@ describe('DataTable', () => {
 
     await user.click(screen.getByRole('button', { name: 'Go to next page' }));
 
-    expect(onPageChange).toHaveBeenCalledWith(1);
+    expect(pagination?.onPageChange).toHaveBeenCalledWith(1);
   });
 
   it('supports manual pagination with current-page rows', () => {

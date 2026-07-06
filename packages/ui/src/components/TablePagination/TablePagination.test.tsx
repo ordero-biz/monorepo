@@ -30,9 +30,8 @@ describe('TablePagination', () => {
 
   it('moves to the previous and next page', async () => {
     const user = userEvent.setup();
-    const onPageChange = vi.fn();
 
-    setup({ onPageChange });
+    const { onPageChange } = setup({ onPageChange: vi.fn() });
 
     await user.click(
       screen.getByRole('button', { name: 'Go to previous page' })
@@ -73,9 +72,11 @@ describe('TablePagination', () => {
 
   it('calls onRowsPerPageChange when the user picks an option', async () => {
     const user = userEvent.setup();
-    const onRowsPerPageChange = vi.fn();
 
-    setup({ onRowsPerPageChange, rowsPerPageOptions: [5, 10, 25] });
+    const { onRowsPerPageChange } = setup({
+      onRowsPerPageChange: vi.fn(),
+      rowsPerPageOptions: [5, 10, 25],
+    });
 
     await user.click(screen.getByRole('combobox', { name: 'Rows per page' }));
     await user.click(screen.getByRole('option', { name: '10' }));
