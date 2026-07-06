@@ -68,6 +68,9 @@ describe('AddProductPage', () => {
     expect(screen.getByRole('textbox', { name: 'Product name' })).toHaveValue(
       ''
     );
+    expect(screen.getByRole('textbox', { name: 'Description' })).toHaveValue(
+      ''
+    );
     expect(
       screen.getByRole('combobox', { name: 'Category' })
     ).toHaveTextContent('Select category');

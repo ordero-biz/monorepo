@@ -34,6 +34,7 @@ describe('submitCreateProduct', () => {
     await expect(
       submitCreateProduct({
         productName: ' Running Shoes ',
+        description: 'Lightweight daily trainer',
         category: '2',
       })
     ).resolves.toEqual({
@@ -53,7 +54,7 @@ describe('submitCreateProduct', () => {
 
     expect(createProductMock).toHaveBeenCalledWith({
       categoryId: 2,
-      description: '',
+      description: 'Lightweight daily trainer',
       name: 'Running Shoes',
     });
   });
@@ -66,6 +67,7 @@ describe('submitCreateProduct', () => {
         message: 'Product creation failed.',
         fieldErrors: {
           categoryId: 'Category is required.',
+          description: 'Description is too long.',
           name: 'Product name already exists.',
         },
       },
@@ -74,6 +76,7 @@ describe('submitCreateProduct', () => {
     await expect(
       submitCreateProduct({
         productName: 'Running Shoes',
+        description: 'Lightweight daily trainer',
         category: '2',
       })
     ).resolves.toEqual({
@@ -81,6 +84,7 @@ describe('submitCreateProduct', () => {
       error: {
         fieldErrors: {
           category: 'Category is required.',
+          description: 'Description is too long.',
           productName: 'Product name already exists.',
         },
         formError: 'Product creation failed.',

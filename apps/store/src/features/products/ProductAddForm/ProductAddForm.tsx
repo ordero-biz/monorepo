@@ -7,6 +7,7 @@ import {
   Radio,
   RadioGroup,
   Select,
+  Textarea,
   TextField,
   Typography,
 } from '@ordero/ui';
@@ -122,18 +123,46 @@ export const ProductAddForm = () => {
                 </div>
 
                 <div className="flex min-w-0 flex-col gap-[var(--space-2)]">
-                  <div>
-                    <p
-                      className="mb-[6px] text-[length:var(--input-label-size-desktop)] leading-[var(--input-label-line-height-desktop)] font-[var(--input-label-weight)] text-[var(--text-secondary)]"
-                      id="product-add-description-title"
-                    >
-                      Description
-                    </p>
-                    <section
-                      aria-labelledby="product-add-description-title"
-                      className="h-[var(--space-20)] max-h-[var(--space-20)] rounded-[var(--radius)] border border-input bg-background p-[var(--space-3)]"
-                    />
-                  </div>
+                  <form.Field name="description">
+                    {(field) => {
+                      const errorText = getFieldSubmitChangeErrorText(
+                        field.state.meta
+                      );
+                      const errorId = 'product-add-description-error';
+
+                      return (
+                        <div>
+                          <label
+                            className={
+                              errorText
+                                ? 'mb-[6px] block text-[length:var(--input-label-size-desktop)] leading-[var(--input-label-line-height-desktop)] font-[var(--input-label-weight)] text-destructive'
+                                : 'mb-[6px] block text-[length:var(--input-label-size-desktop)] leading-[var(--input-label-line-height-desktop)] font-[var(--input-label-weight)] text-[var(--text-secondary)]'
+                            }
+                            htmlFor="product-add-description"
+                          >
+                            Description
+                          </label>
+                          <Textarea
+                            aria-describedby={errorText ? errorId : undefined}
+                            id="product-add-description"
+                            invalid={Boolean(errorText)}
+                            name={field.name}
+                            onBlur={field.handleBlur}
+                            onValueChange={field.handleChange}
+                            value={field.state.value}
+                          />
+                          {errorText ? (
+                            <p
+                              className="flex items-start gap-[var(--form-helper-text-spacing)] pl-[var(--form-helper-text-pl)] pt-[var(--form-helper-text-pt)] text-[length:var(--caption-size-desktop)] leading-[var(--caption-line-height-desktop)] font-[var(--caption-weight)] text-destructive"
+                              id={errorId}
+                            >
+                              {errorText}
+                            </p>
+                          ) : null}
+                        </div>
+                      );
+                    }}
+                  </form.Field>
                 </div>
               </div>
 

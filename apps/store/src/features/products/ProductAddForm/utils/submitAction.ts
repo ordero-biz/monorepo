@@ -4,12 +4,13 @@ import type { ProductAddFormValues } from '../types';
 const mapProductFieldErrors = (fieldErrors?: Record<string, string>) => ({
   ...(fieldErrors?.name ? { productName: fieldErrors.name } : {}),
   ...(fieldErrors?.categoryId ? { category: fieldErrors.categoryId } : {}),
+  ...(fieldErrors?.description ? { description: fieldErrors.description } : {}),
 });
 
 export const submitCreateProduct = async (value: ProductAddFormValues) => {
   const result = await createProduct({
     categoryId: Number(value.category ?? 0),
-    description: '',
+    description: value.description,
     name: value.productName.trim(),
   });
 
