@@ -4,8 +4,6 @@ import {
   Button,
   Card,
   IconButton,
-  Radio,
-  RadioGroup,
   Select,
   Textarea,
   TextField,
@@ -46,7 +44,7 @@ export const ProductAddForm = () => {
           <div className="flex flex-col gap-[var(--space-4)]">
             <Typography variant="h4">Add product</Typography>
 
-            <div className="grid gap-[var(--space-3)] lg:grid-cols-3 lg:items-start">
+            <div className="grid gap-[var(--space-3)] lg:grid-cols-[1fr_1fr_0.5fr] lg:items-start">
               <div className="grid gap-[var(--space-3)] lg:col-span-2 lg:grid-cols-2 lg:items-stretch">
                 <div className="flex flex-col gap-[var(--space-2)]">
                   <form.Field name="productName">
@@ -70,15 +68,6 @@ export const ProductAddForm = () => {
                       );
                     }}
                   </form.Field>
-
-                  <RadioGroup
-                    defaultValue="generate-one"
-                    label="Product generating mode"
-                    name="productGeneratingMode"
-                  >
-                    <Radio value="generate-one">Generate one product</Radio>
-                    <Radio value="generate-many">Generate many products</Radio>
-                  </RadioGroup>
 
                   <form.Field name="category">
                     {(field) => {
