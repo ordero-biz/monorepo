@@ -95,27 +95,9 @@ describe('TablePagination', () => {
     expect(screen.getByText('6 through 10 / 11')).toBeInTheDocument();
   });
 
-  it('renders and toggles the dense switch when enabled', async () => {
-    const user = userEvent.setup();
-    const onDenseChange = vi.fn();
-
-    setup({
-      onDenseChange,
-      showDenseToggle: true,
-    });
-
-    await user.click(screen.getByRole('switch', { name: 'Dense' }));
-
-    expect(onDenseChange).toHaveBeenLastCalledWith(true, expect.any(Object));
-  });
-
   it('disables controls when disabled is set', () => {
-    setup({ disabled: true, showDenseToggle: true });
+    setup({ disabled: true });
 
-    expect(screen.getByRole('switch', { name: 'Dense' })).toHaveAttribute(
-      'aria-disabled',
-      'true'
-    );
     expect(
       screen.getByRole('combobox', { name: 'Rows per page' })
     ).toBeDisabled();

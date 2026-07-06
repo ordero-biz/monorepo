@@ -13,18 +13,12 @@ const getLastPage = ({
 }) => Math.max(0, Math.ceil(count / rowsPerPage) - 1);
 
 const TablePaginationPreview = (args: TablePaginationProps) => {
-  const [dense, setDense] = useState(args.defaultDense ?? args.dense ?? false);
   const [page, setPage] = useState(args.page);
   const [rowsPerPage, setRowsPerPage] = useState(args.rowsPerPage);
 
   return (
     <TablePagination
       {...args}
-      dense={args.showDenseToggle ? dense : args.dense}
-      onDenseChange={(nextDense, details) => {
-        setDense(nextDense);
-        args.onDenseChange?.(nextDense, details);
-      }}
       onPageChange={(nextPage) => {
         setPage(nextPage);
         args.onPageChange(nextPage);
@@ -89,15 +83,6 @@ export const Default: Story = {
   },
 };
 
-export const WithDenseToggle: Story = {
-  args: {
-    defaultDense: true,
-    onDenseChange: () => undefined,
-    showDenseToggle: true,
-  },
-  render: (args) => <TablePaginationPreview {...args} />,
-};
-
 export const FirstPage: Story = {
   args: {
     page: 0,
@@ -133,6 +118,5 @@ export const Empty: Story = {
 export const Disabled: Story = {
   args: {
     disabled: true,
-    showDenseToggle: true,
   },
 };
