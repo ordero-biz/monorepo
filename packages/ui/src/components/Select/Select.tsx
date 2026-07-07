@@ -3,8 +3,8 @@
 import { Field } from '@base-ui/react/field';
 import { Select as SelectPrimitive } from '@base-ui/react/select';
 import { ChevronDown } from 'lucide-react';
-import type { CSSProperties } from 'react';
 import { useId, useMemo, useState } from 'react';
+import { Checkbox } from '@/ui/components/Checkbox';
 import { FieldHelperText } from '@/ui/components/FieldHelperText';
 import { FieldLabel } from '@/ui/components/FieldLabel';
 import { cn } from '@/ui/lib/utils';
@@ -12,9 +12,9 @@ import type { SelectProps } from './types';
 
 const triggerClassNames = {
   outlined:
-    'relative flex w-full min-w-0 cursor-pointer items-center justify-between rounded-[var(--textfield-outlined-radius)] bg-background px-[var(--textfield-outlined-px)] shadow-[var(--_select-outline-shadow)] transition-[box-shadow] hover:shadow-[var(--_select-hover-outline-shadow)] disabled:cursor-not-allowed',
+    'relative flex w-full min-w-0 cursor-pointer items-center justify-between rounded-[var(--textfield-outlined-radius)] bg-background px-[var(--textfield-outlined-px)] transition-[box-shadow] disabled:cursor-not-allowed',
   filled:
-    'relative flex w-full min-w-0 cursor-pointer items-center justify-between rounded-[var(--textfield-filled-radius)] bg-[var(--_select-background)] px-[var(--textfield-filled-pl)] pr-[var(--textfield-filled-pr)] transition-[background-color] hover:bg-[var(--_select-hover-background)] disabled:cursor-not-allowed',
+    'relative flex w-full min-w-0 cursor-pointer items-center justify-between rounded-[var(--textfield-filled-radius)] px-[var(--textfield-filled-pl)] pr-[var(--textfield-filled-pr)] transition-[background-color] disabled:cursor-not-allowed',
 } as const;
 
 const triggerSizeClassNames = {
@@ -71,6 +71,14 @@ const itemPaddingClassNames = {
   filled: 'px-[8px]',
 } as const;
 
+const itemWithCheckboxPaddingClassNames = {
+  outlined: 'pl-0 pr-[10px]',
+  filled: 'pl-0 pr-[8px]',
+} as const;
+
+const itemIndicatorClassName =
+  'mr-[var(--menu-list-spacing)] flex shrink-0 items-center';
+
 const itemTextClassName =
   'min-w-0 flex-1 truncate text-[length:var(--body2-size-desktop)] leading-[var(--body2-line-height-desktop)] font-[var(--body2-weight)] text-[var(--text-secondary)] data-[selected]:font-[var(--font-weight-600)] data-[selected]:text-foreground';
 
@@ -79,14 +87,7 @@ const iconSizeClassNames = {
   s: 'size-[18px]',
 } as const;
 
-type SelectStyle = CSSProperties & {
-  '--_select-background'?: string;
-  '--_select-hover-background'?: string;
-  '--_select-outline-shadow'?: string;
-  '--_select-hover-outline-shadow'?: string;
-};
-
-const getSelectStyle = ({
+const getSelectStateClassName = ({
   active,
   disabled,
   invalid,
@@ -96,67 +97,40 @@ const getSelectStyle = ({
   disabled: boolean;
   invalid: boolean;
   variant: NonNullable<SelectProps['variant']>;
-}): SelectStyle => {
+}) => {
   if (variant === 'filled') {
     if (invalid) {
-      return {
-        '--_select-background': 'var(--color-error-8)',
-        '--_select-hover-background': 'var(--color-error-8)',
-      };
+      return 'bg-[var(--color-error-8)] hover:bg-[var(--color-error-8)]';
     }
 
     if (active) {
-      return {
-        '--_select-background': 'var(--color-grey-16)',
-        '--_select-hover-background': 'var(--color-grey-16)',
-      };
+      return 'bg-[var(--color-grey-16)] hover:bg-[var(--color-grey-16)]';
     }
 
     if (disabled) {
-      return {
-        '--_select-background': 'var(--color-grey-8)',
-        '--_select-hover-background': 'var(--color-grey-8)',
-      };
+      return 'bg-[var(--color-grey-8)] hover:bg-[var(--color-grey-8)]';
     }
 
-    return {
-      '--_select-background': 'var(--color-grey-8)',
-      '--_select-hover-background': 'var(--color-grey-16)',
-    };
+    return 'bg-[var(--color-grey-8)] hover:bg-[var(--color-grey-16)]';
   }
 
   if (disabled) {
-    return {
-      '--_select-outline-shadow': 'inset 0 0 0 1px var(--color-grey-20)',
-      '--_select-hover-outline-shadow': 'inset 0 0 0 1px var(--color-grey-20)',
-    };
+    return 'shadow-[inset_0_0_0_1px_var(--color-grey-20)] hover:shadow-[inset_0_0_0_1px_var(--color-grey-20)]';
   }
 
   if (invalid && active) {
-    return {
-      '--_select-outline-shadow': 'inset 0 0 0 2px var(--destructive)',
-      '--_select-hover-outline-shadow': 'inset 0 0 0 2px var(--destructive)',
-    };
+    return 'shadow-[inset_0_0_0_2px_var(--destructive)] hover:shadow-[inset_0_0_0_2px_var(--destructive)]';
   }
 
   if (invalid) {
-    return {
-      '--_select-outline-shadow': 'inset 0 0 0 1px var(--destructive)',
-      '--_select-hover-outline-shadow': 'inset 0 0 0 1px var(--destructive)',
-    };
+    return 'shadow-[inset_0_0_0_1px_var(--destructive)] hover:shadow-[inset_0_0_0_1px_var(--destructive)]';
   }
 
   if (active) {
-    return {
-      '--_select-outline-shadow': 'inset 0 0 0 2px var(--foreground)',
-      '--_select-hover-outline-shadow': 'inset 0 0 0 2px var(--foreground)',
-    };
+    return 'shadow-[inset_0_0_0_2px_var(--foreground)] hover:shadow-[inset_0_0_0_2px_var(--foreground)]';
   }
 
-  return {
-    '--_select-outline-shadow': 'inset 0 0 0 1px var(--input)',
-    '--_select-hover-outline-shadow': 'inset 0 0 0 1px var(--foreground)',
-  };
+  return 'shadow-[inset_0_0_0_1px_var(--input)] hover:shadow-[inset_0_0_0_1px_var(--foreground)]';
 };
 
 const getTextColorClassName = ({ disabled }: { disabled: boolean }) =>
@@ -165,40 +139,73 @@ const getTextColorClassName = ({ disabled }: { disabled: boolean }) =>
 const getAdornmentColorClassName = ({ disabled }: { disabled: boolean }) =>
   disabled ? 'text-[var(--text-disabled)]' : 'text-[var(--text-secondary)]';
 
-export const Select = ({
-  'aria-describedby': ariaDescribedBy,
-  'aria-label': ariaLabel,
-  'aria-labelledby': ariaLabelledBy,
-  alignItemWithTrigger = true,
-  autoComplete,
-  defaultOpen,
-  defaultValue,
-  disabled = false,
-  errorIcon,
-  errorText,
-  helperIcon,
-  helperText,
-  id,
-  invalid = false,
-  label,
-  name,
-  onBlur,
-  onFocus,
-  onKeyDown,
-  onOpenChange,
-  onValueChange,
-  options,
-  placeholder = 'Label',
-  readOnly,
-  ref,
-  required,
-  size = 'm',
-  startAdornment,
-  startIcon: StartIcon,
-  value,
-  variant = 'outlined',
-  width = 'full',
-}: SelectProps) => {
+const renderSelectedText = ({
+  optionLabelMap,
+  placeholder,
+  selectedValue,
+}: {
+  optionLabelMap: Map<string, SelectProps['options'][number]['label']>;
+  placeholder: SelectProps['placeholder'];
+  selectedValue: string | string[] | null;
+}) => {
+  if (Array.isArray(selectedValue)) {
+    if (selectedValue.length === 0) {
+      return placeholder;
+    }
+
+    const [firstValue, ...additionalValues] = selectedValue;
+    const firstLabel = optionLabelMap.get(firstValue) ?? firstValue;
+
+    return (
+      <>
+        {firstLabel}
+        {additionalValues.length > 0
+          ? ` (+${additionalValues.length} more)`
+          : null}
+      </>
+    );
+  }
+
+  if (selectedValue === null) {
+    return placeholder;
+  }
+
+  return optionLabelMap.get(selectedValue) ?? selectedValue;
+};
+
+export const Select = (props: SelectProps) => {
+  const {
+    'aria-describedby': ariaDescribedBy,
+    'aria-label': ariaLabel,
+    'aria-labelledby': ariaLabelledBy,
+    alignItemWithTrigger,
+    autoComplete,
+    defaultOpen,
+    disabled = false,
+    errorIcon,
+    errorText,
+    helperIcon,
+    helperText,
+    id,
+    invalid = false,
+    label,
+    name,
+    onBlur,
+    onFocus,
+    onKeyDown,
+    onOpenChange,
+    options,
+    placeholder = 'Label',
+    readOnly,
+    ref,
+    required,
+    size = 'm',
+    startAdornment,
+    startIcon: StartIcon,
+    variant = 'outlined',
+    width = 'full',
+  } = props;
+  const multiple = props.multiple ?? false;
   const generatedLabelId = useId();
   const supportTextId = useId();
   const [focused, setFocused] = useState(false);
@@ -225,6 +232,173 @@ export const Select = ({
     [options]
   );
   const isActive = focused || open;
+  const shouldAlignItemWithTrigger = alignItemWithTrigger ?? !multiple;
+  const selectContent = (
+    <>
+      <SelectPrimitive.Trigger
+        aria-describedby={describedBy}
+        aria-label={ariaLabel}
+        aria-labelledby={labelledBy}
+        className={cn(
+          triggerClassNames[variant],
+          triggerSizeClassNames[variant][size],
+          triggerWidthClassNames[width],
+          getSelectStateClassName({
+            active: isActive,
+            disabled,
+            invalid,
+            variant,
+          })
+        )}
+        onBlur={(event) => {
+          setFocused(false);
+          onBlur?.(event);
+        }}
+        onFocus={(event) => {
+          setFocused(true);
+          onFocus?.(event);
+        }}
+        onKeyDown={onKeyDown}
+        ref={ref}
+      >
+        <SelectPrimitive.Value
+          className={valueContainerWidthClassNames[width]}
+          placeholder={placeholder}
+        >
+          {(selectedValue: string | string[] | null) => (
+            <>
+              {startAdornment || StartIcon ? (
+                <span
+                  className={cn(
+                    adornmentClassName,
+                    startAdornmentClassName,
+                    getAdornmentColorClassName({ disabled })
+                  )}
+                >
+                  {startAdornment}
+                  {StartIcon ? (
+                    <StartIcon
+                      className={cn('shrink-0', iconSizeClassNames[size])}
+                    />
+                  ) : null}
+                </span>
+              ) : null}
+              <span
+                className={cn(
+                  valueTextWidthClassNames[width],
+                  getTextColorClassName({ disabled })
+                )}
+              >
+                {renderSelectedText({
+                  optionLabelMap,
+                  placeholder,
+                  selectedValue,
+                })}
+              </span>
+            </>
+          )}
+        </SelectPrimitive.Value>
+        <SelectPrimitive.Icon
+          className={cn(
+            iconClassName,
+            getAdornmentColorClassName({ disabled })
+          )}
+        >
+          <ChevronDown aria-hidden="true" />
+        </SelectPrimitive.Icon>
+      </SelectPrimitive.Trigger>
+      <SelectPrimitive.Portal>
+        <SelectPrimitive.Positioner
+          align="start"
+          alignItemWithTrigger={shouldAlignItemWithTrigger}
+          className="z-50 min-w-[var(--anchor-width)]"
+        >
+          <SelectPrimitive.Popup className={popupClassName}>
+            <SelectPrimitive.List className={listClassName}>
+              {options.map((option) => (
+                <SelectPrimitive.Item
+                  className={cn(
+                    itemClassName,
+                    multiple
+                      ? itemWithCheckboxPaddingClassNames[variant]
+                      : itemPaddingClassNames[variant],
+                    option.disabled ? 'cursor-not-allowed opacity-50' : ''
+                  )}
+                  disabled={option.disabled}
+                  key={option.value}
+                  value={option.value}
+                >
+                  {multiple ? (
+                    <SelectPrimitive.ItemIndicator
+                      className={itemIndicatorClassName}
+                      keepMounted={true}
+                      render={(indicatorProps, state) => (
+                        <span {...indicatorProps}>
+                          <Checkbox
+                            aria-label={`${option.value} selected`}
+                            checked={state.selected}
+                            disabled={option.disabled}
+                            readOnly={true}
+                            size={size}
+                            tabIndex={-1}
+                          />
+                        </span>
+                      )}
+                    />
+                  ) : null}
+                  <SelectPrimitive.ItemText className={itemTextClassName}>
+                    {option.label}
+                  </SelectPrimitive.ItemText>
+                </SelectPrimitive.Item>
+              ))}
+            </SelectPrimitive.List>
+          </SelectPrimitive.Popup>
+        </SelectPrimitive.Positioner>
+      </SelectPrimitive.Portal>
+    </>
+  );
+  const selectRoot = props.multiple ? (
+    <SelectPrimitive.Root<string, true>
+      autoComplete={autoComplete}
+      defaultOpen={defaultOpen}
+      defaultValue={props.defaultValue}
+      disabled={disabled}
+      id={id}
+      items={items}
+      multiple={true}
+      name={name}
+      onOpenChange={(nextOpen, details) => {
+        setOpen(nextOpen);
+        onOpenChange?.(nextOpen, details);
+      }}
+      onValueChange={props.onValueChange}
+      readOnly={readOnly}
+      required={required}
+      value={props.value}
+    >
+      {selectContent}
+    </SelectPrimitive.Root>
+  ) : (
+    <SelectPrimitive.Root<string, false>
+      autoComplete={autoComplete}
+      defaultOpen={defaultOpen}
+      defaultValue={props.defaultValue}
+      disabled={disabled}
+      id={id}
+      items={items}
+      name={name}
+      onOpenChange={(nextOpen, details) => {
+        setOpen(nextOpen);
+        onOpenChange?.(nextOpen, details);
+      }}
+      onValueChange={props.onValueChange}
+      readOnly={readOnly}
+      required={required}
+      value={props.value}
+    >
+      {selectContent}
+    </SelectPrimitive.Root>
+  );
 
   return (
     <Field.Root
@@ -245,124 +419,7 @@ export const Select = ({
           {label}
         </FieldLabel>
       ) : null}
-      <SelectPrimitive.Root
-        autoComplete={autoComplete}
-        defaultOpen={defaultOpen}
-        defaultValue={defaultValue}
-        disabled={disabled}
-        id={id}
-        items={items}
-        name={name}
-        onOpenChange={(nextOpen, details) => {
-          setOpen(nextOpen);
-          onOpenChange?.(nextOpen, details);
-        }}
-        onValueChange={onValueChange}
-        readOnly={readOnly}
-        required={required}
-        value={value}
-      >
-        <SelectPrimitive.Trigger
-          aria-describedby={describedBy}
-          aria-label={ariaLabel}
-          aria-labelledby={labelledBy}
-          className={cn(
-            triggerClassNames[variant],
-            triggerSizeClassNames[variant][size],
-            triggerWidthClassNames[width]
-          )}
-          onBlur={(event) => {
-            setFocused(false);
-            onBlur?.(event);
-          }}
-          onFocus={(event) => {
-            setFocused(true);
-            onFocus?.(event);
-          }}
-          onKeyDown={onKeyDown}
-          ref={ref}
-          style={getSelectStyle({
-            active: isActive,
-            disabled,
-            invalid,
-            variant,
-          })}
-        >
-          <SelectPrimitive.Value
-            className={valueContainerWidthClassNames[width]}
-            placeholder={placeholder}
-          >
-            {(selectedValue: string | null) => (
-              <>
-                {startAdornment || StartIcon ? (
-                  <span
-                    className={cn(
-                      adornmentClassName,
-                      startAdornmentClassName,
-                      getAdornmentColorClassName({ disabled })
-                    )}
-                  >
-                    {startAdornment}
-                    {StartIcon ? (
-                      <StartIcon
-                        className={cn('shrink-0', iconSizeClassNames[size])}
-                      />
-                    ) : null}
-                  </span>
-                ) : null}
-                <span
-                  className={cn(
-                    valueTextWidthClassNames[width],
-                    selectedValue === null
-                      ? 'text-[var(--text-disabled)]'
-                      : getTextColorClassName({ disabled })
-                  )}
-                >
-                  {selectedValue === null
-                    ? placeholder
-                    : (optionLabelMap.get(selectedValue) ?? selectedValue)}
-                </span>
-              </>
-            )}
-          </SelectPrimitive.Value>
-          <SelectPrimitive.Icon
-            className={cn(
-              iconClassName,
-              getAdornmentColorClassName({ disabled })
-            )}
-          >
-            <ChevronDown aria-hidden="true" />
-          </SelectPrimitive.Icon>
-        </SelectPrimitive.Trigger>
-        <SelectPrimitive.Portal>
-          <SelectPrimitive.Positioner
-            align="start"
-            alignItemWithTrigger={alignItemWithTrigger}
-            className="z-50 min-w-[var(--anchor-width)]"
-          >
-            <SelectPrimitive.Popup className={popupClassName}>
-              <SelectPrimitive.List className={listClassName}>
-                {options.map((option) => (
-                  <SelectPrimitive.Item
-                    className={cn(
-                      itemClassName,
-                      itemPaddingClassNames[variant],
-                      option.disabled ? 'cursor-not-allowed opacity-50' : ''
-                    )}
-                    disabled={option.disabled}
-                    key={option.value}
-                    value={option.value}
-                  >
-                    <SelectPrimitive.ItemText className={itemTextClassName}>
-                      {option.label}
-                    </SelectPrimitive.ItemText>
-                  </SelectPrimitive.Item>
-                ))}
-              </SelectPrimitive.List>
-            </SelectPrimitive.Popup>
-          </SelectPrimitive.Positioner>
-        </SelectPrimitive.Portal>
-      </SelectPrimitive.Root>
+      {selectRoot}
       {hasErrorText ? (
         <FieldHelperText
           as="field-error"

@@ -46,6 +46,15 @@ export type {
 } from './components/Chip';
 export { Chip } from './components/Chip';
 export type {
+  ComboboxMultipleProps,
+  ComboboxOption,
+  ComboboxProps,
+  ComboboxSingleProps,
+  ComboboxSize,
+  ComboboxVariant,
+} from './components/Combobox';
+export { Combobox } from './components/Combobox';
+export type {
   DataTableCellProps,
   DataTableColumnAlignment,
   DataTableColumnDef,
