@@ -4,6 +4,8 @@ import { CheckboxGroup as CheckboxGroupPrimitive } from '@base-ui/react/checkbox
 import { Field } from '@base-ui/react/field';
 import { cva } from 'class-variance-authority';
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
+import { FieldHelperText } from '@/ui/components/FieldHelperText';
+import { FieldLabel } from '@/ui/components/FieldLabel';
 import { cn } from '@/ui/lib/utils';
 import type { CheckboxChipGroupProps } from './types';
 
@@ -18,46 +20,6 @@ const checkboxChipGroupRootVariants = cva('flex min-w-0', {
     orientation: 'vertical',
   },
 });
-
-const labelClassName =
-  'mb-[6px] text-[length:var(--input-label-size-desktop)] leading-[var(--input-label-line-height-desktop)] font-[var(--input-label-weight)]';
-
-const helperTextClassName =
-  'flex items-start gap-[var(--form-helper-text-spacing)] pl-[var(--form-helper-text-pl)] pt-[var(--form-helper-text-pt)] text-[length:var(--caption-size-desktop)] leading-[var(--caption-line-height-desktop)] font-[var(--caption-weight)]';
-
-const helperIconClassName =
-  'mt-px shrink-0 [&_svg]:size-[var(--form-helper-text-icon)]';
-
-const getLabelColorClassName = ({
-  disabled,
-  invalid,
-}: {
-  disabled: boolean;
-  invalid: boolean;
-}) => {
-  if (disabled) {
-    return 'text-[var(--text-disabled)]';
-  }
-
-  if (invalid) {
-    return 'text-destructive';
-  }
-
-  return 'text-[var(--text-secondary)]';
-};
-
-const renderSupportText = ({
-  icon,
-  text,
-}: {
-  icon?: CheckboxChipGroupProps['helperIcon'];
-  text: CheckboxChipGroupProps['helperText'];
-}) => (
-  <>
-    {icon ? <span className={helperIconClassName}>{icon}</span> : null}
-    <span className="min-w-0 flex-1">{text}</span>
-  </>
-);
 
 export const CheckboxChipGroup = ({
   'aria-describedby': ariaDescribedBy,
@@ -142,18 +104,9 @@ export const CheckboxChipGroup = ({
       name={name}
     >
       {label ? (
-        <div
-          className={cn(
-            labelClassName,
-            getLabelColorClassName({
-              disabled,
-              invalid,
-            })
-          )}
-          id={labelId}
-        >
+        <FieldLabel as="div" disabled={disabled} id={labelId} invalid={invalid}>
           {label}
-        </div>
+        </FieldLabel>
       ) : null}
       <CheckboxGroupPrimitive
         allValues={allValues}
@@ -174,26 +127,14 @@ export const CheckboxChipGroup = ({
         {children}
       </CheckboxGroupPrimitive>
       {hasErrorText ? (
-        <p
-          className={cn(helperTextClassName, 'text-destructive')}
-          id={supportTextId}
-        >
-          {renderSupportText({
-            icon: errorIcon,
-            text: errorText,
-          })}
-        </p>
+        <FieldHelperText icon={errorIcon} id={supportTextId} invalid>
+          {errorText}
+        </FieldHelperText>
       ) : null}
       {hasHelperText && !hasErrorText ? (
-        <p
-          className={cn(helperTextClassName, 'text-text-secondary')}
-          id={supportTextId}
-        >
-          {renderSupportText({
-            icon: helperIcon,
-            text: helperText,
-          })}
-        </p>
+        <FieldHelperText icon={helperIcon} id={supportTextId}>
+          {helperText}
+        </FieldHelperText>
       ) : null}
     </Field.Root>
   );

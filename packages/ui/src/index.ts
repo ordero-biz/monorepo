@@ -93,6 +93,17 @@ export type {
 } from './components/Dialog';
 export { Dialog } from './components/Dialog';
 export type {
+  FieldHelperTextAlign,
+  FieldHelperTextElement,
+  FieldHelperTextProps,
+} from './components/FieldHelperText';
+export { FieldHelperText } from './components/FieldHelperText';
+export type {
+  FieldLabelElement,
+  FieldLabelProps,
+} from './components/FieldLabel';
+export { FieldLabel } from './components/FieldLabel';
+export type {
   IconButtonColor,
   IconButtonProps,
   IconButtonSize,

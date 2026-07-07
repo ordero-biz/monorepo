@@ -1,8 +1,13 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { Field } from '@base-ui/react/field';
+import { useCallback, useEffect, useId, useRef, useState } from 'react';
+import { FieldHelperText } from '@/ui/components/FieldHelperText';
+import { FieldLabel } from '@/ui/components/FieldLabel';
 import { cn } from '@/ui/lib/utils';
 import type { TextareaProps, TextareaResize } from './types';
+
+const textareaRootClassName = 'flex w-full min-w-0 flex-col';
 
 const textareaFrameClassNames = {
   outlined:
@@ -100,9 +105,14 @@ export const Textarea = ({
   autoFocus,
   defaultValue,
   disabled = false,
+  errorIcon,
+  errorText,
   focused,
+  helperIcon,
+  helperText,
   id,
   invalid = false,
+  label,
   maxLength,
   minLength,
   name,
@@ -120,9 +130,18 @@ export const Textarea = ({
   value,
   variant = 'outlined',
 }: TextareaProps) => {
+  const supportTextId = useId();
+  const generatedTextareaId = useId();
   const [focusedState, setFocusedState] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const isFocused = focused ?? focusedState;
+  const textareaId = id ?? (label ? generatedTextareaId : undefined);
+  const hasErrorText = Boolean(invalid && errorText);
+  const hasHelperText = Boolean(helperText);
+  const describedBy =
+    [ariaDescribedBy, hasErrorText || hasHelperText ? supportTextId : undefined]
+      .filter(Boolean)
+      .join(' ') || undefined;
   const setTextareaRef = useCallback(
     (node: HTMLTextAreaElement | null) => {
       textareaRef.current = node;
@@ -152,55 +171,94 @@ export const Textarea = ({
   }, [autoFocus]);
 
   return (
-    <div
-      className={cn(
-        textareaFrameClassNames[variant],
-        getTextareaFrameStateClassName({
-          disabled,
-          focused: isFocused,
-          invalid,
-          variant,
-        })
-      )}
-      data-slot="textarea"
+    <Field.Root
+      className={textareaRootClassName}
+      data-slot="textarea-field"
+      disabled={disabled}
+      invalid={invalid}
     >
-      <textarea
-        ref={setTextareaRef}
-        aria-describedby={ariaDescribedBy}
-        aria-invalid={invalid || undefined}
-        aria-label={ariaLabel}
-        aria-labelledby={ariaLabelledBy}
-        autoComplete={autoComplete}
+      {label ? (
+        <FieldLabel
+          active={isFocused}
+          as="label"
+          disabled={disabled}
+          htmlFor={textareaId}
+          invalid={invalid}
+          required={required}
+        >
+          {label}
+        </FieldLabel>
+      ) : null}
+      <div
         className={cn(
-          textareaClassName,
-          resizeClassNames[resize],
-          getTextareaTextColorClassName({ disabled })
+          textareaFrameClassNames[variant],
+          getTextareaFrameStateClassName({
+            disabled,
+            focused: isFocused,
+            invalid,
+            variant,
+          })
         )}
-        defaultValue={defaultValue}
-        disabled={disabled}
-        id={id}
-        maxLength={maxLength}
-        minLength={minLength}
-        name={name}
-        onBlur={(event) => {
-          setFocusedState(false);
-          onBlur?.(event);
-        }}
-        onChange={(event) => {
-          onValueChange?.(event.currentTarget.value, { event });
-        }}
-        onFocus={(event) => {
-          setFocusedState(true);
-          onFocus?.(event);
-        }}
-        onKeyDown={onKeyDown}
-        placeholder={placeholder}
-        readOnly={readOnly}
-        required={required}
-        rows={rows}
-        spellCheck={spellCheck}
-        value={value}
-      />
-    </div>
+        data-slot="textarea"
+      >
+        <textarea
+          ref={setTextareaRef}
+          aria-describedby={describedBy}
+          aria-invalid={invalid || undefined}
+          aria-label={ariaLabel}
+          aria-labelledby={ariaLabelledBy}
+          autoComplete={autoComplete}
+          className={cn(
+            textareaClassName,
+            resizeClassNames[resize],
+            getTextareaTextColorClassName({ disabled })
+          )}
+          defaultValue={defaultValue}
+          disabled={disabled}
+          id={textareaId}
+          maxLength={maxLength}
+          minLength={minLength}
+          name={name}
+          onBlur={(event) => {
+            setFocusedState(false);
+            onBlur?.(event);
+          }}
+          onChange={(event) => {
+            onValueChange?.(event.currentTarget.value, { event });
+          }}
+          onFocus={(event) => {
+            setFocusedState(true);
+            onFocus?.(event);
+          }}
+          onKeyDown={onKeyDown}
+          placeholder={placeholder}
+          readOnly={readOnly}
+          required={required}
+          rows={rows}
+          spellCheck={spellCheck}
+          value={value}
+        />
+      </div>
+      {hasErrorText ? (
+        <FieldHelperText
+          as="field-error"
+          icon={errorIcon}
+          id={supportTextId}
+          invalid
+          match={true}
+        >
+          {errorText}
+        </FieldHelperText>
+      ) : null}
+      {hasHelperText && !hasErrorText ? (
+        <FieldHelperText
+          as="field-description"
+          icon={helperIcon}
+          id={supportTextId}
+        >
+          {helperText}
+        </FieldHelperText>
+      ) : null}
+    </Field.Root>
   );
 };

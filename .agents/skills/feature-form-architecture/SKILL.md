@@ -51,6 +51,11 @@ Own the form UI composition:
 - user-visible validation message placement
 - connecting form fields to presentational `@ordero/ui` controls with ordinary controlled props
 
+For labels in composed forms, follow `ui-routine-conventions`: use `Field.Label`
+inside Base UI field context, use native `label` with `htmlFor` for explicit
+control association outside that context, and avoid label semantics for section
+headings or display-only text.
+
 Keep shared UI components form-library agnostic. Do not move field logic into `packages/ui` when it depends on feature schemas, submit state, backend errors, or form-library state.
 
 ### Form Hook

@@ -3,24 +3,43 @@
 import {
   Button,
   Card,
+  FieldHelperText,
   IconButton,
   Select,
   Textarea,
   TextField,
+  ToggleButton,
   Typography,
 } from '@ordero/ui';
 import { useQueryClient } from '@tanstack/react-query';
 import { Plus } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { useMemo, useState } from 'react';
 import { clientRoutes } from '@/lib/client/routes';
+import { useAttributesQuery } from '@/lib/hooks/attributes/useAttributesQuery';
 import { productsQueryKeys } from '@/lib/query/products/productsQueryKeys';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
 import { CategoriesAsyncCombobox } from './CategoriesAsyncCombobox';
+import { PRODUCT_GENERATION_MODE } from './constants';
 import { useCreateProductForm } from './hooks/useCreateProductForm';
+import type { ProductGenerationMode } from './types';
 
 export const ProductAddForm = () => {
   const queryClient = useQueryClient();
   const router = useRouter();
+  const [generationMode, setGenerationMode] = useState<ProductGenerationMode>(
+    PRODUCT_GENERATION_MODE.one
+  );
+  const isMultipleProducts = generationMode === PRODUCT_GENERATION_MODE.many;
+  const attributesQuery = useAttributesQuery();
+  const attributeOptions = useMemo(
+    () =>
+      attributesQuery.data?.content.map((attribute) => ({
+        label: attribute.name,
+        value: String(attribute.id),
+      })) ?? [],
+    [attributesQuery.data]
+  );
   const { form } = useCreateProductForm({
     onCreated: async () => {
       await queryClient.invalidateQueries({
@@ -41,7 +60,7 @@ export const ProductAddForm = () => {
       <Card.Root>
         <Card.Content>
           <div className="flex flex-col gap-[var(--space-4)]">
-            <Typography variant="h4">Add product</Typography>
+            <Typography variant="h4">Create product template</Typography>
 
             <div className="grid gap-[var(--space-3)] lg:grid-cols-[1fr_1fr_0.5fr] lg:items-start">
               <div className="grid gap-[var(--space-3)] lg:col-span-2 lg:grid-cols-2 lg:items-stretch">
@@ -56,11 +75,11 @@ export const ProductAddForm = () => {
                         <TextField
                           errorText={errorText}
                           invalid={Boolean(errorText)}
-                          label="Product name"
+                          label="Base product name"
                           name={field.name}
                           onBlur={field.handleBlur}
                           onValueChange={field.handleChange}
-                          placeholder="Product name"
+                          required
                           size="s"
                           value={field.state.value}
                         />
@@ -90,12 +109,50 @@ export const ProductAddForm = () => {
                     }}
                   </form.Field>
 
-                  <Select
-                    label="Attributes"
-                    options={[]}
-                    placeholder="Select attributes"
-                    size="s"
-                  />
+                  <form.Field
+                    name="attributes"
+                    validators={{
+                      onChange: ({ value }) =>
+                        isMultipleProducts && !value
+                          ? 'Select at least one attribute.'
+                          : undefined,
+                      onSubmit: ({ value }) =>
+                        isMultipleProducts && !value
+                          ? 'Select at least one attribute.'
+                          : undefined,
+                    }}
+                  >
+                    {(field) => {
+                      const errorText = getFieldSubmitChangeErrorText(
+                        field.state.meta
+                      );
+                      const attributesErrorText = attributesQuery.isError
+                        ? "We couldn't load attributes right now."
+                        : errorText;
+
+                      return (
+                        <Select
+                          disabled={attributesQuery.isPending}
+                          errorText={attributesErrorText}
+                          helperText={
+                            isMultipleProducts
+                              ? 'You must select attributes to generate multiple products. (e.g., Size, Color)'
+                              : 'Optional: Select attributes to add characteristics that will be the same for this single product'
+                          }
+                          invalid={Boolean(attributesErrorText)}
+                          label="Attributes"
+                          name={field.name}
+                          onBlur={field.handleBlur}
+                          onValueChange={field.handleChange}
+                          options={attributeOptions}
+                          placeholder="Select attributes"
+                          required={isMultipleProducts}
+                          size="s"
+                          value={field.state.value}
+                        />
+                      );
+                    }}
+                  </form.Field>
                 </div>
 
                 <div className="flex min-w-0 flex-col gap-[var(--space-2)]">
@@ -104,41 +161,42 @@ export const ProductAddForm = () => {
                       const errorText = getFieldSubmitChangeErrorText(
                         field.state.meta
                       );
-                      const errorId = 'product-add-description-error';
 
                       return (
-                        <div>
-                          <label
-                            className={
-                              errorText
-                                ? 'mb-[6px] block text-[length:var(--input-label-size-desktop)] leading-[var(--input-label-line-height-desktop)] font-[var(--input-label-weight)] text-destructive'
-                                : 'mb-[6px] block text-[length:var(--input-label-size-desktop)] leading-[var(--input-label-line-height-desktop)] font-[var(--input-label-weight)] text-[var(--text-secondary)]'
-                            }
-                            htmlFor="product-add-description"
-                          >
-                            Description
-                          </label>
-                          <Textarea
-                            aria-describedby={errorText ? errorId : undefined}
-                            id="product-add-description"
-                            invalid={Boolean(errorText)}
-                            name={field.name}
-                            onBlur={field.handleBlur}
-                            onValueChange={field.handleChange}
-                            value={field.state.value}
-                          />
-                          {errorText ? (
-                            <p
-                              className="flex items-start gap-[var(--form-helper-text-spacing)] pl-[var(--form-helper-text-pl)] pt-[var(--form-helper-text-pt)] text-[length:var(--caption-size-desktop)] leading-[var(--caption-line-height-desktop)] font-[var(--caption-weight)] text-destructive"
-                              id={errorId}
-                            >
-                              {errorText}
-                            </p>
-                          ) : null}
-                        </div>
+                        <Textarea
+                          errorText={errorText}
+                          invalid={Boolean(errorText)}
+                          label="Description"
+                          name={field.name}
+                          onBlur={field.handleBlur}
+                          onValueChange={field.handleChange}
+                          resize="none"
+                          rows={2}
+                          value={field.state.value}
+                        />
                       );
                     }}
                   </form.Field>
+
+                  <ToggleButton.Group
+                    defaultValue={[PRODUCT_GENERATION_MODE.one]}
+                    label="Creation mode"
+                    onValueChange={(value) =>
+                      setGenerationMode(
+                        (value[0] as ProductGenerationMode) ??
+                          PRODUCT_GENERATION_MODE.one
+                      )
+                    }
+                    orientation="horizontal"
+                    size="s"
+                  >
+                    <ToggleButton.Item value={PRODUCT_GENERATION_MODE.one}>
+                      Single product
+                    </ToggleButton.Item>
+                    <ToggleButton.Item value={PRODUCT_GENERATION_MODE.many}>
+                      Multiple products
+                    </ToggleButton.Item>
+                  </ToggleButton.Group>
                 </div>
               </div>
 
@@ -169,24 +227,40 @@ export const ProductAddForm = () => {
                 selector={(state) =>
                   [
                     state.values.productName,
+                    state.values.attributes,
                     state.values.category,
                     state.isSubmitting,
                   ] as const
                 }
               >
-                {([productName, category, isSubmitting]) => {
+                {([productName, attributes, category, isSubmitting]) => {
                   const isSubmitDisabled =
-                    isSubmitting || !productName.trim() || !category;
+                    isSubmitting ||
+                    !productName.trim() ||
+                    !category ||
+                    (isMultipleProducts && !attributes);
+                  const helperText = isMultipleProducts
+                    ? 'You will proceed to configure products based on selected attributes'
+                    : 'You will proceed to configure 1 product';
 
                   return (
-                    <Button
-                      color="primary"
-                      disabled={isSubmitDisabled}
-                      size="l"
-                      type="submit"
-                    >
-                      {isSubmitting ? 'Adding product...' : 'Add product'}
-                    </Button>
+                    <div className="flex flex-col items-end gap-[var(--space-1)]">
+                      <Button
+                        color="primary"
+                        disabled={isSubmitDisabled}
+                        size="l"
+                        type="submit"
+                      >
+                        {isSubmitting
+                          ? 'Generating products...'
+                          : isMultipleProducts
+                            ? 'Next: Configure products'
+                            : 'Next: Configure product'}
+                      </Button>
+                      <FieldHelperText align="end">
+                        {helperText}
+                      </FieldHelperText>
+                    </div>
                   );
                 }}
               </form.Subscribe>
