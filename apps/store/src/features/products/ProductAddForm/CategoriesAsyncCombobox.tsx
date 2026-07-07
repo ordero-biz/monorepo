@@ -87,6 +87,7 @@ export const CategoriesAsyncCombobox = ({
   startAdornment,
   startIcon,
   value,
+  variant,
 }: CategoriesAsyncComboboxProps) => {
   return (
     <AsyncCombobox
@@ -132,6 +133,7 @@ export const CategoriesAsyncCombobox = ({
       startAdornment={startAdornment}
       startIcon={startIcon}
       value={value}
+      variant={variant}
     />
   );
 };

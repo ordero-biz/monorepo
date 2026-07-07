@@ -10,7 +10,10 @@ const mocks = vi.hoisted(() => ({
   onValueChange: vi.fn(),
 }));
 
-vi.mock('@/lib/client/api/categories', () => ({
+vi.mock('@/lib/client/api/categories', async () => ({
+  ...(await vi.importActual<typeof import('@/lib/client/api/categories')>(
+    '@/lib/client/api/categories'
+  )),
   getCategories: mocks.getCategories,
 }));
 

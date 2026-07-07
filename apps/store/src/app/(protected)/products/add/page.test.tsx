@@ -15,7 +15,10 @@ vi.mock('next/navigation', () => ({
   }),
 }));
 
-vi.mock('@/lib/client/api/categories', () => ({
+vi.mock('@/lib/client/api/categories', async () => ({
+  ...(await vi.importActual<typeof import('@/lib/client/api/categories')>(
+    '@/lib/client/api/categories'
+  )),
   getCategories: vi.fn(),
 }));
 
