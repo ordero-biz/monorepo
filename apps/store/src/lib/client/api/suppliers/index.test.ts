@@ -1,4 +1,4 @@
-import { createSupplier, getSuppliers, getSuppliersPath } from '.';
+import { createSupplier, getSupplier, getSuppliers, getSuppliersPath } from '.';
 
 describe('supplier client helpers', () => {
   beforeEach(() => {
@@ -98,6 +98,68 @@ describe('supplier client helpers', () => {
         status: 503,
         message: 'Suppliers lookup failed.',
         code: 'SUPPLIERS_LOOKUP_FAILED',
+        fieldErrors: undefined,
+      },
+    });
+  });
+
+  it('gets a supplier detail from the backend proxy on success', async () => {
+    const fetchMock = vi.mocked(fetch);
+
+    fetchMock.mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          id: 1,
+          name: 'Fresh Farms',
+          email: 'orders@fresh.example',
+          phone: '+1 555 0100',
+          address: '123 Market St',
+          comment: 'Preferred produce supplier',
+        })
+      )
+    );
+
+    await expect(getSupplier('1')).resolves.toEqual({
+      ok: true,
+      data: {
+        id: 1,
+        name: 'Fresh Farms',
+        email: 'orders@fresh.example',
+        phone: '+1 555 0100',
+        address: '123 Market St',
+        comment: 'Preferred produce supplier',
+      },
+    });
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/backend/api/v1/suppliers/1',
+      expect.objectContaining({
+        method: 'GET',
+        cache: 'no-store',
+      })
+    );
+  });
+
+  it('returns normalized failures from the supplier detail route', async () => {
+    vi.mocked(fetch).mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          message: 'Supplier not found.',
+          code: 'SUPPLIER_NOT_FOUND',
+        }),
+        {
+          status: 404,
+          statusText: 'Not Found',
+        }
+      )
+    );
+
+    await expect(getSupplier('404')).resolves.toEqual({
+      ok: false,
+      error: {
+        status: 404,
+        message: 'Supplier not found.',
+        code: 'SUPPLIER_NOT_FOUND',
         fieldErrors: undefined,
       },
     });

@@ -13,6 +13,7 @@ export const CLIENT_BACKEND_PATHS = {
   categories: '/api/backend/api/v1/categories',
   products: '/api/backend/api/v1/products',
   suppliers: '/api/backend/api/v1/suppliers',
+  supplier: '/api/backend/api/v1/suppliers/{id}',
   unitsOfMeasurement: '/api/backend/api/v1/units-of-measurement',
   warehouses: '/api/backend/api/v1/warehouses',
 } as const;
