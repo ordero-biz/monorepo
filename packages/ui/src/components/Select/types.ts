@@ -9,6 +9,7 @@ import type {
 
 export type SelectSize = 's' | 'm';
 export type SelectVariant = 'outlined' | 'filled';
+export type SelectWidth = 'content' | 'full';
 
 export type SelectOption = {
   disabled?: boolean;
@@ -54,4 +55,5 @@ export type SelectProps = {
   startIcon?: ElementType<{ className?: string }>;
   value?: string | null;
   variant?: SelectVariant;
+  width?: SelectWidth;
 };

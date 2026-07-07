@@ -6,10 +6,10 @@ import {
 
 describe('url utils', () => {
   it('builds default pagination search params', () => {
-    expect(getPaginationSearch()).toBe('page=0&size=25');
+    expect(getPaginationSearch()).toBe('page=0&size=10');
     expect(DEFAULT_PAGE).toEqual({
       page: 0,
-      size: 25,
+      size: 10,
     });
   });
 
@@ -57,7 +57,7 @@ describe('url utils', () => {
       })
     ).toEqual({
       page: 0,
-      size: 25,
+      size: 10,
     });
   });
 });

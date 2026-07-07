@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import type { CellContext, HeaderContext } from '@tanstack/react-table';
 import { format, parseISO } from 'date-fns';
+import { useState } from 'react';
 import { Chip } from '@/ui/components/Chip';
 import {
   DataTable,
@@ -9,6 +10,7 @@ import {
   DataTableSelectionCell,
   DataTableSelectionColumnHeader,
   type DataTableColumnDef,
+  type DataTableProps,
 } from '@/ui/components/DataTable';
 import { IconButton } from '@/ui/components/IconButton';
 import { cn } from '@/ui/lib/utils';
@@ -105,6 +107,14 @@ const rows: ProductRow[] = [
     stockWidth: '44.15%',
   },
 ];
+
+const getLastPage = ({
+  count,
+  rowsPerPage,
+}: {
+  count: number;
+  rowsPerPage: number;
+}) => Math.max(0, Math.ceil(count / rowsPerPage) - 1);
 
 const formatCreatedAt = (value: string) => format(parseISO(value), 'dd MMM yyyy');
 
@@ -282,6 +292,48 @@ const columns: DataTableColumnDef<ProductRow>[] = [
   },
 ];
 
+const PaginatedDataTablePreview = (args: DataTableProps<ProductRow>) => {
+  const initialPagination = args.pagination ?? {
+    onPageChange: () => undefined,
+    page: 0,
+    rowsPerPage: 5,
+  };
+  const paginationCount = initialPagination.count ?? args.data.length;
+  const [page, setPage] = useState(initialPagination.page);
+  const [rowsPerPage, setRowsPerPage] = useState(
+    initialPagination.rowsPerPage
+  );
+
+  return (
+    <DataTable
+      {...args}
+      pagination={{
+        ...initialPagination,
+        count: paginationCount,
+        onPageChange: (nextPage) => {
+          setPage(nextPage);
+          initialPagination.onPageChange(nextPage);
+        },
+        onRowsPerPageChange: (nextRowsPerPage, details) => {
+          setRowsPerPage(nextRowsPerPage);
+          setPage((currentPage) =>
+            Math.min(
+              currentPage,
+              getLastPage({
+                count: paginationCount,
+                rowsPerPage: nextRowsPerPage,
+              })
+            )
+          );
+          initialPagination.onRowsPerPageChange?.(nextRowsPerPage, details);
+        },
+        page,
+        rowsPerPage,
+      }}
+    />
+  );
+};
+
 const meta = {
   title: 'Components/DataTable',
   component: DataTable<ProductRow>,
@@ -304,6 +356,18 @@ export const WithCheckboxSelection: Story = {
   args: {
     selectable: true,
   },
+};
+
+export const WithPagination: Story = {
+  args: {
+    pagination: {
+      onPageChange: () => undefined,
+      page: 0,
+      rowsPerPage: 5,
+      rowsPerPageOptions: [5, 10, 25],
+    },
+  },
+  render: (args) => <PaginatedDataTablePreview {...args} />,
 };
 
 export const Empty: Story = {

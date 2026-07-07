@@ -169,3 +169,15 @@ export const SmallSizes: Story = {
       },
     }),
 };
+
+export const ContentWidth: Story = {
+  render: (args) => (
+    <Select
+      {...args}
+      aria-label="View mode"
+      defaultValue="details"
+      label={undefined}
+      width="content"
+    />
+  ),
+};

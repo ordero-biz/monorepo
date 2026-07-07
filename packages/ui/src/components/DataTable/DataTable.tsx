@@ -3,11 +3,13 @@
 import {
   flexRender,
   getCoreRowModel,
+  getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table';
 import type { CSSProperties } from 'react';
 import { useState } from 'react';
+import { TablePagination } from '@/ui/components/TablePagination';
 import { cn } from '@/ui/lib/utils';
 import type {
   DataTableCellProps,
@@ -96,9 +98,11 @@ export const DataTable = <TData,>({
   emptyMessage = 'No results.',
   getRowCanSelect,
   getRowId,
+  manualPagination = false,
   manualSorting = false,
   onRowSelectionChange,
   onSortingChange,
+  pagination,
   rowSelection,
   sorting,
   selectable = false,
@@ -109,6 +113,13 @@ export const DataTable = <TData,>({
     useState<DataTableSortingState>([]);
   const resolvedRowSelection = rowSelection ?? uncontrolledRowSelection;
   const resolvedSorting = sorting ?? uncontrolledSorting;
+  const resolvedPagination = pagination
+    ? {
+        pageIndex: pagination.page,
+        pageSize: pagination.rowsPerPage,
+      }
+    : undefined;
+  const paginationRowCount = pagination?.count ?? data.length;
 
   const table = useReactTable({
     columns,
@@ -117,8 +128,11 @@ export const DataTable = <TData,>({
       ? (row) => getRowCanSelect?.(row.original, row.index) ?? true
       : false,
     getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel:
+      pagination && !manualPagination ? getPaginationRowModel() : undefined,
     getRowId,
     getSortedRowModel: manualSorting ? undefined : getSortedRowModel(),
+    manualPagination: pagination ? manualPagination : false,
     manualSorting,
     onRowSelectionChange: (updater) => {
       const nextRowSelection = resolveRowSelectionState(
@@ -141,7 +155,9 @@ export const DataTable = <TData,>({
 
       onSortingChange?.(nextSorting);
     },
+    rowCount: paginationRowCount,
     state: {
+      pagination: resolvedPagination,
       rowSelection: resolvedRowSelection,
       sorting: resolvedSorting,
     },
@@ -236,6 +252,14 @@ export const DataTable = <TData,>({
           </tbody>
         </table>
       </div>
+      {pagination ? (
+        <TablePagination
+          {...pagination}
+          count={paginationRowCount}
+          page={pagination.page}
+          rowsPerPage={pagination.rowsPerPage}
+        />
+      ) : null}
     </div>
   );
 };
