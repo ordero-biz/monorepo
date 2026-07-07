@@ -27,8 +27,9 @@ import type { ProductGenerationMode } from './types';
 export const ProductAddForm = () => {
   const queryClient = useQueryClient();
   const router = useRouter();
-  const [generationMode, setGenerationMode] =
-    useState<ProductGenerationMode>(PRODUCT_GENERATION_MODE.one);
+  const [generationMode, setGenerationMode] = useState<ProductGenerationMode>(
+    PRODUCT_GENERATION_MODE.one
+  );
   const isMultipleProducts = generationMode === PRODUCT_GENERATION_MODE.many;
   const categoriesQuery = useProductsCategoriesSelectQuery();
   const attributesQuery = useAttributesQuery();
@@ -100,7 +101,14 @@ export const ProductAddForm = () => {
                         <Select
                           disabled={categoriesQuery.isPending}
                           errorText={categoryErrorText}
-                          invalid={Boolean(categoryErrorText)}
+                          helperText={
+                            categoriesQuery.isPending
+                              ? 'Loading categories...'
+                              : undefined
+                          }
+                          invalid={
+                            categoriesQuery.isError || Boolean(errorText)
+                          }
                           label="Category"
                           name={field.name}
                           onBlur={field.handleBlur}
@@ -117,7 +125,6 @@ export const ProductAddForm = () => {
                   <form.Field
                     name="attributes"
                     validators={{
-                      // TODO refactor validation
                       onChange: ({ value }) =>
                         isMultipleProducts && !value
                           ? 'Select at least one attribute.'
@@ -142,8 +149,8 @@ export const ProductAddForm = () => {
                           errorText={attributesErrorText}
                           helperText={
                             isMultipleProducts
-                              ? 'You must select attributes to generate multiple products'
-                              : 'Optional attributes for this product'
+                              ? 'You must select attributes to generate multiple products. (e.g., Size, Color)'
+                              : 'Optional: Select attributes to add characteristics that will be the same for this single product'
                           }
                           invalid={Boolean(attributesErrorText)}
                           label="Attributes"
@@ -176,9 +183,9 @@ export const ProductAddForm = () => {
                           name={field.name}
                           onBlur={field.handleBlur}
                           onValueChange={field.handleChange}
-                          value={field.state.value}
                           resize="none"
                           rows={2}
+                          value={field.state.value}
                         />
                       );
                     }}
@@ -189,7 +196,8 @@ export const ProductAddForm = () => {
                     label="Creation mode"
                     onValueChange={(value) =>
                       setGenerationMode(
-                        (value[0] as ProductGenerationMode) ?? PRODUCT_GENERATION_MODE.one
+                        (value[0] as ProductGenerationMode) ??
+                          PRODUCT_GENERATION_MODE.one
                       )
                     }
                     orientation="horizontal"
@@ -233,14 +241,16 @@ export const ProductAddForm = () => {
                   [
                     state.values.productName,
                     state.values.attributes,
+                    state.values.category,
                     state.isSubmitting,
                   ] as const
                 }
               >
-                {([productName, attributes, isSubmitting]) => {
+                {([productName, attributes, category, isSubmitting]) => {
                   const isSubmitDisabled =
                     isSubmitting ||
                     !productName.trim() ||
+                    !category ||
                     (isMultipleProducts && !attributes);
                   const helperText = isMultipleProducts
                     ? 'You will proceed to configure products based on selected attributes'
@@ -251,6 +261,7 @@ export const ProductAddForm = () => {
                       <Button
                         color="primary"
                         disabled={isSubmitDisabled}
+                        size="l"
                         type="submit"
                       >
                         {isSubmitting

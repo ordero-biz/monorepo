@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { useAttributesQuery } from '@/lib/hooks/attributes/useAttributesQuery';
 import { productsCategoriesQueryInput } from '@/lib/hooks/products/productsCategoriesQueryConfig';
 import { getServerCategories } from '@/lib/server/api/categories';
 import {
@@ -7,7 +8,6 @@ import {
   createTestQueryProvider,
 } from '@/test/prepareSetup';
 import AddProductPage from './page';
-import { useAttributesQuery } from '@/lib/hooks/attributes/useAttributesQuery';
 
 const routerPushMock = vi.fn();
 
@@ -35,7 +35,7 @@ describe('AddProductPage', () => {
     routerPushMock.mockReset();
   });
 
-  it('renders the add product form with category options', async () => {
+  it('renders the add product form with category and attribute options', async () => {
     const user = userEvent.setup();
     const queryClient = createTestQueryClient();
     const TestQueryProvider = createTestQueryProvider(queryClient);
@@ -102,17 +102,16 @@ describe('AddProductPage', () => {
         'Optional: Select attributes to add characteristics that will be the same for this single product'
       )
     ).toBeVisible();
+    expect(screen.getByRole('group', { name: 'Creation mode' })).toBeVisible();
     expect(
-      screen.getByRole('group', { name: 'Creation mode' })
-    ).toBeVisible();
-    expect(screen.getByRole('button', { name: 'Single product' })).toHaveAttribute(
-      'aria-pressed',
-      'true'
-    );
+      screen.getByRole('button', { name: 'Single product' })
+    ).toHaveAttribute('aria-pressed', 'true');
     expect(
       screen.getByRole('button', { name: 'Multiple products' })
     ).toHaveAttribute('aria-pressed', 'false');
+
     await user.click(screen.getByRole('combobox', { name: 'Category' }));
+
     expect(screen.getByRole('option', { name: 'Shoes' })).toBeVisible();
     expect(
       screen.getByRole('button', { name: 'Add product image' })

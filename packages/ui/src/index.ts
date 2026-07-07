@@ -52,6 +52,8 @@ export type {
   DataTableColumnHeaderProps,
   DataTableColumnMeta,
   DataTableColumnWrap,
+  DataTablePaginationProps,
+  DataTablePaginationState,
   DataTableProps,
   DataTableRowSelectionState,
   DataTableSelectionCellProps,
@@ -123,6 +125,7 @@ export type {
   SelectProps,
   SelectSize,
   SelectVariant,
+  SelectWidth,
 } from './components/Select';
 export { Select } from './components/Select';
 export type {
@@ -153,6 +156,11 @@ export {
   SidebarNavigationSectionContent,
   SidebarNavigationSections,
 } from './components/SidebarNavigation';
+export type {
+  TablePaginationProps,
+  TablePaginationRangeLabelArgs,
+} from './components/TablePagination';
+export { TablePagination } from './components/TablePagination';
 export type {
   TextareaChangeEventDetails,
   TextareaProps,

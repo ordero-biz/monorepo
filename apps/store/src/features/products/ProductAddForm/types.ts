@@ -7,4 +7,5 @@ export type ProductAddFormValues = {
   productName: string;
 };
 
-export type ProductGenerationMode = (typeof PRODUCT_GENERATION_MODE)[keyof typeof PRODUCT_GENERATION_MODE];
+export type ProductGenerationMode =
+  (typeof PRODUCT_GENERATION_MODE)[keyof typeof PRODUCT_GENERATION_MODE];

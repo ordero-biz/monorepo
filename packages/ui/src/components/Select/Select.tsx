@@ -12,9 +12,9 @@ import type { SelectProps } from './types';
 
 const triggerClassNames = {
   outlined:
-    'relative flex w-full min-w-0 cursor-pointer items-center rounded-[var(--textfield-outlined-radius)] bg-background px-[var(--textfield-outlined-px)] shadow-[var(--_select-outline-shadow)] transition-[box-shadow] hover:shadow-[var(--_select-hover-outline-shadow)] disabled:cursor-not-allowed',
+    'relative flex w-full min-w-0 cursor-pointer items-center justify-between rounded-[var(--textfield-outlined-radius)] bg-background px-[var(--textfield-outlined-px)] shadow-[var(--_select-outline-shadow)] transition-[box-shadow] hover:shadow-[var(--_select-hover-outline-shadow)] disabled:cursor-not-allowed',
   filled:
-    'relative flex w-full min-w-0 cursor-pointer items-center rounded-[var(--textfield-filled-radius)] bg-[var(--_select-background)] px-[var(--textfield-filled-pl)] pr-[var(--textfield-filled-pr)] transition-[background-color] hover:bg-[var(--_select-hover-background)] disabled:cursor-not-allowed',
+    'relative flex w-full min-w-0 cursor-pointer items-center justify-between rounded-[var(--textfield-filled-radius)] bg-[var(--_select-background)] px-[var(--textfield-filled-pl)] pr-[var(--textfield-filled-pr)] transition-[background-color] hover:bg-[var(--_select-hover-background)] disabled:cursor-not-allowed',
 } as const;
 
 const triggerSizeClassNames = {
@@ -28,15 +28,31 @@ const triggerSizeClassNames = {
   },
 } as const;
 
+const rootWidthClassNames = {
+  content: 'inline-flex w-fit min-w-[inherit] max-w-full flex-col',
+  full: 'flex w-full min-w-0 flex-col',
+} as const;
+
+const triggerWidthClassNames = {
+  content: 'w-fit min-w-[inherit] max-w-full',
+  full: 'w-full',
+} as const;
+
 const adornmentClassName =
   'flex shrink-0 items-center justify-center leading-none text-[length:var(--input-value-size-desktop)] font-[var(--input-value-weight)]';
 
 const startAdornmentClassName = 'mr-[var(--textfield-start-adornment-mr)]';
 
-const valueContainerClassName = 'flex min-w-0 flex-1 items-center';
+const valueContainerWidthClassNames = {
+  content: 'flex min-w-0 items-center',
+  full: 'flex min-w-0 flex-1 items-center',
+} as const;
 
-const valueTextClassName =
-  'min-w-0 flex-1 truncate text-left text-[length:var(--input-value-size-desktop)] leading-[var(--input-value-line-height-desktop)] font-[var(--input-value-weight)]';
+const valueTextWidthClassNames = {
+  content:
+    'whitespace-nowrap text-left text-[length:var(--input-value-size-desktop)] leading-[var(--input-value-line-height-desktop)] font-[var(--input-value-weight)]',
+  full: 'min-w-0 flex-1 truncate text-left text-[length:var(--input-value-size-desktop)] leading-[var(--input-value-line-height-desktop)] font-[var(--input-value-weight)]',
+} as const;
 
 const iconClassName =
   'ml-[var(--textfield-select-arrow-mr)] flex shrink-0 items-center justify-center text-[var(--text-secondary)] transition-transform data-[popup-open]:rotate-180 [&_svg]:size-[var(--textfield-select-arrow-icon)]';
@@ -181,6 +197,7 @@ export const Select = ({
   startIcon: StartIcon,
   value,
   variant = 'outlined',
+  width = 'full',
 }: SelectProps) => {
   const generatedLabelId = useId();
   const supportTextId = useId();
@@ -211,7 +228,7 @@ export const Select = ({
 
   return (
     <Field.Root
-      className="flex w-full min-w-0 flex-col"
+      className={rootWidthClassNames[width]}
       data-slot="select"
       disabled={disabled}
       invalid={invalid}
@@ -251,7 +268,8 @@ export const Select = ({
           aria-labelledby={labelledBy}
           className={cn(
             triggerClassNames[variant],
-            triggerSizeClassNames[variant][size]
+            triggerSizeClassNames[variant][size],
+            triggerWidthClassNames[width]
           )}
           onBlur={(event) => {
             setFocused(false);
@@ -271,7 +289,7 @@ export const Select = ({
           })}
         >
           <SelectPrimitive.Value
-            className={valueContainerClassName}
+            className={valueContainerWidthClassNames[width]}
             placeholder={placeholder}
           >
             {(selectedValue: string | null) => (
@@ -294,7 +312,7 @@ export const Select = ({
                 ) : null}
                 <span
                   className={cn(
-                    valueTextClassName,
+                    valueTextWidthClassNames[width],
                     selectedValue === null
                       ? 'text-[var(--text-disabled)]'
                       : getTextColorClassName({ disabled })
