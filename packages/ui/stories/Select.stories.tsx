@@ -2,9 +2,11 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { CircleAlert, Heart, Info, UserRound } from 'lucide-react';
 import {
   Select,
+  type SelectMultipleProps,
   type SelectOption,
   type SelectProps,
   type SelectSize,
+  type SelectSingleProps,
   type SelectVariant,
 } from '@/ui/components/Select';
 
@@ -22,8 +24,8 @@ const renderPair = ({
   filled,
   outlined,
 }: {
-  filled: SelectProps;
-  outlined: SelectProps;
+  filled: SelectSingleProps;
+  outlined: SelectSingleProps;
 }) => (
   <div className={previewGridClassName}>
     <div className={previewColumnClassName}>
@@ -34,6 +36,28 @@ const renderPair = ({
     </div>
   </div>
 );
+
+const getSingleSelectArgs = ({
+  defaultValue: _defaultValue,
+  multiple: _multiple,
+  onValueChange: _onValueChange,
+  value: _value,
+  ...args
+}: SelectProps): Omit<
+  SelectSingleProps,
+  'defaultValue' | 'multiple' | 'onValueChange' | 'value'
+> => args;
+
+const getMultipleSelectArgs = ({
+  defaultValue: _defaultValue,
+  multiple: _multiple,
+  onValueChange: _onValueChange,
+  value: _value,
+  ...args
+}: SelectProps): Omit<
+  SelectMultipleProps,
+  'defaultValue' | 'multiple' | 'onValueChange' | 'value'
+> => args;
 
 const meta = {
   title: 'Components/Select',
@@ -51,25 +75,30 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
-  render: (args) =>
-    renderPair({
+  render: (args) => {
+    const singleArgs = getSingleSelectArgs(args);
+
+    return renderPair({
       filled: {
-        ...args,
+        ...singleArgs,
         defaultValue: 'list',
         variant: 'filled',
       },
       outlined: {
-        ...args,
+        ...singleArgs,
         defaultValue: 'list',
       },
-    }),
+    });
+  },
 };
 
 export const Invalid: Story = {
-  render: (args) =>
-    renderPair({
+  render: (args) => {
+    const singleArgs = getSingleSelectArgs(args);
+
+    return renderPair({
       filled: {
-        ...args,
+        ...singleArgs,
         defaultValue: 'create',
         errorIcon: <CircleAlert aria-hidden="true" />,
         errorText: 'Caption text, description, notification',
@@ -77,20 +106,23 @@ export const Invalid: Story = {
         variant: 'filled',
       },
       outlined: {
-        ...args,
+        ...singleArgs,
         defaultValue: 'create',
         errorIcon: <CircleAlert aria-hidden="true" />,
         errorText: 'Caption text, description, notification',
         invalid: true,
       },
-    }),
+    });
+  },
 };
 
 export const DisabledWithStartIconAndHelperText: Story = {
-  render: (args) =>
-    renderPair({
+  render: (args) => {
+    const singleArgs = getSingleSelectArgs(args);
+
+    return renderPair({
       filled: {
-        ...args,
+        ...singleArgs,
         defaultValue: 'details',
         disabled: true,
         helperIcon: <Info aria-hidden="true" />,
@@ -100,7 +132,7 @@ export const DisabledWithStartIconAndHelperText: Story = {
         variant: 'filled',
       },
       outlined: {
-        ...args,
+        ...singleArgs,
         defaultValue: 'details',
         disabled: true,
         helperIcon: <Info aria-hidden="true" />,
@@ -108,33 +140,39 @@ export const DisabledWithStartIconAndHelperText: Story = {
         label: 'Disabled',
         startIcon: UserRound,
       },
-    }),
+    });
+  },
 };
 
 export const WithTextStart: Story = {
-  render: (args) =>
-    renderPair({
+  render: (args) => {
+    const singleArgs = getSingleSelectArgs(args);
+
+    return renderPair({
       filled: {
-        ...args,
+        ...singleArgs,
         defaultValue: 'details',
         label: 'Currency',
         startAdornment: '$',
         variant: 'filled',
       },
       outlined: {
-        ...args,
+        ...singleArgs,
         defaultValue: 'details',
         label: 'Currency',
         startAdornment: '$',
       },
-    }),
+    });
+  },
 };
 
 export const WithIconAdornment: Story = {
-  render: (args) =>
-    renderPair({
+  render: (args) => {
+    const singleArgs = getSingleSelectArgs(args);
+
+    return renderPair({
       filled: {
-        ...args,
+        ...singleArgs,
         defaultValue: 'edit',
         helperIcon: <Info aria-hidden="true" />,
         helperText: 'Caption text, description, notification',
@@ -142,42 +180,76 @@ export const WithIconAdornment: Story = {
         variant: 'filled',
       },
       outlined: {
-        ...args,
+        ...singleArgs,
         defaultValue: 'edit',
         helperIcon: <Info aria-hidden="true" />,
         helperText: 'Caption text, description, notification',
         startIcon: Heart,
       },
-    }),
+    });
+  },
+};
+
+export const Multiple: Story = {
+  render: (args) => {
+    const multipleArgs = getMultipleSelectArgs(args);
+
+    return (
+      <div className={previewGridClassName}>
+        <div className={previewColumnClassName}>
+          <Select
+            {...multipleArgs}
+            defaultValue={['list', 'details']}
+            multiple={true}
+          />
+        </div>
+        <div className={previewColumnClassName}>
+          <Select
+            {...multipleArgs}
+            defaultValue={['list', 'details']}
+            multiple={true}
+            variant="filled"
+          />
+        </div>
+      </div>
+    );
+  },
 };
 
 export const SmallSizes: Story = {
-  render: (args) =>
-    renderPair({
+  render: (args) => {
+    const singleArgs = getSingleSelectArgs(args);
+
+    return renderPair({
       filled: {
-        ...args,
+        ...singleArgs,
         defaultValue: 'edit',
         size: 's',
         startIcon: Heart,
         variant: 'filled',
       },
       outlined: {
-        ...args,
+        ...singleArgs,
         defaultValue: 'edit',
         size: 's',
         startIcon: Heart,
       },
-    }),
+    });
+  },
 };
 
 export const ContentWidth: Story = {
-  render: (args) => (
-    <Select
-      {...args}
-      aria-label="View mode"
-      defaultValue="details"
-      label={undefined}
-      width="content"
-    />
-  ),
+  render: (args) => {
+    const singleArgs = getSingleSelectArgs(args);
+
+    return (
+      <Select
+        {...singleArgs}
+        aria-label="View mode"
+        defaultValue="details"
+        label={undefined}
+        width="content"
+      />
+    );
+  },
 };
