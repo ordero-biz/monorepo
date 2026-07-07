@@ -1,9 +1,10 @@
 'use client';
 
+import type { ComboboxChangeEventDetails } from '@ordero/ui';
 import { Combobox } from '@ordero/ui';
 import type { InfiniteData, QueryKey } from '@tanstack/react-query';
 import { useInfiniteQuery } from '@tanstack/react-query';
-import type { UIEventHandler } from 'react';
+import type { UIEvent } from 'react';
 import { useMemo, useState } from 'react';
 import type {
   AsyncComboboxLoadOptionsResult,
@@ -52,7 +53,7 @@ export const AsyncCombobox = (props: AsyncComboboxProps) => {
   const isInitialLoading =
     isOpen && optionsQuery.isFetching && !optionsQuery.data;
 
-  const handleListScroll: UIEventHandler<HTMLDivElement> = (event) => {
+  const handleListScroll = (event: UIEvent<HTMLDivElement>) => {
     onListScroll?.(event);
 
     const { clientHeight, scrollHeight, scrollTop } = event.currentTarget;
@@ -68,9 +69,9 @@ export const AsyncCombobox = (props: AsyncComboboxProps) => {
     }
   };
 
-  const handleOpenChange: NonNullable<AsyncComboboxProps['onOpenChange']> = (
-    nextOpen,
-    details
+  const handleOpenChange = (
+    nextOpen: boolean,
+    details: ComboboxChangeEventDetails
   ) => {
     setOpenState(nextOpen);
     onOpenChange?.(nextOpen, details);

@@ -1,11 +1,6 @@
 'use client';
 
-import {
-  Button,
-  Card,
-  DataTable,
-  Typography,
-} from '@ordero/ui';
+import { Button, Card, DataTable, Typography } from '@ordero/ui';
 import { useCategoriesQuery } from '@/lib/hooks/categories/useCategoriesQuery';
 import { useTablePagination } from '@/lib/hooks/useTablePagination';
 import type { PaginationSearchInput } from '@/lib/utils/url';

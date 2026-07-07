@@ -50,16 +50,88 @@ const loadCategoryOptions = async ({
   };
 };
 
-export const CategoriesAsyncCombobox = (
-  props: CategoriesAsyncComboboxProps
-) => (
-  <AsyncCombobox
-    {...props}
-    emptyText="No categories found"
-    loadErrorText="We couldn't load categories right now."
-    loadingText="Loading categories..."
-    loadOptions={loadCategoryOptions}
-    pageSize={100}
-    queryKey={categoryComboboxQueryKey}
-  />
-);
+export const CategoriesAsyncCombobox = ({
+  'aria-describedby': ariaDescribedBy,
+  'aria-label': ariaLabel,
+  'aria-labelledby': ariaLabelledBy,
+  autoComplete,
+  autoFocus,
+  defaultInputValue,
+  defaultOpen,
+  defaultValue,
+  disabled,
+  endAdornment,
+  endIcon,
+  errorIcon,
+  errorText,
+  helperIcon,
+  helperText,
+  id,
+  inputValue,
+  invalid,
+  label,
+  name,
+  onBlur,
+  onFocus,
+  onInputValueChange,
+  onKeyDown,
+  onListScroll,
+  onOpenChange,
+  onValueChange,
+  open,
+  placeholder,
+  readOnly,
+  ref,
+  required,
+  size,
+  startAdornment,
+  startIcon,
+  value,
+}: CategoriesAsyncComboboxProps) => {
+  return (
+    <AsyncCombobox
+      aria-describedby={ariaDescribedBy}
+      aria-label={ariaLabel}
+      aria-labelledby={ariaLabelledBy}
+      autoComplete={autoComplete}
+      autoFocus={autoFocus}
+      defaultInputValue={defaultInputValue}
+      defaultOpen={defaultOpen}
+      defaultValue={defaultValue}
+      disabled={disabled}
+      emptyText="No categories found"
+      endAdornment={endAdornment}
+      endIcon={endIcon}
+      errorIcon={errorIcon}
+      errorText={errorText}
+      helperIcon={helperIcon}
+      helperText={helperText}
+      id={id}
+      inputValue={inputValue}
+      invalid={invalid}
+      label={label}
+      loadErrorText="We couldn't load categories right now."
+      loadOptions={loadCategoryOptions}
+      loadingText="Loading categories..."
+      name={name}
+      onBlur={onBlur}
+      onFocus={onFocus}
+      onInputValueChange={onInputValueChange}
+      onKeyDown={onKeyDown}
+      onListScroll={onListScroll}
+      onOpenChange={onOpenChange}
+      onValueChange={onValueChange}
+      open={open}
+      pageSize={100}
+      placeholder={placeholder}
+      queryKey={categoryComboboxQueryKey}
+      readOnly={readOnly}
+      ref={ref}
+      required={required}
+      size={size}
+      startAdornment={startAdornment}
+      startIcon={startIcon}
+      value={value}
+    />
+  );
+};

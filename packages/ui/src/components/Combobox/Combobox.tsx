@@ -68,7 +68,10 @@ const itemIndicatorClassName =
   'mr-[var(--menu-list-spacing)] flex size-[20px] shrink-0 items-center justify-center opacity-0 transition-opacity data-[selected]:opacity-100 [&_svg]:size-[16px]';
 
 const itemTextClassName =
-  'min-w-0 flex-1 truncate text-[length:var(--body2-size-desktop)] leading-[var(--body2-line-height-desktop)] font-[var(--body2-weight)] text-[var(--text-secondary)] data-[selected]:font-[var(--font-weight-600)] data-[selected]:text-foreground';
+  'min-w-0 flex-1 truncate text-[length:var(--body2-size-desktop)] leading-[var(--body2-line-height-desktop)] font-[var(--body2-weight)] text-[var(--text-secondary)]';
+
+const selectedItemTextClassName =
+  'font-[var(--font-weight-600)] text-foreground';
 
 const statusClassName =
   'px-[8px] py-[var(--space-1)] text-[length:var(--body2-size-desktop)] leading-[var(--body2-line-height-desktop)] font-[var(--body2-weight)] text-[var(--text-secondary)]';
@@ -170,6 +173,17 @@ const getOptionText = (option: ComboboxOption | undefined, value: string) => {
 
   return option.value;
 };
+
+const isOptionSelected = ({
+  optionValue,
+  selectedValue,
+}: {
+  optionValue: string;
+  selectedValue: string | string[] | null;
+}) =>
+  Array.isArray(selectedValue)
+    ? selectedValue.includes(optionValue)
+    : selectedValue === optionValue;
 
 const renderSupportText = ({
   icon,
@@ -339,11 +353,10 @@ export const Combobox = (props: ComboboxProps) => {
                 <span
                   className={cn(
                     itemTextClassName,
-                    Array.isArray(selectedValue)
-                      ? selectedValue.includes(option.value) &&
-                          'font-[var(--font-weight-600)] text-foreground'
-                      : selectedValue === option.value &&
-                          'font-[var(--font-weight-600)] text-foreground'
+                    isOptionSelected({
+                      optionValue: option.value,
+                      selectedValue,
+                    }) && selectedItemTextClassName
                   )}
                 >
                   {option.label}

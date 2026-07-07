@@ -46,6 +46,7 @@ export type {
 } from './components/Chip';
 export { Chip } from './components/Chip';
 export type {
+  ComboboxChangeEventDetails,
   ComboboxMultipleProps,
   ComboboxOption,
   ComboboxProps,
