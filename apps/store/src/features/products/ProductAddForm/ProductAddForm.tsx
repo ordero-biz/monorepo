@@ -136,8 +136,8 @@ export const ProductAddForm = () => {
                           errorText={attributesErrorText}
                           helperText={
                             isMultipleProducts
-                              ? 'You must select attributes to generate multiple products. (e.g., Size, Color)'
-                              : 'Optional: Select attributes to add characteristics that will be the same for this single product'
+                              ? 'You must select attributes to generate multiple products'
+                              : 'Optional: Add attributes for a single product'
                           }
                           invalid={Boolean(attributesErrorText)}
                           label="Attributes"
