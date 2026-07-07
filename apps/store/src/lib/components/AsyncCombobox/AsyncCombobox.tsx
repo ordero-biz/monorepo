@@ -1,0 +1,93 @@
+'use client';
+
+import { Combobox } from '@ordero/ui';
+import type { InfiniteData, QueryKey } from '@tanstack/react-query';
+import { useInfiniteQuery } from '@tanstack/react-query';
+import type { UIEventHandler } from 'react';
+import { useMemo, useState } from 'react';
+import type {
+  AsyncComboboxLoadOptionsResult,
+  AsyncComboboxProps,
+} from './types';
+
+const DEFAULT_PAGE_SIZE = 25;
+const LOAD_MORE_SCROLL_OFFSET = 24;
+
+export const AsyncCombobox = (props: AsyncComboboxProps) => {
+  const {
+    defaultOpen,
+    invalid = false,
+    loadErrorText = "We couldn't load options right now.",
+    loadOptions,
+    onListScroll,
+    onOpenChange,
+    open,
+    pageSize = DEFAULT_PAGE_SIZE,
+    queryKey,
+    ...comboboxProps
+  } = props;
+  const [openState, setOpenState] = useState(defaultOpen ?? false);
+  const isOpen = open ?? openState;
+  const optionsQuery = useInfiniteQuery<
+    AsyncComboboxLoadOptionsResult,
+    Error,
+    InfiniteData<AsyncComboboxLoadOptionsResult>,
+    QueryKey,
+    number
+  >({
+    enabled: isOpen,
+    getNextPageParam: (lastPage) => lastPage.nextPage,
+    initialPageParam: 0,
+    queryFn: ({ pageParam }) =>
+      loadOptions({
+        page: pageParam,
+        pageSize,
+      }),
+    queryKey: [...queryKey, { pageSize }],
+  });
+  const options = useMemo(
+    () => optionsQuery.data?.pages.flatMap((page) => page.options) ?? [],
+    [optionsQuery.data?.pages]
+  );
+  const isInitialLoading =
+    isOpen && optionsQuery.isFetching && !optionsQuery.data;
+
+  const handleListScroll: UIEventHandler<HTMLDivElement> = (event) => {
+    onListScroll?.(event);
+
+    const { clientHeight, scrollHeight, scrollTop } = event.currentTarget;
+    const isNearBottom =
+      scrollHeight - scrollTop - clientHeight <= LOAD_MORE_SCROLL_OFFSET;
+
+    if (
+      isNearBottom &&
+      optionsQuery.hasNextPage &&
+      !optionsQuery.isFetchingNextPage
+    ) {
+      void optionsQuery.fetchNextPage();
+    }
+  };
+
+  const handleOpenChange: NonNullable<AsyncComboboxProps['onOpenChange']> = (
+    nextOpen,
+    details
+  ) => {
+    setOpenState(nextOpen);
+    onOpenChange?.(nextOpen, details);
+  };
+
+  return (
+    <Combobox
+      {...comboboxProps}
+      defaultOpen={defaultOpen}
+      invalid={invalid || optionsQuery.isError}
+      listErrorText={optionsQuery.isError ? loadErrorText : undefined}
+      loading={isInitialLoading}
+      loadingMore={optionsQuery.isFetchingNextPage}
+      onListScroll={handleListScroll}
+      onOpenChange={handleOpenChange}
+      open={isOpen}
+      options={options}
+    />
+  );
+};

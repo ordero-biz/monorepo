@@ -1,7 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { productsCategoriesQueryInput } from '@/lib/hooks/products/productsCategoriesQueryConfig';
-import { getServerCategories } from '@/lib/server/api/categories';
+import { getCategories } from '@/lib/client/api/categories';
 import {
   createTestQueryClient,
   createTestQueryProvider,
@@ -16,24 +15,24 @@ vi.mock('next/navigation', () => ({
   }),
 }));
 
-vi.mock('@/lib/server/api/categories', () => ({
-  getServerCategories: vi.fn(),
+vi.mock('@/lib/client/api/categories', () => ({
+  getCategories: vi.fn(),
 }));
 
-const getServerCategoriesMock = vi.mocked(getServerCategories);
+const getCategoriesMock = vi.mocked(getCategories);
 
 describe('AddProductPage', () => {
   beforeEach(() => {
-    getServerCategoriesMock.mockReset();
+    getCategoriesMock.mockReset();
     routerPushMock.mockReset();
   });
 
-  it('renders the add product form with category options', async () => {
+  it('renders the add product form and loads category options when opened', async () => {
     const user = userEvent.setup();
     const queryClient = createTestQueryClient();
     const TestQueryProvider = createTestQueryProvider(queryClient);
 
-    getServerCategoriesMock.mockResolvedValue({
+    getCategoriesMock.mockResolvedValue({
       ok: true,
       data: {
         content: [
@@ -54,14 +53,12 @@ describe('AddProductPage', () => {
       },
     });
 
-    render(await AddProductPage(), {
+    render(<AddProductPage />, {
       wrapper: TestQueryProvider,
     });
 
     expect(screen.getByRole('heading', { name: 'Add product' })).toBeVisible();
-    expect(getServerCategoriesMock).toHaveBeenCalledWith(
-      productsCategoriesQueryInput
-    );
+    expect(getCategoriesMock).not.toHaveBeenCalled();
     expect(
       screen.getByRole('textbox', { name: 'Product name' })
     ).toHaveAttribute('placeholder', 'Product name');
@@ -71,26 +68,25 @@ describe('AddProductPage', () => {
     expect(screen.getByRole('textbox', { name: 'Description' })).toHaveValue(
       ''
     );
-    expect(
-      screen.getByRole('combobox', { name: 'Category' })
-    ).toHaveTextContent('Select category');
+    expect(screen.getByRole('combobox', { name: 'Category' })).toHaveAttribute(
+      'placeholder',
+      'Select category'
+    );
     expect(
       screen.getByRole('combobox', { name: 'Attributes' })
     ).toHaveTextContent('Select attributes');
     expect(
-      screen.getByRole('radiogroup', { name: 'Product generating mode' })
-    ).toBeVisible();
-    expect(
-      screen.getByRole('radio', { name: 'Generate one product' })
-    ).toBeChecked();
-    expect(
-      screen.getByRole('radio', { name: 'Generate many products' })
-    ).not.toBeChecked();
-    await user.click(screen.getByRole('combobox', { name: 'Category' }));
-    expect(screen.getByRole('option', { name: 'Shoes' })).toBeVisible();
-    expect(
       screen.getByRole('button', { name: 'Add product image' })
     ).toBeVisible();
     expect(screen.getByRole('button', { name: 'Add product' })).toBeVisible();
+
+    await user.click(screen.getByRole('combobox', { name: 'Category' }));
+
+    expect(getCategoriesMock).toHaveBeenCalledWith({
+      page: 0,
+      size: 100,
+      sort: ['name,asc'],
+    });
+    expect(await screen.findByRole('option', { name: 'Shoes' })).toBeVisible();
   });
 });

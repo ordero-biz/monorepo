@@ -13,15 +13,14 @@ import { useQueryClient } from '@tanstack/react-query';
 import { Plus } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { clientRoutes } from '@/lib/client/routes';
-import { useProductsCategoriesSelectQuery } from '@/lib/hooks/products/useProductsCategoriesSelectQuery';
 import { productsQueryKeys } from '@/lib/query/products/productsQueryKeys';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
+import { CategoriesAsyncCombobox } from './CategoriesAsyncCombobox';
 import { useCreateProductForm } from './hooks/useCreateProductForm';
 
 export const ProductAddForm = () => {
   const queryClient = useQueryClient();
   const router = useRouter();
-  const categoriesQuery = useProductsCategoriesSelectQuery();
   const { form } = useCreateProductForm({
     onCreated: async () => {
       await queryClient.invalidateQueries({
@@ -74,27 +73,15 @@ export const ProductAddForm = () => {
                       const errorText = getFieldSubmitChangeErrorText(
                         field.state.meta
                       );
-                      const categoryErrorText = categoriesQuery.isError
-                        ? "We couldn't load categories right now."
-                        : errorText;
 
                       return (
-                        <Select
-                          disabled={categoriesQuery.isPending}
-                          errorText={categoryErrorText}
-                          helperText={
-                            categoriesQuery.isPending
-                              ? 'Loading categories...'
-                              : undefined
-                          }
-                          invalid={
-                            categoriesQuery.isError || Boolean(errorText)
-                          }
+                        <CategoriesAsyncCombobox
+                          errorText={errorText}
+                          invalid={Boolean(errorText)}
                           label="Category"
                           name={field.name}
                           onBlur={field.handleBlur}
                           onValueChange={field.handleChange}
-                          options={categoriesQuery.categoryOptions}
                           placeholder="Select category"
                           size="s"
                           value={field.state.value}
