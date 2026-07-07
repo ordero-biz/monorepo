@@ -4,6 +4,7 @@ import {
   DataTableColumnHeader,
 } from '@ordero/ui';
 import type { Product } from '@/lib/domain/products';
+import { formatDate } from '@/lib/utils/formatDate';
 
 export const columns: DataTableColumnDef<Product>[] = [
   {
@@ -43,7 +44,9 @@ export const columns: DataTableColumnDef<Product>[] = [
   },
   {
     accessorKey: 'createdAt',
-    cell: ({ row }) => <DataTableCell>{row.original.createdAt}</DataTableCell>,
+    cell: ({ row }) => (
+      <DataTableCell>{formatDate(row.original.createdAt)}</DataTableCell>
+    ),
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Created at" />
     ),

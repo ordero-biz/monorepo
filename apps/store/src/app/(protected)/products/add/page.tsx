@@ -1,12 +1,23 @@
-import { Typography } from '@ordero/ui';
+import { dehydrate, HydrationBoundary } from '@tanstack/react-query';
+import { ProductAddForm } from '@/features/products';
+import { productsCategoriesQueryInput } from '@/lib/hooks/products/productsCategoriesQueryConfig';
+import { categoriesListQueryOptions } from '@/lib/query/categories/categoriesQueryOptions';
+import { makeQueryClient } from '@/lib/query/queryClient';
+import { getServerCategories } from '@/lib/server/api/categories';
 
-export default function AddProductPage() {
+export default async function AddProductPage() {
+  const queryClient = makeQueryClient();
+
+  await queryClient.prefetchQuery(
+    categoriesListQueryOptions(
+      getServerCategories,
+      productsCategoriesQueryInput
+    )
+  );
+
   return (
-    <section className="flex flex-col gap-[var(--space-1)] text-foreground">
-      <Typography variant="h4">Add product</Typography>
-      <Typography color="secondary" variant="body2">
-        Product form placeholder.
-      </Typography>
-    </section>
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <ProductAddForm />
+    </HydrationBoundary>
   );
 }
