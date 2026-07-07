@@ -32,6 +32,17 @@ describe('Combobox', () => {
     );
   });
 
+  it('marks required comboboxes as required', () => {
+    const { 'aria-label': ariaLabel, required } = setup({
+      required: true,
+    });
+
+    expect(screen.getByRole('combobox', { name: ariaLabel })).toHaveAttribute(
+      'aria-required',
+      String(required)
+    );
+  });
+
   it('opens the list and calls onValueChange when the user picks an option', async () => {
     const user = userEvent.setup();
 

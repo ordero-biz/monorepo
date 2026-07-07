@@ -449,6 +449,7 @@ export const Combobox = (props: ComboboxProps) => {
       onValueChange={props.onValueChange}
       open={open}
       readOnly={readOnly}
+      required={required}
       value={props.value}
     >
       {content}
@@ -474,6 +475,7 @@ export const Combobox = (props: ComboboxProps) => {
       onValueChange={props.onValueChange}
       open={open}
       readOnly={readOnly}
+      required={required}
       value={props.value}
     >
       {content}
