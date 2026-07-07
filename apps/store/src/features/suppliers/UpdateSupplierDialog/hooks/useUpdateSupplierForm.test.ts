@@ -1,8 +1,8 @@
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { prepareFormHookTestSetup } from '@/test/prepareFormHookTestSetup';
-import { submitUpdateAttribute } from '../utils/submitAction';
-import { useUpdateAttributeForm } from './useUpdateAttributeForm';
+import { submitUpdateSupplier } from '../utils/submitAction';
+import { useUpdateSupplierForm } from './useUpdateSupplierForm';
 
 const { addToastMock } = vi.hoisted(() => ({
   addToastMock: vi.fn(),
@@ -19,91 +19,104 @@ vi.mock('../utils/submitAction', async () => ({
   ...(await vi.importActual<typeof import('../utils/submitAction')>(
     '../utils/submitAction'
   )),
-  submitUpdateAttribute: vi.fn(),
+  submitUpdateSupplier: vi.fn(),
 }));
 
-const submitUpdateAttributeMock = vi.mocked(submitUpdateAttribute);
+const submitUpdateSupplierMock = vi.mocked(submitUpdateSupplier);
+
+const supplier = {
+  id: 1,
+  name: 'Fresh Farms',
+  email: 'orders@fresh.example',
+  phone: '+1 555 0100',
+  address: '123 Market St',
+  comment: 'Preferred produce supplier',
+};
 
 const { setup } = prepareFormHookTestSetup({
   hookProps: {
-    attributeId: 7,
-    initialName: 'Color',
     onUpdated: vi.fn(),
+    supplier,
   },
-  useFormHook: useUpdateAttributeForm,
+  useFormHook: useUpdateSupplierForm,
 });
 
-const setupUpdateAttributeFormHook = () => {
+const setupUpdateSupplierFormHook = () => {
   const user = userEvent.setup();
   const hookProps = {
-    attributeId: 7,
-    initialName: 'Color',
     onUpdated: vi.fn(),
+    supplier,
   };
   const result = setup({
     hookProps,
   });
 
   return {
+    ...result,
     onUpdated: result.hookProps.onUpdated,
     submitButton: screen.getByRole('button', { name: 'Submit' }),
     user,
-    ...result,
   };
 };
 
-describe('useUpdateAttributeForm', () => {
+describe('useUpdateSupplierForm', () => {
   beforeEach(() => {
     addToastMock.mockClear();
-    submitUpdateAttributeMock.mockReset();
+    submitUpdateSupplierMock.mockReset();
   });
 
-  it('submits the attribute id and default form values before reporting success', async () => {
-    submitUpdateAttributeMock.mockResolvedValue({
+  it('submits the supplier id and default form values before reporting success', async () => {
+    submitUpdateSupplierMock.mockResolvedValue({
       ok: true,
       data: {
-        id: 7,
-        name: 'Material',
-        sortOrder: 10,
-        createdAt: '2026-06-25T18:13:29.608Z',
+        id: 1,
+        name: 'Fresh Farms Updated',
+        email: 'orders.updated@fresh.example',
+        phone: '+1 555 0101',
+        address: '124 Market St',
+        comment: 'Updated supplier',
       },
     });
-    const { onUpdated, submitButton, user } = setupUpdateAttributeFormHook();
+    const { onUpdated, submitButton, user } = setupUpdateSupplierFormHook();
 
     await user.click(submitButton);
 
     await waitFor(() =>
-      expect(submitUpdateAttributeMock).toHaveBeenCalledWith({
-        attributeId: 7,
+      expect(submitUpdateSupplierMock).toHaveBeenCalledWith({
+        supplierId: 1,
         value: {
-          name: 'Color',
+          name: 'Fresh Farms',
+          email: 'orders@fresh.example',
+          phone: '+1 555 0100',
+          address: '123 Market St',
+          comment: 'Preferred produce supplier',
         },
       })
     );
     expect(addToastMock).toHaveBeenCalledWith({
-      description: 'Attribute Material was updated',
+      description: 'Supplier Fresh Farms Updated was updated',
       type: 'success',
     });
     expect(onUpdated).toHaveBeenCalled();
   });
 
   it('shows a toast when submit fails with a form-level error', async () => {
-    submitUpdateAttributeMock.mockResolvedValue({
+    submitUpdateSupplierMock.mockResolvedValue({
       ok: false,
       error: {
         fieldErrors: {
-          name: 'Attribute name already exists.',
+          email: 'Supplier email already exists.',
         },
-        formError: 'Attribute update failed.',
+        formError: 'Supplier update failed.',
       },
     });
-    const { onUpdated, submitButton, user } = setupUpdateAttributeFormHook();
+    const { onUpdated, submitButton, user } = setupUpdateSupplierFormHook();
 
     await user.click(submitButton);
 
     await waitFor(() =>
       expect(addToastMock).toHaveBeenCalledWith({
-        description: 'Attribute update failed.',
+        description: 'Supplier update failed.',
         type: 'error',
       })
     );

@@ -1,26 +1,24 @@
 import { useToastManager } from '@ordero/ui';
 import { useForm } from '@tanstack/react-form';
-import { submitUpdateAttribute } from '../utils/submitAction';
+import type { Supplier } from '@/lib/domain/suppliers';
+import { getSupplierDefaultValues } from '../../CreateSupplierDialog/constants';
+import { submitUpdateSupplier } from '../utils/submitAction';
 
-type UseUpdateAttributeFormArgs = {
-  attributeId: string | number;
-  initialName: string;
+type UseUpdateSupplierFormArgs = {
   onUpdated: () => Promise<void> | void;
+  supplier: Supplier;
 };
 
-export const useUpdateAttributeForm = ({
-  attributeId,
-  initialName,
+export const useUpdateSupplierForm = ({
   onUpdated,
-}: UseUpdateAttributeFormArgs) => {
+  supplier,
+}: UseUpdateSupplierFormArgs) => {
   const { add: addToast } = useToastManager();
   const form = useForm({
-    defaultValues: {
-      name: initialName,
-    },
+    defaultValues: getSupplierDefaultValues(supplier),
     onSubmit: async ({ formApi, value }) => {
-      const result = await submitUpdateAttribute({
-        attributeId,
+      const result = await submitUpdateSupplier({
+        supplierId: supplier.id,
         value,
       });
 
@@ -42,7 +40,7 @@ export const useUpdateAttributeForm = ({
       }
 
       addToast({
-        description: `Attribute ${result.data.name} was updated`,
+        description: `Supplier ${result.data.name} was updated`,
         type: 'success',
       });
 

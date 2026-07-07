@@ -1,6 +1,6 @@
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { getSupplier } from '@/lib/client/api/suppliers';
+import { getSupplier, updateSupplier } from '@/lib/client/api/suppliers';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { SupplierDetail } from './SupplierDetail';
 
@@ -9,9 +9,11 @@ vi.mock('@/lib/client/api/suppliers', async () => ({
     '@/lib/client/api/suppliers'
   )),
   getSupplier: vi.fn(),
+  updateSupplier: vi.fn(),
 }));
 
 const getSupplierMock = vi.mocked(getSupplier);
+const updateSupplierMock = vi.mocked(updateSupplier);
 
 const { setup } = prepareStoreSetup({
   component: SupplierDetail,
@@ -23,6 +25,7 @@ const { setup } = prepareStoreSetup({
 describe('SupplierDetail', () => {
   beforeEach(() => {
     getSupplierMock.mockReset();
+    updateSupplierMock.mockReset();
   });
 
   it('requests the supplier when loaded', async () => {
@@ -63,8 +66,8 @@ describe('SupplierDetail', () => {
     expect(screen.getByText('Comment')).toBeVisible();
     expect(screen.getByText('Preferred produce supplier')).toBeVisible();
     expect(
-      screen.queryByRole('button', { name: /edit/i })
-    ).not.toBeInTheDocument();
+      screen.getByRole('button', { name: 'Edit Fresh Farms' })
+    ).toBeVisible();
   });
 
   it('renders a placeholder when optional text is not provided', async () => {

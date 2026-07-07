@@ -20,6 +20,10 @@ type CreateSupplierInput = {
   comment: string;
 };
 
+type UpdateSupplierInput = CreateSupplierInput & {
+  supplierId: string | number;
+};
+
 export const getSuppliersPath = (input?: PaginationSearchInput) =>
   `${CLIENT_BACKEND_PATHS.suppliers}?${getPaginationSearch(input)}`;
 
@@ -41,3 +45,12 @@ export const createSupplier = (input: CreateSupplierInput) =>
     method: 'POST',
     body: input,
   });
+
+export const updateSupplier = ({ supplierId, ...input }: UpdateSupplierInput) =>
+  apiFetch<Supplier>(
+    tokenizePath(CLIENT_BACKEND_PATHS.supplier, { id: supplierId }),
+    {
+      method: 'PATCH',
+      body: input,
+    }
+  );
