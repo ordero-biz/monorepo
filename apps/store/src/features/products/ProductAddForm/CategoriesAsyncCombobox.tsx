@@ -7,6 +7,7 @@ import {
   type AsyncComboboxLoadOptionsResult,
   type AsyncComboboxSingleProps,
 } from '@/lib/components/AsyncCombobox';
+import { categoriesQueryKeys } from '@/lib/query/categories/categoriesQueryKeys';
 
 type CategoriesAsyncComboboxProps = Omit<
   AsyncComboboxSingleProps,
@@ -19,8 +20,7 @@ type CategoriesAsyncComboboxProps = Omit<
 >;
 
 const categoryComboboxQueryKey = [
-  'products',
-  'add',
+  ...categoriesQueryKeys.list,
   'category-combobox',
 ] as const;
 

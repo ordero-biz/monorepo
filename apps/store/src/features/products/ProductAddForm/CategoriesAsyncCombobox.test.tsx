@@ -1,6 +1,7 @@
-import { screen } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getCategories } from '@/lib/client/api/categories';
+import { categoriesQueryKeys } from '@/lib/query/categories/categoriesQueryKeys';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { CategoriesAsyncCombobox } from './CategoriesAsyncCombobox';
 
@@ -30,9 +31,7 @@ describe('CategoriesAsyncCombobox', () => {
     mocks.onValueChange.mockReset();
   });
 
-  it('calls onValueChange when the user picks a category', async () => {
-    const user = userEvent.setup();
-
+  const mockSuccessfulCategories = () => {
     getCategoriesMock.mockResolvedValue({
       ok: true,
       data: {
@@ -53,6 +52,12 @@ describe('CategoriesAsyncCombobox', () => {
         },
       },
     });
+  };
+
+  it('calls onValueChange when the user picks a category', async () => {
+    const user = userEvent.setup();
+
+    mockSuccessfulCategories();
 
     setup();
 
@@ -63,5 +68,22 @@ describe('CategoriesAsyncCombobox', () => {
       '1',
       expect.any(Object)
     );
+  });
+
+  it('refetches when category list queries are invalidated', async () => {
+    const user = userEvent.setup();
+
+    mockSuccessfulCategories();
+    const { queryClient } = setup();
+
+    await user.click(screen.getByRole('combobox', { name: 'Category' }));
+
+    await waitFor(() => expect(getCategoriesMock).toHaveBeenCalledTimes(1));
+
+    await queryClient.invalidateQueries({
+      queryKey: categoriesQueryKeys.list,
+    });
+
+    await waitFor(() => expect(getCategoriesMock).toHaveBeenCalledTimes(2));
   });
 });
