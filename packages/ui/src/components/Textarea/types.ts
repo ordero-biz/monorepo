@@ -2,6 +2,7 @@ import type {
   ChangeEvent,
   FocusEventHandler,
   KeyboardEventHandler,
+  ReactNode,
   Ref,
 } from 'react';
 
@@ -20,9 +21,14 @@ export type TextareaProps = {
   autoFocus?: boolean;
   defaultValue?: string;
   disabled?: boolean;
+  errorIcon?: ReactNode;
+  errorText?: ReactNode;
   focused?: boolean;
+  helperIcon?: ReactNode;
+  helperText?: ReactNode;
   id?: string;
   invalid?: boolean;
+  label?: ReactNode;
   maxLength?: number;
   minLength?: number;
   name?: string;

@@ -5,7 +5,8 @@ import { Field } from '@base-ui/react/field';
 import { Check, ChevronDown } from 'lucide-react';
 import { useId, useMemo, useState } from 'react';
 import { Chip } from '@/ui/components/Chip';
-import { renderFieldLabelContent } from '@/ui/components/shared/renderFieldLabelContent';
+import { FieldHelperText } from '@/ui/components/FieldHelperText';
+import { FieldLabel } from '@/ui/components/FieldLabel';
 import { cn } from '@/ui/lib/utils';
 import type { ComboboxOption, ComboboxProps } from './types';
 
@@ -26,15 +27,6 @@ const inputGroupSizeClassNames = {
     s: 'min-h-[var(--textfield-sm-height)]',
   },
 } as const;
-
-const labelClassName =
-  'mb-[6px] text-[length:var(--input-label-size-desktop)] leading-[var(--input-label-line-height-desktop)] font-[var(--input-label-weight)]';
-
-const helperTextClassName =
-  'flex items-start gap-[var(--form-helper-text-spacing)] pl-[var(--form-helper-text-pl)] pt-[var(--form-helper-text-pt)] text-[length:var(--caption-size-desktop)] leading-[var(--caption-line-height-desktop)] font-[var(--caption-weight)]';
-
-const helperIconClassName =
-  'mt-px shrink-0 [&_svg]:size-[var(--form-helper-text-icon)]';
 
 const adornmentClassName =
   'flex shrink-0 items-center justify-center leading-none text-[length:var(--input-value-size-desktop)] font-[var(--input-value-weight)]';
@@ -82,30 +74,6 @@ const iconSizeClassNames = {
   m: 'size-[20px]',
   s: 'size-[18px]',
 } as const;
-
-const getLabelColorClassName = ({
-  active,
-  disabled,
-  invalid,
-}: {
-  active: boolean;
-  disabled: boolean;
-  invalid: boolean;
-}) => {
-  if (disabled) {
-    return 'text-[var(--text-disabled)]';
-  }
-
-  if (invalid) {
-    return 'text-destructive';
-  }
-
-  if (active) {
-    return 'text-foreground';
-  }
-
-  return 'text-[var(--text-secondary)]';
-};
 
 const getComboboxStateClassName = ({
   active,
@@ -171,19 +139,6 @@ const getOptionText = (option: ComboboxOption | undefined, value: string) => {
   return option.value;
 };
 
-const renderSupportText = ({
-  icon,
-  text,
-}: {
-  icon?: ComboboxProps['helperIcon'];
-  text: ComboboxProps['helperText'];
-}) => (
-  <>
-    {icon ? <span className={helperIconClassName}>{icon}</span> : null}
-    <span className="min-w-0 flex-1">{text}</span>
-  </>
-);
-
 export const Combobox = (props: ComboboxProps) => {
   const {
     'aria-describedby': ariaDescribedBy,
@@ -228,11 +183,15 @@ export const Combobox = (props: ComboboxProps) => {
     variant = 'outlined',
   } = props;
   const multiple = props.multiple ?? false;
+  const generatedLabelId = useId();
   const supportTextId = useId();
   const [focused, setFocused] = useState(false);
   const [openState, setOpenState] = useState(defaultOpen ?? false);
   const hasErrorText = Boolean(invalid && errorText);
   const hasHelperText = Boolean(helperText);
+  const labelId = label && !ariaLabel ? `${generatedLabelId}-label` : undefined;
+  const labelledBy =
+    [ariaLabelledBy, labelId].filter(Boolean).join(' ') || undefined;
   const describedBy =
     [ariaDescribedBy, hasErrorText || hasHelperText ? supportTextId : undefined]
       .filter(Boolean)
@@ -249,7 +208,7 @@ export const Combobox = (props: ComboboxProps) => {
       ref={ref}
       aria-describedby={describedBy}
       aria-label={ariaLabel}
-      aria-labelledby={ariaLabelledBy}
+      aria-labelledby={labelledBy}
       autoFocus={autoFocus}
       className={cn(inputClassName, getTextColorClassName({ disabled }))}
       disabled={disabled}
@@ -490,42 +449,36 @@ export const Combobox = (props: ComboboxProps) => {
       invalid={invalid}
     >
       {label ? (
-        <Field.Label
-          className={cn(
-            labelClassName,
-            getLabelColorClassName({
-              active: isActive,
-              disabled,
-              invalid,
-            })
-          )}
+        <FieldLabel
+          active={isActive}
+          disabled={disabled}
+          id={labelId}
+          invalid={invalid}
+          required={required}
         >
-          {renderFieldLabelContent({ label, required })}
-        </Field.Label>
+          {label}
+        </FieldLabel>
       ) : null}
       {root}
       {hasErrorText ? (
-        <Field.Error
-          className={cn(helperTextClassName, 'text-destructive')}
+        <FieldHelperText
+          as="field-error"
+          icon={errorIcon}
           id={supportTextId}
+          invalid
           match={true}
         >
-          {renderSupportText({
-            icon: errorIcon,
-            text: errorText,
-          })}
-        </Field.Error>
+          {errorText}
+        </FieldHelperText>
       ) : null}
       {hasHelperText && !hasErrorText ? (
-        <Field.Description
-          className={cn(helperTextClassName, 'text-text-secondary')}
+        <FieldHelperText
+          as="field-description"
+          icon={helperIcon}
           id={supportTextId}
         >
-          {renderSupportText({
-            icon: helperIcon,
-            text: helperText,
-          })}
-        </Field.Description>
+          {helperText}
+        </FieldHelperText>
       ) : null}
     </Field.Root>
   );

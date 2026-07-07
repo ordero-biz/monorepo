@@ -30,6 +30,7 @@ export type ToggleButtonGroupProps = {
   defaultValue?: readonly string[];
   disabled?: boolean;
   id?: string;
+  label?: ReactNode;
   loopFocus?: boolean;
   multiple?: boolean;
   onValueChange?: (

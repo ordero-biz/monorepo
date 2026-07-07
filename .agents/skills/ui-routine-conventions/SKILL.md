@@ -190,6 +190,7 @@ For shared UI work across `packages` and `apps`:
 - prefer semantic HTML elements over generic `div` and `span` wrappers when the content has clear structural meaning such as navigation, lists, sections, headers, footers, or other landmark/sectioning roles
 - use non-semantic wrappers only when semantic elements would be incorrect for the content or when a library primitive constrains the rendered element
 - prefer Base UI primitives/components whenever a matching primitive/component exists
+- for field labels, use `Field.Label` when the label is inside a Base UI field context; use a native `label` with `htmlFor` when explicitly labeling a control outside that context; use non-label text such as `span` or `div` only for section headings or display text that should not label a control
 - prefer explicit component props for design-system components
 - do not expose `className` on shared `packages/ui` components
 - keep stories and tests aligned with the public API, not internal structure
