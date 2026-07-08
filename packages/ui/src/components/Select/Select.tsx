@@ -178,7 +178,6 @@ export const Select = (props: SelectProps) => {
     'aria-describedby': ariaDescribedBy,
     'aria-label': ariaLabel,
     'aria-labelledby': ariaLabelledBy,
-    alignItemWithTrigger,
     autoComplete,
     defaultOpen,
     disabled = false,
@@ -232,7 +231,6 @@ export const Select = (props: SelectProps) => {
     [options]
   );
   const isActive = focused || open;
-  const shouldAlignItemWithTrigger = alignItemWithTrigger ?? !multiple;
   const selectContent = (
     <>
       <SelectPrimitive.Trigger
@@ -310,8 +308,9 @@ export const Select = (props: SelectProps) => {
       <SelectPrimitive.Portal>
         <SelectPrimitive.Positioner
           align="start"
-          alignItemWithTrigger={shouldAlignItemWithTrigger}
+          alignItemWithTrigger={false}
           className="z-50 min-w-[var(--anchor-width)]"
+          sideOffset={4}
         >
           <SelectPrimitive.Popup className={popupClassName}>
             <SelectPrimitive.List className={listClassName}>
