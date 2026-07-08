@@ -17,9 +17,9 @@ import { useRouter } from 'next/navigation';
 import { useMemo, useState } from 'react';
 import { clientRoutes } from '@/lib/client/routes';
 import { useAttributesQuery } from '@/lib/hooks/attributes/useAttributesQuery';
-import { useProductsCategoriesSelectQuery } from '@/lib/hooks/products/useProductsCategoriesSelectQuery';
 import { productsQueryKeys } from '@/lib/query/products/productsQueryKeys';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
+import { CategoriesAsyncCombobox } from './CategoriesAsyncCombobox';
 import { PRODUCT_GENERATION_MODE } from './constants';
 import { useCreateProductForm } from './hooks/useCreateProductForm';
 import type { ProductGenerationMode } from './types';
@@ -31,7 +31,6 @@ export const ProductAddForm = () => {
     PRODUCT_GENERATION_MODE.one
   );
   const isMultipleProducts = generationMode === PRODUCT_GENERATION_MODE.many;
-  const categoriesQuery = useProductsCategoriesSelectQuery();
   const attributesQuery = useAttributesQuery();
   const attributeOptions = useMemo(
     () =>
@@ -93,27 +92,15 @@ export const ProductAddForm = () => {
                       const errorText = getFieldSubmitChangeErrorText(
                         field.state.meta
                       );
-                      const categoryErrorText = categoriesQuery.isError
-                        ? "We couldn't load categories right now."
-                        : errorText;
 
                       return (
-                        <Select
-                          disabled={categoriesQuery.isPending}
-                          errorText={categoryErrorText}
-                          helperText={
-                            categoriesQuery.isPending
-                              ? 'Loading categories...'
-                              : undefined
-                          }
-                          invalid={
-                            categoriesQuery.isError || Boolean(errorText)
-                          }
+                        <CategoriesAsyncCombobox
+                          errorText={errorText}
+                          invalid={Boolean(errorText)}
                           label="Category"
                           name={field.name}
                           onBlur={field.handleBlur}
                           onValueChange={field.handleChange}
-                          options={categoriesQuery.categoryOptions}
                           placeholder="Select category"
                           size="s"
                           value={field.state.value}
@@ -149,8 +136,8 @@ export const ProductAddForm = () => {
                           errorText={attributesErrorText}
                           helperText={
                             isMultipleProducts
-                              ? 'You must select attributes to generate multiple products. (e.g., Size, Color)'
-                              : 'Optional: Select attributes to add characteristics that will be the same for this single product'
+                              ? 'You must select attributes to generate multiple products'
+                              : 'Optional: Add attributes for a single product'
                           }
                           invalid={Boolean(attributesErrorText)}
                           label="Attributes"

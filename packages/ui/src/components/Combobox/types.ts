@@ -18,6 +18,8 @@ export type ComboboxOption = {
   value: string;
 };
 
+export type ComboboxChangeEventDetails = ComboboxRoot.ChangeEventDetails;
+
 type ComboboxCommonProps = {
   'aria-describedby'?: string;
   'aria-label'?: string;
@@ -47,14 +49,11 @@ type ComboboxCommonProps = {
   onFocus?: FocusEventHandler<HTMLInputElement>;
   onInputValueChange?: (
     value: string,
-    details: ComboboxRoot.ChangeEventDetails
+    details: ComboboxChangeEventDetails
   ) => void;
   onKeyDown?: KeyboardEventHandler<HTMLInputElement>;
   onListScroll?: UIEventHandler<HTMLDivElement>;
-  onOpenChange?: (
-    open: boolean,
-    details: ComboboxRoot.ChangeEventDetails
-  ) => void;
+  onOpenChange?: (open: boolean, details: ComboboxChangeEventDetails) => void;
   open?: boolean;
   options: ComboboxOption[];
   placeholder?: string;
@@ -72,7 +71,7 @@ export type ComboboxSingleProps = ComboboxCommonProps & {
   multiple?: false;
   onValueChange?: (
     value: string | null,
-    details: ComboboxRoot.ChangeEventDetails
+    details: ComboboxChangeEventDetails
   ) => void;
   value?: string | null;
 };
@@ -82,7 +81,7 @@ export type ComboboxMultipleProps = ComboboxCommonProps & {
   multiple: true;
   onValueChange?: (
     value: string[],
-    details: ComboboxRoot.ChangeEventDetails
+    details: ComboboxChangeEventDetails
   ) => void;
   value?: string[];
 };

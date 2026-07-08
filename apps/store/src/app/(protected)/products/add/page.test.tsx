@@ -1,8 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { getCategories } from '@/lib/client/api/categories';
 import { useAttributesQuery } from '@/lib/hooks/attributes/useAttributesQuery';
-import { productsCategoriesQueryInput } from '@/lib/hooks/products/productsCategoriesQueryConfig';
-import { getServerCategories } from '@/lib/server/api/categories';
 import {
   createTestQueryClient,
   createTestQueryProvider,
@@ -17,20 +16,23 @@ vi.mock('next/navigation', () => ({
   }),
 }));
 
-vi.mock('@/lib/server/api/categories', () => ({
-  getServerCategories: vi.fn(),
+vi.mock('@/lib/client/api/categories', async () => ({
+  ...(await vi.importActual<typeof import('@/lib/client/api/categories')>(
+    '@/lib/client/api/categories'
+  )),
+  getCategories: vi.fn(),
 }));
 
 vi.mock('@/lib/hooks/attributes/useAttributesQuery', () => ({
   useAttributesQuery: vi.fn(),
 }));
 
-const getServerCategoriesMock = vi.mocked(getServerCategories);
+const getCategoriesMock = vi.mocked(getCategories);
 const useAttributesQueryMock = vi.mocked(useAttributesQuery);
 
 describe('AddProductPage', () => {
   beforeEach(() => {
-    getServerCategoriesMock.mockReset();
+    getCategoriesMock.mockReset();
     useAttributesQueryMock.mockReset();
     routerPushMock.mockReset();
   });
@@ -40,7 +42,7 @@ describe('AddProductPage', () => {
     const queryClient = createTestQueryClient();
     const TestQueryProvider = createTestQueryProvider(queryClient);
 
-    getServerCategoriesMock.mockResolvedValue({
+    getCategoriesMock.mockResolvedValue({
       ok: true,
       data: {
         content: [
@@ -75,25 +77,24 @@ describe('AddProductPage', () => {
       isPending: false,
     } as never);
 
-    render(await AddProductPage(), {
+    render(<AddProductPage />, {
       wrapper: TestQueryProvider,
     });
 
     expect(
       screen.getByRole('heading', { name: 'Create product template' })
     ).toBeVisible();
-    expect(getServerCategoriesMock).toHaveBeenCalledWith(
-      productsCategoriesQueryInput
-    );
+    expect(getCategoriesMock).not.toHaveBeenCalled();
     expect(
       screen.getByRole('textbox', { name: 'Base product name' })
     ).toHaveValue('');
     expect(screen.getByRole('textbox', { name: 'Description' })).toHaveValue(
       ''
     );
-    expect(
-      screen.getByRole('combobox', { name: 'Category' })
-    ).toHaveTextContent('Select category');
+    expect(screen.getByRole('combobox', { name: 'Category' })).toHaveAttribute(
+      'placeholder',
+      'Select category'
+    );
     expect(
       screen.getByRole('combobox', { name: 'Attributes' })
     ).toHaveTextContent('Select attributes');
@@ -109,10 +110,6 @@ describe('AddProductPage', () => {
     expect(
       screen.getByRole('button', { name: 'Multiple products' })
     ).toHaveAttribute('aria-pressed', 'false');
-
-    await user.click(screen.getByRole('combobox', { name: 'Category' }));
-
-    expect(screen.getByRole('option', { name: 'Shoes' })).toBeVisible();
     expect(
       screen.getByRole('button', { name: 'Add product image' })
     ).toBeVisible();
@@ -123,6 +120,19 @@ describe('AddProductPage', () => {
       screen.getByText('You will proceed to configure 1 product')
     ).toBeVisible();
 
+    await user.click(screen.getByRole('combobox', { name: 'Category' }));
+
+    expect(getCategoriesMock).toHaveBeenCalledWith({
+      page: 0,
+      size: 100,
+      sort: ['name,asc'],
+    });
+
+    const shoesOption = await screen.findByRole('option', { name: 'Shoes' });
+
+    expect(shoesOption).toBeVisible();
+
+    await user.click(shoesOption);
     await user.click(screen.getByRole('button', { name: 'Multiple products' }));
 
     expect(

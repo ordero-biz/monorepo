@@ -106,6 +106,63 @@ Common controls can be moved into `packages/ui` as shared presentational compone
 
 Keep the component in the local feature if it requires knowledge of TanStack Form state, submit state, schema knowledge, or backend response formats.
 
+### Combobox Fields
+
+Use `Select` for short, fixed option sets where search is not needed. Use
+`Combobox` for searchable options, textbox-style filtering, or multiple
+selection with chips.
+
+Wire form-owned combobox fields through ordinary controlled props:
+
+```tsx
+<Combobox
+  errorText={errorText}
+  invalid={Boolean(errorText)}
+  label="Category"
+  name={field.name}
+  onBlur={field.handleBlur}
+  onValueChange={field.handleChange}
+  options={categoryOptions}
+  placeholder="Select category"
+  size="s"
+  value={field.state.value}
+/>
+```
+
+Use `value: string | null` for single selection. Use `multiple={true}` with a
+`string[]` value for multiple selection.
+
+For request-backed option lists, create a feature-owned or app-owned resource
+wrapper such as `CategoriesAsyncCombobox` instead of putting request/query logic
+directly inside the form markup. The wrapper should own:
+
+- the request helper and option mapping
+- pagination, sorting, filters, and page size
+- loading, empty, and load-error copy
+- the TanStack Query key used for the option cache
+
+Keep the query key under the same resource prefix used for invalidation, then
+add a component-specific segment so option data does not collide with list-page
+data:
+
+```ts
+const categoryComboboxQueryKey = [
+  ...categoriesQueryKeys.list,
+  'category-combobox',
+] as const;
+```
+
+Include request parameters that can vary, such as page size, filters, or sort,
+in the key. Fixed wrapper-owned parameters can stay in the wrapper, but the key
+should still be resource-aligned so
+`invalidateQueries({ queryKey: categoriesQueryKeys.list })` refreshes category
+option caches after category writes.
+
+When a wrapper intentionally forwards props explicitly instead of using
+`{...props}`, forward every retained `Combobox` prop. This includes form and
+accessibility props (`name`, `onBlur`, `aria-label`, `aria-labelledby`,
+`aria-describedby`) and visual props such as `size` and `variant`.
+
 ## Form Hook Tests
 
 Use the app-local `prepareFormHookTestSetup` helper when a hook test only needs

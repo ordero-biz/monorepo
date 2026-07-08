@@ -1,7 +1,6 @@
 'use client';
 
 import { Button, PageHeader, Typography } from '@ordero/ui';
-import { Plus } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { clientRoutes } from '@/lib/client/routes';
 

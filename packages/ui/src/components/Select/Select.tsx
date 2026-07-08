@@ -64,7 +64,7 @@ const listClassName =
   'flex flex-col gap-[var(--menu-list-spacing)] rounded-[calc(var(--radius)-4px)]';
 
 const itemClassName =
-  'flex h-[36px] w-full cursor-pointer items-center rounded-[var(--radius)] text-left outline-none transition-[background-color,color] data-[highlighted]:bg-[var(--color-grey-8)] data-[selected]:bg-[var(--color-grey-16)]';
+  'group/select-item flex h-[36px] w-full cursor-pointer items-center rounded-[var(--radius)] text-left outline-none transition-[background-color,color] data-[highlighted]:bg-[var(--color-grey-8)] data-[selected]:bg-[var(--color-grey-16)]';
 
 const itemPaddingClassNames = {
   outlined: 'px-[10px]',
@@ -80,7 +80,7 @@ const itemIndicatorClassName =
   'mr-[var(--menu-list-spacing)] flex shrink-0 items-center';
 
 const itemTextClassName =
-  'min-w-0 flex-1 truncate text-[length:var(--body2-size-desktop)] leading-[var(--body2-line-height-desktop)] font-[var(--body2-weight)] text-[var(--text-secondary)] data-[selected]:font-[var(--font-weight-600)] data-[selected]:text-foreground';
+  'min-w-0 flex-1 truncate text-[length:var(--body2-size-desktop)] leading-[var(--body2-line-height-desktop)] font-[var(--body2-weight)] text-[var(--text-primary)] group-data-[selected]/select-item:font-[var(--font-weight-600)]';
 
 const iconSizeClassNames = {
   m: 'size-[20px]',
@@ -178,7 +178,6 @@ export const Select = (props: SelectProps) => {
     'aria-describedby': ariaDescribedBy,
     'aria-label': ariaLabel,
     'aria-labelledby': ariaLabelledBy,
-    alignItemWithTrigger,
     autoComplete,
     defaultOpen,
     disabled = false,
@@ -232,7 +231,6 @@ export const Select = (props: SelectProps) => {
     [options]
   );
   const isActive = focused || open;
-  const shouldAlignItemWithTrigger = alignItemWithTrigger ?? !multiple;
   const selectContent = (
     <>
       <SelectPrimitive.Trigger
@@ -310,8 +308,9 @@ export const Select = (props: SelectProps) => {
       <SelectPrimitive.Portal>
         <SelectPrimitive.Positioner
           align="start"
-          alignItemWithTrigger={shouldAlignItemWithTrigger}
+          alignItemWithTrigger={false}
           className="z-50 min-w-[var(--anchor-width)]"
+          sideOffset={4}
         >
           <SelectPrimitive.Popup className={popupClassName}>
             <SelectPrimitive.List className={listClassName}>

@@ -49,7 +49,7 @@ const listClassName =
   'flex max-h-[min(var(--available-height),320px)] flex-col gap-[var(--menu-list-spacing)] overflow-y-auto rounded-[calc(var(--radius)-4px)]';
 
 const itemClassName =
-  'flex h-[36px] w-full cursor-pointer items-center rounded-[var(--radius)] text-left outline-none transition-[background-color,color] hover:bg-[var(--color-grey-8)] data-[highlighted]:bg-[var(--color-grey-8)] data-[selected]:bg-[var(--color-grey-16)] data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50 data-[disabled]:hover:bg-transparent';
+  'group/combobox-item flex h-[36px] w-full cursor-pointer items-center rounded-[var(--radius)] text-left outline-none transition-[background-color,color] hover:bg-[var(--color-grey-8)] data-[highlighted]:bg-[var(--color-grey-8)] data-[selected]:bg-[var(--color-grey-16)] data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50 data-[disabled]:hover:bg-transparent';
 
 const itemPaddingClassNames = {
   outlined: 'px-[10px]',
@@ -60,7 +60,7 @@ const itemIndicatorClassName =
   'mr-[var(--menu-list-spacing)] flex size-[20px] shrink-0 items-center justify-center opacity-0 transition-opacity data-[selected]:opacity-100 [&_svg]:size-[16px]';
 
 const itemTextClassName =
-  'min-w-0 flex-1 truncate text-[length:var(--body2-size-desktop)] leading-[var(--body2-line-height-desktop)] font-[var(--body2-weight)] text-[var(--text-secondary)] data-[selected]:font-[var(--font-weight-600)] data-[selected]:text-foreground';
+  'min-w-0 flex-1 truncate text-[length:var(--body2-size-desktop)] leading-[var(--body2-line-height-desktop)] font-[var(--body2-weight)] text-[var(--text-primary)] group-data-[selected]/combobox-item:font-[var(--font-weight-600)]';
 
 const statusClassName =
   'px-[8px] py-[var(--space-1)] text-[length:var(--body2-size-desktop)] leading-[var(--body2-line-height-desktop)] font-[var(--body2-weight)] text-[var(--text-secondary)]';
@@ -293,22 +293,7 @@ export const Combobox = (props: ComboboxProps) => {
                 <Check aria-hidden="true" />
               </ComboboxPrimitive.ItemIndicator>
             ) : null}
-            <ComboboxPrimitive.Value>
-              {(selectedValue: string | string[] | null) => (
-                <span
-                  className={cn(
-                    itemTextClassName,
-                    Array.isArray(selectedValue)
-                      ? selectedValue.includes(option.value) &&
-                          'font-[var(--font-weight-600)] text-foreground'
-                      : selectedValue === option.value &&
-                          'font-[var(--font-weight-600)] text-foreground'
-                  )}
-                >
-                  {option.label}
-                </span>
-              )}
-            </ComboboxPrimitive.Value>
+            <span className={itemTextClassName}>{option.label}</span>
           </ComboboxPrimitive.Item>
         )}
       </ComboboxPrimitive.List>
