@@ -4,6 +4,7 @@ import {
   deleteAttributeValues,
   getAttribute,
   getAttributes,
+  getAttributesPath,
   getAttributeValues,
   updateAttribute,
   updateAttributeValue,
@@ -16,6 +17,18 @@ describe('attribute client helpers', () => {
 
   afterEach(() => {
     vi.unstubAllGlobals();
+  });
+
+  it('builds attribute pageable search params', () => {
+    expect(
+      getAttributesPath({
+        page: 2,
+        size: 10,
+        sort: ['name,asc', 'createdAt,desc'],
+      })
+    ).toBe(
+      '/api/backend/api/v1/attributes?page=2&size=10&sort=name%2Casc&sort=createdAt%2Cdesc'
+    );
   });
 
   it('gets attributes from the backend proxy on success', async () => {
@@ -33,7 +46,7 @@ describe('attribute client helpers', () => {
             },
           ],
           page: {
-            size: 25,
+            size: 10,
             number: 0,
             totalElements: 1,
             totalPages: 1,
@@ -54,7 +67,7 @@ describe('attribute client helpers', () => {
           },
         ],
         page: {
-          size: 25,
+          size: 10,
           number: 0,
           totalElements: 1,
           totalPages: 1,
@@ -63,7 +76,39 @@ describe('attribute client helpers', () => {
     });
 
     expect(fetchMock).toHaveBeenCalledWith(
-      '/api/backend/api/v1/attributes',
+      '/api/backend/api/v1/attributes?page=0&size=10',
+      expect.objectContaining({
+        method: 'GET',
+        cache: 'no-store',
+      })
+    );
+  });
+
+  it('gets attributes with pagination search params', async () => {
+    const fetchMock = vi.mocked(fetch);
+
+    fetchMock.mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          content: [],
+          page: {
+            size: 10,
+            number: 2,
+            totalElements: 0,
+            totalPages: 0,
+          },
+        })
+      )
+    );
+
+    await getAttributes({
+      page: 2,
+      size: 10,
+      sort: ['name,asc'],
+    });
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/backend/api/v1/attributes?page=2&size=10&sort=name%2Casc',
       expect.objectContaining({
         method: 'GET',
         cache: 'no-store',

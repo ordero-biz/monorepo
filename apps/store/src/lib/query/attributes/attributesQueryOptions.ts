@@ -2,11 +2,14 @@ import type { ApiResult } from '@ordero/api-types';
 import { queryOptions } from '@tanstack/react-query';
 import type { Attribute, AttributeValue } from '@/lib/domain/attributes';
 import type { PaginatedResponse } from '@/lib/server/types';
+import type { PaginationSearchInput } from '@/lib/utils/url';
 import { attributesQueryKeys } from './attributesQueryKeys';
 
 type AttributeId = string | number;
 
-type AttributesFetcher = () => Promise<ApiResult<PaginatedResponse<Attribute>>>;
+type AttributesFetcher = (
+  input?: PaginationSearchInput
+) => Promise<ApiResult<PaginatedResponse<Attribute>>>;
 
 type AttributeFetcher = (
   attributeId: AttributeId
@@ -27,11 +30,12 @@ const unwrapApiResult = async <T>(request: Promise<ApiResult<T>>) => {
 };
 
 export const attributesListQueryOptions = (
-  fetchAttributes: AttributesFetcher
+  fetchAttributes: AttributesFetcher,
+  input?: PaginationSearchInput
 ) =>
   queryOptions({
-    queryKey: attributesQueryKeys.list,
-    queryFn: () => unwrapApiResult(fetchAttributes()),
+    queryKey: attributesQueryKeys.listPage(input),
+    queryFn: () => unwrapApiResult(fetchAttributes(input)),
   });
 
 export const attributeQueryOptions = (

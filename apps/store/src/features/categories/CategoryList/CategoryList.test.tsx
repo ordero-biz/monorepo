@@ -73,7 +73,7 @@ describe('CategoryList', () => {
             },
           ],
           page: {
-            size: 25,
+            size: 10,
             number: 0,
             totalElements: 1,
             totalPages: 1,
@@ -114,7 +114,7 @@ describe('CategoryList', () => {
           },
         ],
         page: {
-          size: 25,
+          size: 10,
           number: 0,
           totalElements: 1,
           totalPages: 1,
@@ -173,7 +173,7 @@ describe('CategoryList', () => {
       data: {
         content: [],
         page: {
-          size: 25,
+          size: 10,
           number: 0,
           totalElements: 0,
           totalPages: 0,
@@ -219,7 +219,7 @@ describe('CategoryList', () => {
       data: {
         content: [],
         page: {
-          size: 25,
+          size: 10,
           number: 0,
           totalElements: 51,
           totalPages: 3,
@@ -232,7 +232,7 @@ describe('CategoryList', () => {
     setup({
       paginationInput: {
         page: 0,
-        size: 25,
+        size: 10,
         sort: ['name,asc'],
       },
     });

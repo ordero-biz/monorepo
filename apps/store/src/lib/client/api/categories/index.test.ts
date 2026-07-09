@@ -42,7 +42,7 @@ describe('category client helpers', () => {
             },
           ],
           page: {
-            size: 25,
+            size: 10,
             number: 0,
             totalElements: 1,
             totalPages: 1,
@@ -69,7 +69,7 @@ describe('category client helpers', () => {
           },
         ],
         page: {
-          size: 25,
+          size: 10,
           number: 0,
           totalElements: 1,
           totalPages: 1,
@@ -78,7 +78,7 @@ describe('category client helpers', () => {
     });
 
     expect(fetchMock).toHaveBeenCalledWith(
-      '/api/backend/api/v1/categories?page=0&size=25',
+      '/api/backend/api/v1/categories?page=0&size=10',
       expect.objectContaining({
         method: 'GET',
         cache: 'no-store',

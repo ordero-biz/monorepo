@@ -45,7 +45,7 @@ describe('supplier server helpers', () => {
         },
       ],
       page: {
-        size: 25,
+        size: 10,
         number: 0,
         totalElements: 1,
         totalPages: 1,
@@ -65,7 +65,7 @@ describe('supplier server helpers', () => {
 
     expect(fetchBackendResponseMock).toHaveBeenCalledWith({
       path: '/api/v1/suppliers',
-      search: 'page=0&size=25',
+      search: 'page=0&size=10',
       token: 'server-token',
       init: {
         method: 'GET',

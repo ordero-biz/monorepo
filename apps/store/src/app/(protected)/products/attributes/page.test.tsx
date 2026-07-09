@@ -1,73 +1,133 @@
-import { screen } from '@testing-library/react';
-import { getAttributes } from '@/lib/client/api/attributes';
-import { getAttributeDetailRoute } from '@/lib/client/routes';
-import { prepareStoreSetup } from '@/test/prepareSetup';
+import { render, screen } from '@testing-library/react';
+import { attributesQueryKeys } from '@/lib/query/attributes/attributesQueryKeys';
+import { getServerAttributes } from '@/lib/server/api/attributes';
+import type { PaginationSearchInput } from '@/lib/utils/url';
+import {
+  createTestQueryClient,
+  createTestQueryProvider,
+} from '@/test/prepareSetup';
 import AttributesPage from './page';
 
-const routerPushMock = vi.fn();
+const attributesListMock = vi.hoisted(() => vi.fn());
 
-vi.mock('next/navigation', () => ({
-  useRouter: () => ({
-    push: routerPushMock,
-  }),
+vi.mock('@/features/attributes/AttributesList/AttributesList', () => ({
+  AttributesList: (props: { paginationInput?: PaginationSearchInput }) => {
+    attributesListMock(props);
+
+    return <div>Attributes list</div>;
+  },
 }));
 
-vi.mock('@/lib/client/api/attributes', async () => ({
-  ...(await vi.importActual<typeof import('@/lib/client/api/attributes')>(
-    '@/lib/client/api/attributes'
-  )),
-  getAttributes: vi.fn(),
+vi.mock('@/features/attributes/AttributesList/AttributesListHeader', () => ({
+  AttributesListHeader: () => <div>Attributes header</div>,
 }));
 
-const getAttributesMock = vi.mocked(getAttributes);
+vi.mock('@/lib/server/api/attributes', () => ({
+  getServerAttributes: vi.fn(),
+}));
 
-const { setup } = prepareStoreSetup({
-  component: AttributesPage,
-});
+const getServerAttributesMock = vi.mocked(getServerAttributes);
 
 describe('AttributesPage', () => {
   beforeEach(() => {
-    getAttributesMock.mockReset();
-    routerPushMock.mockClear();
+    getServerAttributesMock.mockReset();
+    attributesListMock.mockReset();
   });
 
-  it('renders the attributes route with create action and loaded attributes', async () => {
-    getAttributesMock.mockResolvedValue({
-      ok: true,
-      data: {
-        content: [
-          {
-            id: 1,
-            name: 'Size',
-            sortOrder: 10,
-            values: ['S', 'M', 'L'],
-            createdAt: '2026-05-26T20:55:51.542Z',
-          },
-        ],
-        page: {
-          size: 25,
-          number: 0,
-          totalElements: 1,
-          totalPages: 1,
+  it('prefetches attributes and hydrates the query cache', async () => {
+    const attributes = {
+      content: [
+        {
+          id: 1,
+          name: 'Size',
+          sortOrder: 10,
+          values: ['S', 'M', 'L'],
+          createdAt: '2026-05-26T20:55:51.542Z',
         },
+      ],
+      page: {
+        size: 10,
+        number: 0,
+        totalElements: 1,
+        totalPages: 1,
       },
+    };
+    const queryClient = createTestQueryClient();
+    const TestQueryProvider = createTestQueryProvider(queryClient);
+
+    getServerAttributesMock.mockResolvedValue({
+      ok: true,
+      data: attributes,
     });
 
-    setup();
+    render(await AttributesPage(), {
+      wrapper: TestQueryProvider,
+    });
 
+    expect(screen.getByText('Attributes header')).toBeVisible();
+    expect(screen.getByText('Attributes list')).toBeVisible();
+    expect(getServerAttributesMock).toHaveBeenCalledWith({
+      page: 0,
+      size: 10,
+    });
+    expect(attributesListMock).toHaveBeenCalledWith({
+      paginationInput: {
+        page: 0,
+        size: 10,
+      },
+    });
     expect(
-      screen.getByRole('heading', { name: 'Attributes list' })
-    ).toBeVisible();
-    expect(
-      screen.getByRole('button', { name: 'Create Attribute' })
-    ).toBeVisible();
-    expect(
-      await screen.findByRole('table', { name: 'Attributes list' })
-    ).toBeVisible();
-    expect(screen.getByRole('link', { name: 'Size' })).toHaveAttribute(
-      'href',
-      getAttributeDetailRoute(1)
+      queryClient.getQueryData(
+        attributesQueryKeys.listPage({
+          page: 0,
+          size: 10,
+        })
+      )
+    ).toEqual(attributes);
+  });
+
+  it('prefetches attributes with pagination from the URL search params', async () => {
+    const attributes = {
+      content: [],
+      page: {
+        size: 10,
+        number: 2,
+        totalElements: 0,
+        totalPages: 0,
+      },
+    };
+    const paginationInput = {
+      page: 2,
+      size: 10,
+      sort: ['name,asc', 'createdAt,desc'],
+    };
+    const queryClient = createTestQueryClient();
+    const TestQueryProvider = createTestQueryProvider(queryClient);
+
+    getServerAttributesMock.mockResolvedValue({
+      ok: true,
+      data: attributes,
+    });
+
+    render(
+      await AttributesPage({
+        searchParams: Promise.resolve({
+          page: '2',
+          size: '10',
+          sort: ['name,asc', 'createdAt,desc'],
+        }),
+      }),
+      {
+        wrapper: TestQueryProvider,
+      }
     );
-    expect(screen.getByText('26 May 2026')).toBeVisible();
+
+    expect(getServerAttributesMock).toHaveBeenCalledWith(paginationInput);
+    expect(attributesListMock).toHaveBeenCalledWith({
+      paginationInput,
+    });
+    expect(
+      queryClient.getQueryData(attributesQueryKeys.listPage(paginationInput))
+    ).toEqual(attributes);
   });
 });
