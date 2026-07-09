@@ -4,6 +4,20 @@ import { getWarehouses } from '@/lib/client/api/warehouses';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { WarehousesList } from './WarehousesList';
 
+const mocks = vi.hoisted(() => ({
+  pathname: '/products/warehouse',
+  push: vi.fn(),
+  searchParams: new URLSearchParams(),
+}));
+
+vi.mock('next/navigation', () => ({
+  usePathname: () => mocks.pathname,
+  useRouter: () => ({
+    push: mocks.push,
+  }),
+  useSearchParams: () => mocks.searchParams,
+}));
+
 vi.mock('@/lib/client/api/warehouses', async () => ({
   ...(await vi.importActual<typeof import('@/lib/client/api/warehouses')>(
     '@/lib/client/api/warehouses'
@@ -20,6 +34,8 @@ const { setup } = prepareStoreSetup({
 describe('WarehousesList', () => {
   beforeEach(() => {
     getWarehousesMock.mockReset();
+    mocks.push.mockReset();
+    mocks.searchParams = new URLSearchParams();
   });
 
   it('renders a loading state while warehouses are loading', () => {
@@ -52,7 +68,7 @@ describe('WarehousesList', () => {
             },
           ],
           page: {
-            size: 25,
+            size: 10,
             number: 0,
             totalElements: 1,
             totalPages: 1,
@@ -88,7 +104,7 @@ describe('WarehousesList', () => {
           },
         ],
         page: {
-          size: 25,
+          size: 10,
           number: 0,
           totalElements: 1,
           totalPages: 1,

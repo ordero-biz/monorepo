@@ -1,9 +1,23 @@
-import { screen } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getAttributes } from '@/lib/client/api/attributes';
 import { getAttributeDetailRoute } from '@/lib/client/routes';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { AttributesList } from './AttributesList';
+
+const mocks = vi.hoisted(() => ({
+  pathname: '/products/attributes',
+  push: vi.fn(),
+  searchParams: new URLSearchParams(),
+}));
+
+vi.mock('next/navigation', () => ({
+  usePathname: () => mocks.pathname,
+  useRouter: () => ({
+    push: mocks.push,
+  }),
+  useSearchParams: () => mocks.searchParams,
+}));
 
 vi.mock('@/lib/client/api/attributes', async () => ({
   ...(await vi.importActual<typeof import('@/lib/client/api/attributes')>(
@@ -21,6 +35,8 @@ const { setup } = prepareStoreSetup({
 describe('AttributesList', () => {
   beforeEach(() => {
     getAttributesMock.mockReset();
+    mocks.push.mockReset();
+    mocks.searchParams = new URLSearchParams();
   });
 
   it('renders a loading state while attributes are loading', () => {
@@ -53,7 +69,7 @@ describe('AttributesList', () => {
             },
           ],
           page: {
-            size: 25,
+            size: 10,
             number: 0,
             totalElements: 1,
             totalPages: 1,
@@ -89,7 +105,7 @@ describe('AttributesList', () => {
           },
         ],
         page: {
-          size: 25,
+          size: 10,
           number: 0,
           totalElements: 1,
           totalPages: 1,
@@ -123,7 +139,7 @@ describe('AttributesList', () => {
           },
         ],
         page: {
-          size: 25,
+          size: 10,
           number: 0,
           totalElements: 1,
           totalPages: 1,
@@ -137,5 +153,67 @@ describe('AttributesList', () => {
       'href',
       getAttributeDetailRoute(1)
     );
+  });
+
+  it('requests attributes with pagination input', async () => {
+    const paginationInput = {
+      page: 2,
+      size: 10,
+      sort: ['name,asc'],
+    };
+
+    getAttributesMock.mockResolvedValue({
+      ok: true,
+      data: {
+        content: [],
+        page: {
+          size: 10,
+          number: 2,
+          totalElements: 0,
+          totalPages: 0,
+        },
+      },
+    });
+
+    setup({
+      paginationInput,
+    });
+
+    await waitFor(() => {
+      expect(getAttributesMock).toHaveBeenCalledWith(paginationInput);
+    });
+  });
+
+  it('renders current server page rows without client-side pagination', async () => {
+    getAttributesMock.mockResolvedValue({
+      ok: true,
+      data: {
+        content: [
+          {
+            id: 2,
+            name: 'Material',
+            sortOrder: 20,
+            values: ['Cotton'],
+            createdAt: '2026-05-27T20:55:51.542Z',
+          },
+        ],
+        page: {
+          size: 1,
+          number: 1,
+          totalElements: 2,
+          totalPages: 2,
+        },
+      },
+    });
+
+    setup({
+      paginationInput: {
+        page: 1,
+        size: 1,
+      },
+    });
+
+    expect(await screen.findByText('Material')).toBeVisible();
+    expect(screen.getByText('2-2 of 2')).toBeVisible();
   });
 });

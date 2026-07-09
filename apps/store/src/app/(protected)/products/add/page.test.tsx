@@ -100,7 +100,7 @@ describe('AddProductPage', () => {
     ).toHaveTextContent('Select attributes');
     expect(
       screen.getByText(
-        'Optional: Select attributes to add characteristics that will be the same for this single product'
+        'Optional: Add attributes for a single product'
       )
     ).toBeVisible();
     expect(screen.getByRole('group', { name: 'Creation mode' })).toBeVisible();
@@ -140,7 +140,7 @@ describe('AddProductPage', () => {
     ).toBeVisible();
     expect(
       screen.getByText(
-        'You must select attributes to generate multiple products. (e.g., Size, Color)'
+        'You must select attributes to generate multiple products'
       )
     ).toBeVisible();
   });

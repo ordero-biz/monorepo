@@ -2,6 +2,7 @@
 
 import { Button, Card, DataTable, Typography } from '@ordero/ui';
 import { useUnitsOfMeasurementQuery } from '@/lib/hooks/units-of-measurement/useUnitsOfMeasurementQuery';
+import { useTablePagination } from '@/lib/hooks/useTablePagination';
 import type { PaginationSearchInput } from '@/lib/utils/url';
 import { columns } from './columns';
 
@@ -13,6 +14,10 @@ export const UnitsOfMeasurementList = ({
   paginationInput,
 }: UnitsOfMeasurementListProps) => {
   const unitsOfMeasurementQuery = useUnitsOfMeasurementQuery(paginationInput);
+  const tablePagination = useTablePagination({
+    pageMetadata: unitsOfMeasurementQuery.data?.page,
+    paginationInput,
+  });
 
   if (unitsOfMeasurementQuery.isPending) {
     return (
@@ -57,6 +62,8 @@ export const UnitsOfMeasurementList = ({
       data={unitsOfMeasurementQuery.data.content}
       emptyMessage="No units of measurement found."
       getRowId={(row) => String(row.id)}
+      manualPagination
+      pagination={tablePagination}
     />
   );
 };

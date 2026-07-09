@@ -38,7 +38,7 @@ describe('categories queries', () => {
         },
       ],
       page: {
-        size: 25,
+        size: 10,
         number: 0,
         totalElements: 1,
         totalPages: 1,

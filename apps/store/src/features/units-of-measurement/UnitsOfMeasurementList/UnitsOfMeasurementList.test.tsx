@@ -4,6 +4,20 @@ import { getUnitsOfMeasurement } from '@/lib/client/api/units-of-measurement';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { UnitsOfMeasurementList } from './UnitsOfMeasurementList';
 
+const mocks = vi.hoisted(() => ({
+  pathname: '/products/units-of-measurement',
+  push: vi.fn(),
+  searchParams: new URLSearchParams(),
+}));
+
+vi.mock('next/navigation', () => ({
+  usePathname: () => mocks.pathname,
+  useRouter: () => ({
+    push: mocks.push,
+  }),
+  useSearchParams: () => mocks.searchParams,
+}));
+
 vi.mock('@/lib/client/api/units-of-measurement', async () => ({
   ...(await vi.importActual<
     typeof import('@/lib/client/api/units-of-measurement')
@@ -20,6 +34,8 @@ const { setup } = prepareStoreSetup({
 describe('UnitsOfMeasurementList', () => {
   beforeEach(() => {
     getUnitsOfMeasurementMock.mockReset();
+    mocks.push.mockReset();
+    mocks.searchParams = new URLSearchParams();
   });
 
   it('renders a loading state while units of measurement are loading', () => {
@@ -52,7 +68,7 @@ describe('UnitsOfMeasurementList', () => {
             },
           ],
           page: {
-            size: 25,
+            size: 10,
             number: 0,
             totalElements: 1,
             totalPages: 1,
@@ -90,7 +106,7 @@ describe('UnitsOfMeasurementList', () => {
           },
         ],
         page: {
-          size: 25,
+          size: 10,
           number: 0,
           totalElements: 1,
           totalPages: 1,

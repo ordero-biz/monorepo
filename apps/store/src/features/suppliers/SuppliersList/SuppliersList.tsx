@@ -2,6 +2,7 @@
 
 import { Button, Card, DataTable, Typography } from '@ordero/ui';
 import { useSuppliersQuery } from '@/lib/hooks/suppliers/useSuppliersQuery';
+import { useTablePagination } from '@/lib/hooks/useTablePagination';
 import type { PaginationSearchInput } from '@/lib/utils/url';
 import { columns } from './columns';
 
@@ -11,6 +12,10 @@ type SuppliersListProps = {
 
 export const SuppliersList = ({ paginationInput }: SuppliersListProps) => {
   const suppliersQuery = useSuppliersQuery(paginationInput);
+  const tablePagination = useTablePagination({
+    pageMetadata: suppliersQuery.data?.page,
+    paginationInput,
+  });
 
   if (suppliersQuery.isPending) {
     return (
@@ -55,6 +60,8 @@ export const SuppliersList = ({ paginationInput }: SuppliersListProps) => {
       data={suppliersQuery.data.content}
       emptyMessage="No suppliers found."
       getRowId={(row) => String(row.id)}
+      manualPagination
+      pagination={tablePagination}
     />
   );
 };

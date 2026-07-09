@@ -4,12 +4,19 @@ import { apiFetch } from '@ordero/api-client';
 import type { Attribute, AttributeValue } from '@/lib/domain/attributes';
 import type { PaginatedResponse } from '@/lib/server/types';
 import { tokenizePath } from '@/lib/utils/tokenizePath';
+import {
+  getPaginationSearch,
+  type PaginationSearchInput,
+} from '@/lib/utils/url';
 import { CLIENT_BACKEND_PATHS } from '../path';
 
 type AttributesListResponse = PaginatedResponse<Attribute>;
 
-export const getAttributes = () =>
-  apiFetch<AttributesListResponse>(CLIENT_BACKEND_PATHS.attributes, {
+export const getAttributesPath = (input?: PaginationSearchInput) =>
+  `${CLIENT_BACKEND_PATHS.attributes}?${getPaginationSearch(input)}`;
+
+export const getAttributes = (input?: PaginationSearchInput) =>
+  apiFetch<AttributesListResponse>(getAttributesPath(input), {
     method: 'GET',
   });
 

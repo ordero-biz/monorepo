@@ -46,7 +46,7 @@ describe('WarehousePage', () => {
         },
       ],
       page: {
-        size: 25,
+        size: 10,
         number: 0,
         totalElements: 1,
         totalPages: 1,
@@ -68,19 +68,19 @@ describe('WarehousePage', () => {
     expect(screen.getByText('Warehouses list')).toBeVisible();
     expect(getServerWarehousesMock).toHaveBeenCalledWith({
       page: 0,
-      size: 25,
+      size: 10,
     });
     expect(warehousesListMock).toHaveBeenCalledWith({
       paginationInput: {
         page: 0,
-        size: 25,
+        size: 10,
       },
     });
     expect(
       queryClient.getQueryData(
         warehousesQueryKeys.listPage({
           page: 0,
-          size: 25,
+          size: 10,
         })
       )
     ).toEqual(warehouses);

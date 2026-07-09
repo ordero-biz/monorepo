@@ -47,7 +47,7 @@ describe('SuppliersPage', () => {
         },
       ],
       page: {
-        size: 25,
+        size: 10,
         number: 0,
         totalElements: 1,
         totalPages: 1,
@@ -69,19 +69,19 @@ describe('SuppliersPage', () => {
     expect(screen.getByText('Suppliers list')).toBeVisible();
     expect(getServerSuppliersMock).toHaveBeenCalledWith({
       page: 0,
-      size: 25,
+      size: 10,
     });
     expect(suppliersListMock).toHaveBeenCalledWith({
       paginationInput: {
         page: 0,
-        size: 25,
+        size: 10,
       },
     });
     expect(
       queryClient.getQueryData(
         suppliersQueryKeys.listPage({
           page: 0,
-          size: 25,
+          size: 10,
         })
       )
     ).toEqual(suppliers);
