@@ -1,5 +1,5 @@
 import { updateSupplier } from '@/lib/client/api/suppliers';
-import type { SupplierEntityFormValues } from '../../CreateSupplierDialog/utils/validations';
+import type { SupplierEntityFormValues } from '../../list/CreateSupplier/utils/validations';
 
 type SubmitUpdateSupplierArgs = {
   supplierId: string | number;

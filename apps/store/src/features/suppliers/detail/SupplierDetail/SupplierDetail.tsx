@@ -1,7 +1,7 @@
 'use client';
 
-import { Button, Card, Typography } from '@ordero/ui';
 import { useSupplierQuery } from '@/lib/hooks/suppliers/useSupplierQuery';
+import { Button, Card, Typography } from '@/ui/index';
 import { SupplierDetailHeader } from './SupplierDetailHeader';
 import { SupplierDetailInfo } from './SupplierDetailInfo';
 

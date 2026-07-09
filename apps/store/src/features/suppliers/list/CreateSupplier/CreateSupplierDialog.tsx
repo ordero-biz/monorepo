@@ -3,7 +3,7 @@
 import { Dialog } from '@ordero/ui';
 import { useQueryClient } from '@tanstack/react-query';
 import { suppliersQueryKeys } from '@/lib/query/suppliers/suppliersQueryKeys';
-import { SupplierEntityForm } from '../SupplierEntityForm/SupplierEntityForm';
+import { ActionSupplierDialogContent } from '../../shared/ActionSupplierDialogContent';
 import { useCreateSupplierForm } from './hooks/useCreateSupplierForm';
 
 type CreateSupplierDialogProps = {
@@ -51,7 +51,7 @@ export const CreateSupplierDialog = ({
                 <Dialog.Title>Add supplier</Dialog.Title>
               </Dialog.Header>
 
-              <SupplierEntityForm
+              <ActionSupplierDialogContent
                 form={form}
                 pendingText="Adding..."
                 submitText="Add"

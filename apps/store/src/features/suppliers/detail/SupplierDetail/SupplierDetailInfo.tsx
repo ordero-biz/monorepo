@@ -1,5 +1,5 @@
-import { Card, Typography } from '@ordero/ui';
 import type { Supplier } from '@/lib/domain/suppliers';
+import { Card, Typography } from '@/ui/index';
 
 type SupplierDetailInfoProps = {
   supplier: Supplier;
@@ -10,7 +10,7 @@ type SupplierDetailField = {
   value: Supplier[keyof Supplier];
 };
 
-const getSupplierDetailFields = (supplier: Supplier): SupplierDetailField[] => [
+const getSupplierDetailData = (supplier: Supplier): SupplierDetailField[] => [
   {
     label: 'Email',
     value: supplier.email,
@@ -37,7 +37,7 @@ export const SupplierDetailInfo = ({ supplier }: SupplierDetailInfoProps) => {
       </Card.Header>
       <Card.Content>
         <dl className="grid gap-[var(--space-2)] sm:grid-cols-2">
-          {getSupplierDetailFields(supplier).map((field) => (
+          {getSupplierDetailData(supplier).map((field) => (
             <div
               className="flex min-w-0 flex-col gap-[var(--space-1)]"
               key={field.label}

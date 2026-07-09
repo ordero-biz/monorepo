@@ -1,7 +1,7 @@
 import { useToastManager } from '@ordero/ui';
 import { useForm } from '@tanstack/react-form';
 import type { Supplier } from '@/lib/domain/suppliers';
-import { getSupplierDefaultValues } from '../../CreateSupplierDialog/constants';
+import { getSupplierDefaultValues } from '../../list/CreateSupplier/constants';
 import { submitUpdateSupplier } from '../utils/submitAction';
 
 type UseUpdateSupplierFormArgs = {

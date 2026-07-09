@@ -1,6 +1,6 @@
-import { PageHeader, Typography } from '@ordero/ui';
+import { UpdateSupplierDialogTrigger } from '@/features/suppliers/detail/UpdateSupplier';
 import type { Supplier } from '@/lib/domain/suppliers';
-import { UpdateSupplierDialogTrigger } from '../UpdateSupplierDialog/UpdateSupplierDialogTrigger';
+import { PageHeader, Typography } from '@/ui/index';
 
 type SupplierDetailHeaderProps = {
   onUpdated: () => Promise<void> | void;

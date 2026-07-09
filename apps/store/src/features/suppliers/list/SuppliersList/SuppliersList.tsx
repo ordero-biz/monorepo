@@ -1,8 +1,8 @@
 'use client';
 
-import { Button, Card, DataTable, Typography } from '@ordero/ui';
 import { useSuppliersQuery } from '@/lib/hooks/suppliers/useSuppliersQuery';
 import type { PaginationSearchInput } from '@/lib/utils/url';
+import { Button, Card, DataTable, Typography } from '@/ui/index';
 import { columns } from './columns';
 
 type SuppliersListProps = {

@@ -1,12 +1,12 @@
-import { Button, Dialog, TextField } from '@ordero/ui';
-import type { useCreateSupplierForm } from '@/features/suppliers/CreateSupplierDialog/hooks/useCreateSupplierForm';
+import type { useCreateSupplierForm } from '@/features/suppliers/list/CreateSupplier/hooks/useCreateSupplierForm';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
+import { Button, Dialog, TextField } from '@/ui/index';
 import {
   validateSupplierAddress,
   validateSupplierEmail,
   validateSupplierName,
   validateSupplierPhone,
-} from '../CreateSupplierDialog/utils/validations';
+} from '../../list/CreateSupplier/utils/validations';
 
 type SupplierEntityFormApi = ReturnType<typeof useCreateSupplierForm>['form'];
 
@@ -16,7 +16,7 @@ type SupplierEntityFormProps = {
   submitText: string;
 };
 
-export const SupplierEntityForm = ({
+export const ActionSupplierDialogContent = ({
   form,
   pendingText,
   submitText,

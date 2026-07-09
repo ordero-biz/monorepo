@@ -1,0 +1,1 @@
+export { UpdateSupplierDialogTrigger } from './UpdateSupplierDialogTrigger';

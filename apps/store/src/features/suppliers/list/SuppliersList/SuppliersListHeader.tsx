@@ -1,5 +1,5 @@
-import { PageHeader, Typography } from '@ordero/ui';
-import { CreateSupplierDialogTrigger } from '../CreateSupplierDialog/CreateSupplierDialogTrigger';
+import { CreateSupplierDialogTrigger } from '@/features/suppliers/list/CreateSupplier';
+import { PageHeader, Typography } from '@/ui/index';
 
 export const SuppliersListHeader = () => (
   <PageHeader.Root>

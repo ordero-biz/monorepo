@@ -1,11 +1,11 @@
+import Link from 'next/link';
+import { getSupplierDetailRoute } from '@/lib/client/routes';
+import type { Supplier } from '@/lib/domain/suppliers';
 import {
   DataTableCell,
   type DataTableColumnDef,
   DataTableColumnHeader,
-} from '@ordero/ui';
-import Link from 'next/link';
-import { getSupplierDetailRoute } from '@/lib/client/routes';
-import type { Supplier } from '@/lib/domain/suppliers';
+} from '@/ui/index';
 
 export const columns: DataTableColumnDef<Supplier>[] = [
   {
