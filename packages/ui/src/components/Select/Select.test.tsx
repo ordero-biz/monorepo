@@ -60,6 +60,34 @@ describe('Select', () => {
     );
   });
 
+  it('supports selecting multiple options', async () => {
+    const user = userEvent.setup();
+
+    const { 'aria-label': ariaLabel, onValueChange } = setup({
+      'aria-label': 'Visible columns',
+      defaultValue: ['list'],
+      multiple: true,
+      onValueChange: vi.fn(),
+    });
+
+    const trigger = screen.getByRole('combobox', { name: ariaLabel });
+
+    expect(trigger).toHaveTextContent('List');
+
+    await user.click(trigger);
+    await user.click(screen.getByRole('option', { name: 'Details' }));
+
+    expect(trigger).toHaveTextContent('List (+1 more)');
+    expect(onValueChange).toHaveBeenLastCalledWith(
+      ['list', 'details'],
+      expect.any(Object)
+    );
+    expect(screen.getByRole('option', { name: 'Details' })).toHaveAttribute(
+      'aria-selected',
+      'true'
+    );
+  });
+
   it('renders helper text and start content', async () => {
     const user = userEvent.setup();
 
@@ -78,6 +106,23 @@ describe('Select', () => {
     expect(
       screen.getByRole('combobox', { name: 'View mode' })
     ).toHaveTextContent('List');
+  });
+
+  it('uses the label as the accessible name without opening when users click the label', async () => {
+    const user = userEvent.setup();
+
+    const { label } = setup({
+      'aria-label': undefined,
+      label: 'Mode',
+    });
+
+    expect(screen.getByRole('combobox', { name: label })).toBeInTheDocument();
+
+    await user.click(screen.getByText(label));
+
+    expect(
+      screen.queryByRole('option', { name: 'List' })
+    ).not.toBeInTheDocument();
   });
 
   it('renders error text when invalid', () => {

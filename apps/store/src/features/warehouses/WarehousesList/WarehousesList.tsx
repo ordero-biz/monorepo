@@ -2,6 +2,7 @@
 
 import { Button, Card, DataTable, Typography } from '@ordero/ui';
 import { useWarehousesQuery } from '@/lib/hooks/warehouses/useWarehousesQuery';
+import { useTablePagination } from '@/lib/hooks/useTablePagination';
 import type { PaginationSearchInput } from '@/lib/utils/url';
 import { columns } from './columns';
 
@@ -11,6 +12,10 @@ type WarehousesListProps = {
 
 export const WarehousesList = ({ paginationInput }: WarehousesListProps) => {
   const warehousesQuery = useWarehousesQuery(paginationInput);
+  const tablePagination = useTablePagination({
+    pageMetadata: warehousesQuery.data?.page,
+    paginationInput,
+  });
 
   if (warehousesQuery.isPending) {
     return (
@@ -55,6 +60,8 @@ export const WarehousesList = ({ paginationInput }: WarehousesListProps) => {
       data={warehousesQuery.data.content}
       emptyMessage="No warehouses found."
       getRowId={(row) => String(row.id)}
+      manualPagination
+      pagination={tablePagination}
     />
   );
 };

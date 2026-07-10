@@ -9,6 +9,7 @@ import type {
 
 export type SelectSize = 's' | 'm';
 export type SelectVariant = 'outlined' | 'filled';
+export type SelectWidth = 'content' | 'full';
 
 export type SelectOption = {
   disabled?: boolean;
@@ -16,14 +17,13 @@ export type SelectOption = {
   value: string;
 };
 
-export type SelectProps = {
+type SelectCommonProps = {
   'aria-describedby'?: string;
   'aria-label'?: string;
   'aria-labelledby'?: string;
   alignItemWithTrigger?: boolean;
   autoComplete?: string;
   defaultOpen?: boolean;
-  defaultValue?: string | null;
   disabled?: boolean;
   errorIcon?: ReactNode;
   errorText?: ReactNode;
@@ -40,10 +40,6 @@ export type SelectProps = {
     open: boolean,
     details: SelectRoot.ChangeEventDetails
   ) => void;
-  onValueChange?: (
-    value: string | null,
-    details: SelectRoot.ChangeEventDetails
-  ) => void;
   options: SelectOption[];
   placeholder?: ReactNode;
   readOnly?: boolean;
@@ -52,6 +48,28 @@ export type SelectProps = {
   size?: SelectSize;
   startAdornment?: ReactNode;
   startIcon?: ElementType<{ className?: string }>;
-  value?: string | null;
   variant?: SelectVariant;
+  width?: SelectWidth;
 };
+
+export type SelectSingleProps = SelectCommonProps & {
+  defaultValue?: string | null;
+  multiple?: false;
+  onValueChange?: (
+    value: string | null,
+    details: SelectRoot.ChangeEventDetails
+  ) => void;
+  value?: string | null;
+};
+
+export type SelectMultipleProps = SelectCommonProps & {
+  defaultValue?: string[];
+  multiple: true;
+  onValueChange?: (
+    value: string[],
+    details: SelectRoot.ChangeEventDetails
+  ) => void;
+  value?: string[];
+};
+
+export type SelectProps = SelectSingleProps | SelectMultipleProps;

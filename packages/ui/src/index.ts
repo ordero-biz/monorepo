@@ -46,12 +46,24 @@ export type {
 } from './components/Chip';
 export { Chip } from './components/Chip';
 export type {
+  ComboboxChangeEventDetails,
+  ComboboxMultipleProps,
+  ComboboxOption,
+  ComboboxProps,
+  ComboboxSingleProps,
+  ComboboxSize,
+  ComboboxVariant,
+} from './components/Combobox';
+export { Combobox } from './components/Combobox';
+export type {
   DataTableCellProps,
   DataTableColumnAlignment,
   DataTableColumnDef,
   DataTableColumnHeaderProps,
   DataTableColumnMeta,
   DataTableColumnWrap,
+  DataTablePaginationProps,
+  DataTablePaginationState,
   DataTableProps,
   DataTableRowSelectionState,
   DataTableSelectionCellProps,
@@ -80,6 +92,17 @@ export type {
   DialogViewportProps,
 } from './components/Dialog';
 export { Dialog } from './components/Dialog';
+export type {
+  FieldHelperTextAlign,
+  FieldHelperTextElement,
+  FieldHelperTextProps,
+} from './components/FieldHelperText';
+export { FieldHelperText } from './components/FieldHelperText';
+export type {
+  FieldLabelElement,
+  FieldLabelProps,
+} from './components/FieldLabel';
+export { FieldLabel } from './components/FieldLabel';
 export type {
   IconButtonColor,
   IconButtonProps,
@@ -112,6 +135,7 @@ export type {
   SelectProps,
   SelectSize,
   SelectVariant,
+  SelectWidth,
 } from './components/Select';
 export { Select } from './components/Select';
 export type {
@@ -142,6 +166,11 @@ export {
   SidebarNavigationSectionContent,
   SidebarNavigationSections,
 } from './components/SidebarNavigation';
+export type {
+  TablePaginationProps,
+  TablePaginationRangeLabelArgs,
+} from './components/TablePagination';
+export { TablePagination } from './components/TablePagination';
 export type {
   TextareaChangeEventDetails,
   TextareaProps,

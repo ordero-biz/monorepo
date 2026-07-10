@@ -50,7 +50,7 @@ describe('ProductsPage', () => {
         },
       ],
       page: {
-        size: 25,
+        size: 10,
         number: 0,
         totalElements: 1,
         totalPages: 1,
@@ -72,19 +72,19 @@ describe('ProductsPage', () => {
     expect(screen.getByText('Products list')).toBeVisible();
     expect(getServerProductsMock).toHaveBeenCalledWith({
       page: 0,
-      size: 25,
+      size: 10,
     });
     expect(productsListMock).toHaveBeenCalledWith({
       paginationInput: {
         page: 0,
-        size: 25,
+        size: 10,
       },
     });
     expect(
       queryClient.getQueryData(
         productsQueryKeys.listPage({
           page: 0,
-          size: 25,
+          size: 10,
         })
       )
     ).toEqual(products);

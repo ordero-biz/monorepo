@@ -2,6 +2,7 @@
 
 import { Button, Card, DataTable, Typography } from '@ordero/ui';
 import { useProductsQuery } from '@/lib/hooks/products/useProductsQuery';
+import { useTablePagination } from '@/lib/hooks/useTablePagination';
 import type { PaginationSearchInput } from '@/lib/utils/url';
 import { columns } from './columns';
 
@@ -11,6 +12,10 @@ type ProductsListProps = {
 
 export const ProductsList = ({ paginationInput }: ProductsListProps) => {
   const productsQuery = useProductsQuery(paginationInput);
+  const tablePagination = useTablePagination({
+    pageMetadata: productsQuery.data?.page,
+    paginationInput,
+  });
 
   if (productsQuery.isPending) {
     return (
@@ -55,6 +60,8 @@ export const ProductsList = ({ paginationInput }: ProductsListProps) => {
       data={productsQuery.data.content}
       emptyMessage="No products found."
       getRowId={(row) => String(row.id)}
+      manualPagination
+      pagination={tablePagination}
     />
   );
 };

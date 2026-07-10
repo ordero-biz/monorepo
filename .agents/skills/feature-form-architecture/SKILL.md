@@ -51,6 +51,11 @@ Own the form UI composition:
 - user-visible validation message placement
 - connecting form fields to presentational `@ordero/ui` controls with ordinary controlled props
 
+For labels in composed forms, follow `ui-routine-conventions`: use `Field.Label`
+inside Base UI field context, use native `label` with `htmlFor` for explicit
+control association outside that context, and avoid label semantics for section
+headings or display-only text.
+
 Keep shared UI components form-library agnostic. Do not move field logic into `packages/ui` when it depends on feature schemas, submit state, backend errors, or form-library state.
 
 ### Form Hook
@@ -83,6 +88,39 @@ Extract dense or repeated field groups into local components or field-section ho
 - section-specific validation display
 
 Keep this logic near the field section, not in the main form hook. For example, an attribute-values row factory should move with an `AttributeValuesField`, not into `useCreateAttributeForm`.
+
+### Combobox Fields
+
+Use `Select` for short, fixed option sets where search is not needed. Use
+`Combobox` when the field needs searchable options, textbox-style filtering, or
+multiple selection with chips.
+
+For form-owned combobox fields:
+
+- wire fields through ordinary controlled props: `value`, `onValueChange`,
+  `name`, `onBlur`, `invalid`, and `errorText`
+- use `value: string | null` for single selection and `value: string[]` with
+  `multiple={true}` for multiple selection
+- keep shared `@ordero/ui` comboboxes presentational and form-library agnostic
+- cover behavior in tests by opening the combobox by role and selecting options
+  by role/name; do not assert variant classes or private DOM structure
+
+For request-backed option lists, create a feature-owned or app-owned resource
+wrapper such as `CategoriesAsyncCombobox` instead of putting request/query logic
+directly in the form markup. The wrapper should own the request helper, option
+mapping, page size, sorting/filtering, loading/error copy, and `queryKey`.
+
+Anchor async combobox query keys under the same resource query prefix used for
+invalidation, then add a component-specific segment so list-page data and option
+data do not collide. Include request parameters that can vary, such as page
+size, filters, or sort, in the key. This keeps broad invalidations such as
+`invalidateQueries({ queryKey: categoriesQueryKeys.list })` refreshing related
+option caches after writes.
+
+When a wrapper keeps explicit prop forwarding, forward every retained
+`Combobox` prop intentionally, including visual props like `variant` and
+accessibility props like `aria-describedby`, `aria-label`, and
+`aria-labelledby`.
 
 ## Success Callbacks
 

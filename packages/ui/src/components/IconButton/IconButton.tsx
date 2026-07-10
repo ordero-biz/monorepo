@@ -10,8 +10,8 @@ const iconButtonVariants = cva(
   {
     variants: {
       color: {
-        default: 'text-[var(--grey-600)] hover:bg-[var(--figma-grey-8)]',
-        inherit: 'text-foreground hover:bg-[var(--figma-grey-8)]',
+        default: 'text-[var(--grey-600)] hover:bg-grey-8',
+        inherit: 'text-foreground hover:bg-grey-8',
         primary: 'text-primary hover:bg-primary-8',
         info: 'text-info-main hover:bg-info-8',
         success: 'text-success-main hover:bg-success-8',

@@ -4,6 +4,7 @@ export const BACKEND_AUTH_PATHS = {
 } as const;
 
 export const BACKEND_ATTRIBUTE_PATHS = {
+  attributes: '/api/v1/attributes',
   attribute: '/api/v1/attributes/{id}',
   attributeValues: '/api/v1/attributes/{id}/values',
 } as const;

@@ -48,7 +48,7 @@ describe('UnitsOfMeasurementPage', () => {
         },
       ],
       page: {
-        size: 25,
+        size: 10,
         number: 0,
         totalElements: 1,
         totalPages: 1,
@@ -70,19 +70,19 @@ describe('UnitsOfMeasurementPage', () => {
     expect(screen.getByText('Units of measurement list')).toBeVisible();
     expect(getServerUnitsOfMeasurementMock).toHaveBeenCalledWith({
       page: 0,
-      size: 25,
+      size: 10,
     });
     expect(unitsOfMeasurementListMock).toHaveBeenCalledWith({
       paginationInput: {
         page: 0,
-        size: 25,
+        size: 10,
       },
     });
     expect(
       queryClient.getQueryData(
         unitsOfMeasurementQueryKeys.listPage({
           page: 0,
-          size: 25,
+          size: 10,
         })
       )
     ).toEqual(unitsOfMeasurement);

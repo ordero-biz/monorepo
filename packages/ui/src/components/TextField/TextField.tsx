@@ -3,8 +3,9 @@
 import { Field } from '@base-ui/react/field';
 import { cva } from 'class-variance-authority';
 import { useId, useState } from 'react';
+import { FieldHelperText } from '@/ui/components/FieldHelperText';
+import { FieldLabel } from '@/ui/components/FieldLabel';
 import { Input } from '@/ui/components/Input';
-import { renderFieldLabelContent } from '@/ui/components/shared/renderFieldLabelContent';
 import { cn } from '@/ui/lib/utils';
 import type { TextFieldProps } from './types';
 
@@ -24,52 +25,6 @@ const textFieldRootVariants = cva('flex w-full min-w-0 flex-col', {
     variant: 'outlined',
   },
 });
-
-const labelClassName =
-  'mb-[6px] text-[length:var(--input-label-size-desktop)] leading-[var(--input-label-line-height-desktop)] font-[var(--input-label-weight)]';
-
-const helperTextClassName =
-  'flex items-start gap-[var(--form-helper-text-spacing)] pl-[var(--form-helper-text-pl)] pt-[var(--form-helper-text-pt)] text-[length:var(--caption-size-desktop)] leading-[var(--caption-line-height-desktop)] font-[var(--caption-weight)]';
-
-const helperIconClassName =
-  'mt-px shrink-0 [&_svg]:size-[var(--form-helper-text-icon)]';
-
-const getLabelColorClassName = ({
-  disabled,
-  focused,
-  invalid,
-}: {
-  disabled: boolean;
-  focused: boolean;
-  invalid: boolean;
-}) => {
-  if (disabled) {
-    return 'text-[var(--text-disabled)]';
-  }
-
-  if (invalid) {
-    return 'text-destructive';
-  }
-
-  if (focused) {
-    return 'text-foreground';
-  }
-
-  return 'text-[var(--text-secondary)]';
-};
-
-const renderSupportText = ({
-  icon,
-  text,
-}: {
-  icon?: TextFieldProps['helperIcon'];
-  text: TextFieldProps['helperText'];
-}) => (
-  <>
-    {icon ? <span className={helperIconClassName}>{icon}</span> : null}
-    <span className="min-w-0 flex-1">{text}</span>
-  </>
-);
 
 export const TextField = ({
   'aria-describedby': ariaDescribedBy,
@@ -121,18 +76,14 @@ export const TextField = ({
       invalid={invalid}
     >
       {label ? (
-        <Field.Label
-          className={cn(
-            labelClassName,
-            getLabelColorClassName({
-              disabled,
-              focused: focusedState,
-              invalid,
-            })
-          )}
+        <FieldLabel
+          active={focusedState}
+          disabled={disabled}
+          invalid={invalid}
+          required={required}
         >
-          {renderFieldLabelContent({ label, required })}
-        </Field.Label>
+          {label}
+        </FieldLabel>
       ) : null}
       <Input
         aria-describedby={describedBy}
@@ -170,27 +121,24 @@ export const TextField = ({
         variant={variant}
       />
       {hasErrorText ? (
-        <Field.Error
-          className={cn(helperTextClassName, 'text-destructive')}
+        <FieldHelperText
+          as="field-error"
+          icon={errorIcon}
           id={supportTextId}
+          invalid
           match={true}
         >
-          {renderSupportText({
-            icon: errorIcon,
-            text: errorText,
-          })}
-        </Field.Error>
+          {errorText}
+        </FieldHelperText>
       ) : null}
       {hasHelperText && !hasErrorText ? (
-        <Field.Description
-          className={cn(helperTextClassName, 'text-text-secondary')}
+        <FieldHelperText
+          as="field-description"
+          icon={helperIcon}
           id={supportTextId}
         >
-          {renderSupportText({
-            icon: helperIcon,
-            text: helperText,
-          })}
-        </Field.Description>
+          {helperText}
+        </FieldHelperText>
       ) : null}
     </Field.Root>
   );

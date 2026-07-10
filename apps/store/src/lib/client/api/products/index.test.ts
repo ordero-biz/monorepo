@@ -1,4 +1,4 @@
-import { getProducts, getProductsPath } from '.';
+import { createProduct, getProducts, getProductsPath } from '.';
 
 describe('products client helpers', () => {
   beforeEach(() => {
@@ -41,7 +41,7 @@ describe('products client helpers', () => {
             },
           ],
           page: {
-            size: 25,
+            size: 10,
             number: 0,
             totalElements: 1,
             totalPages: 1,
@@ -67,7 +67,7 @@ describe('products client helpers', () => {
           },
         ],
         page: {
-          size: 25,
+          size: 10,
           number: 0,
           totalElements: 1,
           totalPages: 1,
@@ -76,7 +76,7 @@ describe('products client helpers', () => {
     });
 
     expect(fetchMock).toHaveBeenCalledWith(
-      '/api/backend/api/v1/products?page=0&size=25',
+      '/api/backend/api/v1/products?page=0&size=10',
       expect.objectContaining({
         method: 'GET',
         cache: 'no-store',
@@ -105,6 +105,95 @@ describe('products client helpers', () => {
         message: 'Products lookup failed.',
         code: 'PRODUCTS_LOOKUP_FAILED',
         fieldErrors: undefined,
+      },
+    });
+  });
+
+  it('posts a new product through the backend proxy', async () => {
+    const fetchMock = vi.mocked(fetch);
+
+    fetchMock.mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          id: 3,
+          name: 'Running Shoes',
+          description: '',
+          createdAt: '2026-07-03T07:20:30.291Z',
+          category: {
+            id: 2,
+            name: 'Footwear',
+            createdAt: '2026-07-01T07:20:30.291Z',
+          },
+        })
+      )
+    );
+
+    await expect(
+      createProduct({
+        name: 'Running Shoes',
+        description: '',
+        categoryId: 2,
+      })
+    ).resolves.toEqual({
+      ok: true,
+      data: {
+        id: 3,
+        name: 'Running Shoes',
+        description: '',
+        createdAt: '2026-07-03T07:20:30.291Z',
+        category: {
+          id: 2,
+          name: 'Footwear',
+          createdAt: '2026-07-01T07:20:30.291Z',
+        },
+      },
+    });
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/backend/api/v1/products',
+      expect.objectContaining({
+        method: 'POST',
+        body: JSON.stringify({
+          name: 'Running Shoes',
+          description: '',
+          categoryId: 2,
+        }),
+        cache: 'no-store',
+      })
+    );
+  });
+
+  it('returns normalized failures from product creation', async () => {
+    vi.mocked(fetch).mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          message: 'Product creation failed.',
+          fieldErrors: {
+            name: 'Product name already exists.',
+          },
+        }),
+        {
+          status: 422,
+          statusText: 'Unprocessable Entity',
+        }
+      )
+    );
+
+    await expect(
+      createProduct({
+        name: 'Running Shoes',
+        description: '',
+        categoryId: 2,
+      })
+    ).resolves.toEqual({
+      ok: false,
+      error: {
+        status: 422,
+        message: 'Product creation failed.',
+        code: undefined,
+        fieldErrors: {
+          name: 'Product name already exists.',
+        },
       },
     });
   });

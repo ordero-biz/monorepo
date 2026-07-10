@@ -5,6 +5,20 @@ import { getSupplierDetailRoute } from '@/lib/client/routes';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { SuppliersList } from './SuppliersList';
 
+const mocks = vi.hoisted(() => ({
+  pathname: '/products/suppliers',
+  push: vi.fn(),
+  searchParams: new URLSearchParams(),
+}));
+
+vi.mock('next/navigation', () => ({
+  usePathname: () => mocks.pathname,
+  useRouter: () => ({
+    push: mocks.push,
+  }),
+  useSearchParams: () => mocks.searchParams,
+}));
+
 vi.mock('@/lib/client/api/suppliers', async () => ({
   ...(await vi.importActual<typeof import('@/lib/client/api/suppliers')>(
     '@/lib/client/api/suppliers'
@@ -21,6 +35,8 @@ const { setup } = prepareStoreSetup({
 describe('SuppliersList', () => {
   beforeEach(() => {
     getSuppliersMock.mockReset();
+    mocks.push.mockReset();
+    mocks.searchParams = new URLSearchParams();
   });
 
   it('renders a loading state while suppliers are loading', () => {
@@ -54,7 +70,7 @@ describe('SuppliersList', () => {
             },
           ],
           page: {
-            size: 25,
+            size: 10,
             number: 0,
             totalElements: 1,
             totalPages: 1,
@@ -91,7 +107,7 @@ describe('SuppliersList', () => {
           },
         ],
         page: {
-          size: 25,
+          size: 10,
           number: 0,
           totalElements: 1,
           totalPages: 1,

@@ -4,6 +4,20 @@ import { getProducts } from '@/lib/client/api/products';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { ProductsList } from './ProductsList';
 
+const mocks = vi.hoisted(() => ({
+  pathname: '/products',
+  push: vi.fn(),
+  searchParams: new URLSearchParams(),
+}));
+
+vi.mock('next/navigation', () => ({
+  usePathname: () => mocks.pathname,
+  useRouter: () => ({
+    push: mocks.push,
+  }),
+  useSearchParams: () => mocks.searchParams,
+}));
+
 vi.mock('@/lib/client/api/products', async () => ({
   ...(await vi.importActual<typeof import('@/lib/client/api/products')>(
     '@/lib/client/api/products'
@@ -20,6 +34,8 @@ const { setup } = prepareStoreSetup({
 describe('ProductsList', () => {
   beforeEach(() => {
     getProductsMock.mockReset();
+    mocks.push.mockReset();
+    mocks.searchParams = new URLSearchParams();
   });
 
   it('renders a loading state while products are loading', () => {
@@ -56,7 +72,7 @@ describe('ProductsList', () => {
             },
           ],
           page: {
-            size: 25,
+            size: 10,
             number: 0,
             totalElements: 1,
             totalPages: 1,
@@ -96,7 +112,7 @@ describe('ProductsList', () => {
           },
         ],
         page: {
-          size: 25,
+          size: 10,
           number: 0,
           totalElements: 1,
           totalPages: 1,
@@ -112,7 +128,7 @@ describe('ProductsList', () => {
     expect(screen.getByText('Running Shoes')).toBeVisible();
     expect(screen.getByText('Lightweight daily trainer')).toBeVisible();
     expect(screen.getByText('Footwear')).toBeVisible();
-    expect(screen.getByText('2026-07-03T07:20:30.291Z')).toBeVisible();
+    expect(screen.getByText('03 Jul 2026')).toBeVisible();
   });
 
   it('requests products with pagination input', async () => {
@@ -142,5 +158,42 @@ describe('ProductsList', () => {
     await waitFor(() => {
       expect(getProductsMock).toHaveBeenCalledWith(paginationInput);
     });
+  });
+
+  it('renders current server page rows without client-side pagination', async () => {
+    getProductsMock.mockResolvedValue({
+      ok: true,
+      data: {
+        content: [
+          {
+            id: 2,
+            name: 'Trail Shoes',
+            description: 'Stable off-road trainer',
+            createdAt: '2026-07-04T07:20:30.291Z',
+            category: {
+              id: 2,
+              name: 'Footwear',
+              createdAt: '2026-07-01T07:20:30.291Z',
+            },
+          },
+        ],
+        page: {
+          size: 1,
+          number: 1,
+          totalElements: 2,
+          totalPages: 2,
+        },
+      },
+    });
+
+    setup({
+      paginationInput: {
+        page: 1,
+        size: 1,
+      },
+    });
+
+    expect(await screen.findByText('Trail Shoes')).toBeVisible();
+    expect(screen.getByText('2-2 of 2')).toBeVisible();
   });
 });

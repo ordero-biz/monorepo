@@ -82,6 +82,19 @@ describe('ToggleButton', () => {
     );
   });
 
+  it('labels a group from the label prop', () => {
+    render(
+      <ToggleButton.Group defaultValue={['grid']} label="View mode">
+        <ToggleButton.Item value="grid">Grid</ToggleButton.Item>
+        <ToggleButton.Item value="list">List</ToggleButton.Item>
+      </ToggleButton.Group>
+    );
+
+    expect(
+      screen.getByRole('group', { name: 'View mode' })
+    ).toBeInTheDocument();
+  });
+
   it('supports multiple selection inside a group', async () => {
     const user = userEvent.setup();
 

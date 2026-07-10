@@ -1,11 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Textarea, type TextareaProps } from '@/ui/components/Textarea';
-import { cn } from '@/ui/lib/utils';
 
 const previewGridClassName = 'grid gap-8 md:grid-cols-2';
 const previewColumnClassName = 'min-w-0';
-const helperTextClassName =
-  'flex items-start gap-[var(--form-helper-text-spacing)] pl-[var(--form-helper-text-pl)] pt-[var(--form-helper-text-pt)] text-[length:var(--caption-size-desktop)] leading-[var(--caption-line-height-desktop)] font-[var(--caption-weight)]';
 
 const renderPair = ({
   filled,
@@ -29,8 +26,15 @@ const meta = {
   component: Textarea,
   tags: ['autodocs'],
   args: {
-    'aria-label': 'Textarea',
+    label: 'Textarea',
     placeholder: 'Value',
+    resize: 'vertical',
+  },
+  argTypes: {
+    resize: {
+      control: 'select',
+      options: ['vertical', 'none'],
+    },
   },
 } satisfies Meta<typeof Textarea>;
 
@@ -86,73 +90,55 @@ export const Disabled: Story = {
 };
 
 export const Invalid: Story = {
-  render: (args) => (
-    <div className={previewGridClassName}>
-      <div className={previewColumnClassName}>
-        <Textarea
-          {...args}
-          aria-describedby="outlined-textarea-error"
-          defaultValue="Incorrect value"
-          invalid={true}
-        />
-        <p
-          className={cn(helperTextClassName, 'text-destructive')}
-          id="outlined-textarea-error"
-        >
-          Textarea value is invalid.
-        </p>
-      </div>
-      <div className={previewColumnClassName}>
-        <Textarea
-          {...args}
-          aria-describedby="filled-textarea-error"
-          defaultValue="Incorrect value"
-          invalid={true}
-          variant="filled"
-        />
-        <p
-          className={cn(helperTextClassName, 'text-destructive')}
-          id="filled-textarea-error"
-        >
-          Textarea value is invalid.
-        </p>
-      </div>
-    </div>
-  ),
+  render: (args) =>
+    renderPair({
+      filled: {
+        ...args,
+        defaultValue: 'Incorrect value',
+        errorText: 'Textarea value is invalid.',
+        invalid: true,
+        variant: 'filled',
+      },
+      outlined: {
+        ...args,
+        defaultValue: 'Incorrect value',
+        errorText: 'Textarea value is invalid.',
+        invalid: true,
+      },
+    }),
 };
 
-export const WithAccessibleDescription: Story = {
-  render: (args) => (
-    <div className={previewGridClassName}>
-      <div className={previewColumnClassName}>
-        <Textarea
-          {...args}
-          aria-describedby="outlined-textarea-description"
-          defaultValue="Value"
-        />
-        <p
-          className={cn(helperTextClassName, 'text-[var(--text-secondary)]')}
-          id="outlined-textarea-description"
-        >
-          The outlined textarea is described by supporting text outside the
-          component.
-        </p>
-      </div>
-      <div className={previewColumnClassName}>
-        <Textarea
-          {...args}
-          aria-describedby="filled-textarea-description"
-          defaultValue="Value"
-          variant="filled"
-        />
-        <p
-          className={cn(helperTextClassName, 'text-[var(--text-secondary)]')}
-          id="filled-textarea-description"
-        >
-          The filled textarea is described by supporting text outside the
-          component.
-        </p>
-      </div>
-    </div>
-  ),
+export const WithHelperText: Story = {
+  render: (args) =>
+    renderPair({
+      filled: {
+        ...args,
+        defaultValue: 'Value',
+        helperText: 'The filled textarea is described by supporting text.',
+        variant: 'filled',
+      },
+      outlined: {
+        ...args,
+        defaultValue: 'Value',
+        helperText: 'The outlined textarea is described by supporting text.',
+      },
+    }),
+};
+
+export const NonResizable: Story = {
+  args: {
+    resize: 'none',
+  },
+  render: (args) =>
+    renderPair({
+      filled: {
+        ...args,
+        defaultValue: 'This textarea keeps a fixed size.',
+        variant: 'filled',
+      },
+      outlined: {
+        ...args,
+        defaultValue: 'This textarea keeps a fixed size.',
+      },
+    }),
 };
