@@ -22,7 +22,7 @@ export const supplierAddressSchema = z
   .trim()
   .min(1, 'Supplier address is required');
 
-export const createSupplierSchema = z.object({
+export const supplierEntitySchema = z.object({
   name: supplierNameSchema,
   email: supplierEmailSchema,
   phone: supplierPhoneSchema,
@@ -30,7 +30,8 @@ export const createSupplierSchema = z.object({
   comment: z.string(),
 });
 
-export type CreateSupplierFormValues = z.infer<typeof createSupplierSchema>;
+export type SupplierEntityFormValues = z.infer<typeof supplierEntitySchema>;
+export type CreateSupplierFormValues = SupplierEntityFormValues;
 
 const getValidationMessage = (schema: z.ZodString, value: string) => {
   const result = schema.safeParse(value);

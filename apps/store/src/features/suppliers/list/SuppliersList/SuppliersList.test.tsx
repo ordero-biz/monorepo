@@ -1,6 +1,7 @@
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getSuppliers } from '@/lib/client/api/suppliers';
+import { getSupplierDetailRoute } from '@/lib/client/routes';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { SuppliersList } from './SuppliersList';
 
@@ -119,7 +120,10 @@ describe('SuppliersList', () => {
     expect(
       await screen.findByRole('table', { name: 'Suppliers list' })
     ).toBeVisible();
-    expect(screen.getByText('Fresh Farms')).toBeVisible();
+    expect(screen.getByRole('link', { name: 'Fresh Farms' })).toHaveAttribute(
+      'href',
+      getSupplierDetailRoute(1)
+    );
     expect(screen.getByText('orders@fresh.example')).toBeVisible();
     expect(screen.getByText('+1 555 0100')).toBeVisible();
     expect(screen.getByText('123 Market St')).toBeVisible();

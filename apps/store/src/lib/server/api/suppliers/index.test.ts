@@ -1,7 +1,7 @@
 import { AUTH_TOKEN_COOKIE_NAME } from '@ordero/next-api/server';
 import { cookies } from 'next/headers';
 import { fetchBackendResponse } from '@/lib/server/fetch';
-import { getServerSuppliers } from '.';
+import { getServerSupplier, getServerSuppliers } from '.';
 
 vi.mock('next/headers', () => ({
   cookies: vi.fn(),
@@ -106,10 +106,54 @@ describe('supplier server helpers', () => {
     });
   });
 
+  it('gets a supplier detail with the server auth token', async () => {
+    const response = {
+      id: 1,
+      name: 'Fresh Farms',
+      email: 'orders@fresh.example',
+      phone: '+1 555 0100',
+      address: '123 Market St',
+      comment: 'Preferred produce supplier',
+    };
+
+    mockAuthCookie('server-token');
+    fetchBackendResponseMock.mockResolvedValue({
+      ok: true,
+      data: new Response(JSON.stringify(response)),
+    });
+
+    await expect(getServerSupplier('1')).resolves.toEqual({
+      ok: true,
+      data: response,
+    });
+
+    expect(fetchBackendResponseMock).toHaveBeenCalledWith({
+      path: '/api/v1/suppliers/1',
+      search: undefined,
+      token: 'server-token',
+      init: {
+        method: 'GET',
+      },
+    });
+  });
+
   it('returns an authentication error without a server token', async () => {
     mockAuthCookie();
 
     await expect(getServerSuppliers()).resolves.toEqual({
+      ok: false,
+      error: {
+        status: 401,
+        message: 'Authentication required.',
+      },
+    });
+    expect(fetchBackendResponseMock).not.toHaveBeenCalled();
+  });
+
+  it('returns an authentication error for supplier detail without a server token', async () => {
+    mockAuthCookie();
+
+    await expect(getServerSupplier('1')).resolves.toEqual({
       ok: false,
       error: {
         status: 401,

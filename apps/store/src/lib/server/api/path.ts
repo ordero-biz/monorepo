@@ -19,6 +19,7 @@ export const BACKEND_PRODUCT_PATHS = {
 
 export const BACKEND_SUPPLIER_PATHS = {
   suppliers: '/api/v1/suppliers',
+  supplier: '/api/v1/suppliers/{id}',
 } as const;
 
 export const BACKEND_UNITS_OF_MEASUREMENT_PATHS = {

@@ -1,4 +1,10 @@
-import { createSupplier, getSuppliers, getSuppliersPath } from '.';
+import {
+  createSupplier,
+  getSupplier,
+  getSuppliers,
+  getSuppliersPath,
+  updateSupplier,
+} from '.';
 
 describe('supplier client helpers', () => {
   beforeEach(() => {
@@ -103,6 +109,68 @@ describe('supplier client helpers', () => {
     });
   });
 
+  it('gets a supplier detail from the backend proxy on success', async () => {
+    const fetchMock = vi.mocked(fetch);
+
+    fetchMock.mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          id: 1,
+          name: 'Fresh Farms',
+          email: 'orders@fresh.example',
+          phone: '+1 555 0100',
+          address: '123 Market St',
+          comment: 'Preferred produce supplier',
+        })
+      )
+    );
+
+    await expect(getSupplier('1')).resolves.toEqual({
+      ok: true,
+      data: {
+        id: 1,
+        name: 'Fresh Farms',
+        email: 'orders@fresh.example',
+        phone: '+1 555 0100',
+        address: '123 Market St',
+        comment: 'Preferred produce supplier',
+      },
+    });
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/backend/api/v1/suppliers/1',
+      expect.objectContaining({
+        method: 'GET',
+        cache: 'no-store',
+      })
+    );
+  });
+
+  it('returns normalized failures from the supplier detail route', async () => {
+    vi.mocked(fetch).mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          message: 'Supplier not found.',
+          code: 'SUPPLIER_NOT_FOUND',
+        }),
+        {
+          status: 404,
+          statusText: 'Not Found',
+        }
+      )
+    );
+
+    await expect(getSupplier('404')).resolves.toEqual({
+      ok: false,
+      error: {
+        status: 404,
+        message: 'Supplier not found.',
+        code: 'SUPPLIER_NOT_FOUND',
+        fieldErrors: undefined,
+      },
+    });
+  });
+
   it('posts a new supplier through the backend proxy', async () => {
     const fetchMock = vi.mocked(fetch);
 
@@ -184,6 +252,97 @@ describe('supplier client helpers', () => {
       error: {
         status: 422,
         message: 'Supplier creation failed.',
+        code: undefined,
+        fieldErrors: {
+          email: 'Supplier email already exists.',
+        },
+      },
+    });
+  });
+
+  it('patches a supplier through the backend proxy', async () => {
+    const fetchMock = vi.mocked(fetch);
+
+    fetchMock.mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          id: 1,
+          name: 'Fresh Farms Updated',
+          email: 'orders.updated@fresh.example',
+          phone: '+1 555 0101',
+          address: '124 Market St',
+          comment: 'Updated supplier',
+        })
+      )
+    );
+
+    await expect(
+      updateSupplier({
+        supplierId: 1,
+        name: 'Fresh Farms Updated',
+        email: 'orders.updated@fresh.example',
+        phone: '+1 555 0101',
+        address: '124 Market St',
+        comment: 'Updated supplier',
+      })
+    ).resolves.toEqual({
+      ok: true,
+      data: {
+        id: 1,
+        name: 'Fresh Farms Updated',
+        email: 'orders.updated@fresh.example',
+        phone: '+1 555 0101',
+        address: '124 Market St',
+        comment: 'Updated supplier',
+      },
+    });
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/backend/api/v1/suppliers/1',
+      expect.objectContaining({
+        method: 'PATCH',
+        body: JSON.stringify({
+          name: 'Fresh Farms Updated',
+          email: 'orders.updated@fresh.example',
+          phone: '+1 555 0101',
+          address: '124 Market St',
+          comment: 'Updated supplier',
+        }),
+        cache: 'no-store',
+      })
+    );
+  });
+
+  it('returns normalized failures from the update supplier route', async () => {
+    vi.mocked(fetch).mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          message: 'Supplier update failed.',
+          fieldErrors: {
+            email: 'Supplier email already exists.',
+          },
+        }),
+        {
+          status: 422,
+          statusText: 'Unprocessable Entity',
+        }
+      )
+    );
+
+    await expect(
+      updateSupplier({
+        supplierId: 1,
+        name: 'Fresh Farms',
+        email: 'orders@fresh.example',
+        phone: '+1 555 0100',
+        address: '123 Market St',
+        comment: '',
+      })
+    ).resolves.toEqual({
+      ok: false,
+      error: {
+        status: 422,
+        message: 'Supplier update failed.',
         code: undefined,
         fieldErrors: {
           email: 'Supplier email already exists.',

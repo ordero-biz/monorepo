@@ -8,6 +8,7 @@ import type { Supplier } from '@/lib/domain/suppliers';
 import { BACKEND_SUPPLIER_PATHS } from '@/lib/server/api/path';
 import { fetchBackendResponse } from '@/lib/server/fetch';
 import type { PaginatedResponse } from '@/lib/server/types';
+import { tokenizePath } from '@/lib/utils/tokenizePath';
 import {
   getPaginationSearch,
   type PaginationSearchInput,
@@ -55,4 +56,9 @@ export const getServerSuppliers = (input?: PaginationSearchInput) =>
   fetchSupplierResource<PaginatedResponse<Supplier>>(
     BACKEND_SUPPLIER_PATHS.suppliers,
     getPaginationSearch(input)
+  );
+
+export const getServerSupplier = (supplierId: string | number) =>
+  fetchSupplierResource<Supplier>(
+    tokenizePath(BACKEND_SUPPLIER_PATHS.supplier, { id: supplierId })
   );

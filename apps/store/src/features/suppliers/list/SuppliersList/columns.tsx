@@ -1,14 +1,25 @@
+import Link from 'next/link';
+import { getSupplierDetailRoute } from '@/lib/client/routes';
+import type { Supplier } from '@/lib/domain/suppliers';
 import {
   DataTableCell,
   type DataTableColumnDef,
   DataTableColumnHeader,
-} from '@ordero/ui';
-import type { Supplier } from '@/lib/domain/suppliers';
+} from '@/ui/index';
 
 export const columns: DataTableColumnDef<Supplier>[] = [
   {
     accessorKey: 'name',
-    cell: ({ row }) => <DataTableCell>{row.original.name}</DataTableCell>,
+    cell: ({ row }) => (
+      <DataTableCell>
+        <Link
+          className="w-full font-600 rounded-[var(--radius-sm)] outline-none transition-colors hover:text-[var(--color-text-body)] hover:underline"
+          href={getSupplierDetailRoute(row.original.id)}
+        >
+          {row.original.name}
+        </Link>
+      </DataTableCell>
+    ),
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Name" />
     ),
