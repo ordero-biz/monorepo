@@ -1,26 +1,24 @@
-import type { useCreateSupplierForm } from '@/features/suppliers/list/CreateSupplier/hooks/useCreateSupplierForm';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
 import { Button, Dialog, TextField } from '@/ui/index';
+import type { SupplierEntityFormApi } from './index';
 import {
   validateSupplierAddress,
   validateSupplierEmail,
   validateSupplierName,
   validateSupplierPhone,
-} from '../../list/CreateSupplier/utils/validations';
+} from './index';
 
-type SupplierEntityFormApi = ReturnType<typeof useCreateSupplierForm>['form'];
-
-type SupplierEntityFormProps = {
+type SupplierFormDialogContentProps = {
   form: SupplierEntityFormApi;
   pendingText: string;
   submitText: string;
 };
 
-export const ActionSupplierDialogContent = ({
+export const SupplierFormDialogContent = ({
   form,
   pendingText,
   submitText,
-}: SupplierEntityFormProps) => {
+}: SupplierFormDialogContentProps) => {
   return (
     <>
       <Dialog.Content>

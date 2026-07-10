@@ -1,5 +1,5 @@
 import { createSupplier } from '@/lib/client/api/suppliers';
-import type { CreateSupplierFormValues } from './validations';
+import type { CreateSupplierFormValues } from '../../../shared/SupplierFormDialogContent';
 
 export const submitCreateSupplier = async (value: CreateSupplierFormValues) => {
   const result = await createSupplier({

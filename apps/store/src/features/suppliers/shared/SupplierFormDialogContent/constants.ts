@@ -1,5 +1,5 @@
 import type { Supplier } from '@/lib/domain/suppliers';
-import type { SupplierEntityFormValues } from './utils/validations';
+import type { SupplierEntityFormValues } from './validations';
 
 export const createSupplierDefaultValues: SupplierEntityFormValues = {
   name: '',

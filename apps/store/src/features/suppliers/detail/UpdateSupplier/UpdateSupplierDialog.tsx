@@ -4,8 +4,10 @@ import { Dialog } from '@ordero/ui';
 import { useQueryClient } from '@tanstack/react-query';
 import type { Supplier } from '@/lib/domain/suppliers';
 import { suppliersQueryKeys } from '@/lib/query/suppliers/suppliersQueryKeys';
-import { getSupplierDefaultValues } from '../../list/CreateSupplier/constants';
-import { ActionSupplierDialogContent } from '../../shared/ActionSupplierDialogContent';
+import {
+  getSupplierDefaultValues,
+  SupplierFormDialogContent,
+} from '../../shared/SupplierFormDialogContent';
 import { useUpdateSupplierForm } from './hooks/useUpdateSupplierForm';
 
 type UpdateSupplierDialogProps = {
@@ -61,7 +63,7 @@ export const UpdateSupplierDialog = ({
                 <Dialog.Title>Edit supplier</Dialog.Title>
               </Dialog.Header>
 
-              <ActionSupplierDialogContent
+              <SupplierFormDialogContent
                 form={form}
                 pendingText="Saving..."
                 submitText="Save"
