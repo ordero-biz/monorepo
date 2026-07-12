@@ -99,6 +99,43 @@ describe('UpdateAttributeValueDialog', () => {
     expect(saveButton).toBeEnabled();
   });
 
+  it('prevents another save while the update is in flight', async () => {
+    let resolveUpdate:
+      | ((value: Awaited<ReturnType<typeof updateAttributeValue>>) => void)
+      | undefined;
+
+    updateAttributeValueMock.mockReturnValue(
+      new Promise((resolve) => {
+        resolveUpdate = resolve;
+      })
+    );
+    const user = userEvent.setup();
+
+    setup();
+
+    const dialog = screen.getByRole('dialog', {
+      name: 'Edit Attribute Value',
+    });
+    const saveButton = within(dialog).getByRole('button', { name: 'Save' });
+
+    await user.click(saveButton);
+
+    expect(saveButton).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Saving...' })).toBeVisible();
+
+    resolveUpdate?.({
+      ok: true,
+      data: {
+        id: 3,
+        name: 'Blue',
+        sortOrder: 0,
+        createdAt: '2026-06-24T20:07:32.467Z',
+      },
+    });
+
+    await screen.findByRole('button', { name: 'Save' });
+  });
+
   it('shows backend errors and keeps the dialog open when submit fails', async () => {
     updateAttributeValueMock.mockResolvedValue({
       ok: false,

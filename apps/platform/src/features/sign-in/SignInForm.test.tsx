@@ -2,6 +2,7 @@ import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { signIn } from '@/lib/client/api/auth';
 import { clientRoutes } from '@/lib/client/routes';
+import { authQueryKeys } from '@/lib/hooks/auth/useSessionQuery';
 import { preparePlatformSetup } from '@/test/prepareSetup';
 import { SignInForm } from './SignInForm';
 
@@ -29,9 +30,10 @@ const { setup } = preparePlatformSetup({
 const setupSignInForm = () => {
   const user = userEvent.setup();
 
-  setup();
+  const result = setup();
 
   return {
+    ...result,
     emailField: screen.getByRole('textbox', { name: 'Email address' }),
     passwordField: screen.getByLabelText(/Password/),
     signInButton: screen.getByRole('button', { name: 'Sign in' }),
@@ -200,16 +202,18 @@ describe('SignInForm', () => {
   });
 
   it('submits credentials and redirects to stores after successful sign in', async () => {
+    const session = {
+      authenticated: true,
+      user: {
+        email: 'admin@gmail.com',
+      },
+    };
     signInMock.mockResolvedValue({
       ok: true,
-      data: {
-        authenticated: true,
-        user: {
-          email: 'admin@gmail.com',
-        },
-      },
+      data: session,
     });
-    const { emailField, passwordField, signInButton, user } = setupSignInForm();
+    const { emailField, passwordField, queryClient, signInButton, user } =
+      setupSignInForm();
 
     await user.type(emailField, 'admin@gmail.com');
     await user.type(passwordField, '123456');
@@ -219,6 +223,9 @@ describe('SignInForm', () => {
       email: 'admin@gmail.com',
       password: '123456',
     });
+    expect(queryClient.getQueryData(authQueryKeys.session)).toStrictEqual(
+      session
+    );
     expect(routerPushMock).toHaveBeenCalledWith(clientRoutes.stores);
   });
 

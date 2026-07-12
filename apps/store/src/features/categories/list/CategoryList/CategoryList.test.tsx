@@ -5,14 +5,16 @@ import { prepareStoreSetup } from '@/test/prepareSetup';
 import { CategoryList } from './CategoryList';
 
 const mocks = vi.hoisted(() => ({
-  createCategory: vi.fn(),
   getCategories: vi.fn(),
   pathname: '/products/categories',
   push: vi.fn(),
   searchParams: new URLSearchParams(),
 }));
 
-vi.mock('next/navigation', () => ({
+vi.mock('next/navigation', async () => ({
+  ...(await vi.importActual<typeof import('next/navigation')>(
+    'next/navigation'
+  )),
   usePathname: () => mocks.pathname,
   useRouter: () => ({
     push: mocks.push,
@@ -20,9 +22,15 @@ vi.mock('next/navigation', () => ({
   useSearchParams: () => mocks.searchParams,
 }));
 
-vi.mock('@/lib/client/api/categories', () => ({
-  createCategory: mocks.createCategory,
+vi.mock('@/lib/client/api/categories', async () => ({
+  ...(await vi.importActual<typeof import('@/lib/client/api/categories')>(
+    '@/lib/client/api/categories'
+  )),
   getCategories: mocks.getCategories,
+}));
+
+vi.mock('./CategoryListHeader', () => ({
+  CategoryListHeader: () => <div />,
 }));
 
 const getCategoriesMock = vi.mocked(getCategories);
@@ -164,6 +172,7 @@ describe('CategoryList', () => {
     });
 
     expect(await screen.findByText('Accessories')).toBeVisible();
+    expect(screen.getByText('None')).toBeVisible();
     expect(screen.getByText('2-2 of 2')).toBeVisible();
   });
 

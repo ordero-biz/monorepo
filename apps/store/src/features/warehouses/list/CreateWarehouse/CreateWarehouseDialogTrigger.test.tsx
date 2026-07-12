@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { CreateWarehouseDialogTrigger } from './CreateWarehouseDialogTrigger';
@@ -16,5 +16,32 @@ describe('CreateWarehouseDialogTrigger', () => {
     await user.click(screen.getByRole('button', { name: 'Add Warehouse' }));
 
     expect(screen.getByRole('dialog', { name: 'Add warehouse' })).toBeVisible();
+  });
+
+  it('resets unsaved fields when the dialog is closed and reopened', async () => {
+    const user = userEvent.setup();
+
+    setup();
+
+    await user.click(screen.getByRole('button', { name: 'Add Warehouse' }));
+
+    const dialog = screen.getByRole('dialog', { name: 'Add warehouse' });
+    const codeField = within(dialog).getByRole('textbox', { name: 'Code' });
+
+    await user.type(codeField, 'WH-001');
+    await user.keyboard('{Escape}');
+
+    expect(
+      screen.queryByRole('dialog', { name: 'Add warehouse' })
+    ).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Add Warehouse' }));
+
+    expect(
+      within(screen.getByRole('dialog', { name: 'Add warehouse' })).getByRole(
+        'textbox',
+        { name: 'Code' }
+      )
+    ).toHaveValue('');
   });
 });

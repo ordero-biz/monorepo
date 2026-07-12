@@ -2,12 +2,16 @@ import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { signIn } from '@/lib/client/api/auth';
 import { clientRoutes } from '@/lib/client/routes';
+import { authQueryKeys } from '@/lib/hooks/auth/useSessionQuery';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { SignInForm } from './SignInForm';
 
 const routerReplaceMock = vi.hoisted(() => vi.fn());
 
-vi.mock('next/navigation', () => ({
+vi.mock('next/navigation', async () => ({
+  ...(await vi.importActual<typeof import('next/navigation')>(
+    'next/navigation'
+  )),
   useRouter: () => ({
     replace: routerReplaceMock,
   }),
@@ -29,13 +33,14 @@ const { setup } = prepareStoreSetup({
 const setupSignInForm = () => {
   const user = userEvent.setup();
 
-  setup();
+  const result = setup();
 
   return {
     emailField: screen.getByRole('textbox', { name: 'Email address' }),
     passwordField: screen.getByLabelText(/Password/),
     signInButton: screen.getByRole('button', { name: 'Sign in' }),
     user,
+    ...result,
   };
 };
 
@@ -69,6 +74,27 @@ describe('SignInForm', () => {
       screen.getByText('Password must contain at least 6 characters.')
     ).toBeVisible();
     expect(passwordField).toHaveValue('');
+  });
+
+  it('shows validation after blur and clears it as the email is corrected', async () => {
+    const { emailField, user } = setupSignInForm();
+
+    await user.type(emailField, 'invalid');
+
+    expect(
+      screen.queryByText('Enter a valid email address.')
+    ).not.toBeInTheDocument();
+
+    await user.tab();
+
+    expect(screen.getByText('Enter a valid email address.')).toBeVisible();
+
+    await user.clear(emailField);
+    await user.type(emailField, 'admin@gmail.com');
+
+    expect(
+      screen.queryByText('Enter a valid email address.')
+    ).not.toBeInTheDocument();
   });
 
   it('shows the backend email error for a valid rejected address on submit', async () => {
@@ -109,7 +135,8 @@ describe('SignInForm', () => {
         },
       },
     });
-    const { emailField, passwordField, signInButton, user } = setupSignInForm();
+    const { emailField, passwordField, queryClient, signInButton, user } =
+      setupSignInForm();
 
     await user.type(emailField, 'admin@gmail.com');
     await user.type(passwordField, '123456');
@@ -120,8 +147,47 @@ describe('SignInForm', () => {
       password: '123456',
     });
     expect(routerReplaceMock).toHaveBeenCalledWith(clientRoutes.attributes);
+    expect(queryClient.getQueryData(authQueryKeys.session)).toEqual({
+      authenticated: true,
+      user: {
+        email: 'admin@gmail.com',
+      },
+    });
     expect(emailField).toHaveValue('admin@gmail.com');
     expect(passwordField).toHaveValue('');
+  });
+
+  it('prevents another sign-in while the request is in flight', async () => {
+    let resolveSignIn:
+      | ((value: Awaited<ReturnType<typeof signIn>>) => void)
+      | undefined;
+
+    signInMock.mockReturnValue(
+      new Promise((resolve) => {
+        resolveSignIn = resolve;
+      })
+    );
+    const { emailField, passwordField, signInButton, user } = setupSignInForm();
+
+    await user.type(emailField, 'admin@gmail.com');
+    await user.type(passwordField, '123456');
+    await user.click(signInButton);
+
+    expect(
+      screen.getByRole('button', { name: 'Signing in...' })
+    ).toBeDisabled();
+
+    resolveSignIn?.({
+      ok: true,
+      data: {
+        authenticated: true,
+        user: {
+          email: 'admin@gmail.com',
+        },
+      },
+    });
+
+    await screen.findByRole('button', { name: 'Sign in' });
   });
 
   it('shows a toast when sign in fails with a form-level backend error', async () => {

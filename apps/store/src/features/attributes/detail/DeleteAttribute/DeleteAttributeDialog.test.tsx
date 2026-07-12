@@ -4,11 +4,14 @@ import { deleteAttributes } from '@/lib/client/api/attributes';
 import { clientRoutes } from '@/lib/client/routes';
 import { attributesQueryKeys } from '@/lib/query/attributes/attributesQueryKeys';
 import { prepareStoreSetup } from '@/test/prepareSetup';
-import { DeleteAttributeDialogTrigger } from './DeleteAttributeDialogTrigger';
+import { DeleteAttributeDialog } from './DeleteAttributeDialog';
 
 const routerPushMock = vi.fn();
 
-vi.mock('next/navigation', () => ({
+vi.mock('next/navigation', async () => ({
+  ...(await vi.importActual<typeof import('next/navigation')>(
+    'next/navigation'
+  )),
   useRouter: () => ({
     push: routerPushMock,
   }),
@@ -24,7 +27,7 @@ vi.mock('@/lib/client/api/attributes', async () => ({
 const deleteAttributesMock = vi.mocked(deleteAttributes);
 
 const { setup } = prepareStoreSetup({
-  component: DeleteAttributeDialogTrigger,
+  component: DeleteAttributeDialog,
   props: {
     attribute: {
       id: 7,
@@ -32,6 +35,8 @@ const { setup } = prepareStoreSetup({
       sortOrder: 10,
       createdAt: '2026-06-24T20:07:32.467Z',
     },
+    onOpenChange: vi.fn(),
+    open: true,
   },
 });
 
@@ -41,12 +46,8 @@ describe('DeleteAttributeDialog', () => {
     routerPushMock.mockClear();
   });
 
-  it('opens a confirmation dialog with the attribute name', async () => {
-    const user = userEvent.setup();
-
+  it('renders a confirmation dialog with the attribute name', () => {
     setup();
-
-    await user.click(screen.getByRole('button', { name: 'Delete Color' }));
 
     expect(
       screen.getByRole('dialog', { name: 'Delete attribute' })
@@ -63,11 +64,10 @@ describe('DeleteAttributeDialog', () => {
       ok: true,
       data: undefined,
     });
-    const { queryClient } = setup();
+    const { onOpenChange, queryClient } = setup();
     const invalidateQueriesSpy = vi.spyOn(queryClient, 'invalidateQueries');
     const removeQueriesSpy = vi.spyOn(queryClient, 'removeQueries');
 
-    await user.click(screen.getByRole('button', { name: 'Delete Color' }));
     await user.click(screen.getByRole('button', { name: 'Delete' }));
 
     expect(deleteAttributesMock).toHaveBeenCalledWith({
@@ -84,7 +84,37 @@ describe('DeleteAttributeDialog', () => {
         queryKey: attributesQueryKeys.list,
       })
     );
+    expect(onOpenChange).toHaveBeenCalledWith(false);
     expect(routerPushMock).toHaveBeenCalledWith(clientRoutes.attributes);
+  });
+
+  it('prevents another deletion while the request is in flight', async () => {
+    let resolveDelete:
+      | ((value: Awaited<ReturnType<typeof deleteAttributes>>) => void)
+      | undefined;
+
+    deleteAttributesMock.mockReturnValue(
+      new Promise((resolve) => {
+        resolveDelete = resolve;
+      })
+    );
+    const user = userEvent.setup();
+
+    setup();
+
+    const deleteButton = screen.getByRole('button', { name: 'Delete' });
+
+    await user.click(deleteButton);
+
+    expect(deleteButton).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Deleting...' })).toBeVisible();
+
+    resolveDelete?.({
+      ok: true,
+      data: undefined,
+    });
+
+    await screen.findByRole('button', { name: 'Delete' });
   });
 
   it('shows a toast and stays on the page when delete fails', async () => {
@@ -99,7 +129,6 @@ describe('DeleteAttributeDialog', () => {
 
     setup();
 
-    await user.click(screen.getByRole('button', { name: 'Delete Color' }));
     await user.click(screen.getByRole('button', { name: 'Delete' }));
 
     expect(

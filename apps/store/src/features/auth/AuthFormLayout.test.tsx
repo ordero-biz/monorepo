@@ -21,4 +21,23 @@ describe('AuthFormLayout', () => {
     expect(screen.getByRole('button', { name: 'Child action' })).toBeVisible();
     expect(screen.queryByRole('link')).not.toBeInTheDocument();
   });
+
+  it('renders the optional footer prompt and link', () => {
+    render(
+      <AuthFormLayout
+        footerHref="/sign-up"
+        footerLabel="Create account"
+        footerPrompt="Don't have an account?"
+        subtitle="Please enter your details to get started"
+        title="Welcome back!"
+      >
+        <button type="button">Child action</button>
+      </AuthFormLayout>
+    );
+
+    expect(screen.getByText("Don't have an account?")).toBeVisible();
+    expect(
+      screen.getByRole('link', { name: 'Create account' })
+    ).toHaveAttribute('href', '/sign-up');
+  });
 });

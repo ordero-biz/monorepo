@@ -10,7 +10,10 @@ const mocks = vi.hoisted(() => ({
   searchParams: new URLSearchParams(),
 }));
 
-vi.mock('next/navigation', () => ({
+vi.mock('next/navigation', async () => ({
+  ...(await vi.importActual<typeof import('next/navigation')>(
+    'next/navigation'
+  )),
   usePathname: () => mocks.pathname,
   useRouter: () => ({
     push: mocks.push,
@@ -150,5 +153,91 @@ describe('WarehousesList', () => {
     await waitFor(() => {
       expect(getWarehousesMock).toHaveBeenCalledWith(paginationInput);
     });
+  });
+
+  it('renders the current server page without client-side pagination', async () => {
+    getWarehousesMock.mockResolvedValue({
+      ok: true,
+      data: {
+        content: [
+          {
+            id: 2,
+            code: 'WH-002',
+            name: 'Overflow Warehouse',
+            address: '124 Commerce Ave',
+            comment: 'Overflow stock location',
+          },
+        ],
+        page: {
+          size: 1,
+          number: 1,
+          totalElements: 2,
+          totalPages: 2,
+        },
+      },
+    });
+
+    setup({
+      paginationInput: {
+        page: 1,
+        size: 1,
+      },
+    });
+
+    expect(await screen.findByText('Overflow Warehouse')).toBeVisible();
+    expect(screen.getByText('2-2 of 2')).toBeVisible();
+  });
+
+  it('renders an empty state when there are no warehouses', async () => {
+    getWarehousesMock.mockResolvedValue({
+      ok: true,
+      data: {
+        content: [],
+        page: {
+          size: 10,
+          number: 0,
+          totalElements: 0,
+          totalPages: 0,
+        },
+      },
+    });
+
+    setup();
+
+    expect(await screen.findByText('No warehouses found.')).toBeVisible();
+  });
+
+  it('pushes pagination changes to the URL', async () => {
+    mocks.searchParams = new URLSearchParams('page=0&size=25&sort=name%2Casc');
+    getWarehousesMock.mockResolvedValue({
+      ok: true,
+      data: {
+        content: [],
+        page: {
+          size: 10,
+          number: 0,
+          totalElements: 51,
+          totalPages: 3,
+        },
+      },
+    });
+    const user = userEvent.setup();
+
+    setup({
+      paginationInput: {
+        page: 0,
+        size: 10,
+        sort: ['name,asc'],
+      },
+    });
+
+    await user.click(
+      await screen.findByRole('button', { name: 'Go to next page' })
+    );
+
+    expect(mocks.push).toHaveBeenCalledWith(
+      '/products/warehouse?page=1&size=25&sort=name%2Casc',
+      { scroll: false }
+    );
   });
 });

@@ -28,4 +28,30 @@ describe('UpdateAttributeDialogTrigger', () => {
       screen.getByRole('dialog', { name: 'Edit Attribute' })
     ).toBeVisible();
   });
+
+  it('resets an unsaved name when the dialog is closed and reopened', async () => {
+    const user = userEvent.setup();
+
+    setup();
+
+    await user.click(screen.getByRole('button', { name: 'Edit Color' }));
+
+    const nameField = screen.getByRole('textbox', {
+      name: 'Attribute name',
+    });
+
+    await user.clear(nameField);
+    await user.type(nameField, 'Material');
+    await user.keyboard('{Escape}');
+
+    expect(
+      screen.queryByRole('dialog', { name: 'Edit Attribute' })
+    ).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Edit Color' }));
+
+    expect(screen.getByRole('textbox', { name: 'Attribute name' })).toHaveValue(
+      'Color'
+    );
+  });
 });

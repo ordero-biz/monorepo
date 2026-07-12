@@ -3,7 +3,9 @@ import userEvent from '@testing-library/user-event';
 import { createCategory } from '@/lib/client/api/categories';
 import { categoriesQueryKeys } from '@/lib/query/categories/categoriesQueryKeys';
 import { prepareStoreSetup } from '@/test/prepareSetup';
-import { CreateCategoryDialogTrigger } from './CreateCategoryDialogTrigger';
+import { CreateCategoryDialog } from './CreateCategoryDialog';
+
+const onOpenChangeMock = vi.fn();
 
 vi.mock('@/lib/client/api/categories', async () => ({
   ...(await vi.importActual<typeof import('@/lib/client/api/categories')>(
@@ -15,7 +17,7 @@ vi.mock('@/lib/client/api/categories', async () => ({
 const createCategoryMock = vi.mocked(createCategory);
 
 const { setup } = prepareStoreSetup({
-  component: CreateCategoryDialogTrigger,
+  component: CreateCategoryDialog,
   props: {
     availableCategories: [
       {
@@ -26,31 +28,21 @@ const { setup } = prepareStoreSetup({
         createdAt: '2026-07-01T10:54:34.839Z',
       },
     ],
+    onOpenChange: onOpenChangeMock,
+    open: true,
   },
 });
 
 describe('CreateCategoryDialog', () => {
   beforeEach(() => {
     createCategoryMock.mockReset();
-  });
-
-  it('opens the dialog from the create category trigger', async () => {
-    const user = userEvent.setup();
-
-    setup();
-
-    await user.click(screen.getByRole('button', { name: /create category/i }));
-
-    expect(
-      screen.getByRole('dialog', { name: 'Create new category' })
-    ).toBeVisible();
+    onOpenChangeMock.mockClear();
   });
 
   it('requires a category name before create is available', async () => {
     const user = userEvent.setup();
 
     setup();
-    await user.click(screen.getByRole('button', { name: /create category/i }));
 
     const dialog = screen.getByRole('dialog', { name: 'Create new category' });
     const nameField = within(dialog).getByRole('textbox', {
@@ -73,7 +65,6 @@ describe('CreateCategoryDialog', () => {
   });
 
   it('creates a category with the selected parent category', async () => {
-    const user = userEvent.setup();
     createCategoryMock.mockResolvedValue({
       ok: true,
       data: {
@@ -89,11 +80,9 @@ describe('CreateCategoryDialog', () => {
         },
       },
     });
+    const user = userEvent.setup();
     const { queryClient } = setup();
     const invalidateQueriesSpy = vi.spyOn(queryClient, 'invalidateQueries');
-
-    await user.click(screen.getByRole('button', { name: /create category/i }));
-
     const dialog = screen.getByRole('dialog', { name: 'Create new category' });
 
     await user.type(
@@ -115,13 +104,52 @@ describe('CreateCategoryDialog', () => {
         queryKey: categoriesQueryKeys.list,
       })
     );
-    expect(
-      screen.queryByRole('dialog', { name: 'Create new category' })
-    ).not.toBeInTheDocument();
+    expect(onOpenChangeMock).toHaveBeenCalledWith(false);
+  });
+
+  it('prevents another creation while the request is in flight', async () => {
+    let resolveCreate:
+      | ((value: Awaited<ReturnType<typeof createCategory>>) => void)
+      | undefined;
+
+    createCategoryMock.mockReturnValue(
+      new Promise((resolve) => {
+        resolveCreate = resolve;
+      })
+    );
+    const user = userEvent.setup();
+
+    setup();
+
+    const dialog = screen.getByRole('dialog', { name: 'Create new category' });
+    const nameField = within(dialog).getByRole('textbox', {
+      name: 'Name',
+    });
+
+    await user.type(nameField, 'Sneakers');
+
+    const createButton = within(dialog).getByRole('button', { name: 'Create' });
+
+    await user.click(createButton);
+
+    expect(createButton).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Creating...' })).toBeVisible();
+
+    resolveCreate?.({
+      ok: true,
+      data: {
+        id: 3,
+        name: 'Sneakers',
+        sortOrder: 15,
+        color: '#16a34a',
+        createdAt: '2026-07-01T11:22:53.562Z',
+      },
+    });
+
+    await screen.findByRole('button', { name: 'Create' });
   });
 
   it('shows backend errors and keeps the dialog open when submit fails', async () => {
-    const user = userEvent.setup();
     createCategoryMock.mockResolvedValue({
       ok: false,
       error: {
@@ -132,10 +160,9 @@ describe('CreateCategoryDialog', () => {
         },
       },
     });
+    const user = userEvent.setup();
 
     setup();
-
-    await user.click(screen.getByRole('button', { name: /create category/i }));
 
     const dialog = screen.getByRole('dialog', { name: 'Create new category' });
     const nameField = within(dialog).getByRole('textbox', {
@@ -161,5 +188,6 @@ describe('CreateCategoryDialog', () => {
     expect(
       screen.getByRole('dialog', { name: 'Create new category' })
     ).toBeVisible();
+    expect(onOpenChangeMock).not.toHaveBeenCalledWith(false);
   });
 });

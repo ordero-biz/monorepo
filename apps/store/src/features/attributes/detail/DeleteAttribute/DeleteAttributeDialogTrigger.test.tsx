@@ -3,11 +3,12 @@ import userEvent from '@testing-library/user-event';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { DeleteAttributeDialogTrigger } from './DeleteAttributeDialogTrigger';
 
-const routerPushMock = vi.fn();
-
-vi.mock('next/navigation', () => ({
+vi.mock('next/navigation', async () => ({
+  ...(await vi.importActual<typeof import('next/navigation')>(
+    'next/navigation'
+  )),
   useRouter: () => ({
-    push: routerPushMock,
+    push: vi.fn(),
   }),
 }));
 

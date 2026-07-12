@@ -67,6 +67,11 @@ describe('CategoriesAsyncCombobox', () => {
     await user.click(screen.getByRole('combobox', { name: 'Category' }));
     await user.click(await screen.findByRole('option', { name: 'Shoes' }));
 
+    expect(getCategoriesMock).toHaveBeenCalledWith({
+      page: 0,
+      size: 100,
+      sort: ['name,asc'],
+    });
     expect(mocks.onValueChange).toHaveBeenLastCalledWith(
       '1',
       expect.any(Object)
@@ -88,5 +93,46 @@ describe('CategoriesAsyncCombobox', () => {
     });
 
     await waitFor(() => expect(getCategoriesMock).toHaveBeenCalledTimes(2));
+  });
+
+  it('shows an empty state when no categories are available', async () => {
+    getCategoriesMock.mockResolvedValue({
+      ok: true,
+      data: {
+        content: [],
+        page: {
+          number: 0,
+          size: 100,
+          totalElements: 0,
+          totalPages: 0,
+        },
+      },
+    });
+    const user = userEvent.setup();
+
+    setup();
+
+    await user.click(screen.getByRole('combobox', { name: 'Category' }));
+
+    expect(await screen.findByText('No categories found')).toBeVisible();
+  });
+
+  it('shows a load error when categories cannot be retrieved', async () => {
+    getCategoriesMock.mockResolvedValue({
+      ok: false,
+      error: {
+        status: 500,
+        message: 'Could not load categories.',
+      },
+    });
+    const user = userEvent.setup();
+
+    setup();
+
+    await user.click(screen.getByRole('combobox', { name: 'Category' }));
+
+    expect(
+      await screen.findByText("We couldn't load categories right now.")
+    ).toBeVisible();
   });
 });

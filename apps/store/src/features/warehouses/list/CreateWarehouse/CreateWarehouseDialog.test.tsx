@@ -3,7 +3,9 @@ import userEvent from '@testing-library/user-event';
 import { createWarehouse } from '@/lib/client/api/warehouses';
 import { warehousesQueryKeys } from '@/lib/query/warehouses/warehousesQueryKeys';
 import { prepareStoreSetup } from '@/test/prepareSetup';
-import { CreateWarehouseDialogTrigger } from './CreateWarehouseDialogTrigger';
+import { CreateWarehouseDialog } from './CreateWarehouseDialog';
+
+const onOpenChangeMock = vi.fn();
 
 vi.mock('@/lib/client/api/warehouses', async () => ({
   ...(await vi.importActual<typeof import('@/lib/client/api/warehouses')>(
@@ -15,29 +17,23 @@ vi.mock('@/lib/client/api/warehouses', async () => ({
 const createWarehouseMock = vi.mocked(createWarehouse);
 
 const { setup } = prepareStoreSetup({
-  component: CreateWarehouseDialogTrigger,
+  component: CreateWarehouseDialog,
+  props: {
+    onOpenChange: onOpenChangeMock,
+    open: true,
+  },
 });
 
 describe('CreateWarehouseDialog', () => {
   beforeEach(() => {
     createWarehouseMock.mockReset();
-  });
-
-  it('opens the dialog from the add warehouse trigger', async () => {
-    const user = userEvent.setup();
-
-    setup();
-
-    await user.click(screen.getByRole('button', { name: /add warehouse/i }));
-
-    expect(screen.getByRole('dialog', { name: 'Add warehouse' })).toBeVisible();
+    onOpenChangeMock.mockClear();
   });
 
   it('requires code, name, and address before add is available', async () => {
     const user = userEvent.setup();
 
     setup();
-    await user.click(screen.getByRole('button', { name: /add warehouse/i }));
 
     const dialog = screen.getByRole('dialog', { name: 'Add warehouse' });
     const codeField = within(dialog).getByRole('textbox', {
@@ -71,7 +67,7 @@ describe('CreateWarehouseDialog', () => {
     expect(addButton).toBeEnabled();
   });
 
-  it('closes on submit, resets the form, and invalidates the list', async () => {
+  it('creates a warehouse, closes the dialog, and invalidates the list', async () => {
     const user = userEvent.setup();
     createWarehouseMock.mockResolvedValue({
       ok: true,
@@ -84,10 +80,8 @@ describe('CreateWarehouseDialog', () => {
       },
     });
 
-    const { queryClient } = setup();
+    const { onOpenChange, queryClient } = setup();
     const invalidateQueriesSpy = vi.spyOn(queryClient, 'invalidateQueries');
-
-    await user.click(screen.getByRole('button', { name: /add warehouse/i }));
 
     const dialog = screen.getByRole('dialog', { name: 'Add warehouse' });
 
@@ -120,28 +114,7 @@ describe('CreateWarehouseDialog', () => {
         queryKey: warehousesQueryKeys.list,
       })
     );
-    expect(
-      screen.queryByRole('dialog', { name: 'Add warehouse' })
-    ).not.toBeInTheDocument();
-
-    await user.click(screen.getByRole('button', { name: /add warehouse/i }));
-
-    const reopenedDialog = screen.getByRole('dialog', {
-      name: 'Add warehouse',
-    });
-
-    expect(
-      within(reopenedDialog).getByRole('textbox', { name: 'Code' })
-    ).toHaveValue('');
-    expect(
-      within(reopenedDialog).getByRole('textbox', { name: 'Name' })
-    ).toHaveValue('');
-    expect(
-      within(reopenedDialog).getByRole('textbox', { name: 'Address' })
-    ).toHaveValue('');
-    expect(
-      within(reopenedDialog).getByRole('textbox', { name: 'Comment' })
-    ).toHaveValue('');
+    expect(onOpenChange).toHaveBeenCalledWith(false);
   });
 
   it('shows backend errors and keeps the dialog open when submit fails', async () => {
@@ -157,9 +130,7 @@ describe('CreateWarehouseDialog', () => {
       },
     });
 
-    setup();
-
-    await user.click(screen.getByRole('button', { name: /add warehouse/i }));
+    const { onOpenChange } = setup();
 
     const dialog = screen.getByRole('dialog', { name: 'Add warehouse' });
     const codeField = within(dialog).getByRole('textbox', {
@@ -193,5 +164,6 @@ describe('CreateWarehouseDialog', () => {
       await screen.findByRole('dialog', { name: 'Warehouse creation failed.' })
     ).toBeVisible();
     expect(screen.getByRole('dialog', { name: 'Add warehouse' })).toBeVisible();
+    expect(onOpenChange).not.toHaveBeenCalledWith(false);
   });
 });

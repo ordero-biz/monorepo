@@ -22,14 +22,12 @@ const { setup } = preparePlatformSetup({
 
 const setupAddStoreForm = () => {
   const user = userEvent.setup();
-  const onCreated = vi.fn();
   const result = setup({
-    onCreated,
+    onCreated: vi.fn(),
   });
 
   return {
     ...result,
-    onCreated,
     user,
     subDomainField: screen.getByRole('textbox', { name: 'Subdomain' }),
     nameField: screen.getByRole('textbox', { name: 'Name' }),
@@ -132,6 +130,40 @@ describe('AddStoreForm', () => {
     expect(
       await screen.findByRole('dialog', { name: 'Store created.' })
     ).toBeVisible();
+  });
+
+  it('prevents another submission while store creation is in flight', async () => {
+    let resolveStore:
+      | ((value: Awaited<ReturnType<typeof createStore>>) => void)
+      | undefined;
+
+    createStoreMock.mockReturnValue(
+      new Promise((resolve) => {
+        resolveStore = resolve;
+      })
+    );
+    const { nameField, subDomainField, submitButton, user } =
+      setupAddStoreForm();
+
+    await user.type(subDomainField, 'north-shop');
+    await user.type(nameField, 'North Shop');
+    await user.click(submitButton);
+
+    expect(submitButton).toBeDisabled();
+    expect(
+      screen.getByRole('button', { name: 'Creating store...' })
+    ).toBeVisible();
+
+    resolveStore?.({
+      ok: true,
+      data: {
+        id: 1,
+        name: 'North Shop',
+        subDomain: 'north-shop',
+      },
+    });
+
+    await screen.findByRole('button', { name: 'Create store' });
   });
 
   it('shows the backend subDomain field error on submit', async () => {

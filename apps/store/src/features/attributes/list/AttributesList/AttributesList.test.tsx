@@ -11,7 +11,10 @@ const mocks = vi.hoisted(() => ({
   searchParams: new URLSearchParams(),
 }));
 
-vi.mock('next/navigation', () => ({
+vi.mock('next/navigation', async () => ({
+  ...(await vi.importActual<typeof import('next/navigation')>(
+    'next/navigation'
+  )),
   usePathname: () => mocks.pathname,
   useRouter: () => ({
     push: mocks.push,
@@ -153,6 +156,25 @@ describe('AttributesList', () => {
       'href',
       getAttributeDetailRoute(1)
     );
+  });
+
+  it('renders an empty state when no attributes are available', async () => {
+    getAttributesMock.mockResolvedValue({
+      ok: true,
+      data: {
+        content: [],
+        page: {
+          size: 10,
+          number: 0,
+          totalElements: 0,
+          totalPages: 0,
+        },
+      },
+    });
+
+    setup();
+
+    expect(await screen.findByText('No attributes found.')).toBeVisible();
   });
 
   it('requests attributes with pagination input', async () => {

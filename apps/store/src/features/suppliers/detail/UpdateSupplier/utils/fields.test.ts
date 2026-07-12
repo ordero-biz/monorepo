@@ -1,4 +1,3 @@
-import { describe, expect, it } from 'vitest';
 import type { Supplier } from '@/lib/domain/suppliers';
 import { getSupplierDefaultValues } from './fields';
 
