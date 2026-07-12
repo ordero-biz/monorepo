@@ -70,6 +70,35 @@ describe('DeleteAttributeValueDialog', () => {
     expect(onOpenChangeMock).toHaveBeenCalledWith(false);
   });
 
+  it('prevents another deletion while the request is in flight', async () => {
+    let resolveDelete:
+      | ((value: Awaited<ReturnType<typeof deleteAttributeValues>>) => void)
+      | undefined;
+
+    deleteAttributeValuesMock.mockReturnValue(
+      new Promise((resolve) => {
+        resolveDelete = resolve;
+      })
+    );
+    const user = userEvent.setup();
+
+    setup();
+
+    const deleteButton = screen.getByRole('button', { name: 'Delete' });
+
+    await user.click(deleteButton);
+
+    expect(deleteButton).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Deleting...' })).toBeVisible();
+
+    resolveDelete?.({
+      ok: true,
+      data: undefined,
+    });
+
+    await screen.findByRole('button', { name: 'Delete' });
+  });
+
   it('shows a toast and keeps the dialog open when delete fails', async () => {
     deleteAttributeValuesMock.mockResolvedValue({
       ok: false,

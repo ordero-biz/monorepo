@@ -1,26 +1,18 @@
-import { render, screen } from '@testing-library/react';
-import {
-  createTestQueryClient,
-  createTestQueryProvider,
-} from '@/test/prepareSetup';
+import { screen } from '@testing-library/react';
+import { prepareStoreSetup } from '@/test/prepareSetup';
 import { SignInFormLayout } from './SignInLayout';
 
-vi.mock('next/navigation', () => ({
-  useRouter: () => ({
-    replace: vi.fn(),
-  }),
+vi.mock('./SignInForm', () => ({
+  SignInForm: () => <div>Sign in form</div>,
 }));
 
-describe('SignInFormLayout', () => {
-  it('renders the auth layout copy and sign-in form without sign-up navigation', () => {
-    const queryClient = createTestQueryClient();
-    const TestQueryProvider = createTestQueryProvider(queryClient);
+const { setup } = prepareStoreSetup({
+  component: SignInFormLayout,
+});
 
-    render(
-      <TestQueryProvider>
-        <SignInFormLayout />
-      </TestQueryProvider>
-    );
+describe('SignInFormLayout', () => {
+  it('renders the sign-in layout copy without sign-up navigation', () => {
+    setup();
 
     expect(
       screen.getByRole('heading', { name: 'Welcome back!' })
@@ -28,11 +20,7 @@ describe('SignInFormLayout', () => {
     expect(
       screen.getByText('Please enter your details to get started')
     ).toBeVisible();
-    expect(
-      screen.getByRole('textbox', { name: 'Email address' })
-    ).toBeVisible();
-    expect(screen.getByLabelText(/Password/)).toBeVisible();
-    expect(screen.getByRole('button', { name: 'Sign in' })).toBeVisible();
+    expect(screen.getByText('Sign in form')).toBeVisible();
     expect(screen.queryByRole('link')).not.toBeInTheDocument();
   });
 });

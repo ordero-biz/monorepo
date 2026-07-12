@@ -3,7 +3,9 @@ import userEvent from '@testing-library/user-event';
 import { createUnitOfMeasurement } from '@/lib/client/api/units-of-measurement';
 import { unitsOfMeasurementQueryKeys } from '@/lib/query/units-of-measurement/unitsOfMeasurementQueryKeys';
 import { prepareStoreSetup } from '@/test/prepareSetup';
-import { CreateUnitOfMeasurementDialogTrigger } from './CreateUnitOfMeasurementDialogTrigger';
+import { CreateUnitOfMeasurementDialog } from './CreateUnitOfMeasurementDialog';
+
+const onOpenChangeMock = vi.fn();
 
 vi.mock('@/lib/client/api/units-of-measurement', async () => ({
   ...(await vi.importActual<
@@ -15,35 +17,23 @@ vi.mock('@/lib/client/api/units-of-measurement', async () => ({
 const createUnitOfMeasurementMock = vi.mocked(createUnitOfMeasurement);
 
 const { setup } = prepareStoreSetup({
-  component: CreateUnitOfMeasurementDialogTrigger,
+  component: CreateUnitOfMeasurementDialog,
+  props: {
+    onOpenChange: onOpenChangeMock,
+    open: true,
+  },
 });
 
 describe('CreateUnitOfMeasurementDialog', () => {
   beforeEach(() => {
     createUnitOfMeasurementMock.mockReset();
-  });
-
-  it('opens the dialog from the add unit of measurement trigger', async () => {
-    const user = userEvent.setup();
-
-    setup();
-
-    await user.click(
-      screen.getByRole('button', { name: /add unit of measurement/i })
-    );
-
-    expect(
-      screen.getByRole('dialog', { name: 'Add unit of measurement' })
-    ).toBeVisible();
+    onOpenChangeMock.mockClear();
   });
 
   it('requires code, name, and symbol before add is available', async () => {
     const user = userEvent.setup();
 
     setup();
-    await user.click(
-      screen.getByRole('button', { name: /add unit of measurement/i })
-    );
 
     const dialog = screen.getByRole('dialog', {
       name: 'Add unit of measurement',
@@ -77,7 +67,7 @@ describe('CreateUnitOfMeasurementDialog', () => {
     expect(addButton).toBeEnabled();
   });
 
-  it('closes on submit, resets the form, and invalidates the list', async () => {
+  it('creates a unit of measurement, closes the dialog, and invalidates the list', async () => {
     const user = userEvent.setup();
     createUnitOfMeasurementMock.mockResolvedValue({
       ok: true,
@@ -90,12 +80,8 @@ describe('CreateUnitOfMeasurementDialog', () => {
       },
     });
 
-    const { queryClient } = setup();
+    const { onOpenChange, queryClient } = setup();
     const invalidateQueriesSpy = vi.spyOn(queryClient, 'invalidateQueries');
-
-    await user.click(
-      screen.getByRole('button', { name: /add unit of measurement/i })
-    );
 
     const dialog = screen.getByRole('dialog', {
       name: 'Add unit of measurement',
@@ -130,30 +116,7 @@ describe('CreateUnitOfMeasurementDialog', () => {
         queryKey: unitsOfMeasurementQueryKeys.list,
       })
     );
-    expect(
-      screen.queryByRole('dialog', { name: 'Add unit of measurement' })
-    ).not.toBeInTheDocument();
-
-    await user.click(
-      screen.getByRole('button', { name: /add unit of measurement/i })
-    );
-
-    const reopenedDialog = screen.getByRole('dialog', {
-      name: 'Add unit of measurement',
-    });
-
-    expect(
-      within(reopenedDialog).getByRole('textbox', { name: 'Code' })
-    ).toHaveValue('');
-    expect(
-      within(reopenedDialog).getByRole('textbox', { name: 'Name' })
-    ).toHaveValue('');
-    expect(
-      within(reopenedDialog).getByRole('textbox', { name: 'Symbol' })
-    ).toHaveValue('');
-    expect(
-      within(reopenedDialog).getByRole('textbox', { name: 'Comment' })
-    ).toHaveValue('');
+    expect(onOpenChange).toHaveBeenCalledWith(false);
   });
 
   it('shows backend errors and keeps the dialog open when submit fails', async () => {
@@ -169,11 +132,7 @@ describe('CreateUnitOfMeasurementDialog', () => {
       },
     });
 
-    setup();
-
-    await user.click(
-      screen.getByRole('button', { name: /add unit of measurement/i })
-    );
+    const { onOpenChange } = setup();
 
     const dialog = screen.getByRole('dialog', {
       name: 'Add unit of measurement',
@@ -211,5 +170,6 @@ describe('CreateUnitOfMeasurementDialog', () => {
     expect(
       screen.getByRole('dialog', { name: 'Add unit of measurement' })
     ).toBeVisible();
+    expect(onOpenChange).not.toHaveBeenCalledWith(false);
   });
 });

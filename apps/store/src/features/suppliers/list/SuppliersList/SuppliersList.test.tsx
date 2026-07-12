@@ -11,7 +11,10 @@ const mocks = vi.hoisted(() => ({
   searchParams: new URLSearchParams(),
 }));
 
-vi.mock('next/navigation', () => ({
+vi.mock('next/navigation', async () => ({
+  ...(await vi.importActual<typeof import('next/navigation')>(
+    'next/navigation'
+  )),
   usePathname: () => mocks.pathname,
   useRouter: () => ({
     push: mocks.push,
@@ -157,5 +160,92 @@ describe('SuppliersList', () => {
     await waitFor(() => {
       expect(getSuppliersMock).toHaveBeenCalledWith(paginationInput);
     });
+  });
+
+  it('renders current server page rows without client-side pagination', async () => {
+    getSuppliersMock.mockResolvedValue({
+      ok: true,
+      data: {
+        content: [
+          {
+            id: 2,
+            name: 'Harvest Goods',
+            email: 'orders@harvest.example',
+            phone: '+1 555 0101',
+            address: '124 Market St',
+            comment: 'Dry goods supplier',
+          },
+        ],
+        page: {
+          size: 1,
+          number: 1,
+          totalElements: 2,
+          totalPages: 2,
+        },
+      },
+    });
+
+    setup({
+      paginationInput: {
+        page: 1,
+        size: 1,
+      },
+    });
+
+    expect(await screen.findByText('Harvest Goods')).toBeVisible();
+    expect(screen.getByText('2-2 of 2')).toBeVisible();
+  });
+
+  it('renders an empty state when there are no suppliers', async () => {
+    getSuppliersMock.mockResolvedValue({
+      ok: true,
+      data: {
+        content: [],
+        page: {
+          size: 10,
+          number: 0,
+          totalElements: 0,
+          totalPages: 0,
+        },
+      },
+    });
+
+    setup();
+
+    expect(await screen.findByText('No suppliers found.')).toBeVisible();
+  });
+
+  it('pushes pagination changes to the URL', async () => {
+    mocks.searchParams = new URLSearchParams('page=0&size=25&sort=name%2Casc');
+    getSuppliersMock.mockResolvedValue({
+      ok: true,
+      data: {
+        content: [],
+        page: {
+          size: 10,
+          number: 0,
+          totalElements: 51,
+          totalPages: 3,
+        },
+      },
+    });
+    const user = userEvent.setup();
+
+    setup({
+      paginationInput: {
+        page: 0,
+        size: 10,
+        sort: ['name,asc'],
+      },
+    });
+
+    await user.click(
+      await screen.findByRole('button', { name: 'Go to next page' })
+    );
+
+    expect(mocks.push).toHaveBeenCalledWith(
+      '/products/suppliers?page=1&size=25&sort=name%2Casc',
+      { scroll: false }
+    );
   });
 });

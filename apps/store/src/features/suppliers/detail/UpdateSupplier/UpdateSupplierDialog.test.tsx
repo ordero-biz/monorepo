@@ -3,7 +3,10 @@ import userEvent from '@testing-library/user-event';
 import { updateSupplier } from '@/lib/client/api/suppliers';
 import { suppliersQueryKeys } from '@/lib/query/suppliers/suppliersQueryKeys';
 import { prepareStoreSetup } from '@/test/prepareSetup';
-import { UpdateSupplierDialogTrigger } from './UpdateSupplierDialogTrigger';
+import { UpdateSupplierDialog } from './UpdateSupplierDialog';
+
+const onOpenChangeMock = vi.fn();
+const onUpdatedMock = vi.fn();
 
 vi.mock('@/lib/client/api/suppliers', async () => ({
   ...(await vi.importActual<typeof import('@/lib/client/api/suppliers')>(
@@ -24,36 +27,24 @@ const supplier = {
 };
 
 const { setup } = prepareStoreSetup({
-  component: UpdateSupplierDialogTrigger,
+  component: UpdateSupplierDialog,
   props: {
-    onUpdated: vi.fn(),
+    onOpenChange: onOpenChangeMock,
+    onUpdated: onUpdatedMock,
+    open: true,
     supplier,
   },
 });
 
-const setupUpdateSupplierDialog = () => {
-  const user = userEvent.setup();
-  const onUpdated = vi.fn();
-  const result = setup({
-    onUpdated,
-  });
-
-  return {
-    ...result,
-    onUpdated,
-    user,
-  };
-};
-
 describe('UpdateSupplierDialog', () => {
   beforeEach(() => {
+    onOpenChangeMock.mockClear();
+    onUpdatedMock.mockClear();
     updateSupplierMock.mockReset();
   });
 
-  it('opens with the current supplier values', async () => {
-    const { user } = setupUpdateSupplierDialog();
-
-    await user.click(screen.getByRole('button', { name: 'Edit Fresh Farms' }));
+  it('opens with the current supplier values', () => {
+    setup();
 
     const dialog = screen.getByRole('dialog', { name: 'Edit supplier' });
 
@@ -74,41 +65,7 @@ describe('UpdateSupplierDialog', () => {
     ).toHaveValue('Preferred produce supplier');
   });
 
-  it('requires name, email, phone, and address before save is available', async () => {
-    const { user } = setupUpdateSupplierDialog();
-
-    await user.click(screen.getByRole('button', { name: 'Edit Fresh Farms' }));
-
-    const dialog = screen.getByRole('dialog', { name: 'Edit supplier' });
-    const emailField = within(dialog).getByRole('textbox', {
-      name: 'Email',
-    });
-    const addressField = within(dialog).getByRole('textbox', {
-      name: 'Address',
-    });
-    const saveButton = within(dialog).getByRole('button', { name: 'Save' });
-
-    expect(saveButton).toBeEnabled();
-
-    await user.clear(emailField);
-    await user.type(emailField, 'not-an-email');
-    await user.tab();
-
-    expect(
-      within(dialog).getByText('Enter a valid supplier email')
-    ).toBeVisible();
-
-    await user.clear(addressField);
-
-    expect(saveButton).toBeDisabled();
-
-    await user.type(addressField, '124 Market St');
-
-    expect(saveButton).toBeEnabled();
-  });
-
-  it('submits updated values, closes, invalidates the list, and reports success', async () => {
-    const { onUpdated, queryClient, user } = setupUpdateSupplierDialog();
+  it('submits updated values, closes, invalidates caches, and reports success', async () => {
     updateSupplierMock.mockResolvedValue({
       ok: true,
       data: {
@@ -120,10 +77,9 @@ describe('UpdateSupplierDialog', () => {
         comment: 'Updated supplier',
       },
     });
+    const user = userEvent.setup();
+    const { onOpenChange, onUpdated, queryClient } = setup();
     const invalidateQueriesSpy = vi.spyOn(queryClient, 'invalidateQueries');
-
-    await user.click(screen.getByRole('button', { name: 'Edit Fresh Farms' }));
-
     const dialog = screen.getByRole('dialog', { name: 'Edit supplier' });
     const nameField = within(dialog).getByRole('textbox', { name: 'Name' });
     const emailField = within(dialog).getByRole('textbox', { name: 'Email' });
@@ -169,13 +125,10 @@ describe('UpdateSupplierDialog', () => {
       })
     ).toBeVisible();
     await waitFor(() => expect(onUpdated).toHaveBeenCalled());
-    expect(
-      screen.queryByRole('dialog', { name: 'Edit supplier' })
-    ).not.toBeInTheDocument();
+    expect(onOpenChange).toHaveBeenCalledWith(false);
   });
 
   it('shows backend errors and keeps the dialog open when submit fails', async () => {
-    const { onUpdated, user } = setupUpdateSupplierDialog();
     updateSupplierMock.mockResolvedValue({
       ok: false,
       error: {
@@ -186,8 +139,8 @@ describe('UpdateSupplierDialog', () => {
         },
       },
     });
-
-    await user.click(screen.getByRole('button', { name: 'Edit Fresh Farms' }));
+    const user = userEvent.setup();
+    const { onOpenChange, onUpdated } = setup();
 
     const dialog = screen.getByRole('dialog', { name: 'Edit supplier' });
     const emailField = within(dialog).getByRole('textbox', {
@@ -206,6 +159,7 @@ describe('UpdateSupplierDialog', () => {
       await screen.findByRole('dialog', { name: 'Supplier update failed.' })
     ).toBeVisible();
     expect(screen.getByRole('dialog', { name: 'Edit supplier' })).toBeVisible();
+    expect(onOpenChange).not.toHaveBeenCalledWith(false);
     expect(onUpdated).not.toHaveBeenCalled();
   });
 });

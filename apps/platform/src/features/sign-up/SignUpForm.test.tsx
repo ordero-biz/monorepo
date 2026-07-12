@@ -2,6 +2,7 @@ import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { signUp } from '@/lib/client/api/auth';
 import { clientRoutes } from '@/lib/client/routes';
+import { authQueryKeys } from '@/lib/hooks/auth/useSessionQuery';
 import { preparePlatformSetup } from '@/test/prepareSetup';
 import { SignUpForm } from './SignUpForm';
 
@@ -29,9 +30,10 @@ const { setup } = preparePlatformSetup({
 const setupSignUpForm = () => {
   const user = userEvent.setup();
 
-  setup();
+  const result = setup();
 
   return {
+    ...result,
     emailField: screen.getByRole('textbox', { name: 'Email address' }),
     passwordField: screen.getByLabelText(/Password/),
     signUpButton: screen.getByRole('button', { name: 'Sign up' }),
@@ -192,17 +194,24 @@ describe('SignUpForm', () => {
   });
 
   it('submits account credentials and redirects to stores after successful sign up', async () => {
+    const session = {
+      authenticated: true,
+      user: {
+        email: 'admin@gmail.com',
+      },
+    };
     signUpMock.mockResolvedValue({
       ok: true,
-      data: {
-        authenticated: true,
-        user: {
-          email: 'admin@gmail.com',
-        },
-      },
+      data: session,
     });
-    const { emailField, passwordField, signUpButton, termsCheckbox, user } =
-      setupSignUpForm();
+    const {
+      emailField,
+      passwordField,
+      queryClient,
+      signUpButton,
+      termsCheckbox,
+      user,
+    } = setupSignUpForm();
 
     await user.type(emailField, 'admin@gmail.com');
     await user.type(passwordField, '123456');
@@ -213,7 +222,44 @@ describe('SignUpForm', () => {
       email: 'admin@gmail.com',
       password: '123456',
     });
+    expect(queryClient.getQueryData(authQueryKeys.session)).toStrictEqual(
+      session
+    );
     expect(routerPushMock).toHaveBeenCalledWith(clientRoutes.stores);
+  });
+
+  it('prevents another submission while sign up is in flight', async () => {
+    let resolveSignUp:
+      | ((value: Awaited<ReturnType<typeof signUp>>) => void)
+      | undefined;
+
+    signUpMock.mockReturnValue(
+      new Promise((resolve) => {
+        resolveSignUp = resolve;
+      })
+    );
+    const { emailField, passwordField, signUpButton, termsCheckbox, user } =
+      setupSignUpForm();
+
+    await user.type(emailField, 'admin@gmail.com');
+    await user.type(passwordField, '123456');
+    await user.click(termsCheckbox);
+    await user.click(signUpButton);
+
+    expect(signUpButton).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Signing up...' })).toBeVisible();
+
+    resolveSignUp?.({
+      ok: true,
+      data: {
+        authenticated: true,
+        user: {
+          email: 'admin@gmail.com',
+        },
+      },
+    });
+
+    await screen.findByRole('button', { name: 'Sign up' });
   });
 
   it('shows a toast when sign up fails with a form-level backend error', async () => {

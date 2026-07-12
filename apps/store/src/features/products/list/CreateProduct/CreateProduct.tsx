@@ -23,6 +23,10 @@ import { CategoriesAsyncCombobox } from './CategoriesAsyncCombobox';
 import { PRODUCT_GENERATION_MODE } from './constants';
 import { useCreateProductForm } from './hooks/useCreateProductForm';
 import type { ProductGenerationMode } from './types';
+import {
+  validateProductCategory,
+  validateProductName,
+} from './utils/validations';
 
 export const CreateProduct = () => {
   const queryClient = useQueryClient();
@@ -68,7 +72,13 @@ export const CreateProduct = () => {
             <div className="grid gap-[var(--space-3)] lg:grid-cols-[1fr_1fr_0.5fr] lg:items-start">
               <div className="grid gap-[var(--space-3)] lg:col-span-2 lg:grid-cols-2 lg:items-stretch">
                 <div className="flex flex-col gap-[var(--space-2)]">
-                  <form.Field name="productName">
+                  <form.Field
+                    name="productName"
+                    validators={{
+                      onChange: validateProductName,
+                      onSubmit: validateProductName,
+                    }}
+                  >
                     {(field) => {
                       const errorText = getFieldSubmitChangeErrorText(
                         field.state.meta
@@ -90,7 +100,13 @@ export const CreateProduct = () => {
                     }}
                   </form.Field>
 
-                  <form.Field name="category">
+                  <form.Field
+                    name="category"
+                    validators={{
+                      onChange: validateProductCategory,
+                      onSubmit: validateProductCategory,
+                    }}
+                  >
                     {(field) => {
                       const errorText = getFieldSubmitChangeErrorText(
                         field.state.meta

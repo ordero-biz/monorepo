@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { updateAttribute } from '@/lib/client/api/attributes';
 import { attributesQueryKeys } from '@/lib/query/attributes/attributesQueryKeys';
 import { prepareStoreSetup } from '@/test/prepareSetup';
-import { UpdateAttributeDialogTrigger } from './UpdateAttributeDialogTrigger';
+import { UpdateAttributeDialog } from './UpdateAttributeDialog';
 
 vi.mock('@/lib/client/api/attributes', async () => ({
   ...(await vi.importActual<typeof import('@/lib/client/api/attributes')>(
@@ -13,9 +13,11 @@ vi.mock('@/lib/client/api/attributes', async () => ({
 }));
 
 const updateAttributeMock = vi.mocked(updateAttribute);
+const onOpenChangeMock = vi.fn();
+const onUpdatedMock = vi.fn();
 
 const { setup } = prepareStoreSetup({
-  component: UpdateAttributeDialogTrigger,
+  component: UpdateAttributeDialog,
   props: {
     attribute: {
       id: 7,
@@ -23,33 +25,21 @@ const { setup } = prepareStoreSetup({
       sortOrder: 10,
       createdAt: '2026-06-24T20:07:32.467Z',
     },
-    onUpdated: vi.fn(),
+    onOpenChange: onOpenChangeMock,
+    onUpdated: onUpdatedMock,
+    open: true,
   },
 });
-
-const setupUpdateAttributeDialog = () => {
-  const user = userEvent.setup();
-  const onUpdated = vi.fn();
-  const result = setup({
-    onUpdated,
-  });
-
-  return {
-    ...result,
-    onUpdated,
-    user,
-  };
-};
 
 describe('UpdateAttributeDialog', () => {
   beforeEach(() => {
     updateAttributeMock.mockReset();
+    onOpenChangeMock.mockClear();
+    onUpdatedMock.mockClear();
   });
 
-  it('opens with the current attribute name', async () => {
-    const { user } = setupUpdateAttributeDialog();
-
-    await user.click(screen.getByRole('button', { name: 'Edit Color' }));
+  it('opens with the current attribute name', () => {
+    setup();
 
     const dialog = screen.getByRole('dialog', { name: 'Edit Attribute' });
 
@@ -59,7 +49,6 @@ describe('UpdateAttributeDialog', () => {
   });
 
   it('submits the updated name, closes, invalidates the list, and reports success', async () => {
-    const { onUpdated, queryClient, user } = setupUpdateAttributeDialog();
     updateAttributeMock.mockResolvedValue({
       ok: true,
       data: {
@@ -69,10 +58,9 @@ describe('UpdateAttributeDialog', () => {
         createdAt: '2026-06-25T18:13:29.608Z',
       },
     });
+    const user = userEvent.setup();
+    const { onOpenChange, onUpdated, queryClient } = setup();
     const invalidateQueriesSpy = vi.spyOn(queryClient, 'invalidateQueries');
-
-    await user.click(screen.getByRole('button', { name: 'Edit Color' }));
-
     const dialog = screen.getByRole('dialog', { name: 'Edit Attribute' });
     const nameField = within(dialog).getByRole('textbox', {
       name: 'Attribute name',
@@ -91,16 +79,14 @@ describe('UpdateAttributeDialog', () => {
         queryKey: attributesQueryKeys.list,
       })
     );
+    expect(onOpenChange).toHaveBeenCalledWith(false);
     await waitFor(() => expect(onUpdated).toHaveBeenCalled());
-    expect(
-      screen.queryByRole('dialog', { name: 'Edit Attribute' })
-    ).not.toBeInTheDocument();
   });
 
   it('requires an attribute name before save is available', async () => {
-    const { user } = setupUpdateAttributeDialog();
+    const user = userEvent.setup();
 
-    await user.click(screen.getByRole('button', { name: 'Edit Color' }));
+    setup();
 
     const dialog = screen.getByRole('dialog', { name: 'Edit Attribute' });
     const nameField = within(dialog).getByRole('textbox', {
@@ -119,8 +105,42 @@ describe('UpdateAttributeDialog', () => {
     expect(saveButton).toBeEnabled();
   });
 
+  it('prevents another save while the update is in flight', async () => {
+    let resolveUpdate:
+      | ((value: Awaited<ReturnType<typeof updateAttribute>>) => void)
+      | undefined;
+
+    updateAttributeMock.mockReturnValue(
+      new Promise((resolve) => {
+        resolveUpdate = resolve;
+      })
+    );
+    const user = userEvent.setup();
+
+    setup();
+
+    const dialog = screen.getByRole('dialog', { name: 'Edit Attribute' });
+    const saveButton = within(dialog).getByRole('button', { name: 'Save' });
+
+    await user.click(saveButton);
+
+    expect(saveButton).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Saving...' })).toBeVisible();
+
+    resolveUpdate?.({
+      ok: true,
+      data: {
+        id: 7,
+        name: 'Color',
+        sortOrder: 10,
+        createdAt: '2026-06-24T20:07:32.467Z',
+      },
+    });
+
+    await screen.findByRole('button', { name: 'Save' });
+  });
+
   it('shows backend errors and keeps the dialog open when submit fails', async () => {
-    const { onUpdated, user } = setupUpdateAttributeDialog();
     updateAttributeMock.mockResolvedValue({
       ok: false,
       error: {
@@ -131,9 +151,8 @@ describe('UpdateAttributeDialog', () => {
         },
       },
     });
-
-    await user.click(screen.getByRole('button', { name: 'Edit Color' }));
-
+    const user = userEvent.setup();
+    const { onOpenChange, onUpdated } = setup();
     const dialog = screen.getByRole('dialog', { name: 'Edit Attribute' });
     const nameField = within(dialog).getByRole('textbox', {
       name: 'Attribute name',
@@ -152,9 +171,7 @@ describe('UpdateAttributeDialog', () => {
     expect(
       await screen.findByRole('dialog', { name: 'Attribute update failed.' })
     ).toBeVisible();
-    expect(
-      screen.getByRole('dialog', { name: 'Edit Attribute' })
-    ).toBeVisible();
+    expect(onOpenChange).not.toHaveBeenCalledWith(false);
     expect(onUpdated).not.toHaveBeenCalled();
   });
 });

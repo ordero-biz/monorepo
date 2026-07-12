@@ -10,7 +10,10 @@ const mocks = vi.hoisted(() => ({
   searchParams: new URLSearchParams(),
 }));
 
-vi.mock('next/navigation', () => ({
+vi.mock('next/navigation', async () => ({
+  ...(await vi.importActual<typeof import('next/navigation')>(
+    'next/navigation'
+  )),
   usePathname: () => mocks.pathname,
   useRouter: () => ({
     push: mocks.push,
@@ -195,5 +198,58 @@ describe('ProductsList', () => {
 
     expect(await screen.findByText('Trail Shoes')).toBeVisible();
     expect(screen.getByText('2-2 of 2')).toBeVisible();
+  });
+
+  it('renders an empty state when there are no products', async () => {
+    getProductsMock.mockResolvedValue({
+      ok: true,
+      data: {
+        content: [],
+        page: {
+          size: 10,
+          number: 0,
+          totalElements: 0,
+          totalPages: 0,
+        },
+      },
+    });
+
+    setup();
+
+    expect(await screen.findByText('No products found.')).toBeVisible();
+  });
+
+  it('pushes pagination changes to the URL', async () => {
+    mocks.searchParams = new URLSearchParams('page=0&size=25&sort=name%2Casc');
+    getProductsMock.mockResolvedValue({
+      ok: true,
+      data: {
+        content: [],
+        page: {
+          size: 10,
+          number: 0,
+          totalElements: 51,
+          totalPages: 3,
+        },
+      },
+    });
+    const user = userEvent.setup();
+
+    setup({
+      paginationInput: {
+        page: 0,
+        size: 10,
+        sort: ['name,asc'],
+      },
+    });
+
+    await user.click(
+      await screen.findByRole('button', { name: 'Go to next page' })
+    );
+
+    expect(mocks.push).toHaveBeenCalledWith(
+      '/products?page=1&size=25&sort=name%2Casc',
+      { scroll: false }
+    );
   });
 });
