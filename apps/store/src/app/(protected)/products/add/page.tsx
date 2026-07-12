@@ -1,5 +1,5 @@
-import { ProductAddForm } from '@/features/products';
+import { CreateProduct } from '@/features/products';
 
 export default function AddProductPage() {
-  return <ProductAddForm />;
+  return <CreateProduct />;
 }

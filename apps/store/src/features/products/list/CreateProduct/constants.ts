@@ -1,6 +1,6 @@
-import type { ProductAddFormValues } from './types';
+import type { CreateProductValues } from './types';
 
-export const productAddDefaultValues: ProductAddFormValues = {
+export const createProductDefaultValues: CreateProductValues = {
   attributes: null,
   category: null,
   description: '',

@@ -1,10 +1,10 @@
+import type { Product } from '@/lib/domain/products';
+import { formatDate } from '@/lib/utils/formatDate';
 import {
   DataTableCell,
   type DataTableColumnDef,
   DataTableColumnHeader,
-} from '@ordero/ui';
-import type { Product } from '@/lib/domain/products';
-import { formatDate } from '@/lib/utils/formatDate';
+} from '@/ui/index';
 
 export const columns: DataTableColumnDef<Product>[] = [
   {

@@ -1,5 +1,5 @@
 import { createProduct } from '@/lib/client/api/products';
-import type { ProductAddFormValues } from '../types';
+import type { CreateProductValues } from '../types';
 
 const mapProductFieldErrors = (fieldErrors?: Record<string, string>) => ({
   ...(fieldErrors?.name ? { productName: fieldErrors.name } : {}),
@@ -7,7 +7,7 @@ const mapProductFieldErrors = (fieldErrors?: Record<string, string>) => ({
   ...(fieldErrors?.description ? { description: fieldErrors.description } : {}),
 });
 
-export const submitCreateProduct = async (value: ProductAddFormValues) => {
+export const submitCreateProduct = async (value: CreateProductValues) => {
   const result = await createProduct({
     categoryId: Number(value.category ?? 0),
     description: value.description,

@@ -5,24 +5,10 @@ import {
   AsyncCombobox,
   type AsyncComboboxLoadOptionsArgs,
   type AsyncComboboxLoadOptionsResult,
-  type AsyncComboboxSingleProps,
 } from '@/lib/components/AsyncCombobox';
 import { categoriesQueryKeys } from '@/lib/query/categories/categoriesQueryKeys';
 
-type CategoriesAsyncComboboxProps = Omit<
-  AsyncComboboxSingleProps,
-  | 'emptyText'
-  | 'loadErrorText'
-  | 'loadingText'
-  | 'loadOptions'
-  | 'pageSize'
-  | 'queryKey'
->;
-
-const categoryComboboxQueryKey = [
-  ...categoriesQueryKeys.list,
-  'category-combobox',
-] as const;
+import type { CategoriesAsyncComboboxProps } from './types';
 
 const loadCategoryOptions = async ({
   page,
@@ -125,7 +111,7 @@ export const CategoriesAsyncCombobox = ({
       open={open}
       pageSize={100}
       placeholder={placeholder}
-      queryKey={categoryComboboxQueryKey}
+      queryKey={categoriesQueryKeys.combobox()}
       readOnly={readOnly}
       ref={ref}
       required={required}

@@ -1,6 +1,6 @@
 import { useToastManager } from '@ordero/ui';
 import { useForm } from '@tanstack/react-form';
-import { productAddDefaultValues } from '../constants';
+import { createProductDefaultValues } from '../constants';
 import { submitCreateProduct } from '../utils/submitAction';
 
 type UseCreateProductFormArgs = {
@@ -12,7 +12,7 @@ export const useCreateProductForm = ({
 }: UseCreateProductFormArgs) => {
   const { add: addToast } = useToastManager();
   const form = useForm({
-    defaultValues: productAddDefaultValues,
+    defaultValues: createProductDefaultValues,
     onSubmit: async ({ formApi, value }) => {
       const result = await submitCreateProduct(value);
 

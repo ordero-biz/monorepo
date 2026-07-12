@@ -1,8 +1,8 @@
 'use client';
 
-import { Button, PageHeader, Typography } from '@ordero/ui';
 import { useRouter } from 'next/navigation';
 import { clientRoutes } from '@/lib/client/routes';
+import { Button, PageHeader, Typography } from '@/ui/index';
 
 export const ProductsListHeader = () => {
   const router = useRouter();

@@ -1,14 +1,10 @@
 'use client';
 
-import { Button, Card, DataTable, Typography } from '@ordero/ui';
 import { useProductsQuery } from '@/lib/hooks/products/useProductsQuery';
 import { useTablePagination } from '@/lib/hooks/useTablePagination';
-import type { PaginationSearchInput } from '@/lib/utils/url';
+import { Button, Card, DataTable, Typography } from '@/ui/index';
 import { columns } from './columns';
-
-type ProductsListProps = {
-  paginationInput?: PaginationSearchInput;
-};
+import { ProductsListProps } from './types';
 
 export const ProductsList = ({ paginationInput }: ProductsListProps) => {
   const productsQuery = useProductsQuery(paginationInput);

@@ -24,13 +24,15 @@ import { PRODUCT_GENERATION_MODE } from './constants';
 import { useCreateProductForm } from './hooks/useCreateProductForm';
 import type { ProductGenerationMode } from './types';
 
-export const ProductAddForm = () => {
+export const CreateProduct = () => {
   const queryClient = useQueryClient();
   const router = useRouter();
+
   const [generationMode, setGenerationMode] = useState<ProductGenerationMode>(
     PRODUCT_GENERATION_MODE.one
   );
   const isMultipleProducts = generationMode === PRODUCT_GENERATION_MODE.many;
+
   const attributesQuery = useAttributesQuery();
   const attributeOptions = useMemo(
     () =>
@@ -40,6 +42,7 @@ export const ProductAddForm = () => {
       })) ?? [],
     [attributesQuery.data]
   );
+
   const { form } = useCreateProductForm({
     onCreated: async () => {
       await queryClient.invalidateQueries({
