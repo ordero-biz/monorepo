@@ -10,16 +10,12 @@ import { attributesQueryKeys } from '@/lib/query/attributes/attributesQueryKeys'
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
 import { INITIAL_ATTRIBUTE_VALUE_FIELD_INDEX } from './constants';
 import { useCreateAttributeForm } from './hooks/useCreateAttributeForm';
+import type { CreateAttributeDialogProps } from './types';
 import {
   getAttributeValueFieldId,
   getEmptyAttributeValueField,
 } from './utils/fields';
 import { validateAttributeName } from './utils/validations';
-
-type CreateAttributeDialogProps = {
-  onOpenChange: (open: boolean) => void;
-  open: boolean;
-};
 
 export const CreateAttributeDialog = ({
   onOpenChange,

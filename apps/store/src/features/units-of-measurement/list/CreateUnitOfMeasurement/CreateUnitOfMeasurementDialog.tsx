@@ -5,16 +5,12 @@ import { useQueryClient } from '@tanstack/react-query';
 import { unitsOfMeasurementQueryKeys } from '@/lib/query/units-of-measurement/unitsOfMeasurementQueryKeys';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
 import { useCreateUnitOfMeasurementForm } from './hooks/useCreateUnitOfMeasurementForm';
+import type { CreateUnitOfMeasurementDialogProps } from './types';
 import {
   validateUnitOfMeasurementCode,
   validateUnitOfMeasurementName,
   validateUnitOfMeasurementSymbol,
 } from './utils/validations';
-
-type CreateUnitOfMeasurementDialogProps = {
-  onOpenChange: (open: boolean) => void;
-  open: boolean;
-};
 
 export const CreateUnitOfMeasurementDialog = ({
   onOpenChange,

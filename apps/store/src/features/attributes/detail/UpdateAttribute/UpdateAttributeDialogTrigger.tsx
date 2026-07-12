@@ -3,13 +3,8 @@
 import { IconButton } from '@ordero/ui';
 import { Pencil } from 'lucide-react';
 import { useState } from 'react';
-import type { Attribute } from '@/lib/domain/attributes';
+import type { UpdateAttributeDialogTriggerProps } from './types';
 import { UpdateAttributeDialog } from './UpdateAttributeDialog';
-
-type UpdateAttributeDialogTriggerProps = {
-  attribute: Attribute;
-  onUpdated: () => Promise<void> | void;
-};
 
 export const UpdateAttributeDialogTrigger = ({
   attribute,

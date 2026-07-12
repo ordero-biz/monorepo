@@ -3,12 +3,8 @@
 import { Button, Card, DataTable, Typography } from '@ordero/ui';
 import { useAttributesQuery } from '@/lib/hooks/attributes/useAttributesQuery';
 import { useTablePagination } from '@/lib/hooks/useTablePagination';
-import type { PaginationSearchInput } from '@/lib/utils/url';
 import { columns } from './columns';
-
-type AttributesListProps = {
-  paginationInput?: PaginationSearchInput;
-};
+import type { AttributesListProps } from './types';
 
 export const AttributesList = ({ paginationInput }: AttributesListProps) => {
   const attributesQuery = useAttributesQuery(paginationInput);

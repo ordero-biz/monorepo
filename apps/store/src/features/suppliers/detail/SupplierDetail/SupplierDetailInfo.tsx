@@ -1,14 +1,6 @@
 import type { Supplier } from '@/lib/domain/suppliers';
 import { Card, Typography } from '@/ui/index';
-
-type SupplierDetailInfoProps = {
-  supplier: Supplier;
-};
-
-type SupplierDetailField = {
-  label: string;
-  value: Supplier[keyof Supplier];
-};
+import type { SupplierDetailField, SupplierDetailInfoProps } from './types';
 
 const getSupplierDetailData = (supplier: Supplier): SupplierDetailField[] => [
   {

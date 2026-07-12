@@ -2,18 +2,11 @@
 
 import { Button, Dialog, TextField } from '@ordero/ui';
 import { useQueryClient } from '@tanstack/react-query';
-import type { Attribute } from '@/lib/domain/attributes';
 import { attributesQueryKeys } from '@/lib/query/attributes/attributesQueryKeys';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
 import { useUpdateAttributeForm } from './hooks/useUpdateAttributeForm';
+import type { UpdateAttributeDialogProps } from './types';
 import { validateUpdateAttributeName } from './utils/validations';
-
-type UpdateAttributeDialogProps = {
-  attribute: Attribute;
-  onOpenChange: (open: boolean) => void;
-  onUpdated: () => Promise<void> | void;
-  open: boolean;
-};
 
 export const UpdateAttributeDialog = ({
   attribute,

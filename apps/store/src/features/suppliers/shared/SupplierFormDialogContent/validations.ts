@@ -31,7 +31,6 @@ export const supplierEntitySchema = z.object({
 });
 
 export type SupplierEntityFormValues = z.infer<typeof supplierEntitySchema>;
-export type CreateSupplierFormValues = SupplierEntityFormValues;
 
 const getValidationMessage = (schema: z.ZodString, value: string) => {
   const result = schema.safeParse(value);

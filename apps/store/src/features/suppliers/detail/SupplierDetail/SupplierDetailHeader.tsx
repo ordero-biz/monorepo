@@ -1,11 +1,6 @@
 import { UpdateSupplierDialogTrigger } from '@/features/suppliers/detail/UpdateSupplier';
-import type { Supplier } from '@/lib/domain/suppliers';
 import { PageHeader, Typography } from '@/ui/index';
-
-type SupplierDetailHeaderProps = {
-  onUpdated: () => Promise<void> | void;
-  supplier: Supplier;
-};
+import type { SupplierDetailHeaderProps } from './types';
 
 export const SupplierDetailHeader = ({
   onUpdated,

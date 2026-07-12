@@ -7,10 +7,7 @@ import { useAttributeValuesQuery } from '@/lib/hooks/attributes/useAttributeValu
 import { DeleteAttributeValueDialog } from '../DeleteAttributeValue';
 import { UpdateAttributeValueDialog } from '../UpdateAttributeValue';
 import { getColumns } from './columns';
-
-type AttributeDetailValuesProps = {
-  attributeId: string | number;
-};
+import type { AttributeDetailValuesProps } from './types';
 
 export const AttributeDetailValues = ({
   attributeId,

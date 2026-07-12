@@ -1,18 +1,12 @@
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
 import { Button, Dialog, TextField } from '@/ui/index';
-import type { SupplierEntityFormApi } from './index';
+import type { SupplierFormDialogContentProps } from './types';
 import {
   validateSupplierAddress,
   validateSupplierEmail,
   validateSupplierName,
   validateSupplierPhone,
-} from './index';
-
-type SupplierFormDialogContentProps = {
-  form: SupplierEntityFormApi;
-  pendingText: string;
-  submitText: string;
-};
+} from './validations';
 
 export const SupplierFormDialogContent = ({
   form,

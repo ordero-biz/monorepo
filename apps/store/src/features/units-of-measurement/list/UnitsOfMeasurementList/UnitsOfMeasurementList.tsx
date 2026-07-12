@@ -3,12 +3,8 @@
 import { Button, Card, DataTable, Typography } from '@ordero/ui';
 import { useUnitsOfMeasurementQuery } from '@/lib/hooks/units-of-measurement/useUnitsOfMeasurementQuery';
 import { useTablePagination } from '@/lib/hooks/useTablePagination';
-import type { PaginationSearchInput } from '@/lib/utils/url';
 import { columns } from './columns';
-
-type UnitsOfMeasurementListProps = {
-  paginationInput?: PaginationSearchInput;
-};
+import type { UnitsOfMeasurementListProps } from './types';
 
 export const UnitsOfMeasurementList = ({
   paginationInput,

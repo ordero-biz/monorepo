@@ -2,10 +2,7 @@
 
 import { AttributeDetailHeader } from './AttributeDetailHeader';
 import { AttributeDetailValues } from './AttributeDetailValues';
-
-type AttributeDetailProps = {
-  attributeId: string;
-};
+import type { AttributeDetailProps } from './types';
 
 export const AttributeDetail = ({ attributeId }: AttributeDetailProps) => {
   return (

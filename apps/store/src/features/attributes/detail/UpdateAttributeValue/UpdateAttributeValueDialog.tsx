@@ -2,19 +2,11 @@
 
 import { Button, Dialog, TextField } from '@ordero/ui';
 import { useQueryClient } from '@tanstack/react-query';
-import type { AttributeValue } from '@/lib/domain/attributes';
 import { attributesQueryKeys } from '@/lib/query/attributes/attributesQueryKeys';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
 import { useUpdateAttributeValueForm } from './hooks/useUpdateAttributeValueForm';
+import type { UpdateAttributeValueDialogProps } from './types';
 import { validateUpdateAttributeValueName } from './utils/validations';
-
-type UpdateAttributeValueDialogProps = {
-  attributeId: string | number;
-  attributeValue: AttributeValue;
-  onOpenChange: (open: boolean) => void;
-  open: boolean;
-};
-
 export const UpdateAttributeValueDialog = ({
   attributeId,
   attributeValue,

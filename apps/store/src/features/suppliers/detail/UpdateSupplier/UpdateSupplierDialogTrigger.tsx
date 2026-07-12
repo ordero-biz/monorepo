@@ -3,13 +3,8 @@
 import { IconButton } from '@ordero/ui';
 import { Pencil } from 'lucide-react';
 import { useState } from 'react';
-import type { Supplier } from '@/lib/domain/suppliers';
+import type { UpdateSupplierDialogTriggerProps } from './types';
 import { UpdateSupplierDialog } from './UpdateSupplierDialog';
-
-type UpdateSupplierDialogTriggerProps = {
-  onUpdated: () => Promise<void> | void;
-  supplier: Supplier;
-};
 
 export const UpdateSupplierDialogTrigger = ({
   onUpdated,

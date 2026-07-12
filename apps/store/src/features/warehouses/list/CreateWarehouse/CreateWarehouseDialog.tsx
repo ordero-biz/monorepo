@@ -5,16 +5,12 @@ import { useQueryClient } from '@tanstack/react-query';
 import { warehousesQueryKeys } from '@/lib/query/warehouses/warehousesQueryKeys';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
 import { useCreateWarehouseForm } from './hooks/useCreateWarehouseForm';
+import type { CreateWarehouseDialogProps } from './types';
 import {
   validateWarehouseAddress,
   validateWarehouseCode,
   validateWarehouseName,
 } from './utils/validations';
-
-type CreateWarehouseDialogProps = {
-  onOpenChange: (open: boolean) => void;
-  open: boolean;
-};
 
 export const CreateWarehouseDialog = ({
   onOpenChange,

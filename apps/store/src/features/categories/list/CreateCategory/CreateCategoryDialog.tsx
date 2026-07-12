@@ -3,21 +3,15 @@
 import { Button, Dialog, Select, TextField } from '@ordero/ui';
 import { useQueryClient } from '@tanstack/react-query';
 import { useMemo } from 'react';
-import type { Category } from '@/lib/domain/categories';
 import { categoriesQueryKeys } from '@/lib/query/categories/categoriesQueryKeys';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
 import { createCategoryDefaultValues } from './constants';
 import { useCreateCategoryForm } from './hooks/useCreateCategoryForm';
+import type { CreateCategoryDialogProps } from './types';
 import {
   validateCategoryName,
   validateCategoryParentId,
 } from './utils/validations';
-
-type CreateCategoryDialogProps = {
-  availableCategories: Category[];
-  onOpenChange: (open: boolean) => void;
-  open: boolean;
-};
 
 export const CreateCategoryDialog = ({
   availableCategories,

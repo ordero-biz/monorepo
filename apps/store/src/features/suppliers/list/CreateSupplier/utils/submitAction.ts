@@ -1,7 +1,7 @@
 import { createSupplier } from '@/lib/client/api/suppliers';
-import type { CreateSupplierFormValues } from '../../../shared/SupplierFormDialogContent';
+import type { SupplierEntityFormValues } from '../../../shared/SupplierFormDialogContent';
 
-export const submitCreateSupplier = async (value: CreateSupplierFormValues) => {
+export const submitCreateSupplier = async (value: SupplierEntityFormValues) => {
   const result = await createSupplier({
     name: value.name.trim(),
     email: value.email.trim(),

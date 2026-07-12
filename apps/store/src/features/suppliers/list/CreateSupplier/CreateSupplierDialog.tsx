@@ -6,10 +6,7 @@ import { suppliersQueryKeys } from '@/lib/query/suppliers/suppliersQueryKeys';
 import { SupplierFormDialogContent } from '../../shared/SupplierFormDialogContent';
 import { useCreateSupplierForm } from './hooks/useCreateSupplierForm';
 
-type CreateSupplierDialogProps = {
-  onOpenChange: (open: boolean) => void;
-  open: boolean;
-};
+import type { CreateSupplierDialogProps } from './types';
 
 export const CreateSupplierDialog = ({
   onOpenChange,

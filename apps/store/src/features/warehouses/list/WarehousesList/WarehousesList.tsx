@@ -3,12 +3,9 @@
 import { Button, Card, DataTable, Typography } from '@ordero/ui';
 import { useTablePagination } from '@/lib/hooks/useTablePagination';
 import { useWarehousesQuery } from '@/lib/hooks/warehouses/useWarehousesQuery';
-import type { PaginationSearchInput } from '@/lib/utils/url';
 import { columns } from './columns';
 
-type WarehousesListProps = {
-  paginationInput?: PaginationSearchInput;
-};
+import type { WarehousesListProps } from './types';
 
 export const WarehousesList = ({ paginationInput }: WarehousesListProps) => {
   const warehousesQuery = useWarehousesQuery(paginationInput);

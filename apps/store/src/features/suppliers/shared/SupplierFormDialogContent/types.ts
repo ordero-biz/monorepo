@@ -29,4 +29,10 @@ type FormControls<TFormValues> = Pick<
   'Field' | 'Subscribe'
 >;
 
-export type SupplierEntityFormApi = FormControls<SupplierEntityFormValues>;
+type SupplierEntityFormApi = FormControls<SupplierEntityFormValues>;
+
+export type SupplierFormDialogContentProps = {
+  form: SupplierEntityFormApi;
+  pendingText: string;
+  submitText: string;
+};

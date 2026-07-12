@@ -3,12 +3,8 @@
 import { IconButton } from '@ordero/ui';
 import { Trash2 } from 'lucide-react';
 import { useState } from 'react';
-import type { Attribute } from '@/lib/domain/attributes';
 import { DeleteAttributeDialog } from './DeleteAttributeDialog';
-
-type DeleteAttributeDialogTriggerProps = {
-  attribute: Attribute;
-};
+import type { DeleteAttributeDialogTriggerProps } from './types';
 
 export const DeleteAttributeDialogTrigger = ({
   attribute,

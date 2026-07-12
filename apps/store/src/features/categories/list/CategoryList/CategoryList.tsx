@@ -3,13 +3,9 @@
 import { Button, Card, DataTable, Typography } from '@ordero/ui';
 import { useCategoriesQuery } from '@/lib/hooks/categories/useCategoriesQuery';
 import { useTablePagination } from '@/lib/hooks/useTablePagination';
-import type { PaginationSearchInput } from '@/lib/utils/url';
 import { CategoryListHeader } from './CategoryListHeader';
 import { columns } from './columns';
-
-type CategoryListProps = {
-  paginationInput?: PaginationSearchInput;
-};
+import type { CategoryListProps } from './types';
 
 export const CategoryList = ({ paginationInput }: CategoryListProps) => {
   const categoriesQuery = useCategoriesQuery(paginationInput);

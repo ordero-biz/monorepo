@@ -4,15 +4,9 @@ import { Button, Dialog, Typography } from '@ordero/ui';
 import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { clientRoutes } from '@/lib/client/routes';
-import type { Attribute } from '@/lib/domain/attributes';
 import { attributesQueryKeys } from '@/lib/query/attributes/attributesQueryKeys';
 import { useDeleteAttribute } from './hooks/useDeleteAttribute';
-
-type DeleteAttributeDialogProps = {
-  attribute: Attribute;
-  onOpenChange: (open: boolean) => void;
-  open: boolean;
-};
+import type { DeleteAttributeDialogProps } from './types';
 
 export const DeleteAttributeDialog = ({
   attribute,

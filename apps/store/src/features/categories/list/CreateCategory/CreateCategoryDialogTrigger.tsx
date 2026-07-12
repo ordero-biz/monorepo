@@ -2,12 +2,8 @@
 
 import { Button } from '@ordero/ui';
 import { useState } from 'react';
-import type { Category } from '@/lib/domain/categories';
 import { CreateCategoryDialog } from './CreateCategoryDialog';
-
-type CreateCategoryDialogTriggerProps = {
-  availableCategories: Category[];
-};
+import type { CreateCategoryDialogTriggerProps } from './types';
 
 export const CreateCategoryDialogTrigger = ({
   availableCategories,

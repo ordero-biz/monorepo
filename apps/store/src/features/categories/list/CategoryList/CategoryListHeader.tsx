@@ -1,10 +1,6 @@
 import { PageHeader, Typography } from '@ordero/ui';
-import type { Category } from '@/lib/domain/categories';
 import { CreateCategoryDialogTrigger } from '../CreateCategory';
-
-type CategoryListHeaderProps = {
-  availableCategories: Category[];
-};
+import type { CategoryListHeaderProps } from './types';
 
 export const CategoryListHeader = ({
   availableCategories,
