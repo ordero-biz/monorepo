@@ -4,7 +4,7 @@ import { useProductsQuery } from '@/lib/hooks/products/useProductsQuery';
 import { useTablePagination } from '@/lib/hooks/useTablePagination';
 import { Button, Card, DataTable, Typography } from '@/ui/index';
 import { columns } from './columns';
-import { ProductsListProps } from './types';
+import type { ProductsListProps } from './types';
 
 export const ProductsList = ({ paginationInput }: ProductsListProps) => {
   const productsQuery = useProductsQuery(paginationInput);
