@@ -5,9 +5,7 @@ import { Button, Card, Typography } from '@/ui/index';
 import { SupplierDetailHeader } from './SupplierDetailHeader';
 import { SupplierDetailInfo } from './SupplierDetailInfo';
 
-type SupplierDetailProps = {
-  supplierId: string;
-};
+import type { SupplierDetailProps } from './types';
 
 export const SupplierDetail = ({ supplierId }: SupplierDetailProps) => {
   const supplierQuery = useSupplierQuery(supplierId);

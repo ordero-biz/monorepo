@@ -1,3 +1,5 @@
-export { ProductAddForm } from '@/features/products/ProductAddForm';
-export { ProductsList } from '@/features/products/ProductsList/ProductsList';
-export { ProductsListHeader } from '@/features/products/ProductsList/ProductsListHeader';
+export { CreateProduct } from '@/features/products/list/CreateProduct';
+export {
+  ProductsList,
+  ProductsListHeader,
+} from '@/features/products/list/ProductsList';

@@ -1,0 +1,1 @@
+export { UpdateAttributeDialogTrigger } from './UpdateAttributeDialogTrigger';

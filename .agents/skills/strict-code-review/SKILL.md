@@ -97,6 +97,7 @@ Keep the human review focus on issues that configs do not judge well, such as:
 Use this map to load the smallest relevant source of truth for the diff:
 
 - forms and validation: `docs/forms.md`, `docs/testing.md`
+- app feature folder structure and public feature exports: `docs/features.md`
 - shared UI components in `packages/ui`: `ui-component-build`, `ui-routine-conventions`
 - shared workspace/package boundaries: `docs/packages.md`, `AGENTS.md`
 - HTTP/auth, server-state queries, and mutation changes:
@@ -153,6 +154,26 @@ Read `docs/ui-tokens.md` when the review touches:
 - token files
 - Tailwind theme exposure
 - raw `--figma-*` usage
+
+### For app feature folders
+
+When a diff touches `apps/*/src/features`, review the structure against
+`docs/features.md`:
+
+- resource features should be split by logical workflow when they contain list,
+  detail, create/add, update, delete, or shared feature-local concerns
+- route consumers should import from the feature root barrel, and tests should
+  mock the same public entrypoint the consumer imports
+- root feature `index.ts` files should export only public components and public
+  types, not private hooks, submit actions, validators, constants, or table
+  columns
+- public component/workflow folders should have local `index.ts` files that
+  re-export their public surface
+- component props and component-owned types should live in the local
+  `types.ts`; shared API or domain contracts should not live in feature
+  component `types.ts` files
+- cross-workflow imports should use the nearest public barrel rather than deep
+  private component paths
 
 ### Component test setup rules
 

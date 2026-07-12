@@ -10,15 +10,15 @@ import AttributesPage from './page';
 
 const attributesListMock = vi.hoisted(() => vi.fn());
 
-vi.mock('@/features/attributes/AttributesList/AttributesList', () => ({
+vi.mock('@/features/attributes', async () => ({
+  ...(await vi.importActual<typeof import('@/features/attributes')>(
+    '@/features/attributes'
+  )),
   AttributesList: (props: { paginationInput?: PaginationSearchInput }) => {
     attributesListMock(props);
 
     return <div>Attributes list</div>;
   },
-}));
-
-vi.mock('@/features/attributes/AttributesList/AttributesListHeader', () => ({
   AttributesListHeader: () => <div>Attributes header</div>,
 }));
 

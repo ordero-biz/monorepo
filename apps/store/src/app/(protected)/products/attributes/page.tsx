@@ -1,6 +1,6 @@
 import { dehydrate, HydrationBoundary } from '@tanstack/react-query';
-import { AttributesList } from '@/features/attributes/AttributesList/AttributesList';
-import { AttributesListHeader } from '@/features/attributes/AttributesList/AttributesListHeader';
+import { AttributesList, AttributesListHeader } from '@/features/attributes';
+
 import { attributesListQueryOptions } from '@/lib/query/attributes/attributesQueryOptions';
 import { makeQueryClient } from '@/lib/query/queryClient';
 import { getServerAttributes } from '@/lib/server/api/attributes';

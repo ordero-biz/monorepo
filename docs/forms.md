@@ -28,17 +28,23 @@ Owns form-specific layouts, behavior, and states:
 
 ## Recommended Structure & Canonical Flow
 
+Follow `docs/features.md` for the broader feature folder shape. Form workflows
+should live inside the relevant logical feature folder, such as `list/CreateX`,
+`detail/UpdateX`, `detail/DeleteX`, or a standalone `add/` workflow.
+
 To keep forms predictable and consistent, start with the smallest readable
 feature-owned structure and split along responsibility boundaries as the flow
 grows:
 
 ```
-feature-folder/
+feature-folder/list/CreateFeature/
 ├── FeatureFlow.tsx            # dialog/page/drawer workflow and side effects
 ├── FeatureForm.tsx            # <form>, layout, fields, submit button
 ├── hooks/
 │   └── useFeatureForm.ts      # form setup, submit orchestration, errors
 ├── constants.ts               # default values and static configs
+├── types.ts                   # component props and workflow-local types
+├── index.ts                   # public entrypoint for this workflow
 └── utils/
     ├── submitAction.ts        # request call and backend error normalization
     └── validations.ts         # Zod schema and client validators

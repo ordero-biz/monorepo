@@ -36,6 +36,8 @@ For shared UI component work in `packages/ui`, always also use:
 
 - Name component prop types as `type [ComponentName]Props`.
 - Keep prop types close to the component, usually in local `types.ts`.
+- In app feature component folders, keep component-related types in that
+  folder's `types.ts`; do not place shared API or domain contracts there.
 
 ## 3. Prefer object args for many params
 
@@ -73,3 +75,15 @@ When touching `@tanstack/react-table` or `useReactTable` code:
 - Do not pass inline data transformations such as `data.filter(...)`, `data.map(...)`, or `data.slice(...)` directly into `useReactTable`; memoize the derived result first.
 - Prefer hoisted constants for static column defs and `useMemo` for derived columns or data.
 - If a feature updates table data while users are interacting with sorting, selection, pagination, or expanding state, decide explicitly whether the relevant TanStack auto-reset behavior should stay enabled.
+
+## 9. Keep Feature Entrypoint Explicit
+
+For app feature code under `apps/*/src/features`, follow `docs/features.md`:
+
+- split resource features by logical workflow, such as `list`, `detail`,
+  create/add, update, delete, and feature-local `shared`
+- add local `index.ts` files for public component/workflow folders
+- keep root feature `index.ts` files limited to public exports consumed by
+  routes or other features
+- import private hooks, utils, constants, table columns, and validation helpers
+  through local relative paths instead of feature root barrels

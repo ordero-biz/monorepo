@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { BaseLayout } from '@/features/app-shell/BaseLayout';
+import { BaseLayout } from '@/features/app-shell';
 import { requireAuthenticatedRoute } from '@/lib/server/authPageGuard';
 
 type ProtectedLayoutProps = {

@@ -2,20 +2,11 @@
 
 import { Dialog } from '@ordero/ui';
 import { useQueryClient } from '@tanstack/react-query';
-import type { Supplier } from '@/lib/domain/suppliers';
 import { suppliersQueryKeys } from '@/lib/query/suppliers/suppliersQueryKeys';
-import {
-  getSupplierDefaultValues,
-  SupplierFormDialogContent,
-} from '../../shared/SupplierFormDialogContent';
+import { SupplierFormDialogContent } from '../../shared/SupplierFormDialogContent';
 import { useUpdateSupplierForm } from './hooks/useUpdateSupplierForm';
-
-type UpdateSupplierDialogProps = {
-  onOpenChange: (open: boolean) => void;
-  onUpdated: () => Promise<void> | void;
-  open: boolean;
-  supplier: Supplier;
-};
+import type { UpdateSupplierDialogProps } from './types';
+import { getSupplierDefaultValues } from './utils/fields';
 
 export const UpdateSupplierDialog = ({
   onOpenChange,

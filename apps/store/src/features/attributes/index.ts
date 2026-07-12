@@ -1,3 +1,5 @@
-export { AttributeDetail } from '@/features/attributes/AttributeDetail/AttributeDetail';
-export { AttributesList } from '@/features/attributes/AttributesList/AttributesList';
-export { AttributesListHeader } from '@/features/attributes/AttributesList/AttributesListHeader';
+export { AttributeDetail } from '@/features/attributes/detail/AttributeDetail';
+export {
+  AttributesList,
+  AttributesListHeader,
+} from '@/features/attributes/list/AttributesList';
