@@ -97,3 +97,13 @@ shape, move it to an app-owned shared domain module such as
 
 When a component has no props or component-owned types, a `types.ts` file is not
 required just to satisfy the folder shape.
+
+When refactoring feature folders, verify that component props did not remain
+inline in feature components:
+
+```sh
+rg "^type [A-Za-z0-9]+Props" apps/platform/src/features apps/store/src/features -n
+```
+
+Move any matches that are component-owned props into the nearest local
+`types.ts`.

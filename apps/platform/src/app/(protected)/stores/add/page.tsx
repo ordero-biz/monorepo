@@ -1,4 +1,4 @@
-import { AddStorePage } from '@/features/stores/add/AddStorePage';
+import { AddStorePage } from '@/features/stores';
 
 export default function AddStoreRoutePage() {
   return <AddStorePage />;

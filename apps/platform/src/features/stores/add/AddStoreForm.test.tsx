@@ -1,18 +1,8 @@
-import { screen } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createStore } from '@/lib/client/api/stores';
-import { clientRoutes } from '@/lib/client/routes';
-import { storesQueryKeys } from '@/lib/hooks/stores/useStoresQuery';
 import { preparePlatformSetup } from '@/test/prepareSetup';
 import { AddStoreForm } from './AddStoreForm';
-
-const routerPushMock = vi.fn();
-
-vi.mock('next/navigation', () => ({
-  useRouter: () => ({
-    push: routerPushMock,
-  }),
-}));
 
 vi.mock('@/lib/client/api/stores', async () => ({
   ...(await vi.importActual<typeof import('@/lib/client/api/stores')>(
@@ -25,14 +15,21 @@ const createStoreMock = vi.mocked(createStore);
 
 const { setup } = preparePlatformSetup({
   component: AddStoreForm,
+  props: {
+    onCreated: vi.fn(),
+  },
 });
 
 const setupAddStoreForm = () => {
   const user = userEvent.setup();
-  const result = setup();
+  const onCreated = vi.fn();
+  const result = setup({
+    onCreated,
+  });
 
   return {
     ...result,
+    onCreated,
     user,
     subDomainField: screen.getByRole('textbox', { name: 'Subdomain' }),
     nameField: screen.getByRole('textbox', { name: 'Name' }),
@@ -43,7 +40,6 @@ const setupAddStoreForm = () => {
 describe('AddStoreForm', () => {
   beforeEach(() => {
     createStoreMock.mockReset();
-    routerPushMock.mockClear();
   });
 
   it('renders the store domain and name form fields', async () => {
@@ -111,7 +107,7 @@ describe('AddStoreForm', () => {
     ).not.toBeInTheDocument();
   });
 
-  it('submits the swagger payload, shows a success toast, invalidates stores, and redirects', async () => {
+  it('submits the store payload, shows a success toast, and runs the created callback', async () => {
     createStoreMock.mockResolvedValue({
       ok: true,
       data: {
@@ -121,9 +117,8 @@ describe('AddStoreForm', () => {
       },
     });
 
-    const { subDomainField, nameField, queryClient, submitButton, user } =
+    const { nameField, onCreated, subDomainField, submitButton, user } =
       setupAddStoreForm();
-    const invalidateQueriesSpy = vi.spyOn(queryClient, 'invalidateQueries');
 
     await user.type(subDomainField, ' north-shop ');
     await user.type(nameField, ' North Shop ');
@@ -133,10 +128,7 @@ describe('AddStoreForm', () => {
       name: 'North Shop',
       subDomain: 'north-shop',
     });
-    expect(invalidateQueriesSpy).toHaveBeenCalledWith({
-      queryKey: storesQueryKeys.list,
-    });
-    expect(routerPushMock).toHaveBeenCalledWith(clientRoutes.stores);
+    await waitFor(() => expect(onCreated).toHaveBeenCalledTimes(1));
     expect(
       await screen.findByRole('dialog', { name: 'Store created.' })
     ).toBeVisible();
@@ -168,6 +160,5 @@ describe('AddStoreForm', () => {
     expect(
       await screen.findByRole('dialog', { name: 'Validation failed.' })
     ).toBeVisible();
-    expect(routerPushMock).not.toHaveBeenCalled();
   });
 });

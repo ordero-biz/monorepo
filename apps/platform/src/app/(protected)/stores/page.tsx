@@ -1,4 +1,4 @@
-import { StoresListPage } from '@/features/stores/list/StoresListPage';
+import { StoresListPage } from '@/features/stores';
 
 export default function StoresPage() {
   return <StoresListPage />;

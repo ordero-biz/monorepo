@@ -1,9 +1,5 @@
 import { Card, IconButton } from '@ordero/ui';
-import type { Store } from '@/lib/server/types';
-
-type StoreCardProps = {
-  store: Store;
-};
+import type { StoreCardProps } from './types';
 
 export const StoreCard = ({ store }: StoreCardProps) => {
   const { name, subDomain } = store;

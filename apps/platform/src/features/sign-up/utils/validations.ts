@@ -1,8 +1,8 @@
 import { z } from 'zod';
 import {
-  signInEmailSchema,
-  signInPasswordSchema,
-} from '@/features/sign-in/utils/validations';
+  authEmailSchema,
+  authPasswordSchema,
+} from '@/lib/utils/auth/validations';
 import type { ValidationArgs } from '@/lib/utils/form/validation/types';
 
 export const acceptTermsSchema = z
@@ -11,20 +11,20 @@ export const acceptTermsSchema = z
 
 export const signUpSchema = z.object({
   acceptTerms: acceptTermsSchema,
-  email: signInEmailSchema,
-  password: signInPasswordSchema,
+  email: authEmailSchema,
+  password: authPasswordSchema,
 });
 
 export type SignUpFormValues = z.infer<typeof signUpSchema>;
 
 export const validateSignUpEmail = ({ value }: ValidationArgs<string>) => {
-  const result = signInEmailSchema.safeParse(value);
+  const result = authEmailSchema.safeParse(value);
 
   return result.success ? undefined : result.error.issues[0]?.message;
 };
 
 export const validateSignUpPassword = ({ value }: ValidationArgs<string>) => {
-  const result = signInPasswordSchema.safeParse(value);
+  const result = authPasswordSchema.safeParse(value);
 
   return result.success ? undefined : result.error.issues[0]?.message;
 };

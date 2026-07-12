@@ -87,3 +87,7 @@ For app feature code under `apps/*/src/features`, follow `docs/features.md`:
   routes or other features
 - import private hooks, utils, constants, table columns, and validation helpers
   through local relative paths instead of feature root barrels
+
+When refactoring feature folders, run the component-type verification in
+`docs/features.md` before finishing. Do not add empty `types.ts` files when a
+component has no props or component-owned types.

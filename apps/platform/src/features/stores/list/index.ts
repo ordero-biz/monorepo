@@ -1,0 +1,1 @@
+export { StoresListPage } from './StoresListPage';
