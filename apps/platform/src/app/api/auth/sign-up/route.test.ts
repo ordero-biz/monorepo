@@ -1,27 +1,32 @@
 import { AUTH_TOKEN_COOKIE_NAME } from '@ordero/next-api/server';
 import { NextRequest } from 'next/server';
+import { fetchBackendResponse } from '@/lib/server/fetch';
 import { POST as signUpHandler } from './route';
 
-const fetchMock = vi.fn();
-const backendApiUrl = 'https://backend.example.test';
+const { fetchBackendResponseMock } = vi.hoisted(() => ({
+  fetchBackendResponseMock: vi.fn(),
+}));
+
+vi.mock('@/lib/server/fetch', async () => ({
+  ...(await vi.importActual<typeof import('@/lib/server/fetch')>(
+    '@/lib/server/fetch'
+  )),
+  fetchBackendResponse: fetchBackendResponseMock,
+}));
+
+const fetchBackendResponseMocked = vi.mocked(fetchBackendResponse);
 
 const getJson = async <T>(response: Response) => (await response.json()) as T;
 
 describe('POST /api/auth/sign-up', () => {
   beforeEach(() => {
-    process.env.BACKEND_API_URL = backendApiUrl;
-    vi.stubGlobal('fetch', fetchMock);
-    fetchMock.mockReset();
-  });
-
-  afterEach(() => {
-    vi.unstubAllGlobals();
-    delete process.env.BACKEND_API_URL;
+    fetchBackendResponseMocked.mockReset();
   });
 
   it('stores the token in an HttpOnly cookie after sign-up', async () => {
-    fetchMock.mockResolvedValue(
-      new Response(
+    fetchBackendResponseMocked.mockResolvedValue({
+      ok: true,
+      data: new Response(
         JSON.stringify({
           token: 'new-jwt-token',
           ownerResponse: {
@@ -29,8 +34,8 @@ describe('POST /api/auth/sign-up', () => {
             email: 'new-user@gmail.com',
           },
         })
-      )
-    );
+      ),
+    });
     const response = await signUpHandler(
       new NextRequest('http://localhost/api/auth/sign-up', {
         body: JSON.stringify({
@@ -56,33 +61,35 @@ describe('POST /api/auth/sign-up', () => {
       `${AUTH_TOKEN_COOKIE_NAME}=new-jwt-token`
     );
     expect(response.headers.get('set-cookie')).toContain('HttpOnly');
-    expect(fetchMock).toHaveBeenCalledWith(
-      new URL('/api/v1/platform/owners/sign-up', backendApiUrl),
+    expect(fetchBackendResponseMocked).toHaveBeenCalledWith(
       expect.objectContaining({
-        headers: expect.any(Headers),
-        method: 'POST',
+        path: '/api/v1/platform/owners/sign-up',
+        init: expect.objectContaining({
+          body: JSON.stringify({
+            email: 'new-user@gmail.com',
+            password: 'securePassword1',
+          }),
+          headers: expect.any(Headers),
+          method: 'POST',
+        }),
       })
     );
-    const [, backendRequest] = fetchMock.mock.calls[0] ?? [];
-    const headers = new Headers(backendRequest?.headers);
+    const [backendRequest] = fetchBackendResponseMocked.mock.calls[0] ?? [];
 
-    expect(headers.get('content-type')).toBe('application/json');
-    expect(headers.get('cookie')).toBeNull();
+    expect(new Headers(backendRequest?.init?.headers).get('content-type')).toBe(
+      'application/json'
+    );
   });
 
-  it('forwards backend errors during sign-up', async () => {
-    fetchMock.mockResolvedValue(
-      new Response(
-        JSON.stringify({
-          message: 'Email already exists.',
-          fieldErrors: { email: 'This email is already registered.' },
-        }),
-        {
-          status: 409,
-          statusText: 'Conflict',
-        }
-      )
-    );
+  it('forwards normalized backend errors during sign-up', async () => {
+    fetchBackendResponseMocked.mockResolvedValue({
+      ok: false,
+      error: {
+        status: 409,
+        message: 'Email already exists.',
+        fieldErrors: { email: 'This email is already registered.' },
+      },
+    });
     const response = await signUpHandler(
       new NextRequest('http://localhost/api/auth/sign-up', {
         body: JSON.stringify({
@@ -109,7 +116,10 @@ describe('POST /api/auth/sign-up', () => {
     ['JSON null body', () => new Response('null')],
     ['missing token body', () => new Response(JSON.stringify({}))],
   ])('returns 502 when the backend returns a success response with %s', async (_caseName, makeResponse) => {
-    fetchMock.mockResolvedValue(makeResponse());
+    fetchBackendResponseMocked.mockResolvedValue({
+      ok: true,
+      data: makeResponse(),
+    });
     const response = await signUpHandler(
       new NextRequest('http://localhost/api/auth/sign-up', {
         body: JSON.stringify({
@@ -144,5 +154,6 @@ describe('POST /api/auth/sign-up', () => {
       status: 400,
       message: 'Invalid sign-up request.',
     });
+    expect(fetchBackendResponseMocked).not.toHaveBeenCalled();
   });
 });

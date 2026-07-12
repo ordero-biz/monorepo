@@ -1,30 +1,53 @@
 import { AUTH_TOKEN_COOKIE_NAME } from '@ordero/next-api/server';
 import { NextRequest } from 'next/server';
+import { fetchBackendResponse } from '@/lib/server/fetch';
 import { GET, POST } from './[...path]/route';
 
-const fetchMock = vi.fn();
-const backendApiUrl = 'https://backend.example.test';
+const { fetchBackendResponseMock } = vi.hoisted(() => ({
+  fetchBackendResponseMock: vi.fn(),
+}));
+
+vi.mock('@/lib/server/fetch', async () => ({
+  ...(await vi.importActual<typeof import('@/lib/server/fetch')>(
+    '@/lib/server/fetch'
+  )),
+  fetchBackendResponse: fetchBackendResponseMock,
+}));
+
+const fetchBackendResponseMocked = vi.mocked(fetchBackendResponse);
 
 describe('backend proxy route handler', () => {
   beforeEach(() => {
-    process.env.BACKEND_API_URL = backendApiUrl;
-    vi.stubGlobal('fetch', fetchMock);
-    fetchMock.mockReset();
+    fetchBackendResponseMocked.mockReset();
   });
 
-  afterEach(() => {
-    vi.unstubAllGlobals();
-    delete process.env.BACKEND_API_URL;
+  it('rejects unauthenticated requests without contacting the backend', async () => {
+    const response = await GET(
+      new NextRequest('http://localhost/api/backend/orders'),
+      {
+        params: Promise.resolve({
+          path: ['orders'],
+        }),
+      }
+    );
+
+    expect(response.status).toBe(401);
+    await expect(response.json()).resolves.toStrictEqual({
+      status: 401,
+      message: 'Authentication required.',
+    });
+    expect(fetchBackendResponseMocked).not.toHaveBeenCalled();
   });
 
-  it('forwards authenticated requests with a Bearer token', async () => {
-    fetchMock.mockResolvedValue(
-      new Response(
+  it('forwards authenticated requests to the backend helper', async () => {
+    fetchBackendResponseMocked.mockResolvedValue({
+      ok: true,
+      data: new Response(
         JSON.stringify({
           items: [],
         })
-      )
-    );
+      ),
+    });
 
     const response = await GET(
       new NextRequest('http://localhost/api/backend/orders?status=open', {
@@ -44,28 +67,36 @@ describe('backend proxy route handler', () => {
     await expect(response.json()).resolves.toStrictEqual({
       items: [],
     });
-    expect(fetchMock.mock.calls[0][0].toString()).toBe(
-      `${backendApiUrl}/orders?status=open`
+    expect(fetchBackendResponseMocked).toHaveBeenCalledWith(
+      expect.objectContaining({
+        path: 'orders',
+        search: '?status=open',
+        token: 'jwt-token',
+        init: expect.objectContaining({
+          body: undefined,
+          headers: expect.any(Headers),
+          method: 'GET',
+        }),
+      })
     );
-    expect(fetchMock.mock.calls[0][1].headers.get('Authorization')).toBe(
-      'Bearer jwt-token'
-    );
-    expect(fetchMock.mock.calls[0][1].headers.get('Origin')).toBe(
+    const [backendRequest] = fetchBackendResponseMocked.mock.calls[0] ?? [];
+    const requestInit = backendRequest?.init;
+
+    expect(requestInit).toBeDefined();
+    expect(new Headers(requestInit?.headers).get('Origin')).toBe(
       'https://tenant.example.test'
-    );
-    expect(fetchMock.mock.calls[0][1].headers.get('x-forwarded-host')).toBe(
-      null
     );
   });
 
   it('forwards request bodies for mutations', async () => {
-    fetchMock.mockResolvedValue(
-      new Response(
+    fetchBackendResponseMocked.mockResolvedValue({
+      ok: true,
+      data: new Response(
         JSON.stringify({
           ok: true,
         })
-      )
-    );
+      ),
+    });
 
     await POST(
       new NextRequest('http://localhost/api/backend/orders', {
@@ -84,22 +115,26 @@ describe('backend proxy route handler', () => {
         }),
       }
     );
+    const [backendRequest] = fetchBackendResponseMocked.mock.calls[0] ?? [];
+    const requestInit = backendRequest?.init;
 
-    expect(fetchMock.mock.calls[0][1].body).toBeInstanceOf(ReadableStream);
-    expect(fetchMock.mock.calls[0][1].duplex).toBe('half');
-    expect(fetchMock.mock.calls[0][1].headers.get('Content-Type')).toBe(
+    expect(requestInit).toBeDefined();
+    expect(requestInit?.body).toBeInstanceOf(ReadableStream);
+    expect(new Headers(requestInit?.headers).get('Content-Type')).toBe(
       'application/json'
     );
+    expect(requestInit?.method).toBe('POST');
   });
 
   it('does not forward a body when the request has no payload', async () => {
-    fetchMock.mockResolvedValue(
-      new Response(
+    fetchBackendResponseMocked.mockResolvedValue({
+      ok: true,
+      data: new Response(
         JSON.stringify({
           ok: true,
         })
-      )
-    );
+      ),
+    });
 
     await POST(
       new NextRequest('http://localhost/api/backend/orders', {
@@ -114,19 +149,20 @@ describe('backend proxy route handler', () => {
         }),
       }
     );
+    const [backendRequest] = fetchBackendResponseMocked.mock.calls[0] ?? [];
 
-    expect(fetchMock.mock.calls[0][1].body).toBeUndefined();
+    expect(backendRequest?.init?.body).toBeUndefined();
   });
 
-  it('streams multipart request bodies without coercing them to text', async () => {
-    fetchMock.mockResolvedValue(
-      new Response(
+  it('preserves multipart request streams for the backend helper', async () => {
+    fetchBackendResponseMocked.mockResolvedValue({
+      ok: true,
+      data: new Response(
         JSON.stringify({
           ok: true,
         })
-      )
-    );
-
+      ),
+    });
     const body = new ReadableStream({
       start(controller) {
         controller.enqueue(new TextEncoder().encode('--boundary'));
@@ -150,17 +186,18 @@ describe('backend proxy route handler', () => {
         }),
       }
     );
+    const [backendRequest] = fetchBackendResponseMocked.mock.calls[0] ?? [];
 
-    expect(fetchMock.mock.calls[0][1].body).toBe(body);
-    expect(fetchMock.mock.calls[0][1].duplex).toBe('half');
-    expect(fetchMock.mock.calls[0][1].headers.get('Content-Type')).toBe(
+    expect(backendRequest?.init?.body).toBe(body);
+    expect(new Headers(backendRequest?.init?.headers).get('Content-Type')).toBe(
       'multipart/form-data; boundary=boundary'
     );
   });
 
   it('preserves successful backend status codes and headers', async () => {
-    fetchMock.mockResolvedValue(
-      new Response(
+    fetchBackendResponseMocked.mockResolvedValue({
+      ok: true,
+      data: new Response(
         JSON.stringify({
           id: 'order-1',
         }),
@@ -168,11 +205,11 @@ describe('backend proxy route handler', () => {
           status: 201,
           headers: {
             'content-type': 'application/json',
-            location: `${backendApiUrl}/orders/order-1`,
+            location: 'https://backend.example.test/orders/order-1',
           },
         }
-      )
-    );
+      ),
+    });
 
     const response = await POST(
       new NextRequest('http://localhost/api/backend/orders', {
@@ -194,7 +231,7 @@ describe('backend proxy route handler', () => {
 
     expect(response.status).toBe(201);
     expect(response.headers.get('location')).toBe(
-      `${backendApiUrl}/orders/order-1`
+      'https://backend.example.test/orders/order-1'
     );
     await expect(response.json()).resolves.toStrictEqual({
       id: 'order-1',
@@ -202,17 +239,13 @@ describe('backend proxy route handler', () => {
   });
 
   it('clears the auth cookie when the backend returns 401', async () => {
-    fetchMock.mockResolvedValue(
-      new Response(
-        JSON.stringify({
-          message: 'Token expired.',
-        }),
-        {
-          status: 401,
-          statusText: 'Unauthorized',
-        }
-      )
-    );
+    fetchBackendResponseMocked.mockResolvedValue({
+      ok: false,
+      error: {
+        message: 'Token expired.',
+        status: 401,
+      },
+    });
 
     const response = await GET(
       new NextRequest('http://localhost/api/backend/orders', {

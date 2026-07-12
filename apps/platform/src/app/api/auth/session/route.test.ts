@@ -1,32 +1,55 @@
 import { AUTH_TOKEN_COOKIE_NAME } from '@ordero/next-api/server';
 import { NextRequest } from 'next/server';
+import { getServerSession } from '@/lib/server/session';
 import { GET as getSession } from './route';
 
-const fetchMock = vi.fn();
-const backendApiUrl = 'https://backend.example.test';
+const { getServerSessionMock } = vi.hoisted(() => ({
+  getServerSessionMock: vi.fn(),
+}));
+
+vi.mock('@/lib/server/session', () => ({
+  getServerSession: getServerSessionMock,
+}));
+
+const getServerSessionMocked = vi.mocked(getServerSession);
 
 const getJson = async <T>(response: Response) => (await response.json()) as T;
 
 describe('GET /api/auth/session', () => {
   beforeEach(() => {
-    process.env.BACKEND_API_URL = backendApiUrl;
-    vi.stubGlobal('fetch', fetchMock);
-    fetchMock.mockReset();
+    getServerSessionMocked.mockReset();
   });
 
-  afterEach(() => {
-    vi.unstubAllGlobals();
-    delete process.env.BACKEND_API_URL;
-  });
-
-  it('returns a session from the backend /me endpoint when a token exists', async () => {
-    fetchMock.mockResolvedValue(
-      new Response(
-        JSON.stringify({
-          email: 'admin@gmail.com',
-        })
-      )
+  it('returns a signed-out session without a token', async () => {
+    getServerSessionMocked.mockResolvedValue({
+      ok: true,
+      session: {
+        authenticated: false,
+      },
+      shouldClearAuthCookie: false,
+    });
+    const response = await getSession(
+      new NextRequest('http://localhost/api/auth/session')
     );
+
+    await expect(getJson(response)).resolves.toStrictEqual({
+      authenticated: false,
+    });
+    expect(getServerSessionMocked).toHaveBeenCalledWith(undefined);
+    expect(response.headers.get('set-cookie')).toBeNull();
+  });
+
+  it('returns an authenticated session when the server session resolves', async () => {
+    getServerSessionMocked.mockResolvedValue({
+      ok: true,
+      session: {
+        authenticated: true,
+        user: {
+          email: 'admin@gmail.com',
+        },
+      },
+      shouldClearAuthCookie: false,
+    });
     const response = await getSession(
       new NextRequest('http://localhost/api/auth/session', {
         headers: {
@@ -41,23 +64,17 @@ describe('GET /api/auth/session', () => {
         email: 'admin@gmail.com',
       },
     });
-    const [, fetchOptions] = fetchMock.mock.calls[0] ?? [];
-    const headers = new Headers(fetchOptions?.headers);
-    expect(headers.get('Authorization')).toBe('Bearer jwt-token');
+    expect(getServerSessionMocked).toHaveBeenCalledWith('jwt-token');
   });
 
-  it('clears the auth cookie and returns signed out when /me rejects the token', async () => {
-    fetchMock.mockResolvedValue(
-      new Response(
-        JSON.stringify({
-          message: 'Token expired.',
-        }),
-        {
-          status: 401,
-          statusText: 'Unauthorized',
-        }
-      )
-    );
+  it('clears the auth cookie when the server session rejects the token', async () => {
+    getServerSessionMocked.mockResolvedValue({
+      ok: true,
+      session: {
+        authenticated: false,
+      },
+      shouldClearAuthCookie: true,
+    });
     const response = await getSession(
       new NextRequest('http://localhost/api/auth/session', {
         headers: {
@@ -69,6 +86,7 @@ describe('GET /api/auth/session', () => {
     await expect(getJson(response)).resolves.toStrictEqual({
       authenticated: false,
     });
+    expect(getServerSessionMocked).toHaveBeenCalledWith('stale-token');
     expect(response.headers.get('set-cookie')).toContain(
       `${AUTH_TOKEN_COOKIE_NAME}=`
     );
