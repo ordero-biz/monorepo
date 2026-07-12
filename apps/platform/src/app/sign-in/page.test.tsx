@@ -14,13 +14,13 @@ vi.mock('@/lib/server/authPageGuard', () => ({
   hasAuthenticatedServerSession: vi.fn(),
 }));
 
-vi.mock('@/features/auth/AuthPageShell', () => ({
+vi.mock('@/features/auth', () => ({
   AuthPageShell: ({ children }: { children: ReactNode }) => (
     <div data-testid="auth-shell">{children}</div>
   ),
 }));
 
-vi.mock('@/features/sign-in/SignInLayout', () => ({
+vi.mock('@/features/sign-in', () => ({
   SignInFormLayout: () => <div>Sign in form</div>,
 }));
 

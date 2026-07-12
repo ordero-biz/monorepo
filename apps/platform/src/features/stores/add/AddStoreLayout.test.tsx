@@ -2,12 +2,6 @@ import { screen } from '@testing-library/react';
 import { preparePlatformSetup } from '@/test/prepareSetup';
 import { AddStoreLayout } from './AddStoreLayout';
 
-vi.mock('next/navigation', () => ({
-  useRouter: () => ({
-    push: vi.fn(),
-  }),
-}));
-
 vi.mock('@/lib/client/api/stores', async () => ({
   ...(await vi.importActual<typeof import('@/lib/client/api/stores')>(
     '@/lib/client/api/stores'
@@ -17,6 +11,9 @@ vi.mock('@/lib/client/api/stores', async () => ({
 
 const { setup } = preparePlatformSetup({
   component: AddStoreLayout,
+  props: {
+    onCreated: vi.fn(),
+  },
 });
 
 describe('AddStoreLayout', () => {

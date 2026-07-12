@@ -2,8 +2,9 @@
 
 import { Card, Typography } from '@ordero/ui';
 import { AddStoreForm } from './AddStoreForm';
+import type { AddStoreLayoutProps } from './types';
 
-export const AddStoreLayout = () => {
+export const AddStoreLayout = ({ onCreated }: AddStoreLayoutProps) => {
   return (
     <section className="mx-auto flex w-full max-w-[560px] flex-col gap-[var(--space-3)] text-foreground">
       <div className="flex flex-col gap-[var(--space-1)]">
@@ -15,7 +16,7 @@ export const AddStoreLayout = () => {
 
       <Card.Root variant="filled">
         <Card.Content>
-          <AddStoreForm />
+          <AddStoreForm onCreated={onCreated} />
         </Card.Content>
       </Card.Root>
     </section>

@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
-import { AuthPageShell } from '@/features/auth/AuthPageShell';
-import { SignUpLayout } from '@/features/sign-up/SignUpLayout';
+import { AuthPageShell } from '@/features/auth';
+import { SignUpLayout } from '@/features/sign-up';
 import { clientRoutes } from '@/lib/client/routes';
 import { hasAuthenticatedServerSession } from '@/lib/server/authPageGuard';
 

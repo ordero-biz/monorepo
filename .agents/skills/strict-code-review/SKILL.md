@@ -174,6 +174,8 @@ When a diff touches `apps/*/src/features`, review the structure against
   component `types.ts` files
 - cross-workflow imports should use the nearest public barrel rather than deep
   private component paths
+- for feature-folder refactors, expect the component-type verification from
+  `docs/features.md` to be run or otherwise accounted for
 
 ### Component test setup rules
 

@@ -1,8 +1,5 @@
 import { Card } from '@ordero/ui';
-
-type AddStoreCardProps = {
-  onClick: () => void;
-};
+import type { AddStoreCardProps } from './types';
 
 export const AddStoreCard = ({ onClick }: AddStoreCardProps) => {
   return (
