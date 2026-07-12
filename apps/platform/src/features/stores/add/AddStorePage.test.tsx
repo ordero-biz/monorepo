@@ -1,27 +1,30 @@
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { createStore } from '@/lib/client/api/stores';
 import { clientRoutes } from '@/lib/client/routes';
 import { storesQueryKeys } from '@/lib/hooks/stores/useStoresQuery';
 import { preparePlatformSetup } from '@/test/prepareSetup';
 import { AddStorePage } from './AddStorePage';
 
-const routerPushMock = vi.fn();
+const { routerPushMock } = vi.hoisted(() => ({
+  routerPushMock: vi.fn(),
+}));
 
-vi.mock('next/navigation', () => ({
+vi.mock('next/navigation', async () => ({
+  ...(await vi.importActual<typeof import('next/navigation')>(
+    'next/navigation'
+  )),
   useRouter: () => ({
     push: routerPushMock,
   }),
 }));
 
-vi.mock('@/lib/client/api/stores', async () => ({
-  ...(await vi.importActual<typeof import('@/lib/client/api/stores')>(
-    '@/lib/client/api/stores'
-  )),
-  createStore: vi.fn(),
+vi.mock('./AddStoreLayout', () => ({
+  AddStoreLayout: ({ onCreated }: { onCreated: () => Promise<void> }) => (
+    <button onClick={onCreated} type="button">
+      Complete store creation
+    </button>
+  ),
 }));
-
-const createStoreMock = vi.mocked(createStore);
 
 const { setup } = preparePlatformSetup({
   component: AddStorePage,
@@ -29,26 +32,17 @@ const { setup } = preparePlatformSetup({
 
 describe('AddStorePage', () => {
   beforeEach(() => {
-    createStoreMock.mockReset();
-    routerPushMock.mockClear();
+    routerPushMock.mockReset();
   });
 
-  it('invalidates stores and redirects after creating a store', async () => {
-    createStoreMock.mockResolvedValue({
-      ok: true,
-      data: {
-        id: 1,
-        name: 'North Shop',
-        subDomain: 'north-shop',
-      },
-    });
+  it('invalidates stores and redirects after store creation', async () => {
     const user = userEvent.setup();
     const { queryClient } = setup();
     const invalidateQueriesSpy = vi.spyOn(queryClient, 'invalidateQueries');
 
-    await user.type(screen.getByRole('textbox', { name: 'Subdomain' }), 'shop');
-    await user.type(screen.getByRole('textbox', { name: 'Name' }), 'Shop');
-    await user.click(screen.getByRole('button', { name: 'Create store' }));
+    await user.click(
+      screen.getByRole('button', { name: 'Complete store creation' })
+    );
 
     await waitFor(() =>
       expect(invalidateQueriesSpy).toHaveBeenCalledWith({

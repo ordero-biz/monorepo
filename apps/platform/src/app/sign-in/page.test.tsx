@@ -1,54 +1,61 @@
 import { render, screen } from '@testing-library/react';
-import { redirect } from 'next/navigation';
 import type { ReactNode } from 'react';
 import { clientRoutes } from '@/lib/client/routes';
 import SignInPage from './page';
 
-vi.mock('next/navigation', () => ({
-  redirect: vi.fn(() => {
+const { hasAuthenticatedServerSessionMock, redirectMock } = vi.hoisted(() => ({
+  hasAuthenticatedServerSessionMock: vi.fn(),
+  redirectMock: vi.fn(() => {
     throw new Error('redirect');
   }),
 }));
 
-vi.mock('@/lib/server/authPageGuard', () => ({
-  hasAuthenticatedServerSession: vi.fn(),
+vi.mock('next/navigation', async () => ({
+  ...(await vi.importActual<typeof import('next/navigation')>(
+    'next/navigation'
+  )),
+  redirect: redirectMock,
 }));
 
-vi.mock('@/features/auth', () => ({
+vi.mock('@/lib/server/authPageGuard', () => ({
+  hasAuthenticatedServerSession: hasAuthenticatedServerSessionMock,
+}));
+
+vi.mock('@/features/auth', async () => ({
+  ...(await vi.importActual<typeof import('@/features/auth')>(
+    '@/features/auth'
+  )),
   AuthPageShell: ({ children }: { children: ReactNode }) => (
-    <div data-testid="auth-shell">{children}</div>
+    <main>{children}</main>
   ),
 }));
 
-vi.mock('@/features/sign-in', () => ({
+vi.mock('@/features/sign-in', async () => ({
+  ...(await vi.importActual<typeof import('@/features/sign-in')>(
+    '@/features/sign-in'
+  )),
   SignInFormLayout: () => <div>Sign in form</div>,
 }));
 
-const getGuardMock = async () => {
-  const module = await import('@/lib/server/authPageGuard');
-
-  return vi.mocked(module.hasAuthenticatedServerSession);
-};
-
 describe('SignInPage', () => {
-  beforeEach(async () => {
-    vi.mocked(redirect).mockClear();
-    (await getGuardMock()).mockReset();
+  beforeEach(() => {
+    redirectMock.mockClear();
+    hasAuthenticatedServerSessionMock.mockReset();
   });
 
   it('redirects authenticated users away from the sign-in page', async () => {
-    (await getGuardMock()).mockResolvedValue(true);
+    hasAuthenticatedServerSessionMock.mockResolvedValue(true);
 
     await expect(SignInPage()).rejects.toThrow('redirect');
-    expect(redirect).toHaveBeenCalledWith(clientRoutes.stores);
+    expect(redirectMock).toHaveBeenCalledWith(clientRoutes.stores);
   });
 
   it('renders the sign-in page for signed-out users', async () => {
-    (await getGuardMock()).mockResolvedValue(false);
+    hasAuthenticatedServerSessionMock.mockResolvedValue(false);
 
     render(await SignInPage());
 
-    expect(screen.getByTestId('auth-shell')).toBeVisible();
+    expect(screen.getByRole('main')).toBeVisible();
     expect(screen.getByText('Sign in form')).toBeVisible();
   });
 });

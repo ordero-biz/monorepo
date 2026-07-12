@@ -7,9 +7,14 @@ import {
 import { useLogOut } from './useLogOut';
 import { authQueryKeys } from './useSessionQuery';
 
-const routerReplaceMock = vi.fn();
+const { routerReplaceMock } = vi.hoisted(() => ({
+  routerReplaceMock: vi.fn(),
+}));
 
-vi.mock('next/navigation', () => ({
+vi.mock('next/navigation', async () => ({
+  ...(await vi.importActual<typeof import('next/navigation')>(
+    'next/navigation'
+  )),
   useRouter: () => ({
     replace: routerReplaceMock,
   }),
@@ -77,10 +82,19 @@ describe('useLogOut', () => {
       wrapper: TestQueryProvider,
     });
 
+    let logoutResult: Awaited<ReturnType<typeof logout>> | undefined;
+
     await act(async () => {
-      await result.current.logOut();
+      logoutResult = await result.current.logOut();
     });
 
+    expect(logoutResult).toStrictEqual({
+      ok: false,
+      error: {
+        status: 500,
+        message: 'Unable to sign out.',
+      },
+    });
     expect(queryClient.getQueryData(authQueryKeys.session)).toStrictEqual({
       authenticated: true,
     });

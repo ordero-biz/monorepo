@@ -1,5 +1,3 @@
-import { hasAuthenticatedServerSession as resolveAuthenticatedServerSession } from '@ordero/next-api/authPageGuard';
-import { redirect } from 'next/navigation';
 import { clientRoutes } from '@/lib/client/routes';
 import { getServerSession } from '@/lib/server/session';
 import {
@@ -7,41 +5,32 @@ import {
   requireAuthenticatedRoute,
 } from './authPageGuard';
 
-vi.mock('next/navigation', () => ({
-  redirect: vi.fn(() => {
-    throw new Error('redirect');
-  }),
+const { redirectMock, resolveAuthenticatedServerSessionMock } = vi.hoisted(
+  () => ({
+    redirectMock: vi.fn(() => {
+      throw new Error('redirect');
+    }),
+    resolveAuthenticatedServerSessionMock: vi.fn(),
+  })
+);
+
+vi.mock('next/navigation', async () => ({
+  ...(await vi.importActual<typeof import('next/navigation')>(
+    'next/navigation'
+  )),
+  redirect: redirectMock,
 }));
 
-vi.mock('@ordero/next-api/authPageGuard', async () => {
-  const actual = await vi.importActual<
-    typeof import('@ordero/next-api/authPageGuard')
-  >('@ordero/next-api/authPageGuard');
-
-  return {
-    ...actual,
-    hasAuthenticatedServerSession: vi.fn(),
-  };
-});
-
-vi.mock('@/lib/server/session', async () => {
-  const actual = await vi.importActual<typeof import('@/lib/server/session')>(
-    '@/lib/server/session'
-  );
-
-  return {
-    ...actual,
-    getServerSession: vi.fn(),
-  };
-});
-
-const resolveAuthenticatedServerSessionMock = vi.mocked(
-  resolveAuthenticatedServerSession
-);
+vi.mock('@ordero/next-api/authPageGuard', async () => ({
+  ...(await vi.importActual<typeof import('@ordero/next-api/authPageGuard')>(
+    '@ordero/next-api/authPageGuard'
+  )),
+  hasAuthenticatedServerSession: resolveAuthenticatedServerSessionMock,
+}));
 
 describe('authPageGuard', () => {
   beforeEach(() => {
-    vi.mocked(redirect).mockClear();
+    redirectMock.mockClear();
     resolveAuthenticatedServerSessionMock.mockReset();
   });
 
@@ -61,13 +50,13 @@ describe('authPageGuard', () => {
     resolveAuthenticatedServerSessionMock.mockResolvedValue(false);
 
     await expect(requireAuthenticatedRoute()).rejects.toThrow('redirect');
-    expect(redirect).toHaveBeenCalledWith(clientRoutes.signIn);
+    expect(redirectMock).toHaveBeenCalledWith(clientRoutes.signIn);
   });
 
   it('allows authenticated protected route requests to continue', async () => {
     resolveAuthenticatedServerSessionMock.mockResolvedValue(true);
 
     await expect(requireAuthenticatedRoute()).resolves.toBeUndefined();
-    expect(redirect).not.toHaveBeenCalled();
+    expect(redirectMock).not.toHaveBeenCalled();
   });
 });

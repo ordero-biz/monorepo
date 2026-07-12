@@ -6,9 +6,14 @@ import { authQueryKeys } from '@/lib/hooks/auth/useSessionQuery';
 import { preparePlatformSetup } from '@/test/prepareSetup';
 import { SignInForm } from './SignInForm';
 
-const routerPushMock = vi.fn();
+const { routerPushMock } = vi.hoisted(() => ({
+  routerPushMock: vi.fn(),
+}));
 
-vi.mock('next/navigation', () => ({
+vi.mock('next/navigation', async () => ({
+  ...(await vi.importActual<typeof import('next/navigation')>(
+    'next/navigation'
+  )),
   useRouter: () => ({
     push: routerPushMock,
   }),

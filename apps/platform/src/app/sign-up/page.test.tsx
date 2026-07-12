@@ -1,54 +1,61 @@
 import { render, screen } from '@testing-library/react';
-import { redirect } from 'next/navigation';
 import type { ReactNode } from 'react';
 import { clientRoutes } from '@/lib/client/routes';
 import SignUpPage from './page';
 
-vi.mock('next/navigation', () => ({
-  redirect: vi.fn(() => {
+const { hasAuthenticatedServerSessionMock, redirectMock } = vi.hoisted(() => ({
+  hasAuthenticatedServerSessionMock: vi.fn(),
+  redirectMock: vi.fn(() => {
     throw new Error('redirect');
   }),
 }));
 
-vi.mock('@/lib/server/authPageGuard', () => ({
-  hasAuthenticatedServerSession: vi.fn(),
+vi.mock('next/navigation', async () => ({
+  ...(await vi.importActual<typeof import('next/navigation')>(
+    'next/navigation'
+  )),
+  redirect: redirectMock,
 }));
 
-vi.mock('@/features/auth', () => ({
+vi.mock('@/lib/server/authPageGuard', () => ({
+  hasAuthenticatedServerSession: hasAuthenticatedServerSessionMock,
+}));
+
+vi.mock('@/features/auth', async () => ({
+  ...(await vi.importActual<typeof import('@/features/auth')>(
+    '@/features/auth'
+  )),
   AuthPageShell: ({ children }: { children: ReactNode }) => (
-    <div data-testid="auth-shell">{children}</div>
+    <main>{children}</main>
   ),
 }));
 
-vi.mock('@/features/sign-up', () => ({
+vi.mock('@/features/sign-up', async () => ({
+  ...(await vi.importActual<typeof import('@/features/sign-up')>(
+    '@/features/sign-up'
+  )),
   SignUpLayout: () => <div>Sign up form</div>,
 }));
 
-const getGuardMock = async () => {
-  const module = await import('@/lib/server/authPageGuard');
-
-  return vi.mocked(module.hasAuthenticatedServerSession);
-};
-
 describe('SignUpPage', () => {
-  beforeEach(async () => {
-    vi.mocked(redirect).mockClear();
-    (await getGuardMock()).mockReset();
+  beforeEach(() => {
+    redirectMock.mockClear();
+    hasAuthenticatedServerSessionMock.mockReset();
   });
 
   it('redirects authenticated users away from the sign-up page', async () => {
-    (await getGuardMock()).mockResolvedValue(true);
+    hasAuthenticatedServerSessionMock.mockResolvedValue(true);
 
     await expect(SignUpPage()).rejects.toThrow('redirect');
-    expect(redirect).toHaveBeenCalledWith(clientRoutes.home);
+    expect(redirectMock).toHaveBeenCalledWith(clientRoutes.home);
   });
 
   it('renders the sign-up page for signed-out users', async () => {
-    (await getGuardMock()).mockResolvedValue(false);
+    hasAuthenticatedServerSessionMock.mockResolvedValue(false);
 
     render(await SignUpPage());
 
-    expect(screen.getByTestId('auth-shell')).toBeVisible();
+    expect(screen.getByRole('main')).toBeVisible();
     expect(screen.getByText('Sign up form')).toBeVisible();
   });
 });
