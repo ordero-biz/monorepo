@@ -1,5 +1,5 @@
 import { PageHeader, Typography } from '@ordero/ui';
-import { CreateUnitOfMeasurementDialogTrigger } from '../CreateUnitOfMeasurementDialog/CreateUnitOfMeasurementDialogTrigger';
+import { CreateUnitOfMeasurementDialogTrigger } from '../CreateUnitOfMeasurement';
 
 export const UnitsOfMeasurementListHeader = () => (
   <PageHeader.Root>

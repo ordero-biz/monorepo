@@ -1,5 +1,5 @@
 import { PageHeader, Typography } from '@ordero/ui';
-import { CreateWarehouseDialogTrigger } from '../CreateWarehouseDialog/CreateWarehouseDialogTrigger';
+import { CreateWarehouseDialogTrigger } from '../CreateWarehouse';
 
 export const WarehousesListHeader = () => (
   <PageHeader.Root>

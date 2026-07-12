@@ -4,8 +4,8 @@ import { Button, Card, DataTable, Typography } from '@ordero/ui';
 import { useMemo, useState } from 'react';
 import type { AttributeValue } from '@/lib/domain/attributes';
 import { useAttributeValuesQuery } from '@/lib/hooks/attributes/useAttributeValuesQuery';
-import { DeleteAttributeValueDialog } from '../DeleteAttributeValueDialog/DeleteAttributeValueDialog';
-import { UpdateAttributeValueDialog } from '../UpdateAttributeValueDialog/UpdateAttributeValueDialog';
+import { DeleteAttributeValueDialog } from '../DeleteAttributeValue';
+import { UpdateAttributeValueDialog } from '../UpdateAttributeValue';
 import { getColumns } from './columns';
 
 type AttributeDetailValuesProps = {

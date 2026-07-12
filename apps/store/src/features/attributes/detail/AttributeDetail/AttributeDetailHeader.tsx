@@ -2,8 +2,8 @@
 
 import { Button, Card, PageHeader, Typography } from '@ordero/ui';
 import { useAttributeQuery } from '@/lib/hooks/attributes/useAttributeQuery';
-import { DeleteAttributeDialogTrigger } from '../DeleteAttributeDialog/DeleteAttributeDialogTrigger';
-import { UpdateAttributeDialogTrigger } from '../UpdateAttributeDialog/UpdateAttributeDialogTrigger';
+import { DeleteAttributeDialogTrigger } from '../DeleteAttribute';
+import { UpdateAttributeDialogTrigger } from '../UpdateAttribute';
 
 type AttributeDetailHeaderProps = {
   attributeId: string | number;

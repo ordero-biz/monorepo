@@ -1,8 +1,8 @@
 'use client';
 
 import { Button, Card, DataTable, Typography } from '@ordero/ui';
-import { useWarehousesQuery } from '@/lib/hooks/warehouses/useWarehousesQuery';
 import { useTablePagination } from '@/lib/hooks/useTablePagination';
+import { useWarehousesQuery } from '@/lib/hooks/warehouses/useWarehousesQuery';
 import type { PaginationSearchInput } from '@/lib/utils/url';
 import { columns } from './columns';
 

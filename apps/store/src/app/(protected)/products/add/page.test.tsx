@@ -99,9 +99,7 @@ describe('AddProductPage', () => {
       screen.getByRole('combobox', { name: 'Attributes' })
     ).toHaveTextContent('Select attributes');
     expect(
-      screen.getByText(
-        'Optional: Add attributes for a single product'
-      )
+      screen.getByText('Optional: Add attributes for a single product')
     ).toBeVisible();
     expect(screen.getByRole('group', { name: 'Creation mode' })).toBeVisible();
     expect(

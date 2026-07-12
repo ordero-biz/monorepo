@@ -1,6 +1,6 @@
 'use client';
 
-import { AuthFormLayout } from '@/features/auth/AuthFormLayout';
+import { AuthFormLayout } from '@/features/auth';
 import { SignInForm } from './SignInForm';
 
 export const SignInFormLayout = () => {
