@@ -7,18 +7,28 @@ description: Use when creating, refactoring, or reviewing feature-owned form com
 
 Use this skill for feature-owned forms in app code. The goal is to make forms predictable by giving each layer one job: workflow shell, form component, form hook, field sections, and feature utilities.
 
+Before changing the folder shape around a form, consult `docs/features.md`.
+Form workflows should live inside the relevant logical feature folder, such as
+`list/CreateX`, `detail/UpdateX`, `detail/DeleteX`, or a standalone `add/`
+workflow.
+
 ## Recommended Shape
 
 A feature form can start small, but split along these boundaries as soon as the component mixes several concerns:
 
 ```txt
-FeatureFlow.tsx                  # Dialog/page/drawer workflow and side effects
-FeatureForm.tsx                  # <form>, layout, submit event, field composition
-hooks/useFeatureForm.ts          # form setup, submit orchestration, backend errors
-FieldSection.tsx                 # repeated or dense field groups, arrays, row behavior
-constants.ts                     # default values and static configuration
-utils/validations.ts             # schemas and client validators
-utils/submitAction.ts            # feature-owned request normalization and submit call
+list/CreateFeature/
+├── FeatureFlow.tsx              # Dialog/page/drawer workflow and side effects
+├── FeatureForm.tsx              # <form>, layout, submit event, field composition
+├── FieldSection.tsx             # repeated or dense field groups, arrays, row behavior
+├── hooks/
+│   └── useFeatureForm.ts        # form setup, submit orchestration, backend errors
+├── constants.ts                 # default values and static configuration
+├── types.ts                     # component props and workflow-local types
+├── index.ts                     # public entrypoint for this workflow
+└── utils/
+    ├── validations.ts           # schemas and client validators
+    └── submitAction.ts          # feature-owned request normalization and submit call
 ```
 
 Keep the actual names domain-specific. A small page form can combine workflow,
