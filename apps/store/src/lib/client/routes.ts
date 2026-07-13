@@ -16,3 +16,6 @@ export const getAttributeDetailRoute = (attributeId: string | number) =>
 
 export const getSupplierDetailRoute = (supplierId: string | number) =>
   `/products/suppliers/${supplierId}`;
+
+export const getWarehouseDetailRoute = (warehouseId: string | number) =>
+  `/products/warehouse/${warehouseId}`;

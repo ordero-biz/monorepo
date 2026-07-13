@@ -9,6 +9,10 @@ type WarehousesFetcher = (
   input?: PaginationSearchInput
 ) => Promise<ApiResult<PaginatedResponse<Warehouse>>>;
 
+type WarehouseFetcher = (
+  warehouseId: string | number
+) => Promise<ApiResult<Warehouse>>;
+
 const unwrapApiResult = async <T>(request: Promise<ApiResult<T>>) => {
   const result = await request;
 
@@ -26,4 +30,13 @@ export const warehousesListQueryOptions = (
   queryOptions({
     queryKey: warehousesQueryKeys.listPage(input),
     queryFn: () => unwrapApiResult(fetchWarehouses(input)),
+  });
+
+export const warehouseQueryOptions = (
+  warehouseId: string | number,
+  fetchWarehouse: WarehouseFetcher
+) =>
+  queryOptions({
+    queryKey: warehousesQueryKeys.detail(warehouseId),
+    queryFn: () => unwrapApiResult(fetchWarehouse(warehouseId)),
   });

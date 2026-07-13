@@ -1,3 +1,4 @@
+export { WarehouseDetail } from '@/features/warehouses/detail/WarehouseDetail';
 export {
   WarehousesList,
   WarehousesListHeader,

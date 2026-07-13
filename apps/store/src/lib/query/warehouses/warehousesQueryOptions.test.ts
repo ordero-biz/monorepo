@@ -1,5 +1,8 @@
 import { QueryClient } from '@tanstack/react-query';
-import { warehousesListQueryOptions } from './warehousesQueryOptions';
+import {
+  warehouseQueryOptions,
+  warehousesListQueryOptions,
+} from './warehousesQueryOptions';
 
 const createQueryClient = () =>
   new QueryClient({
@@ -51,5 +54,26 @@ describe('warehousesListQueryOptions', () => {
     await expect(createQueryClient().fetchQuery(options)).rejects.toEqual(
       error
     );
+  });
+
+  it('uses a stable detail key and unwraps a fetched warehouse', async () => {
+    const warehouse = {
+      id: 1,
+      code: 'WH-001',
+      name: 'Main Warehouse',
+      address: '123 Commerce Ave',
+      comment: 'Primary stock location',
+    };
+    const fetchWarehouse = vi.fn(async () => ({
+      ok: true as const,
+      data: warehouse,
+    }));
+    const options = warehouseQueryOptions('1', fetchWarehouse);
+
+    expect(options.queryKey).toEqual(['warehouses', 'detail', '1']);
+    await expect(createQueryClient().fetchQuery(options)).resolves.toEqual(
+      warehouse
+    );
+    expect(fetchWarehouse).toHaveBeenCalledWith('1');
   });
 });
