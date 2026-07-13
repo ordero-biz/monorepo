@@ -3,12 +3,23 @@ import {
   type DataTableColumnDef,
   DataTableColumnHeader,
 } from '@ordero/ui';
+import Link from 'next/link';
+import { getWarehouseDetailRoute } from '@/lib/client/routes';
 import type { Warehouse } from '@/lib/domain/warehouses';
 
 export const columns: DataTableColumnDef<Warehouse>[] = [
   {
     accessorKey: 'code',
-    cell: ({ row }) => <DataTableCell>{row.original.code}</DataTableCell>,
+    cell: ({ row }) => (
+      <DataTableCell>
+        <Link
+          className="w-full font-600 rounded-[var(--radius-sm)] outline-none transition-colors hover:text-[var(--color-text-body)] hover:underline"
+          href={getWarehouseDetailRoute(row.original.id)}
+        >
+          {row.original.code}
+        </Link>
+      </DataTableCell>
+    ),
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Code" />
     ),

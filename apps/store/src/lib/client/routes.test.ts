@@ -1,4 +1,8 @@
-import { getAttributeDetailRoute, getSupplierDetailRoute } from './routes';
+import {
+  getAttributeDetailRoute,
+  getSupplierDetailRoute,
+  getWarehouseDetailRoute,
+} from './routes';
 
 describe('client detail routes', () => {
   it.each([
@@ -11,6 +15,8 @@ describe('client detail routes', () => {
       'fresh-farms',
       '/products/suppliers/fresh-farms',
     ],
+    ['warehouse', getWarehouseDetailRoute, 1, '/products/warehouse/1'],
+    ['warehouse', getWarehouseDetailRoute, 'main', '/products/warehouse/main'],
   ])('builds the %s detail route for %s', (_, getRoute, id, route) => {
     expect(getRoute(id)).toBe(route);
   });

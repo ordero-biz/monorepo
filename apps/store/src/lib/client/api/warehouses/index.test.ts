@@ -1,4 +1,9 @@
-import { createWarehouse, getWarehouses, getWarehousesPath } from '.';
+import {
+  createWarehouse,
+  getWarehouse,
+  getWarehouses,
+  getWarehousesPath,
+} from '.';
 
 describe('warehouse client helpers', () => {
   beforeEach(() => {
@@ -99,6 +104,32 @@ describe('warehouse client helpers', () => {
         fieldErrors: undefined,
       },
     });
+  });
+
+  it('gets a warehouse from the backend proxy', async () => {
+    const fetchMock = vi.mocked(fetch);
+    const warehouse = {
+      id: 1,
+      code: 'WH-001',
+      name: 'Main Warehouse',
+      address: '123 Commerce Ave',
+      comment: 'Primary stock location',
+    };
+
+    fetchMock.mockResolvedValue(new Response(JSON.stringify(warehouse)));
+
+    await expect(getWarehouse(1)).resolves.toEqual({
+      ok: true,
+      data: warehouse,
+    });
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/backend/api/v1/warehouses/1',
+      expect.objectContaining({
+        method: 'GET',
+        cache: 'no-store',
+      })
+    );
   });
 
   it('posts a new warehouse through the backend proxy', async () => {

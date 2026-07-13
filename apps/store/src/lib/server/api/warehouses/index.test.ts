@@ -1,7 +1,7 @@
 import { AUTH_TOKEN_COOKIE_NAME } from '@ordero/next-api/server';
 import { cookies } from 'next/headers';
 import { fetchBackendResponse } from '@/lib/server/fetch';
-import { getServerWarehouses } from '.';
+import { getServerWarehouse, getServerWarehouses } from '.';
 
 vi.mock('next/headers', () => ({
   cookies: vi.fn(),
@@ -98,6 +98,36 @@ describe('warehouse server helpers', () => {
     expect(fetchBackendResponseMock).toHaveBeenCalledWith({
       path: '/api/v1/warehouses',
       search: 'page=2&size=10&sort=name%2Casc&sort=code%2Cdesc',
+      token: 'server-token',
+      init: {
+        method: 'GET',
+      },
+    });
+  });
+
+  it('gets a warehouse with the server auth token', async () => {
+    const warehouse = {
+      id: 1,
+      code: 'WH-001',
+      name: 'Main Warehouse',
+      address: '123 Commerce Ave',
+      comment: 'Primary stock location',
+    };
+
+    mockAuthCookie('server-token');
+    fetchBackendResponseMock.mockResolvedValue({
+      ok: true,
+      data: new Response(JSON.stringify(warehouse)),
+    });
+
+    await expect(getServerWarehouse(1)).resolves.toEqual({
+      ok: true,
+      data: warehouse,
+    });
+
+    expect(fetchBackendResponseMock).toHaveBeenCalledWith({
+      path: '/api/v1/warehouses/1',
+      search: undefined,
       token: 'server-token',
       init: {
         method: 'GET',

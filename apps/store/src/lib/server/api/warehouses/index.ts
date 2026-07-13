@@ -8,6 +8,7 @@ import type { Warehouse } from '@/lib/domain/warehouses';
 import { BACKEND_WAREHOUSE_PATHS } from '@/lib/server/api/path';
 import { fetchBackendResponse } from '@/lib/server/fetch';
 import type { PaginatedResponse } from '@/lib/server/types';
+import { tokenizePath } from '@/lib/utils/tokenizePath';
 import {
   getPaginationSearch,
   type PaginationSearchInput,
@@ -55,4 +56,9 @@ export const getServerWarehouses = (input?: PaginationSearchInput) =>
   fetchWarehouseResource<PaginatedResponse<Warehouse>>(
     BACKEND_WAREHOUSE_PATHS.warehouses,
     getPaginationSearch(input)
+  );
+
+export const getServerWarehouse = (warehouseId: string | number) =>
+  fetchWarehouseResource<Warehouse>(
+    tokenizePath(BACKEND_WAREHOUSE_PATHS.warehouse, { id: warehouseId })
   );
