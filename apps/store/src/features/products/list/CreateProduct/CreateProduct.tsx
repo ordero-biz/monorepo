@@ -193,77 +193,6 @@ export const CreateProduct = () => {
                       );
                     }}
                   </form.Field>
-
-                  <form.Field name="attributeValues">
-                    {(field) => (
-                      <form.Subscribe
-                        selector={(state) => state.values.attributes}
-                      >
-                        {(attributes) =>
-                          attributes.length > 0 ? (
-                            <fieldset
-                              aria-label="Attribute values"
-                              className="m-0 flex flex-col gap-[var(--space-2)] border-0 p-0"
-                            >
-                              {attributes.map((attribute) => {
-                                const attributeId = String(attribute.id);
-                                const selectedAttributeValueIds =
-                                  field.state.value[attributeId] ?? [];
-
-                                return (
-                                  <div
-                                    className="flex flex-wrap items-center gap-[var(--space-1)]"
-                                    key={attribute.id}
-                                  >
-                                    <span className="font-medium text-[length:var(--body2-size-desktop)] leading-[var(--body2-line-height-desktop)]">
-                                      {attribute.name}:
-                                    </span>
-                                    {attribute.attributeValues.map(
-                                      (attributeValue) => {
-                                        const attributeValueId = String(
-                                          attributeValue.id
-                                        );
-
-                                        return (
-                                          <ToggleButton.Item
-                                            key={attributeValue.id}
-                                            onPressedChange={(pressed) => {
-                                              field.handleChange({
-                                                ...field.state.value,
-                                                [attributeId]: pressed
-                                                  ? [
-                                                      ...selectedAttributeValueIds,
-                                                      attributeValueId,
-                                                    ]
-                                                  : selectedAttributeValueIds.filter(
-                                                      (
-                                                        selectedAttributeValueId
-                                                      ) =>
-                                                        selectedAttributeValueId !==
-                                                        attributeValueId
-                                                    ),
-                                              });
-                                            }}
-                                            pressed={selectedAttributeValueIds.includes(
-                                              attributeValueId
-                                            )}
-                                            size="s"
-                                            type="button"
-                                          >
-                                            {attributeValue.name}
-                                          </ToggleButton.Item>
-                                        );
-                                      }
-                                    )}
-                                  </div>
-                                );
-                              })}
-                            </fieldset>
-                          ) : null
-                        }
-                      </form.Subscribe>
-                    )}
-                  </form.Field>
                 </div>
 
                 <div className="flex min-w-0 flex-col gap-[var(--space-2)]">
@@ -332,50 +261,112 @@ export const CreateProduct = () => {
                 </Typography>
               </section>
             </div>
-
-            <div className="flex justify-end">
-              <form.Subscribe
-                selector={(state) =>
-                  [
-                    state.values.productName,
-                    state.values.attributes,
-                    state.values.category,
-                    state.isSubmitting,
-                  ] as const
-                }
-              >
-                {([productName, attributes, category, isSubmitting]) => {
-                  const isSubmitDisabled =
-                    isSubmitting ||
-                    !productName.trim() ||
-                    !category ||
-                    (isMultipleProducts && attributes.length === 0);
-                  const helperText = isMultipleProducts
-                    ? 'You will proceed to configure products based on selected attributes'
-                    : 'You will proceed to configure 1 product';
-
-                  return (
-                    <div className="flex flex-col items-end gap-[var(--space-1)]">
-                      <Button
-                        color="primary"
-                        disabled={isSubmitDisabled}
-                        size="l"
-                        type="submit"
+            <form.Field name="attributeValues">
+              {(field) => (
+                <form.Subscribe selector={(state) => state.values.attributes}>
+                  {(attributes) =>
+                    attributes.length > 0 ? (
+                      <fieldset
+                        aria-label="Attribute values"
+                        className="m-0 flex flex-col gap-[var(--space-2)] border-0 p-0"
                       >
-                        {isSubmitting
-                          ? 'Generating products...'
-                          : isMultipleProducts
-                            ? 'Next: Configure products'
-                            : 'Next: Configure product'}
-                      </Button>
-                      <FieldHelperText align="end">
-                        {helperText}
-                      </FieldHelperText>
-                    </div>
-                  );
-                }}
-              </form.Subscribe>
-            </div>
+                        {attributes.map((attribute) => {
+                          const attributeId = String(attribute.id);
+                          const selectedAttributeValueIds =
+                            field.state.value[attributeId] ?? [];
+
+                          return (
+                            <div
+                              className="flex flex-wrap items-center gap-[var(--space-1)]"
+                              key={attribute.id}
+                            >
+                              <span className="font-medium text-[length:var(--body2-size-desktop)] leading-[var(--body2-line-height-desktop)]">
+                                {attribute.name}:
+                              </span>
+                              {attribute.attributeValues.map(
+                                (attributeValue) => {
+                                  const attributeValueId = String(
+                                    attributeValue.id
+                                  );
+
+                                  return (
+                                    <ToggleButton.Item
+                                      key={attributeValue.id}
+                                      onPressedChange={(pressed) => {
+                                        field.handleChange({
+                                          ...field.state.value,
+                                          [attributeId]: pressed
+                                            ? [
+                                                ...selectedAttributeValueIds,
+                                                attributeValueId,
+                                              ]
+                                            : selectedAttributeValueIds.filter(
+                                                (selectedAttributeValueId) =>
+                                                  selectedAttributeValueId !==
+                                                  attributeValueId
+                                              ),
+                                        });
+                                      }}
+                                      pressed={selectedAttributeValueIds.includes(
+                                        attributeValueId
+                                      )}
+                                      size="s"
+                                      type="button"
+                                    >
+                                      {attributeValue.name}
+                                    </ToggleButton.Item>
+                                  );
+                                }
+                              )}
+                            </div>
+                          );
+                        })}
+                      </fieldset>
+                    ) : null
+                  }
+                </form.Subscribe>
+              )}
+            </form.Field>
+
+            <form.Subscribe
+              selector={(state) =>
+                [
+                  state.values.productName,
+                  state.values.attributes,
+                  state.values.category,
+                  state.isSubmitting,
+                ] as const
+              }
+            >
+              {([productName, attributes, category, isSubmitting]) => {
+                const isSubmitDisabled =
+                  isSubmitting ||
+                  !productName.trim() ||
+                  !category ||
+                  (isMultipleProducts && attributes.length === 0);
+                const helperText = isMultipleProducts
+                  ? 'You will proceed to configure products based on selected attributes'
+                  : 'You will proceed to configure 1 product';
+
+                return (
+                  <div className="flex flex-col items-end gap-[var(--space-1)]">
+                    <Button
+                      color="primary"
+                      disabled={isSubmitDisabled}
+                      size="l"
+                      type="submit"
+                    >
+                      {isSubmitting
+                        ? 'Generating products...'
+                        : isMultipleProducts
+                          ? 'Next: Configure products'
+                          : 'Next: Configure product'}
+                    </Button>
+                    <FieldHelperText align="end">{helperText}</FieldHelperText>
+                  </div>
+                );
+              }}
+            </form.Subscribe>
           </div>
         </Card.Content>
       </Card.Root>
