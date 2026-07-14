@@ -1,5 +1,6 @@
 import {
   createUnitOfMeasurement,
+  getUnitOfMeasurement,
   getUnitsOfMeasurement,
   getUnitsOfMeasurementPath,
 } from '.';
@@ -103,6 +104,31 @@ describe('units of measurement client helpers', () => {
         fieldErrors: undefined,
       },
     });
+  });
+
+  it('gets a unit of measurement from the backend proxy', async () => {
+    const fetchMock = vi.mocked(fetch);
+    const unitOfMeasurement = {
+      id: 1,
+      code: 'KG',
+      name: 'Kilogram',
+      symbol: 'kg',
+      comment: 'Weight unit',
+    };
+
+    fetchMock.mockResolvedValue(
+      new Response(JSON.stringify(unitOfMeasurement))
+    );
+
+    await expect(getUnitOfMeasurement(1)).resolves.toEqual({
+      ok: true,
+      data: unitOfMeasurement,
+    });
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/backend/api/v1/units-of-measurement/1',
+      expect.objectContaining({ method: 'GET', cache: 'no-store' })
+    );
   });
 
   it('posts a new unit of measurement through the backend proxy', async () => {

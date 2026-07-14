@@ -1,5 +1,8 @@
 import { QueryClient } from '@tanstack/react-query';
-import { unitsOfMeasurementListQueryOptions } from './unitsOfMeasurementQueryOptions';
+import {
+  unitOfMeasurementQueryOptions,
+  unitsOfMeasurementListQueryOptions,
+} from './unitsOfMeasurementQueryOptions';
 
 const createQueryClient = () =>
   new QueryClient({
@@ -48,5 +51,26 @@ describe('unitsOfMeasurementListQueryOptions', () => {
     await expect(createQueryClient().fetchQuery(options)).rejects.toEqual(
       error
     );
+  });
+
+  it('uses a stable detail key and unwraps a fetched unit of measurement', async () => {
+    const unitOfMeasurement = {
+      id: 1,
+      code: 'KG',
+      name: 'Kilogram',
+      symbol: 'kg',
+      comment: 'Weight unit',
+    };
+    const fetchUnitOfMeasurement = vi.fn(async () => ({
+      ok: true as const,
+      data: unitOfMeasurement,
+    }));
+    const options = unitOfMeasurementQueryOptions('1', fetchUnitOfMeasurement);
+
+    expect(options.queryKey).toEqual(['units-of-measurement', 'detail', '1']);
+    await expect(createQueryClient().fetchQuery(options)).resolves.toEqual(
+      unitOfMeasurement
+    );
+    expect(fetchUnitOfMeasurement).toHaveBeenCalledWith('1');
   });
 });

@@ -9,6 +9,10 @@ type UnitsOfMeasurementFetcher = (
   input?: PaginationSearchInput
 ) => Promise<ApiResult<PaginatedResponse<UnitOfMeasurement>>>;
 
+type UnitOfMeasurementFetcher = (
+  unitOfMeasurementId: string | number
+) => Promise<ApiResult<UnitOfMeasurement>>;
+
 const unwrapApiResult = async <T>(request: Promise<ApiResult<T>>) => {
   const result = await request;
 
@@ -26,4 +30,13 @@ export const unitsOfMeasurementListQueryOptions = (
   queryOptions({
     queryKey: unitsOfMeasurementQueryKeys.listPage(input),
     queryFn: () => unwrapApiResult(fetchUnitsOfMeasurement(input)),
+  });
+
+export const unitOfMeasurementQueryOptions = (
+  unitOfMeasurementId: string | number,
+  fetchUnitOfMeasurement: UnitOfMeasurementFetcher
+) =>
+  queryOptions({
+    queryKey: unitsOfMeasurementQueryKeys.detail(unitOfMeasurementId),
+    queryFn: () => unwrapApiResult(fetchUnitOfMeasurement(unitOfMeasurementId)),
   });
