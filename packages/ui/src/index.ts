@@ -110,6 +110,18 @@ export type {
 } from './components/IconButton';
 export { IconButton } from './components/IconButton';
 export type {
+  MenuAlign,
+  MenuItemProps,
+  MenuPortalProps,
+  MenuPopupProps,
+  MenuPositionerProps,
+  MenuRootProps,
+  MenuSide,
+  MenuTriggerAppearance,
+  MenuTriggerProps,
+} from './components/Menu';
+export { Menu } from './components/Menu';
+export type {
   InputProps,
   InputSize,
   InputVariant,
