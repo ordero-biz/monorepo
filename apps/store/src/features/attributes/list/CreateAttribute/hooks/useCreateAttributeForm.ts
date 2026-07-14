@@ -34,7 +34,7 @@ export const useCreateAttributeForm = ({
       }
 
       addToast({
-        description: `Attribute ${result.data.name} was created`,
+        description: `Attribute ${result.data.name} was added`,
         type: 'success',
       });
 

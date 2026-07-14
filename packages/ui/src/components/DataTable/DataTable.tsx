@@ -253,12 +253,14 @@ export const DataTable = <TData,>({
         </table>
       </div>
       {pagination ? (
-        <TablePagination
-          {...pagination}
-          count={paginationRowCount}
-          page={pagination.page}
-          rowsPerPage={pagination.rowsPerPage}
-        />
+        <div className="border-t border-dashed border-[var(--color-divider)]">
+          <TablePagination
+            {...pagination}
+            count={paginationRowCount}
+            page={pagination.page}
+            rowsPerPage={pagination.rowsPerPage}
+          />
+        </div>
       ) : null}
     </div>
   );

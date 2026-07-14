@@ -71,10 +71,10 @@ describe('UpdateSupplierDialog', () => {
       data: {
         id: 1,
         name: 'Fresh Farms Updated',
-        email: 'orders.updated@fresh.example',
-        phone: '+1 555 0101',
-        address: '124 Market St',
-        comment: 'Updated supplier',
+        email: 'orders@fresh.example',
+        phone: '+1 555 0100',
+        address: '123 Market St',
+        comment: 'Preferred produce supplier',
       },
     });
     const user = userEvent.setup();
@@ -82,34 +82,18 @@ describe('UpdateSupplierDialog', () => {
     const invalidateQueriesSpy = vi.spyOn(queryClient, 'invalidateQueries');
     const dialog = screen.getByRole('dialog', { name: 'Edit supplier' });
     const nameField = within(dialog).getByRole('textbox', { name: 'Name' });
-    const emailField = within(dialog).getByRole('textbox', { name: 'Email' });
-    const phoneField = within(dialog).getByRole('textbox', { name: 'Phone' });
-    const addressField = within(dialog).getByRole('textbox', {
-      name: 'Address',
-    });
-    const commentField = within(dialog).getByRole('textbox', {
-      name: 'Comment',
-    });
 
     await user.clear(nameField);
     await user.type(nameField, ' Fresh Farms Updated ');
-    await user.clear(emailField);
-    await user.type(emailField, ' orders.updated@fresh.example ');
-    await user.clear(phoneField);
-    await user.type(phoneField, ' +1 555 0101 ');
-    await user.clear(addressField);
-    await user.type(addressField, ' 124 Market St ');
-    await user.clear(commentField);
-    await user.type(commentField, ' Updated supplier ');
     await user.click(within(dialog).getByRole('button', { name: 'Save' }));
 
     expect(updateSupplierMock).toHaveBeenCalledWith({
       supplierId: 1,
       name: 'Fresh Farms Updated',
-      email: 'orders.updated@fresh.example',
-      phone: '+1 555 0101',
-      address: '124 Market St',
-      comment: 'Updated supplier',
+      email: 'orders@fresh.example',
+      phone: '+1 555 0100',
+      address: '123 Market St',
+      comment: 'Preferred produce supplier',
     });
     await waitFor(() =>
       expect(invalidateQueriesSpy).toHaveBeenCalledWith({

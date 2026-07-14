@@ -69,7 +69,7 @@ export const CreateAttributeDialog = ({
               }}
             >
               <Dialog.Header>
-                <Dialog.Title>Create new attribute</Dialog.Title>
+                <Dialog.Title>Add new attribute</Dialog.Title>
               </Dialog.Header>
 
               <Dialog.Content>
@@ -203,7 +203,7 @@ export const CreateAttributeDialog = ({
                       disabled={isSubmitting || !name.trim()}
                       type="submit"
                     >
-                      {isSubmitting ? 'Creating...' : 'Create'}
+                      {isSubmitting ? 'Adding...' : 'Add'}
                     </Button>
                   )}
                 </form.Subscribe>

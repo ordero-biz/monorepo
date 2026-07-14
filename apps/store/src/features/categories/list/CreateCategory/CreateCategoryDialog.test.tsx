@@ -44,11 +44,11 @@ describe('CreateCategoryDialog', () => {
 
     setup();
 
-    const dialog = screen.getByRole('dialog', { name: 'Create new category' });
+    const dialog = screen.getByRole('dialog', { name: 'Add new category' });
     const nameField = within(dialog).getByRole('textbox', {
       name: 'Name',
     });
-    const createButton = within(dialog).getByRole('button', { name: 'Create' });
+    const createButton = within(dialog).getByRole('button', { name: 'Add' });
 
     expect(createButton).toBeDisabled();
 
@@ -83,7 +83,7 @@ describe('CreateCategoryDialog', () => {
     const user = userEvent.setup();
     const { queryClient } = setup();
     const invalidateQueriesSpy = vi.spyOn(queryClient, 'invalidateQueries');
-    const dialog = screen.getByRole('dialog', { name: 'Create new category' });
+    const dialog = screen.getByRole('dialog', { name: 'Add new category' });
 
     await user.type(
       within(dialog).getByRole('textbox', { name: 'Name' }),
@@ -93,7 +93,7 @@ describe('CreateCategoryDialog', () => {
       within(dialog).getByRole('combobox', { name: 'Parent category' })
     );
     await user.click(screen.getByRole('option', { name: 'Shoes' }));
-    await user.click(within(dialog).getByRole('button', { name: 'Create' }));
+    await user.click(within(dialog).getByRole('button', { name: 'Add' }));
 
     expect(createCategoryMock).toHaveBeenCalledWith({
       name: 'Sneakers',
@@ -121,19 +121,19 @@ describe('CreateCategoryDialog', () => {
 
     setup();
 
-    const dialog = screen.getByRole('dialog', { name: 'Create new category' });
+    const dialog = screen.getByRole('dialog', { name: 'Add new category' });
     const nameField = within(dialog).getByRole('textbox', {
       name: 'Name',
     });
 
     await user.type(nameField, 'Sneakers');
 
-    const createButton = within(dialog).getByRole('button', { name: 'Create' });
+    const createButton = within(dialog).getByRole('button', { name: 'Add' });
 
     await user.click(createButton);
 
     expect(createButton).toBeDisabled();
-    expect(screen.getByRole('button', { name: 'Creating...' })).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Adding...' })).toBeVisible();
 
     resolveCreate?.({
       ok: true,
@@ -146,7 +146,7 @@ describe('CreateCategoryDialog', () => {
       },
     });
 
-    await screen.findByRole('button', { name: 'Create' });
+    await screen.findByRole('button', { name: 'Add' });
   });
 
   it('shows backend errors and keeps the dialog open when submit fails', async () => {
@@ -164,13 +164,13 @@ describe('CreateCategoryDialog', () => {
 
     setup();
 
-    const dialog = screen.getByRole('dialog', { name: 'Create new category' });
+    const dialog = screen.getByRole('dialog', { name: 'Add new category' });
     const nameField = within(dialog).getByRole('textbox', {
       name: 'Name',
     });
 
     await user.type(nameField, 'Sneakers');
-    await user.click(within(dialog).getByRole('button', { name: 'Create' }));
+    await user.click(within(dialog).getByRole('button', { name: 'Add' }));
 
     expect(createCategoryMock).toHaveBeenCalledWith({
       name: 'Sneakers',
@@ -186,7 +186,7 @@ describe('CreateCategoryDialog', () => {
       await screen.findByRole('dialog', { name: 'Category creation failed.' })
     ).toBeVisible();
     expect(
-      screen.getByRole('dialog', { name: 'Create new category' })
+      screen.getByRole('dialog', { name: 'Add new category' })
     ).toBeVisible();
     expect(onOpenChangeMock).not.toHaveBeenCalledWith(false);
   });

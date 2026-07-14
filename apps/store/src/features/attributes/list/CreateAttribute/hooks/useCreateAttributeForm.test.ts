@@ -70,7 +70,7 @@ describe('useCreateAttributeForm', () => {
 
     await waitFor(() => expect(onCreated).toHaveBeenCalledWith(7));
     expect(addToastMock).toHaveBeenCalledWith({
-      description: 'Attribute Material was created',
+      description: 'Attribute Material was added',
       type: 'success',
     });
   });

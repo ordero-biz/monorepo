@@ -24,10 +24,10 @@ describe('CreateCategoryDialogTrigger', () => {
 
     setup();
 
-    await user.click(screen.getByRole('button', { name: 'Create Category' }));
+    await user.click(screen.getByRole('button', { name: 'Add Category' }));
 
     expect(
-      screen.getByRole('dialog', { name: 'Create new category' })
+      screen.getByRole('dialog', { name: 'Add new category' })
     ).toBeVisible();
   });
 
@@ -36,22 +36,22 @@ describe('CreateCategoryDialogTrigger', () => {
 
     setup();
 
-    await user.click(screen.getByRole('button', { name: 'Create Category' }));
+    await user.click(screen.getByRole('button', { name: 'Add Category' }));
 
-    const dialog = screen.getByRole('dialog', { name: 'Create new category' });
+    const dialog = screen.getByRole('dialog', { name: 'Add new category' });
     const nameField = within(dialog).getByRole('textbox', { name: 'Name' });
 
     await user.type(nameField, 'Sneakers');
     await user.keyboard('{Escape}');
 
     expect(
-      screen.queryByRole('dialog', { name: 'Create new category' })
+      screen.queryByRole('dialog', { name: 'Add new category' })
     ).not.toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', { name: 'Create Category' }));
+    await user.click(screen.getByRole('button', { name: 'Add Category' }));
 
     const reopenedDialog = screen.getByRole('dialog', {
-      name: 'Create new category',
+      name: 'Add new category',
     });
 
     expect(

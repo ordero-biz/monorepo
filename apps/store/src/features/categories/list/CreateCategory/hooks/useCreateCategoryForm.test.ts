@@ -71,7 +71,7 @@ describe('useCreateCategoryForm', () => {
 
     await waitFor(() => expect(onCreated).toHaveBeenCalledTimes(1));
     expect(addToastMock).toHaveBeenCalledWith({
-      description: 'Category Sneakers was created',
+      description: 'Category Sneakers was added',
       type: 'success',
     });
   });

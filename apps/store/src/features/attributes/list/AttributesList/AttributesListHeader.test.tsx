@@ -4,7 +4,7 @@ import { AttributesListHeader } from './AttributesListHeader';
 
 vi.mock('../CreateAttribute', () => ({
   CreateAttributeDialogTrigger: () => (
-    <button type="button">Create Attribute</button>
+    <button type="button">Add Attribute</button>
   ),
 }));
 
@@ -20,7 +20,7 @@ describe('AttributesListHeader', () => {
       screen.getByRole('heading', { name: 'Attributes list' })
     ).toBeVisible();
     expect(
-      screen.getByRole('button', { name: 'Create Attribute' })
+      screen.getByRole('button', { name: 'Add Attribute' })
     ).toBeVisible();
   });
 });

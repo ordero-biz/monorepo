@@ -4,7 +4,7 @@ import { CategoryListHeader } from './CategoryListHeader';
 
 vi.mock('../CreateCategory', () => ({
   CreateCategoryDialogTrigger: () => (
-    <button type="button">Create Category</button>
+    <button type="button">Add Category</button>
   ),
 }));
 
@@ -23,7 +23,7 @@ describe('CategoryListHeader', () => {
       screen.getByRole('heading', { name: 'Category list' })
     ).toBeVisible();
     expect(
-      screen.getByRole('button', { name: 'Create Category' })
+      screen.getByRole('button', { name: 'Add Category' })
     ).toBeVisible();
   });
 });

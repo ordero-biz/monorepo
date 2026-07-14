@@ -13,7 +13,7 @@ export const CreateCategoryDialogTrigger = ({
   return (
     <>
       <Button color="primary" onClick={() => setOpen(true)} type="button">
-        Create Category
+        Add Category
       </Button>
 
       <CreateCategoryDialog

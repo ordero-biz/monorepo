@@ -47,11 +47,11 @@ describe('CreateAttributeDialog', () => {
 
     setup();
 
-    const dialog = screen.getByRole('dialog', { name: 'Create new attribute' });
+    const dialog = screen.getByRole('dialog', { name: 'Add new attribute' });
     const nameField = within(dialog).getByRole('textbox', {
       name: 'Name',
     });
-    const createButton = within(dialog).getByRole('button', { name: 'Create' });
+    const createButton = within(dialog).getByRole('button', { name: 'Add' });
 
     expect(createButton).toBeDisabled();
 
@@ -74,7 +74,7 @@ describe('CreateAttributeDialog', () => {
 
     setup();
 
-    const dialog = screen.getByRole('dialog', { name: 'Create new attribute' });
+    const dialog = screen.getByRole('dialog', { name: 'Add new attribute' });
     const addButton = within(dialog).getByRole('button', {
       name: 'Add attribute value',
     });
@@ -123,7 +123,7 @@ describe('CreateAttributeDialog', () => {
     const user = userEvent.setup();
     const { queryClient } = setup();
     const invalidateQueriesSpy = vi.spyOn(queryClient, 'invalidateQueries');
-    const dialog = screen.getByRole('dialog', { name: 'Create new attribute' });
+    const dialog = screen.getByRole('dialog', { name: 'Add new attribute' });
     const nameField = within(dialog).getByRole('textbox', {
       name: 'Name',
     });
@@ -141,7 +141,7 @@ describe('CreateAttributeDialog', () => {
       within(dialog).getByRole('textbox', { name: 'Attribute value 2' }),
       'Blue'
     );
-    await user.click(within(dialog).getByRole('button', { name: 'Create' }));
+    await user.click(within(dialog).getByRole('button', { name: 'Add' }));
 
     expect(createAttributeMock).toHaveBeenCalledWith({
       name: 'Material',
@@ -180,19 +180,19 @@ describe('CreateAttributeDialog', () => {
 
     setup();
 
-    const dialog = screen.getByRole('dialog', { name: 'Create new attribute' });
+    const dialog = screen.getByRole('dialog', { name: 'Add new attribute' });
     const nameField = within(dialog).getByRole('textbox', {
       name: 'Name',
     });
 
     await user.type(nameField, 'Material');
 
-    const createButton = within(dialog).getByRole('button', { name: 'Create' });
+    const createButton = within(dialog).getByRole('button', { name: 'Add' });
 
     await user.click(createButton);
 
     expect(createButton).toBeDisabled();
-    expect(screen.getByRole('button', { name: 'Creating...' })).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Adding...' })).toBeVisible();
 
     resolveCreate?.({
       ok: true,
@@ -204,7 +204,7 @@ describe('CreateAttributeDialog', () => {
       },
     });
 
-    await screen.findByRole('button', { name: 'Create' });
+    await screen.findByRole('button', { name: 'Add' });
   });
 
   it('shows backend errors and keeps the dialog open when submit fails', async () => {
@@ -222,13 +222,13 @@ describe('CreateAttributeDialog', () => {
 
     setup();
 
-    const dialog = screen.getByRole('dialog', { name: 'Create new attribute' });
+    const dialog = screen.getByRole('dialog', { name: 'Add new attribute' });
     const nameField = within(dialog).getByRole('textbox', {
       name: 'Name',
     });
 
     await user.type(nameField, 'Material');
-    await user.click(within(dialog).getByRole('button', { name: 'Create' }));
+    await user.click(within(dialog).getByRole('button', { name: 'Add' }));
 
     expect(createAttributeMock).toHaveBeenCalledWith({
       name: 'Material',

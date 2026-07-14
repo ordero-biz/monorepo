@@ -22,10 +22,10 @@ describe('CreateAttributeDialogTrigger', () => {
 
     setup();
 
-    await user.click(screen.getByRole('button', { name: 'Create Attribute' }));
+    await user.click(screen.getByRole('button', { name: 'Add Attribute' }));
 
     expect(
-      screen.getByRole('dialog', { name: 'Create new attribute' })
+      screen.getByRole('dialog', { name: 'Add new attribute' })
     ).toBeVisible();
   });
 
@@ -34,9 +34,9 @@ describe('CreateAttributeDialogTrigger', () => {
 
     setup();
 
-    await user.click(screen.getByRole('button', { name: 'Create Attribute' }));
+    await user.click(screen.getByRole('button', { name: 'Add Attribute' }));
 
-    const dialog = screen.getByRole('dialog', { name: 'Create new attribute' });
+    const dialog = screen.getByRole('dialog', { name: 'Add new attribute' });
     const nameField = within(dialog).getByRole('textbox', { name: 'Name' });
     const firstValueField = within(dialog).getByRole('textbox', {
       name: 'Attribute value 1',
@@ -50,13 +50,13 @@ describe('CreateAttributeDialogTrigger', () => {
     await user.keyboard('{Escape}');
 
     expect(
-      screen.queryByRole('dialog', { name: 'Create new attribute' })
+      screen.queryByRole('dialog', { name: 'Add new attribute' })
     ).not.toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', { name: 'Create Attribute' }));
+    await user.click(screen.getByRole('button', { name: 'Add Attribute' }));
 
     const reopenedDialog = screen.getByRole('dialog', {
-      name: 'Create new attribute',
+      name: 'Add new attribute',
     });
 
     expect(

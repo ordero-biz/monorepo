@@ -47,26 +47,16 @@ describe('CreateSupplierDialog', () => {
     const invalidateQueriesSpy = vi.spyOn(queryClient, 'invalidateQueries');
     const dialog = screen.getByRole('dialog', { name: 'Add supplier' });
 
-    await user.type(
-      within(dialog).getByRole('textbox', { name: 'Name' }),
-      ' Fresh Farms '
-    );
-    await user.type(
-      within(dialog).getByRole('textbox', { name: 'Email' }),
-      ' orders@fresh.example '
-    );
-    await user.type(
-      within(dialog).getByRole('textbox', { name: 'Phone' }),
-      ' +1 555 0100 '
-    );
-    await user.type(
-      within(dialog).getByRole('textbox', { name: 'Address' }),
-      ' 123 Market St '
-    );
-    await user.type(
-      within(dialog).getByRole('textbox', { name: 'Comment' }),
-      ' Preferred produce supplier '
-    );
+    await user.click(within(dialog).getByRole('textbox', { name: 'Name' }));
+    await user.paste(' Fresh Farms ');
+    await user.click(within(dialog).getByRole('textbox', { name: 'Email' }));
+    await user.paste(' orders@fresh.example ');
+    await user.click(within(dialog).getByRole('textbox', { name: 'Phone' }));
+    await user.paste(' +1 555 0100 ');
+    await user.click(within(dialog).getByRole('textbox', { name: 'Address' }));
+    await user.paste(' 123 Market St ');
+    await user.click(within(dialog).getByRole('textbox', { name: 'Comment' }));
+    await user.paste(' Preferred produce supplier ');
     await user.click(within(dialog).getByRole('button', { name: 'Add' }));
 
     expect(createSupplierMock).toHaveBeenCalledWith({
@@ -103,19 +93,14 @@ describe('CreateSupplierDialog', () => {
       name: 'Email',
     });
 
-    await user.type(
-      within(dialog).getByRole('textbox', { name: 'Name' }),
-      'Fresh Farms'
-    );
-    await user.type(emailField, 'orders@fresh.example');
-    await user.type(
-      within(dialog).getByRole('textbox', { name: 'Phone' }),
-      '+1 555 0100'
-    );
-    await user.type(
-      within(dialog).getByRole('textbox', { name: 'Address' }),
-      '123 Market St'
-    );
+    await user.click(within(dialog).getByRole('textbox', { name: 'Name' }));
+    await user.paste('Fresh Farms');
+    await user.click(emailField);
+    await user.paste('orders@fresh.example');
+    await user.click(within(dialog).getByRole('textbox', { name: 'Phone' }));
+    await user.paste('+1 555 0100');
+    await user.click(within(dialog).getByRole('textbox', { name: 'Address' }));
+    await user.paste('123 Market St');
     await user.click(within(dialog).getByRole('button', { name: 'Add' }));
 
     expect(

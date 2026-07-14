@@ -34,7 +34,7 @@ export const useCreateCategoryForm = ({
       }
 
       addToast({
-        description: `Category ${result.data.name} was created`,
+        description: `Category ${result.data.name} was added`,
         type: 'success',
       });
 

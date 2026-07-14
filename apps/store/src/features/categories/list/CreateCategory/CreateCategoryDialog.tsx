@@ -63,7 +63,7 @@ export const CreateCategoryDialog = ({
               }}
             >
               <Dialog.Header>
-                <Dialog.Title>Create new category</Dialog.Title>
+                <Dialog.Title>Add new category</Dialog.Title>
               </Dialog.Header>
 
               <Dialog.Content>
@@ -140,7 +140,7 @@ export const CreateCategoryDialog = ({
 
                     return (
                       <Button disabled={isCreateDisabled} type="submit">
-                        {isSubmitting ? 'Creating...' : 'Create'}
+                        {isSubmitting ? 'Adding...' : 'Add'}
                       </Button>
                     );
                   }}
