@@ -2,6 +2,7 @@ import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createProduct } from '@/lib/client/api/products';
 import { clientRoutes } from '@/lib/client/routes';
+import type { AttributeDropdown } from '@/lib/domain/attributes';
 import { productsQueryKeys } from '@/lib/query/products/productsQueryKeys';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { CreateProduct } from './CreateProduct';
@@ -9,7 +10,6 @@ import { CreateProduct } from './CreateProduct';
 const mocks = vi.hoisted(() => ({
   createProduct: vi.fn(),
   push: vi.fn(),
-  useAttributesQuery: vi.fn(),
 }));
 
 vi.mock('next/navigation', async () => ({
@@ -28,13 +28,6 @@ vi.mock('@/lib/client/api/products', async () => ({
   createProduct: mocks.createProduct,
 }));
 
-vi.mock('@/lib/hooks/attributes/useAttributesQuery', async () => ({
-  ...(await vi.importActual<
-    typeof import('@/lib/hooks/attributes/useAttributesQuery')
-  >('@/lib/hooks/attributes/useAttributesQuery')),
-  useAttributesQuery: mocks.useAttributesQuery,
-}));
-
 vi.mock('./CategoriesAsyncCombobox', () => ({
   CategoriesAsyncCombobox: ({
     label,
@@ -49,21 +42,51 @@ vi.mock('./CategoriesAsyncCombobox', () => ({
   ),
 }));
 
+vi.mock('./AttributesAsyncCombobox', () => ({
+  AttributesAsyncCombobox: ({
+    label,
+    onSelectedAttributesChange,
+  }: {
+    label: string;
+    onSelectedAttributesChange?: (attributes: AttributeDropdown[]) => void;
+  }) => (
+    <button
+      onClick={() =>
+        onSelectedAttributesChange?.([
+          {
+            id: 7,
+            name: 'Color',
+            sortOrder: 0,
+            createdAt: '2026-07-14T17:54:42.035Z',
+            attributeValues: [
+              {
+                id: 70,
+                name: 'Red',
+                sortOrder: 0,
+                createdAt: '2026-07-14T17:54:42.036Z',
+              },
+              {
+                id: 71,
+                name: 'Blue',
+                sortOrder: 1,
+                createdAt: '2026-07-14T17:54:42.036Z',
+              },
+            ],
+          },
+        ])
+      }
+      type="button"
+    >
+      Select {label}
+    </button>
+  ),
+}));
+
 const createProductMock = vi.mocked(createProduct);
 
 const { setup } = prepareStoreSetup({
   component: CreateProduct,
 });
-
-const setAvailableAttributes = () => {
-  mocks.useAttributesQuery.mockReturnValue({
-    data: {
-      content: [],
-    },
-    isError: false,
-    isPending: false,
-  });
-};
 
 const completeRequiredFields = async (
   user: ReturnType<typeof userEvent.setup>
@@ -79,7 +102,6 @@ describe('CreateProduct', () => {
   beforeEach(() => {
     createProductMock.mockReset();
     mocks.push.mockReset();
-    setAvailableAttributes();
   });
 
   it('requires a product name and category before continuing', async () => {
@@ -140,6 +162,23 @@ describe('CreateProduct', () => {
       })
     );
     expect(mocks.push).toHaveBeenCalledWith(clientRoutes.products);
+  });
+
+  it('renders values for selected attributes', async () => {
+    const user = userEvent.setup();
+
+    setup();
+
+    await user.click(screen.getByRole('button', { name: 'Select Attributes' }));
+
+    expect(screen.getByText('Color:')).toBeVisible();
+
+    const blueValue = screen.getByRole('button', { name: 'Blue' });
+
+    await user.click(blueValue);
+
+    expect(screen.getByRole('button', { name: 'Red' })).toBeVisible();
+    expect(blueValue).toHaveAttribute('aria-pressed', 'true');
   });
 
   it('prevents another product creation while the request is in flight', async () => {

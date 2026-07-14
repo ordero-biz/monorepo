@@ -1,7 +1,8 @@
 import type { CreateProductValues } from './types';
 
 export const createProductDefaultValues: CreateProductValues = {
-  attributes: null,
+  attributes: [],
+  attributeValues: {},
   category: null,
   description: '',
   productName: '',

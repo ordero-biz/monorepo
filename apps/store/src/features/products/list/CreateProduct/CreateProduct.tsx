@@ -5,7 +5,6 @@ import {
   Card,
   FieldHelperText,
   IconButton,
-  Select,
   Textarea,
   TextField,
   ToggleButton,
@@ -14,11 +13,12 @@ import {
 import { useQueryClient } from '@tanstack/react-query';
 import { Plus } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { clientRoutes } from '@/lib/client/routes';
-import { useAttributesQuery } from '@/lib/hooks/attributes/useAttributesQuery';
+import type { AttributeDropdown } from '@/lib/domain/attributes';
 import { productsQueryKeys } from '@/lib/query/products/productsQueryKeys';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
+import { AttributesAsyncCombobox } from './AttributesAsyncCombobox';
 import { CategoriesAsyncCombobox } from './CategoriesAsyncCombobox';
 import { PRODUCT_GENERATION_MODE } from './constants';
 import { useCreateProductForm } from './hooks/useCreateProductForm';
@@ -28,6 +28,28 @@ import {
   validateProductName,
 } from './utils/validations';
 
+const getAttributeValueSelections = (
+  currentValue: Record<string, string[]>,
+  attributes: AttributeDropdown[]
+) =>
+  Object.fromEntries(
+    attributes.map((attribute) => {
+      const attributeId = String(attribute.id);
+      const availableValueIds = new Set(
+        attribute.attributeValues.map((attributeValue) =>
+          String(attributeValue.id)
+        )
+      );
+
+      return [
+        attributeId,
+        (currentValue[attributeId] ?? []).filter((attributeValueId) =>
+          availableValueIds.has(attributeValueId)
+        ),
+      ];
+    })
+  );
+
 export const CreateProduct = () => {
   const queryClient = useQueryClient();
   const router = useRouter();
@@ -36,16 +58,6 @@ export const CreateProduct = () => {
     PRODUCT_GENERATION_MODE.one
   );
   const isMultipleProducts = generationMode === PRODUCT_GENERATION_MODE.many;
-
-  const attributesQuery = useAttributesQuery();
-  const attributeOptions = useMemo(
-    () =>
-      attributesQuery.data?.content.map((attribute) => ({
-        label: attribute.name,
-        value: String(attribute.id),
-      })) ?? [],
-    [attributesQuery.data]
-  );
 
   const { form } = useCreateProductForm({
     onCreated: async () => {
@@ -132,11 +144,11 @@ export const CreateProduct = () => {
                     name="attributes"
                     validators={{
                       onChange: ({ value }) =>
-                        isMultipleProducts && !value
+                        isMultipleProducts && value.length === 0
                           ? 'Select at least one attribute.'
                           : undefined,
                       onSubmit: ({ value }) =>
-                        isMultipleProducts && !value
+                        isMultipleProducts && value.length === 0
                           ? 'Select at least one attribute.'
                           : undefined,
                     }}
@@ -145,32 +157,112 @@ export const CreateProduct = () => {
                       const errorText = getFieldSubmitChangeErrorText(
                         field.state.meta
                       );
-                      const attributesErrorText = attributesQuery.isError
-                        ? "We couldn't load attributes right now."
-                        : errorText;
 
                       return (
-                        <Select
-                          disabled={attributesQuery.isPending}
-                          errorText={attributesErrorText}
+                        <AttributesAsyncCombobox
+                          errorText={errorText}
                           helperText={
                             isMultipleProducts
                               ? 'You must select attributes to generate multiple products'
                               : 'Optional: Add attributes for a single product'
                           }
-                          invalid={Boolean(attributesErrorText)}
+                          invalid={Boolean(errorText)}
                           label="Attributes"
+                          multiple
                           name={field.name}
                           onBlur={field.handleBlur}
-                          onValueChange={field.handleChange}
-                          options={attributeOptions}
+                          onSelectedAttributesChange={(attributes) => {
+                            field.handleChange(attributes);
+                            form.setFieldValue(
+                              'attributeValues',
+                              (currentValue) =>
+                                getAttributeValueSelections(
+                                  currentValue,
+                                  attributes
+                                )
+                            );
+                          }}
                           placeholder="Select attributes"
                           required={isMultipleProducts}
+                          selectedAttributes={field.state.value}
                           size="s"
-                          value={field.state.value}
+                          value={field.state.value.map((attribute) =>
+                            String(attribute.id)
+                          )}
                         />
                       );
                     }}
+                  </form.Field>
+
+                  <form.Field name="attributeValues">
+                    {(field) => (
+                      <form.Subscribe
+                        selector={(state) => state.values.attributes}
+                      >
+                        {(attributes) =>
+                          attributes.length > 0 ? (
+                            <fieldset
+                              aria-label="Attribute values"
+                              className="m-0 flex flex-col gap-[var(--space-2)] border-0 p-0"
+                            >
+                              {attributes.map((attribute) => {
+                                const attributeId = String(attribute.id);
+                                const selectedAttributeValueIds =
+                                  field.state.value[attributeId] ?? [];
+
+                                return (
+                                  <div
+                                    className="flex flex-wrap items-center gap-[var(--space-1)]"
+                                    key={attribute.id}
+                                  >
+                                    <span className="font-medium text-[length:var(--body2-size-desktop)] leading-[var(--body2-line-height-desktop)]">
+                                      {attribute.name}:
+                                    </span>
+                                    {attribute.attributeValues.map(
+                                      (attributeValue) => {
+                                        const attributeValueId = String(
+                                          attributeValue.id
+                                        );
+
+                                        return (
+                                          <ToggleButton.Item
+                                            key={attributeValue.id}
+                                            onPressedChange={(pressed) => {
+                                              field.handleChange({
+                                                ...field.state.value,
+                                                [attributeId]: pressed
+                                                  ? [
+                                                      ...selectedAttributeValueIds,
+                                                      attributeValueId,
+                                                    ]
+                                                  : selectedAttributeValueIds.filter(
+                                                      (
+                                                        selectedAttributeValueId
+                                                      ) =>
+                                                        selectedAttributeValueId !==
+                                                        attributeValueId
+                                                    ),
+                                              });
+                                            }}
+                                            pressed={selectedAttributeValueIds.includes(
+                                              attributeValueId
+                                            )}
+                                            size="s"
+                                            type="button"
+                                          >
+                                            {attributeValue.name}
+                                          </ToggleButton.Item>
+                                        );
+                                      }
+                                    )}
+                                  </div>
+                                );
+                              })}
+                            </fieldset>
+                          ) : null
+                        }
+                      </form.Subscribe>
+                    )}
                   </form.Field>
                 </div>
 
@@ -257,7 +349,7 @@ export const CreateProduct = () => {
                     isSubmitting ||
                     !productName.trim() ||
                     !category ||
-                    (isMultipleProducts && !attributes);
+                    (isMultipleProducts && attributes.length === 0);
                   const helperText = isMultipleProducts
                     ? 'You will proceed to configure products based on selected attributes'
                     : 'You will proceed to configure 1 product';

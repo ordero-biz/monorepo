@@ -33,7 +33,8 @@ describe('submitCreateProduct', () => {
 
     await expect(
       submitCreateProduct({
-        attributes: null,
+        attributes: [],
+        attributeValues: {},
         productName: ' Running Shoes ',
         description: 'Lightweight daily trainer',
         category: '2',
@@ -76,7 +77,8 @@ describe('submitCreateProduct', () => {
 
     await expect(
       submitCreateProduct({
-        attributes: null,
+        attributes: [],
+        attributeValues: {},
         productName: 'Running Shoes',
         description: 'Lightweight daily trainer',
         category: '2',

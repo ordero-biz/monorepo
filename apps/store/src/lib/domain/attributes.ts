@@ -12,3 +12,7 @@ export type AttributeValue = {
   sortOrder: number;
   createdAt: string;
 };
+
+export type AttributeDropdown = Attribute & {
+  attributeValues: AttributeValue[];
+};

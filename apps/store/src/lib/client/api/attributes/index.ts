@@ -1,7 +1,11 @@
 'use client';
 
 import { apiFetch } from '@ordero/api-client';
-import type { Attribute, AttributeValue } from '@/lib/domain/attributes';
+import type {
+  Attribute,
+  AttributeDropdown,
+  AttributeValue,
+} from '@/lib/domain/attributes';
 import type { PaginatedResponse } from '@/lib/server/types';
 import { tokenizePath } from '@/lib/utils/tokenizePath';
 import {
@@ -17,6 +21,11 @@ export const getAttributesPath = (input?: PaginationSearchInput) =>
 
 export const getAttributes = (input?: PaginationSearchInput) =>
   apiFetch<AttributesListResponse>(getAttributesPath(input), {
+    method: 'GET',
+  });
+
+export const getAttributesDropdown = () =>
+  apiFetch<AttributeDropdown[]>(CLIENT_BACKEND_PATHS.attributesDropdown, {
     method: 'GET',
   });
 
