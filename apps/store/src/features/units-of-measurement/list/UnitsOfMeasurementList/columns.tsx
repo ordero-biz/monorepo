@@ -3,9 +3,30 @@ import {
   type DataTableColumnDef,
   DataTableColumnHeader,
 } from '@ordero/ui';
+import Link from 'next/link';
+import { getUnitOfMeasurementDetailRoute } from '@/lib/client/routes';
 import type { UnitOfMeasurement } from '@/lib/domain/unitsOfMeasurement';
 
 export const columns: DataTableColumnDef<UnitOfMeasurement>[] = [
+  {
+    accessorKey: 'name',
+    cell: ({ row }) => (
+      <DataTableCell>
+        <Link
+          className="w-full font-600 rounded-[var(--radius-sm)] outline-none transition-colors hover:text-[var(--color-text-body)] hover:underline"
+          href={getUnitOfMeasurementDetailRoute(row.original.id)}
+        >
+          {row.original.name}
+        </Link>
+      </DataTableCell>
+    ),
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Name" />
+    ),
+    meta: {
+      width: '28%',
+    },
+  },
   {
     accessorKey: 'code',
     cell: ({ row }) => <DataTableCell>{row.original.code}</DataTableCell>,
@@ -14,16 +35,6 @@ export const columns: DataTableColumnDef<UnitOfMeasurement>[] = [
     ),
     meta: {
       width: '18%',
-    },
-  },
-  {
-    accessorKey: 'name',
-    cell: ({ row }) => <DataTableCell>{row.original.name}</DataTableCell>,
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Name" />
-    ),
-    meta: {
-      width: '28%',
     },
   },
   {

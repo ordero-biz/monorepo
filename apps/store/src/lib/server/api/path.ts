@@ -24,6 +24,7 @@ export const BACKEND_SUPPLIER_PATHS = {
 
 export const BACKEND_UNITS_OF_MEASUREMENT_PATHS = {
   unitsOfMeasurement: '/api/v1/units-of-measurement',
+  unitOfMeasurement: '/api/v1/units-of-measurement/{id}',
 } as const;
 
 export const BACKEND_WAREHOUSE_PATHS = {

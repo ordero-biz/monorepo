@@ -8,6 +8,7 @@ import type { UnitOfMeasurement } from '@/lib/domain/unitsOfMeasurement';
 import { BACKEND_UNITS_OF_MEASUREMENT_PATHS } from '@/lib/server/api/path';
 import { fetchBackendResponse } from '@/lib/server/fetch';
 import type { PaginatedResponse } from '@/lib/server/types';
+import { tokenizePath } from '@/lib/utils/tokenizePath';
 import {
   getPaginationSearch,
   type PaginationSearchInput,
@@ -55,4 +56,13 @@ export const getServerUnitsOfMeasurement = (input?: PaginationSearchInput) =>
   fetchUnitsOfMeasurementResource<PaginatedResponse<UnitOfMeasurement>>(
     BACKEND_UNITS_OF_MEASUREMENT_PATHS.unitsOfMeasurement,
     getPaginationSearch(input)
+  );
+
+export const getServerUnitOfMeasurement = (
+  unitOfMeasurementId: string | number
+) =>
+  fetchUnitsOfMeasurementResource<UnitOfMeasurement>(
+    tokenizePath(BACKEND_UNITS_OF_MEASUREMENT_PATHS.unitOfMeasurement, {
+      id: unitOfMeasurementId,
+    })
   );

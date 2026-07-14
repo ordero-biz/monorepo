@@ -19,3 +19,7 @@ export const getSupplierDetailRoute = (supplierId: string | number) =>
 
 export const getWarehouseDetailRoute = (warehouseId: string | number) =>
   `/products/warehouse/${warehouseId}`;
+
+export const getUnitOfMeasurementDetailRoute = (
+  unitOfMeasurementId: string | number
+) => `/products/units-of-measurement/${unitOfMeasurementId}`;

@@ -1,7 +1,7 @@
 import { AUTH_TOKEN_COOKIE_NAME } from '@ordero/next-api/server';
 import { cookies } from 'next/headers';
 import { fetchBackendResponse } from '@/lib/server/fetch';
-import { getServerUnitsOfMeasurement } from '.';
+import { getServerUnitOfMeasurement, getServerUnitsOfMeasurement } from '.';
 
 vi.mock('next/headers', () => ({
   cookies: vi.fn(),
@@ -102,6 +102,34 @@ describe('units of measurement server helpers', () => {
       init: {
         method: 'GET',
       },
+    });
+  });
+
+  it('gets a unit of measurement with the server auth token', async () => {
+    const unitOfMeasurement = {
+      id: 1,
+      code: 'KG',
+      name: 'Kilogram',
+      symbol: 'kg',
+      comment: 'Weight unit',
+    };
+
+    mockAuthCookie('server-token');
+    fetchBackendResponseMock.mockResolvedValue({
+      ok: true,
+      data: new Response(JSON.stringify(unitOfMeasurement)),
+    });
+
+    await expect(getServerUnitOfMeasurement(1)).resolves.toEqual({
+      ok: true,
+      data: unitOfMeasurement,
+    });
+
+    expect(fetchBackendResponseMock).toHaveBeenCalledWith({
+      path: '/api/v1/units-of-measurement/1',
+      search: undefined,
+      token: 'server-token',
+      init: { method: 'GET' },
     });
   });
 
