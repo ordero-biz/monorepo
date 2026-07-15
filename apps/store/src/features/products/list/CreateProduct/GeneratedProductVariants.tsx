@@ -11,7 +11,7 @@ export const GeneratedProductVariants = ({
   >
     {([attributes, productVariants]) =>
       productVariants.length > 0 ? (
-        <div className="mt-2 mb-2 flex flex-col gap-[var(--space-3)]">
+        <div className="mt-3 mb-2 flex flex-col gap-[var(--space-1)]">
           {productVariants.map((productVariant, variantIndex) => (
             <GeneratedProductVariantCard
               attributes={attributes}

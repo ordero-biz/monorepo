@@ -42,9 +42,35 @@ vi.mock('./AttributesAsyncCombobox', () => ({
       onClick={() =>
         onSelectedAttributesChange?.([
           {
+            id: 8,
+            name: 'Manufacture',
+            sortOrder: 0,
+            createdAt: '2026-07-14T17:54:42.035Z',
+            attributeValues: [
+              {
+                id: 80,
+                name: 'China',
+                sortOrder: 0,
+                createdAt: '2026-07-14T17:54:42.036Z',
+              },
+              {
+                id: 81,
+                name: 'USA',
+                sortOrder: 1,
+                createdAt: '2026-07-14T17:54:42.036Z',
+              },
+              {
+                id: 82,
+                name: 'Ukraine',
+                sortOrder: 2,
+                createdAt: '2026-07-14T17:54:42.036Z',
+              },
+            ],
+          },
+          {
             id: 7,
             name: 'Color',
-            sortOrder: 0,
+            sortOrder: 1,
             createdAt: '2026-07-14T17:54:42.035Z',
             attributeValues: [
               {
@@ -55,8 +81,14 @@ vi.mock('./AttributesAsyncCombobox', () => ({
               },
               {
                 id: 71,
-                name: 'Blue',
+                name: 'Green',
                 sortOrder: 1,
+                createdAt: '2026-07-14T17:54:42.036Z',
+              },
+              {
+                id: 72,
+                name: 'Blue',
+                sortOrder: 2,
                 createdAt: '2026-07-14T17:54:42.036Z',
               },
             ],
@@ -129,6 +161,47 @@ describe('CreateProduct', () => {
     expect(screen.getByDisplayValue('Running Shoes Blue')).toBeInTheDocument();
     expect(screen.getByText('Attributes')).toBeVisible();
     expect(screen.getAllByText('Blue')).toHaveLength(2);
+    expect(createProductMock).not.toHaveBeenCalled();
+  });
+
+  it('generates multiple product previews from selected attribute value combinations', async () => {
+    const user = userEvent.setup();
+
+    setup();
+
+    await completeRequiredFields(user);
+    await user.click(screen.getByRole('button', { name: 'Multiple products' }));
+    await user.click(screen.getByRole('button', { name: 'Select Attributes' }));
+    await user.click(screen.getByRole('button', { name: 'China' }));
+    await user.click(screen.getByRole('button', { name: 'USA' }));
+    await user.click(screen.getByRole('button', { name: 'Red' }));
+    await user.click(screen.getByRole('button', { name: 'Green' }));
+    await user.click(screen.getByRole('button', { name: 'Blue' }));
+    await user.click(
+      screen.getByRole('button', { name: 'Next: Configure products' })
+    );
+
+    expect(
+      screen.getByDisplayValue('Running Shoes China Red')
+    ).toBeInTheDocument();
+    expect(
+      screen.getByDisplayValue('Running Shoes China Green')
+    ).toBeInTheDocument();
+    expect(
+      screen.getByDisplayValue('Running Shoes China Blue')
+    ).toBeInTheDocument();
+    expect(
+      screen.getByDisplayValue('Running Shoes USA Red')
+    ).toBeInTheDocument();
+    expect(
+      screen.getByDisplayValue('Running Shoes USA Green')
+    ).toBeInTheDocument();
+    expect(
+      screen.getByDisplayValue('Running Shoes USA Blue')
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByDisplayValue('Running Shoes Ukraine Red')
+    ).not.toBeInTheDocument();
     expect(createProductMock).not.toHaveBeenCalled();
   });
 

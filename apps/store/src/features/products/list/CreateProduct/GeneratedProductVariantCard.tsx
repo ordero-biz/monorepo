@@ -1,7 +1,7 @@
 import { Card, Chip, Textarea, TextField, Typography } from '@ordero/ui';
 import { ProductImageDropzone } from './ProductImageDropzone';
 import type { GeneratedProductVariantCardProps } from './types';
-import { getProductVariantAttributeValues } from './utils/generation';
+import { getProductVariantAttributeValues } from './utils/cartesianProductGeneration';
 
 export const GeneratedProductVariantCard = ({
   attributes,

@@ -6,6 +6,13 @@ export type GeneratedProductAttributeValue = {
   name: string;
 };
 
+type GetGeneratedProductVariantsArgs = {
+  attributeValuesByAttributeId: Record<string, string[]>;
+  attributes: AttributeDropdown[];
+  description: string;
+  productName: string;
+};
+
 export const getAttributeValueSelections = (
   currentValue: Record<string, string[]>,
   attributes: AttributeDropdown[]
@@ -47,6 +54,25 @@ export const getSelectedAttributeValues = (
       }));
   });
 
+export const getSelectedAttributeValueGroups = (
+  attributes: AttributeDropdown[],
+  attributeValuesByAttributeId: Record<string, string[]>
+): GeneratedProductAttributeValue[][] =>
+  attributes.map((attribute) => {
+    const selectedValueIds = new Set(
+      attributeValuesByAttributeId[String(attribute.id)] ?? []
+    );
+
+    return attribute.attributeValues
+      .filter((attributeValue) =>
+        selectedValueIds.has(String(attributeValue.id))
+      )
+      .map((attributeValue) => ({
+        id: attributeValue.id,
+        name: attributeValue.name,
+      }));
+  });
+
 export const getGeneratedProductName = (
   productName: string,
   attributeValues: GeneratedProductAttributeValue[]
@@ -73,6 +99,46 @@ export const getGeneratedSingleProductVariant = ({
   name: getGeneratedProductName(productName, attributeValues),
   sku: '',
 });
+
+export const getGeneratedProductVariants = ({
+  attributeValuesByAttributeId,
+  attributes,
+  description,
+  productName,
+}: GetGeneratedProductVariantsArgs): CreateProductVariantValues[] => {
+  const selectedAttributeValueGroups = getSelectedAttributeValueGroups(
+    attributes,
+    attributeValuesByAttributeId
+  );
+
+  if (
+    selectedAttributeValueGroups.length === 0 ||
+    selectedAttributeValueGroups.some((group) => group.length === 0)
+  ) {
+    return [];
+  }
+
+  const attributeValueCombinations = selectedAttributeValueGroups.reduce<
+    GeneratedProductAttributeValue[][]
+  >(
+    (combinations, attributeValueGroup) =>
+      combinations.flatMap((combination) =>
+        attributeValueGroup.map((attributeValue) => [
+          ...combination,
+          attributeValue,
+        ])
+      ),
+    [[]]
+  );
+
+  return attributeValueCombinations.map((attributeValues) =>
+    getGeneratedSingleProductVariant({
+      attributeValues,
+      description,
+      productName,
+    })
+  );
+};
 
 export const getProductVariantAttributeValues = (
   attributes: AttributeDropdown[],

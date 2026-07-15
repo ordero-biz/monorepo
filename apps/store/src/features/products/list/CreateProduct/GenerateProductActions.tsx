@@ -2,9 +2,11 @@ import { Button, FieldHelperText } from '@ordero/ui';
 import { PRODUCT_GENERATION_MODE } from './constants';
 import type { GenerateProductActionsProps } from './types';
 import {
+  getGeneratedProductVariants,
   getGeneratedSingleProductVariant,
+  getSelectedAttributeValueGroups,
   getSelectedAttributeValues,
-} from './utils/generation';
+} from './utils/cartesianProductGeneration';
 
 export const GenerateProductActions = ({
   form,
@@ -25,10 +27,17 @@ export const GenerateProductActions = ({
       }
     >
       {([productName, attributes, attributeValues, description, category]) => {
+        const selectedAttributeValueGroups = getSelectedAttributeValueGroups(
+          attributes,
+          attributeValues
+        );
+        const hasSelectedAttributeValues =
+          selectedAttributeValueGroups.length > 0 &&
+          selectedAttributeValueGroups.every((group) => group.length > 0);
         const isGenerateDisabled =
           !productName.trim() ||
           !category ||
-          (isMultipleProducts && attributes.length === 0);
+          (isMultipleProducts && !hasSelectedAttributeValues);
         const helperText = isMultipleProducts
           ? 'You will proceed to configure products based on selected attributes'
           : 'You will proceed to configure 1 product';
@@ -40,6 +49,16 @@ export const GenerateProductActions = ({
               disabled={isGenerateDisabled}
               onClick={() => {
                 if (isMultipleProducts) {
+                  form.setFieldValue(
+                    'productVariants',
+                    getGeneratedProductVariants({
+                      attributeValuesByAttributeId: attributeValues,
+                      attributes,
+                      description,
+                      productName,
+                    })
+                  );
+
                   return;
                 }
 
