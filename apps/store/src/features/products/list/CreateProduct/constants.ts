@@ -6,6 +6,7 @@ export const createProductDefaultValues: CreateProductValues = {
   category: null,
   description: '',
   productName: '',
+  productVariants: [],
 };
 
 export const PRODUCT_GENERATION_MODE = {

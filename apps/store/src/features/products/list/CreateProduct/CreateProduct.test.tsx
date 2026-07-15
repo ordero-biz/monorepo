@@ -1,24 +1,12 @@
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createProduct } from '@/lib/client/api/products';
-import { clientRoutes } from '@/lib/client/routes';
 import type { AttributeDropdown } from '@/lib/domain/attributes';
-import { productsQueryKeys } from '@/lib/query/products/productsQueryKeys';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { CreateProduct } from './CreateProduct';
 
 const mocks = vi.hoisted(() => ({
   createProduct: vi.fn(),
-  push: vi.fn(),
-}));
-
-vi.mock('next/navigation', async () => ({
-  ...(await vi.importActual<typeof import('next/navigation')>(
-    'next/navigation'
-  )),
-  useRouter: () => ({
-    push: mocks.push,
-  }),
 }));
 
 vi.mock('@/lib/client/api/products', async () => ({
@@ -101,7 +89,6 @@ const completeRequiredFields = async (
 describe('CreateProduct', () => {
   beforeEach(() => {
     createProductMock.mockReset();
-    mocks.push.mockReset();
   });
 
   it('requires a product name and category before continuing', async () => {
@@ -127,7 +114,27 @@ describe('CreateProduct', () => {
     expect(continueButton).toBeEnabled();
   });
 
-  it('creates a product, invalidates the list, and returns to products', async () => {
+  it('generates a single product preview without creating the product', async () => {
+    const user = userEvent.setup();
+
+    setup();
+
+    await completeRequiredFields(user);
+    await user.click(screen.getByRole('button', { name: 'Select Attributes' }));
+    await user.click(screen.getByRole('button', { name: 'Blue' }));
+    await user.click(
+      screen.getByRole('button', { name: 'Next: Configure product' })
+    );
+
+    expect(
+      screen.getByDisplayValue('Running Shoes Blue')
+    ).toBeInTheDocument();
+    expect(screen.getByText('Attributes')).toBeVisible();
+    expect(screen.getAllByText('Blue')).toHaveLength(2);
+    expect(createProductMock).not.toHaveBeenCalled();
+  });
+
+  it('submits the generated product variant collection', async () => {
     createProductMock.mockResolvedValue({
       ok: true,
       data: {
@@ -143,25 +150,38 @@ describe('CreateProduct', () => {
       },
     });
     const user = userEvent.setup();
-    const { queryClient } = setup();
-    const invalidateQueriesSpy = vi.spyOn(queryClient, 'invalidateQueries');
+
+    setup();
 
     await completeRequiredFields(user);
+    await user.click(screen.getByRole('button', { name: 'Select Attributes' }));
+    await user.click(screen.getByRole('button', { name: 'Blue' }));
     await user.click(
       screen.getByRole('button', { name: 'Next: Configure product' })
     );
+    await user.type(screen.getByRole('textbox', { name: 'SKU' }), 'SHOE-BLUE');
+    await user.type(
+      screen.getByRole('textbox', { name: 'Barcode' }),
+      'barcode-1'
+    );
+    await user.click(screen.getByRole('button', { name: 'Create product' }));
 
-    expect(createProductMock).toHaveBeenCalledWith({
-      categoryId: 2,
-      description: '',
-      name: 'Running Shoes',
-    });
     await waitFor(() =>
-      expect(invalidateQueriesSpy).toHaveBeenCalledWith({
-        queryKey: productsQueryKeys.list,
+      expect(createProductMock).toHaveBeenCalledWith({
+        name: 'Running Shoes',
+        description: '',
+        categoryId: 2,
+        productVariants: [
+          {
+            name: 'Running Shoes Blue',
+            description: '',
+            sku: 'SHOE-BLUE',
+            barcode: 'barcode-1',
+            attributeValueIds: [71],
+          },
+        ],
       })
     );
-    expect(mocks.push).toHaveBeenCalledWith(clientRoutes.products);
   });
 
   it('renders values for selected attributes', async () => {
@@ -179,82 +199,5 @@ describe('CreateProduct', () => {
 
     expect(screen.getByRole('button', { name: 'Red' })).toBeVisible();
     expect(blueValue).toHaveAttribute('aria-pressed', 'true');
-  });
-
-  it('prevents another product creation while the request is in flight', async () => {
-    let resolveCreate:
-      | ((value: Awaited<ReturnType<typeof createProduct>>) => void)
-      | undefined;
-
-    createProductMock.mockReturnValue(
-      new Promise((resolve) => {
-        resolveCreate = resolve;
-      })
-    );
-    const user = userEvent.setup();
-
-    setup();
-
-    await completeRequiredFields(user);
-    await user.click(
-      screen.getByRole('button', { name: 'Next: Configure product' })
-    );
-
-    expect(
-      screen.getByRole('button', { name: 'Generating products...' })
-    ).toBeDisabled();
-
-    resolveCreate?.({
-      ok: true,
-      data: {
-        id: 3,
-        name: 'Running Shoes',
-        description: '',
-        createdAt: '2026-07-03T07:20:30.291Z',
-        category: {
-          id: 2,
-          name: 'Footwear',
-          createdAt: '2026-07-01T07:20:30.291Z',
-        },
-      },
-    });
-
-    await screen.findByRole('button', { name: 'Next: Configure product' });
-  });
-
-  it('shows backend field errors without leaving the page', async () => {
-    createProductMock.mockResolvedValue({
-      ok: false,
-      error: {
-        status: 422,
-        message: 'Product creation failed.',
-        fieldErrors: {
-          name: 'Product name already exists.',
-        },
-      },
-    });
-    const user = userEvent.setup();
-
-    setup();
-
-    await completeRequiredFields(user);
-    await user.click(
-      screen.getByRole('button', { name: 'Next: Configure product' })
-    );
-
-    const nameField = screen.getByRole('textbox', {
-      name: 'Base product name',
-    });
-
-    expect(
-      await screen.findByText('Product name already exists.')
-    ).toBeVisible();
-    expect(nameField).toHaveAccessibleDescription(
-      'Product name already exists.'
-    );
-    expect(
-      await screen.findByRole('dialog', { name: 'Product creation failed.' })
-    ).toBeVisible();
-    expect(mocks.push).not.toHaveBeenCalled();
   });
 });

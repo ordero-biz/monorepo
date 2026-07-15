@@ -15,6 +15,13 @@ type CreateProductInput = {
   categoryId: number;
   description: string;
   name: string;
+  productVariants: {
+    attributeValueIds: number[];
+    barcode: string;
+    description: string;
+    name: string;
+    sku: string;
+  }[];
 };
 
 export const getProductsPath = (input?: PaginationSearchInput) =>

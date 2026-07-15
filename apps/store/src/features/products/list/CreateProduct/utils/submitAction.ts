@@ -12,6 +12,13 @@ export const submitCreateProduct = async (value: CreateProductValues) => {
     categoryId: Number(value.category ?? 0),
     description: value.description,
     name: value.productName.trim(),
+    productVariants: value.productVariants.map((productVariant) => ({
+      attributeValueIds: productVariant.attributeValueIds,
+      barcode: productVariant.barcode,
+      description: productVariant.description,
+      name: productVariant.name.trim(),
+      sku: productVariant.sku,
+    })),
   });
 
   if (!result.ok) {

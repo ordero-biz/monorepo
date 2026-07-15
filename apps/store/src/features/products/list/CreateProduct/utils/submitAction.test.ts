@@ -38,6 +38,15 @@ describe('submitCreateProduct', () => {
         productName: ' Running Shoes ',
         description: 'Lightweight daily trainer',
         category: '2',
+        productVariants: [
+          {
+            attributeValueIds: [71],
+            barcode: 'barcode-1',
+            description: 'Blue variant',
+            name: ' Running Shoes Blue ',
+            sku: 'SHOE-BLUE',
+          },
+        ],
       })
     ).resolves.toEqual({
       ok: true,
@@ -58,6 +67,15 @@ describe('submitCreateProduct', () => {
       categoryId: 2,
       description: 'Lightweight daily trainer',
       name: 'Running Shoes',
+      productVariants: [
+        {
+          attributeValueIds: [71],
+          barcode: 'barcode-1',
+          description: 'Blue variant',
+          name: 'Running Shoes Blue',
+          sku: 'SHOE-BLUE',
+        },
+      ],
     });
   });
 
@@ -82,6 +100,7 @@ describe('submitCreateProduct', () => {
         productName: 'Running Shoes',
         description: 'Lightweight daily trainer',
         category: '2',
+        productVariants: [],
       })
     ).resolves.toEqual({
       ok: false,
