@@ -16,7 +16,7 @@ export const DeleteAttributeDialogTrigger = ({
       <IconButton
         aria-label={`Delete ${attribute.name}`}
         onClick={() => setOpen(true)}
-        size="s"
+        size="xs"
         title={`Delete ${attribute.name}`}
       >
         <Trash2 aria-hidden="true" />

@@ -66,3 +66,20 @@ export const IconButtonTrigger: Story = {
     </Menu.Root>
   ),
 };
+
+export const ItemColors: Story = {
+  render: () => (
+    <Menu.Root defaultOpen={true}>
+      <Menu.Trigger>Open menu</Menu.Trigger>
+      <Menu.Portal>
+        <Menu.Positioner>
+          <Menu.Popup>
+            <Menu.Item>Edit</Menu.Item>
+            <Menu.Item color="primary">Duplicate</Menu.Item>
+            <Menu.Item color="error">Delete</Menu.Item>
+          </Menu.Popup>
+        </Menu.Positioner>
+      </Menu.Portal>
+    </Menu.Root>
+  ),
+};

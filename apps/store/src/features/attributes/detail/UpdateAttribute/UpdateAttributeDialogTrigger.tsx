@@ -17,7 +17,7 @@ export const UpdateAttributeDialogTrigger = ({
       <IconButton
         aria-label={`Edit ${attribute.name}`}
         onClick={() => setOpen(true)}
-        size="s"
+        size="xs"
         title={`Edit ${attribute.name}`}
       >
         <Pencil aria-hidden="true" />

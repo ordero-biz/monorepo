@@ -36,7 +36,7 @@ describe('AttributeDetailValues', () => {
     );
   });
 
-  it('renders values in a one-column table', async () => {
+  it('renders values with an actions menu', async () => {
     getAttributeValuesMock.mockResolvedValue({
       ok: true,
       data: [
@@ -56,8 +56,9 @@ describe('AttributeDetailValues', () => {
     ).toBeVisible();
     expect(screen.getByText('Name')).toBeVisible();
     expect(screen.getByText('Blue')).toBeVisible();
-    expect(screen.getByRole('button', { name: 'Edit Blue' })).toBeVisible();
-    expect(screen.getByRole('button', { name: 'Delete Blue' })).toBeVisible();
+    expect(
+      screen.getByRole('button', { name: 'Actions for Blue' })
+    ).toBeVisible();
     expect(
       screen.queryByRole('columnheader', { name: 'Created at' })
     ).not.toBeInTheDocument();
@@ -82,7 +83,10 @@ describe('AttributeDetailValues', () => {
 
     setup();
 
-    await user.click(await screen.findByRole('button', { name: 'Edit Blue' }));
+    await user.click(
+      await screen.findByRole('button', { name: 'Actions for Blue' })
+    );
+    await user.click(await screen.findByRole('menuitem', { name: 'Edit' }));
 
     expect(
       screen.getByRole('dialog', { name: 'Edit Attribute Value' })
@@ -109,8 +113,9 @@ describe('AttributeDetailValues', () => {
     setup();
 
     await user.click(
-      await screen.findByRole('button', { name: 'Delete Blue' })
+      await screen.findByRole('button', { name: 'Actions for Blue' })
     );
+    await user.click(await screen.findByRole('menuitem', { name: 'Delete' }));
 
     const dialog = screen.getByRole('dialog', {
       name: 'Delete attribute value',

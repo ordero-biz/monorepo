@@ -1,6 +1,7 @@
 'use client';
 
 import { Menu as MenuPrimitive } from '@base-ui/react/menu';
+import { cva } from 'class-variance-authority';
 import { Button } from '@/ui/components/Button';
 import { IconButton } from '@/ui/components/IconButton';
 import type {
@@ -15,8 +16,25 @@ import type {
 const popupClassName =
   'z-50 flex min-w-[var(--anchor-width)] flex-col gap-[var(--menu-list-spacing)] overflow-y-auto overscroll-contain rounded-[var(--radius)] border border-border bg-popover p-[var(--menu-list-p)] text-popover-foreground shadow-[var(--dropdown-x1)_var(--dropdown-y1)_var(--dropdown-blur1)_var(--dropdown-spread1)_var(--color-grey-16),var(--dropdown-x2)_var(--dropdown-y2)_var(--dropdown-blur2)_var(--dropdown-spread2)_var(--color-grey-20)] outline-none';
 
-const itemClassName =
-  'flex min-h-[calc(var(--body2-line-height-desktop)+var(--menu-item-py)+var(--menu-item-py))] w-full cursor-pointer items-center gap-[var(--menu-item-spacing)] rounded-[var(--menu-item-radius)] px-[var(--menu-item-px)] py-[var(--menu-item-py)] text-left text-[length:var(--body2-size-desktop)] leading-[var(--body2-line-height-desktop)] font-[var(--body2-weight)] text-foreground outline-none transition-[background-color,color] hover:bg-muted data-[highlighted]:bg-muted data-[disabled]:cursor-not-allowed data-[disabled]:text-[var(--text-disabled)] data-[disabled]:hover:bg-transparent';
+const menuItemVariants = cva(
+  'flex min-h-[calc(var(--body2-line-height-desktop)+var(--menu-item-py)+var(--menu-item-py))] w-full cursor-pointer items-center gap-[var(--menu-item-spacing)] rounded-[var(--menu-item-radius)] px-[var(--menu-item-px)] py-[var(--menu-item-py)] text-left text-[length:var(--body2-size-desktop)] leading-[var(--body2-line-height-desktop)] font-[var(--body2-weight)] outline-none transition-[background-color,color] hover:bg-muted data-[highlighted]:bg-muted data-[disabled]:cursor-not-allowed data-[disabled]:text-[var(--text-disabled)] data-[disabled]:hover:bg-transparent',
+  {
+    variants: {
+      color: {
+        error: 'text-[var(--error-dark)]',
+        info: 'text-[var(--info-dark)]',
+        inherit: 'text-foreground',
+        primary: 'text-[var(--primary-dark)]',
+        secondary: 'text-[var(--secondary-main)]',
+        success: 'text-[var(--success-darker)]',
+        warning: 'text-[var(--warning-darker)]',
+      },
+    },
+    defaultVariants: {
+      color: 'inherit',
+    },
+  }
+);
 
 const getPopupMaxHeight = (
   maxHeight: NonNullable<MenuPopupProps['maxHeight']>
@@ -169,13 +187,14 @@ export const MenuPopup = ({
 export const MenuItem = ({
   children,
   closeOnClick,
+  color,
   disabled,
   id,
   label,
   onClick,
 }: MenuItemProps) => (
   <MenuPrimitive.Item
-    className={itemClassName}
+    className={menuItemVariants({ color })}
     closeOnClick={closeOnClick}
     disabled={disabled}
     id={id}
