@@ -59,8 +59,10 @@ describe('Menu', () => {
       screen.getByRole('button', { name: 'Open menu options' })
     );
 
-    expect(screen.getByRole('menu')).toBeInTheDocument();
-    expect(screen.getByRole('menuitem', { name: 'Edit' })).toBeInTheDocument();
+    expect(await screen.findByRole('menu')).toBeInTheDocument();
+    expect(
+      await screen.findByRole('menuitem', { name: 'Edit' })
+    ).toBeInTheDocument();
   });
 
   it('closes after users choose an item', async () => {
@@ -72,7 +74,9 @@ describe('Menu', () => {
     await user.click(
       screen.getByRole('button', { name: 'Open menu options' })
     );
-    await user.click(screen.getByRole('menuitem', { name: 'Duplicate' }));
+    await user.click(
+      await screen.findByRole('menuitem', { name: 'Duplicate' })
+    );
 
     expect(onOpenChange).toHaveBeenLastCalledWith(false);
     expect(screen.queryByRole('menu')).not.toBeInTheDocument();
@@ -87,10 +91,9 @@ describe('Menu', () => {
       screen.getByRole('button', { name: 'Open menu options' })
     );
 
-    expect(screen.getByRole('menuitem', { name: 'Delete' })).toHaveAttribute(
-      'aria-disabled',
-      'true'
-    );
+    expect(
+      await screen.findByRole('menuitem', { name: 'Delete' })
+    ).toHaveAttribute('aria-disabled', 'true');
   });
 
   it('disables its trigger when the menu root is disabled', () => {
@@ -109,7 +112,7 @@ describe('Menu', () => {
     await user.click(screen.getByRole('button', { name: 'More actions' }));
 
     expect(
-      screen.getByRole('menuitem', { name: 'Archive' })
+      await screen.findByRole('menuitem', { name: 'Archive' })
     ).toBeInTheDocument();
 
     await user.click(screen.getByRole('button', { name: 'More actions' }));

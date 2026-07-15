@@ -1,8 +1,10 @@
 'use client';
 
-import { Button, Card, PageHeader, Typography } from '@ordero/ui';
+import { Button, Card, Menu, PageHeader, Typography } from '@ordero/ui';
+import { EllipsisVertical, Trash2 } from 'lucide-react';
+import { useState } from 'react';
 import { useAttributeQuery } from '@/lib/hooks/attributes/useAttributeQuery';
-import { DeleteAttributeDialogTrigger } from '../DeleteAttribute';
+import { DeleteAttributeDialog } from '../DeleteAttribute';
 import { UpdateAttributeDialogTrigger } from '../UpdateAttribute';
 import type { AttributeDetailHeaderProps } from './types';
 
@@ -10,6 +12,7 @@ export const AttributeDetailHeader = ({
   attributeId,
 }: AttributeDetailHeaderProps) => {
   const attributeQuery = useAttributeQuery(attributeId);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   if (attributeQuery.isPending) {
     return (
@@ -58,10 +61,42 @@ export const AttributeDetailHeader = ({
               await attributeQuery.refetch();
             }}
           />
-          <DeleteAttributeDialogTrigger attribute={attributeQuery.data} />
         </div>
       </PageHeader.Left>
-      <PageHeader.Right></PageHeader.Right>
+      <PageHeader.Right>
+        <Menu.Root>
+          <Menu.Trigger
+            aria-label={`Actions for ${attributeQuery.data.name}`}
+            appearance="iconButton"
+            size="s"
+            title={`Actions for ${attributeQuery.data.name}`}
+          >
+            <EllipsisVertical aria-hidden="true" />
+          </Menu.Trigger>
+          <Menu.Portal>
+            <Menu.Positioner align="end">
+              <Menu.Popup>
+                <Menu.Item
+                  color="error"
+                  onClick={() => setIsDeleteDialogOpen(true)}
+                >
+                  <Trash2
+                    aria-hidden="true"
+                    className="size-[var(--icon-button-xs-icon)]"
+                  />
+                  Delete attribute
+                </Menu.Item>
+              </Menu.Popup>
+            </Menu.Positioner>
+          </Menu.Portal>
+        </Menu.Root>
+
+        <DeleteAttributeDialog
+          attribute={attributeQuery.data}
+          onOpenChange={setIsDeleteDialogOpen}
+          open={isDeleteDialogOpen}
+        />
+      </PageHeader.Right>
     </PageHeader.Root>
   );
 };

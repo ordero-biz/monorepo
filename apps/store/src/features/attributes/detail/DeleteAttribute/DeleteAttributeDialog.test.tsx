@@ -49,13 +49,12 @@ describe('DeleteAttributeDialog', () => {
   it('renders a confirmation dialog with the attribute name', () => {
     setup();
 
-    expect(
-      screen.getByRole('dialog', { name: 'Delete attribute' })
-    ).toBeVisible();
-    expect(
-      screen.getByText('Are you sure you want to delete', { exact: false })
-    ).toBeVisible();
-    expect(screen.getByText('Color')).toBeVisible();
+    const dialog = screen.getByRole('dialog', { name: 'Delete attribute' });
+
+    expect(dialog).toBeVisible();
+    expect(dialog).toHaveTextContent(
+      'Are you sure you want to delete the "Color" attribute and all its associated values?'
+    );
   });
 
   it('deletes the attribute, invalidates the list, and navigates to the list page', async () => {
@@ -123,7 +122,7 @@ describe('DeleteAttributeDialog', () => {
       ok: false,
       error: {
         status: 500,
-        message: 'Attribute delete failed.',
+        message: 'Attribute delete failed',
       },
     });
 
@@ -132,7 +131,7 @@ describe('DeleteAttributeDialog', () => {
     await user.click(screen.getByRole('button', { name: 'Delete' }));
 
     expect(
-      await screen.findByRole('dialog', { name: 'Attribute delete failed.' })
+      await screen.findByRole('dialog', { name: 'Attribute delete failed' })
     ).toBeVisible();
     expect(
       screen.getByRole('dialog', { name: 'Delete attribute' })

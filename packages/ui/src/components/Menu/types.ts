@@ -4,6 +4,7 @@ import type { ButtonColor, ButtonSize, ButtonVariant } from '../Button';
 export type MenuAlign = 'start' | 'center' | 'end';
 export type MenuSide = 'top' | 'right' | 'bottom' | 'left';
 export type MenuTriggerAppearance = 'button' | 'iconButton';
+export type MenuItemColor = ButtonColor;
 
 export type MenuRootProps = {
   children?: ReactNode;
@@ -49,6 +50,7 @@ export type MenuPopupProps = {
 export type MenuItemProps = {
   children?: ReactNode;
   closeOnClick?: boolean;
+  color?: MenuItemColor;
   disabled?: boolean;
   id?: string;
   label?: string;

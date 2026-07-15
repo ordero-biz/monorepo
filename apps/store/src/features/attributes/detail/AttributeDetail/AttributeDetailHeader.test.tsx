@@ -61,7 +61,33 @@ describe('AttributeDetailHeader', () => {
 
     expect(await screen.findByRole('heading', { name: 'Color' })).toBeVisible();
     expect(screen.getByRole('button', { name: 'Edit Color' })).toBeVisible();
-    expect(screen.getByRole('button', { name: 'Delete Color' })).toBeVisible();
+    expect(
+      screen.getByRole('button', { name: 'Actions for Color' })
+    ).toBeVisible();
+  });
+
+  it('opens the delete dialog from the actions menu', async () => {
+    getAttributeMock.mockResolvedValue({
+      ok: true,
+      data: {
+        id: 7,
+        name: 'Color',
+        sortOrder: 10,
+        createdAt: '2026-06-24T20:07:32.467Z',
+      },
+    });
+    const user = userEvent.setup();
+
+    setup();
+
+    await user.click(
+      await screen.findByRole('button', { name: 'Actions for Color' })
+    );
+    await user.click(await screen.findByRole('menuitem', { name: 'Delete attribute' }));
+
+    expect(
+      screen.getByRole('dialog', { name: 'Delete attribute' })
+    ).toBeVisible();
   });
 
   it('refreshes the header after updating the attribute name', async () => {
