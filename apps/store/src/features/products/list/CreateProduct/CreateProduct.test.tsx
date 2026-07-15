@@ -1,4 +1,4 @@
-import { screen, waitFor } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createProduct } from '@/lib/client/api/products';
 import type { AttributeDropdown } from '@/lib/domain/attributes';
@@ -126,9 +126,7 @@ describe('CreateProduct', () => {
       screen.getByRole('button', { name: 'Next: Configure product' })
     );
 
-    expect(
-      screen.getByDisplayValue('Running Shoes Blue')
-    ).toBeInTheDocument();
+    expect(screen.getByDisplayValue('Running Shoes Blue')).toBeInTheDocument();
     expect(screen.getByText('Attributes')).toBeVisible();
     expect(screen.getAllByText('Blue')).toHaveLength(2);
     expect(createProductMock).not.toHaveBeenCalled();
@@ -159,6 +157,17 @@ describe('CreateProduct', () => {
     await user.click(
       screen.getByRole('button', { name: 'Next: Configure product' })
     );
+    const variantAttributes = screen.getByRole('group', {
+      name: 'Attributes for Running Shoes Blue',
+    });
+    const removeBlueVariantAttribute = within(variantAttributes).getByRole(
+      'button',
+      {
+        name: 'Remove Blue',
+      }
+    );
+
+    await user.click(removeBlueVariantAttribute);
     await user.type(screen.getByRole('textbox', { name: 'SKU' }), 'SHOE-BLUE');
     await user.type(
       screen.getByRole('textbox', { name: 'Barcode' }),
@@ -177,7 +186,7 @@ describe('CreateProduct', () => {
             description: '',
             sku: 'SHOE-BLUE',
             barcode: 'barcode-1',
-            attributeValueIds: [71],
+            attributeValueIds: [],
           },
         ],
       })

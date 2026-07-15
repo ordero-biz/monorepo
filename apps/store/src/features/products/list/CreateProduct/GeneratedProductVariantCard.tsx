@@ -1,4 +1,10 @@
-import { Card, Chip, Textarea, TextField, Typography } from '@ordero/ui';
+import {
+  Card,
+  Chip,
+  Textarea,
+  TextField,
+  Typography,
+} from '@ordero/ui';
 import { ProductImageDropzone } from './ProductImageDropzone';
 import type { GeneratedProductVariantCardProps } from './types';
 import { getProductVariantAttributeValues } from './utils/generation';
@@ -86,19 +92,52 @@ export const GeneratedProductVariantCard = ({
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-[var(--space-1)]">
-          <span className="text-[length:var(--caption-size-desktop)] leading-[var(--caption-line-height-desktop)] text-text-secondary">
-            Attributes
-          </span>
-          {getProductVariantAttributeValues(
-            attributes,
-            productVariant.attributeValueIds
-          ).map((attributeValue) => (
-            <Chip key={attributeValue.id} size="s" variant="outlined">
-              {attributeValue.name}
-            </Chip>
-          ))}
-        </div>
+        <form.Field
+          name={`productVariants[${variantIndex}].attributeValueIds` as const}
+        >
+          {(field) =>
+            attributes.length > 0 ? (
+              <div
+                aria-label={`Attributes for ${productVariant.name}`}
+                className="flex flex-wrap items-center gap-[var(--space-1)]"
+                role="group"
+              >
+                <span className="text-[length:var(--caption-size-desktop)] leading-[var(--caption-line-height-desktop)] text-text-secondary">
+                  Attributes
+                </span>
+                {getProductVariantAttributeValues(
+                  attributes,
+                  field.state.value
+                ).map((attributeValue) => (
+                  <Chip
+                    aria-label={attributeValue.name}
+                    key={attributeValue.id}
+                    onDelete={() => {
+                      field.handleChange(
+                        field.state.value.filter(
+                          (selectedAttributeValueId) =>
+                            selectedAttributeValueId !== attributeValue.id
+                        )
+                      );
+                    }}
+                    size="s"
+                    variant="outlined"
+                  >
+                    {attributeValue.name}
+                  </Chip>
+                ))}
+                {getProductVariantAttributeValues(
+                  attributes,
+                  field.state.value
+                ).length === 0 ? (
+                  <span className="text-[length:var(--caption-size-desktop)] leading-[var(--caption-line-height-desktop)] text-text-secondary">
+                    None
+                  </span>
+                ) : null}
+              </div>
+            ) : null
+          }
+        </form.Field>
       </div>
     </Card.Content>
   </Card.Root>
