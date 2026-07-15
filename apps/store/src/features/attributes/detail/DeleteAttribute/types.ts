@@ -5,7 +5,3 @@ export type DeleteAttributeDialogProps = {
   onOpenChange: (open: boolean) => void;
   open: boolean;
 };
-
-export type DeleteAttributeDialogTriggerProps = {
-  attribute: Attribute;
-};

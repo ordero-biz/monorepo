@@ -84,7 +84,7 @@ describe('useDeleteAttribute', () => {
       ok: false,
       error: {
         status: 500,
-        message: 'Attribute delete failed.',
+        message: 'Attribute delete failed',
       },
     });
     const { onDeleted, result } = setupDeleteAttributeHook();
@@ -95,7 +95,7 @@ describe('useDeleteAttribute', () => {
 
     await waitFor(() =>
       expect(addToastMock).toHaveBeenCalledWith({
-        description: 'Attribute delete failed.',
+        description: 'Attribute delete failed',
         type: 'error',
       })
     );

@@ -1,1 +1,1 @@
-export { DeleteAttributeDialogTrigger } from './DeleteAttributeDialogTrigger';
+export { DeleteAttributeDialog } from './DeleteAttributeDialog';

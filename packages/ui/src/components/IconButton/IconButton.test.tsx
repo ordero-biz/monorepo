@@ -74,6 +74,35 @@ describe('IconButton', () => {
     expect(onBlur).toHaveBeenCalledTimes(1);
   });
 
+  it('supports popup trigger accessibility and pointer handlers', async () => {
+    const user = userEvent.setup();
+    const onMouseDown = vi.fn();
+    const onPointerDown = vi.fn();
+
+    render(
+      <IconButton
+        aria-controls="action-menu"
+        aria-expanded={false}
+        aria-haspopup="menu"
+        aria-label="More actions"
+        onMouseDown={onMouseDown}
+        onPointerDown={onPointerDown}
+      >
+        <RefreshCw aria-hidden="true" />
+      </IconButton>
+    );
+
+    const button = screen.getByRole('button', { name: 'More actions' });
+
+    await user.pointer({ keys: '[MouseLeft>]', target: button });
+
+    expect(button).toHaveAttribute('aria-controls', 'action-menu');
+    expect(button).toHaveAttribute('aria-expanded', 'false');
+    expect(button).toHaveAttribute('aria-haspopup', 'menu');
+    expect(onMouseDown).toHaveBeenCalledTimes(1);
+    expect(onPointerDown).toHaveBeenCalledTimes(1);
+  });
+
   it('does not submit a form by default when clicked', async () => {
     const user = userEvent.setup();
 
