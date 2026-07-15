@@ -16,7 +16,8 @@ export const GeneratedProductVariants = ({
             <GeneratedProductVariantCard
               attributes={attributes}
               form={form}
-              key={`${productVariant.name}-${variantIndex}`}
+              // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
+              key={variantIndex}
               productVariant={productVariant}
               variantIndex={variantIndex}
             />

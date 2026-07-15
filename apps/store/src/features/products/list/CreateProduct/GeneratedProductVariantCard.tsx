@@ -1,10 +1,4 @@
-import {
-  Card,
-  Chip,
-  Textarea,
-  TextField,
-  Typography,
-} from '@ordero/ui';
+import { Card, Chip, Textarea, TextField, Typography } from '@ordero/ui';
 import { ProductImageDropzone } from './ProductImageDropzone';
 import type { GeneratedProductVariantCardProps } from './types';
 import { getProductVariantAttributeValues } from './utils/generation';
@@ -100,7 +94,7 @@ export const GeneratedProductVariantCard = ({
               <div
                 aria-label={`Attributes for ${productVariant.name}`}
                 className="flex flex-wrap items-center gap-[var(--space-1)]"
-                role="group"
+                role="treegrid"
               >
                 <span className="text-[length:var(--caption-size-desktop)] leading-[var(--caption-line-height-desktop)] text-text-secondary">
                   Attributes
@@ -126,10 +120,8 @@ export const GeneratedProductVariantCard = ({
                     {attributeValue.name}
                   </Chip>
                 ))}
-                {getProductVariantAttributeValues(
-                  attributes,
-                  field.state.value
-                ).length === 0 ? (
+                {getProductVariantAttributeValues(attributes, field.state.value)
+                  .length === 0 ? (
                   <span className="text-[length:var(--caption-size-desktop)] leading-[var(--caption-line-height-desktop)] text-text-secondary">
                     None
                   </span>
