@@ -34,9 +34,7 @@ export const CreateProductTemplateFields = ({
             }}
           >
             {(field) => {
-              const errorText = getFieldSubmitChangeErrorText(
-                field.state.meta
-              );
+              const errorText = getFieldSubmitChangeErrorText(field.state.meta);
 
               return (
                 <TextField
@@ -62,9 +60,7 @@ export const CreateProductTemplateFields = ({
             }}
           >
             {(field) => {
-              const errorText = getFieldSubmitChangeErrorText(
-                field.state.meta
-              );
+              const errorText = getFieldSubmitChangeErrorText(field.state.meta);
 
               return (
                 <CategoriesAsyncCombobox
@@ -96,9 +92,7 @@ export const CreateProductTemplateFields = ({
             }}
           >
             {(field) => {
-              const errorText = getFieldSubmitChangeErrorText(
-                field.state.meta
-              );
+              const errorText = getFieldSubmitChangeErrorText(field.state.meta);
 
               return (
                 <AttributesAsyncCombobox
@@ -136,9 +130,7 @@ export const CreateProductTemplateFields = ({
         <div className="flex min-w-0 flex-col gap-[var(--space-2)]">
           <form.Field name="description">
             {(field) => {
-              const errorText = getFieldSubmitChangeErrorText(
-                field.state.meta
-              );
+              const errorText = getFieldSubmitChangeErrorText(field.state.meta);
 
               return (
                 <Textarea
