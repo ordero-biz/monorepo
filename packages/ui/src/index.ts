@@ -6,6 +6,14 @@ export type {
 } from './components/Button';
 export { Button } from './components/Button';
 export type {
+  AccordionHeaderProps,
+  AccordionItemProps,
+  AccordionPanelProps,
+  AccordionRootProps,
+  AccordionTriggerProps,
+} from './components/Accordion';
+export { Accordion } from './components/Accordion';
+export type {
   CardContentProps,
   CardDescriptionProps,
   CardDividerProps,
