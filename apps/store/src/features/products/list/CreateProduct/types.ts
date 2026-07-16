@@ -27,11 +27,13 @@ export type AttributesAsyncComboboxProps = Omit<
   | 'pageSize'
   | 'queryKey'
 > & {
+  onAvailableAttributesChange?: (attributes: AttributeDropdown[]) => void;
   onSelectedAttributesChange?: (attributes: AttributeDropdown[]) => void;
   selectedAttributes?: AttributeDropdown[];
 };
 
 export type CreateProductTemplateFieldsProps = {
+  onAvailableAttributesChange: (attributes: AttributeDropdown[]) => void;
   form: CreateProductForm;
   generationMode: ProductGenerationMode;
   onGenerationModeChange: (generationMode: ProductGenerationMode) => void;
@@ -47,14 +49,25 @@ export type GenerateProductActionsProps = {
 };
 
 export type GeneratedProductVariantsProps = {
+  availableAttributes: AttributeDropdown[];
   form: CreateProductForm;
 };
 
 export type GeneratedProductVariantCardProps = {
   attributes: AttributeDropdown[];
+  availableAttributes: AttributeDropdown[];
   form: CreateProductForm;
   productVariant: CreateProductVariantValues;
   variantIndex: number;
+};
+
+export type EditProductVariantAttributesDialogProps = {
+  attributeValueIds: number[];
+  attributes: AttributeDropdown[];
+  onOpenChange: (open: boolean) => void;
+  onUpdate: (attributeValueIds: number[]) => void;
+  open: boolean;
+  productVariantName: string;
 };
 
 export type ProductImageDropzoneProps = {

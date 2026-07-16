@@ -2,6 +2,7 @@ import { GeneratedProductVariantCard } from './GeneratedProductVariantCard';
 import type { GeneratedProductVariantsProps } from './types';
 
 export const GeneratedProductVariants = ({
+  availableAttributes,
   form,
 }: GeneratedProductVariantsProps) => (
   <form.Subscribe
@@ -15,6 +16,7 @@ export const GeneratedProductVariants = ({
           {productVariants.map((productVariant, variantIndex) => (
             <GeneratedProductVariantCard
               attributes={attributes}
+              availableAttributes={availableAttributes}
               form={form}
               // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
               key={variantIndex}

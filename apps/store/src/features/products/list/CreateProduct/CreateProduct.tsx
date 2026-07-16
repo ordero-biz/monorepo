@@ -2,6 +2,7 @@
 
 import { Button, Card, Typography } from '@ordero/ui';
 import { useState } from 'react';
+import type { AttributeDropdown } from '@/lib/domain/attributes';
 import { CreateProductTemplateFields } from './CreateProductTemplateFields';
 import { PRODUCT_GENERATION_MODE } from './constants';
 import { GeneratedProductVariants } from './GeneratedProductVariants';
@@ -11,6 +12,9 @@ import { ProductAttributeValuesField } from './ProductAttributeValuesField';
 import type { ProductGenerationMode } from './types';
 
 export const CreateProduct = () => {
+  const [availableAttributes, setAvailableAttributes] = useState<
+    AttributeDropdown[]
+  >([]);
   const [generationMode, setGenerationMode] = useState<ProductGenerationMode>(
     PRODUCT_GENERATION_MODE.one
   );
@@ -37,6 +41,7 @@ export const CreateProduct = () => {
             <CreateProductTemplateFields
               form={form}
               generationMode={generationMode}
+              onAvailableAttributesChange={setAvailableAttributes}
               onGenerationModeChange={setGenerationMode}
             />
 
@@ -50,7 +55,10 @@ export const CreateProduct = () => {
         </Card.Content>
       </Card.Root>
 
-      <GeneratedProductVariants form={form} />
+      <GeneratedProductVariants
+        availableAttributes={availableAttributes}
+        form={form}
+      />
       <form.Subscribe
         selector={(state) =>
           [state.values.productVariants, state.isSubmitting] as const

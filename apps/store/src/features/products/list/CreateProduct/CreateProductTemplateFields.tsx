@@ -17,6 +17,7 @@ import {
 export const CreateProductTemplateFields = ({
   form,
   generationMode,
+  onAvailableAttributesChange,
   onGenerationModeChange,
 }: CreateProductTemplateFieldsProps) => {
   const isMultipleProducts = generationMode === PRODUCT_GENERATION_MODE.many;
@@ -111,6 +112,7 @@ export const CreateProductTemplateFields = ({
                   label="Attributes"
                   multiple
                   name={field.name}
+                  onAvailableAttributesChange={onAvailableAttributesChange}
                   onBlur={field.handleBlur}
                   onSelectedAttributesChange={(attributes) => {
                     field.handleChange(attributes);

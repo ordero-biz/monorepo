@@ -44,6 +44,7 @@ export const AttributesAsyncCombobox = ({
   onInputValueChange,
   onKeyDown,
   onListScroll,
+  onAvailableAttributesChange,
   onOpenChange,
   onSelectedAttributesChange,
   onValueChange,
@@ -81,10 +82,13 @@ export const AttributesAsyncCombobox = ({
         throw result.error;
       }
 
-      setLoadedAttributesById((currentAttributesById) => ({
-        ...currentAttributesById,
+      const nextLoadedAttributesById = {
+        ...loadedAttributesById,
         ...mergeAttributesById(result.data),
-      }));
+      };
+
+      setLoadedAttributesById(nextLoadedAttributesById);
+      onAvailableAttributesChange?.(Object.values(nextLoadedAttributesById));
 
       return {
         options: result.data.map((attribute) => ({
@@ -92,7 +96,7 @@ export const AttributesAsyncCombobox = ({
           value: String(attribute.id),
         })),
       };
-    }, []);
+    }, [loadedAttributesById, onAvailableAttributesChange]);
 
   return (
     <AsyncCombobox
