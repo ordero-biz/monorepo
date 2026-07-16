@@ -7,24 +7,17 @@ import {
   Typography,
 } from '@ordero/ui';
 import { Pencil } from 'lucide-react';
-import { useState } from 'react';
-import { EditProductVariantAttributesDialog } from './EditProductVariantAttributesDialog';
 import { ProductImageDropzone } from './ProductImageDropzone';
 import type { GeneratedProductVariantCardProps } from './types';
 import { getProductVariantAttributeValues } from './utils/cartesianProductGeneration';
 
 export const GeneratedProductVariantCard = ({
   attributes,
-  availableAttributes,
   form,
+  onEditAttributes,
   productVariant,
   variantIndex,
-}: GeneratedProductVariantCardProps) => {
-  const [attributesDialogOpen, setAttributesDialogOpen] = useState(false);
-  const variantAttributes =
-    availableAttributes.length > 0 ? availableAttributes : attributes;
-
-  return (
+}: GeneratedProductVariantCardProps) => (
     <Card.Root variant="outlined">
       <Card.Content>
         <div className="flex flex-col mb-2 gap-[var(--space-3)]">
@@ -110,65 +103,52 @@ export const GeneratedProductVariantCard = ({
             name={`productVariants[${variantIndex}].attributeValueIds` as const}
           >
             {(field) =>
-              variantAttributes.length > 0 ? (
-                <>
-                  <div
-                    aria-label={`Attributes for ${productVariant.name}`}
-                    className="flex flex-wrap items-center gap-[var(--space-1)]"
-                    role="treegrid"
-                  >
-                    <span className="text-[length:var(--caption-size-desktop)] leading-[var(--caption-line-height-desktop)] text-text-secondary">
-                      Attributes
-                    </span>
-                    {getProductVariantAttributeValues(
-                      variantAttributes,
-                      field.state.value
-                    ).map((attributeValue) => (
-                      <Chip
-                        aria-label={attributeValue.name}
-                        key={attributeValue.id}
-                        onDelete={() => {
-                          field.handleChange(
-                            field.state.value.filter(
-                              (selectedAttributeValueId) =>
-                                selectedAttributeValueId !== attributeValue.id
-                            )
-                          );
-                        }}
-                        size="s"
-                        variant="outlined"
-                      >
-                        {attributeValue.name}
-                      </Chip>
-                    ))}
-                    {getProductVariantAttributeValues(
-                      variantAttributes,
-                      field.state.value
-                    ).length === 0 ? (
-                      <span className="text-[length:var(--caption-size-desktop)] leading-[var(--caption-line-height-desktop)] text-text-secondary">
-                        None
-                      </span>
-                    ) : null}
-                    <IconButton
-                      aria-label={`Edit attributes for ${productVariant.name}`}
-                      onClick={() => setAttributesDialogOpen(true)}
-                      size="xs"
-                      title={`Edit attributes for ${productVariant.name}`}
-                      type="button"
+              attributes.length > 0 ? (
+                <div
+                  aria-label={`Attributes for ${productVariant.name}`}
+                  className="flex flex-wrap items-center gap-[var(--space-1)]"
+                  role="treegrid"
+                >
+                  <span className="text-[length:var(--caption-size-desktop)] leading-[var(--caption-line-height-desktop)] text-text-secondary">
+                    Attributes
+                  </span>
+                  {getProductVariantAttributeValues(
+                    attributes,
+                    field.state.value
+                  ).map((attributeValue) => (
+                    <Chip
+                      aria-label={attributeValue.name}
+                      key={attributeValue.id}
+                      onDelete={() => {
+                        field.handleChange(
+                          field.state.value.filter(
+                            (selectedAttributeValueId) =>
+                              selectedAttributeValueId !== attributeValue.id
+                          )
+                        );
+                      }}
+                      size="s"
+                      variant="outlined"
                     >
-                      <Pencil aria-hidden="true" />
-                    </IconButton>
-                  </div>
-
-                  <EditProductVariantAttributesDialog
-                    attributes={variantAttributes}
-                    attributeValueIds={field.state.value}
-                    onOpenChange={setAttributesDialogOpen}
-                    onUpdate={field.handleChange}
-                    open={attributesDialogOpen}
-                    productVariantName={productVariant.name}
-                  />
-                </>
+                      {attributeValue.name}
+                    </Chip>
+                  ))}
+                  {getProductVariantAttributeValues(attributes, field.state.value)
+                    .length === 0 ? (
+                    <span className="text-[length:var(--caption-size-desktop)] leading-[var(--caption-line-height-desktop)] text-text-secondary">
+                      None
+                    </span>
+                  ) : null}
+                  <IconButton
+                    aria-label={`Edit attributes for ${productVariant.name}`}
+                    onClick={onEditAttributes}
+                    size="xs"
+                    title={`Edit attributes for ${productVariant.name}`}
+                    type="button"
+                  >
+                    <Pencil aria-hidden="true" />
+                  </IconButton>
+                </div>
               ) : null
             }
           </form.Field>
@@ -176,4 +156,3 @@ export const GeneratedProductVariantCard = ({
       </Card.Content>
     </Card.Root>
   );
-};

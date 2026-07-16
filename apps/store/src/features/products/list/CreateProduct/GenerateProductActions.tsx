@@ -34,13 +34,19 @@ export const GenerateProductActions = ({
         const hasSelectedAttributeValues =
           selectedAttributeValueGroups.length > 0 &&
           selectedAttributeValueGroups.every((group) => group.length > 0);
+        const generatedProductsCount = hasSelectedAttributeValues
+          ? selectedAttributeValueGroups.reduce(
+              (count, group) => count * group.length,
+              1
+            )
+          : 0;
         const isGenerateDisabled =
           !productName.trim() ||
           !category ||
           (isMultipleProducts && !hasSelectedAttributeValues);
         const helperText = isMultipleProducts
-          ? 'You will proceed to configure products based on selected attributes'
-          : 'You will proceed to configure 1 product';
+          ? `${generatedProductsCount} products will be generated`
+          : '1 product will be generated';
 
         return (
           <div className="flex flex-col items-end gap-[var(--space-1)]">
