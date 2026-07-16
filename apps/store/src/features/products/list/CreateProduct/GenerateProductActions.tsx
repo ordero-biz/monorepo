@@ -6,7 +6,7 @@ import {
   getGeneratedSingleProductVariant,
   getSelectedAttributeValueGroups,
   getSelectedAttributeValues,
-} from './utils/cartesianProductGeneration';
+} from './utils/productGeneration';
 
 export const GenerateProductActions = ({
   form,

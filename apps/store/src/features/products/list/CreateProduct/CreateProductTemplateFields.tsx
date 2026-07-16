@@ -8,7 +8,7 @@ import type {
   CreateProductTemplateFieldsProps,
   ProductGenerationMode,
 } from './types';
-import { getAttributeValueSelections } from './utils/cartesianProductGeneration';
+import { getAttributeValueSelections } from './utils/productGeneration';
 import {
   validateProductCategory,
   validateProductName,

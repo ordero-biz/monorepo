@@ -9,7 +9,7 @@ import {
 import { Pencil } from 'lucide-react';
 import { ProductImageDropzone } from './ProductImageDropzone';
 import type { GeneratedProductVariantCardProps } from './types';
-import { getProductVariantAttributeValues } from './utils/cartesianProductGeneration';
+import { getProductVariantAttributeValues } from './utils/productGeneration';
 
 export const GeneratedProductVariantCard = ({
   attributes,
