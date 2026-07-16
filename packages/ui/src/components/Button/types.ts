@@ -1,7 +1,9 @@
 import type {
+  AriaAttributes,
   FocusEventHandler,
   KeyboardEventHandler,
   MouseEventHandler,
+  PointerEventHandler,
   ReactNode,
   Ref,
 } from 'react';
@@ -20,7 +22,10 @@ export type ButtonColor =
 export type ButtonSize = 's' | 'm' | 'l';
 
 export type ButtonProps = {
+  'aria-controls'?: AriaAttributes['aria-controls'];
   'aria-describedby'?: string;
+  'aria-expanded'?: AriaAttributes['aria-expanded'];
+  'aria-haspopup'?: AriaAttributes['aria-haspopup'];
   'aria-label'?: string;
   'aria-labelledby'?: string;
   children?: ReactNode;
@@ -35,6 +40,8 @@ export type ButtonProps = {
   onClick?: MouseEventHandler<HTMLButtonElement>;
   onFocus?: FocusEventHandler<HTMLButtonElement>;
   onKeyDown?: KeyboardEventHandler<HTMLButtonElement>;
+  onMouseDown?: MouseEventHandler<HTMLButtonElement>;
+  onPointerDown?: PointerEventHandler<HTMLButtonElement>;
   ref?: Ref<HTMLElement>;
   size?: ButtonSize;
   startIcon?: ReactNode;

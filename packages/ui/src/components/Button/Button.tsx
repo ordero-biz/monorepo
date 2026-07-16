@@ -12,7 +12,10 @@ const iconSizeClassNames = {
 } as const;
 
 export const Button = ({
+  'aria-controls': ariaControls,
   'aria-describedby': ariaDescribedBy,
+  'aria-expanded': ariaExpanded,
+  'aria-haspopup': ariaHasPopup,
   'aria-label': ariaLabel,
   'aria-labelledby': ariaLabelledBy,
   children,
@@ -27,6 +30,8 @@ export const Button = ({
   onClick,
   onFocus,
   onKeyDown,
+  onMouseDown,
+  onPointerDown,
   ref,
   size,
   startIcon,
@@ -40,7 +45,10 @@ export const Button = ({
   return (
     <ButtonPrimitive
       ref={ref}
+      aria-controls={ariaControls}
       aria-describedby={ariaDescribedBy}
+      aria-expanded={ariaExpanded}
+      aria-haspopup={ariaHasPopup}
       aria-label={ariaLabel}
       aria-labelledby={ariaLabelledBy}
       type={type}
@@ -53,6 +61,8 @@ export const Button = ({
       onClick={onClick}
       onFocus={onFocus}
       onKeyDown={onKeyDown}
+      onMouseDown={onMouseDown}
+      onPointerDown={onPointerDown}
       tabIndex={tabIndex}
       title={title}
       className={cn(buttonVariants({ color, fullWidth, size, variant }))}

@@ -36,8 +36,8 @@ export const DeleteAttributeValueDialog = ({
 
             <Dialog.Content>
               <Typography variant="body1">
-                Are you sure you want delete{' '}
-                <strong>{attributeValue.name}</strong> attribute value?
+                Are you sure you want to delete the{' '}
+                "<strong>{attributeValue.name}</strong>" attribute value?
               </Typography>
             </Dialog.Content>
 

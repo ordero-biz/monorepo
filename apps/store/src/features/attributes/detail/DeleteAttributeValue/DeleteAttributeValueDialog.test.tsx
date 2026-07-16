@@ -39,13 +39,14 @@ describe('DeleteAttributeValueDialog', () => {
   it('renders a confirmation dialog with the attribute value name', () => {
     setup();
 
-    expect(
-      screen.getByRole('dialog', { name: 'Delete attribute value' })
-    ).toBeVisible();
-    expect(
-      screen.getByText('Are you sure you want delete', { exact: false })
-    ).toBeVisible();
-    expect(screen.getByText('Blue')).toBeVisible();
+    const dialog = screen.getByRole('dialog', {
+      name: 'Delete attribute value',
+    });
+
+    expect(dialog).toBeVisible();
+    expect(dialog).toHaveTextContent(
+      'Are you sure you want to delete the "Blue" attribute value?'
+    );
   });
 
   it('deletes the attribute value, invalidates the values list, and closes the dialog', async () => {
