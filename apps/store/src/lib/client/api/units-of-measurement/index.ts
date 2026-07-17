@@ -42,3 +42,33 @@ export const createUnitOfMeasurement = (input: CreateUnitOfMeasurementInput) =>
     method: 'POST',
     body: input,
   });
+
+type UpdateUnitOfMeasurementInput = {
+  unitOfMeasurementId: string | number;
+  code: string;
+  name: string;
+  symbol: string;
+  comment: string;
+};
+
+export const updateUnitOfMeasurement = ({
+  unitOfMeasurementId,
+  code,
+  name,
+  symbol,
+  comment,
+}: UpdateUnitOfMeasurementInput) =>
+  apiFetch<UnitOfMeasurement>(
+    tokenizePath(CLIENT_BACKEND_PATHS.unitOfMeasurement, {
+      id: unitOfMeasurementId,
+    }),
+    {
+      method: 'PATCH',
+      body: {
+        code,
+        name,
+        symbol,
+        comment,
+      },
+    }
+  );

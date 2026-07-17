@@ -5,7 +5,7 @@ import { getSupplierDefaultValues } from '../utils/fields';
 import { submitUpdateSupplier } from '../utils/submitAction';
 
 type UseUpdateSupplierFormArgs = {
-  onUpdated: () => Promise<void> | void;
+  onUpdated: (supplier: Supplier) => Promise<void> | void;
   supplier: Supplier;
 };
 
@@ -44,7 +44,7 @@ export const useUpdateSupplierForm = ({
         type: 'success',
       });
 
-      await onUpdated();
+      await onUpdated(result.data);
     },
   });
 

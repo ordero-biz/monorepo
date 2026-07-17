@@ -3,6 +3,7 @@ import {
   getUnitOfMeasurement,
   getUnitsOfMeasurement,
   getUnitsOfMeasurementPath,
+  updateUnitOfMeasurement,
 } from '.';
 
 describe('units of measurement client helpers', () => {
@@ -207,6 +208,85 @@ describe('units of measurement client helpers', () => {
       error: {
         status: 422,
         message: 'Unit of measurement creation failed.',
+        code: undefined,
+        fieldErrors: {
+          code: 'Unit code already exists.',
+        },
+      },
+    });
+  });
+
+  it('patches a unit of measurement through the backend proxy', async () => {
+    const fetchMock = vi.mocked(fetch);
+    const unitOfMeasurement = {
+      id: 1,
+      code: 'G',
+      name: 'Gram',
+      symbol: 'g',
+      comment: 'Weight unit',
+    };
+
+    fetchMock.mockResolvedValue(
+      new Response(JSON.stringify(unitOfMeasurement))
+    );
+
+    await expect(
+      updateUnitOfMeasurement({
+        unitOfMeasurementId: 1,
+        code: 'G',
+        name: 'Gram',
+        symbol: 'g',
+        comment: 'Weight unit',
+      })
+    ).resolves.toEqual({
+      ok: true,
+      data: unitOfMeasurement,
+    });
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/backend/api/v1/units-of-measurement/1',
+      expect.objectContaining({
+        method: 'PATCH',
+        body: JSON.stringify({
+          code: 'G',
+          name: 'Gram',
+          symbol: 'g',
+          comment: 'Weight unit',
+        }),
+        cache: 'no-store',
+      })
+    );
+  });
+
+  it('returns normalized failures from the update unit of measurement route', async () => {
+    vi.mocked(fetch).mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          message: 'Unit of measurement update failed.',
+          fieldErrors: {
+            code: 'Unit code already exists.',
+          },
+        }),
+        {
+          status: 422,
+          statusText: 'Unprocessable Entity',
+        }
+      )
+    );
+
+    await expect(
+      updateUnitOfMeasurement({
+        unitOfMeasurementId: 1,
+        code: 'KG',
+        name: 'Kilogram',
+        symbol: 'kg',
+        comment: '',
+      })
+    ).resolves.toEqual({
+      ok: false,
+      error: {
+        status: 422,
+        message: 'Unit of measurement update failed.',
         code: undefined,
         fieldErrors: {
           code: 'Unit code already exists.',

@@ -84,7 +84,12 @@ describe('useUpdateAttributeForm', () => {
       description: 'Attribute Material was updated',
       type: 'success',
     });
-    expect(onUpdated).toHaveBeenCalled();
+    expect(onUpdated).toHaveBeenCalledWith({
+      id: 7,
+      name: 'Material',
+      sortOrder: 10,
+      createdAt: '2026-06-25T18:13:29.608Z',
+    });
   });
 
   it('shows a toast when submit fails with a form-level error', async () => {

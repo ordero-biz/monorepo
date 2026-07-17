@@ -1,7 +1,17 @@
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { updateAttribute } from '@/lib/client/api/attributes';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { UpdateAttributeDialogTrigger } from './UpdateAttributeDialogTrigger';
+
+vi.mock('@/lib/client/api/attributes', async () => ({
+  ...(await vi.importActual<typeof import('@/lib/client/api/attributes')>(
+    '@/lib/client/api/attributes'
+  )),
+  updateAttribute: vi.fn(),
+}));
+
+const updateAttributeMock = vi.mocked(updateAttribute);
 
 const { setup } = prepareStoreSetup({
   component: UpdateAttributeDialogTrigger,
@@ -17,6 +27,10 @@ const { setup } = prepareStoreSetup({
 });
 
 describe('UpdateAttributeDialogTrigger', () => {
+  beforeEach(() => {
+    updateAttributeMock.mockReset();
+  });
+
   it('opens the update attribute dialog', async () => {
     const user = userEvent.setup();
 
@@ -52,6 +66,44 @@ describe('UpdateAttributeDialogTrigger', () => {
 
     expect(screen.getByRole('textbox', { name: 'Attribute name' })).toHaveValue(
       'Color'
+    );
+  });
+
+  it('uses the saved values when the dialog is reopened after an update', async () => {
+    updateAttributeMock.mockResolvedValue({
+      ok: true,
+      data: {
+        id: 7,
+        name: 'Material',
+        sortOrder: 10,
+        createdAt: '2026-06-25T18:13:29.608Z',
+      },
+    });
+    const user = userEvent.setup();
+
+    setup();
+
+    await user.click(screen.getByRole('button', { name: 'Edit Color' }));
+
+    const nameField = screen.getByRole('textbox', {
+      name: 'Attribute name',
+    });
+
+    await user.clear(nameField);
+    await user.type(nameField, ' Material ');
+    await user.click(screen.getByRole('button', { name: 'Save' }));
+
+    expect(
+      await screen.findByText('Attribute Material was updated')
+    ).toBeVisible();
+    expect(
+      screen.queryByRole('dialog', { name: 'Edit Attribute' })
+    ).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Edit Color' }));
+
+    expect(screen.getByRole('textbox', { name: 'Attribute name' })).toHaveValue(
+      'Material'
     );
   });
 });
