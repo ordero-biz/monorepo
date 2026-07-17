@@ -19,8 +19,6 @@ describe('AttributesListHeader', () => {
     expect(
       screen.getByRole('heading', { name: 'Attributes list' })
     ).toBeVisible();
-    expect(
-      screen.getByRole('button', { name: 'Add Attribute' })
-    ).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Add Attribute' })).toBeVisible();
   });
 });

@@ -45,8 +45,9 @@ export const DeleteAttributeDialog = ({
 
             <Dialog.Content>
               <Typography variant="body1">
-                Are you sure you want to delete the{' '}
-                "<strong>{attribute.name}</strong>" attribute and all its associated values?
+                Are you sure you want to delete the "
+                <strong>{attribute.name}</strong>" attribute and all its
+                associated values?
               </Typography>
             </Dialog.Content>
 

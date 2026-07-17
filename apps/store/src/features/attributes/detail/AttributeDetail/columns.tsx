@@ -41,9 +41,7 @@ export const getColumns = ({
           <Menu.Portal>
             <Menu.Positioner align="end">
               <Menu.Popup>
-                <Menu.Item
-                  onClick={() => onUpdateAttributeValue(row.original)}
-                >
+                <Menu.Item onClick={() => onUpdateAttributeValue(row.original)}>
                   <Pencil
                     aria-hidden="true"
                     className="size-[var(--icon-button-xs-icon)]"

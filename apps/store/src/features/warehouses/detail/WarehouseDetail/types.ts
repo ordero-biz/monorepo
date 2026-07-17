@@ -4,6 +4,11 @@ export type WarehouseDetailProps = {
   warehouseId: string;
 };
 
+export type WarehouseDetailHeaderProps = {
+  onUpdated: () => Promise<void> | void;
+  warehouse: Warehouse;
+};
+
 export type WarehouseDetailInfoProps = {
   warehouse: Warehouse;
 };

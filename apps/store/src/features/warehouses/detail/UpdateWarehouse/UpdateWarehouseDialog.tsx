@@ -9,21 +9,29 @@ import {
   validateWarehouseCode,
   validateWarehouseName,
 } from '../../shared/validations';
-import { useCreateWarehouseForm } from './hooks/useCreateWarehouseForm';
-import type { CreateWarehouseDialogProps } from './types';
+import { useUpdateWarehouseForm } from './hooks/useUpdateWarehouseForm';
+import type { UpdateWarehouseDialogProps } from './types';
+import { getWarehouseDefaultValues } from './utils/fields';
 
-export const CreateWarehouseDialog = ({
+export const UpdateWarehouseDialog = ({
+  warehouse,
   onOpenChange,
+  onUpdated,
   open,
-}: CreateWarehouseDialogProps) => {
+}: UpdateWarehouseDialogProps) => {
   const queryClient = useQueryClient();
-
-  const { form } = useCreateWarehouseForm({
-    onCreated: async () => {
+  const { form } = useUpdateWarehouseForm({
+    warehouse,
+    onUpdated: async (updatedWarehouse) => {
+      form.reset(getWarehouseDefaultValues(updatedWarehouse));
       onOpenChange(false);
       await queryClient.invalidateQueries({
         queryKey: warehousesQueryKeys.list,
       });
+      await queryClient.invalidateQueries({
+        queryKey: warehousesQueryKeys.detail(warehouse.id),
+      });
+      await onUpdated();
     },
   });
 
@@ -31,7 +39,7 @@ export const CreateWarehouseDialog = ({
     onOpenChange(nextOpen);
 
     if (!nextOpen) {
-      form.reset();
+      form.reset(getWarehouseDefaultValues(warehouse));
     }
   };
 
@@ -49,7 +57,7 @@ export const CreateWarehouseDialog = ({
               }}
             >
               <Dialog.Header>
-                <Dialog.Title>Add warehouse</Dialog.Title>
+                <Dialog.Title>Edit warehouse</Dialog.Title>
               </Dialog.Header>
 
               <Dialog.Content>
@@ -81,7 +89,6 @@ export const CreateWarehouseDialog = ({
                       );
                     }}
                   </form.Field>
-
                   <form.Field
                     name="name"
                     validators={{
@@ -109,7 +116,6 @@ export const CreateWarehouseDialog = ({
                       );
                     }}
                   </form.Field>
-
                   <form.Field
                     name="address"
                     validators={{
@@ -137,7 +143,6 @@ export const CreateWarehouseDialog = ({
                       );
                     }}
                   </form.Field>
-
                   <form.Field name="comment">
                     {(field) => {
                       const errorText = getFieldSubmitChangeErrorText(
@@ -182,7 +187,7 @@ export const CreateWarehouseDialog = ({
                       }
                       type="submit"
                     >
-                      {isSubmitting ? 'Adding...' : 'Add'}
+                      {isSubmitting ? 'Saving...' : 'Save'}
                     </Button>
                   )}
                 </form.Subscribe>

@@ -3,31 +3,30 @@
 import { IconButton } from '@ordero/ui';
 import { Pencil } from 'lucide-react';
 import { useState } from 'react';
-import type { UpdateSupplierDialogTriggerProps } from './types';
-import { UpdateSupplierDialog } from './UpdateSupplierDialog';
+import type { UpdateWarehouseDialogTriggerProps } from './types';
+import { UpdateWarehouseDialog } from './UpdateWarehouseDialog';
 
-export const UpdateSupplierDialogTrigger = ({
+export const UpdateWarehouseDialogTrigger = ({
   onUpdated,
-  supplier,
-}: UpdateSupplierDialogTriggerProps) => {
+  warehouse,
+}: UpdateWarehouseDialogTriggerProps) => {
   const [open, setOpen] = useState(false);
 
   return (
     <>
       <IconButton
-        aria-label={`Edit ${supplier.name}`}
+        aria-label={`Edit ${warehouse.name}`}
         onClick={() => setOpen(true)}
         size="xs"
-        title={`Edit ${supplier.name}`}
+        title={`Edit ${warehouse.name}`}
       >
         <Pencil aria-hidden="true" />
       </IconButton>
-
-      <UpdateSupplierDialog
+      <UpdateWarehouseDialog
         onOpenChange={setOpen}
         onUpdated={onUpdated}
         open={open}
-        supplier={supplier}
+        warehouse={warehouse}
       />
     </>
   );

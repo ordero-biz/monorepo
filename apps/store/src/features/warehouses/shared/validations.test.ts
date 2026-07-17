@@ -1,8 +1,8 @@
 import {
-  createWarehouseSchema,
   validateWarehouseAddress,
   validateWarehouseCode,
   validateWarehouseName,
+  warehouseFormSchema,
 } from './validations';
 
 describe('warehouse field validation', () => {
@@ -29,7 +29,7 @@ describe('warehouse field validation', () => {
 
   it('trims required values while retaining the optional comment', () => {
     expect(
-      createWarehouseSchema.parse({
+      warehouseFormSchema.parse({
         code: ' WH-001 ',
         name: ' Main Warehouse ',
         address: ' 123 Commerce Ave ',

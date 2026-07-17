@@ -1,10 +1,17 @@
-import { createWarehouse } from '@/lib/client/api/warehouses';
+import { updateWarehouse } from '@/lib/client/api/warehouses';
 import type { WarehouseFormValues } from '../../../shared/validations';
 
-export const submitCreateWarehouse = async (
-  value: WarehouseFormValues
-) => {
-  const result = await createWarehouse({
+type SubmitUpdateWarehouseArgs = {
+  value: WarehouseFormValues;
+  warehouseId: string | number;
+};
+
+export const submitUpdateWarehouse = async ({
+  value,
+  warehouseId,
+}: SubmitUpdateWarehouseArgs) => {
+  const result = await updateWarehouse({
+    warehouseId,
     code: value.code.trim(),
     name: value.name.trim(),
     address: value.address.trim(),

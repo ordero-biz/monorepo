@@ -19,6 +19,10 @@ type CreateWarehouseInput = {
   comment: string;
 };
 
+type UpdateWarehouseInput = CreateWarehouseInput & {
+  warehouseId: string | number;
+};
+
 export const getWarehousesPath = (input?: PaginationSearchInput) =>
   `${CLIENT_BACKEND_PATHS.warehouses}?${getPaginationSearch(input)}`;
 
@@ -40,3 +44,15 @@ export const createWarehouse = (input: CreateWarehouseInput) =>
     method: 'POST',
     body: input,
   });
+
+export const updateWarehouse = ({
+  warehouseId,
+  ...input
+}: UpdateWarehouseInput) =>
+  apiFetch<Warehouse>(
+    tokenizePath(CLIENT_BACKEND_PATHS.warehouse, { id: warehouseId }),
+    {
+      method: 'PATCH',
+      body: input,
+    }
+  );
