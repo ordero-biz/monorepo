@@ -8,7 +8,7 @@ import {
   validateWarehouseAddress,
   validateWarehouseCode,
   validateWarehouseName,
-} from '../../list/CreateWarehouse/utils/validations';
+} from '../../shared/validations';
 import { useUpdateWarehouseForm } from './hooks/useUpdateWarehouseForm';
 import type { UpdateWarehouseDialogProps } from './types';
 import { getWarehouseDefaultValues } from './utils/fields';
@@ -22,7 +22,8 @@ export const UpdateWarehouseDialog = ({
   const queryClient = useQueryClient();
   const { form } = useUpdateWarehouseForm({
     warehouse,
-    onUpdated: async () => {
+    onUpdated: async (updatedWarehouse) => {
+      form.reset(getWarehouseDefaultValues(updatedWarehouse));
       onOpenChange(false);
       await queryClient.invalidateQueries({
         queryKey: warehousesQueryKeys.list,

@@ -43,12 +43,16 @@ describe('UpdateWarehouseDialog', () => {
   });
 
   it('submits changes, closes, and refreshes warehouse caches', async () => {
+    const updatedWarehouse = {
+      ...warehouse,
+      name: 'Central Warehouse',
+    };
     updateWarehouseMock.mockResolvedValue({
       ok: true,
-      data: { ...warehouse, name: 'Updated Warehouse' },
+      data: updatedWarehouse,
     });
     const user = userEvent.setup();
-    const { onOpenChange, onUpdated, queryClient } = setup();
+    const { onOpenChange, onUpdated, queryClient, renderResult } = setup();
     const invalidateQueriesSpy = vi.spyOn(queryClient, 'invalidateQueries');
     const dialog = screen.getByRole('dialog', { name: 'Edit warehouse' });
     const nameField = within(dialog).getByRole('textbox', { name: 'Name' });
@@ -74,6 +78,41 @@ describe('UpdateWarehouseDialog', () => {
     });
     expect(onOpenChange).toHaveBeenCalledWith(false);
     expect(onUpdated).toHaveBeenCalled();
+
+    renderResult.rerender({ open: false });
+    renderResult.rerender({ open: true, warehouse: updatedWarehouse });
+
+    expect(
+      screen.getByRole('textbox', { name: 'Name' })
+    ).toHaveValue('Central Warehouse');
+  });
+
+  it('reveals required errors after blur and clears them while correcting input', async () => {
+    const user = userEvent.setup();
+    setup();
+    const dialog = screen.getByRole('dialog', { name: 'Edit warehouse' });
+    const codeField = within(dialog).getByRole('textbox', { name: 'Code' });
+
+    await user.clear(codeField);
+
+    expect(
+      within(dialog).queryByText('Warehouse code is required')
+    ).not.toBeInTheDocument();
+
+    await user.tab();
+
+    expect(
+      await within(dialog).findByText('Warehouse code is required')
+    ).toBeVisible();
+
+    await user.click(codeField);
+    await user.type(codeField, 'WH-001');
+
+    await waitFor(() =>
+      expect(
+        within(dialog).queryByText('Warehouse code is required')
+      ).not.toBeInTheDocument()
+    );
   });
 
   it('shows backend field errors and keeps the dialog open', async () => {

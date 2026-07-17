@@ -5,7 +5,7 @@ import { getWarehouseDefaultValues } from '../utils/fields';
 import { submitUpdateWarehouse } from '../utils/submitAction';
 
 type UseUpdateWarehouseFormArgs = {
-  onUpdated: () => Promise<void> | void;
+  onUpdated: (warehouse: Warehouse) => Promise<void> | void;
   warehouse: Warehouse;
 };
 
@@ -44,7 +44,7 @@ export const useUpdateWarehouseForm = ({
         type: 'success',
       });
 
-      await onUpdated();
+      await onUpdated(result.data);
     },
   });
 

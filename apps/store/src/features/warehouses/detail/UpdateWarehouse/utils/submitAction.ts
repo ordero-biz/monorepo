@@ -1,8 +1,8 @@
 import { updateWarehouse } from '@/lib/client/api/warehouses';
-import type { CreateWarehouseFormValues } from '../../../list/CreateWarehouse/utils/validations';
+import type { WarehouseFormValues } from '../../../shared/validations';
 
 type SubmitUpdateWarehouseArgs = {
-  value: CreateWarehouseFormValues;
+  value: WarehouseFormValues;
   warehouseId: string | number;
 };
 

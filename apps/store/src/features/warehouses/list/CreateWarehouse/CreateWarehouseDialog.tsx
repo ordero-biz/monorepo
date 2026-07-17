@@ -4,13 +4,13 @@ import { Button, Dialog, TextField } from '@ordero/ui';
 import { useQueryClient } from '@tanstack/react-query';
 import { warehousesQueryKeys } from '@/lib/query/warehouses/warehousesQueryKeys';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
-import { useCreateWarehouseForm } from './hooks/useCreateWarehouseForm';
-import type { CreateWarehouseDialogProps } from './types';
 import {
   validateWarehouseAddress,
   validateWarehouseCode,
   validateWarehouseName,
-} from './utils/validations';
+} from '../../shared/validations';
+import { useCreateWarehouseForm } from './hooks/useCreateWarehouseForm';
+import type { CreateWarehouseDialogProps } from './types';
 
 export const CreateWarehouseDialog = ({
   onOpenChange,
