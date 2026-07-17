@@ -136,6 +136,38 @@ describe('UpdateUnitOfMeasurementDialog', () => {
     expect(saveButton).toBeEnabled();
   });
 
+  it('prevents another save while the update is in flight', async () => {
+    let resolveUpdate:
+      | ((value: Awaited<ReturnType<typeof updateUnitOfMeasurement>>) => void)
+      | undefined;
+
+    updateUnitOfMeasurementMock.mockReturnValue(
+      new Promise((resolve) => {
+        resolveUpdate = resolve;
+      })
+    );
+    const user = userEvent.setup();
+
+    setup();
+
+    const dialog = screen.getByRole('dialog', {
+      name: 'Edit unit of measurement',
+    });
+    const saveButton = within(dialog).getByRole('button', { name: 'Save' });
+
+    await user.click(saveButton);
+
+    expect(saveButton).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Saving...' })).toBeVisible();
+
+    resolveUpdate?.({
+      ok: true,
+      data: unitOfMeasurement,
+    });
+
+    await screen.findByRole('button', { name: 'Save' });
+  });
+
   it('shows backend errors and keeps the dialog open when submit fails', async () => {
     updateUnitOfMeasurementMock.mockResolvedValue({
       ok: false,
