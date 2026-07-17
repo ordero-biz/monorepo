@@ -72,3 +72,15 @@ export const updateUnitOfMeasurement = ({
       },
     }
   );
+
+type DeleteUnitsOfMeasurementInput = {
+  unitOfMeasurementIds: number[];
+};
+
+export const deleteUnitsOfMeasurement = (
+  input: DeleteUnitsOfMeasurementInput
+) =>
+  apiFetch<void>(CLIENT_BACKEND_PATHS.unitsOfMeasurement, {
+    method: 'DELETE',
+    body: input,
+  });

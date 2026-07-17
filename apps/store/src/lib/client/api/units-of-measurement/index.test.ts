@@ -1,5 +1,6 @@
 import {
   createUnitOfMeasurement,
+  deleteUnitsOfMeasurement,
   getUnitOfMeasurement,
   getUnitsOfMeasurement,
   getUnitsOfMeasurementPath,
@@ -291,6 +292,60 @@ describe('units of measurement client helpers', () => {
         fieldErrors: {
           code: 'Unit code already exists.',
         },
+      },
+    });
+  });
+
+  it('deletes units of measurement through the backend proxy', async () => {
+    const fetchMock = vi.mocked(fetch);
+
+    fetchMock.mockResolvedValue(new Response(null, { status: 200 }));
+
+    await expect(
+      deleteUnitsOfMeasurement({
+        unitOfMeasurementIds: [1],
+      })
+    ).resolves.toEqual({
+      ok: true,
+      data: undefined,
+    });
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/backend/api/v1/units-of-measurement',
+      expect.objectContaining({
+        method: 'DELETE',
+        body: JSON.stringify({
+          unitOfMeasurementIds: [1],
+        }),
+        cache: 'no-store',
+      })
+    );
+  });
+
+  it('returns normalized failures from the delete units of measurement route', async () => {
+    vi.mocked(fetch).mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          message: 'Unit of measurement deletion failed.',
+        }),
+        {
+          status: 409,
+          statusText: 'Conflict',
+        }
+      )
+    );
+
+    await expect(
+      deleteUnitsOfMeasurement({
+        unitOfMeasurementIds: [1],
+      })
+    ).resolves.toEqual({
+      ok: false,
+      error: {
+        status: 409,
+        message: 'Unit of measurement deletion failed.',
+        code: undefined,
+        fieldErrors: undefined,
       },
     });
   });
