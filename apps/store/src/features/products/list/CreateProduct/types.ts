@@ -53,6 +53,13 @@ export type GeneratedProductVariantsProps = {
   form: CreateProductForm;
 };
 
+export type GeneratedProductVariantListProps = {
+  attributes: AttributeDropdown[];
+  form: CreateProductForm;
+  onEditAttributes: (variantIndex: number) => void;
+  productVariants: CreateProductVariantValues[];
+};
+
 export type GeneratedProductVariantCardProps = {
   attributes: AttributeDropdown[];
   form: CreateProductForm;

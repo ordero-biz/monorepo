@@ -1,7 +1,40 @@
 import { useState } from 'react';
 import { EditProductVariantAttributesDialog } from './EditProductVariantAttributesDialog';
 import { GeneratedProductVariantCard } from './GeneratedProductVariantCard';
-import type { GeneratedProductVariantsProps } from './types';
+import { useIncrementalProductVariants } from './hooks/useIncrementalProductVariants';
+import type {
+  GeneratedProductVariantListProps,
+  GeneratedProductVariantsProps,
+} from './types';
+
+const GeneratedProductVariantList = ({
+  attributes,
+  form,
+  onEditAttributes,
+  productVariants,
+}: GeneratedProductVariantListProps) => {
+  const { hasMoreVariants, loadMoreRef, visibleProductVariants } =
+    useIncrementalProductVariants(productVariants);
+
+  return (
+    <div className="mt-3 mb-2 flex flex-col gap-[var(--space-1)]">
+      {visibleProductVariants.map((productVariant, variantIndex) => (
+        <GeneratedProductVariantCard
+          attributes={attributes}
+          form={form}
+          // biome-ignore lint/suspicious/noArrayIndexKey: Generated variants are replaced as a full collection.
+          key={variantIndex}
+          onEditAttributes={() => onEditAttributes(variantIndex)}
+          productVariant={productVariant}
+          variantIndex={variantIndex}
+        />
+      ))}
+      {hasMoreVariants ? (
+        <div aria-hidden="true" className="h-px" ref={loadMoreRef} />
+      ) : null}
+    </div>
+  );
+};
 
 export const GeneratedProductVariants = ({
   availableAttributes,
@@ -33,19 +66,12 @@ export const GeneratedProductVariants = ({
 
         return productVariants.length > 0 ? (
           <>
-            <div className="mt-3 mb-2 flex flex-col gap-[var(--space-1)]">
-              {productVariants.map((productVariant, variantIndex) => (
-                <GeneratedProductVariantCard
-                  attributes={variantAttributes}
-                  form={form}
-                  // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-                  key={variantIndex}
-                  onEditAttributes={() => setEditingVariantIndex(variantIndex)}
-                  productVariant={productVariant}
-                  variantIndex={variantIndex}
-                />
-              ))}
-            </div>
+            <GeneratedProductVariantList
+              attributes={variantAttributes}
+              form={form}
+              onEditAttributes={setEditingVariantIndex}
+              productVariants={productVariants}
+            />
 
             {editingVariantIndex !== null && editingProductVariant ? (
               <form.Field
