@@ -1,4 +1,4 @@
-import { screen, waitFor } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createProduct } from '@/lib/client/api/products';
 import type { AttributeDropdown } from '@/lib/domain/attributes';
@@ -161,6 +161,41 @@ describe('CreateProduct', () => {
     expect(screen.getByDisplayValue('Running Shoes Blue')).toBeInTheDocument();
     expect(screen.getByText('Attributes')).toBeVisible();
     expect(screen.getAllByText('Blue')).toHaveLength(2);
+    expect(createProductMock).not.toHaveBeenCalled();
+  });
+
+  it('replaces a variant attribute value from the same attribute', async () => {
+    const user = userEvent.setup();
+
+    setup();
+
+    await completeRequiredFields(user);
+    await user.click(screen.getByRole('button', { name: 'Select Attributes' }));
+    await user.click(screen.getByRole('button', { name: 'Blue' }));
+    await user.click(
+      screen.getByRole('button', { name: 'Next: Configure product' })
+    );
+
+    await user.click(
+      screen.getByRole('button', {
+        name: 'Edit attributes for Running Shoes Blue',
+      })
+    );
+    const dialog = screen.getByRole('dialog', {
+      name: 'Edit variant attributes for Running Shoes Blue',
+    });
+
+    await user.click(within(dialog).getByRole('button', { name: 'Red' }));
+    await user.click(within(dialog).getByRole('button', { name: 'Update' }));
+
+    const variantAttributes = screen.getByRole('treegrid', {
+      name: 'Attributes for Running Shoes Blue',
+    });
+
+    expect(within(variantAttributes).getByText('Red')).toBeVisible();
+    expect(
+      within(variantAttributes).queryByText('Blue')
+    ).not.toBeInTheDocument();
     expect(createProductMock).not.toHaveBeenCalled();
   });
 

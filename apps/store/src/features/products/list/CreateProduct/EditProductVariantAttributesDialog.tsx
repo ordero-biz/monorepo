@@ -2,6 +2,12 @@ import { Button, Dialog, ToggleButton, Typography } from '@ordero/ui';
 import { useEffect, useState } from 'react';
 import type { EditProductVariantAttributesDialogProps } from './types';
 
+type HandleAttributeValueChangeArgs = {
+  attributeValueId: number;
+  attributeValueIds: number[];
+  pressed: boolean;
+};
+
 export const EditProductVariantAttributesDialog = ({
   attributes,
   attributeValueIds,
@@ -21,15 +27,22 @@ export const EditProductVariantAttributesDialog = ({
     }
   }, [attributeValueIds, open]);
 
-  const handleAttributeValueChange = (
-    attributeValueId: number,
-    pressed: boolean
-  ) => {
+  const handleAttributeValueChange = ({
+    attributeValueId,
+    attributeValueIds,
+    pressed,
+  }: HandleAttributeValueChangeArgs) => {
     setSelectedAttributeValueIds((currentAttributeValueIds) => {
       if (pressed) {
-        return currentAttributeValueIds.includes(attributeValueId)
-          ? currentAttributeValueIds
-          : [...currentAttributeValueIds, attributeValueId];
+        const attributeValueIdsSet = new Set(attributeValueIds);
+
+        return [
+          ...currentAttributeValueIds.filter(
+            (selectedAttributeValueId) =>
+              !attributeValueIdsSet.has(selectedAttributeValueId)
+          ),
+          attributeValueId,
+        ];
       }
 
       return currentAttributeValueIds.filter(
@@ -57,34 +70,41 @@ export const EditProductVariantAttributesDialog = ({
                   aria-label="Variant attribute values"
                   className="m-0 flex flex-col border-0 p-0"
                 >
-                  {attributes.map((attribute) => (
-                    <div
-                      className="flex flex-wrap items-center gap-[var(--space-1)] border-t border-[var(--color-grey-32)] py-[var(--space-1)] first:border-t-0 first:pt-0 last:pb-0"
-                      key={attribute.id}
-                    >
-                      <span className="font-medium text-[length:var(--body2-size-desktop)] leading-[var(--body2-line-height-desktop)]">
-                        {attribute.name}:
-                      </span>
-                      {attribute.attributeValues.map((attributeValue) => (
-                        <ToggleButton.Item
-                          key={attributeValue.id}
-                          onPressedChange={(pressed) => {
-                            handleAttributeValueChange(
-                              attributeValue.id,
-                              pressed
-                            );
-                          }}
-                          pressed={selectedAttributeValueIdsSet.has(
-                            attributeValue.id
-                          )}
-                          size="s"
-                          type="button"
-                        >
-                          {attributeValue.name}
-                        </ToggleButton.Item>
-                      ))}
-                    </div>
-                  ))}
+                  {attributes.map((attribute) => {
+                    const attributeValueIds = attribute.attributeValues.map(
+                      (attributeValue) => attributeValue.id
+                    );
+
+                    return (
+                      <div
+                        className="flex flex-wrap items-center gap-[var(--space-1)] border-t border-[var(--color-grey-32)] py-[var(--space-1)] first:border-t-0 first:pt-0 last:pb-0"
+                        key={attribute.id}
+                      >
+                        <span className="font-medium text-[length:var(--body2-size-desktop)] leading-[var(--body2-line-height-desktop)]">
+                          {attribute.name}:
+                        </span>
+                        {attribute.attributeValues.map((attributeValue) => (
+                          <ToggleButton.Item
+                            key={attributeValue.id}
+                            onPressedChange={(pressed) => {
+                              handleAttributeValueChange({
+                                attributeValueId: attributeValue.id,
+                                attributeValueIds,
+                                pressed,
+                              });
+                            }}
+                            pressed={selectedAttributeValueIdsSet.has(
+                              attributeValue.id
+                            )}
+                            size="s"
+                            type="button"
+                          >
+                            {attributeValue.name}
+                          </ToggleButton.Item>
+                        ))}
+                      </div>
+                    );
+                  })}
                 </fieldset>
               ) : (
                 <Typography color="text-secondary" variant="body2">
