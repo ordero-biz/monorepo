@@ -13,6 +13,10 @@ export const productCategorySchema = z
   .nullable()
   .refine((value) => value !== null, 'Category is required');
 
+export const productVariantAttributeValueIdsSchema = z
+  .array(z.number())
+  .min(1, 'Select at least one attribute value');
+
 export const productVariantBarcodeSchema = z
   .string()
   .trim()
@@ -28,7 +32,9 @@ export const productVariantSkuSchema = z
   .trim()
   .min(1, 'SKU is required');
 
-type ProductVariantField = 'barcode' | 'name' | 'sku';
+type ProductVariantField = 'attributeValueIds' | 'barcode' | 'name' | 'sku';
+
+type ProductVariantTextField = 'barcode' | 'name' | 'sku';
 
 type ProductVariantUniqueField = 'barcode' | 'sku';
 
@@ -76,6 +82,37 @@ const getDuplicateVariantFieldIndexes = ({
   return duplicateIndexes;
 };
 
+const getAttributeValueIdsKey = (attributeValueIds: number[]) =>
+  [...new Set(attributeValueIds)]
+    .sort((firstId, secondId) => firstId - secondId)
+    .join('|');
+
+const getDuplicateAttributeValueIndexes = (
+  productVariants: CreateProductVariantValues[]
+) => {
+  const firstIndexByValue = new Map<string, number>();
+  const duplicateIndexes = new Set<number>();
+
+  productVariants.forEach((productVariant, index) => {
+    if (productVariant.attributeValueIds.length === 0) {
+      return;
+    }
+
+    const value = getAttributeValueIdsKey(productVariant.attributeValueIds);
+    const firstIndex = firstIndexByValue.get(value);
+
+    if (firstIndex === undefined) {
+      firstIndexByValue.set(value, index);
+      return;
+    }
+
+    duplicateIndexes.add(firstIndex);
+    duplicateIndexes.add(index);
+  });
+
+  return duplicateIndexes;
+};
+
 const addProductVariantFieldErrors = ({
   duplicateIndexes = new Set<number>(),
   errors,
@@ -86,7 +123,7 @@ const addProductVariantFieldErrors = ({
 }: {
   duplicateIndexes?: Set<number>;
   errors: ProductVariantFieldErrors;
-  fieldName: ProductVariantField;
+  fieldName: ProductVariantTextField;
   productVariants: CreateProductVariantValues[];
   requiredSchema: z.ZodString;
   uniqueMessage?: string;
@@ -105,6 +142,34 @@ const addProductVariantFieldErrors = ({
 
     if (uniqueMessage && duplicateIndexes.has(index)) {
       errors[fieldPath] = uniqueMessage;
+    }
+  });
+};
+
+const addProductVariantAttributeValueErrors = ({
+  duplicateIndexes,
+  errors,
+  productVariants,
+}: {
+  duplicateIndexes: Set<number>;
+  errors: ProductVariantFieldErrors;
+  productVariants: CreateProductVariantValues[];
+}) => {
+  productVariants.forEach((productVariant, index) => {
+    const fieldPath = `productVariants[${index}].attributeValueIds` as const;
+    const result = productVariantAttributeValueIdsSchema.safeParse(
+      productVariant.attributeValueIds
+    );
+
+    if (!result.success) {
+      errors[fieldPath] =
+        result.error.issues[0]?.message ??
+        'Select at least one attribute value';
+      return;
+    }
+
+    if (duplicateIndexes.has(index)) {
+      errors[fieldPath] = 'Attribute values must be unique across variants';
     }
   });
 };
@@ -135,7 +200,15 @@ export const validateProductVariants = ({
     fieldName: 'sku',
     productVariants: value.productVariants,
   });
+  const attributeValueDuplicateIndexes = getDuplicateAttributeValueIndexes(
+    value.productVariants
+  );
 
+  addProductVariantAttributeValueErrors({
+    duplicateIndexes: attributeValueDuplicateIndexes,
+    errors,
+    productVariants: value.productVariants,
+  });
   addProductVariantFieldErrors({
     errors,
     fieldName: 'name',

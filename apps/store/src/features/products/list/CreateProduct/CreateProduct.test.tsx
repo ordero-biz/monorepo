@@ -1,4 +1,4 @@
-import { screen, waitFor, within } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createProduct } from '@/lib/client/api/products';
 import type { AttributeDropdown } from '@/lib/domain/attributes';
@@ -230,17 +230,6 @@ describe('CreateProduct', () => {
     await user.click(
       screen.getByRole('button', { name: 'Next: Configure product' })
     );
-    const variantAttributes = screen.getByRole('group', {
-      name: 'Attributes for Running Shoes Blue',
-    });
-    const removeBlueVariantAttribute = within(variantAttributes).getByRole(
-      'button',
-      {
-        name: 'Remove Blue',
-      }
-    );
-
-    await user.click(removeBlueVariantAttribute);
     const createButton = screen.getByRole('button', { name: 'Create product' });
 
     expect(createButton).toBeDisabled();
@@ -265,7 +254,7 @@ describe('CreateProduct', () => {
             description: '',
             sku: 'SHOE-BLUE',
             barcode: 'barcode-1',
-            attributeValueIds: [],
+            attributeValueIds: [72],
           },
         ],
       })

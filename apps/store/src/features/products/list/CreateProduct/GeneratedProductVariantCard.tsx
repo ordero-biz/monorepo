@@ -1,12 +1,14 @@
 import {
   Card,
   Chip,
+  FieldHelperText,
+  FieldLabel,
   IconButton,
   Textarea,
   TextField,
   Typography,
 } from '@ordero/ui';
-import { Pencil } from 'lucide-react';
+import { Pencil, Plus } from 'lucide-react';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
 import { ProductImageDropzone } from './ProductImageDropzone';
 import type { GeneratedProductVariantCardProps } from './types';
@@ -126,55 +128,84 @@ export const GeneratedProductVariantCard = ({
         <form.Field
           name={`productVariants[${variantIndex}].attributeValueIds` as const}
         >
-          {(field) =>
-            attributes.length > 0 ? (
-              <div
-                aria-label={`Attributes for ${productVariant.name}`}
-                className="flex flex-wrap items-center gap-[var(--space-1)]"
-                role="treegrid"
-              >
-                <span className="text-[length:var(--caption-size-desktop)] leading-[var(--caption-line-height-desktop)] text-text-secondary">
-                  Attributes
-                </span>
-                {getProductVariantAttributeValues(
-                  attributes,
-                  field.state.value
-                ).map((attributeValue) => (
-                  <Chip
-                    aria-label={attributeValue.name}
-                    key={attributeValue.id}
-                    onDelete={() => {
-                      field.handleChange(
-                        field.state.value.filter(
-                          (selectedAttributeValueId) =>
-                            selectedAttributeValueId !== attributeValue.id
-                        )
-                      );
-                    }}
-                    size="s"
-                    variant="outlined"
-                  >
-                    {attributeValue.name}
-                  </Chip>
-                ))}
-                {getProductVariantAttributeValues(attributes, field.state.value)
-                  .length === 0 ? (
-                  <span className="text-[length:var(--caption-size-desktop)] leading-[var(--caption-line-height-desktop)] text-text-secondary">
-                    None
-                  </span>
-                ) : null}
-                <IconButton
-                  aria-label={`Edit attributes for ${productVariant.name}`}
-                  onClick={onEditAttributes}
-                  size="xs"
-                  title={`Edit attributes for ${productVariant.name}`}
-                  type="button"
+          {(field) => {
+            const validationErrorText = getFieldSubmitChangeErrorText(
+              field.state.meta
+            );
+            const hasNoAttributeValues = field.state.value.length === 0;
+            const errorText =
+              validationErrorText ??
+              (hasNoAttributeValues
+                ? 'Select at least one attribute value'
+                : undefined);
+            const selectedAttributeValues = getProductVariantAttributeValues(
+              attributes,
+              field.state.value
+            );
+
+            return attributes.length > 0 ? (
+              <div className="flex flex-col gap-[var(--space-0-5)]">
+                <FieldLabel
+                  as="span"
+                  invalid={Boolean(errorText)}
+                  required
                 >
-                  <Pencil aria-hidden="true" />
-                </IconButton>
+                  Attributes
+                </FieldLabel>
+                <div
+                  aria-label={`Attributes for ${productVariant.name}`}
+                  className="flex flex-wrap items-center gap-[var(--space-1)]"
+                  role="treegrid"
+                >
+                  {selectedAttributeValues.map((attributeValue) => (
+                    <Chip
+                      aria-label={attributeValue.name}
+                      key={attributeValue.id}
+                      onDelete={() => {
+                        field.handleChange(
+                          field.state.value.filter(
+                            (selectedAttributeValueId) =>
+                              selectedAttributeValueId !== attributeValue.id
+                          )
+                        );
+                      }}
+                      size="s"
+                      variant="outlined"
+                    >
+                      {attributeValue.name}
+                    </Chip>
+                  ))}
+                  {selectedAttributeValues.length === 0 ? (
+                    <IconButton
+                      aria-label={`Add attributes for ${productVariant.name}`}
+                      onClick={onEditAttributes}
+                      size="xs"
+                      title={`Add attributes for ${productVariant.name}`}
+                      type="button"
+                    >
+                      <Plus aria-hidden="true" />
+                    </IconButton>
+                  ) : null}
+                  {selectedAttributeValues.length > 0 ? (
+                    <IconButton
+                      aria-label={`Edit attributes for ${productVariant.name}`}
+                      onClick={onEditAttributes}
+                      size="xs"
+                      title={`Edit attributes for ${productVariant.name}`}
+                      type="button"
+                    >
+                      <Pencil aria-hidden="true" />
+                    </IconButton>
+                  ) : null}
+                </div>
+                {errorText ? (
+                  <FieldHelperText invalid>
+                    {errorText}
+                  </FieldHelperText>
+                ) : null}
               </div>
-            ) : null
-          }
+            ) : null;
+          }}
         </form.Field>
       </div>
     </Card.Content>

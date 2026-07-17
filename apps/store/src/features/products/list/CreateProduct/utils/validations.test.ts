@@ -41,7 +41,7 @@ describe('validateProductCategory', () => {
 });
 
 describe('validateProductVariants', () => {
-  it('requires a name, barcode, and SKU for each variant', () => {
+  it('requires attribute values, a name, barcode, and SKU for each variant', () => {
     expect(
       validateProductVariants({
         value: getProductValues([
@@ -56,6 +56,8 @@ describe('validateProductVariants', () => {
       })
     ).toEqual({
       fields: {
+        'productVariants[0].attributeValueIds':
+          'Select at least one attribute value',
         'productVariants[0].barcode': 'Barcode is required',
         'productVariants[0].name': 'Product variant name is required',
         'productVariants[0].sku': 'SKU is required',
@@ -68,14 +70,14 @@ describe('validateProductVariants', () => {
       validateProductVariants({
         value: getProductValues([
           {
-            attributeValueIds: [],
+            attributeValueIds: [72],
             barcode: 'barcode-1',
             description: '',
             name: 'Running Shoes Blue',
             sku: 'SHOE-BLUE',
           },
           {
-            attributeValueIds: [],
+            attributeValueIds: [71],
             barcode: ' barcode-1 ',
             description: '',
             name: 'Running Shoes Red',
@@ -95,19 +97,49 @@ describe('validateProductVariants', () => {
     });
   });
 
-  it('accepts variants with unique barcodes and SKUs', () => {
+  it('requires unique attribute value sets across variants', () => {
     expect(
       validateProductVariants({
         value: getProductValues([
           {
-            attributeValueIds: [],
+            attributeValueIds: [72, 80],
+            barcode: 'barcode-1',
+            description: '',
+            name: 'Running Shoes Blue China',
+            sku: 'SHOE-BLUE-CHINA',
+          },
+          {
+            attributeValueIds: [80, 72],
+            barcode: 'barcode-2',
+            description: '',
+            name: 'Running Shoes China Blue',
+            sku: 'SHOE-CHINA-BLUE',
+          },
+        ]),
+      })
+    ).toEqual({
+      fields: {
+        'productVariants[0].attributeValueIds':
+          'Attribute values must be unique across variants',
+        'productVariants[1].attributeValueIds':
+          'Attribute values must be unique across variants',
+      },
+    });
+  });
+
+  it('accepts variants with unique attribute values, barcodes, and SKUs', () => {
+    expect(
+      validateProductVariants({
+        value: getProductValues([
+          {
+            attributeValueIds: [72],
             barcode: 'barcode-1',
             description: '',
             name: 'Running Shoes Blue',
             sku: 'SHOE-BLUE',
           },
           {
-            attributeValueIds: [],
+            attributeValueIds: [71],
             barcode: 'barcode-2',
             description: '',
             name: 'Running Shoes Red',
