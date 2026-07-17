@@ -1,5 +1,5 @@
+import { PageHeader, Typography } from '@ordero/ui';
 import { UpdateWarehouseDialogTrigger } from '@/features/warehouses/detail/UpdateWarehouse';
-import { PageHeader, Typography } from '@/ui/index';
 import type { WarehouseDetailHeaderProps } from './types';
 
 export const WarehouseDetailHeader = ({

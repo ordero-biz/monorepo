@@ -1,7 +1,7 @@
 'use client';
 
+import { Button, Card, Typography } from '@ordero/ui';
 import { useWarehouseQuery } from '@/lib/hooks/warehouses/useWarehouseQuery';
-import { Button, Card, Typography } from '@/ui/index';
 import type { WarehouseDetailProps } from './types';
 import { WarehouseDetailHeader } from './WarehouseDetailHeader';
 import { WarehouseDetailInfo } from './WarehouseDetailInfo';
