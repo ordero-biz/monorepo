@@ -3,6 +3,7 @@ import {
   getWarehouse,
   getWarehouses,
   getWarehousesPath,
+  updateWarehouse,
 } from '.';
 
 describe('warehouse client helpers', () => {
@@ -212,6 +213,73 @@ describe('warehouse client helpers', () => {
         fieldErrors: {
           code: 'Warehouse code already exists.',
         },
+      },
+    });
+  });
+
+  it('patches a warehouse through the backend proxy', async () => {
+    const fetchMock = vi.mocked(fetch);
+    const warehouse = {
+      id: 1,
+      code: 'WH-002',
+      name: 'Updated Warehouse',
+      address: '124 Commerce Ave',
+      comment: 'Updated stock location',
+    };
+
+    fetchMock.mockResolvedValue(new Response(JSON.stringify(warehouse)));
+
+    await expect(
+      updateWarehouse({
+        warehouseId: 1,
+        code: 'WH-002',
+        name: 'Updated Warehouse',
+        address: '124 Commerce Ave',
+        comment: 'Updated stock location',
+      })
+    ).resolves.toEqual({ ok: true, data: warehouse });
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/backend/api/v1/warehouses/1',
+      expect.objectContaining({
+        method: 'PATCH',
+        body: JSON.stringify({
+          code: 'WH-002',
+          name: 'Updated Warehouse',
+          address: '124 Commerce Ave',
+          comment: 'Updated stock location',
+        }),
+        cache: 'no-store',
+      })
+    );
+  });
+
+  it('returns normalized failures from the update warehouse route', async () => {
+    vi.mocked(fetch).mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          message: 'Warehouse update failed.',
+          fieldErrors: { code: 'Warehouse code already exists.' },
+        }),
+        { status: 422, statusText: 'Unprocessable Entity' }
+      )
+    );
+
+    await expect(
+      updateWarehouse({
+        warehouseId: 1,
+        code: 'WH-001',
+        name: 'Main Warehouse',
+        address: '123 Commerce Ave',
+        comment: '',
+      })
+    ).resolves.toEqual({
+      ok: false,
+      error: {
+        status: 422,
+        message: 'Warehouse update failed.',
+        code: undefined,
+        fieldErrors: { code: 'Warehouse code already exists.' },
       },
     });
   });
