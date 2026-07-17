@@ -83,7 +83,9 @@ describe('AttributeDetailHeader', () => {
     await user.click(
       await screen.findByRole('button', { name: 'Actions for Color' })
     );
-    await user.click(await screen.findByRole('menuitem', { name: 'Delete attribute' }));
+    await user.click(
+      await screen.findByRole('menuitem', { name: 'Delete attribute' })
+    );
 
     expect(
       screen.getByRole('dialog', { name: 'Delete attribute' })

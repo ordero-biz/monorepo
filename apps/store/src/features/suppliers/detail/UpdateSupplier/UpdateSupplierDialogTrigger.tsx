@@ -17,7 +17,7 @@ export const UpdateSupplierDialogTrigger = ({
       <IconButton
         aria-label={`Edit ${supplier.name}`}
         onClick={() => setOpen(true)}
-        size="s"
+        size="xs"
         title={`Edit ${supplier.name}`}
       >
         <Pencil aria-hidden="true" />

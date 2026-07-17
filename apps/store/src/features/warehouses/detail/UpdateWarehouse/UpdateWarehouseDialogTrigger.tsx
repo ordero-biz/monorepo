@@ -14,10 +14,20 @@ export const UpdateWarehouseDialogTrigger = ({
 
   return (
     <>
-      <IconButton aria-label={`Edit ${warehouse.name}`} onClick={() => setOpen(true)} size="s" title={`Edit ${warehouse.name}`}>
+      <IconButton
+        aria-label={`Edit ${warehouse.name}`}
+        onClick={() => setOpen(true)}
+        size="xs"
+        title={`Edit ${warehouse.name}`}
+      >
         <Pencil aria-hidden="true" />
       </IconButton>
-      <UpdateWarehouseDialog onOpenChange={setOpen} onUpdated={onUpdated} open={open} warehouse={warehouse} />
+      <UpdateWarehouseDialog
+        onOpenChange={setOpen}
+        onUpdated={onUpdated}
+        open={open}
+        warehouse={warehouse}
+      />
     </>
   );
 };
