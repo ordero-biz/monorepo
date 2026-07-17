@@ -44,9 +44,6 @@ export const GenerateProductActions = ({
           !productName.trim() ||
           !category ||
           (isMultipleProducts && !hasSelectedAttributeValues);
-        const helperText = isMultipleProducts
-          ? `${generatedProductsCount} products will be generated`
-          : '1 product will be generated';
 
         return (
           <div className="flex flex-col items-end gap-[var(--space-1)]">
@@ -88,7 +85,11 @@ export const GenerateProductActions = ({
                 ? 'Next: Configure products'
                 : 'Next: Configure product'}
             </Button>
-            <FieldHelperText align="end">{helperText}</FieldHelperText>
+            {isMultipleProducts ? (
+              <FieldHelperText align="end">
+                {generatedProductsCount} products will be generated
+              </FieldHelperText>
+            ) : null}
           </div>
         );
       }}

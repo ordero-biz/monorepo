@@ -99,7 +99,7 @@ export const CreateProductTemplateFields = ({
                   errorText={errorText}
                   helperText={
                     isMultipleProducts
-                      ? 'You must select attributes to generate multiple products'
+                      ? 'You must select attributes and their values to generate multiple products'
                       : 'Optional: Add attributes for a single product'
                   }
                   invalid={Boolean(errorText)}
