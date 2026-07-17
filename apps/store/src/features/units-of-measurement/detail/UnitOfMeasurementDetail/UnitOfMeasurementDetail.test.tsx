@@ -48,6 +48,7 @@ describe('UnitOfMeasurementDetail', () => {
     expect(screen.getByText('KG')).toBeVisible();
     expect(screen.getByText('kg')).toBeVisible();
     expect(screen.getByText('Weight unit')).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Edit Kilogram' })).toBeVisible();
   });
 
   it('renders an error state and retries loading the unit of measurement', async () => {

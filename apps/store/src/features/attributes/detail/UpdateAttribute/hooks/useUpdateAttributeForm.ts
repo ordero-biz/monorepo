@@ -1,11 +1,12 @@
 import { useToastManager } from '@ordero/ui';
 import { useForm } from '@tanstack/react-form';
+import type { Attribute } from '@/lib/domain/attributes';
 import { submitUpdateAttribute } from '../utils/submitAction';
 
 type UseUpdateAttributeFormArgs = {
   attributeId: string | number;
   initialName: string;
-  onUpdated: () => Promise<void> | void;
+  onUpdated: (attribute: Attribute) => Promise<void> | void;
 };
 
 export const useUpdateAttributeForm = ({
@@ -46,7 +47,7 @@ export const useUpdateAttributeForm = ({
         type: 'success',
       });
 
-      await onUpdated();
+      await onUpdated(result.data);
     },
   });
 

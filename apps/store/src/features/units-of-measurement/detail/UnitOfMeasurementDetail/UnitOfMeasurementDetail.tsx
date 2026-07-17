@@ -2,6 +2,7 @@
 
 import { useUnitOfMeasurementQuery } from '@/lib/hooks/units-of-measurement/useUnitOfMeasurementQuery';
 import { Button, Card, PageHeader, Typography } from '@/ui/index';
+import { UpdateUnitOfMeasurementDialogTrigger } from '../UpdateUnitOfMeasurement';
 import type { UnitOfMeasurementDetailProps } from './types';
 import { UnitOfMeasurementDetailInfo } from './UnitOfMeasurementDetailInfo';
 
@@ -53,6 +54,14 @@ export const UnitOfMeasurementDetail = ({
           <Typography variant="h5">
             {unitOfMeasurementQuery.data.name}
           </Typography>
+          <div>
+            <UpdateUnitOfMeasurementDialogTrigger
+              onUpdated={async () => {
+                await unitOfMeasurementQuery.refetch();
+              }}
+              unitOfMeasurement={unitOfMeasurementQuery.data}
+            />
+          </div>
         </PageHeader.Left>
       </PageHeader.Root>
       <UnitOfMeasurementDetailInfo
