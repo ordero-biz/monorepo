@@ -7,6 +7,7 @@ import {
   Typography,
 } from '@ordero/ui';
 import { Pencil } from 'lucide-react';
+import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
 import { ProductImageDropzone } from './ProductImageDropzone';
 import type { GeneratedProductVariantCardProps } from './types';
 import { getProductVariantAttributeValues } from './utils/productGeneration';
@@ -28,44 +29,71 @@ export const GeneratedProductVariantCard = ({
         <div className="grid gap-[var(--space-2)] lg:grid-cols-[1fr_1fr_0.9fr]">
           <div className="flex flex-col gap-[var(--space-2)]">
             <form.Field name={`productVariants[${variantIndex}].name` as const}>
-              {(field) => (
-                <TextField
-                  label="Product variant name"
-                  name={field.name}
-                  onBlur={field.handleBlur}
-                  onValueChange={field.handleChange}
-                  size="s"
-                  value={field.state.value}
-                />
-              )}
+              {(field) => {
+                const errorText = getFieldSubmitChangeErrorText(
+                  field.state.meta
+                );
+
+                return (
+                  <TextField
+                    errorText={errorText}
+                    invalid={Boolean(errorText)}
+                    label="Product variant name"
+                    name={field.name}
+                    onBlur={field.handleBlur}
+                    onValueChange={field.handleChange}
+                    required
+                    size="s"
+                    value={field.state.value}
+                  />
+                );
+              }}
             </form.Field>
             <form.Field
               name={`productVariants[${variantIndex}].barcode` as const}
             >
-              {(field) => (
-                <TextField
-                  label="Barcode"
-                  name={field.name}
-                  onBlur={field.handleBlur}
-                  onValueChange={field.handleChange}
-                  placeholder="Barcode"
-                  size="s"
-                  value={field.state.value}
-                />
-              )}
+              {(field) => {
+                const errorText = getFieldSubmitChangeErrorText(
+                  field.state.meta
+                );
+
+                return (
+                  <TextField
+                    errorText={errorText}
+                    invalid={Boolean(errorText)}
+                    label="Barcode"
+                    name={field.name}
+                    onBlur={field.handleBlur}
+                    onValueChange={field.handleChange}
+                    placeholder="Barcode"
+                    required
+                    size="s"
+                    value={field.state.value}
+                  />
+                );
+              }}
             </form.Field>
             <form.Field name={`productVariants[${variantIndex}].sku` as const}>
-              {(field) => (
-                <TextField
-                  label="SKU"
-                  name={field.name}
-                  onBlur={field.handleBlur}
-                  onValueChange={field.handleChange}
-                  placeholder="SKU"
-                  size="s"
-                  value={field.state.value}
-                />
-              )}
+              {(field) => {
+                const errorText = getFieldSubmitChangeErrorText(
+                  field.state.meta
+                );
+
+                return (
+                  <TextField
+                    errorText={errorText}
+                    invalid={Boolean(errorText)}
+                    label="SKU"
+                    name={field.name}
+                    onBlur={field.handleBlur}
+                    onValueChange={field.handleChange}
+                    placeholder="SKU"
+                    required
+                    size="s"
+                    value={field.state.value}
+                  />
+                );
+              }}
             </form.Field>
           </div>
 

@@ -241,12 +241,18 @@ describe('CreateProduct', () => {
     );
 
     await user.click(removeBlueVariantAttribute);
+    const createButton = screen.getByRole('button', { name: 'Create product' });
+
+    expect(createButton).toBeDisabled();
+
     await user.type(screen.getByRole('textbox', { name: 'SKU' }), 'SHOE-BLUE');
     await user.type(
       screen.getByRole('textbox', { name: 'Barcode' }),
       'barcode-1'
     );
-    await user.click(screen.getByRole('button', { name: 'Create product' }));
+    expect(createButton).toBeEnabled();
+
+    await user.click(createButton);
 
     await waitFor(() =>
       expect(createProductMock).toHaveBeenCalledWith({

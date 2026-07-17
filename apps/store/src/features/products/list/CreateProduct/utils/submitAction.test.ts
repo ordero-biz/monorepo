@@ -41,10 +41,10 @@ describe('submitCreateProduct', () => {
         productVariants: [
           {
             attributeValueIds: [71],
-            barcode: 'barcode-1',
+            barcode: ' barcode-1 ',
             description: 'Blue variant',
             name: ' Running Shoes Blue ',
-            sku: 'SHOE-BLUE',
+            sku: ' SHOE-BLUE ',
           },
         ],
       })

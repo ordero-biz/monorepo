@@ -61,15 +61,19 @@ export const CreateProduct = () => {
       />
       <form.Subscribe
         selector={(state) =>
-          [state.values.productVariants, state.isSubmitting] as const
+          [
+            state.values.productVariants,
+            state.isSubmitting,
+            state.canSubmit,
+          ] as const
         }
       >
-        {([productVariants, isSubmitting]) =>
+        {([productVariants, isSubmitting, canSubmit]) =>
           productVariants.length > 0 ? (
             <div className="flex justify-end">
               <Button
                 color="primary"
-                disabled={isSubmitting}
+                disabled={isSubmitting || !canSubmit}
                 size="l"
                 type="submit"
               >
