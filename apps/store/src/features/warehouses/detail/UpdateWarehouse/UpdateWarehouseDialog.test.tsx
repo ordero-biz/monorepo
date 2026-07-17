@@ -115,6 +115,53 @@ describe('UpdateWarehouseDialog', () => {
     );
   });
 
+  it('discards unsaved changes after closing and reopening', async () => {
+    const user = userEvent.setup();
+    const { onOpenChange, renderResult } = setup();
+    const dialog = screen.getByRole('dialog', { name: 'Edit warehouse' });
+    const nameField = within(dialog).getByRole('textbox', { name: 'Name' });
+
+    await user.clear(nameField);
+    await user.type(nameField, 'Unsaved warehouse name');
+    await user.click(within(dialog).getByRole('button', { name: 'Close' }));
+
+    expect(onOpenChange).toHaveBeenCalledWith(false);
+
+    renderResult.rerender({ open: false });
+    renderResult.rerender({ open: true });
+
+    expect(screen.getByRole('textbox', { name: 'Name' })).toHaveValue(
+      'Main Warehouse'
+    );
+  });
+
+  it('disables another save while the update is in flight', async () => {
+    let resolveUpdate:
+      | ((value: Awaited<ReturnType<typeof updateWarehouse>>) => void)
+      | undefined;
+
+    updateWarehouseMock.mockReturnValue(
+      new Promise((resolve) => {
+        resolveUpdate = resolve;
+      })
+    );
+    const user = userEvent.setup();
+
+    setup();
+
+    const dialog = screen.getByRole('dialog', { name: 'Edit warehouse' });
+    const saveButton = within(dialog).getByRole('button', { name: 'Save' });
+
+    await user.click(saveButton);
+
+    expect(saveButton).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Saving...' })).toBeVisible();
+
+    resolveUpdate?.({ ok: true, data: warehouse });
+
+    await screen.findByRole('button', { name: 'Save' });
+  });
+
   it('shows backend field errors and keeps the dialog open', async () => {
     updateWarehouseMock.mockResolvedValue({
       ok: false,
@@ -127,11 +174,18 @@ describe('UpdateWarehouseDialog', () => {
     const user = userEvent.setup();
     const { onOpenChange, onUpdated } = setup();
     const dialog = screen.getByRole('dialog', { name: 'Edit warehouse' });
+    const codeField = within(dialog).getByRole('textbox', { name: 'Code' });
 
     await user.click(within(dialog).getByRole('button', { name: 'Save' }));
 
     expect(
       await within(dialog).findByText('Warehouse code already exists.')
+    ).toBeVisible();
+    expect(codeField).toHaveAccessibleDescription(
+      'Warehouse code already exists.'
+    );
+    expect(
+      await screen.findByRole('dialog', { name: 'Warehouse update failed.' })
     ).toBeVisible();
     expect(onOpenChange).not.toHaveBeenCalledWith(false);
     expect(onUpdated).not.toHaveBeenCalled();
