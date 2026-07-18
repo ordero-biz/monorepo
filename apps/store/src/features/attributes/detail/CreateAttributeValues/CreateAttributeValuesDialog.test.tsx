@@ -60,6 +60,38 @@ describe('CreateAttributeValuesDialog', () => {
     expect(saveButton).toBeEnabled();
   });
 
+  it('reveals an empty value error on blur and clears it while the user corrects the value', async () => {
+    const user = userEvent.setup();
+
+    setup();
+
+    const dialog = screen.getByRole('dialog', {
+      name: 'Add attribute values',
+    });
+    const valueField = within(dialog).getByRole('textbox', {
+      name: 'Attribute value 1',
+    });
+
+    await user.click(valueField);
+    await user.tab();
+
+    expect(
+      await within(dialog).findByText(
+        'Enter an attribute value or remove this empty field'
+      )
+    ).toBeVisible();
+
+    await user.type(valueField, 'Green');
+
+    await waitFor(() =>
+      expect(
+        within(dialog).queryByText(
+          'Enter an attribute value or remove this empty field'
+        )
+      ).not.toBeInTheDocument()
+    );
+  });
+
   it('adds values and refreshes the attribute values query', async () => {
     createAttributeValuesMock.mockResolvedValue({
       ok: true,
@@ -177,7 +209,7 @@ describe('CreateAttributeValuesDialog', () => {
     expect(createAttributeValuesMock).not.toHaveBeenCalled();
   });
 
-  it('prevents another add while the request is in flight', async () => {
+  it('prevents value edits while the request is in flight', async () => {
     let resolveCreate:
       | ((value: Awaited<ReturnType<typeof createAttributeValues>>) => void)
       | undefined;
@@ -204,6 +236,13 @@ describe('CreateAttributeValuesDialog', () => {
     expect(createAttributeValuesMock).toHaveBeenCalledTimes(1);
     expect(
       within(dialog).getByRole('button', { name: 'Saving...' })
+    ).toBeDisabled();
+    expect(valueField).toBeDisabled();
+    expect(
+      within(dialog).getByRole('button', { name: '+ Add another value' })
+    ).toBeDisabled();
+    expect(
+      within(dialog).getByRole('button', { name: 'Close' })
     ).toBeDisabled();
 
     resolveCreate?.({
