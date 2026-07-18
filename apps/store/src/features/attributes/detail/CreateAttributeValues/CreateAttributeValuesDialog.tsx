@@ -128,9 +128,12 @@ export const CreateAttributeValuesDialog = ({
                                           name={subField.name}
                                           onBlur={() => {
                                             subField.handleBlur();
-                                            subField.handleChange(
-                                              subField.state.value
-                                            );
+
+                                            if (attributeValue) {
+                                              subField.handleChange(
+                                                subField.state.value
+                                              );
+                                            }
                                           }}
                                           onValueChange={subField.handleChange}
                                           size="s"
@@ -154,10 +157,13 @@ export const CreateAttributeValuesDialog = ({
                                           </div>
                                         )}
                                       </div>
-                                      {isLastItem && (
-                                        <Button
-                                          disabled={isSubmitting}
-                                          onClick={() => {
+                                        {isLastItem && (
+                                          <Button
+                                            disabled={
+                                              isSubmitting ||
+                                              !attributeValue.trim()
+                                            }
+                                            onClick={() => {
                                             const newAttributeValue =
                                               createAttributeValue();
 

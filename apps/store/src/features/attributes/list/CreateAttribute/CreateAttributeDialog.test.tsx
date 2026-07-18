@@ -86,15 +86,24 @@ describe('CreateAttributeDialog', () => {
     expect(
       within(dialog).queryByRole('textbox', { name: 'Attribute value 2' })
     ).not.toBeInTheDocument();
+    expect(addAnotherValueButton).toBeDisabled();
+
+    await user.type(firstValueField, 'Green');
+
+    expect(addAnotherValueButton).toBeEnabled();
 
     await user.click(addAnotherValueButton);
 
     const secondValueField = within(dialog).getByRole('textbox', {
       name: 'Attribute value 2',
     });
+    const nextAddAnotherValueButton = within(dialog).getByRole('button', {
+      name: '+ Add another value',
+    });
 
     expect(secondValueField).toHaveValue('');
     await waitFor(() => expect(secondValueField).toHaveFocus());
+    expect(nextAddAnotherValueButton).toBeDisabled();
     expect(within(dialog).getByText('Attribute values')).toBeVisible();
     expect(
       within(dialog).getByRole('button', { name: 'Remove attribute value 1' })
@@ -110,35 +119,6 @@ describe('CreateAttributeDialog', () => {
     expect(
       within(dialog).getByRole('textbox', { name: 'Attribute value 1' })
     ).toHaveValue('');
-  });
-
-  it('requires an added attribute value to be completed or removed before creation', async () => {
-    const user = userEvent.setup();
-
-    setup();
-
-    const dialog = screen.getByRole('dialog', { name: 'Add new attribute' });
-
-    await user.type(
-      within(dialog).getByRole('textbox', { name: 'Name' }),
-      'Material'
-    );
-    await user.click(
-      within(dialog).getByRole('button', { name: '+ Add another value' })
-    );
-    await user.click(within(dialog).getByRole('button', { name: 'Add' }));
-
-    expect(
-      await within(dialog).findByText(
-        'Enter an attribute value or remove this empty field'
-      )
-    ).toBeVisible();
-    expect(
-      within(dialog).getByRole('textbox', { name: 'Attribute value 2' })
-    ).toHaveAccessibleDescription(
-      'Enter an attribute value or remove this empty field'
-    );
-    expect(createAttributeMock).not.toHaveBeenCalled();
   });
 
   it('creates the attribute, invalidates the list, and navigates to its detail page', async () => {
@@ -195,6 +175,47 @@ describe('CreateAttributeDialog', () => {
     );
     expect(onOpenChangeMock).toHaveBeenCalledWith(false);
     expect(routerPushMock).toHaveBeenCalledWith(getAttributeDetailRoute(1));
+  });
+
+  it('ignores an empty added value when creating an attribute', async () => {
+    createAttributeMock.mockResolvedValue({
+      ok: true,
+      data: {
+        id: 1,
+        name: 'Material',
+        sortOrder: 10,
+        createdAt: '2026-05-26T20:55:51.542Z',
+      },
+    });
+    const user = userEvent.setup();
+
+    setup();
+
+    const dialog = screen.getByRole('dialog', { name: 'Add new attribute' });
+
+    await user.type(
+      within(dialog).getByRole('textbox', { name: 'Name' }),
+      'Material'
+    );
+    await user.type(
+      within(dialog).getByRole('textbox', { name: 'Attribute value 1' }),
+      'Green'
+    );
+    await user.click(
+      within(dialog).getByRole('button', { name: '+ Add another value' })
+    );
+    await user.click(within(dialog).getByRole('button', { name: 'Add' }));
+
+    expect(createAttributeMock).toHaveBeenCalledWith({
+      name: 'Material',
+      sortOrder: 0,
+      attributeValues: [
+        {
+          name: 'Green',
+          sortOrder: 0,
+        },
+      ],
+    });
   });
 
   it('prevents another creation while the request is in flight', async () => {

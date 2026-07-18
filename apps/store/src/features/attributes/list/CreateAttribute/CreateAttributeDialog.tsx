@@ -17,7 +17,6 @@ import {
 } from './utils/fields';
 import {
   validateAttributeName,
-  validateAttributeValueName,
 } from './utils/validations';
 
 export const CreateAttributeDialog = ({
@@ -131,27 +130,12 @@ export const CreateAttributeDialog = ({
                                 const fieldId =
                                   attributeValue?.id ??
                                   getAttributeValueFieldId(index);
-                                const isInitialAttributeValue =
-                                  fieldId ===
-                                  getAttributeValueFieldId(
-                                    INITIAL_ATTRIBUTE_VALUE_FIELD_INDEX
-                                  );
 
                                 return (
                                   <form.Field
                                     key={fieldId}
                                     name={
                                       `attributeValues[${index}].value` as const
-                                    }
-                                    validators={
-                                      isInitialAttributeValue
-                                        ? undefined
-                                        : {
-                                            onChange:
-                                              validateAttributeValueName,
-                                            onSubmit:
-                                              validateAttributeValueName,
-                                          }
                                     }
                                   >
                                     {(subField) => {
@@ -177,12 +161,7 @@ export const CreateAttributeDialog = ({
                                                   : undefined
                                               }
                                               name={subField.name}
-                                              onBlur={() => {
-                                                subField.handleBlur();
-                                                subField.handleChange(
-                                                  subField.state.value
-                                                );
-                                              }}
+                                              onBlur={subField.handleBlur}
                                               onValueChange={
                                                 subField.handleChange
                                               }
@@ -209,7 +188,10 @@ export const CreateAttributeDialog = ({
                                           </div>
                                           {isLastItem && (
                                             <Button
-                                              disabled={isSubmitting}
+                                              disabled={
+                                                isSubmitting ||
+                                                !attributeValue.trim()
+                                              }
                                               onClick={() => {
                                                 const newAttributeValue =
                                                   createAttributeValue();

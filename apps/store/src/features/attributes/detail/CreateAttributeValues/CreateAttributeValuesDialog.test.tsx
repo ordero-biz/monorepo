@@ -47,20 +47,21 @@ describe('CreateAttributeValuesDialog', () => {
     });
     const saveButton = within(dialog).getByRole('button', { name: 'Save' });
 
-    expect(addAnotherValueButton).toBeEnabled();
     expect(
       within(dialog).queryByRole('button', {
         name: 'Remove attribute value 1',
       })
     ).not.toBeInTheDocument();
     expect(saveButton).toBeDisabled();
+    expect(addAnotherValueButton).toBeDisabled();
 
     await user.type(valueField, 'Green');
 
     expect(saveButton).toBeEnabled();
+    expect(addAnotherValueButton).toBeEnabled();
   });
 
-  it('reveals an empty value error on blur and clears it while the user corrects the value', async () => {
+  it('does not validate an empty value on blur', async () => {
     const user = userEvent.setup();
 
     setup();
@@ -76,20 +77,10 @@ describe('CreateAttributeValuesDialog', () => {
     await user.tab();
 
     expect(
-      await within(dialog).findByText(
+      within(dialog).queryByText(
         'Enter an attribute value or remove this empty field'
       )
-    ).toBeVisible();
-
-    await user.type(valueField, 'Green');
-
-    await waitFor(() =>
-      expect(
-        within(dialog).queryByText(
-          'Enter an attribute value or remove this empty field'
-        )
-      ).not.toBeInTheDocument()
-    );
+    ).not.toBeInTheDocument();
   });
 
   it('adds values and refreshes the attribute values query', async () => {
@@ -154,8 +145,12 @@ describe('CreateAttributeValuesDialog', () => {
     const secondValueField = within(dialog).getByRole('textbox', {
       name: 'Attribute value 2',
     });
+    const nextAddAnotherValueButton = within(dialog).getByRole('button', {
+      name: '+ Add another value',
+    });
 
     await waitFor(() => expect(secondValueField).toHaveFocus());
+    expect(nextAddAnotherValueButton).toBeDisabled();
 
     await user.type(secondValueField, 'Blue');
     await user.click(
@@ -170,7 +165,7 @@ describe('CreateAttributeValuesDialog', () => {
     ).not.toBeInTheDocument();
   });
 
-  it('shows a required error beside every empty value after submit', async () => {
+  it('shows a required error beside an empty added value after submit', async () => {
     const user = userEvent.setup();
 
     setup();
@@ -186,23 +181,15 @@ describe('CreateAttributeValuesDialog', () => {
     await user.click(
       within(dialog).getByRole('button', { name: '+ Add another value' })
     );
-    await user.click(
-      within(dialog).getByRole('button', { name: '+ Add another value' })
-    );
     await user.click(within(dialog).getByRole('button', { name: 'Save' }));
 
     expect(
       await within(dialog).findAllByText(
         'Enter an attribute value or remove this empty field'
       )
-    ).toHaveLength(2);
+    ).toHaveLength(1);
     expect(
       within(dialog).getByRole('textbox', { name: 'Attribute value 2' })
-    ).toHaveAccessibleDescription(
-      'Enter an attribute value or remove this empty field'
-    );
-    expect(
-      within(dialog).getByRole('textbox', { name: 'Attribute value 3' })
     ).toHaveAccessibleDescription(
       'Enter an attribute value or remove this empty field'
     );

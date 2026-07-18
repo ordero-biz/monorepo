@@ -6,11 +6,6 @@ export const attributeNameSchema = z
   .trim()
   .min(1, 'Attribute name is required');
 
-export const attributeValueNameSchema = z
-  .string()
-  .trim()
-  .min(1, 'Enter an attribute value or remove this empty field');
-
 export const attributeValueSchema = z.object({
   id: z.string(),
   value: z.string(),
@@ -26,14 +21,6 @@ export type CreateAttributeFormValues = z.infer<typeof createAttributeSchema>;
 
 export const validateAttributeName = ({ value }: ValidationArgs<string>) => {
   const result = attributeNameSchema.safeParse(value);
-
-  return result.success ? undefined : result.error.issues[0]?.message;
-};
-
-export const validateAttributeValueName = ({
-  value,
-}: ValidationArgs<string>) => {
-  const result = attributeValueNameSchema.safeParse(value);
 
   return result.success ? undefined : result.error.issues[0]?.message;
 };
