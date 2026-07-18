@@ -7,6 +7,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table';
+import { cva } from 'class-variance-authority';
 import type { CSSProperties } from 'react';
 import { useState } from 'react';
 import { TablePagination } from '@/ui/components/TablePagination';
@@ -18,6 +19,18 @@ import type {
   DataTableRowSelectionState,
   DataTableSortingState,
 } from './types';
+
+const dataTableCellVariants = cva('flex items-center text-card-foreground', {
+  variants: {
+    variant: {
+      actions: 'px-[var(--spacing-2)]',
+      default: 'p-[var(--spacing-2)]',
+    },
+  },
+  defaultVariants: {
+    variant: 'default',
+  },
+});
 
 const tableShellStyle = {
   boxShadow:
@@ -85,10 +98,8 @@ const getColumnStyle = ({
   } satisfies CSSProperties;
 };
 
-export const DataTableCell = ({ children }: DataTableCellProps) => (
-  <div className="flex items-center p-[var(--spacing-2)] text-card-foreground">
-    {children}
-  </div>
+export const DataTableCell = ({ children, variant }: DataTableCellProps) => (
+  <div className={dataTableCellVariants({ variant })}>{children}</div>
 );
 
 export const DataTable = <TData,>({

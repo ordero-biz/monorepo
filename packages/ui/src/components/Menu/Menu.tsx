@@ -76,6 +76,7 @@ export const MenuTrigger = ({
 }: MenuTriggerProps) => {
   const iconButtonColor = color ?? 'default';
   const iconButtonSize = size ?? 'm';
+  const buttonSize = size === 'xs' ? undefined : size;
 
   return (
     <MenuPrimitive.Trigger
@@ -124,7 +125,7 @@ export const MenuTrigger = ({
             onMouseDown={props.onMouseDown}
             onPointerDown={props.onPointerDown}
             ref={props.ref}
-            size={size}
+            size={buttonSize}
             startIcon={startIcon}
             title={title}
             variant={variant}

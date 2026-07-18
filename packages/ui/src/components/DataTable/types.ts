@@ -15,6 +15,8 @@ export type DataTableColumnAlignment = 'left' | 'center' | 'right';
 
 export type DataTableColumnWrap = 'wrap' | 'nowrap';
 
+export type DataTableCellVariant = 'actions' | 'default';
+
 export type DataTableColumnMeta = {
   align?: DataTableColumnAlignment;
   minWidth?: number | string;
@@ -49,6 +51,7 @@ export type DataTableSelectionCellProps<TData extends RowData> = {
 
 export type DataTableCellProps = {
   children: ReactNode;
+  variant?: DataTableCellVariant;
 };
 
 export type DataTableRowSelectionState = RowSelectionState;

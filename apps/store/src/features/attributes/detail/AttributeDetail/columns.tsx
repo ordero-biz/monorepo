@@ -28,12 +28,12 @@ export const getColumns = ({
   },
   {
     cell: ({ row }) => (
-      <DataTableCell>
+      <DataTableCell variant="actions">
         <Menu.Root>
           <Menu.Trigger
             aria-label={`Actions for ${row.original.name}`}
             appearance="iconButton"
-            size="s"
+            size="xs"
             title={`Actions for ${row.original.name}`}
           >
             <EllipsisVertical aria-hidden="true" />
