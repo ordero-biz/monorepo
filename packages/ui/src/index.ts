@@ -115,6 +115,7 @@ export type {
   IconButtonColor,
   IconButtonProps,
   IconButtonSize,
+  IconButtonVariant,
 } from './components/IconButton';
 export { IconButton } from './components/IconButton';
 export type {

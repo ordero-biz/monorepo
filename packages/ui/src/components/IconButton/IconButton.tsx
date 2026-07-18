@@ -10,13 +10,14 @@ const iconButtonVariants = cva(
   {
     variants: {
       color: {
-        default: 'text-[var(--grey-600)] hover:bg-grey-8',
-        inherit: 'text-foreground hover:bg-grey-8',
-        primary: 'text-primary hover:bg-primary-8',
-        info: 'text-info-main hover:bg-info-8',
-        success: 'text-success-main hover:bg-success-8',
-        warning: 'text-warning-main hover:bg-warning-8',
-        error: 'text-error-main hover:bg-error-8',
+        default: '',
+        inherit: '',
+        primary: '',
+        secondary: '',
+        info: '',
+        success: '',
+        warning: '',
+        error: '',
       },
       size: {
         xs: 'size-[var(--icon-button-xs-size)]',
@@ -24,10 +25,104 @@ const iconButtonVariants = cva(
         m: 'size-[var(--icon-button-md-size)]',
         l: 'size-[var(--icon-button-lg-size)]',
       },
+      variant: {
+        soft: '',
+        text: '',
+      },
     },
+    compoundVariants: [
+      {
+        color: 'default',
+        variant: 'text',
+        class: 'text-[var(--grey-600)] hover:bg-grey-8',
+      },
+      {
+        color: 'inherit',
+        variant: 'text',
+        class: 'text-foreground hover:bg-grey-8',
+      },
+      {
+        color: 'primary',
+        variant: 'text',
+        class: 'text-primary hover:bg-primary-8',
+      },
+      {
+        color: 'secondary',
+        variant: 'text',
+        class: 'text-[var(--secondary-main)] hover:bg-secondary-8',
+      },
+      {
+        color: 'info',
+        variant: 'text',
+        class: 'text-info-main hover:bg-info-8',
+      },
+      {
+        color: 'success',
+        variant: 'text',
+        class: 'text-success-main hover:bg-success-8',
+      },
+      {
+        color: 'warning',
+        variant: 'text',
+        class: 'text-warning-main hover:bg-warning-8',
+      },
+      {
+        color: 'error',
+        variant: 'text',
+        class: 'text-error-main hover:bg-error-8',
+      },
+      {
+        color: 'default',
+        variant: 'soft',
+        class:
+          'bg-grey-8 text-[var(--grey-800)] hover:bg-grey-16 disabled:bg-grey-20',
+      },
+      {
+        color: 'inherit',
+        variant: 'soft',
+        class: 'bg-grey-8 text-foreground hover:bg-grey-16 disabled:bg-grey-20',
+      },
+      {
+        color: 'primary',
+        variant: 'soft',
+        class:
+          'bg-primary-8 text-[var(--primary-dark)] hover:bg-primary-16 disabled:bg-grey-20',
+      },
+      {
+        color: 'secondary',
+        variant: 'soft',
+        class:
+          'bg-secondary-8 text-[var(--secondary-dark)] hover:bg-secondary-16 disabled:bg-grey-20',
+      },
+      {
+        color: 'info',
+        variant: 'soft',
+        class:
+          'bg-info-8 text-[var(--info-dark)] hover:bg-info-16 disabled:bg-grey-20',
+      },
+      {
+        color: 'success',
+        variant: 'soft',
+        class:
+          'bg-success-8 text-[var(--success-darker)] hover:bg-success-16 disabled:bg-grey-20',
+      },
+      {
+        color: 'warning',
+        variant: 'soft',
+        class:
+          'bg-warning-8 text-[var(--warning-darker)] hover:bg-warning-16 disabled:bg-grey-20',
+      },
+      {
+        color: 'error',
+        variant: 'soft',
+        class:
+          'bg-error-8 text-[var(--error-dark)] hover:bg-error-16 disabled:bg-grey-20',
+      },
+    ],
     defaultVariants: {
       color: 'default',
       size: 'm',
+      variant: 'text',
     },
   }
 );
@@ -63,6 +158,7 @@ export const IconButton = ({
   tabIndex,
   title,
   type = 'button',
+  variant,
 }: IconButtonProps) => {
   const iconClassName = iconSizeClassNames[size ?? 'm'];
 
@@ -75,7 +171,7 @@ export const IconButton = ({
       aria-haspopup={ariaHasPopup}
       aria-label={ariaLabel}
       aria-labelledby={ariaLabelledBy}
-      className={cn(iconButtonVariants({ color, size }))}
+      className={cn(iconButtonVariants({ color, size, variant }))}
       data-slot="icon-button"
       disabled={disabled}
       form={form}
