@@ -36,6 +36,30 @@ export const getAttributeValues = (attributeId: string | number) =>
     }
   );
 
+type CreateAttributeValuesInput = {
+  attributeId: string | number;
+  attributeValues: {
+    name: string;
+    sortOrder: number;
+  }[];
+};
+
+export const createAttributeValues = ({
+  attributeId,
+  attributeValues,
+}: CreateAttributeValuesInput) =>
+  apiFetch<AttributeValue[]>(
+    tokenizePath(CLIENT_BACKEND_PATHS.attributeValuesBulk, {
+      id: attributeId,
+    }),
+    {
+      method: 'POST',
+      body: {
+        attributeValues,
+      },
+    }
+  );
+
 type CreateAttributeInput = {
   name: string;
   sortOrder: number;
