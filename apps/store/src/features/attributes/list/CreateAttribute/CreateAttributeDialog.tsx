@@ -1,10 +1,10 @@
 'use client';
 
-import { Button, Dialog, IconButton, TextField, Typography } from '@ordero/ui';
+import { Button, Dialog, IconButton, TextField } from '@ordero/ui';
 import { useQueryClient } from '@tanstack/react-query';
-import { Minus, Plus } from 'lucide-react';
+import { Minus } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { getAttributeDetailRoute } from '@/lib/client/routes';
 import { attributesQueryKeys } from '@/lib/query/attributes/attributesQueryKeys';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
@@ -26,6 +26,8 @@ export const CreateAttributeDialog = ({
   const nextAttributeValueFieldIndex = useRef(
     INITIAL_ATTRIBUTE_VALUE_FIELD_INDEX + 1
   );
+  const [autoFocusAttributeValueId, setAutoFocusAttributeValueId] =
+    useState<string>();
 
   const { form } = useCreateAttributeForm({
     onCreated: async (attributeId) => {
@@ -41,9 +43,22 @@ export const CreateAttributeDialog = ({
     onOpenChange(nextOpen);
 
     if (!nextOpen) {
+      setAutoFocusAttributeValueId(undefined);
       form.reset();
     }
   };
+
+  useEffect(() => {
+    if (!autoFocusAttributeValueId) {
+      return;
+    }
+
+    const timeoutId = setTimeout(() => {
+      document.getElementById(autoFocusAttributeValueId)?.focus();
+    });
+
+    return () => clearTimeout(timeoutId);
+  }, [autoFocusAttributeValueId]);
 
   const createAttributeValue = () => {
     const attributeValue = getEmptyAttributeValueField(
@@ -101,113 +116,125 @@ export const CreateAttributeDialog = ({
                     }}
                   </form.Field>
 
-                  <form.Field name="attributeValues" mode="array">
-                    {(field) => (
-                      <section className="flex flex-col gap-[var(--space-1-5)] rounded-[var(--radius)] bg-[var(--color-grey-8)] p-[var(--space-1-25)]">
-                        <div className="flex flex-col gap-[var(--space-0-5)]">
-                          <Typography variant="body1">
-                            Attribute values
-                          </Typography>
+                  <form.Subscribe selector={(state) => state.isSubmitting}>
+                    {(isSubmitting) => (
+                      <form.Field name="attributeValues" mode="array">
+                        {(field) => (
+                          <div className="flex flex-col gap-[var(--space-0-5)]">
+                            {field.state.value.map(
+                              (attributeValue, index) => {
+                                const isLastItem =
+                                  index === field.state.value.length - 1;
+                                const fieldId =
+                                  attributeValue?.id ??
+                                  getAttributeValueFieldId(index);
 
-                          {field.state.value.map((attributeValue, index) => {
-                            const isLastItem =
-                              index === field.state.value.length - 1;
-                            const fieldId =
-                              attributeValue?.id ??
-                              getAttributeValueFieldId(index);
+                                return (
+                                  <form.Field
+                                    key={fieldId}
+                                    name={
+                                      `attributeValues[${index}].value` as const
+                                    }
+                                  >
+                                    {(subField) => {
+                                      const fieldError =
+                                        getFieldSubmitChangeErrorText(
+                                          subField.state.meta
+                                        );
+                                      const attributeValue =
+                                        subField.state.value ?? '';
 
-                            return (
-                              <div
-                                className="flex items-start gap-[var(--space-0-5)]"
-                                key={fieldId}
-                              >
-                                <form.Field
-                                  name={
-                                    `attributeValues[${index}].value` as const
-                                  }
-                                >
-                                  {(subField) => {
-                                    const fieldError =
-                                      subField.state.meta.errorMap.onSubmit;
-                                    const attributeValue =
-                                      subField.state.value ?? '';
-                                    const isAddButtonDisabled =
-                                      isLastItem && !attributeValue.trim();
-
-                                    return (
-                                      <TextField
-                                        aria-label={`Attribute value ${index + 1}`}
-                                        endAdornment={
-                                          <IconButton
-                                            aria-label={
-                                              isLastItem
-                                                ? 'Add attribute value'
-                                                : `Remove attribute value ${index + 1}`
-                                            }
-                                            color="primary"
-                                            disabled={isAddButtonDisabled}
-                                            onClick={() => {
-                                              if (isLastItem) {
-                                                if (!attributeValue.trim()) {
-                                                  return;
-                                                }
-
-                                                field.pushValue(
-                                                  createAttributeValue()
+                                      return (
+                                        <>
+                                          <div className="flex items-start gap-[var(--space-0-5)]">
+                                            <TextField
+                                              aria-label={`Attribute value ${index + 1}`}
+                                              disabled={isSubmitting}
+                                              errorText={fieldError}
+                                              id={fieldId}
+                                              invalid={Boolean(fieldError)}
+                                              name={subField.name}
+                                              onBlur={() => {
+                                                subField.handleBlur();
+                                                subField.handleChange(
+                                                  subField.state.value
                                                 );
-
-                                                return;
+                                              }}
+                                              onValueChange={
+                                                subField.handleChange
                                               }
-
-                                              field.removeValue(index);
-                                            }}
-                                            size="s"
-                                            type="button"
-                                          >
-                                            {isLastItem ? (
-                                              <Plus aria-hidden="true" />
-                                            ) : (
-                                              <Minus aria-hidden="true" />
+                                              size="s"
+                                              value={attributeValue}
+                                            />
+                                            {field.state.value.length > 1 && (
+                                              <div className="flex h-[var(--textfield-outlined-sm-height)] items-center">
+                                                <IconButton
+                                                  aria-label={`Remove attribute value ${index + 1}`}
+                                                  color="default"
+                                                  disabled={isSubmitting}
+                                                  onClick={() =>
+                                                    field.removeValue(index)
+                                                  }
+                                                  size="xs"
+                                                  type="button"
+                                                  variant="soft"
+                                                >
+                                                  <Minus aria-hidden="true" />
+                                                </IconButton>
+                                              </div>
                                             )}
-                                          </IconButton>
-                                        }
-                                        errorText={fieldError}
-                                        invalid={Boolean(fieldError)}
-                                        name={subField.name}
-                                        onBlur={subField.handleBlur}
-                                        onValueChange={subField.handleChange}
-                                        size="s"
-                                        value={attributeValue}
-                                      />
-                                    );
-                                  }}
-                                </form.Field>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </section>
+                                          </div>
+                                          {isLastItem && (
+                                            <Button
+                                              disabled={isSubmitting}
+                                              onClick={() => {
+                                                const newAttributeValue =
+                                                  createAttributeValue();
+
+                                                setAutoFocusAttributeValueId(
+                                                  newAttributeValue.id
+                                                );
+                                                field.pushValue(
+                                                  newAttributeValue
+                                                );
+                                              }}
+                                              type="button"
+                                              variant="text"
+                                            >
+                                              + Add another value
+                                            </Button>
+                                          )}
+                                        </>
+                                      );
+                                    }}
+                                  </form.Field>
+                                );
+                              }
+                            )}
+                          </div>
+                        )}
+                      </form.Field>
                     )}
-                  </form.Field>
+                  </form.Subscribe>
                 </div>
               </Dialog.Content>
 
-              <Dialog.Footer>
-                <form.Subscribe
-                  selector={(state) =>
-                    [state.values.name, state.isSubmitting] as const
-                  }
-                >
-                  {([name, isSubmitting]) => (
+              <form.Subscribe
+                selector={(state) =>
+                  [state.values.name, state.isSubmitting] as const
+                }
+              >
+                {([name, isSubmitting]) => (
+                  <Dialog.Footer closeDisabled={isSubmitting}>
                     <Button
                       disabled={isSubmitting || !name.trim()}
                       type="submit"
                     >
                       {isSubmitting ? 'Adding...' : 'Add'}
                     </Button>
-                  )}
-                </form.Subscribe>
-              </Dialog.Footer>
+                  </Dialog.Footer>
+                )}
+              </form.Subscribe>
             </form>
           </Dialog.Popup>
         </Dialog.Viewport>

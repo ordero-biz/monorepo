@@ -69,14 +69,14 @@ describe('CreateAttributeDialog', () => {
     expect(createButton).toBeEnabled();
   });
 
-  it('adds and removes attribute value fields dynamically', async () => {
+  it('adds, focuses, and removes attribute value fields dynamically', async () => {
     const user = userEvent.setup();
 
     setup();
 
     const dialog = screen.getByRole('dialog', { name: 'Add new attribute' });
-    const addButton = within(dialog).getByRole('button', {
-      name: 'Add attribute value',
+    const addAnotherValueButton = within(dialog).getByRole('button', {
+      name: '+ Add another value',
     });
     const firstValueField = within(dialog).getByRole('textbox', {
       name: 'Attribute value 1',
@@ -86,14 +86,14 @@ describe('CreateAttributeDialog', () => {
       within(dialog).queryByRole('textbox', { name: 'Attribute value 2' })
     ).not.toBeInTheDocument();
 
-    await user.type(firstValueField, 'Green');
-    await user.click(addButton);
+    await user.click(addAnotherValueButton);
 
     const secondValueField = within(dialog).getByRole('textbox', {
       name: 'Attribute value 2',
     });
 
     expect(secondValueField).toHaveValue('');
+    await waitFor(() => expect(secondValueField).toHaveFocus());
     expect(
       within(dialog).getByRole('button', { name: 'Remove attribute value 1' })
     ).toBeVisible();
@@ -130,13 +130,13 @@ describe('CreateAttributeDialog', () => {
     const firstValueField = within(dialog).getByRole('textbox', {
       name: 'Attribute value 1',
     });
-    const addValueButton = within(dialog).getByRole('button', {
-      name: 'Add attribute value',
+    const addAnotherValueButton = within(dialog).getByRole('button', {
+      name: '+ Add another value',
     });
 
     await user.type(nameField, 'Material');
     await user.type(firstValueField, 'Green');
-    await user.click(addValueButton);
+    await user.click(addAnotherValueButton);
     await user.type(
       within(dialog).getByRole('textbox', { name: 'Attribute value 2' }),
       'Blue'
@@ -184,6 +184,12 @@ describe('CreateAttributeDialog', () => {
     const nameField = within(dialog).getByRole('textbox', {
       name: 'Name',
     });
+    const attributeValueField = within(dialog).getByRole('textbox', {
+      name: 'Attribute value 1',
+    });
+    const addAnotherValueButton = within(dialog).getByRole('button', {
+      name: '+ Add another value',
+    });
 
     await user.type(nameField, 'Material');
 
@@ -193,6 +199,11 @@ describe('CreateAttributeDialog', () => {
 
     expect(createButton).toBeDisabled();
     expect(screen.getByRole('button', { name: 'Adding...' })).toBeVisible();
+    expect(attributeValueField).toBeDisabled();
+    expect(addAnotherValueButton).toBeDisabled();
+    expect(
+      within(dialog).getByRole('button', { name: 'Close' })
+    ).toBeDisabled();
 
     resolveCreate?.({
       ok: true,
