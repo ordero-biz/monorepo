@@ -4,7 +4,7 @@ import type { ValidationArgs } from '@/lib/utils/form/validation/types';
 export const attributeValueNameSchema = z
   .string()
   .trim()
-  .min(1, 'Attribute value is required');
+  .min(1, 'Enter an attribute value or remove this empty field');
 
 export const attributeValueSchema = z.object({
   id: z.string(),
@@ -22,15 +22,10 @@ export type CreateAttributeValuesFormValues = z.infer<
   typeof createAttributeValuesSchema
 >;
 
-export const validateAttributeValues = ({
+export const validateAttributeValueName = ({
   value,
-}: ValidationArgs<AttributeValueFormValue[]>) => {
-  const hasAttributeValue = value.some(
-    (attributeValue) =>
-      attributeValueNameSchema.safeParse(attributeValue.value).success
-  );
+}: ValidationArgs<string>) => {
+  const result = attributeValueNameSchema.safeParse(value);
 
-  return hasAttributeValue
-    ? undefined
-    : 'At least one attribute value is required';
+  return result.success ? undefined : result.error.issues[0]?.message;
 };
