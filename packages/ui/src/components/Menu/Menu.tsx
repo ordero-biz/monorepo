@@ -6,8 +6,8 @@ import { Button } from '@/ui/components/Button';
 import { IconButton } from '@/ui/components/IconButton';
 import type {
   MenuItemProps,
-  MenuPortalProps,
   MenuPopupProps,
+  MenuPortalProps,
   MenuPositionerProps,
   MenuRootProps,
   MenuTriggerProps,
@@ -74,14 +74,14 @@ export const MenuTrigger = ({
   title,
   variant = 'outlined',
 }: MenuTriggerProps) => {
-  const iconButtonColor = color === 'secondary' ? 'default' : color;
+  const iconButtonColor = color ?? 'default';
   const iconButtonSize = size ?? 'm';
 
   return (
     <MenuPrimitive.Trigger
       disabled={disabled}
       id={id}
-      render={(props) =>
+      render={(props, state) =>
         appearance === 'iconButton' ? (
           <IconButton
             aria-controls={props['aria-controls']}
@@ -91,7 +91,7 @@ export const MenuTrigger = ({
             aria-label={ariaLabel ?? props['aria-label']}
             aria-labelledby={props['aria-labelledby']}
             color={iconButtonColor}
-            disabled={props.disabled}
+            disabled={state.disabled}
             id={id}
             onBlur={props.onBlur}
             onClick={props.onClick}
@@ -114,7 +114,7 @@ export const MenuTrigger = ({
             aria-label={ariaLabel ?? props['aria-label']}
             aria-labelledby={props['aria-labelledby']}
             color={color}
-            disabled={props.disabled}
+            disabled={state.disabled}
             endIcon={endIcon}
             id={id}
             onBlur={props.onBlur}
@@ -150,20 +150,12 @@ export const MenuPositioner = ({
   side = 'bottom',
   sideOffset = 4,
 }: MenuPositionerProps) => (
-  <MenuPrimitive.Positioner
-    align={align}
-    side={side}
-    sideOffset={sideOffset}
-  >
+  <MenuPrimitive.Positioner align={align} side={side} sideOffset={sideOffset}>
     {children}
   </MenuPrimitive.Positioner>
 );
 
-export const MenuPopup = ({
-  children,
-  id,
-  maxHeight,
-}: MenuPopupProps) => {
+export const MenuPopup = ({ children, id, maxHeight }: MenuPopupProps) => {
   const popupMaxHeight =
     maxHeight === undefined ? undefined : getPopupMaxHeight(maxHeight);
 
