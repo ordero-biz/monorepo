@@ -12,12 +12,15 @@ export type IconButtonColor =
   | 'default'
   | 'inherit'
   | 'primary'
+  | 'secondary'
   | 'info'
   | 'success'
   | 'warning'
   | 'error';
 
 export type IconButtonSize = 'xs' | 's' | 'm' | 'l';
+
+export type IconButtonVariant = 'text' | 'soft';
 
 export type IconButtonProps = {
   'aria-controls'?: AriaAttributes['aria-controls'];
@@ -43,4 +46,5 @@ export type IconButtonProps = {
   tabIndex?: number;
   title?: string;
   type?: 'button' | 'reset' | 'submit';
+  variant?: IconButtonVariant;
 };

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { EllipsisVertical } from 'lucide-react';
-import { Menu } from '@/ui/components/Menu';
+import { Menu, type MenuPopupProps } from '@/ui/components/Menu';
 
 const menuItems = [
   'Item 1',
@@ -25,7 +25,12 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-const renderMenu = ({ defaultOpen, maxHeight }: { defaultOpen?: boolean; maxHeight?: string }) => (
+type RenderMenuArgs = {
+  defaultOpen?: boolean;
+  maxHeight?: MenuPopupProps['maxHeight'];
+};
+
+const renderMenu = ({ defaultOpen, maxHeight }: RenderMenuArgs) => (
   <Menu.Root defaultOpen={defaultOpen}>
     <Menu.Trigger>Open menu</Menu.Trigger>
     <Menu.Portal>
@@ -56,6 +61,29 @@ export const IconButtonTrigger: Story = {
       </Menu.Trigger>
       <Menu.Portal>
         <Menu.Positioner align="end">
+          <Menu.Popup>
+            <Menu.Item>Edit</Menu.Item>
+            <Menu.Item>Duplicate</Menu.Item>
+            <Menu.Item>Delete</Menu.Item>
+          </Menu.Popup>
+        </Menu.Positioner>
+      </Menu.Portal>
+    </Menu.Root>
+  ),
+};
+
+export const SecondaryIconButtonTrigger: Story = {
+  render: () => (
+    <Menu.Root>
+      <Menu.Trigger
+        appearance='iconButton'
+        aria-label='More secondary actions'
+        color='secondary'
+      >
+        <EllipsisVertical aria-hidden='true' />
+      </Menu.Trigger>
+      <Menu.Portal>
+        <Menu.Positioner align='end'>
           <Menu.Popup>
             <Menu.Item>Edit</Menu.Item>
             <Menu.Item>Duplicate</Menu.Item>
