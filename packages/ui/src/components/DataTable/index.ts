@@ -4,6 +4,7 @@ export { DataTableSelectionCell } from './DataTableSelectionCell';
 export { DataTableSelectionColumnHeader } from './DataTableSelectionColumnHeader';
 export type {
   DataTableCellProps,
+  DataTableCellVariant,
   DataTableColumnAlignment,
   DataTableColumnDef,
   DataTableColumnHeaderProps,

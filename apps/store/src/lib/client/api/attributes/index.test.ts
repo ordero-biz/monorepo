@@ -1,5 +1,6 @@
 import {
   createAttribute,
+  createAttributeValues,
   deleteAttributes,
   deleteAttributeValues,
   getAttribute,
@@ -320,6 +321,101 @@ describe('attribute client helpers', () => {
         cache: 'no-store',
       })
     );
+  });
+
+  it('posts attribute values in bulk through the backend proxy', async () => {
+    const fetchMock = vi.mocked(fetch);
+
+    fetchMock.mockResolvedValue(
+      new Response(
+        JSON.stringify([
+          {
+            id: 3,
+            name: 'Green',
+            sortOrder: 0,
+            createdAt: '2026-07-18T07:53:03.586Z',
+          },
+        ])
+      )
+    );
+
+    await expect(
+      createAttributeValues({
+        attributeId: 7,
+        attributeValues: [
+          {
+            name: 'Green',
+            sortOrder: 0,
+          },
+        ],
+      })
+    ).resolves.toEqual({
+      ok: true,
+      data: [
+        {
+          id: 3,
+          name: 'Green',
+          sortOrder: 0,
+          createdAt: '2026-07-18T07:53:03.586Z',
+        },
+      ],
+    });
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/backend/api/v1/attributes/7/values/bulk',
+      expect.objectContaining({
+        method: 'POST',
+        body: JSON.stringify({
+          attributeValues: [
+            {
+              name: 'Green',
+              sortOrder: 0,
+            },
+          ],
+        }),
+        cache: 'no-store',
+      })
+    );
+  });
+
+  it('returns normalized failures from the bulk attribute values route', async () => {
+    vi.mocked(fetch).mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          message: 'Attribute values could not be added.',
+          code: 'ATTRIBUTE_VALUES_CREATE_FAILED',
+          fieldErrors: {
+            'attributeValues[0].name': 'Attribute value already exists.',
+          },
+        }),
+        {
+          status: 422,
+          statusText: 'Unprocessable Entity',
+        }
+      )
+    );
+
+    await expect(
+      createAttributeValues({
+        attributeId: 7,
+        attributeValues: [
+          {
+            name: 'Green',
+            sortOrder: 0,
+          },
+        ],
+      })
+    ).resolves.toEqual({
+      ok: false,
+      error: {
+        status: 422,
+        message: 'Attribute values could not be added.',
+        code: 'ATTRIBUTE_VALUES_CREATE_FAILED',
+        fieldErrors: {
+          'attributeValues[0].name': 'Attribute value already exists.',
+        },
+      },
+    });
   });
 
   it('patches an attribute through the backend proxy', async () => {

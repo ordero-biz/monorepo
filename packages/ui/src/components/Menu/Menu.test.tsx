@@ -22,7 +22,7 @@ const menuChildren = (
 
 const iconButtonMenuChildren = (
   <>
-    <Menu.Trigger appearance="iconButton" aria-label="More actions">
+    <Menu.Trigger appearance="iconButton" aria-label="More actions" size="xs">
       <EllipsisVertical aria-hidden="true" />
     </Menu.Trigger>
     <Menu.Portal>

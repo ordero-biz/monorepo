@@ -65,6 +65,7 @@ export type {
 export { Combobox } from './components/Combobox';
 export type {
   DataTableCellProps,
+  DataTableCellVariant,
   DataTableColumnAlignment,
   DataTableColumnDef,
   DataTableColumnHeaderProps,

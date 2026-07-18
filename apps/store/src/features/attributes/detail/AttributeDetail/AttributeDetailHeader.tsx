@@ -4,6 +4,7 @@ import { Button, Card, Menu, PageHeader, Typography } from '@ordero/ui';
 import { EllipsisVertical, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { useAttributeQuery } from '@/lib/hooks/attributes/useAttributeQuery';
+import { CreateAttributeValuesDialogTrigger } from '../CreateAttributeValues';
 import { DeleteAttributeDialog } from '../DeleteAttribute';
 import { UpdateAttributeDialogTrigger } from '../UpdateAttribute';
 import type { AttributeDetailHeaderProps } from './types';
@@ -64,6 +65,8 @@ export const AttributeDetailHeader = ({
         </div>
       </PageHeader.Left>
       <PageHeader.Right>
+        <CreateAttributeValuesDialogTrigger attributeId={attributeId} />
+
         <Menu.Root>
           <Menu.Trigger
             aria-label={`Actions for ${attributeQuery.data.name}`}

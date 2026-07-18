@@ -269,15 +269,15 @@ const columns: DataTableColumnDef<ProductRow>[] = [
   },
   {
     cell: ({ row }) => (
-      <div className="flex items-center justify-end p-[var(--spacing-2)]">
+      <DataTableCell variant="actions">
         <IconButton
           aria-label={`Open actions for ${row.original.name}`}
           color="default"
-          size="s"
+          size="xs"
         >
           <MoreVertical />
         </IconButton>
-      </div>
+      </DataTableCell>
     ),
     header: () => (
       <div className="w-full p-[var(--spacing-2)]">
