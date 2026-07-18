@@ -15,7 +15,10 @@ import {
   getAttributeValueFieldId,
   getEmptyAttributeValueField,
 } from './utils/fields';
-import { validateAttributeName } from './utils/validations';
+import {
+  validateAttributeName,
+  validateAttributeValueName,
+} from './utils/validations';
 
 export const CreateAttributeDialog = ({
   onOpenChange,
@@ -128,12 +131,27 @@ export const CreateAttributeDialog = ({
                                 const fieldId =
                                   attributeValue?.id ??
                                   getAttributeValueFieldId(index);
+                                const isInitialAttributeValue =
+                                  fieldId ===
+                                  getAttributeValueFieldId(
+                                    INITIAL_ATTRIBUTE_VALUE_FIELD_INDEX
+                                  );
 
                                 return (
                                   <form.Field
                                     key={fieldId}
                                     name={
                                       `attributeValues[${index}].value` as const
+                                    }
+                                    validators={
+                                      isInitialAttributeValue
+                                        ? undefined
+                                        : {
+                                            onChange:
+                                              validateAttributeValueName,
+                                            onSubmit:
+                                              validateAttributeValueName,
+                                          }
                                     }
                                   >
                                     {(subField) => {
@@ -153,6 +171,11 @@ export const CreateAttributeDialog = ({
                                               errorText={fieldError}
                                               id={fieldId}
                                               invalid={Boolean(fieldError)}
+                                              label={
+                                                index === 0
+                                                  ? 'Attribute values'
+                                                  : undefined
+                                              }
                                               name={subField.name}
                                               onBlur={() => {
                                                 subField.handleBlur();
