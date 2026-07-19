@@ -132,6 +132,7 @@ export const AttributeDetailValues = ({
             </ContextualActionBar.Left>
             <ContextualActionBar.Right>
               <Button
+                variant="soft"
                 color="error"
                 onClick={() =>
                   setDeletingAttributeValues(selectedAttributeValues)

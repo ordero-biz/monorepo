@@ -64,7 +64,7 @@
   --figma-card-header-pr: var(--figma-spacing-2);
   --figma-card-header-py: var(--figma-spacing-3);
   --figma-card-header-spacing: var(--figma-spacing-2);
-  --figma-card-content-p: var(--figma-spacing-3);
+  --figma-card-content-p: var(--figma-spacing-2);
 
   /* rating */
   --figma-rating-spacing: var(--figma-spacing-1);

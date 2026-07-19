@@ -128,7 +128,7 @@ const getCheckboxBoxStateClassName = ({
     return checkedBoxClassNames[color];
   }
 
-  return 'border-[var(--grey-600)] bg-background';
+  return 'border-[var(--grey-500)] bg-background';
 };
 
 const getLabelColorClassName = ({ disabled }: { disabled: boolean }) =>

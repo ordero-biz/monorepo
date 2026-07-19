@@ -6,9 +6,9 @@ import { buttonVariants } from './classNames';
 import type { ButtonProps } from './types';
 
 const iconSizeClassNames = {
-  l: 'size-[var(--button-lg-icon)]',
-  m: 'size-[var(--button-md-icon)]',
-  s: 'size-[var(--button-sm-icon)]',
+  l: 'flex size-[var(--button-lg-icon)] shrink-0 items-center justify-center [&>svg]:size-full',
+  m: 'flex size-[var(--button-md-icon)] shrink-0 items-center justify-center [&>svg]:size-full',
+  s: 'flex size-[var(--button-sm-icon)] shrink-0 items-center justify-center [&>svg]:size-full',
 } as const;
 
 export const Button = ({
