@@ -1,0 +1,1 @@
+export { WarehouseFormDialogContent } from './WarehouseFormDialogContent';
