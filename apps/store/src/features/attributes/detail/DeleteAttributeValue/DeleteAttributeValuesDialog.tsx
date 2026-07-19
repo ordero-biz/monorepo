@@ -16,7 +16,9 @@ export const DeleteAttributeValuesDialog = ({
   const queryClient = useQueryClient();
   const isSingleValue = attributeValues.length === 1;
   const { handleDelete, isDeleting } = useDeleteAttributeValues({
-    attributeValueIds: attributeValues.map((attributeValue) => attributeValue.id),
+    attributeValueIds: attributeValues.map(
+      (attributeValue) => attributeValue.id
+    ),
     onDeleted: async () => {
       onDeleted?.();
       onOpenChange(false);

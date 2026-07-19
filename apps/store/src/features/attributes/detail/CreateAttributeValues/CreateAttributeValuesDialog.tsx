@@ -157,13 +157,13 @@ export const CreateAttributeValuesDialog = ({
                                           </div>
                                         )}
                                       </div>
-                                        {isLastItem && (
-                                          <Button
-                                            disabled={
-                                              isSubmitting ||
-                                              !attributeValue.trim()
-                                            }
-                                            onClick={() => {
+                                      {isLastItem && (
+                                        <Button
+                                          disabled={
+                                            isSubmitting ||
+                                            !attributeValue.trim()
+                                          }
+                                          onClick={() => {
                                             const newAttributeValue =
                                               createAttributeValue();
 

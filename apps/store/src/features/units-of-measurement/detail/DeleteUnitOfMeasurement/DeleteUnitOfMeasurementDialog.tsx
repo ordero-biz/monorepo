@@ -43,8 +43,7 @@ export const DeleteUnitOfMeasurementDialog = ({
             <Dialog.Content>
               <Typography variant="body1">
                 Are you sure you want to delete the "
-                <strong>{unitOfMeasurement.name}</strong>" unit of
-                measurement?
+                <strong>{unitOfMeasurement.name}</strong>" unit of measurement?
               </Typography>
             </Dialog.Content>
 

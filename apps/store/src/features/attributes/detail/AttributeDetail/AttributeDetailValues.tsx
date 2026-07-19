@@ -3,12 +3,14 @@
 import {
   Button,
   Card,
+  ContextualActionBar,
   DataTable,
-  type DataTableRowSelectionState,
   Typography,
+  useDataTableSelection,
 } from '@ordero/ui';
 import { Trash2 } from 'lucide-react';
 import { useMemo, useState } from 'react';
+import { BaseLayoutContextualActionBar } from '@/features/app-shell';
 import type { AttributeValue } from '@/lib/domain/attributes';
 import { useAttributeValuesQuery } from '@/lib/hooks/attributes/useAttributeValuesQuery';
 import {
@@ -18,6 +20,12 @@ import {
 import { UpdateAttributeValueDialog } from '../UpdateAttributeValue';
 import { getColumns } from './columns';
 import type { AttributeDetailValuesProps } from './types';
+
+const getAttributeValueRowId = (attributeValue: AttributeValue) =>
+  String(attributeValue.id);
+
+const getAttributeValueCheckboxAriaLabel = (attributeValue: AttributeValue) =>
+  `Select ${attributeValue.name}`;
 
 export const AttributeDetailValues = ({
   attributeId,
@@ -31,8 +39,6 @@ export const AttributeDetailValues = ({
   const [deletingAttributeValues, setDeletingAttributeValues] = useState<
     AttributeValue[] | null
   >(null);
-  const [rowSelection, setRowSelection] =
-    useState<DataTableRowSelectionState>({});
 
   const columns = useMemo(
     () =>
@@ -42,23 +48,16 @@ export const AttributeDetailValues = ({
       }),
     []
   );
-  const selection = useMemo(
-    () => ({
-      getRowCheckboxAriaLabel: (attributeValue: AttributeValue) =>
-        `Select ${attributeValue.name}`,
-      onRowSelectionChange: setRowSelection,
-      rowSelection,
-      selectAllCheckboxAriaLabel: 'Select all attribute values',
-    }),
-    [rowSelection]
-  );
-  const selectedAttributeValues = useMemo(
-    () =>
-      attributeValuesQuery.data?.filter(
-        (attributeValue) => rowSelection[String(attributeValue.id)]
-      ) ?? [],
-    [attributeValuesQuery.data, rowSelection]
-  );
+  const {
+    clearSelection,
+    selectedRows: selectedAttributeValues,
+    selection,
+  } = useDataTableSelection({
+    data: attributeValuesQuery.data,
+    getRowCheckboxAriaLabel: getAttributeValueCheckboxAriaLabel,
+    getRowId: getAttributeValueRowId,
+    selectAllCheckboxAriaLabel: 'Select all attribute values',
+  });
 
   if (attributeValuesQuery.isPending) {
     return (
@@ -100,7 +99,9 @@ export const AttributeDetailValues = ({
     <>
       <div
         className={
-          selectedAttributeValues.length > 0 ? 'pb-[var(--space-20)]' : undefined
+          selectedAttributeValues.length > 0
+            ? 'pb-[var(--space-20)]'
+            : undefined
         }
       >
         <DataTable
@@ -108,48 +109,41 @@ export const AttributeDetailValues = ({
           columns={columns}
           data={attributeValuesQuery.data}
           emptyMessage="No attribute values found."
-          getRowId={(row) => String(row.id)}
+          getRowId={getAttributeValueRowId}
           selection={selection}
         />
       </div>
 
       {selectedAttributeValues.length > 0 ? (
-        <aside
-          aria-label="Attribute value bulk actions"
-          className="fixed right-[var(--space-4)] bottom-[var(--space-4)] left-[calc(var(--base-layout-main-offset)_+_var(--space-4))] z-40 flex justify-center"
-        >
-          <div className="w-full max-w-[var(--base-layout-content-max-width)]">
-            <Card.Root variant="filled">
-              <Card.Content>
-                <div className="flex items-center justify-between gap-[var(--space-2)]">
-                  <Typography variant="body1">
-                    {selectedAttributeValues.length} selected
-                  </Typography>
-                  <div className="flex items-center gap-[var(--space-1)]">
-                    <Button
-                      color="inherit"
-                      onClick={() => setRowSelection({})}
-                      size="s"
-                      variant="text"
-                    >
-                      Clear selection
-                    </Button>
-                    <Button
-                      color="error"
-                      onClick={() =>
-                        setDeletingAttributeValues(selectedAttributeValues)
-                      }
-                      size="s"
-                      startIcon={<Trash2 aria-hidden="true" />}
-                    >
-                      Delete
-                    </Button>
-                  </div>
-                </div>
-              </Card.Content>
-            </Card.Root>
-          </div>
-        </aside>
+        <BaseLayoutContextualActionBar>
+          <ContextualActionBar.Root ariaLabel="Attribute value bulk actions">
+            <ContextualActionBar.Left>
+              <Typography variant="body1">
+                {selectedAttributeValues.length} selected
+              </Typography>
+              <Button
+                color="inherit"
+                onClick={clearSelection}
+                size="s"
+                variant="text"
+              >
+                Clear selection
+              </Button>
+            </ContextualActionBar.Left>
+            <ContextualActionBar.Right>
+              <Button
+                color="error"
+                onClick={() =>
+                  setDeletingAttributeValues(selectedAttributeValues)
+                }
+                size="s"
+                startIcon={<Trash2 aria-hidden="true" />}
+              >
+                Delete
+              </Button>
+            </ContextualActionBar.Right>
+          </ContextualActionBar.Root>
+        </BaseLayoutContextualActionBar>
       ) : null}
 
       {updatingAttributeValue && (
@@ -182,7 +176,7 @@ export const AttributeDetailValues = ({
         <DeleteAttributeValuesDialog
           attributeId={attributeId}
           attributeValues={deletingAttributeValues}
-          onDeleted={() => setRowSelection({})}
+          onDeleted={clearSelection}
           onOpenChange={(nextOpen) => {
             if (!nextOpen) {
               setDeletingAttributeValues(null);

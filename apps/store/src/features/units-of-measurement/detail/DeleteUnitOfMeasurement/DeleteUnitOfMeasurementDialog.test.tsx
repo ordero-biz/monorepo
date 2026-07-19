@@ -84,7 +84,9 @@ describe('DeleteUnitOfMeasurementDialog', () => {
       })
     );
     expect(onOpenChange).toHaveBeenCalledWith(false);
-    expect(routerPushMock).toHaveBeenCalledWith(clientRoutes.unitsOfMeasurement);
+    expect(routerPushMock).toHaveBeenCalledWith(
+      clientRoutes.unitsOfMeasurement
+    );
   });
 
   it('prevents another deletion while the request is in flight', async () => {

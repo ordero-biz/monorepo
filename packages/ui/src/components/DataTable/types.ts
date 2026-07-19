@@ -68,6 +68,14 @@ export type DataTableSelectionProps<TData> = {
   selectAllCheckboxAriaLabel?: string;
 };
 
+export type UseDataTableSelectionArgs<TData> = {
+  data?: TData[];
+  getRowId: (row: TData, index: number) => string;
+  getRowCanSelect?: DataTableSelectionProps<TData>['getRowCanSelect'];
+  getRowCheckboxAriaLabel?: DataTableSelectionProps<TData>['getRowCheckboxAriaLabel'];
+  selectAllCheckboxAriaLabel?: string;
+};
+
 export type DataTablePaginationState = PaginationState;
 
 export type DataTablePaginationProps = Omit<TablePaginationProps, 'count'> & {

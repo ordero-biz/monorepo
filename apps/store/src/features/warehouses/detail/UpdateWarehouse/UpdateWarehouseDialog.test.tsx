@@ -82,9 +82,9 @@ describe('UpdateWarehouseDialog', () => {
     renderResult.rerender({ open: false });
     renderResult.rerender({ open: true, warehouse: updatedWarehouse });
 
-    expect(
-      screen.getByRole('textbox', { name: 'Name' })
-    ).toHaveValue('Central Warehouse');
+    expect(screen.getByRole('textbox', { name: 'Name' })).toHaveValue(
+      'Central Warehouse'
+    );
   });
 
   it('reveals required errors after blur and clears them while correcting input', async () => {
