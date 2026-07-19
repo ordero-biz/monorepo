@@ -1,4 +1,10 @@
-import { createCategory, getCategories, getCategoriesPath } from '.';
+import {
+  createCategory,
+  getCategories,
+  getCategoriesPath,
+  getCategory,
+  updateCategory,
+} from '.';
 
 describe('category client helpers', () => {
   beforeEach(() => {
@@ -133,8 +139,10 @@ describe('category client helpers', () => {
 
     await expect(
       createCategory({
+        color: '#16a34a',
         name: 'Sneakers',
         parentId: 1,
+        sortOrder: 15,
       })
     ).resolves.toEqual({
       ok: true,
@@ -157,8 +165,10 @@ describe('category client helpers', () => {
       expect.objectContaining({
         method: 'POST',
         body: JSON.stringify({
+          color: '#16a34a',
           name: 'Sneakers',
           parentId: 1,
+          sortOrder: 15,
         }),
         cache: 'no-store',
       })
@@ -183,8 +193,10 @@ describe('category client helpers', () => {
 
     await expect(
       createCategory({
+        color: '#16a34a',
         name: 'Sneakers',
         parentId: 1,
+        sortOrder: 15,
       })
     ).resolves.toEqual({
       ok: false,
@@ -197,5 +209,71 @@ describe('category client helpers', () => {
         },
       },
     });
+  });
+
+  it('gets a category from the backend proxy', async () => {
+    const fetchMock = vi.mocked(fetch);
+    const category = {
+      id: 3,
+      name: 'Sneakers',
+      sortOrder: 15,
+      color: '#16a34a',
+      createdAt: '2026-07-01T11:22:53.562Z',
+    };
+
+    fetchMock.mockResolvedValue(new Response(JSON.stringify(category)));
+
+    await expect(getCategory(3)).resolves.toEqual({
+      ok: true,
+      data: category,
+    });
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/backend/api/v1/categories/3',
+      expect.objectContaining({
+        method: 'GET',
+        cache: 'no-store',
+      })
+    );
+  });
+
+  it('patches a category through the backend proxy', async () => {
+    const fetchMock = vi.mocked(fetch);
+    const category = {
+      id: 3,
+      name: 'Running shoes',
+      sortOrder: 20,
+      color: '#15803d',
+      createdAt: '2026-07-01T11:22:53.562Z',
+    };
+
+    fetchMock.mockResolvedValue(new Response(JSON.stringify(category)));
+
+    await expect(
+      updateCategory({
+        categoryId: 3,
+        color: '#15803d',
+        name: 'Running shoes',
+        parentId: null,
+        sortOrder: 20,
+      })
+    ).resolves.toEqual({
+      ok: true,
+      data: category,
+    });
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/backend/api/v1/categories/3',
+      expect.objectContaining({
+        method: 'PATCH',
+        body: JSON.stringify({
+          color: '#15803d',
+          name: 'Running shoes',
+          parentId: null,
+          sortOrder: 20,
+        }),
+        cache: 'no-store',
+      })
+    );
   });
 });

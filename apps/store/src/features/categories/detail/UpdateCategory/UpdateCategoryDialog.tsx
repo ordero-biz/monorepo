@@ -4,22 +4,30 @@ import { Dialog } from '@ordero/ui';
 import { useQueryClient } from '@tanstack/react-query';
 import { categoriesQueryKeys } from '@/lib/query/categories/categoriesQueryKeys';
 import { CategoryFormDialogContent } from '../../shared/CategoryFormDialogContent';
-import { createCategoryDefaultValues } from './constants';
-import { useCreateCategoryForm } from './hooks/useCreateCategoryForm';
-import type { CreateCategoryDialogProps } from './types';
+import { useUpdateCategoryForm } from './hooks/useUpdateCategoryForm';
+import type { UpdateCategoryDialogProps } from './types';
+import { getCategoryDefaultValues } from './utils/fields';
 
-export const CreateCategoryDialog = ({
+export const UpdateCategoryDialog = ({
   availableCategories,
+  category,
   onOpenChange,
+  onUpdated,
   open,
-}: CreateCategoryDialogProps) => {
+}: UpdateCategoryDialogProps) => {
   const queryClient = useQueryClient();
-  const { form } = useCreateCategoryForm({
-    onCreated: async () => {
+  const { form } = useUpdateCategoryForm({
+    category,
+    onUpdated: async (updatedCategory) => {
+      form.reset(getCategoryDefaultValues(updatedCategory));
       onOpenChange(false);
       await queryClient.invalidateQueries({
         queryKey: categoriesQueryKeys.list,
       });
+      await queryClient.invalidateQueries({
+        queryKey: categoriesQueryKeys.detail(category.id),
+      });
+      await onUpdated();
     },
   });
 
@@ -27,7 +35,7 @@ export const CreateCategoryDialog = ({
     onOpenChange(nextOpen);
 
     if (!nextOpen) {
-      form.reset(createCategoryDefaultValues);
+      form.reset(getCategoryDefaultValues(category));
     }
   };
 
@@ -45,14 +53,16 @@ export const CreateCategoryDialog = ({
               }}
             >
               <Dialog.Header>
-                <Dialog.Title>Add new category</Dialog.Title>
+                <Dialog.Title>Edit category</Dialog.Title>
               </Dialog.Header>
 
               <CategoryFormDialogContent
-                availableCategories={availableCategories}
+                availableCategories={availableCategories.filter(
+                  ({ id }) => id !== category.id
+                )}
                 form={form}
-                pendingText="Adding..."
-                submitText="Add"
+                pendingText="Saving..."
+                submitText="Save"
               />
             </form>
           </Dialog.Popup>

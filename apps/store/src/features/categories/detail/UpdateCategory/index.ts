@@ -1,0 +1,1 @@
+export { UpdateCategoryDialogTrigger } from './UpdateCategoryDialogTrigger';

@@ -3,6 +3,7 @@
 import { apiFetch } from '@ordero/api-client';
 import type { Category } from '@/lib/domain/categories';
 import type { PaginatedResponse } from '@/lib/server/types';
+import { tokenizePath } from '@/lib/utils/tokenizePath';
 import {
   getPaginationSearch,
   type PaginationSearchInput,
@@ -20,12 +21,35 @@ export const getCategories = (input?: PaginationSearchInput) =>
   });
 
 type CreateCategoryInput = {
+  color: string;
   name: string;
   parentId: number | null;
+  sortOrder: number;
 };
+
+type UpdateCategoryInput = CreateCategoryInput & {
+  categoryId: string | number;
+};
+
+export const getCategory = (categoryId: string | number) =>
+  apiFetch<Category>(
+    tokenizePath(CLIENT_BACKEND_PATHS.category, { id: categoryId }),
+    {
+      method: 'GET',
+    }
+  );
 
 export const createCategory = (input: CreateCategoryInput) =>
   apiFetch<Category>(CLIENT_BACKEND_PATHS.categories, {
     method: 'POST',
     body: input,
   });
+
+export const updateCategory = ({ categoryId, ...input }: UpdateCategoryInput) =>
+  apiFetch<Category>(
+    tokenizePath(CLIENT_BACKEND_PATHS.category, { id: categoryId }),
+    {
+      method: 'PATCH',
+      body: input,
+    }
+  );

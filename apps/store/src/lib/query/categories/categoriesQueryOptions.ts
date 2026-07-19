@@ -9,6 +9,10 @@ type CategoriesFetcher = (
   input?: PaginationSearchInput
 ) => Promise<ApiResult<PaginatedResponse<Category>>>;
 
+type CategoryFetcher = (
+  categoryId: string | number
+) => Promise<ApiResult<Category>>;
+
 const unwrapApiResult = async <T>(request: Promise<ApiResult<T>>) => {
   const result = await request;
 
@@ -26,4 +30,13 @@ export const categoriesListQueryOptions = (
   queryOptions({
     queryKey: categoriesQueryKeys.listPage(input),
     queryFn: () => unwrapApiResult(fetchCategories(input)),
+  });
+
+export const categoryQueryOptions = (
+  categoryId: string | number,
+  fetchCategory: CategoryFetcher
+) =>
+  queryOptions({
+    queryKey: categoriesQueryKeys.detail(categoryId),
+    queryFn: () => unwrapApiResult(fetchCategory(categoryId)),
   });

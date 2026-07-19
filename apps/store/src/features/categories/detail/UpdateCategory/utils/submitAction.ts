@@ -1,8 +1,17 @@
-import { createCategory } from '@/lib/client/api/categories';
-import type { CreateCategoryFormValues } from './validations';
+import { updateCategory } from '@/lib/client/api/categories';
+import type { CategoryFormValues } from '../../../shared/validations';
 
-export const submitCreateCategory = async (value: CreateCategoryFormValues) => {
-  const result = await createCategory({
+type SubmitUpdateCategoryArgs = {
+  categoryId: string | number;
+  value: CategoryFormValues;
+};
+
+export const submitUpdateCategory = async ({
+  categoryId,
+  value,
+}: SubmitUpdateCategoryArgs) => {
+  const result = await updateCategory({
+    categoryId,
     color: value.color.trim(),
     name: value.name.trim(),
     parentId: value.parentId ? Number(value.parentId) : null,
