@@ -6,3 +6,11 @@ export type DeleteAttributeValueDialogProps = {
   onOpenChange: (open: boolean) => void;
   open: boolean;
 };
+
+export type DeleteAttributeValuesDialogProps = {
+  attributeId: string | number;
+  attributeValues: AttributeValue[];
+  onDeleted?: () => void;
+  onOpenChange: (open: boolean) => void;
+  open: boolean;
+};
