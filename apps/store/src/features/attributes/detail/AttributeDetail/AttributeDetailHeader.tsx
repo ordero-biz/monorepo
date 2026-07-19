@@ -6,7 +6,7 @@ import { useState } from 'react';
 import { useAttributeQuery } from '@/lib/hooks/attributes/useAttributeQuery';
 import { CreateAttributeValuesDialogTrigger } from '../CreateAttributeValues';
 import { DeleteAttributeDialog } from '../DeleteAttribute';
-import { UpdateAttributeDialog } from '../UpdateAttribute/UpdateAttributeDialog';
+import { UpdateAttributeDialog } from '../UpdateAttribute';
 import type { AttributeDetailHeaderProps } from './types';
 
 export const AttributeDetailHeader = ({
