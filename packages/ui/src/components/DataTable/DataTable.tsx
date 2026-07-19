@@ -116,7 +116,7 @@ const createSelectionColumn = <TData,>(): DataTableColumnDef<TData> => ({
     ) ?? `Select row ${row.index + 1}`;
 
     return (
-      <div className="flex items-center justify-center p-[var(--spacing-2)]">
+      <div className="flex items-center justify-center px-[var(--spacing-2)]">
         <Checkbox
           aria-label={checkboxAriaLabel}
           checked={row.getIsSelected()}
@@ -137,7 +137,7 @@ const createSelectionColumn = <TData,>(): DataTableColumnDef<TData> => ({
     }
 
     return (
-      <div className="flex items-center justify-center p-[var(--spacing-2)]">
+      <div className="flex items-center justify-center px-[var(--spacing-2)]">
         <Checkbox
           aria-label={
             table.options.meta?.dataTableSelection?.selectAllCheckboxAriaLabel ??
@@ -305,7 +305,7 @@ export const DataTable = <TData,>({
               table.getRowModel().rows.map((row) => (
                 <tr
                   key={row.id}
-                  className="bg-card last:[&_td]:border-b-0 data-[state=selected]:bg-[var(--color-primary-8)]"
+                  className="bg-card last:[&_td]:border-b-0 data-[state=selected]:bg-[var(--color-grey-8)]"
                   data-state={row.getIsSelected() ? 'selected' : undefined}
                 >
                   {row.getVisibleCells().map((cell) => {

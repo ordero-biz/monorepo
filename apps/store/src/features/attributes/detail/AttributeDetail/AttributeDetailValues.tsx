@@ -116,9 +116,9 @@ export const AttributeDetailValues = ({
       {selectedAttributeValues.length > 0 ? (
         <aside
           aria-label="Attribute value bulk actions"
-          className="fixed right-[var(--space-4)] bottom-[var(--space-4)] left-[var(--space-4)] z-40 flex justify-center"
+          className="fixed right-[var(--space-4)] bottom-[var(--space-4)] left-[calc(var(--base-layout-main-offset)_+_var(--space-4))] z-40 flex justify-center"
         >
-          <div className="w-full max-w-[var(--layout-container-md)]">
+          <div className="w-full max-w-[var(--base-layout-content-max-width)]">
             <Card.Root variant="filled">
               <Card.Content>
                 <div className="flex items-center justify-between gap-[var(--space-2)]">
