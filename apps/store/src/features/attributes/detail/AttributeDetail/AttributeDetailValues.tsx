@@ -111,7 +111,7 @@ export const AttributeDetailValues = ({
         <BaseLayoutContextualActionBar>
           <ContextualActionBar.Root ariaLabel="Attribute value bulk actions">
             <ContextualActionBar.Left>
-              <Typography variant="body1">
+              <Typography variant="body2">
                 {selectedAttributeValues.length} selected
               </Typography>
               <Button
