@@ -1,12 +1,12 @@
 'use client';
 
 import { Button, Card, Menu, PageHeader, Typography } from '@ordero/ui';
-import { EllipsisVertical, Trash2 } from 'lucide-react';
+import { EllipsisVertical, Pencil, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { useAttributeQuery } from '@/lib/hooks/attributes/useAttributeQuery';
 import { CreateAttributeValuesDialogTrigger } from '../CreateAttributeValues';
 import { DeleteAttributeDialog } from '../DeleteAttribute';
-import { UpdateAttributeDialogTrigger } from '../UpdateAttribute';
+import { UpdateAttributeDialog } from '../UpdateAttribute/UpdateAttributeDialog';
 import type { AttributeDetailHeaderProps } from './types';
 
 export const AttributeDetailHeader = ({
@@ -14,6 +14,7 @@ export const AttributeDetailHeader = ({
 }: AttributeDetailHeaderProps) => {
   const attributeQuery = useAttributeQuery(attributeId);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
 
   if (attributeQuery.isPending) {
     return (
@@ -55,14 +56,6 @@ export const AttributeDetailHeader = ({
     <PageHeader.Root>
       <PageHeader.Left>
         <Typography variant="h5">{attributeQuery.data.name}</Typography>
-        <div>
-          <UpdateAttributeDialogTrigger
-            attribute={attributeQuery.data}
-            onUpdated={async () => {
-              await attributeQuery.refetch();
-            }}
-          />
-        </div>
       </PageHeader.Left>
       <PageHeader.Right>
         <CreateAttributeValuesDialogTrigger attributeId={attributeId} />
@@ -79,6 +72,13 @@ export const AttributeDetailHeader = ({
           <Menu.Portal>
             <Menu.Positioner align="end">
               <Menu.Popup>
+                <Menu.Item onClick={() => setIsUpdateDialogOpen(true)}>
+                  <Pencil
+                    aria-hidden="true"
+                    className="size-[var(--icon-button-xs-icon)]"
+                  />
+                  Edit attribute name
+                </Menu.Item>
                 <Menu.Item
                   color="error"
                   onClick={() => setIsDeleteDialogOpen(true)}
@@ -98,6 +98,14 @@ export const AttributeDetailHeader = ({
           attribute={attributeQuery.data}
           onOpenChange={setIsDeleteDialogOpen}
           open={isDeleteDialogOpen}
+        />
+        <UpdateAttributeDialog
+          attribute={attributeQuery.data}
+          onOpenChange={setIsUpdateDialogOpen}
+          onUpdated={async () => {
+            await attributeQuery.refetch();
+          }}
+          open={isUpdateDialogOpen}
         />
       </PageHeader.Right>
     </PageHeader.Root>

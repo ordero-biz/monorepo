@@ -60,7 +60,6 @@ describe('AttributeDetailHeader', () => {
     setup();
 
     expect(await screen.findByRole('heading', { name: 'Color' })).toBeVisible();
-    expect(screen.getByRole('button', { name: 'Edit Color' })).toBeVisible();
     expect(screen.getByRole('button', { name: 'Add Value' })).toBeVisible();
     expect(
       screen.getByRole('button', { name: 'Actions for Color' })
@@ -84,6 +83,9 @@ describe('AttributeDetailHeader', () => {
     await user.click(
       await screen.findByRole('button', { name: 'Actions for Color' })
     );
+    expect(
+      await screen.findByRole('menuitem', { name: 'Edit attribute name' })
+    ).toBeVisible();
     await user.click(
       await screen.findByRole('menuitem', { name: 'Delete attribute' })
     );
@@ -148,7 +150,12 @@ describe('AttributeDetailHeader', () => {
     setup();
 
     expect(await screen.findByRole('heading', { name: 'Color' })).toBeVisible();
-    await user.click(screen.getByRole('button', { name: 'Edit Color' }));
+    await user.click(
+      screen.getByRole('button', { name: 'Actions for Color' })
+    );
+    await user.click(
+      await screen.findByRole('menuitem', { name: 'Edit attribute name' })
+    );
 
     const nameField = screen.getByRole('textbox', {
       name: 'Attribute name',
