@@ -4,7 +4,7 @@ import {
   createTestQueryClient,
   createTestQueryProvider,
 } from '@/test/prepareSetup';
-import { useDeleteAttributeValue } from './useDeleteAttributeValue';
+import { useDeleteAttributeValues } from './useDeleteAttributeValues';
 
 const { addToastMock } = vi.hoisted(() => ({
   addToastMock: vi.fn(),
@@ -26,14 +26,13 @@ vi.mock('@/lib/client/api/attributes', async () => ({
 
 const deleteAttributeValuesMock = vi.mocked(deleteAttributeValues);
 
-const setupDeleteAttributeValueHook = () => {
+const setupDeleteAttributeValuesHook = () => {
   const onDeleted = vi.fn();
   const TestQueryProvider = createTestQueryProvider(createTestQueryClient());
   const { result } = renderHook(
     () =>
-      useDeleteAttributeValue({
-        attributeValueId: 3,
-        attributeValueName: 'Blue',
+      useDeleteAttributeValues({
+        attributeValueIds: [3],
         onDeleted,
       }),
     {
@@ -47,7 +46,7 @@ const setupDeleteAttributeValueHook = () => {
   };
 };
 
-describe('useDeleteAttributeValue', () => {
+describe('useDeleteAttributeValues', () => {
   beforeEach(() => {
     addToastMock.mockClear();
     deleteAttributeValuesMock.mockReset();
@@ -58,7 +57,7 @@ describe('useDeleteAttributeValue', () => {
       ok: true,
       data: undefined,
     });
-    const { onDeleted, result } = setupDeleteAttributeValueHook();
+    const { onDeleted, result } = setupDeleteAttributeValuesHook();
 
     expect(result.current.isDeleting).toBe(false);
 
@@ -73,7 +72,7 @@ describe('useDeleteAttributeValue', () => {
     );
     await waitFor(() => expect(onDeleted).toHaveBeenCalled());
     expect(addToastMock).toHaveBeenCalledWith({
-      description: 'Attribute value Blue was deleted.',
+      description: 'Attribute value was deleted.',
       type: 'success',
     });
     expect(result.current.isDeleting).toBe(false);
@@ -87,7 +86,7 @@ describe('useDeleteAttributeValue', () => {
         message: 'Attribute value delete failed.',
       },
     });
-    const { onDeleted, result } = setupDeleteAttributeValueHook();
+    const { onDeleted, result } = setupDeleteAttributeValuesHook();
 
     act(() => {
       result.current.handleDelete();

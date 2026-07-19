@@ -97,22 +97,15 @@ export const AttributeDetailValues = ({
 
   return (
     <>
-      <div
-        className={
-          selectedAttributeValues.length > 0
-            ? 'pb-[var(--space-20)]'
-            : undefined
-        }
-      >
-        <DataTable
-          ariaLabel="Attribute values"
-          columns={columns}
-          data={attributeValuesQuery.data}
-          emptyMessage="No attribute values found."
-          getRowId={getAttributeValueRowId}
-          selection={selection}
-        />
-      </div>
+
+      <DataTable
+        ariaLabel="Attribute values"
+        columns={columns}
+        data={attributeValuesQuery.data}
+        emptyMessage="No attribute values found."
+        getRowId={getAttributeValueRowId}
+        selection={selection}
+      />
 
       {selectedAttributeValues.length > 0 ? (
         <BaseLayoutContextualActionBar>
