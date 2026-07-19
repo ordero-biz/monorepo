@@ -28,6 +28,10 @@ When the task touches accessibility testing strategy for shared UI, also read:
 
 - `docs/accessibility-testing.md`
 
+When the task adds or changes a shared or feature-level data table, also read:
+
+- `docs/data-tables.md`
+
 ## Testing Conventions
 
 Use behavior-first tests.
@@ -202,6 +206,10 @@ For shared UI work across `packages` and `apps`:
 For `packages/ui` specifically:
 
 - prefer stable exports from `packages/ui/src/index.ts`
+- use `DataTable`'s `selection` prop as the default selection API; reserve
+  `DataTableSelectionCell` and `DataTableSelectionColumnHeader` for advanced
+  custom layouts
+- preserve the standard current-page scope for select-all checkboxes
 
 ## Validation
 

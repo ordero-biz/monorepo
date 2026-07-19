@@ -70,6 +70,8 @@ For shared UI component work in `packages/ui`, always also use:
 
 When touching `@tanstack/react-table` or `useReactTable` code:
 
+- Read `docs/data-tables.md` when the task involves the shared `DataTable` or
+  a feature's sorting, pagination, or selection behavior.
 - Keep `columns`, `data`, and any controlled table state passed into `useReactTable` on stable references.
 - Do not define table `columns` or `data` arrays inline in the same render path that calls `useReactTable` unless they are memoized or hoisted.
 - Do not pass inline data transformations such as `data.filter(...)`, `data.map(...)`, or `data.slice(...)` directly into `useReactTable`; memoize the derived result first.

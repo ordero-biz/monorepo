@@ -314,6 +314,130 @@ describe('DataTable', () => {
     ).toBeChecked();
   });
 
+  it('selects only the current page with a reusable selection header', async () => {
+    const user = userEvent.setup();
+    const onRowSelectionChange = vi.fn();
+
+    setup({
+      columns: [
+        {
+          accessorKey: 'id',
+          cell: ({ row }) => (
+            <DataTableSelectionCell
+              checkboxAriaLabel={`Select ${row.original.id}`}
+              row={row}
+            >
+              <div>{row.original.id}</div>
+            </DataTableSelectionCell>
+          ),
+          header: ({ column, table }) => (
+            <DataTableSelectionColumnHeader
+              checkboxAriaLabel="Select all invoices"
+              column={column}
+              table={table}
+              title="Invoice"
+            />
+          ),
+          id: 'selection',
+        },
+      ],
+      data: [
+        ...data,
+        {
+          amount: '$75.00',
+          id: 'INV-003',
+          status: 'Overdue',
+        },
+      ],
+      getRowId: (row) => row.id,
+      onRowSelectionChange,
+      pagination: {
+        onPageChange: vi.fn(),
+        page: 0,
+        rowsPerPage: 2,
+      },
+      selectable: true,
+    });
+
+    await user.click(
+      screen.getByRole('checkbox', { name: 'Select INV-001' })
+    );
+
+    expect(
+      screen.getByRole('checkbox', { name: 'Select all invoices' })
+    ).toHaveAttribute('aria-checked', 'mixed');
+
+    await user.click(
+      screen.getByRole('checkbox', { name: 'Select all invoices' })
+    );
+
+    expect(onRowSelectionChange).toHaveBeenLastCalledWith({
+      'INV-001': true,
+      'INV-002': true,
+    });
+    expect(
+      screen.getByRole('checkbox', { name: 'Select INV-001' })
+    ).toBeChecked();
+    expect(
+      screen.getByRole('checkbox', { name: 'Select INV-002' })
+    ).toBeChecked();
+    expect(
+      screen.getByRole('checkbox', { name: 'Select all invoices' })
+    ).toBeChecked();
+  });
+
+  it('keeps the reusable selection header clear for rows selected on another page', () => {
+    setup({
+      columns: [
+        {
+          accessorKey: 'id',
+          cell: ({ row }) => (
+            <DataTableSelectionCell
+              checkboxAriaLabel={`Select ${row.original.id}`}
+              row={row}
+            >
+              <div>{row.original.id}</div>
+            </DataTableSelectionCell>
+          ),
+          header: ({ column, table }) => (
+            <DataTableSelectionColumnHeader
+              checkboxAriaLabel="Select all invoices"
+              column={column}
+              table={table}
+              title="Invoice"
+            />
+          ),
+          id: 'selection',
+        },
+      ],
+      data: [
+        ...data,
+        {
+          amount: '$75.00',
+          id: 'INV-003',
+          status: 'Overdue',
+        },
+      ],
+      getRowId: (row) => row.id,
+      pagination: {
+        onPageChange: vi.fn(),
+        page: 0,
+        rowsPerPage: 2,
+      },
+      rowSelection: {
+        'INV-003': true,
+      },
+      selectable: true,
+    });
+
+    const selectAllInvoices = screen.getByRole('checkbox', {
+      name: 'Select all invoices',
+    });
+
+    expect(selectAllInvoices).not.toBeChecked();
+    expect(selectAllInvoices).toHaveAttribute('aria-checked', 'false');
+  });
+
   it('disables selection for rows excluded by getRowCanSelect', () => {
     setup({
       columns: [

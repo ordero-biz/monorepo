@@ -21,11 +21,14 @@ export const DataTableSelectionColumnHeader = <TData extends RowData>({
         <div className="flex items-center pl-[var(--spacing-1)]">
           <Checkbox
             aria-label={checkboxAriaLabel}
-            checked={table.getIsAllRowsSelected()}
+            checked={table.getIsAllPageRowsSelected()}
             indeterminate={
-              table.getIsSomeRowsSelected() && !table.getIsAllRowsSelected()
+              table.getIsSomePageRowsSelected() &&
+              !table.getIsAllPageRowsSelected()
             }
-            onCheckedChange={(checked) => table.toggleAllRowsSelected(checked)}
+            onCheckedChange={(checked) =>
+              table.toggleAllPageRowsSelected(checked)
+            }
             size="s"
           />
         </div>
