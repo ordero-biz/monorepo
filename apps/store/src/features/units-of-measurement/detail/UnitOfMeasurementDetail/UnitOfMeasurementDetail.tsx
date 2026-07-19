@@ -1,17 +1,11 @@
 'use client';
 
-import { useUnitOfMeasurementQuery } from '@/lib/hooks/units-of-measurement/useUnitOfMeasurementQuery';
-import {
-  Button,
-  Card,
-  Menu,
-  PageHeader,
-  Typography,
-} from '@ordero/ui';
+import { Button, Card, Menu, PageHeader, Typography } from '@ordero/ui';
 import { EllipsisVertical, Trash2 } from 'lucide-react';
 import { useState } from 'react';
-import { UpdateUnitOfMeasurementDialogTrigger } from '../UpdateUnitOfMeasurement';
+import { useUnitOfMeasurementQuery } from '@/lib/hooks/units-of-measurement/useUnitOfMeasurementQuery';
 import { DeleteUnitOfMeasurementDialog } from '../DeleteUnitOfMeasurement';
+import { UpdateUnitOfMeasurementDialogTrigger } from '../UpdateUnitOfMeasurement';
 import type { UnitOfMeasurementDetailProps } from './types';
 import { UnitOfMeasurementDetailInfo } from './UnitOfMeasurementDetailInfo';
 

@@ -1,9 +1,7 @@
 import { createWarehouse } from '@/lib/client/api/warehouses';
 import type { WarehouseFormValues } from '../../../shared/validations';
 
-export const submitCreateWarehouse = async (
-  value: WarehouseFormValues
-) => {
+export const submitCreateWarehouse = async (value: WarehouseFormValues) => {
   const result = await createWarehouse({
     code: value.code.trim(),
     name: value.name.trim(),

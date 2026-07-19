@@ -7,8 +7,6 @@ import {
   DataTable,
   DataTableCell,
   DataTableColumnHeader,
-  DataTableSelectionCell,
-  DataTableSelectionColumnHeader,
   type DataTableColumnDef,
   type DataTableProps,
 } from '@/ui/components/DataTable';
@@ -143,30 +141,17 @@ const publishToneClassNames = {
   Published: 'bg-[var(--color-info-16)] text-[var(--info-dark)]',
 } as const;
 
-const productColumnHeader = ({
-  table,
-  column,
-}: HeaderContext<ProductRow, unknown>) => (
-  <DataTableSelectionColumnHeader
-    checkboxAriaLabel="Select all products"
-    column={column}
-    table={table}
-    title="Product"
-  />
+const productColumnHeader = ({ column }: HeaderContext<ProductRow, unknown>) => (
+  <DataTableColumnHeader column={column} title="Product" />
 );
 
 const productColumnCell = ({ row }: CellContext<ProductRow, unknown>) => (
-  <DataTableSelectionCell
-    checkboxAriaLabel={`Select ${row.original.name}`}
-    row={row}
-  >
-    <div className="flex min-w-0 flex-1 items-center py-[var(--spacing-2)]">
-      <div className="flex min-w-0 flex-1 flex-col items-start justify-center px-[var(--spacing-2)]">
-        <p className="w-full text-card-foreground">{row.original.name}</p>
-        <p className="w-full text-muted-foreground">{row.original.category}</p>
-      </div>
+  <div className="flex min-w-0 flex-1 items-center py-[var(--spacing-2)]">
+    <div className="flex min-w-0 flex-1 flex-col items-start justify-center px-[var(--spacing-2)]">
+      <p className="w-full text-card-foreground">{row.original.name}</p>
+      <p className="w-full text-muted-foreground">{row.original.category}</p>
     </div>
-  </DataTableSelectionCell>
+  </div>
 );
 
 const renderTextCell = (value: string) => (
@@ -354,7 +339,10 @@ export const Default: Story = {};
 
 export const WithCheckboxSelection: Story = {
   args: {
-    selectable: true,
+    selection: {
+      getRowCheckboxAriaLabel: (row) => `Select ${row.name}`,
+      selectAllCheckboxAriaLabel: 'Select all products',
+    },
   },
 };
 

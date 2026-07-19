@@ -97,6 +97,10 @@ Always read:
 
 - `docs/ui-tokens.md`
 
+When adding or changing `DataTable` behavior, also read:
+
+- `docs/data-tables.md`
+
 The token-usage and Figma-mapping rules from `ui-routine-conventions` are mandatory for this skill and take precedence over any looser interpretation of this section.
 
 Follow this token architecture:

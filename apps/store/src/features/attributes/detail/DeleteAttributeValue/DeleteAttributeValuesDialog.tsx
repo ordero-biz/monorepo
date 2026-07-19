@@ -2,32 +2,30 @@
 
 import { Button, Dialog, Typography } from '@ordero/ui';
 import { useQueryClient } from '@tanstack/react-query';
-import { useRouter } from 'next/navigation';
-import { clientRoutes } from '@/lib/client/routes';
-import { unitsOfMeasurementQueryKeys } from '@/lib/query/units-of-measurement/unitsOfMeasurementQueryKeys';
-import { useDeleteUnitOfMeasurement } from './hooks/useDeleteUnitOfMeasurement';
-import type { DeleteUnitOfMeasurementDialogProps } from './types';
+import { attributesQueryKeys } from '@/lib/query/attributes/attributesQueryKeys';
+import { useDeleteAttributeValues } from './hooks/useDeleteAttributeValues';
+import type { DeleteAttributeValuesDialogProps } from './types';
 
-export const DeleteUnitOfMeasurementDialog = ({
+export const DeleteAttributeValuesDialog = ({
+  attributeId,
+  attributeValues,
+  onDeleted,
   onOpenChange,
   open,
-  unitOfMeasurement,
-}: DeleteUnitOfMeasurementDialogProps) => {
+}: DeleteAttributeValuesDialogProps) => {
   const queryClient = useQueryClient();
-  const router = useRouter();
-  const { handleDelete, isDeleting } = useDeleteUnitOfMeasurement({
+  const isSingleValue = attributeValues.length === 1;
+  const { handleDelete, isDeleting } = useDeleteAttributeValues({
+    attributeValueIds: attributeValues.map(
+      (attributeValue) => attributeValue.id
+    ),
     onDeleted: async () => {
+      onDeleted?.();
       onOpenChange(false);
-      queryClient.removeQueries({
-        queryKey: unitsOfMeasurementQueryKeys.detail(unitOfMeasurement.id),
-      });
       await queryClient.invalidateQueries({
-        queryKey: unitsOfMeasurementQueryKeys.list,
+        queryKey: attributesQueryKeys.values(attributeId),
       });
-      router.push(clientRoutes.unitsOfMeasurement);
     },
-    unitOfMeasurementId: unitOfMeasurement.id,
-    unitOfMeasurementName: unitOfMeasurement.name,
   });
 
   return (
@@ -37,13 +35,18 @@ export const DeleteUnitOfMeasurementDialog = ({
         <Dialog.Viewport>
           <Dialog.Popup size="xs">
             <Dialog.Header>
-              <Dialog.Title>Delete unit of measurement</Dialog.Title>
+              <Dialog.Title>
+                {isSingleValue
+                  ? 'Delete attribute value'
+                  : 'Delete attribute values'}
+              </Dialog.Title>
             </Dialog.Header>
 
             <Dialog.Content>
               <Typography variant="body1">
-                Are you sure you want to delete the "
-                <strong>{unitOfMeasurement.name}</strong>" unit of measurement?
+                {isSingleValue
+                  ? `Are you sure you want to delete the "${attributeValues[0]?.name}" attribute value?`
+                  : `Are you sure you want to delete ${attributeValues.length} attribute values?`}
               </Typography>
             </Dialog.Content>
 

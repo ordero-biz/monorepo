@@ -27,6 +27,10 @@ export type DataTableColumnMeta = {
 declare module '@tanstack/react-table' {
   interface ColumnMeta<TData extends RowData, TValue>
     extends DataTableColumnMeta {}
+
+  interface TableMeta<TData extends RowData> {
+    dataTableSelection?: DataTableSelectionProps<TData>;
+  }
 }
 
 export type DataTableColumnDef<TData> = ColumnDef<TData, unknown>;
@@ -56,6 +60,22 @@ export type DataTableCellProps = {
 
 export type DataTableRowSelectionState = RowSelectionState;
 
+export type DataTableSelectionProps<TData> = {
+  getRowCanSelect?: (row: TData, index: number) => boolean;
+  getRowCheckboxAriaLabel?: (row: TData, index: number) => string;
+  onRowSelectionChange?: (rowSelection: DataTableRowSelectionState) => void;
+  rowSelection?: DataTableRowSelectionState;
+  selectAllCheckboxAriaLabel?: string;
+};
+
+export type UseDataTableSelectionArgs<TData> = {
+  data?: TData[];
+  getRowId: (row: TData, index: number) => string;
+  getRowCanSelect?: DataTableSelectionProps<TData>['getRowCanSelect'];
+  getRowCheckboxAriaLabel?: DataTableSelectionProps<TData>['getRowCheckboxAriaLabel'];
+  selectAllCheckboxAriaLabel?: string;
+};
+
 export type DataTablePaginationState = PaginationState;
 
 export type DataTablePaginationProps = Omit<TablePaginationProps, 'count'> & {
@@ -77,6 +97,7 @@ export type DataTableProps<TData> = {
   onSortingChange?: (sorting: DataTableSortingState) => void;
   pagination?: DataTablePaginationProps;
   rowSelection?: DataTableRowSelectionState;
+  selection?: DataTableSelectionProps<TData>;
   sorting?: DataTableSortingState;
   selectable?: boolean;
 };
