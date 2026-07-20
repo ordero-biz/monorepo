@@ -186,7 +186,9 @@ describe('ProductsList', () => {
     });
 
     expect(await screen.findByText('Running Shoes')).toBeVisible();
-    expect(screen.getByText('Lightweight daily trainer')).toBeVisible();
+    expect(
+      screen.queryByText('Lightweight daily trainer')
+    ).not.toBeInTheDocument();
     expect(screen.getByText('Footwear')).toBeVisible();
     expect(screen.getByText('03 Jul 2026')).toBeVisible();
     expect(getProductVariantsMock).not.toHaveBeenCalled();

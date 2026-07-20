@@ -23,20 +23,7 @@ export const productGroupColumns: DataTableColumnDef<Product>[] = [
       <DataTableColumnHeader column={column} title="Name" />
     ),
     meta: {
-      width: '24%',
-    },
-  },
-  {
-    accessorKey: 'description',
-    cell: ({ row }) => (
-      <DataTableCell>{row.original.description}</DataTableCell>
-    ),
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Description" />
-    ),
-    meta: {
-      width: '38%',
-      wrap: 'wrap',
+      width: '40%',
     },
   },
   {
@@ -48,7 +35,7 @@ export const productGroupColumns: DataTableColumnDef<Product>[] = [
       <DataTableColumnHeader column={column} title="Category" />
     ),
     meta: {
-      width: '22%',
+      width: '34%',
     },
   },
   {
@@ -60,7 +47,7 @@ export const productGroupColumns: DataTableColumnDef<Product>[] = [
       <DataTableColumnHeader column={column} title="Created at" />
     ),
     meta: {
-      width: '16%',
+      width: '26%',
     },
   },
 ];
