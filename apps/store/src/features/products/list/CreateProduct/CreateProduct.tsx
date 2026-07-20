@@ -49,9 +49,14 @@ export const CreateProduct = () => {
 
   const { form } = useCreateProductForm({
     onCreated: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: productsQueryKeys.list,
-      });
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: productsQueryKeys.list,
+        }),
+        queryClient.invalidateQueries({
+          queryKey: productsQueryKeys.variantsList,
+        }),
+      ]);
       router.push(clientRoutes.products);
     },
   });

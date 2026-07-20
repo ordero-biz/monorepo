@@ -1,8 +1,8 @@
 import { dehydrate, HydrationBoundary } from '@tanstack/react-query';
-import { ProductsList, ProductsListHeader } from '@/features/products';
-import { productsListQueryOptions } from '@/lib/query/products/productsQueryOptions';
+import { ProductsListView } from '@/features/products';
+import { productVariantsListQueryOptions } from '@/lib/query/products/productsQueryOptions';
 import { makeQueryClient } from '@/lib/query/queryClient';
-import { getServerProducts } from '@/lib/server/api/products';
+import { getServerProductVariants } from '@/lib/server/api/products';
 import {
   getPaginationSearchInput,
   type SearchParamsInput,
@@ -19,15 +19,12 @@ export default async function ProductsPage({
   const queryClient = makeQueryClient();
 
   await queryClient.prefetchQuery(
-    productsListQueryOptions(getServerProducts, paginationInput)
+    productVariantsListQueryOptions(getServerProductVariants, paginationInput)
   );
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <div className="flex flex-col gap-[var(--space-2)]">
-        <ProductsListHeader />
-        <ProductsList paginationInput={paginationInput} />
-      </div>
+      <ProductsListView paginationInput={paginationInput} />
     </HydrationBoundary>
   );
 }

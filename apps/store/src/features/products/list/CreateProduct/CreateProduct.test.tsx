@@ -105,7 +105,7 @@ describe('CreateProduct', () => {
     expect(continueButton).toBeEnabled();
   });
 
-  it('creates a product, invalidates the list, and returns to products', async () => {
+  it('creates a product, invalidates product lists, and returns to products', async () => {
     createProductMock.mockResolvedValue({
       ok: true,
       data: {
@@ -139,6 +139,9 @@ describe('CreateProduct', () => {
         queryKey: productsQueryKeys.list,
       })
     );
+    expect(invalidateQueriesSpy).toHaveBeenCalledWith({
+      queryKey: productsQueryKeys.variantsList,
+    });
     expect(mocks.push).toHaveBeenCalledWith(clientRoutes.products);
   });
 

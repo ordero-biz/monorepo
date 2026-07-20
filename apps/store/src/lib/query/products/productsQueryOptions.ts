@@ -1,6 +1,6 @@
 import type { ApiResult } from '@ordero/api-types';
 import { queryOptions } from '@tanstack/react-query';
-import type { Product } from '@/lib/domain/products';
+import type { Product, ProductVariant } from '@/lib/domain/products';
 import type { PaginatedResponse } from '@/lib/server/types';
 import type { PaginationSearchInput } from '@/lib/utils/url';
 import { productsQueryKeys } from './productsQueryKeys';
@@ -8,6 +8,10 @@ import { productsQueryKeys } from './productsQueryKeys';
 type ProductsFetcher = (
   input?: PaginationSearchInput
 ) => Promise<ApiResult<PaginatedResponse<Product>>>;
+
+type ProductVariantsFetcher = (
+  input?: PaginationSearchInput
+) => Promise<ApiResult<PaginatedResponse<ProductVariant>>>;
 
 const unwrapApiResult = async <T>(request: Promise<ApiResult<T>>) => {
   const result = await request;
@@ -26,4 +30,13 @@ export const productsListQueryOptions = (
   queryOptions({
     queryKey: productsQueryKeys.listPage(input),
     queryFn: () => unwrapApiResult(fetchProducts(input)),
+  });
+
+export const productVariantsListQueryOptions = (
+  fetchProductVariants: ProductVariantsFetcher,
+  input?: PaginationSearchInput
+) =>
+  queryOptions({
+    queryKey: productsQueryKeys.variantsListPage(input),
+    queryFn: () => unwrapApiResult(fetchProductVariants(input)),
   });
