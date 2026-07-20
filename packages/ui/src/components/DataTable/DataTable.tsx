@@ -7,17 +7,32 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table';
+import { cva } from 'class-variance-authority';
 import type { CSSProperties } from 'react';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
+import { Checkbox } from '@/ui/components/Checkbox';
 import { TablePagination } from '@/ui/components/TablePagination';
 import { cn } from '@/ui/lib/utils';
 import type {
   DataTableCellProps,
   DataTableColumnAlignment,
+  DataTableColumnDef,
   DataTableProps,
   DataTableRowSelectionState,
   DataTableSortingState,
 } from './types';
+
+const dataTableCellVariants = cva('flex items-center text-card-foreground', {
+  variants: {
+    variant: {
+      actions: 'px-[var(--spacing-2)]',
+      default: 'p-[var(--spacing-2)]',
+    },
+  },
+  defaultVariants: {
+    variant: 'default',
+  },
+});
 
 const tableShellStyle = {
   boxShadow:
@@ -85,11 +100,69 @@ const getColumnStyle = ({
   } satisfies CSSProperties;
 };
 
-export const DataTableCell = ({ children }: DataTableCellProps) => (
-  <div className="flex items-center p-[var(--spacing-2)] text-card-foreground">
-    {children}
-  </div>
+export const DataTableCell = ({ children, variant }: DataTableCellProps) => (
+  <div className={dataTableCellVariants({ variant })}>{children}</div>
 );
+
+const createSelectionColumn = <TData,>(): DataTableColumnDef<TData> => ({
+  cell: ({ row, table }) => {
+    if (!row.getCanSelect()) {
+      return null;
+    }
+
+    const checkboxAriaLabel = table.options.meta?.dataTableSelection?.getRowCheckboxAriaLabel?.(
+      row.original,
+      row.index
+    ) ?? `Select row ${row.index + 1}`;
+
+    return (
+      <div className="flex items-center justify-center px-[var(--spacing-1)]">
+        <Checkbox
+          aria-label={checkboxAriaLabel}
+          checked={row.getIsSelected()}
+          onCheckedChange={(checked) => row.toggleSelected(checked)}
+          size="s"
+        />
+      </div>
+    );
+  },
+  enableSorting: false,
+  header: ({ table }) => {
+    const hasSelectableRows = table
+      .getRowModel()
+      .rows.some((row) => row.getCanSelect());
+
+    if (!hasSelectableRows) {
+      return null;
+    }
+
+    return (
+      <div className="flex items-center justify-center px-[var(--spacing-1)]">
+        <Checkbox
+          aria-label={
+            table.options.meta?.dataTableSelection?.selectAllCheckboxAriaLabel ??
+            'Select all rows'
+          }
+          checked={table.getIsAllPageRowsSelected()}
+          indeterminate={
+            table.getIsSomePageRowsSelected() &&
+            !table.getIsAllPageRowsSelected()
+          }
+          onCheckedChange={(checked) =>
+            table.toggleAllPageRowsSelected(checked)
+          }
+          size="s"
+        />
+      </div>
+    );
+  },
+  id: '__selection',
+  meta: {
+    align: 'center',
+    width: 48,
+    wrap: 'nowrap',
+  },
+});
 
 export const DataTable = <TData,>({
   ariaLabel,
@@ -104,6 +177,7 @@ export const DataTable = <TData,>({
   onSortingChange,
   pagination,
   rowSelection,
+  selection,
   sorting,
   selectable = false,
 }: DataTableProps<TData>) => {
@@ -111,7 +185,13 @@ export const DataTable = <TData,>({
     useState<DataTableRowSelectionState>({});
   const [uncontrolledSorting, setUncontrolledSorting] =
     useState<DataTableSortingState>([]);
-  const resolvedRowSelection = rowSelection ?? uncontrolledRowSelection;
+  const selectionRowState = selection?.rowSelection ?? rowSelection;
+  const selectionChangeHandler =
+    selection?.onRowSelectionChange ?? onRowSelectionChange;
+  const getSelectableRow = selection?.getRowCanSelect ?? getRowCanSelect;
+  const isRowSelectionEnabled = selection !== undefined || selectable;
+  const hasBuiltInSelectionColumn = selection !== undefined;
+  const resolvedRowSelection = selectionRowState ?? uncontrolledRowSelection;
   const resolvedSorting = sorting ?? uncontrolledSorting;
   const resolvedPagination = pagination
     ? {
@@ -121,11 +201,19 @@ export const DataTable = <TData,>({
     : undefined;
   const paginationRowCount = pagination?.count ?? data.length;
 
+  const tableColumns = useMemo(() => {
+    if (!hasBuiltInSelectionColumn) {
+      return columns;
+    }
+
+    return [createSelectionColumn<TData>(), ...columns];
+  }, [columns, hasBuiltInSelectionColumn]);
+
   const table = useReactTable({
-    columns,
+    columns: tableColumns,
     data,
-    enableRowSelection: selectable
-      ? (row) => getRowCanSelect?.(row.original, row.index) ?? true
+    enableRowSelection: isRowSelectionEnabled
+      ? (row) => getSelectableRow?.(row.original, row.index) ?? true
       : false,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel:
@@ -134,17 +222,20 @@ export const DataTable = <TData,>({
     getSortedRowModel: manualSorting ? undefined : getSortedRowModel(),
     manualPagination: pagination ? manualPagination : false,
     manualSorting,
+    meta: {
+      dataTableSelection: selection,
+    },
     onRowSelectionChange: (updater) => {
       const nextRowSelection = resolveRowSelectionState(
         updater,
         resolvedRowSelection
       );
 
-      if (rowSelection === undefined) {
+      if (selectionRowState === undefined) {
         setUncontrolledRowSelection(nextRowSelection);
       }
 
-      onRowSelectionChange?.(nextRowSelection);
+      selectionChangeHandler?.(nextRowSelection);
     },
     onSortingChange: (updater) => {
       const nextSorting = resolveSortingState(updater, resolvedSorting);
@@ -214,7 +305,7 @@ export const DataTable = <TData,>({
               table.getRowModel().rows.map((row) => (
                 <tr
                   key={row.id}
-                  className="bg-card last:[&_td]:border-b-0 data-[state=selected]:bg-[var(--color-primary-8)]"
+                  className="bg-card hover:bg-[var(--color-grey-8)] last:[&_td]:border-b-0 data-[state=selected]:bg-[var(--color-grey-8)]"
                   data-state={row.getIsSelected() ? 'selected' : undefined}
                 >
                   {row.getVisibleCells().map((cell) => {

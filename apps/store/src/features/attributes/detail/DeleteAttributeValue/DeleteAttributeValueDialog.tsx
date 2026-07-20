@@ -3,7 +3,7 @@
 import { Button, Dialog, Typography } from '@ordero/ui';
 import { useQueryClient } from '@tanstack/react-query';
 import { attributesQueryKeys } from '@/lib/query/attributes/attributesQueryKeys';
-import { useDeleteAttributeValue } from './hooks/useDeleteAttributeValue';
+import { useDeleteAttributeValues } from './hooks/useDeleteAttributeValues';
 import type { DeleteAttributeValueDialogProps } from './types';
 
 export const DeleteAttributeValueDialog = ({
@@ -13,9 +13,8 @@ export const DeleteAttributeValueDialog = ({
   open,
 }: DeleteAttributeValueDialogProps) => {
   const queryClient = useQueryClient();
-  const { handleDelete, isDeleting } = useDeleteAttributeValue({
-    attributeValueId: attributeValue.id,
-    attributeValueName: attributeValue.name,
+  const { handleDelete, isDeleting } = useDeleteAttributeValues({
+    attributeValueIds: [attributeValue.id],
     onDeleted: async () => {
       onOpenChange(false);
       await queryClient.invalidateQueries({
@@ -36,8 +35,8 @@ export const DeleteAttributeValueDialog = ({
 
             <Dialog.Content>
               <Typography variant="body1">
-                Are you sure you want to delete the{' '}
-                "<strong>{attributeValue.name}</strong>" attribute value?
+                Are you sure you want to delete the "
+                <strong>{attributeValue.name}</strong>" attribute value?
               </Typography>
             </Dialog.Content>
 

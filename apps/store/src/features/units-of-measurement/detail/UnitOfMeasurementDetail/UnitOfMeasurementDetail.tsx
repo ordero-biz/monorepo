@@ -1,7 +1,11 @@
 'use client';
 
+import { Button, Card, Menu, PageHeader, Typography } from '@ordero/ui';
+import { EllipsisVertical, Trash2 } from 'lucide-react';
+import { useState } from 'react';
 import { useUnitOfMeasurementQuery } from '@/lib/hooks/units-of-measurement/useUnitOfMeasurementQuery';
-import { Button, Card, PageHeader, Typography } from '@/ui/index';
+import { DeleteUnitOfMeasurementDialog } from '../DeleteUnitOfMeasurement';
+import { UpdateUnitOfMeasurementDialogTrigger } from '../UpdateUnitOfMeasurement';
 import type { UnitOfMeasurementDetailProps } from './types';
 import { UnitOfMeasurementDetailInfo } from './UnitOfMeasurementDetailInfo';
 
@@ -9,6 +13,7 @@ export const UnitOfMeasurementDetail = ({
   unitOfMeasurementId,
 }: UnitOfMeasurementDetailProps) => {
   const unitOfMeasurementQuery = useUnitOfMeasurementQuery(unitOfMeasurementId);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   if (unitOfMeasurementQuery.isPending) {
     return (
@@ -53,7 +58,49 @@ export const UnitOfMeasurementDetail = ({
           <Typography variant="h5">
             {unitOfMeasurementQuery.data.name}
           </Typography>
+          <div>
+            <UpdateUnitOfMeasurementDialogTrigger
+              onUpdated={async () => {
+                await unitOfMeasurementQuery.refetch();
+              }}
+              unitOfMeasurement={unitOfMeasurementQuery.data}
+            />
+          </div>
         </PageHeader.Left>
+        <PageHeader.Right>
+          <Menu.Root>
+            <Menu.Trigger
+              aria-label={`Actions for ${unitOfMeasurementQuery.data.name}`}
+              appearance="iconButton"
+              size="s"
+              title={`Actions for ${unitOfMeasurementQuery.data.name}`}
+            >
+              <EllipsisVertical aria-hidden="true" />
+            </Menu.Trigger>
+            <Menu.Portal>
+              <Menu.Positioner align="end">
+                <Menu.Popup>
+                  <Menu.Item
+                    color="error"
+                    onClick={() => setIsDeleteDialogOpen(true)}
+                  >
+                    <Trash2
+                      aria-hidden="true"
+                      className="size-[var(--icon-button-xs-icon)]"
+                    />
+                    Delete unit of measurement
+                  </Menu.Item>
+                </Menu.Popup>
+              </Menu.Positioner>
+            </Menu.Portal>
+          </Menu.Root>
+
+          <DeleteUnitOfMeasurementDialog
+            onOpenChange={setIsDeleteDialogOpen}
+            open={isDeleteDialogOpen}
+            unitOfMeasurement={unitOfMeasurementQuery.data}
+          />
+        </PageHeader.Right>
       </PageHeader.Root>
       <UnitOfMeasurementDetailInfo
         unitOfMeasurement={unitOfMeasurementQuery.data}

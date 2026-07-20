@@ -1,10 +1,10 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
-import { deleteAttributeValues } from '@/lib/client/api/attributes';
+import { deleteUnitsOfMeasurement } from '@/lib/client/api/units-of-measurement';
 import {
   createTestQueryClient,
   createTestQueryProvider,
 } from '@/test/prepareSetup';
-import { useDeleteAttributeValue } from './useDeleteAttributeValue';
+import { useDeleteUnitOfMeasurement } from './useDeleteUnitOfMeasurement';
 
 const { addToastMock } = vi.hoisted(() => ({
   addToastMock: vi.fn(),
@@ -17,24 +17,24 @@ vi.mock('@ordero/ui', async () => ({
   }),
 }));
 
-vi.mock('@/lib/client/api/attributes', async () => ({
-  ...(await vi.importActual<typeof import('@/lib/client/api/attributes')>(
-    '@/lib/client/api/attributes'
-  )),
-  deleteAttributeValues: vi.fn(),
+vi.mock('@/lib/client/api/units-of-measurement', async () => ({
+  ...(await vi.importActual<
+    typeof import('@/lib/client/api/units-of-measurement')
+  >('@/lib/client/api/units-of-measurement')),
+  deleteUnitsOfMeasurement: vi.fn(),
 }));
 
-const deleteAttributeValuesMock = vi.mocked(deleteAttributeValues);
+const deleteUnitsOfMeasurementMock = vi.mocked(deleteUnitsOfMeasurement);
 
-const setupDeleteAttributeValueHook = () => {
+const setupDeleteUnitOfMeasurementHook = () => {
   const onDeleted = vi.fn();
   const TestQueryProvider = createTestQueryProvider(createTestQueryClient());
   const { result } = renderHook(
     () =>
-      useDeleteAttributeValue({
-        attributeValueId: 3,
-        attributeValueName: 'Blue',
+      useDeleteUnitOfMeasurement({
         onDeleted,
+        unitOfMeasurementId: 7,
+        unitOfMeasurementName: 'Kilogram',
       }),
     {
       wrapper: TestQueryProvider,
@@ -42,23 +42,23 @@ const setupDeleteAttributeValueHook = () => {
   );
 
   return {
-    result,
     onDeleted,
+    result,
   };
 };
 
-describe('useDeleteAttributeValue', () => {
+describe('useDeleteUnitOfMeasurement', () => {
   beforeEach(() => {
     addToastMock.mockClear();
-    deleteAttributeValuesMock.mockReset();
+    deleteUnitsOfMeasurementMock.mockReset();
   });
 
-  it('deletes the attribute value and runs success cleanup', async () => {
-    deleteAttributeValuesMock.mockResolvedValue({
+  it('deletes the unit of measurement and runs success cleanup', async () => {
+    deleteUnitsOfMeasurementMock.mockResolvedValue({
       ok: true,
       data: undefined,
     });
-    const { onDeleted, result } = setupDeleteAttributeValueHook();
+    const { onDeleted, result } = setupDeleteUnitOfMeasurementHook();
 
     expect(result.current.isDeleting).toBe(false);
 
@@ -67,27 +67,27 @@ describe('useDeleteAttributeValue', () => {
     });
 
     await waitFor(() =>
-      expect(deleteAttributeValuesMock).toHaveBeenCalledWith({
-        attributeValueIds: [3],
+      expect(deleteUnitsOfMeasurementMock).toHaveBeenCalledWith({
+        unitOfMeasurementIds: [7],
       })
     );
     await waitFor(() => expect(onDeleted).toHaveBeenCalled());
     expect(addToastMock).toHaveBeenCalledWith({
-      description: 'Attribute value Blue was deleted.',
+      description: 'Unit of measurement Kilogram was deleted.',
       type: 'success',
     });
     expect(result.current.isDeleting).toBe(false);
   });
 
-  it('shows a toast and skips success cleanup when delete fails', async () => {
-    deleteAttributeValuesMock.mockResolvedValue({
+  it('shows a toast and skips success cleanup when deletion fails', async () => {
+    deleteUnitsOfMeasurementMock.mockResolvedValue({
       ok: false,
       error: {
         status: 500,
-        message: 'Attribute value delete failed.',
+        message: 'Unit of measurement deletion failed',
       },
     });
-    const { onDeleted, result } = setupDeleteAttributeValueHook();
+    const { onDeleted, result } = setupDeleteUnitOfMeasurementHook();
 
     act(() => {
       result.current.handleDelete();
@@ -95,7 +95,7 @@ describe('useDeleteAttributeValue', () => {
 
     await waitFor(() =>
       expect(addToastMock).toHaveBeenCalledWith({
-        description: 'Attribute value delete failed.',
+        description: 'Unit of measurement deletion failed',
         type: 'error',
       })
     );

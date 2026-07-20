@@ -97,7 +97,14 @@ describe('useUpdateSupplierForm', () => {
       description: 'Supplier Fresh Farms Updated was updated',
       type: 'success',
     });
-    expect(onUpdated).toHaveBeenCalled();
+    expect(onUpdated).toHaveBeenCalledWith({
+      id: 1,
+      name: 'Fresh Farms Updated',
+      email: 'orders.updated@fresh.example',
+      phone: '+1 555 0101',
+      address: '124 Market St',
+      comment: 'Updated supplier',
+    });
   });
 
   it('shows a toast when submit fails with a form-level error', async () => {

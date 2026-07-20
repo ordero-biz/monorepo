@@ -1,8 +1,9 @@
 'use client';
 
+import { Button, Card, Typography } from '@ordero/ui';
 import { useWarehouseQuery } from '@/lib/hooks/warehouses/useWarehouseQuery';
-import { Button, Card, PageHeader, Typography } from '@/ui/index';
 import type { WarehouseDetailProps } from './types';
+import { WarehouseDetailHeader } from './WarehouseDetailHeader';
 import { WarehouseDetailInfo } from './WarehouseDetailInfo';
 
 export const WarehouseDetail = ({ warehouseId }: WarehouseDetailProps) => {
@@ -46,11 +47,12 @@ export const WarehouseDetail = ({ warehouseId }: WarehouseDetailProps) => {
 
   return (
     <div className="flex flex-col gap-[var(--space-2)]">
-      <PageHeader.Root>
-        <PageHeader.Left>
-          <Typography variant="h5">{warehouseQuery.data.name}</Typography>
-        </PageHeader.Left>
-      </PageHeader.Root>
+      <WarehouseDetailHeader
+        onUpdated={async () => {
+          await warehouseQuery.refetch();
+        }}
+        warehouse={warehouseQuery.data}
+      />
       <WarehouseDetailInfo warehouse={warehouseQuery.data} />
     </div>
   );

@@ -1,5 +1,6 @@
 import type { CSSProperties, MouseEventHandler, ReactNode } from 'react';
 import type { ButtonColor, ButtonSize, ButtonVariant } from '../Button';
+import type { IconButtonSize } from '../IconButton';
 
 export type MenuAlign = 'start' | 'center' | 'end';
 export type MenuSide = 'top' | 'right' | 'bottom' | 'left';
@@ -16,19 +17,27 @@ export type MenuRootProps = {
   open?: boolean;
 };
 
-export type MenuTriggerProps = {
+type MenuTriggerCommonProps = {
   'aria-label'?: string;
-  appearance?: MenuTriggerAppearance;
   children?: ReactNode;
   color?: ButtonColor;
   disabled?: boolean;
   endIcon?: ReactNode;
   id?: string;
-  size?: ButtonSize;
   startIcon?: ReactNode;
   title?: string;
   variant?: ButtonVariant;
 };
+
+export type MenuTriggerProps =
+  | (MenuTriggerCommonProps & {
+      appearance?: 'button';
+      size?: ButtonSize;
+    })
+  | (MenuTriggerCommonProps & {
+      appearance: 'iconButton';
+      size?: IconButtonSize;
+    });
 
 export type MenuPortalProps = {
   children?: ReactNode;

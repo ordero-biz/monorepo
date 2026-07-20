@@ -54,6 +54,12 @@ export type {
 } from './components/Chip';
 export { Chip } from './components/Chip';
 export type {
+  ContextualActionBarLeftProps,
+  ContextualActionBarRightProps,
+  ContextualActionBarRootProps,
+} from './components/ContextualActionBar';
+export { ContextualActionBar } from './components/ContextualActionBar';
+export type {
   ComboboxChangeEventDetails,
   ComboboxMultipleProps,
   ComboboxOption,
@@ -65,6 +71,7 @@ export type {
 export { Combobox } from './components/Combobox';
 export type {
   DataTableCellProps,
+  DataTableCellVariant,
   DataTableColumnAlignment,
   DataTableColumnDef,
   DataTableColumnHeaderProps,
@@ -74,6 +81,7 @@ export type {
   DataTablePaginationState,
   DataTableProps,
   DataTableRowSelectionState,
+  DataTableSelectionProps,
   DataTableSelectionCellProps,
   DataTableSelectionColumnHeaderProps,
   DataTableSortingState,
@@ -85,6 +93,8 @@ export {
   DataTableSelectionCell,
   DataTableSelectionColumnHeader,
 } from './components/DataTable';
+export { useDataTableSelection } from './components/DataTable';
+export type { UseDataTableSelectionArgs } from './components/DataTable';
 export type {
   DialogBackdropProps,
   DialogCloseProps,
@@ -115,6 +125,7 @@ export type {
   IconButtonColor,
   IconButtonProps,
   IconButtonSize,
+  IconButtonVariant,
 } from './components/IconButton';
 export { IconButton } from './components/IconButton';
 export type {

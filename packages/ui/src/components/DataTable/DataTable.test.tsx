@@ -1,7 +1,7 @@
 import { prepareSetup } from '@ordero/test-config/react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Checkbox } from '@/ui/components/Checkbox';
 import { DataTable } from './DataTable';
 import { DataTableColumnHeader } from './DataTableColumnHeader';
@@ -10,6 +10,7 @@ import { DataTableSelectionColumnHeader } from './DataTableSelectionColumnHeader
 import type {
   DataTableColumnDef,
   DataTableProps,
+  DataTableRowSelectionState,
   DataTableSortingState,
 } from './types';
 
@@ -48,6 +49,28 @@ const data: InvoiceRow[] = [
     amount: '$180.00',
     id: 'INV-002',
     status: 'Pending',
+  },
+];
+
+const sortableColumns: DataTableColumnDef<InvoiceRow>[] = [
+  {
+    accessorKey: 'amount',
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Amount" />
+    ),
+  },
+];
+
+const sortableData: InvoiceRow[] = [
+  {
+    amount: '$300.00',
+    id: 'INV-003',
+    status: 'Unpaid',
+  },
+  {
+    amount: '$100.00',
+    id: 'INV-001',
+    status: 'Paid',
   },
 ];
 
@@ -215,6 +238,37 @@ describe('DataTable', () => {
     ).toBeChecked();
   });
 
+  it('renders a built-in selection column without adding it to the consumer columns', async () => {
+    const user = userEvent.setup();
+    const onRowSelectionChange = vi.fn();
+
+    setup({
+      selection: {
+        getRowCheckboxAriaLabel: (row) => `Select ${row.id}`,
+        onRowSelectionChange,
+        selectAllCheckboxAriaLabel: 'Select all invoices',
+      },
+    });
+
+    await user.click(screen.getByRole('checkbox', { name: 'Select INV-001' }));
+
+    expect(
+      screen.getByRole('checkbox', { name: 'Select INV-001' })
+    ).toBeChecked();
+    expect(onRowSelectionChange).toHaveBeenCalled();
+
+    await user.click(
+      screen.getByRole('checkbox', { name: 'Select all invoices' })
+    );
+
+    expect(
+      screen.getByRole('checkbox', { name: 'Select all invoices' })
+    ).toBeChecked();
+    expect(
+      screen.getByRole('checkbox', { name: 'Select INV-002' })
+    ).toBeChecked();
+  });
+
   it('supports row selection with reusable selection wrappers', async () => {
     const user = userEvent.setup();
 
@@ -258,6 +312,130 @@ describe('DataTable', () => {
     expect(
       screen.getByRole('checkbox', { name: 'Select INV-002' })
     ).toBeChecked();
+  });
+
+  it('selects only the current page with a reusable selection header', async () => {
+    const user = userEvent.setup();
+    const onRowSelectionChange = vi.fn();
+
+    setup({
+      columns: [
+        {
+          accessorKey: 'id',
+          cell: ({ row }) => (
+            <DataTableSelectionCell
+              checkboxAriaLabel={`Select ${row.original.id}`}
+              row={row}
+            >
+              <div>{row.original.id}</div>
+            </DataTableSelectionCell>
+          ),
+          header: ({ column, table }) => (
+            <DataTableSelectionColumnHeader
+              checkboxAriaLabel="Select all invoices"
+              column={column}
+              table={table}
+              title="Invoice"
+            />
+          ),
+          id: 'selection',
+        },
+      ],
+      data: [
+        ...data,
+        {
+          amount: '$75.00',
+          id: 'INV-003',
+          status: 'Overdue',
+        },
+      ],
+      getRowId: (row) => row.id,
+      onRowSelectionChange,
+      pagination: {
+        onPageChange: vi.fn(),
+        page: 0,
+        rowsPerPage: 2,
+      },
+      selectable: true,
+    });
+
+    await user.click(
+      screen.getByRole('checkbox', { name: 'Select INV-001' })
+    );
+
+    expect(
+      screen.getByRole('checkbox', { name: 'Select all invoices' })
+    ).toHaveAttribute('aria-checked', 'mixed');
+
+    await user.click(
+      screen.getByRole('checkbox', { name: 'Select all invoices' })
+    );
+
+    expect(onRowSelectionChange).toHaveBeenLastCalledWith({
+      'INV-001': true,
+      'INV-002': true,
+    });
+    expect(
+      screen.getByRole('checkbox', { name: 'Select INV-001' })
+    ).toBeChecked();
+    expect(
+      screen.getByRole('checkbox', { name: 'Select INV-002' })
+    ).toBeChecked();
+    expect(
+      screen.getByRole('checkbox', { name: 'Select all invoices' })
+    ).toBeChecked();
+  });
+
+  it('keeps the reusable selection header clear for rows selected on another page', () => {
+    setup({
+      columns: [
+        {
+          accessorKey: 'id',
+          cell: ({ row }) => (
+            <DataTableSelectionCell
+              checkboxAriaLabel={`Select ${row.original.id}`}
+              row={row}
+            >
+              <div>{row.original.id}</div>
+            </DataTableSelectionCell>
+          ),
+          header: ({ column, table }) => (
+            <DataTableSelectionColumnHeader
+              checkboxAriaLabel="Select all invoices"
+              column={column}
+              table={table}
+              title="Invoice"
+            />
+          ),
+          id: 'selection',
+        },
+      ],
+      data: [
+        ...data,
+        {
+          amount: '$75.00',
+          id: 'INV-003',
+          status: 'Overdue',
+        },
+      ],
+      getRowId: (row) => row.id,
+      pagination: {
+        onPageChange: vi.fn(),
+        page: 0,
+        rowsPerPage: 2,
+      },
+      rowSelection: {
+        'INV-003': true,
+      },
+      selectable: true,
+    });
+
+    const selectAllInvoices = screen.getByRole('checkbox', {
+      name: 'Select all invoices',
+    });
+
+    expect(selectAllInvoices).not.toBeChecked();
+    expect(selectAllInvoices).toHaveAttribute('aria-checked', 'false');
   });
 
   it('disables selection for rows excluded by getRowCanSelect', () => {
@@ -380,6 +558,46 @@ describe('DataTable', () => {
     });
 
     await user.click(screen.getByRole('button', { name: /amount/i }));
+
+    const rows = screen.getAllByRole('row');
+
+    expect(rows[1]).toHaveTextContent('$100.00');
+    expect(rows[2]).toHaveTextContent('$300.00');
+    expect(
+      screen.getByRole('columnheader', { name: 'Amount' })
+    ).toHaveAttribute('aria-sort', 'ascending');
+  });
+
+  it('preserves sorting when controlled built-in selection changes', async () => {
+    const user = userEvent.setup();
+
+    const SortableSelectionTable = () => {
+      const [rowSelection, setRowSelection] =
+        useState<DataTableRowSelectionState>({});
+      const selection = useMemo(
+        () => ({
+          getRowCheckboxAriaLabel: (row: InvoiceRow) => `Select ${row.id}`,
+          onRowSelectionChange: setRowSelection,
+          rowSelection,
+          selectAllCheckboxAriaLabel: 'Select all invoices',
+        }),
+        [rowSelection]
+      );
+
+      return (
+        <DataTable
+          ariaLabel="Sortable invoice table"
+          columns={sortableColumns}
+          data={sortableData}
+          selection={selection}
+        />
+      );
+    };
+
+    render(<SortableSelectionTable />);
+
+    await user.click(screen.getByRole('button', { name: /amount/i }));
+    await user.click(screen.getByRole('checkbox', { name: 'Select INV-001' }));
 
     const rows = screen.getAllByRole('row');
 

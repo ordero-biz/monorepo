@@ -16,14 +16,14 @@ export const warehouseAddressSchema = z
   .trim()
   .min(1, 'Warehouse address is required');
 
-export const createWarehouseSchema = z.object({
+export const warehouseFormSchema = z.object({
   code: warehouseCodeSchema,
   name: warehouseNameSchema,
   address: warehouseAddressSchema,
   comment: z.string(),
 });
 
-export type CreateWarehouseFormValues = z.infer<typeof createWarehouseSchema>;
+export type WarehouseFormValues = z.infer<typeof warehouseFormSchema>;
 
 const getValidationMessage = (schema: z.ZodString, value: string) => {
   const result = schema.safeParse(value);

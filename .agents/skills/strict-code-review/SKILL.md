@@ -103,6 +103,7 @@ Use this map to load the smallest relevant source of truth for the diff:
 - HTTP/auth, server-state queries, and mutation changes:
   `docs/http-auth.md`, `docs/testing.md`, `platform-http-requests`
 - shared UI component API shape: `docs/ui-components.md`
+- shared or feature data-table behavior: `docs/data-tables.md`
 - tokens, CSS variables, and Tailwind exposure: `docs/ui-tokens.md`, `ui-routine-conventions`
 - TS and TSX authoring conventions: `ts-react-conventions`
 - shared UI accessibility testing: `docs/accessibility-testing.md`
@@ -295,6 +296,12 @@ When the diff touches `@tanstack/react-table`, `useReactTable`, shared table pri
 - treat always-on `getSortedRowModel()` without a `manualSorting` path as a likely finding when the component API suggests server-side sorting support
 - when `manualSorting` or server-side sorting support is introduced, expect targeted tests that confirm sorting state updates without local row reordering
 - when data updates are introduced alongside sorting, selection, pagination, or expanding behavior, verify whether TanStack auto-reset behavior is still desired and whether that expectation is tested
+- for selectable `DataTable` work, verify that select-all is limited to the
+  current visible page, row ids are stable domain ids, labels identify rows and
+  the collection, and tests cover the applicable pagination scope
+- treat consumer-created raw checkbox columns as a review concern unless a
+  custom layout cannot use the built-in `selection` API or the documented
+  composition helpers
 
 ## Form review rules
 

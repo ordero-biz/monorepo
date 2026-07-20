@@ -1,13 +1,31 @@
 'use client';
 
-import { Button, Card, DataTable, Typography } from '@ordero/ui';
+import {
+  Button,
+  Card,
+  ContextualActionBar,
+  DataTable,
+  Typography,
+  useDataTableSelection,
+} from '@ordero/ui';
+import { Trash2 } from 'lucide-react';
 import { useMemo, useState } from 'react';
+import { BaseLayoutContextualActionBar } from '@/features/app-shell';
 import type { AttributeValue } from '@/lib/domain/attributes';
 import { useAttributeValuesQuery } from '@/lib/hooks/attributes/useAttributeValuesQuery';
-import { DeleteAttributeValueDialog } from '../DeleteAttributeValue';
+import {
+  DeleteAttributeValueDialog,
+  DeleteAttributeValuesDialog,
+} from '../DeleteAttributeValue';
 import { UpdateAttributeValueDialog } from '../UpdateAttributeValue';
 import { getColumns } from './columns';
 import type { AttributeDetailValuesProps } from './types';
+
+const getAttributeValueRowId = (attributeValue: AttributeValue) =>
+  String(attributeValue.id);
+
+const getAttributeValueCheckboxAriaLabel = (attributeValue: AttributeValue) =>
+  `Select ${attributeValue.name}`;
 
 export const AttributeDetailValues = ({
   attributeId,
@@ -18,6 +36,9 @@ export const AttributeDetailValues = ({
     useState<AttributeValue | null>(null);
   const [deletingAttributeValue, setDeletingAttributeValue] =
     useState<AttributeValue | null>(null);
+  const [deletingAttributeValues, setDeletingAttributeValues] = useState<
+    AttributeValue[] | null
+  >(null);
 
   const columns = useMemo(
     () =>
@@ -27,6 +48,16 @@ export const AttributeDetailValues = ({
       }),
     []
   );
+  const {
+    clearSelection,
+    selectedRows: selectedAttributeValues,
+    selection,
+  } = useDataTableSelection({
+    data: attributeValuesQuery.data,
+    getRowCheckboxAriaLabel: getAttributeValueCheckboxAriaLabel,
+    getRowId: getAttributeValueRowId,
+    selectAllCheckboxAriaLabel: 'Select all attribute values',
+  });
 
   if (attributeValuesQuery.isPending) {
     return (
@@ -66,13 +97,48 @@ export const AttributeDetailValues = ({
 
   return (
     <>
+
       <DataTable
         ariaLabel="Attribute values"
         columns={columns}
         data={attributeValuesQuery.data}
         emptyMessage="No attribute values found."
-        getRowId={(row) => String(row.id)}
+        getRowId={getAttributeValueRowId}
+        selection={selection}
       />
+
+      {selectedAttributeValues.length > 0 ? (
+        <BaseLayoutContextualActionBar>
+          <ContextualActionBar.Root ariaLabel="Attribute value bulk actions">
+            <ContextualActionBar.Left>
+              <Typography variant="body2">
+                {selectedAttributeValues.length} selected
+              </Typography>
+              <Button
+                color="inherit"
+                onClick={clearSelection}
+                size="s"
+                variant="text"
+              >
+                Clear selection
+              </Button>
+            </ContextualActionBar.Left>
+            <ContextualActionBar.Right>
+              <Button
+                variant="soft"
+                color="error"
+                onClick={() =>
+                  setDeletingAttributeValues(selectedAttributeValues)
+                }
+                size="s"
+                startIcon={<Trash2 aria-hidden="true" />}
+              >
+                Delete
+              </Button>
+            </ContextualActionBar.Right>
+          </ContextualActionBar.Root>
+        </BaseLayoutContextualActionBar>
+      ) : null}
 
       {updatingAttributeValue && (
         <UpdateAttributeValueDialog
@@ -97,6 +163,20 @@ export const AttributeDetailValues = ({
             }
           }}
           open={Boolean(deletingAttributeValue)}
+        />
+      )}
+
+      {deletingAttributeValues && (
+        <DeleteAttributeValuesDialog
+          attributeId={attributeId}
+          attributeValues={deletingAttributeValues}
+          onDeleted={clearSelection}
+          onOpenChange={(nextOpen) => {
+            if (!nextOpen) {
+              setDeletingAttributeValues(null);
+            }
+          }}
+          open={Boolean(deletingAttributeValues)}
         />
       )}
     </>

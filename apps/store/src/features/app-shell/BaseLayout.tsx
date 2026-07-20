@@ -10,10 +10,18 @@ const baseLayoutContentClassName = cn(
   'xl:max-w-[var(--layout-container-xl)] xl:px-7'
 );
 
+const baseLayoutMainClassName = cn(
+  'flex min-w-0 flex-1 flex-col [--base-layout-content-max-width:100%] [--base-layout-main-offset:var(--nav-width)]',
+  'sm:[--base-layout-content-max-width:var(--layout-container-sm)]',
+  'md:[--base-layout-content-max-width:var(--layout-container-md)]',
+  'lg:[--base-layout-content-max-width:var(--layout-container-lg)]',
+  'xl:[--base-layout-content-max-width:var(--layout-container-xl)]'
+);
+
 export const BaseLayout = ({ children }: BaseLayoutProps) => (
   <div className="mx-auto flex min-h-screen w-full">
     <Sidebar />
-    <main className="flex min-w-0 flex-1 flex-col">
+    <main className={baseLayoutMainClassName}>
       <TopBar.Root id="store-page-header">
         <TopBar.Left>
           <Typography variant="h6">Store</Typography>

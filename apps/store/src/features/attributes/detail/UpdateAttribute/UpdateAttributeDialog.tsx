@@ -2,11 +2,15 @@
 
 import { Button, Dialog, TextField } from '@ordero/ui';
 import { useQueryClient } from '@tanstack/react-query';
+import { useRef, useState } from 'react';
+import type { Attribute } from '@/lib/domain/attributes';
 import { attributesQueryKeys } from '@/lib/query/attributes/attributesQueryKeys';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
 import { useUpdateAttributeForm } from './hooks/useUpdateAttributeForm';
 import type { UpdateAttributeDialogProps } from './types';
 import { validateUpdateAttributeName } from './utils/validations';
+
+const getAttributeFormValues = ({ name }: Attribute) => ({ name });
 
 export const UpdateAttributeDialog = ({
   attribute,
@@ -15,26 +19,31 @@ export const UpdateAttributeDialog = ({
   open,
 }: UpdateAttributeDialogProps) => {
   const queryClient = useQueryClient();
+  const latestAttributeRef = useRef(attribute);
+  const [formValues, setFormValues] = useState(() =>
+    getAttributeFormValues(attribute)
+  );
   const { form } = useUpdateAttributeForm({
     attributeId: attribute.id,
-    initialName: attribute.name,
-    onUpdated: async () => {
+    initialName: formValues.name,
+    onUpdated: async (updatedAttribute) => {
+      const updatedFormValues = getAttributeFormValues(updatedAttribute);
+
+      latestAttributeRef.current = updatedAttribute;
+      setFormValues(updatedFormValues);
+      form.reset(updatedFormValues);
       onOpenChange(false);
       await queryClient.invalidateQueries({
         queryKey: attributesQueryKeys.list,
       });
-      await onUpdated();
+      await onUpdated(updatedAttribute);
     },
   });
 
   const handleOpenChange = (nextOpen: boolean) => {
     onOpenChange(nextOpen);
 
-    if (!nextOpen) {
-      form.reset({
-        name: attribute.name,
-      });
-    }
+    form.reset(getAttributeFormValues(latestAttributeRef.current));
   };
 
   return (

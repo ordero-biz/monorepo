@@ -22,8 +22,6 @@ describe('CategoryListHeader', () => {
     expect(
       screen.getByRole('heading', { name: 'Category list' })
     ).toBeVisible();
-    expect(
-      screen.getByRole('button', { name: 'Add Category' })
-    ).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Add Category' })).toBeVisible();
   });
 });

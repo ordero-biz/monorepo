@@ -1,5 +1,5 @@
 import { prepareSetup } from '@ordero/test-config/react';
-import { screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { EllipsisVertical } from 'lucide-react';
 import { Menu } from './index';
@@ -22,7 +22,7 @@ const menuChildren = (
 
 const iconButtonMenuChildren = (
   <>
-    <Menu.Trigger appearance="iconButton" aria-label="More actions">
+    <Menu.Trigger appearance="iconButton" aria-label="More actions" size="xs">
       <EllipsisVertical aria-hidden="true" />
     </Menu.Trigger>
     <Menu.Portal>
@@ -55,9 +55,7 @@ describe('Menu', () => {
 
     setup();
 
-    await user.click(
-      screen.getByRole('button', { name: 'Open menu options' })
-    );
+    await user.click(screen.getByRole('button', { name: 'Open menu options' }));
 
     expect(await screen.findByRole('menu')).toBeInTheDocument();
     expect(
@@ -71,9 +69,7 @@ describe('Menu', () => {
       onOpenChange: vi.fn(),
     });
 
-    await user.click(
-      screen.getByRole('button', { name: 'Open menu options' })
-    );
+    await user.click(screen.getByRole('button', { name: 'Open menu options' }));
     await user.click(
       await screen.findByRole('menuitem', { name: 'Duplicate' })
     );
@@ -87,9 +83,7 @@ describe('Menu', () => {
 
     setup();
 
-    await user.click(
-      screen.getByRole('button', { name: 'Open menu options' })
-    );
+    await user.click(screen.getByRole('button', { name: 'Open menu options' }));
 
     expect(
       await screen.findByRole('menuitem', { name: 'Delete' })
@@ -102,6 +96,22 @@ describe('Menu', () => {
     expect(
       screen.getByRole('button', { name: 'Open menu options' })
     ).toBeDisabled();
+  });
+
+  it('disables an icon button trigger when it is disabled', () => {
+    render(
+      <Menu.Root>
+        <Menu.Trigger
+          appearance="iconButton"
+          aria-label="More actions"
+          disabled
+        >
+          <EllipsisVertical aria-hidden="true" />
+        </Menu.Trigger>
+      </Menu.Root>
+    );
+
+    expect(screen.getByRole('button', { name: 'More actions' })).toBeDisabled();
   });
 
   it('opens from an icon button trigger', async () => {

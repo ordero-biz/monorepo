@@ -60,7 +60,7 @@ describe('AttributeDetailHeader', () => {
     setup();
 
     expect(await screen.findByRole('heading', { name: 'Color' })).toBeVisible();
-    expect(screen.getByRole('button', { name: 'Edit Color' })).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Add Value' })).toBeVisible();
     expect(
       screen.getByRole('button', { name: 'Actions for Color' })
     ).toBeVisible();
@@ -83,10 +83,36 @@ describe('AttributeDetailHeader', () => {
     await user.click(
       await screen.findByRole('button', { name: 'Actions for Color' })
     );
-    await user.click(await screen.findByRole('menuitem', { name: 'Delete attribute' }));
+    expect(
+      await screen.findByRole('menuitem', { name: 'Edit attribute name' })
+    ).toBeVisible();
+    await user.click(
+      await screen.findByRole('menuitem', { name: 'Delete attribute' })
+    );
 
     expect(
       screen.getByRole('dialog', { name: 'Delete attribute' })
+    ).toBeVisible();
+  });
+
+  it('opens the add values dialog from the main action', async () => {
+    getAttributeMock.mockResolvedValue({
+      ok: true,
+      data: {
+        id: 7,
+        name: 'Color',
+        sortOrder: 10,
+        createdAt: '2026-06-24T20:07:32.467Z',
+      },
+    });
+    const user = userEvent.setup();
+
+    setup();
+
+    await user.click(await screen.findByRole('button', { name: 'Add Value' }));
+
+    expect(
+      screen.getByRole('dialog', { name: 'Add attribute values' })
     ).toBeVisible();
   });
 
@@ -124,7 +150,12 @@ describe('AttributeDetailHeader', () => {
     setup();
 
     expect(await screen.findByRole('heading', { name: 'Color' })).toBeVisible();
-    await user.click(screen.getByRole('button', { name: 'Edit Color' }));
+    await user.click(
+      screen.getByRole('button', { name: 'Actions for Color' })
+    );
+    await user.click(
+      await screen.findByRole('menuitem', { name: 'Edit attribute name' })
+    );
 
     const nameField = screen.getByRole('textbox', {
       name: 'Attribute name',

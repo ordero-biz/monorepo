@@ -69,31 +69,42 @@ describe('CreateAttributeDialog', () => {
     expect(createButton).toBeEnabled();
   });
 
-  it('adds and removes attribute value fields dynamically', async () => {
+  it('adds, focuses, and removes attribute value fields dynamically', async () => {
     const user = userEvent.setup();
 
     setup();
 
     const dialog = screen.getByRole('dialog', { name: 'Add new attribute' });
-    const addButton = within(dialog).getByRole('button', {
-      name: 'Add attribute value',
+    const addAnotherValueButton = within(dialog).getByRole('button', {
+      name: '+ Add another value',
     });
     const firstValueField = within(dialog).getByRole('textbox', {
       name: 'Attribute value 1',
     });
 
+    expect(within(dialog).getByText('Attribute values')).toBeVisible();
     expect(
       within(dialog).queryByRole('textbox', { name: 'Attribute value 2' })
     ).not.toBeInTheDocument();
+    expect(addAnotherValueButton).toBeDisabled();
 
     await user.type(firstValueField, 'Green');
-    await user.click(addButton);
+
+    expect(addAnotherValueButton).toBeEnabled();
+
+    await user.click(addAnotherValueButton);
 
     const secondValueField = within(dialog).getByRole('textbox', {
       name: 'Attribute value 2',
     });
+    const nextAddAnotherValueButton = within(dialog).getByRole('button', {
+      name: '+ Add another value',
+    });
 
     expect(secondValueField).toHaveValue('');
+    await waitFor(() => expect(secondValueField).toHaveFocus());
+    expect(nextAddAnotherValueButton).toBeDisabled();
+    expect(within(dialog).getByText('Attribute values')).toBeVisible();
     expect(
       within(dialog).getByRole('button', { name: 'Remove attribute value 1' })
     ).toBeVisible();
@@ -130,13 +141,13 @@ describe('CreateAttributeDialog', () => {
     const firstValueField = within(dialog).getByRole('textbox', {
       name: 'Attribute value 1',
     });
-    const addValueButton = within(dialog).getByRole('button', {
-      name: 'Add attribute value',
+    const addAnotherValueButton = within(dialog).getByRole('button', {
+      name: '+ Add another value',
     });
 
     await user.type(nameField, 'Material');
     await user.type(firstValueField, 'Green');
-    await user.click(addValueButton);
+    await user.click(addAnotherValueButton);
     await user.type(
       within(dialog).getByRole('textbox', { name: 'Attribute value 2' }),
       'Blue'
@@ -166,6 +177,47 @@ describe('CreateAttributeDialog', () => {
     expect(routerPushMock).toHaveBeenCalledWith(getAttributeDetailRoute(1));
   });
 
+  it('ignores an empty added value when creating an attribute', async () => {
+    createAttributeMock.mockResolvedValue({
+      ok: true,
+      data: {
+        id: 1,
+        name: 'Material',
+        sortOrder: 10,
+        createdAt: '2026-05-26T20:55:51.542Z',
+      },
+    });
+    const user = userEvent.setup();
+
+    setup();
+
+    const dialog = screen.getByRole('dialog', { name: 'Add new attribute' });
+
+    await user.type(
+      within(dialog).getByRole('textbox', { name: 'Name' }),
+      'Material'
+    );
+    await user.type(
+      within(dialog).getByRole('textbox', { name: 'Attribute value 1' }),
+      'Green'
+    );
+    await user.click(
+      within(dialog).getByRole('button', { name: '+ Add another value' })
+    );
+    await user.click(within(dialog).getByRole('button', { name: 'Add' }));
+
+    expect(createAttributeMock).toHaveBeenCalledWith({
+      name: 'Material',
+      sortOrder: 0,
+      attributeValues: [
+        {
+          name: 'Green',
+          sortOrder: 0,
+        },
+      ],
+    });
+  });
+
   it('prevents another creation while the request is in flight', async () => {
     let resolveCreate:
       | ((value: Awaited<ReturnType<typeof createAttribute>>) => void)
@@ -184,6 +236,12 @@ describe('CreateAttributeDialog', () => {
     const nameField = within(dialog).getByRole('textbox', {
       name: 'Name',
     });
+    const attributeValueField = within(dialog).getByRole('textbox', {
+      name: 'Attribute value 1',
+    });
+    const addAnotherValueButton = within(dialog).getByRole('button', {
+      name: '+ Add another value',
+    });
 
     await user.type(nameField, 'Material');
 
@@ -193,6 +251,11 @@ describe('CreateAttributeDialog', () => {
 
     expect(createButton).toBeDisabled();
     expect(screen.getByRole('button', { name: 'Adding...' })).toBeVisible();
+    expect(attributeValueField).toBeDisabled();
+    expect(addAnotherValueButton).toBeDisabled();
+    expect(
+      within(dialog).getByRole('button', { name: 'Close' })
+    ).toBeDisabled();
 
     resolveCreate?.({
       ok: true,

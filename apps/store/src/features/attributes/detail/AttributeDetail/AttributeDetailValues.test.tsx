@@ -125,6 +125,39 @@ describe('AttributeDetailValues', () => {
     expect(within(dialog).getByText('Blue')).toBeVisible();
   });
 
+  it('shows bulk actions for selected attribute values', async () => {
+    getAttributeValuesMock.mockResolvedValue({
+      ok: true,
+      data: [
+        {
+          id: 3,
+          name: 'Blue',
+          sortOrder: 0,
+          createdAt: '2026-06-24T20:07:32.467Z',
+        },
+      ],
+    });
+    const user = userEvent.setup();
+
+    setup();
+
+    await user.click(
+      await screen.findByRole('checkbox', { name: 'Select Blue' })
+    );
+
+    expect(
+      screen.getByRole('complementary', {
+        name: 'Attribute value bulk actions',
+      })
+    ).toHaveTextContent('1 selected');
+
+    await user.click(screen.getByRole('button', { name: 'Delete' }));
+
+    expect(
+      screen.getByRole('dialog', { name: 'Delete attribute value' })
+    ).toBeVisible();
+  });
+
   it('shows an error and retries loading attribute values', async () => {
     getAttributeValuesMock
       .mockResolvedValueOnce({

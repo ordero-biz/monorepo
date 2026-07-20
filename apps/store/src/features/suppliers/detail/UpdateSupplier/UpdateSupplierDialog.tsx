@@ -2,6 +2,7 @@
 
 import { Dialog } from '@ordero/ui';
 import { useQueryClient } from '@tanstack/react-query';
+import { useRef, useState } from 'react';
 import { suppliersQueryKeys } from '@/lib/query/suppliers/suppliersQueryKeys';
 import { SupplierFormDialogContent } from '../../shared/SupplierFormDialogContent';
 import { useUpdateSupplierForm } from './hooks/useUpdateSupplierForm';
@@ -15,9 +16,14 @@ export const UpdateSupplierDialog = ({
   supplier,
 }: UpdateSupplierDialogProps) => {
   const queryClient = useQueryClient();
+  const latestSupplierRef = useRef(supplier);
+  const [formSupplier, setFormSupplier] = useState(supplier);
   const { form } = useUpdateSupplierForm({
-    supplier,
-    onUpdated: async () => {
+    supplier: formSupplier,
+    onUpdated: async (updatedSupplier) => {
+      latestSupplierRef.current = updatedSupplier;
+      setFormSupplier(updatedSupplier);
+      form.reset(getSupplierDefaultValues(updatedSupplier));
       onOpenChange(false);
       await queryClient.invalidateQueries({
         queryKey: suppliersQueryKeys.list,
@@ -25,16 +31,14 @@ export const UpdateSupplierDialog = ({
       await queryClient.invalidateQueries({
         queryKey: suppliersQueryKeys.detail(supplier.id),
       });
-      await onUpdated();
+      await onUpdated(updatedSupplier);
     },
   });
 
   const handleOpenChange = (nextOpen: boolean) => {
     onOpenChange(nextOpen);
 
-    if (!nextOpen) {
-      form.reset(getSupplierDefaultValues(supplier));
-    }
+    form.reset(getSupplierDefaultValues(latestSupplierRef.current));
   };
 
   return (
