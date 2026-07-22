@@ -1,21 +1,21 @@
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import type { Supplier } from '@/lib/domain/suppliers';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { SupplierDetailHeader } from './SupplierDetailHeader';
 
-vi.mock('@/features/suppliers/detail/UpdateSupplier', () => ({
-  UpdateSupplierDialogTrigger: ({
+vi.mock('../UpdateSupplier/UpdateSupplierDialog', () => ({
+  UpdateSupplierDialog: ({
+    open,
     onUpdated,
-    supplier,
   }: {
+    open: boolean;
     onUpdated: () => Promise<void> | void;
-    supplier: Supplier;
-  }) => (
-    <button onClick={() => void onUpdated()} type="button">
-      Edit {supplier.name}
-    </button>
-  ),
+  }) =>
+    open ? (
+      <button onClick={() => void onUpdated()} type="button">
+        Save supplier
+      </button>
+    ) : null,
 }));
 
 const { setup } = prepareStoreSetup({
@@ -34,13 +34,17 @@ const { setup } = prepareStoreSetup({
 });
 
 describe('SupplierDetailHeader', () => {
-  it('renders the supplier name and edit action', async () => {
+  it('opens the edit action from the actions menu', async () => {
     const user = userEvent.setup();
     const { onUpdated } = setup();
 
     expect(screen.getByRole('heading', { name: 'Fresh Farms' })).toBeVisible();
 
-    await user.click(screen.getByRole('button', { name: 'Edit Fresh Farms' }));
+    await user.click(
+      screen.getByRole('button', { name: 'Actions for Fresh Farms' })
+    );
+    await user.click(screen.getByRole('menuitem', { name: 'Edit supplier' }));
+    await user.click(screen.getByRole('button', { name: 'Save supplier' }));
 
     await waitFor(() => expect(onUpdated).toHaveBeenCalled());
   });
