@@ -1,11 +1,11 @@
 'use client';
 
 import { Button, Card, Menu, PageHeader, Typography } from '@ordero/ui';
-import { EllipsisVertical, Trash2 } from 'lucide-react';
+import { EllipsisVertical, Pencil, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { useUnitOfMeasurementQuery } from '@/lib/hooks/units-of-measurement/useUnitOfMeasurementQuery';
 import { DeleteUnitOfMeasurementDialog } from '../DeleteUnitOfMeasurement';
-import { UpdateUnitOfMeasurementDialogTrigger } from '../UpdateUnitOfMeasurement';
+import { UpdateUnitOfMeasurementDialog } from '../UpdateUnitOfMeasurement/UpdateUnitOfMeasurementDialog';
 import type { UnitOfMeasurementDetailProps } from './types';
 import { UnitOfMeasurementDetailInfo } from './UnitOfMeasurementDetailInfo';
 
@@ -14,6 +14,7 @@ export const UnitOfMeasurementDetail = ({
 }: UnitOfMeasurementDetailProps) => {
   const unitOfMeasurementQuery = useUnitOfMeasurementQuery(unitOfMeasurementId);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
 
   if (unitOfMeasurementQuery.isPending) {
     return (
@@ -58,14 +59,6 @@ export const UnitOfMeasurementDetail = ({
           <Typography variant="h5">
             {unitOfMeasurementQuery.data.name}
           </Typography>
-          <div>
-            <UpdateUnitOfMeasurementDialogTrigger
-              onUpdated={async () => {
-                await unitOfMeasurementQuery.refetch();
-              }}
-              unitOfMeasurement={unitOfMeasurementQuery.data}
-            />
-          </div>
         </PageHeader.Left>
         <PageHeader.Right>
           <Menu.Root>
@@ -80,6 +73,13 @@ export const UnitOfMeasurementDetail = ({
             <Menu.Portal>
               <Menu.Positioner align="end">
                 <Menu.Popup>
+                  <Menu.Item onClick={() => setIsUpdateDialogOpen(true)}>
+                    <Pencil
+                      aria-hidden="true"
+                      className="size-[var(--icon-button-xs-icon)]"
+                    />
+                    Edit unit of measurement
+                  </Menu.Item>
                   <Menu.Item
                     color="error"
                     onClick={() => setIsDeleteDialogOpen(true)}
@@ -98,6 +98,14 @@ export const UnitOfMeasurementDetail = ({
           <DeleteUnitOfMeasurementDialog
             onOpenChange={setIsDeleteDialogOpen}
             open={isDeleteDialogOpen}
+            unitOfMeasurement={unitOfMeasurementQuery.data}
+          />
+          <UpdateUnitOfMeasurementDialog
+            onOpenChange={setIsUpdateDialogOpen}
+            onUpdated={async () => {
+              await unitOfMeasurementQuery.refetch();
+            }}
+            open={isUpdateDialogOpen}
             unitOfMeasurement={unitOfMeasurementQuery.data}
           />
         </PageHeader.Right>
