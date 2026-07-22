@@ -13,6 +13,10 @@ type CategoryFetcher = (
   categoryId: string | number
 ) => Promise<ApiResult<Category>>;
 
+type CategoryChildrenFetcher = (
+  parentId: string | number
+) => Promise<ApiResult<Category[]>>;
+
 const unwrapApiResult = async <T>(request: Promise<ApiResult<T>>) => {
   const result = await request;
 
@@ -39,4 +43,13 @@ export const categoryQueryOptions = (
   queryOptions({
     queryKey: categoriesQueryKeys.detail(categoryId),
     queryFn: () => unwrapApiResult(fetchCategory(categoryId)),
+  });
+
+export const categoryChildrenQueryOptions = (
+  parentId: string | number,
+  fetchCategoryChildren: CategoryChildrenFetcher
+) =>
+  queryOptions({
+    queryKey: categoriesQueryKeys.children(parentId),
+    queryFn: () => unwrapApiResult(fetchCategoryChildren(parentId)),
   });

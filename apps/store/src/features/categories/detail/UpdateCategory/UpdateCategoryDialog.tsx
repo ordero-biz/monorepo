@@ -26,6 +26,20 @@ export const UpdateCategoryDialog = ({
       await queryClient.invalidateQueries({
         queryKey: categoriesQueryKeys.detail(category.id),
       });
+      const parentCategoryIds = new Set(
+        [
+          category.parentCategory?.id,
+          updatedCategory.parentCategory?.id,
+        ].filter((categoryId): categoryId is number => categoryId !== undefined)
+      );
+
+      await Promise.all(
+        [...parentCategoryIds].map((parentCategoryId) =>
+          queryClient.invalidateQueries({
+            queryKey: categoriesQueryKeys.children(parentCategoryId),
+          })
+        )
+      );
       await onUpdated();
     },
   });

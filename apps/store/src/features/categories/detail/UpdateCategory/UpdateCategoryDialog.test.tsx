@@ -98,6 +98,9 @@ describe('UpdateCategoryDialog', () => {
     expect(invalidateQueriesSpy).toHaveBeenCalledWith({
       queryKey: categoriesQueryKeys.detail(2),
     });
+    expect(invalidateQueriesSpy).toHaveBeenCalledWith({
+      queryKey: categoriesQueryKeys.children(1),
+    });
     expect(onOpenChange).toHaveBeenCalledWith(false);
     expect(onUpdated).toHaveBeenCalled();
   });

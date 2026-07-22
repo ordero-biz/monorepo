@@ -13,6 +13,10 @@ export type CategoryDetailInfoProps = {
   category: Category;
 };
 
+export type CategoryDetailChildrenProps = {
+  categoryId: string;
+};
+
 export type CategoryDetailField = {
   label: string;
   value: string | number | null | undefined;

@@ -2,6 +2,7 @@
 
 import { Button, Card, Typography } from '@ordero/ui';
 import { useCategoryQuery } from '@/lib/hooks/categories/useCategoryQuery';
+import { CategoryDetailChildren } from './CategoryDetailChildren';
 import { CategoryDetailHeader } from './CategoryDetailHeader';
 import { CategoryDetailInfo } from './CategoryDetailInfo';
 import type { CategoryDetailProps } from './types';
@@ -54,6 +55,7 @@ export const CategoryDetail = ({ categoryId }: CategoryDetailProps) => {
         }}
       />
       <CategoryDetailInfo category={categoryQuery.data} />
+      <CategoryDetailChildren categoryId={categoryId} />
     </div>
   );
 };

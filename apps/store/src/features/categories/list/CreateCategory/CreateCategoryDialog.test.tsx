@@ -117,6 +117,9 @@ describe('CreateCategoryDialog', () => {
         queryKey: categoriesQueryKeys.list,
       })
     );
+    expect(invalidateQueriesSpy).toHaveBeenCalledWith({
+      queryKey: categoriesQueryKeys.children(1),
+    });
     expect(onOpenChangeMock).toHaveBeenCalledWith(false);
   });
 

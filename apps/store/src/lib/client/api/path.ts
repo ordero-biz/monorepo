@@ -13,6 +13,7 @@ export const CLIENT_BACKEND_PATHS = {
   attributeValue: '/api/backend/api/v1/attributes/values/{id}',
   categories: '/api/backend/api/v1/categories',
   category: '/api/backend/api/v1/categories/{id}',
+  categoryChildren: '/api/backend/api/v1/categories/{parentId}/children',
   products: '/api/backend/api/v1/products',
   suppliers: '/api/backend/api/v1/suppliers',
   supplier: '/api/backend/api/v1/suppliers/{id}',

@@ -37,6 +37,14 @@ export const getCategory = (categoryId: string | number) =>
     }
   );
 
+export const getCategoryChildren = (parentId: string | number) =>
+  apiFetch<Category[]>(
+    tokenizePath(CLIENT_BACKEND_PATHS.categoryChildren, { parentId }),
+    {
+      method: 'GET',
+    }
+  );
+
 export const createCategory = (input: CreateCategoryInput) =>
   apiFetch<Category>(CLIENT_BACKEND_PATHS.categories, {
     method: 'POST',

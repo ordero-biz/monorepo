@@ -14,11 +14,19 @@ export const CreateCategoryDialog = ({
 }: CreateCategoryDialogProps) => {
   const queryClient = useQueryClient();
   const { form } = useCreateCategoryForm({
-    onCreated: async () => {
+    onCreated: async (createdCategory) => {
       onOpenChange(false);
       await queryClient.invalidateQueries({
         queryKey: categoriesQueryKeys.list,
       });
+
+      if (createdCategory.parentCategory) {
+        await queryClient.invalidateQueries({
+          queryKey: categoriesQueryKeys.children(
+            createdCategory.parentCategory.id
+          ),
+        });
+      }
     },
   });
 

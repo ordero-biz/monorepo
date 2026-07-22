@@ -4,6 +4,12 @@ import { getCategory } from '@/lib/client/api/categories';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { CategoryDetail } from './CategoryDetail';
 
+vi.mock('./CategoryDetailChildren', () => ({
+  CategoryDetailChildren: ({ categoryId }: { categoryId: string }) => (
+    <div>Child categories {categoryId}</div>
+  ),
+}));
+
 vi.mock('@/lib/client/api/categories', async () => ({
   ...(await vi.importActual<typeof import('@/lib/client/api/categories')>(
     '@/lib/client/api/categories'
@@ -47,6 +53,7 @@ describe('CategoryDetail', () => {
     ).toBeVisible();
     expect(screen.getByText('Category details')).toBeVisible();
     expect(screen.getByText('Shoes')).toBeVisible();
+    expect(screen.getByText('Child categories 2')).toBeVisible();
 
     await userEvent
       .setup()
