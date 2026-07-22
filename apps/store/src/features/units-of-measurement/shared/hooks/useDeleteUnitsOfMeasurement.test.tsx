@@ -4,7 +4,7 @@ import {
   createTestQueryClient,
   createTestQueryProvider,
 } from '@/test/prepareSetup';
-import { useDeleteUnitOfMeasurement } from './useDeleteUnitOfMeasurement';
+import { useDeleteUnitsOfMeasurement } from './useDeleteUnitsOfMeasurement';
 
 const { addToastMock } = vi.hoisted(() => ({
   addToastMock: vi.fn(),
@@ -26,15 +26,16 @@ vi.mock('@/lib/client/api/units-of-measurement', async () => ({
 
 const deleteUnitsOfMeasurementMock = vi.mocked(deleteUnitsOfMeasurement);
 
-const setupDeleteUnitOfMeasurementHook = () => {
+const setupDeleteUnitsOfMeasurementHook = (
+  unitOfMeasurementIds = [7]
+) => {
   const onDeleted = vi.fn();
   const TestQueryProvider = createTestQueryProvider(createTestQueryClient());
   const { result } = renderHook(
     () =>
-      useDeleteUnitOfMeasurement({
+      useDeleteUnitsOfMeasurement({
         onDeleted,
-        unitOfMeasurementId: 7,
-        unitOfMeasurementName: 'Kilogram',
+        unitOfMeasurementIds,
       }),
     {
       wrapper: TestQueryProvider,
@@ -47,18 +48,18 @@ const setupDeleteUnitOfMeasurementHook = () => {
   };
 };
 
-describe('useDeleteUnitOfMeasurement', () => {
+describe('useDeleteUnitsOfMeasurement', () => {
   beforeEach(() => {
     addToastMock.mockClear();
     deleteUnitsOfMeasurementMock.mockReset();
   });
 
-  it('deletes the unit of measurement and runs success cleanup', async () => {
+  it('deletes a unit of measurement and runs success cleanup', async () => {
     deleteUnitsOfMeasurementMock.mockResolvedValue({
       ok: true,
       data: undefined,
     });
-    const { onDeleted, result } = setupDeleteUnitOfMeasurementHook();
+    const { onDeleted, result } = setupDeleteUnitsOfMeasurementHook();
 
     expect(result.current.isDeleting).toBe(false);
 
@@ -73,10 +74,29 @@ describe('useDeleteUnitOfMeasurement', () => {
     );
     await waitFor(() => expect(onDeleted).toHaveBeenCalled());
     expect(addToastMock).toHaveBeenCalledWith({
-      description: 'Unit of measurement Kilogram was deleted.',
+      description: 'Unit of measurement was deleted.',
       type: 'success',
     });
     expect(result.current.isDeleting).toBe(false);
+  });
+
+  it('uses plural success copy for multiple deleted units', async () => {
+    deleteUnitsOfMeasurementMock.mockResolvedValue({
+      ok: true,
+      data: undefined,
+    });
+    const { result } = setupDeleteUnitsOfMeasurementHook([7, 8]);
+
+    act(() => {
+      result.current.handleDelete();
+    });
+
+    await waitFor(() =>
+      expect(addToastMock).toHaveBeenCalledWith({
+        description: '2 units of measurement were deleted.',
+        type: 'success',
+      })
+    );
   });
 
   it('shows a toast and skips success cleanup when deletion fails', async () => {
@@ -87,7 +107,7 @@ describe('useDeleteUnitOfMeasurement', () => {
         message: 'Unit of measurement deletion failed',
       },
     });
-    const { onDeleted, result } = setupDeleteUnitOfMeasurementHook();
+    const { onDeleted, result } = setupDeleteUnitsOfMeasurementHook();
 
     act(() => {
       result.current.handleDelete();

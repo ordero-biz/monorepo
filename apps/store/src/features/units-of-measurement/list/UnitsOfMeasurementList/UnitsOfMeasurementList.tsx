@@ -1,10 +1,29 @@
 'use client';
 
-import { Button, Card, DataTable, Typography } from '@ordero/ui';
+import {
+  Button,
+  Card,
+  ContextualActionBar,
+  DataTable,
+  Typography,
+  useDataTableSelection,
+} from '@ordero/ui';
+import { Trash2 } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { BaseLayoutContextualActionBar } from '@/features/app-shell';
+import type { UnitOfMeasurement } from '@/lib/domain/unitsOfMeasurement';
 import { useUnitsOfMeasurementQuery } from '@/lib/hooks/units-of-measurement/useUnitsOfMeasurementQuery';
 import { useTablePagination } from '@/lib/hooks/useTablePagination';
-import { columns } from './columns';
+import { DeleteUnitsOfMeasurementDialog } from '../DeleteUnitsOfMeasurement';
+import { getColumns } from './columns';
 import type { UnitsOfMeasurementListProps } from './types';
+
+const getUnitOfMeasurementRowId = (unitOfMeasurement: UnitOfMeasurement) =>
+  String(unitOfMeasurement.id);
+
+const getUnitOfMeasurementCheckboxAriaLabel = (
+  unitOfMeasurement: UnitOfMeasurement
+) => `Select ${unitOfMeasurement.name}`;
 
 export const UnitsOfMeasurementList = ({
   paginationInput,
@@ -13,6 +32,27 @@ export const UnitsOfMeasurementList = ({
   const tablePagination = useTablePagination({
     pageMetadata: unitsOfMeasurementQuery.data?.page,
     paginationInput,
+  });
+  const [deletingUnitsOfMeasurement, setDeletingUnitsOfMeasurement] =
+    useState<UnitOfMeasurement[] | null>(null);
+  const [deletingUnitOfMeasurement, setDeletingUnitOfMeasurement] =
+    useState<UnitOfMeasurement | null>(null);
+  const columns = useMemo(
+    () =>
+      getColumns({
+        onDeleteUnitOfMeasurement: setDeletingUnitOfMeasurement,
+      }),
+    []
+  );
+  const {
+    clearSelection,
+    selectedRows: selectedUnitsOfMeasurement,
+    selection,
+  } = useDataTableSelection({
+    data: unitsOfMeasurementQuery.data?.content ?? [],
+    getRowCheckboxAriaLabel: getUnitOfMeasurementCheckboxAriaLabel,
+    getRowId: getUnitOfMeasurementRowId,
+    selectAllCheckboxAriaLabel: 'Select all units of measurement',
   });
 
   if (unitsOfMeasurementQuery.isPending) {
@@ -52,14 +92,75 @@ export const UnitsOfMeasurementList = ({
   }
 
   return (
-    <DataTable
-      ariaLabel="Units of measurement list"
-      columns={columns}
-      data={unitsOfMeasurementQuery.data.content}
-      emptyMessage="No units of measurement found."
-      getRowId={(row) => String(row.id)}
-      manualPagination
-      pagination={tablePagination}
-    />
+    <>
+      <DataTable
+        ariaLabel="Units of measurement list"
+        columns={columns}
+        data={unitsOfMeasurementQuery.data.content}
+        emptyMessage="No units of measurement found."
+        getRowId={getUnitOfMeasurementRowId}
+        manualPagination
+        pagination={tablePagination}
+        selection={selection}
+      />
+
+      {selectedUnitsOfMeasurement.length > 0 ? (
+        <BaseLayoutContextualActionBar>
+          <ContextualActionBar.Root ariaLabel="Unit of measurement bulk actions">
+            <ContextualActionBar.Left>
+              <Typography variant="body2">
+                {selectedUnitsOfMeasurement.length} selected
+              </Typography>
+              <Button
+                color="inherit"
+                onClick={clearSelection}
+                size="s"
+                variant="text"
+              >
+                Clear selection
+              </Button>
+            </ContextualActionBar.Left>
+            <ContextualActionBar.Right>
+              <Button
+                color="error"
+                onClick={() =>
+                  setDeletingUnitsOfMeasurement(selectedUnitsOfMeasurement)
+                }
+                size="s"
+                startIcon={<Trash2 aria-hidden="true" />}
+                variant="soft"
+              >
+                Delete
+              </Button>
+            </ContextualActionBar.Right>
+          </ContextualActionBar.Root>
+        </BaseLayoutContextualActionBar>
+      ) : null}
+
+      {deletingUnitOfMeasurement ? (
+        <DeleteUnitsOfMeasurementDialog
+          onOpenChange={(nextOpen) => {
+            if (!nextOpen) {
+              setDeletingUnitOfMeasurement(null);
+            }
+          }}
+          open={Boolean(deletingUnitOfMeasurement)}
+          unitsOfMeasurement={[deletingUnitOfMeasurement]}
+        />
+      ) : null}
+
+      {deletingUnitsOfMeasurement ? (
+        <DeleteUnitsOfMeasurementDialog
+          onDeleted={clearSelection}
+          onOpenChange={(nextOpen) => {
+            if (!nextOpen) {
+              setDeletingUnitsOfMeasurement(null);
+            }
+          }}
+          open={Boolean(deletingUnitsOfMeasurement)}
+          unitsOfMeasurement={deletingUnitsOfMeasurement}
+        />
+      ) : null}
+    </>
   );
 };

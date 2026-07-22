@@ -2,12 +2,20 @@ import {
   DataTableCell,
   type DataTableColumnDef,
   DataTableColumnHeader,
+  Menu,
 } from '@ordero/ui';
+import { EllipsisVertical, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import { getUnitOfMeasurementDetailRoute } from '@/lib/client/routes';
 import type { UnitOfMeasurement } from '@/lib/domain/unitsOfMeasurement';
 
-export const columns: DataTableColumnDef<UnitOfMeasurement>[] = [
+type GetColumnsArgs = {
+  onDeleteUnitOfMeasurement: (unitOfMeasurement: UnitOfMeasurement) => void;
+};
+
+export const getColumns = ({
+  onDeleteUnitOfMeasurement,
+}: GetColumnsArgs): DataTableColumnDef<UnitOfMeasurement>[] => [
   {
     accessorKey: 'name',
     cell: ({ row }) => (
@@ -56,6 +64,44 @@ export const columns: DataTableColumnDef<UnitOfMeasurement>[] = [
     meta: {
       width: '36%',
       wrap: 'wrap',
+    },
+  },
+  {
+    cell: ({ row }) => (
+      <DataTableCell variant="actions">
+        <Menu.Root>
+          <Menu.Trigger
+            aria-label={`Actions for ${row.original.name}`}
+            appearance="iconButton"
+            size="xs"
+            title={`Actions for ${row.original.name}`}
+          >
+            <EllipsisVertical aria-hidden="true" />
+          </Menu.Trigger>
+          <Menu.Portal>
+            <Menu.Positioner align="end">
+              <Menu.Popup>
+                <Menu.Item
+                  color="error"
+                  onClick={() => onDeleteUnitOfMeasurement(row.original)}
+                >
+                  <Trash2
+                    aria-hidden="true"
+                    className="size-[var(--icon-button-xs-icon)]"
+                  />
+                  Delete
+                </Menu.Item>
+              </Menu.Popup>
+            </Menu.Positioner>
+          </Menu.Portal>
+        </Menu.Root>
+      </DataTableCell>
+    ),
+    header: () => null,
+    id: 'actions',
+    meta: {
+      align: 'right',
+      wrap: 'nowrap',
     },
   },
 ];
