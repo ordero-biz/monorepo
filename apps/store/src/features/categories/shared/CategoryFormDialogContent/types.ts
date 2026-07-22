@@ -6,8 +6,6 @@ import type {
 import type { Category } from '@/lib/domain/categories';
 import type { CategoryFormValues } from '../validations';
 
-export type CategoryOption = Pick<Category, 'id' | 'name'>;
-
 type FormValidate<TFormValues> = FormValidateOrFn<TFormValues> | undefined;
 
 type FormAsyncValidate<TFormValues> =
@@ -35,7 +33,7 @@ type FormControls<TFormValues> = Pick<
 type CategoryFormApi = FormControls<CategoryFormValues>;
 
 export type CategoryFormDialogContentProps = {
-  availableCategories: CategoryOption[];
+  disabledCategoryIds?: readonly Category['id'][];
   form: CategoryFormApi;
   pendingText: string;
   submitText: string;

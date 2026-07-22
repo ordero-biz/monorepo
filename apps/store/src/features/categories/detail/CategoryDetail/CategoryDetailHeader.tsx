@@ -3,7 +3,6 @@ import { UpdateCategoryDialogTrigger } from '@/features/categories/detail/Update
 import type { CategoryDetailHeaderProps } from './types';
 
 export const CategoryDetailHeader = ({
-  availableCategories,
   category,
   onUpdated,
 }: CategoryDetailHeaderProps) => (
@@ -12,7 +11,6 @@ export const CategoryDetailHeader = ({
       <Typography variant="h5">{category.name}</Typography>
       <div>
         <UpdateCategoryDialogTrigger
-          availableCategories={availableCategories}
           category={category}
           onUpdated={onUpdated}
         />

@@ -1,6 +1,6 @@
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { updateCategory } from '@/lib/client/api/categories';
+import { getCategories, updateCategory } from '@/lib/client/api/categories';
 import { categoriesQueryKeys } from '@/lib/query/categories/categoriesQueryKeys';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { UpdateCategoryDialog } from './UpdateCategoryDialog';
@@ -13,9 +13,11 @@ vi.mock('@/lib/client/api/categories', async () => ({
     '@/lib/client/api/categories'
   )),
   updateCategory: vi.fn(),
+  getCategories: vi.fn(),
 }));
 
 const updateCategoryMock = vi.mocked(updateCategory);
+const getCategoriesMock = vi.mocked(getCategories);
 
 const category = {
   id: 2,
@@ -33,16 +35,6 @@ const category = {
 const { setup } = prepareStoreSetup({
   component: UpdateCategoryDialog,
   props: {
-    availableCategories: [
-      category,
-      {
-        id: 1,
-        name: 'Shoes',
-        sortOrder: 10,
-        color: '#2563eb',
-        createdAt: '2026-07-01T10:54:34.839Z',
-      },
-    ],
     category,
     onOpenChange: onOpenChangeMock,
     onUpdated: onUpdatedMock,
@@ -55,6 +47,27 @@ describe('UpdateCategoryDialog', () => {
     onOpenChangeMock.mockClear();
     onUpdatedMock.mockClear();
     updateCategoryMock.mockReset();
+    getCategoriesMock.mockResolvedValue({
+      ok: true,
+      data: {
+        content: [
+          {
+            id: 1,
+            name: 'Shoes',
+            sortOrder: 10,
+            color: '#2563eb',
+            createdAt: '2026-07-01T10:54:34.839Z',
+          },
+          category,
+        ],
+        page: {
+          number: 0,
+          size: 100,
+          totalElements: 2,
+          totalPages: 1,
+        },
+      },
+    });
   });
 
   it('updates a category, closes, and refreshes category caches', async () => {
@@ -89,7 +102,7 @@ describe('UpdateCategoryDialog', () => {
     expect(onUpdated).toHaveBeenCalled();
   });
 
-  it('does not offer the category itself as a parent', async () => {
+  it('disables the category itself as a parent', async () => {
     const user = userEvent.setup();
 
     setup();
@@ -101,9 +114,7 @@ describe('UpdateCategoryDialog', () => {
     );
 
     expect(screen.getByRole('option', { name: 'Shoes' })).toBeVisible();
-    expect(
-      screen.queryByRole('option', { name: 'Sneakers' })
-    ).not.toBeInTheDocument();
+    expect(screen.getByRole('option', { name: 'Sneakers' })).toBeDisabled();
   });
 
   it('renders missing editable values as empty strings', () => {

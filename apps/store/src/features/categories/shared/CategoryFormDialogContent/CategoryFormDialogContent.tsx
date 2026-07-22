@@ -1,29 +1,22 @@
-import { Button, Dialog, Select, TextField } from '@ordero/ui';
-import { useMemo } from 'react';
+import { Button, Dialog, TextField } from '@ordero/ui';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
+import { CategoriesAsyncCombobox } from '../CategoriesAsyncCombobox';
 import { validateCategoryName, validateCategoryParentId } from '../validations';
 import type { CategoryFormDialogContentProps } from './types';
 
+const PARENT_CATEGORY_STATIC_OPTIONS = [
+  {
+    label: 'No parent category',
+    value: '',
+  },
+];
+
 export const CategoryFormDialogContent = ({
-  availableCategories,
+  disabledCategoryIds,
   form,
   pendingText,
   submitText,
 }: CategoryFormDialogContentProps) => {
-  const parentCategoryOptions = useMemo(
-    () => [
-      {
-        label: 'No parent category',
-        value: '',
-      },
-      ...availableCategories.map((category) => ({
-        label: category.name,
-        value: String(category.id),
-      })),
-    ],
-    [availableCategories]
-  );
-
   return (
     <>
       <Dialog.Content>
@@ -65,16 +58,17 @@ export const CategoryFormDialogContent = ({
               const errorText = getFieldSubmitChangeErrorText(field.state.meta);
 
               return (
-                <Select
+                <CategoriesAsyncCombobox
+                  disabledCategoryIds={disabledCategoryIds}
                   errorText={errorText}
                   invalid={Boolean(errorText)}
                   label="Parent category"
                   name={field.name}
                   onBlur={field.handleBlur}
                   onValueChange={(value) => field.handleChange(value || null)}
-                  options={parentCategoryOptions}
                   placeholder=""
                   size="s"
+                  staticOptions={PARENT_CATEGORY_STATIC_OPTIONS}
                   value={field.state.value}
                 />
               );

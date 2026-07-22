@@ -7,7 +7,6 @@ import type { UpdateCategoryDialogTriggerProps } from './types';
 import { UpdateCategoryDialog } from './UpdateCategoryDialog';
 
 export const UpdateCategoryDialogTrigger = ({
-  availableCategories,
   category,
   onUpdated,
 }: UpdateCategoryDialogTriggerProps) => {
@@ -24,7 +23,6 @@ export const UpdateCategoryDialogTrigger = ({
         <Pencil aria-hidden="true" />
       </IconButton>
       <UpdateCategoryDialog
-        availableCategories={availableCategories}
         category={category}
         onOpenChange={setOpen}
         onUpdated={onUpdated}

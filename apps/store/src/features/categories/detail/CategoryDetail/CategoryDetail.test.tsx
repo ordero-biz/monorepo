@@ -1,6 +1,6 @@
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { getCategories, getCategory } from '@/lib/client/api/categories';
+import { getCategory } from '@/lib/client/api/categories';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { CategoryDetail } from './CategoryDetail';
 
@@ -8,11 +8,9 @@ vi.mock('@/lib/client/api/categories', async () => ({
   ...(await vi.importActual<typeof import('@/lib/client/api/categories')>(
     '@/lib/client/api/categories'
   )),
-  getCategories: vi.fn(),
   getCategory: vi.fn(),
 }));
 
-const getCategoriesMock = vi.mocked(getCategories);
 const getCategoryMock = vi.mocked(getCategory);
 
 const category = {
@@ -37,20 +35,11 @@ const { setup } = prepareStoreSetup({
 
 describe('CategoryDetail', () => {
   beforeEach(() => {
-    getCategoriesMock.mockReset();
     getCategoryMock.mockReset();
   });
 
   it('renders category details and its edit action', async () => {
     getCategoryMock.mockResolvedValue({ ok: true, data: category });
-    getCategoriesMock.mockResolvedValue({
-      ok: true,
-      data: {
-        content: [category],
-        page: { number: 0, size: 100, totalElements: 1, totalPages: 1 },
-      },
-    });
-
     setup();
 
     expect(
@@ -73,13 +62,6 @@ describe('CategoryDetail', () => {
         error: { status: 500, message: 'Could not load category.' },
       })
       .mockResolvedValueOnce({ ok: true, data: category });
-    getCategoriesMock.mockResolvedValue({
-      ok: true,
-      data: {
-        content: [category],
-        page: { number: 0, size: 100, totalElements: 1, totalPages: 1 },
-      },
-    });
     const user = userEvent.setup();
 
     setup();

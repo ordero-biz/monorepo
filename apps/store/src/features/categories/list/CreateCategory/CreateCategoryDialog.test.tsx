@@ -1,6 +1,6 @@
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { createCategory } from '@/lib/client/api/categories';
+import { createCategory, getCategories } from '@/lib/client/api/categories';
 import { categoriesQueryKeys } from '@/lib/query/categories/categoriesQueryKeys';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { CreateCategoryDialog } from './CreateCategoryDialog';
@@ -12,22 +12,15 @@ vi.mock('@/lib/client/api/categories', async () => ({
     '@/lib/client/api/categories'
   )),
   createCategory: vi.fn(),
+  getCategories: vi.fn(),
 }));
 
 const createCategoryMock = vi.mocked(createCategory);
+const getCategoriesMock = vi.mocked(getCategories);
 
 const { setup } = prepareStoreSetup({
   component: CreateCategoryDialog,
   props: {
-    availableCategories: [
-      {
-        id: 1,
-        name: 'Shoes',
-        sortOrder: 10,
-        color: '#2563eb',
-        createdAt: '2026-07-01T10:54:34.839Z',
-      },
-    ],
     onOpenChange: onOpenChangeMock,
     open: true,
   },
@@ -36,6 +29,26 @@ const { setup } = prepareStoreSetup({
 describe('CreateCategoryDialog', () => {
   beforeEach(() => {
     createCategoryMock.mockReset();
+    getCategoriesMock.mockResolvedValue({
+      ok: true,
+      data: {
+        content: [
+          {
+            id: 1,
+            name: 'Shoes',
+            sortOrder: 10,
+            color: '#2563eb',
+            createdAt: '2026-07-01T10:54:34.839Z',
+          },
+        ],
+        page: {
+          number: 0,
+          size: 100,
+          totalElements: 1,
+          totalPages: 1,
+        },
+      },
+    });
     onOpenChangeMock.mockClear();
   });
 

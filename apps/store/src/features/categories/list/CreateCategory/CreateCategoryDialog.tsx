@@ -9,7 +9,6 @@ import { useCreateCategoryForm } from './hooks/useCreateCategoryForm';
 import type { CreateCategoryDialogProps } from './types';
 
 export const CreateCategoryDialog = ({
-  availableCategories,
   onOpenChange,
   open,
 }: CreateCategoryDialogProps) => {
@@ -49,7 +48,6 @@ export const CreateCategoryDialog = ({
               </Dialog.Header>
 
               <CategoryFormDialogContent
-                availableCategories={availableCategories}
                 form={form}
                 pendingText="Adding..."
                 submitText="Add"

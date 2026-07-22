@@ -5,17 +5,6 @@ import { CreateCategoryDialogTrigger } from './CreateCategoryDialogTrigger';
 
 const { setup } = prepareStoreSetup({
   component: CreateCategoryDialogTrigger,
-  props: {
-    availableCategories: [
-      {
-        id: 1,
-        name: 'Shoes',
-        sortOrder: 10,
-        color: '#2563eb',
-        createdAt: '2026-07-01T10:54:34.839Z',
-      },
-    ],
-  },
 });
 
 describe('CreateCategoryDialogTrigger', () => {

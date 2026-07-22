@@ -1,17 +1,13 @@
 'use client';
 
 import { Button, Card, Typography } from '@ordero/ui';
-import { useCategoriesQuery } from '@/lib/hooks/categories/useCategoriesQuery';
 import { useCategoryQuery } from '@/lib/hooks/categories/useCategoryQuery';
-import type { CategoryDetailProps } from './types';
 import { CategoryDetailHeader } from './CategoryDetailHeader';
 import { CategoryDetailInfo } from './CategoryDetailInfo';
-
-const categoryOptionsQueryInput = { page: 0, size: 100 };
+import type { CategoryDetailProps } from './types';
 
 export const CategoryDetail = ({ categoryId }: CategoryDetailProps) => {
   const categoryQuery = useCategoryQuery(categoryId);
-  const categoriesQuery = useCategoriesQuery(categoryOptionsQueryInput);
 
   if (categoryQuery.isPending) {
     return (
@@ -49,18 +45,9 @@ export const CategoryDetail = ({ categoryId }: CategoryDetailProps) => {
     );
   }
 
-  const availableCategories = categoriesQuery.data?.content ?? [];
-  const parentCategory = categoryQuery.data.parentCategory;
-  const categoryOptions =
-    parentCategory &&
-    !availableCategories.some(({ id }) => id === parentCategory.id)
-      ? [...availableCategories, parentCategory]
-      : availableCategories;
-
   return (
     <div className="flex flex-col gap-[var(--space-2)]">
       <CategoryDetailHeader
-        availableCategories={categoryOptions}
         category={categoryQuery.data}
         onUpdated={async () => {
           await categoryQuery.refetch();

@@ -17,6 +17,7 @@ const LOAD_MORE_SCROLL_OFFSET = 24;
 export const AsyncCombobox = (props: AsyncComboboxProps) => {
   const {
     defaultOpen,
+    isOptionDisabled,
     invalid = false,
     loadErrorText = "We couldn't load options right now.",
     loadOptions,
@@ -25,6 +26,7 @@ export const AsyncCombobox = (props: AsyncComboboxProps) => {
     open,
     pageSize = DEFAULT_PAGE_SIZE,
     queryKey,
+    staticOptions = [],
     ...comboboxProps
   } = props;
   const [openState, setOpenState] = useState(defaultOpen ?? false);
@@ -46,10 +48,15 @@ export const AsyncCombobox = (props: AsyncComboboxProps) => {
       }),
     queryKey: [...queryKey, { pageSize }],
   });
-  const options = useMemo(
-    () => optionsQuery.data?.pages.flatMap((page) => page.options) ?? [],
-    [optionsQuery.data?.pages]
-  );
+  const options = useMemo(() => {
+    const loadedOptions =
+      optionsQuery.data?.pages.flatMap((page) => page.options) ?? [];
+
+    return [...staticOptions, ...loadedOptions].map((option) => ({
+      ...option,
+      disabled: option.disabled || isOptionDisabled?.(option),
+    }));
+  }, [isOptionDisabled, optionsQuery.data?.pages, staticOptions]);
   const isInitialLoading =
     isOpen && optionsQuery.isFetching && !optionsQuery.data;
 

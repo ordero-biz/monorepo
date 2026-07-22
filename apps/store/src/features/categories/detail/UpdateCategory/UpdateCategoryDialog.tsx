@@ -9,7 +9,6 @@ import type { UpdateCategoryDialogProps } from './types';
 import { getCategoryDefaultValues } from './utils/fields';
 
 export const UpdateCategoryDialog = ({
-  availableCategories,
   category,
   onOpenChange,
   onUpdated,
@@ -57,9 +56,7 @@ export const UpdateCategoryDialog = ({
               </Dialog.Header>
 
               <CategoryFormDialogContent
-                availableCategories={availableCategories.filter(
-                  ({ id }) => id !== category.id
-                )}
+                disabledCategoryIds={[category.id]}
                 form={form}
                 pendingText="Saving..."
                 submitText="Save"
