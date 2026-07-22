@@ -96,10 +96,8 @@ describe('CreateCategoryDialog', () => {
     await user.click(within(dialog).getByRole('button', { name: 'Add' }));
 
     expect(createCategoryMock).toHaveBeenCalledWith({
-      color: '#000000',
       name: 'Sneakers',
       parentId: 1,
-      sortOrder: 0,
     });
     await waitFor(() =>
       expect(invalidateQueriesSpy).toHaveBeenCalledWith({
@@ -175,10 +173,8 @@ describe('CreateCategoryDialog', () => {
     await user.click(within(dialog).getByRole('button', { name: 'Add' }));
 
     expect(createCategoryMock).toHaveBeenCalledWith({
-      color: '#000000',
       name: 'Sneakers',
       parentId: null,
-      sortOrder: 0,
     });
     expect(
       await within(dialog).findByText('Category name already exists.')

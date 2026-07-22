@@ -139,10 +139,8 @@ describe('category client helpers', () => {
 
     await expect(
       createCategory({
-        color: '#16a34a',
         name: 'Sneakers',
         parentId: 1,
-        sortOrder: 15,
       })
     ).resolves.toEqual({
       ok: true,
@@ -165,10 +163,8 @@ describe('category client helpers', () => {
       expect.objectContaining({
         method: 'POST',
         body: JSON.stringify({
-          color: '#16a34a',
           name: 'Sneakers',
           parentId: 1,
-          sortOrder: 15,
         }),
         cache: 'no-store',
       })
@@ -193,10 +189,8 @@ describe('category client helpers', () => {
 
     await expect(
       createCategory({
-        color: '#16a34a',
         name: 'Sneakers',
         parentId: 1,
-        sortOrder: 15,
       })
     ).resolves.toEqual({
       ok: false,
@@ -252,10 +246,8 @@ describe('category client helpers', () => {
     await expect(
       updateCategory({
         categoryId: 3,
-        color: '#15803d',
         name: 'Running shoes',
         parentId: null,
-        sortOrder: 20,
       })
     ).resolves.toEqual({
       ok: true,
@@ -267,10 +259,8 @@ describe('category client helpers', () => {
       expect.objectContaining({
         method: 'PATCH',
         body: JSON.stringify({
-          color: '#15803d',
           name: 'Running shoes',
           parentId: null,
-          sortOrder: 20,
         }),
         cache: 'no-store',
       })

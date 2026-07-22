@@ -3,10 +3,8 @@ import type { CreateCategoryFormValues } from './validations';
 
 export const submitCreateCategory = async (value: CreateCategoryFormValues) => {
   const result = await createCategory({
-    color: value.color.trim(),
     name: value.name.trim(),
     parentId: value.parentId ? Number(value.parentId) : null,
-    sortOrder: Number(value.sortOrder),
   });
 
   if (!result.ok) {

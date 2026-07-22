@@ -8,10 +8,6 @@ const getCategoryDetailData = (category: Category): CategoryDetailField[] => [
     value: category.parentCategory?.name,
   },
   {
-    label: 'Sort order',
-    value: category.sortOrder,
-  },
-  {
     label: 'Color',
     value: category.color,
   },

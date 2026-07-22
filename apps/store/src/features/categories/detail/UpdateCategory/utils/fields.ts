@@ -4,8 +4,6 @@ import type { CategoryFormValues } from '../../../shared/validations';
 export const getCategoryDefaultValues = (
   category: Category
 ): CategoryFormValues => ({
-  color: category.color,
-  name: category.name,
+  name: category.name ?? '',
   parentId: category.parentCategory ? String(category.parentCategory.id) : null,
-  sortOrder: String(category.sortOrder),
 });

@@ -35,10 +35,8 @@ describe('submitCreateCategory', () => {
 
     await expect(
       submitCreateCategory({
-        color: ' #16a34a ',
         name: '  Sneakers  ',
         parentId: '1',
-        sortOrder: '15',
       })
     ).resolves.toEqual({
       ok: true,
@@ -46,10 +44,8 @@ describe('submitCreateCategory', () => {
     });
 
     expect(createCategoryMock).toHaveBeenCalledWith({
-      color: '#16a34a',
       name: 'Sneakers',
       parentId: 1,
-      sortOrder: 15,
     });
   });
 
@@ -67,10 +63,8 @@ describe('submitCreateCategory', () => {
 
     await expect(
       submitCreateCategory({
-        color: '#16a34a',
         name: 'Sneakers',
         parentId: '1',
-        sortOrder: '15',
       })
     ).resolves.toEqual({
       ok: false,
@@ -98,10 +92,8 @@ describe('submitCreateCategory', () => {
 
     await expect(
       submitCreateCategory({
-        color: '#16a34a',
         name: 'Sneakers',
         parentId: null,
-        sortOrder: '15',
       })
     ).resolves.toEqual({
       ok: true,
@@ -109,10 +101,8 @@ describe('submitCreateCategory', () => {
     });
 
     expect(createCategoryMock).toHaveBeenCalledWith({
-      color: '#16a34a',
       name: 'Sneakers',
       parentId: null,
-      sortOrder: 15,
     });
   });
 });

@@ -74,10 +74,8 @@ describe('UpdateCategoryDialog', () => {
 
     expect(updateCategoryMock).toHaveBeenCalledWith({
       categoryId: 2,
-      color: '#16a34a',
       name: 'Running shoes',
       parentId: 1,
-      sortOrder: 15,
     });
     await waitFor(() =>
       expect(invalidateQueriesSpy).toHaveBeenCalledWith({
@@ -106,5 +104,21 @@ describe('UpdateCategoryDialog', () => {
     expect(
       screen.queryByRole('option', { name: 'Sneakers' })
     ).not.toBeInTheDocument();
+  });
+
+  it('renders missing editable values as empty strings', () => {
+    setup({
+      category: {
+        ...category,
+        name: null,
+      } as unknown as typeof category,
+    });
+
+    const dialog = screen.getByRole('dialog', { name: 'Edit category' });
+
+    expect(within(dialog).getByRole('textbox', { name: 'Name' })).toHaveValue(
+      ''
+    );
+    expect(within(dialog).getByRole('button', { name: 'Save' })).toBeDisabled();
   });
 });

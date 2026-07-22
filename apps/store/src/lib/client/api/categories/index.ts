@@ -21,10 +21,8 @@ export const getCategories = (input?: PaginationSearchInput) =>
   });
 
 type CreateCategoryInput = {
-  color: string;
   name: string;
   parentId: number | null;
-  sortOrder: number;
 };
 
 type UpdateCategoryInput = CreateCategoryInput & {

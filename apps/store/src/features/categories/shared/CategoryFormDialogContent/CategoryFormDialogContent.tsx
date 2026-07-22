@@ -1,13 +1,8 @@
 import { Button, Dialog, Select, TextField } from '@ordero/ui';
 import { useMemo } from 'react';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
+import { validateCategoryName, validateCategoryParentId } from '../validations';
 import type { CategoryFormDialogContentProps } from './types';
-import {
-  validateCategoryColor,
-  validateCategoryName,
-  validateCategoryParentId,
-  validateCategorySortOrder,
-} from '../validations';
 
 export const CategoryFormDialogContent = ({
   availableCategories,
@@ -60,60 +55,6 @@ export const CategoryFormDialogContent = ({
           </form.Field>
 
           <form.Field
-            name="color"
-            validators={{
-              onChange: validateCategoryColor,
-              onSubmit: validateCategoryColor,
-            }}
-          >
-            {(field) => {
-              const errorText = getFieldSubmitChangeErrorText(field.state.meta);
-
-              return (
-                <TextField
-                  errorText={errorText}
-                  invalid={Boolean(errorText)}
-                  label="Color"
-                  name={field.name}
-                  onBlur={field.handleBlur}
-                  onValueChange={field.handleChange}
-                  required
-                  size="s"
-                  type="color"
-                  value={field.state.value}
-                />
-              );
-            }}
-          </form.Field>
-
-          <form.Field
-            name="sortOrder"
-            validators={{
-              onChange: validateCategorySortOrder,
-              onSubmit: validateCategorySortOrder,
-            }}
-          >
-            {(field) => {
-              const errorText = getFieldSubmitChangeErrorText(field.state.meta);
-
-              return (
-                <TextField
-                  errorText={errorText}
-                  invalid={Boolean(errorText)}
-                  label="Sort order"
-                  name={field.name}
-                  onBlur={field.handleBlur}
-                  onValueChange={field.handleChange}
-                  required
-                  size="s"
-                  type="number"
-                  value={field.state.value}
-                />
-              );
-            }}
-          </form.Field>
-
-          <form.Field
             name="parentId"
             validators={{
               onChange: validateCategoryParentId,
@@ -144,25 +85,10 @@ export const CategoryFormDialogContent = ({
 
       <Dialog.Footer>
         <form.Subscribe
-          selector={(state) =>
-            [
-              state.values.color,
-              state.values.name,
-              state.values.sortOrder,
-              state.isSubmitting,
-            ] as const
-          }
+          selector={(state) => [state.values.name, state.isSubmitting] as const}
         >
-          {([color, name, sortOrder, isSubmitting]) => (
-            <Button
-              disabled={
-                isSubmitting ||
-                !color.trim() ||
-                !name.trim() ||
-                !sortOrder.trim()
-              }
-              type="submit"
-            >
+          {([name, isSubmitting]) => (
+            <Button disabled={isSubmitting || !name.trim()} type="submit">
               {isSubmitting ? pendingText : submitText}
             </Button>
           )}

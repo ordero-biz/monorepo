@@ -1,9 +1,6 @@
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import {
-  getCategories,
-  getCategory,
-} from '@/lib/client/api/categories';
+import { getCategories, getCategory } from '@/lib/client/api/categories';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { CategoryDetail } from './CategoryDetail';
 
@@ -61,15 +58,12 @@ describe('CategoryDetail', () => {
     ).toBeVisible();
     expect(screen.getByText('Category details')).toBeVisible();
     expect(screen.getByText('Shoes')).toBeVisible();
-    expect(screen.getByText('15')).toBeVisible();
 
-    await userEvent.setup().click(
-      screen.getByRole('button', { name: 'Edit Sneakers' })
-    );
+    await userEvent
+      .setup()
+      .click(screen.getByRole('button', { name: 'Edit Sneakers' }));
 
-    expect(
-      screen.getByRole('dialog', { name: 'Edit category' })
-    ).toBeVisible();
+    expect(screen.getByRole('dialog', { name: 'Edit category' })).toBeVisible();
   });
 
   it('retries loading after a category request fails', async () => {
