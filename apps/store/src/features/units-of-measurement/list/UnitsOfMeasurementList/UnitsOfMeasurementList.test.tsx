@@ -1,6 +1,9 @@
-import { screen, waitFor } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { getUnitsOfMeasurement } from '@/lib/client/api/units-of-measurement';
+import {
+  deleteUnitsOfMeasurement,
+  getUnitsOfMeasurement,
+} from '@/lib/client/api/units-of-measurement';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { UnitsOfMeasurementList } from './UnitsOfMeasurementList';
 
@@ -25,9 +28,11 @@ vi.mock('@/lib/client/api/units-of-measurement', async () => ({
   ...(await vi.importActual<
     typeof import('@/lib/client/api/units-of-measurement')
   >('@/lib/client/api/units-of-measurement')),
+  deleteUnitsOfMeasurement: vi.fn(),
   getUnitsOfMeasurement: vi.fn(),
 }));
 
+const deleteUnitsOfMeasurementMock = vi.mocked(deleteUnitsOfMeasurement);
 const getUnitsOfMeasurementMock = vi.mocked(getUnitsOfMeasurement);
 
 const { setup } = prepareStoreSetup({
@@ -36,6 +41,7 @@ const { setup } = prepareStoreSetup({
 
 describe('UnitsOfMeasurementList', () => {
   beforeEach(() => {
+    deleteUnitsOfMeasurementMock.mockReset();
     getUnitsOfMeasurementMock.mockReset();
     mocks.push.mockReset();
     mocks.searchParams = new URLSearchParams();
@@ -128,6 +134,208 @@ describe('UnitsOfMeasurementList', () => {
     expect(screen.getByText('Kilogram')).toBeVisible();
     expect(screen.getByText('kg')).toBeVisible();
     expect(screen.getByText('Weight unit')).toBeVisible();
+  });
+
+  it('shows bulk delete actions for selected units of measurement', async () => {
+    getUnitsOfMeasurementMock.mockResolvedValue({
+      ok: true,
+      data: {
+        content: [
+          {
+            id: 1,
+            code: 'KG',
+            name: 'Kilogram',
+            symbol: 'kg',
+            comment: 'Weight unit',
+          },
+        ],
+        page: {
+          size: 10,
+          number: 0,
+          totalElements: 1,
+          totalPages: 1,
+        },
+      },
+    });
+    const user = userEvent.setup();
+
+    setup();
+
+    await user.click(
+      await screen.findByRole('checkbox', { name: 'Select Kilogram' })
+    );
+
+    expect(screen.getByText('1 selected')).toBeVisible();
+    expect(
+      screen.getByRole('button', { name: 'Clear selection' })
+    ).toBeVisible();
+
+    await user.click(screen.getByRole('button', { name: 'Delete' }));
+
+    expect(
+      screen.getByRole('dialog', { name: 'Delete unit of measurement' })
+    ).toHaveTextContent(
+      'Are you sure you want to delete the "Kilogram" unit of measurement?'
+    );
+  });
+
+  it('preserves other selections when deleting from a unit row action', async () => {
+    getUnitsOfMeasurementMock.mockResolvedValue({
+      ok: true,
+      data: {
+        content: [
+          {
+            id: 1,
+            code: 'KG',
+            name: 'Kilogram',
+            symbol: 'kg',
+            comment: 'Weight unit',
+          },
+          {
+            id: 2,
+            code: 'L',
+            name: 'Liter',
+            symbol: 'l',
+            comment: 'Volume unit',
+          },
+        ],
+        page: {
+          size: 10,
+          number: 0,
+          totalElements: 2,
+          totalPages: 1,
+        },
+      },
+    });
+    deleteUnitsOfMeasurementMock.mockResolvedValue({
+      ok: true,
+      data: undefined,
+    });
+    const user = userEvent.setup();
+
+    setup();
+
+    await user.click(
+      await screen.findByRole('checkbox', { name: 'Select Liter' })
+    );
+    await user.click(
+      screen.getByRole('button', { name: 'Actions for Kilogram' })
+    );
+    await user.click(screen.getByRole('menuitem', { name: 'Delete' }));
+
+    expect(
+      screen.getByRole('dialog', { name: 'Delete unit of measurement' })
+    ).toHaveTextContent(
+      'Are you sure you want to delete the "Kilogram" unit of measurement?'
+    );
+    await user.click(
+      within(
+        screen.getByRole('dialog', { name: 'Delete unit of measurement' })
+      ).getByRole('button', { name: 'Delete' })
+    );
+
+    expect(deleteUnitsOfMeasurementMock).toHaveBeenCalledWith({
+      unitOfMeasurementIds: [1],
+    });
+    await waitFor(() => expect(screen.getByText('1 selected')).toBeVisible());
+  });
+
+  it('selects only units on the current server page', async () => {
+    getUnitsOfMeasurementMock.mockResolvedValue({
+      ok: true,
+      data: {
+        content: [
+          {
+            id: 1,
+            code: 'KG',
+            name: 'Kilogram',
+            symbol: 'kg',
+            comment: 'Weight unit',
+          },
+          {
+            id: 2,
+            code: 'L',
+            name: 'Liter',
+            symbol: 'l',
+            comment: 'Volume unit',
+          },
+        ],
+        page: {
+          size: 2,
+          number: 0,
+          totalElements: 3,
+          totalPages: 2,
+        },
+      },
+    });
+    const user = userEvent.setup();
+
+    setup({
+      paginationInput: {
+        page: 0,
+        size: 2,
+      },
+    });
+
+    await user.click(
+      await screen.findByRole('checkbox', {
+        name: 'Select all units of measurement',
+      })
+    );
+
+    expect(screen.getByText('2 selected')).toBeVisible();
+    expect(screen.queryByText('3 selected')).not.toBeInTheDocument();
+  });
+
+  it('deletes selected units and clears the selection after success', async () => {
+    getUnitsOfMeasurementMock.mockResolvedValue({
+      ok: true,
+      data: {
+        content: [
+          {
+            id: 1,
+            code: 'KG',
+            name: 'Kilogram',
+            symbol: 'kg',
+            comment: 'Weight unit',
+          },
+        ],
+        page: {
+          size: 10,
+          number: 0,
+          totalElements: 1,
+          totalPages: 1,
+        },
+      },
+    });
+    deleteUnitsOfMeasurementMock.mockResolvedValue({
+      ok: true,
+      data: undefined,
+    });
+    const user = userEvent.setup();
+
+    const { queryClient } = setup();
+    const removeQueriesSpy = vi.spyOn(queryClient, 'removeQueries');
+
+    await user.click(
+      await screen.findByRole('checkbox', { name: 'Select Kilogram' })
+    );
+    await user.click(screen.getByRole('button', { name: 'Delete' }));
+    await user.click(
+      within(
+        screen.getByRole('dialog', { name: 'Delete unit of measurement' })
+      ).getByRole('button', { name: 'Delete' })
+    );
+
+    expect(deleteUnitsOfMeasurementMock).toHaveBeenCalledWith({
+      unitOfMeasurementIds: [1],
+    });
+    expect(removeQueriesSpy).toHaveBeenCalledWith({
+      queryKey: ['units-of-measurement', 'detail', '1'],
+    });
+    await waitFor(() =>
+      expect(screen.queryByText('1 selected')).not.toBeInTheDocument()
+    );
   });
 
   it('requests units of measurement with pagination input', async () => {
