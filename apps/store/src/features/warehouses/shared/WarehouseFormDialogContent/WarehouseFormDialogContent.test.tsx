@@ -3,8 +3,8 @@ import { useForm } from '@tanstack/react-form';
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { prepareStoreSetup } from '@/test/prepareSetup';
-import { WarehouseFormDialogContent } from './WarehouseFormDialogContent';
 import type { WarehouseFormValues } from '../validations';
+import { WarehouseFormDialogContent } from './WarehouseFormDialogContent';
 
 type WarehouseFormDialogContentTestFixtureProps = {
   onSubmit?: () => Promise<void> | void;

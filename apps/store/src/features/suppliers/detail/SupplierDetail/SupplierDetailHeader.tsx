@@ -1,6 +1,6 @@
-import { Menu, PageHeader, Typography } from '@/ui/index';
 import { EllipsisVertical, Pencil } from 'lucide-react';
 import { useState } from 'react';
+import { Menu, PageHeader, Typography } from '@/ui/index';
 import { UpdateSupplierDialog } from '../UpdateSupplier/UpdateSupplierDialog';
 import type { SupplierDetailHeaderProps } from './types';
 
