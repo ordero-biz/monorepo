@@ -150,9 +150,7 @@ describe('AttributeDetailHeader', () => {
     setup();
 
     expect(await screen.findByRole('heading', { name: 'Color' })).toBeVisible();
-    await user.click(
-      screen.getByRole('button', { name: 'Actions for Color' })
-    );
+    await user.click(screen.getByRole('button', { name: 'Actions for Color' }));
     await user.click(
       await screen.findByRole('menuitem', { name: 'Edit attribute name' })
     );

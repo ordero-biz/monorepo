@@ -97,7 +97,6 @@ export const AttributeDetailValues = ({
 
   return (
     <>
-
       <DataTable
         ariaLabel="Attribute values"
         columns={columns}

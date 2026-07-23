@@ -14,7 +14,7 @@ import { BaseLayoutContextualActionBar } from '@/features/app-shell';
 import type { UnitOfMeasurement } from '@/lib/domain/unitsOfMeasurement';
 import { useUnitsOfMeasurementQuery } from '@/lib/hooks/units-of-measurement/useUnitsOfMeasurementQuery';
 import { useTablePagination } from '@/lib/hooks/useTablePagination';
-import { DeleteUnitsOfMeasurementDialog } from '../DeleteUnitsOfMeasurement';
+import { DeleteUnitsOfMeasurementDialog } from '../../shared';
 import { getColumns } from './columns';
 import type { UnitsOfMeasurementListProps } from './types';
 
@@ -29,14 +29,18 @@ export const UnitsOfMeasurementList = ({
   paginationInput,
 }: UnitsOfMeasurementListProps) => {
   const unitsOfMeasurementQuery = useUnitsOfMeasurementQuery(paginationInput);
+
   const tablePagination = useTablePagination({
     pageMetadata: unitsOfMeasurementQuery.data?.page,
     paginationInput,
   });
-  const [deletingUnitsOfMeasurement, setDeletingUnitsOfMeasurement] =
-    useState<UnitOfMeasurement[] | null>(null);
+
+  const [deletingUnitsOfMeasurement, setDeletingUnitsOfMeasurement] = useState<
+    UnitOfMeasurement[] | null
+  >(null);
   const [deletingUnitOfMeasurement, setDeletingUnitOfMeasurement] =
     useState<UnitOfMeasurement | null>(null);
+
   const columns = useMemo(
     () =>
       getColumns({
@@ -44,6 +48,7 @@ export const UnitsOfMeasurementList = ({
       }),
     []
   );
+
   const {
     clearSelection,
     selectedRows: selectedUnitsOfMeasurement,

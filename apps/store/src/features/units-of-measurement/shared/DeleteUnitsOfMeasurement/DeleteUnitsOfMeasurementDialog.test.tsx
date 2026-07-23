@@ -1,21 +1,9 @@
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { deleteUnitsOfMeasurement } from '@/lib/client/api/units-of-measurement';
-import { clientRoutes } from '@/lib/client/routes';
 import { unitsOfMeasurementQueryKeys } from '@/lib/query/units-of-measurement/unitsOfMeasurementQueryKeys';
 import { prepareStoreSetup } from '@/test/prepareSetup';
-import { DeleteUnitOfMeasurementDialog } from './DeleteUnitOfMeasurementDialog';
-
-const routerPushMock = vi.fn();
-
-vi.mock('next/navigation', async () => ({
-  ...(await vi.importActual<typeof import('next/navigation')>(
-    'next/navigation'
-  )),
-  useRouter: () => ({
-    push: routerPushMock,
-  }),
-}));
+import { DeleteUnitsOfMeasurementDialog } from './DeleteUnitsOfMeasurementDialog';
 
 vi.mock('@/lib/client/api/units-of-measurement', async () => ({
   ...(await vi.importActual<
@@ -26,29 +14,52 @@ vi.mock('@/lib/client/api/units-of-measurement', async () => ({
 
 const deleteUnitsOfMeasurementMock = vi.mocked(deleteUnitsOfMeasurement);
 
-const { setup } = prepareStoreSetup({
-  component: DeleteUnitOfMeasurementDialog,
+const singleUnit = {
+  id: 7,
+  code: 'KG',
+  name: 'Kilogram',
+  symbol: 'kg',
+  comment: 'Weight unit',
+};
+
+const multipleUnits = [
+  singleUnit,
+  {
+    id: 8,
+    code: 'G',
+    name: 'Gram',
+    symbol: 'g',
+    comment: 'Weight unit',
+  },
+];
+
+const { setup: setupSingle } = prepareStoreSetup({
+  component: DeleteUnitsOfMeasurementDialog,
   props: {
+    onDeleted: vi.fn(),
     onOpenChange: vi.fn(),
     open: true,
-    unitOfMeasurement: {
-      id: 7,
-      code: 'KG',
-      name: 'Kilogram',
-      symbol: 'kg',
-      comment: 'Weight unit',
-    },
+    unitsOfMeasurement: [singleUnit],
   },
 });
 
-describe('DeleteUnitOfMeasurementDialog', () => {
+const { setup: setupMultiple } = prepareStoreSetup({
+  component: DeleteUnitsOfMeasurementDialog,
+  props: {
+    onDeleted: vi.fn(),
+    onOpenChange: vi.fn(),
+    open: true,
+    unitsOfMeasurement: multipleUnits,
+  },
+});
+
+describe('DeleteUnitsOfMeasurementDialog', () => {
   beforeEach(() => {
     deleteUnitsOfMeasurementMock.mockReset();
-    routerPushMock.mockClear();
   });
 
-  it('renders a confirmation dialog with the unit of measurement name', () => {
-    setup();
+  it('renders a confirmation dialog with the unit of measurement name when single unit', () => {
+    setupSingle();
 
     const dialog = screen.getByRole('dialog', {
       name: 'Delete unit of measurement',
@@ -60,23 +71,39 @@ describe('DeleteUnitOfMeasurementDialog', () => {
     );
   });
 
-  it('deletes the unit, invalidates the list, and navigates to the list page', async () => {
+  it('renders a confirmation dialog with the count of units when multiple units', () => {
+    setupMultiple();
+
+    const dialog = screen.getByRole('dialog', {
+      name: 'Delete units of measurement',
+    });
+
+    expect(dialog).toBeVisible();
+    expect(dialog).toHaveTextContent(
+      'Are you sure you want to delete 2 units of measurement?'
+    );
+  });
+
+  it('deletes the units, invalidates the list, and closes the dialog', async () => {
     const user = userEvent.setup();
     deleteUnitsOfMeasurementMock.mockResolvedValue({
       ok: true,
       data: undefined,
     });
-    const { onOpenChange, queryClient } = setup();
+    const { onDeleted, onOpenChange, queryClient } = setupMultiple();
     const invalidateQueriesSpy = vi.spyOn(queryClient, 'invalidateQueries');
     const removeQueriesSpy = vi.spyOn(queryClient, 'removeQueries');
 
     await user.click(screen.getByRole('button', { name: 'Delete' }));
 
     expect(deleteUnitsOfMeasurementMock).toHaveBeenCalledWith({
-      unitOfMeasurementIds: [7],
+      unitOfMeasurementIds: [7, 8],
     });
     expect(removeQueriesSpy).toHaveBeenCalledWith({
       queryKey: unitsOfMeasurementQueryKeys.detail(7),
+    });
+    expect(removeQueriesSpy).toHaveBeenCalledWith({
+      queryKey: unitsOfMeasurementQueryKeys.detail(8),
     });
     await waitFor(() =>
       expect(invalidateQueriesSpy).toHaveBeenCalledWith({
@@ -84,9 +111,7 @@ describe('DeleteUnitOfMeasurementDialog', () => {
       })
     );
     expect(onOpenChange).toHaveBeenCalledWith(false);
-    expect(routerPushMock).toHaveBeenCalledWith(
-      clientRoutes.unitsOfMeasurement
-    );
+    expect(onDeleted).toHaveBeenCalled();
   });
 
   it('prevents another deletion while the request is in flight', async () => {
@@ -101,7 +126,7 @@ describe('DeleteUnitOfMeasurementDialog', () => {
     );
     const user = userEvent.setup();
 
-    setup();
+    setupSingle();
 
     const deleteButton = screen.getByRole('button', { name: 'Delete' });
 
@@ -128,7 +153,7 @@ describe('DeleteUnitOfMeasurementDialog', () => {
       },
     });
 
-    setup();
+    setupSingle();
 
     await user.click(screen.getByRole('button', { name: 'Delete' }));
 
@@ -140,6 +165,5 @@ describe('DeleteUnitOfMeasurementDialog', () => {
     expect(
       screen.getByRole('dialog', { name: 'Delete unit of measurement' })
     ).toBeVisible();
-    expect(routerPushMock).not.toHaveBeenCalled();
   });
 });

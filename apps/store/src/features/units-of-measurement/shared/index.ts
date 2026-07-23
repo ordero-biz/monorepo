@@ -1,1 +1,4 @@
-export { useDeleteUnitsOfMeasurement } from './hooks/useDeleteUnitsOfMeasurement';
+export {
+  DeleteUnitsOfMeasurementDialog,
+  useDeleteUnitsOfMeasurement,
+} from './DeleteUnitsOfMeasurement';

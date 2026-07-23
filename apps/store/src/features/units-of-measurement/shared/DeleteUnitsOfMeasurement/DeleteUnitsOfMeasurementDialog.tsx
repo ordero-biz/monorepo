@@ -2,31 +2,33 @@
 
 import { Button, Dialog, Typography } from '@ordero/ui';
 import { useQueryClient } from '@tanstack/react-query';
-import { useRouter } from 'next/navigation';
-import { clientRoutes } from '@/lib/client/routes';
 import { unitsOfMeasurementQueryKeys } from '@/lib/query/units-of-measurement/unitsOfMeasurementQueryKeys';
-import { useDeleteUnitsOfMeasurement } from '../../shared';
-import type { DeleteUnitOfMeasurementDialogProps } from './types';
+import { useDeleteUnitsOfMeasurement } from './hooks/useDeleteUnitsOfMeasurement';
+import type { DeleteUnitsOfMeasurementDialogProps } from './types';
 
-export const DeleteUnitOfMeasurementDialog = ({
+export const DeleteUnitsOfMeasurementDialog = ({
+  onDeleted,
   onOpenChange,
   open,
-  unitOfMeasurement,
-}: DeleteUnitOfMeasurementDialogProps) => {
+  unitsOfMeasurement,
+}: DeleteUnitsOfMeasurementDialogProps) => {
   const queryClient = useQueryClient();
-  const router = useRouter();
+  const isSingleUnit = unitsOfMeasurement.length === 1;
+
   const { handleDelete, isDeleting } = useDeleteUnitsOfMeasurement({
     onDeleted: async () => {
       onOpenChange(false);
-      queryClient.removeQueries({
-        queryKey: unitsOfMeasurementQueryKeys.detail(unitOfMeasurement.id),
+      unitsOfMeasurement.forEach((unit) => {
+        queryClient.removeQueries({
+          queryKey: unitsOfMeasurementQueryKeys.detail(unit.id),
+        });
       });
       await queryClient.invalidateQueries({
         queryKey: unitsOfMeasurementQueryKeys.list,
       });
-      router.push(clientRoutes.unitsOfMeasurement);
+      await onDeleted?.();
     },
-    unitOfMeasurementIds: [unitOfMeasurement.id],
+    unitOfMeasurementIds: unitsOfMeasurement.map((unit) => unit.id),
   });
 
   return (
@@ -36,13 +38,27 @@ export const DeleteUnitOfMeasurementDialog = ({
         <Dialog.Viewport>
           <Dialog.Popup size="xs">
             <Dialog.Header>
-              <Dialog.Title>Delete unit of measurement</Dialog.Title>
+              <Dialog.Title>
+                {isSingleUnit
+                  ? 'Delete unit of measurement'
+                  : 'Delete units of measurement'}
+              </Dialog.Title>
             </Dialog.Header>
 
             <Dialog.Content>
               <Typography variant="body1">
-                Are you sure you want to delete the "
-                <strong>{unitOfMeasurement.name}</strong>" unit of measurement?
+                {isSingleUnit ? (
+                  <>
+                    Are you sure you want to delete the "
+                    <strong>{unitsOfMeasurement[0]?.name}</strong>" unit of
+                    measurement?
+                  </>
+                ) : (
+                  <>
+                    Are you sure you want to delete {unitsOfMeasurement.length}{' '}
+                    units of measurement?
+                  </>
+                )}
               </Typography>
             </Dialog.Content>
 

@@ -2,9 +2,11 @@
 
 import { Button, Card, Menu, PageHeader, Typography } from '@ordero/ui';
 import { EllipsisVertical, Pencil, Trash2 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { clientRoutes } from '@/lib/client/routes';
 import { useUnitOfMeasurementQuery } from '@/lib/hooks/units-of-measurement/useUnitOfMeasurementQuery';
-import { DeleteUnitOfMeasurementDialog } from '../DeleteUnitOfMeasurement';
+import { DeleteUnitsOfMeasurementDialog } from '../../shared';
 import { UpdateUnitOfMeasurementDialog } from '../UpdateUnitOfMeasurement/UpdateUnitOfMeasurementDialog';
 import type { UnitOfMeasurementDetailProps } from './types';
 import { UnitOfMeasurementDetailInfo } from './UnitOfMeasurementDetailInfo';
@@ -12,6 +14,7 @@ import { UnitOfMeasurementDetailInfo } from './UnitOfMeasurementDetailInfo';
 export const UnitOfMeasurementDetail = ({
   unitOfMeasurementId,
 }: UnitOfMeasurementDetailProps) => {
+  const router = useRouter();
   const unitOfMeasurementQuery = useUnitOfMeasurementQuery(unitOfMeasurementId);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
@@ -95,10 +98,13 @@ export const UnitOfMeasurementDetail = ({
             </Menu.Portal>
           </Menu.Root>
 
-          <DeleteUnitOfMeasurementDialog
+          <DeleteUnitsOfMeasurementDialog
+            onDeleted={async () => {
+              router.push(clientRoutes.unitsOfMeasurement);
+            }}
             onOpenChange={setIsDeleteDialogOpen}
             open={isDeleteDialogOpen}
-            unitOfMeasurement={unitOfMeasurementQuery.data}
+            unitsOfMeasurement={[unitOfMeasurementQuery.data]}
           />
           <UpdateUnitOfMeasurementDialog
             onOpenChange={setIsUpdateDialogOpen}

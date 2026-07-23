@@ -1,11 +1,11 @@
 import { Button, Dialog, TextField } from '@ordero/ui';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
-import type { WarehouseFormDialogContentProps } from './types';
 import {
   validateWarehouseAddress,
   validateWarehouseCode,
   validateWarehouseName,
 } from '../validations';
+import type { WarehouseFormDialogContentProps } from './types';
 
 export const WarehouseFormDialogContent = ({
   form,
@@ -129,10 +129,7 @@ export const WarehouseFormDialogContent = ({
           {([code, name, address, isSubmitting]) => (
             <Button
               disabled={
-                isSubmitting ||
-                !code.trim() ||
-                !name.trim() ||
-                !address.trim()
+                isSubmitting || !code.trim() || !name.trim() || !address.trim()
               }
               type="submit"
             >

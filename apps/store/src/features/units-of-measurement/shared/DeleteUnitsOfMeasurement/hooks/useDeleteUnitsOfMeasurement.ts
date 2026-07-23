@@ -1,9 +1,9 @@
 'use client';
 
 import type { ApiError } from '@ordero/api-types';
-import { useToastManager } from '@ordero/ui';
 import { useMutation } from '@tanstack/react-query';
 import { deleteUnitsOfMeasurement } from '@/lib/client/api/units-of-measurement';
+import { useToastManager } from '@/ui/index';
 
 type UseDeleteUnitsOfMeasurementArgs = {
   onDeleted: () => Promise<void> | void;

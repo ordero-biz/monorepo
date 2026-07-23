@@ -11,7 +11,7 @@ const { addToastMock } = vi.hoisted(() => ({
 }));
 
 vi.mock('@ordero/ui', async () => ({
-  ...(await vi.importActual<typeof import('@ordero/ui')>('@ordero/ui')),
+  ...(await vi.importActual<typeof import('@/ui/index')>('@ordero/ui')),
   useToastManager: () => ({
     add: addToastMock,
   }),
@@ -26,9 +26,7 @@ vi.mock('@/lib/client/api/units-of-measurement', async () => ({
 
 const deleteUnitsOfMeasurementMock = vi.mocked(deleteUnitsOfMeasurement);
 
-const setupDeleteUnitsOfMeasurementHook = (
-  unitOfMeasurementIds = [7]
-) => {
+const setupDeleteUnitsOfMeasurementHook = (unitOfMeasurementIds = [7]) => {
   const onDeleted = vi.fn();
   const TestQueryProvider = createTestQueryProvider(createTestQueryClient());
   const { result } = renderHook(
