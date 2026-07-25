@@ -156,14 +156,6 @@ export const CreateProductTemplateFields = ({
                 PRODUCT_GENERATION_MODE.one;
 
               onGenerationModeChange(nextGenerationMode);
-              form.clearFieldValues('productVariants', {
-                dontUpdateMeta: true,
-                dontValidate: true,
-              });
-              form.setErrorMap({
-                onChange: undefined,
-                onSubmit: undefined,
-              });
             }}
             orientation="horizontal"
             size="s"

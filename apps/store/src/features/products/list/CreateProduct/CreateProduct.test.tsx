@@ -207,6 +207,26 @@ describe('CreateProduct', () => {
     expect(createProductMock).not.toHaveBeenCalled();
   });
 
+  it('keeps generated product variants when switching generation modes', async () => {
+    const user = userEvent.setup();
+
+    setup();
+
+    await completeRequiredFields(user);
+    await user.click(screen.getByRole('button', { name: 'Select Attributes' }));
+    await user.click(screen.getByRole('button', { name: 'Blue' }));
+    await user.click(
+      screen.getByRole('button', { name: 'Next: Configure product' })
+    );
+
+    expect(screen.getByDisplayValue('Running Shoes Blue')).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Multiple products' }));
+
+    expect(screen.getByDisplayValue('Running Shoes Blue')).toBeInTheDocument();
+    expect(createProductMock).not.toHaveBeenCalled();
+  });
+
   it('shows only template-selected attributes in the variant attribute editor', async () => {
     const user = userEvent.setup();
 

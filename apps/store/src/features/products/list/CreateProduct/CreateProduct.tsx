@@ -31,7 +31,7 @@ export const CreateProduct = () => {
     >
       <Card.Root>
         <Card.Content>
-          <div className="flex flex-col gap-[var(--space-4)]">
+          <div className="flex flex-col gap-[var(--space-2)]">
             <Typography variant="h4">Create product template</Typography>
 
             <CreateProductTemplateFields
