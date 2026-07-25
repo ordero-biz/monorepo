@@ -1,7 +1,8 @@
+import { Typography } from '@ordero/ui';
 import { useState } from 'react';
+import { PRODUCT_GENERATION_MODE } from './constants';
 import { EditProductVariantAttributesDialog } from './EditProductVariantAttributesDialog';
 import { GeneratedProductVariantCard } from './GeneratedProductVariantCard';
-import { PRODUCT_GENERATION_MODE } from './constants';
 import { useIncrementalProductVariants } from './hooks/useIncrementalProductVariants';
 import type {
   GeneratedProductVariantListProps,
@@ -18,7 +19,7 @@ const GeneratedProductVariantList = ({
     useIncrementalProductVariants(productVariants);
 
   return (
-    <div className="mt-3 mb-2 flex flex-col gap-[var(--space-1)]">
+    <div className="mt-1 mb-2 flex flex-col gap-[var(--space-1)]">
       {visibleProductVariants.map((productVariant, variantIndex) => (
         <GeneratedProductVariantCard
           attributes={attributes}
@@ -66,7 +67,8 @@ export const GeneratedProductVariants = ({
             : productVariants[editingVariantIndex];
 
         return productVariants.length > 0 ? (
-          <>
+          <div className="mt-3">
+            <Typography variant="h5">Generated product variants</Typography>
             <GeneratedProductVariantList
               attributes={attributes}
               form={form}
@@ -95,7 +97,7 @@ export const GeneratedProductVariants = ({
                 )}
               </form.Field>
             ) : null}
-          </>
+          </div>
         ) : null;
       }}
     </form.Subscribe>
