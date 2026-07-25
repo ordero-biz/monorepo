@@ -9,6 +9,7 @@ type HandleAttributeValueChangeArgs = {
 };
 
 export const EditProductVariantAttributesDialog = ({
+  allowMultipleValuesPerAttribute,
   attributes,
   attributeValueIds,
   onOpenChange,
@@ -34,6 +35,12 @@ export const EditProductVariantAttributesDialog = ({
   }: HandleAttributeValueChangeArgs) => {
     setSelectedAttributeValueIds((currentAttributeValueIds) => {
       if (pressed) {
+        if (allowMultipleValuesPerAttribute) {
+          return currentAttributeValueIds.includes(attributeValueId)
+            ? currentAttributeValueIds
+            : [...currentAttributeValueIds, attributeValueId];
+        }
+
         const attributeValueIdsSet = new Set(attributeValueIds);
 
         return [

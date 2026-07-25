@@ -58,6 +58,7 @@ export const CreateProduct = () => {
       <GeneratedProductVariants
         availableAttributes={availableAttributes}
         form={form}
+        generationMode={generationMode}
       />
       <form.Subscribe
         selector={(state) =>

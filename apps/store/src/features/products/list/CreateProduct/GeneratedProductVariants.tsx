@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { EditProductVariantAttributesDialog } from './EditProductVariantAttributesDialog';
 import { GeneratedProductVariantCard } from './GeneratedProductVariantCard';
+import { PRODUCT_GENERATION_MODE } from './constants';
 import { useIncrementalProductVariants } from './hooks/useIncrementalProductVariants';
 import type {
   GeneratedProductVariantListProps,
@@ -39,10 +40,13 @@ const GeneratedProductVariantList = ({
 export const GeneratedProductVariants = ({
   availableAttributes,
   form,
+  generationMode,
 }: GeneratedProductVariantsProps) => {
   const [editingVariantIndex, setEditingVariantIndex] = useState<number | null>(
     null
   );
+  const allowMultipleValuesPerAttribute =
+    generationMode === PRODUCT_GENERATION_MODE.one;
 
   const handleAttributesDialogOpenChange = (open: boolean) => {
     if (!open) {
@@ -81,6 +85,9 @@ export const GeneratedProductVariants = ({
               >
                 {(field) => (
                   <EditProductVariantAttributesDialog
+                    allowMultipleValuesPerAttribute={
+                      allowMultipleValuesPerAttribute
+                    }
                     attributes={variantAttributes}
                     attributeValueIds={field.state.value}
                     onOpenChange={handleAttributesDialogOpenChange}

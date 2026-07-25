@@ -164,7 +164,7 @@ describe('CreateProduct', () => {
     expect(createProductMock).not.toHaveBeenCalled();
   });
 
-  it('replaces a variant attribute value from the same attribute', async () => {
+  it('adds another variant attribute value from the same attribute for a single product', async () => {
     const user = userEvent.setup();
 
     setup();
@@ -193,9 +193,7 @@ describe('CreateProduct', () => {
     });
 
     expect(within(variantAttributes).getByText('Red')).toBeVisible();
-    expect(
-      within(variantAttributes).queryByText('Blue')
-    ).not.toBeInTheDocument();
+    expect(within(variantAttributes).getByText('Blue')).toBeVisible();
     expect(createProductMock).not.toHaveBeenCalled();
   });
 

@@ -51,6 +51,7 @@ export type GenerateProductActionsProps = {
 export type GeneratedProductVariantsProps = {
   availableAttributes: AttributeDropdown[];
   form: CreateProductForm;
+  generationMode: ProductGenerationMode;
 };
 
 export type GeneratedProductVariantListProps = {
@@ -69,6 +70,7 @@ export type GeneratedProductVariantCardProps = {
 };
 
 export type EditProductVariantAttributesDialogProps = {
+  allowMultipleValuesPerAttribute: boolean;
   attributeValueIds: number[];
   attributes: AttributeDropdown[];
   onOpenChange: (open: boolean) => void;
