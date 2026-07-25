@@ -38,7 +38,6 @@ const GeneratedProductVariantList = ({
 };
 
 export const GeneratedProductVariants = ({
-  availableAttributes,
   form,
   generationMode,
 }: GeneratedProductVariantsProps) => {
@@ -61,8 +60,6 @@ export const GeneratedProductVariants = ({
       }
     >
       {([attributes, productVariants]) => {
-        const variantAttributes =
-          availableAttributes.length > 0 ? availableAttributes : attributes;
         const editingProductVariant =
           editingVariantIndex === null
             ? undefined
@@ -71,7 +68,7 @@ export const GeneratedProductVariants = ({
         return productVariants.length > 0 ? (
           <>
             <GeneratedProductVariantList
-              attributes={variantAttributes}
+              attributes={attributes}
               form={form}
               onEditAttributes={setEditingVariantIndex}
               productVariants={productVariants}
@@ -88,7 +85,7 @@ export const GeneratedProductVariants = ({
                     allowMultipleValuesPerAttribute={
                       allowMultipleValuesPerAttribute
                     }
-                    attributes={variantAttributes}
+                    attributes={attributes}
                     attributeValueIds={field.state.value}
                     onOpenChange={handleAttributesDialogOpenChange}
                     onUpdate={field.handleChange}

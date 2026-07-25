@@ -37,69 +37,79 @@ vi.mock('./AttributesAsyncCombobox', () => ({
   }: {
     label: string;
     onSelectedAttributesChange?: (attributes: AttributeDropdown[]) => void;
-  }) => (
-    <button
-      onClick={() =>
-        onSelectedAttributesChange?.([
-          {
-            id: 8,
-            name: 'Manufacture',
-            sortOrder: 0,
-            createdAt: '2026-07-14T17:54:42.035Z',
-            attributeValues: [
-              {
-                id: 80,
-                name: 'China',
-                sortOrder: 0,
-                createdAt: '2026-07-14T17:54:42.036Z',
-              },
-              {
-                id: 81,
-                name: 'USA',
-                sortOrder: 1,
-                createdAt: '2026-07-14T17:54:42.036Z',
-              },
-              {
-                id: 82,
-                name: 'Ukraine',
-                sortOrder: 2,
-                createdAt: '2026-07-14T17:54:42.036Z',
-              },
-            ],
-          },
-          {
-            id: 7,
-            name: 'Color',
-            sortOrder: 1,
-            createdAt: '2026-07-14T17:54:42.035Z',
-            attributeValues: [
-              {
-                id: 70,
-                name: 'Red',
-                sortOrder: 0,
-                createdAt: '2026-07-14T17:54:42.036Z',
-              },
-              {
-                id: 71,
-                name: 'Green',
-                sortOrder: 1,
-                createdAt: '2026-07-14T17:54:42.036Z',
-              },
-              {
-                id: 72,
-                name: 'Blue',
-                sortOrder: 2,
-                createdAt: '2026-07-14T17:54:42.036Z',
-              },
-            ],
-          },
-        ])
-      }
-      type="button"
-    >
-      Select {label}
-    </button>
-  ),
+  }) => {
+    const manufactureAttribute = {
+      id: 8,
+      name: 'Manufacture',
+      sortOrder: 0,
+      createdAt: '2026-07-14T17:54:42.035Z',
+      attributeValues: [
+        {
+          id: 80,
+          name: 'China',
+          sortOrder: 0,
+          createdAt: '2026-07-14T17:54:42.036Z',
+        },
+        {
+          id: 81,
+          name: 'USA',
+          sortOrder: 1,
+          createdAt: '2026-07-14T17:54:42.036Z',
+        },
+        {
+          id: 82,
+          name: 'Ukraine',
+          sortOrder: 2,
+          createdAt: '2026-07-14T17:54:42.036Z',
+        },
+      ],
+    };
+    const colorAttribute = {
+      id: 7,
+      name: 'Color',
+      sortOrder: 1,
+      createdAt: '2026-07-14T17:54:42.035Z',
+      attributeValues: [
+        {
+          id: 70,
+          name: 'Red',
+          sortOrder: 0,
+          createdAt: '2026-07-14T17:54:42.036Z',
+        },
+        {
+          id: 71,
+          name: 'Green',
+          sortOrder: 1,
+          createdAt: '2026-07-14T17:54:42.036Z',
+        },
+        {
+          id: 72,
+          name: 'Blue',
+          sortOrder: 2,
+          createdAt: '2026-07-14T17:54:42.036Z',
+        },
+      ],
+    };
+
+    return (
+      <>
+        <button
+          onClick={() =>
+            onSelectedAttributesChange?.([manufactureAttribute, colorAttribute])
+          }
+          type="button"
+        >
+          Select {label}
+        </button>
+        <button
+          onClick={() => onSelectedAttributesChange?.([colorAttribute])}
+          type="button"
+        >
+          Select Color Attribute
+        </button>
+      </>
+    );
+  },
 }));
 
 const createProductMock = vi.mocked(createProduct);
@@ -194,6 +204,37 @@ describe('CreateProduct', () => {
 
     expect(within(variantAttributes).getByText('Red')).toBeVisible();
     expect(within(variantAttributes).getByText('Blue')).toBeVisible();
+    expect(createProductMock).not.toHaveBeenCalled();
+  });
+
+  it('shows only template-selected attributes in the variant attribute editor', async () => {
+    const user = userEvent.setup();
+
+    setup();
+
+    await completeRequiredFields(user);
+    await user.click(
+      screen.getByRole('button', { name: 'Select Color Attribute' })
+    );
+    await user.click(screen.getByRole('button', { name: 'Blue' }));
+    await user.click(
+      screen.getByRole('button', { name: 'Next: Configure product' })
+    );
+
+    await user.click(
+      screen.getByRole('button', {
+        name: 'Edit attributes for Running Shoes Blue',
+      })
+    );
+    const dialog = screen.getByRole('dialog', {
+      name: 'Edit variant attributes for Running Shoes Blue',
+    });
+
+    expect(within(dialog).getByText('Color:')).toBeVisible();
+    expect(within(dialog).queryByText('Manufacture:')).not.toBeInTheDocument();
+    expect(
+      within(dialog).queryByRole('button', { name: 'China' })
+    ).not.toBeInTheDocument();
     expect(createProductMock).not.toHaveBeenCalled();
   });
 
