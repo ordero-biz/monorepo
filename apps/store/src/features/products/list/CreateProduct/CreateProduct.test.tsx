@@ -174,6 +174,54 @@ describe('CreateProduct', () => {
     expect(createProductMock).not.toHaveBeenCalled();
   });
 
+  it('submits a single generated product without attribute values', async () => {
+    createProductMock.mockResolvedValue({
+      ok: true,
+      data: {
+        id: 3,
+        name: 'Running Shoes',
+        description: '',
+        createdAt: '2026-07-03T07:20:30.291Z',
+        category: {
+          id: 2,
+          name: 'Footwear',
+          createdAt: '2026-07-01T07:20:30.291Z',
+        },
+      },
+    });
+    const user = userEvent.setup();
+
+    setup();
+
+    await completeRequiredFields(user);
+    await user.click(
+      screen.getByRole('button', { name: 'Next: Configure product' })
+    );
+    await user.type(screen.getByRole('textbox', { name: 'SKU' }), 'SHOE');
+    await user.type(
+      screen.getByRole('textbox', { name: 'Barcode' }),
+      'barcode-1'
+    );
+    await user.click(screen.getByRole('button', { name: 'Create product' }));
+
+    await waitFor(() =>
+      expect(createProductMock).toHaveBeenCalledWith({
+        name: 'Running Shoes',
+        description: '',
+        categoryId: 2,
+        productVariants: [
+          {
+            name: 'Running Shoes',
+            description: '',
+            sku: 'SHOE',
+            barcode: 'barcode-1',
+            attributeValueIds: [],
+          },
+        ],
+      })
+    );
+  });
+
   it('adds another variant attribute value from the same attribute for a single product', async () => {
     const user = userEvent.setup();
 
@@ -295,6 +343,26 @@ describe('CreateProduct', () => {
     ).toBeInTheDocument();
     expect(
       screen.queryByDisplayValue('Running Shoes Ukraine Red')
+    ).not.toBeInTheDocument();
+    expect(createProductMock).not.toHaveBeenCalled();
+  });
+
+  it('generates multiple-mode previews from any selected attribute values', async () => {
+    const user = userEvent.setup();
+
+    setup();
+
+    await completeRequiredFields(user);
+    await user.click(screen.getByRole('button', { name: 'Multiple products' }));
+    await user.click(screen.getByRole('button', { name: 'Select Attributes' }));
+    await user.click(screen.getByRole('button', { name: 'Blue' }));
+    await user.click(
+      screen.getByRole('button', { name: 'Next: Configure products' })
+    );
+
+    expect(screen.getByDisplayValue('Running Shoes Blue')).toBeInTheDocument();
+    expect(
+      screen.queryByDisplayValue('Running Shoes China Blue')
     ).not.toBeInTheDocument();
     expect(createProductMock).not.toHaveBeenCalled();
   });

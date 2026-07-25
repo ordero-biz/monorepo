@@ -1,3 +1,4 @@
+import { PRODUCT_GENERATION_MODE } from '../constants';
 import type { CreateProductValues } from '../types';
 import {
   validateProductCategory,
@@ -6,7 +7,9 @@ import {
 } from './validations';
 
 const getProductValues = (
-  productVariants: CreateProductValues['productVariants']
+  productVariants: CreateProductValues['productVariants'],
+  productVariantsGenerationMode: CreateProductValues['productVariantsGenerationMode'] =
+    PRODUCT_GENERATION_MODE.many
 ): CreateProductValues => ({
   attributes: [],
   attributeValues: {},
@@ -14,6 +17,7 @@ const getProductValues = (
   description: '',
   productName: 'Running Shoes',
   productVariants,
+  productVariantsGenerationMode,
 });
 
 describe('validateProductName', () => {
@@ -63,6 +67,25 @@ describe('validateProductVariants', () => {
         'productVariants[0].sku': 'SKU is required',
       },
     });
+  });
+
+  it('allows a single generated product variant without attribute values', () => {
+    expect(
+      validateProductVariants({
+        value: getProductValues(
+          [
+            {
+              attributeValueIds: [],
+              barcode: 'barcode-1',
+              description: '',
+              name: 'Running Shoes',
+              sku: 'SHOE',
+            },
+          ],
+          PRODUCT_GENERATION_MODE.one
+        ),
+      })
+    ).toBeUndefined();
   });
 
   it('requires unique barcodes and SKUs across variants', () => {

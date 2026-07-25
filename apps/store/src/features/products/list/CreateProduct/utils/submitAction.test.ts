@@ -1,4 +1,5 @@
 import { createProduct } from '@/lib/client/api/products';
+import { PRODUCT_GENERATION_MODE } from '../constants';
 import { submitCreateProduct } from './submitAction';
 
 vi.mock('@/lib/client/api/products', async () => ({
@@ -47,6 +48,7 @@ describe('submitCreateProduct', () => {
             sku: ' SHOE-BLUE ',
           },
         ],
+        productVariantsGenerationMode: PRODUCT_GENERATION_MODE.one,
       })
     ).resolves.toEqual({
       ok: true,
@@ -101,6 +103,7 @@ describe('submitCreateProduct', () => {
         description: 'Lightweight daily trainer',
         category: '2',
         productVariants: [],
+        productVariantsGenerationMode: PRODUCT_GENERATION_MODE.one,
       })
     ).resolves.toEqual({
       ok: false,

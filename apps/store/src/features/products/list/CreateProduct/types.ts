@@ -48,7 +48,6 @@ export type GenerateProductActionsProps = {
 
 export type GeneratedProductVariantsProps = {
   form: CreateProductForm;
-  generationMode: ProductGenerationMode;
 };
 
 export type GeneratedProductVariantListProps = {
@@ -56,6 +55,7 @@ export type GeneratedProductVariantListProps = {
   form: CreateProductForm;
   onEditAttributes: (variantIndex: number) => void;
   productVariants: CreateProductVariantValues[];
+  requireAttributeValueIds: boolean;
 };
 
 export type GeneratedProductVariantCardProps = {
@@ -63,6 +63,7 @@ export type GeneratedProductVariantCardProps = {
   form: CreateProductForm;
   onEditAttributes: () => void;
   productVariant: CreateProductVariantValues;
+  requireAttributeValueIds: boolean;
   variantIndex: number;
 };
 
@@ -88,6 +89,7 @@ export type CreateProductValues = {
   description: string;
   productName: string;
   productVariants: CreateProductVariantValues[];
+  productVariantsGenerationMode: ProductGenerationMode;
 };
 
 export type CreateProductVariantValues = {

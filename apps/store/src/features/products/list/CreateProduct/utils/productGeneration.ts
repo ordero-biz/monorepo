@@ -109,12 +109,9 @@ export const getGeneratedProductVariants = ({
   const selectedAttributeValueGroups = getSelectedAttributeValueGroups(
     attributes,
     attributeValuesByAttributeId
-  );
+  ).filter((group) => group.length > 0);
 
-  if (
-    selectedAttributeValueGroups.length === 0 ||
-    selectedAttributeValueGroups.some((group) => group.length === 0)
-  ) {
+  if (selectedAttributeValueGroups.length === 0) {
     return [];
   }
 

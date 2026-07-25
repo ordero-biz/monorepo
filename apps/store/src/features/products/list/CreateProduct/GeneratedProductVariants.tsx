@@ -14,6 +14,7 @@ const GeneratedProductVariantList = ({
   form,
   onEditAttributes,
   productVariants,
+  requireAttributeValueIds,
 }: GeneratedProductVariantListProps) => {
   const { hasMoreVariants, loadMoreRef, visibleProductVariants } =
     useIncrementalProductVariants(productVariants);
@@ -28,6 +29,7 @@ const GeneratedProductVariantList = ({
           key={variantIndex}
           onEditAttributes={() => onEditAttributes(variantIndex)}
           productVariant={productVariant}
+          requireAttributeValueIds={requireAttributeValueIds}
           variantIndex={variantIndex}
         />
       ))}
@@ -40,13 +42,10 @@ const GeneratedProductVariantList = ({
 
 export const GeneratedProductVariants = ({
   form,
-  generationMode,
 }: GeneratedProductVariantsProps) => {
   const [editingVariantIndex, setEditingVariantIndex] = useState<number | null>(
     null
   );
-  const allowMultipleValuesPerAttribute =
-    generationMode === PRODUCT_GENERATION_MODE.one;
 
   const handleAttributesDialogOpenChange = (open: boolean) => {
     if (!open) {
@@ -57,10 +56,18 @@ export const GeneratedProductVariants = ({
   return (
     <form.Subscribe
       selector={(state) =>
-        [state.values.attributes, state.values.productVariants] as const
+        [
+          state.values.attributes,
+          state.values.productVariants,
+          state.values.productVariantsGenerationMode,
+        ] as const
       }
     >
-      {([attributes, productVariants]) => {
+      {([attributes, productVariants, productVariantsGenerationMode]) => {
+        const allowMultipleValuesPerAttribute =
+          productVariantsGenerationMode === PRODUCT_GENERATION_MODE.one;
+        const requireAttributeValueIds =
+          productVariantsGenerationMode === PRODUCT_GENERATION_MODE.many;
         const editingProductVariant =
           editingVariantIndex === null
             ? undefined
@@ -74,6 +81,7 @@ export const GeneratedProductVariants = ({
               form={form}
               onEditAttributes={setEditingVariantIndex}
               productVariants={productVariants}
+              requireAttributeValueIds={requireAttributeValueIds}
             />
 
             {editingVariantIndex !== null && editingProductVariant ? (

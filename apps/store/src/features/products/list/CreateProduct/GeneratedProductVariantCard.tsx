@@ -19,6 +19,7 @@ export const GeneratedProductVariantCard = ({
   form,
   onEditAttributes,
   productVariant,
+  requireAttributeValueIds,
   variantIndex,
 }: GeneratedProductVariantCardProps) => (
   <Card.Root variant="outlined">
@@ -135,7 +136,7 @@ export const GeneratedProductVariantCard = ({
             const hasNoAttributeValues = field.state.value.length === 0;
             const errorText =
               validationErrorText ??
-              (hasNoAttributeValues
+              (requireAttributeValueIds && hasNoAttributeValues
                 ? 'Select at least one attribute value'
                 : undefined);
             const selectedAttributeValues = getProductVariantAttributeValues(
@@ -148,7 +149,7 @@ export const GeneratedProductVariantCard = ({
                 <FieldLabel
                   as="span"
                   invalid={Boolean(errorText)}
-                  required
+                  required={requireAttributeValueIds}
                 >
                   Attributes
                 </FieldLabel>

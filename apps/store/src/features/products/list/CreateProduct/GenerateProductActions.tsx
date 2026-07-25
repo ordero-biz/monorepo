@@ -30,10 +30,9 @@ export const GenerateProductActions = ({
         const selectedAttributeValueGroups = getSelectedAttributeValueGroups(
           attributes,
           attributeValues
-        );
+        ).filter((group) => group.length > 0);
         const hasSelectedAttributeValues =
-          selectedAttributeValueGroups.length > 0 &&
-          selectedAttributeValueGroups.every((group) => group.length > 0);
+          selectedAttributeValueGroups.length > 0;
         const generatedProductsCount = hasSelectedAttributeValues
           ? selectedAttributeValueGroups.reduce(
               (count, group) => count * group.length,
@@ -51,6 +50,11 @@ export const GenerateProductActions = ({
               color="primary"
               disabled={isGenerateDisabled}
               onClick={() => {
+                form.setFieldValue(
+                  'productVariantsGenerationMode',
+                  generationMode
+                );
+
                 if (isMultipleProducts) {
                   form.setFieldValue(
                     'productVariants',

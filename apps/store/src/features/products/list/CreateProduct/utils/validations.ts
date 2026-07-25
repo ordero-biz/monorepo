@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import type { ValidationArgs } from '@/lib/utils/form/validation/types';
+import { PRODUCT_GENERATION_MODE } from '../constants';
 import type { CreateProductValues, CreateProductVariantValues } from '../types';
 
 export const productNameSchema = z
@@ -150,22 +151,27 @@ const addProductVariantAttributeValueErrors = ({
   duplicateIndexes,
   errors,
   productVariants,
+  requireAttributeValueIds,
 }: {
   duplicateIndexes: Set<number>;
   errors: ProductVariantFieldErrors;
   productVariants: CreateProductVariantValues[];
+  requireAttributeValueIds: boolean;
 }) => {
   productVariants.forEach((productVariant, index) => {
     const fieldPath = `productVariants[${index}].attributeValueIds` as const;
-    const result = productVariantAttributeValueIdsSchema.safeParse(
-      productVariant.attributeValueIds
-    );
 
-    if (!result.success) {
-      errors[fieldPath] =
-        result.error.issues[0]?.message ??
-        'Select at least one attribute value';
-      return;
+    if (requireAttributeValueIds) {
+      const result = productVariantAttributeValueIdsSchema.safeParse(
+        productVariant.attributeValueIds
+      );
+
+      if (!result.success) {
+        errors[fieldPath] =
+          result.error.issues[0]?.message ??
+          'Select at least one attribute value';
+        return;
+      }
     }
 
     if (duplicateIndexes.has(index)) {
@@ -203,11 +209,14 @@ export const validateProductVariants = ({
   const attributeValueDuplicateIndexes = getDuplicateAttributeValueIndexes(
     value.productVariants
   );
+  const requireAttributeValueIds =
+    value.productVariantsGenerationMode === PRODUCT_GENERATION_MODE.many;
 
   addProductVariantAttributeValueErrors({
     duplicateIndexes: attributeValueDuplicateIndexes,
     errors,
     productVariants: value.productVariants,
+    requireAttributeValueIds,
   });
   addProductVariantFieldErrors({
     errors,

@@ -1,5 +1,10 @@
 import type { CreateProductValues } from './types';
 
+export const PRODUCT_GENERATION_MODE = {
+  one: 'one',
+  many: 'many',
+} as const;
+
 export const createProductDefaultValues: CreateProductValues = {
   attributes: [],
   attributeValues: {},
@@ -7,9 +12,5 @@ export const createProductDefaultValues: CreateProductValues = {
   description: '',
   productName: '',
   productVariants: [],
+  productVariantsGenerationMode: PRODUCT_GENERATION_MODE.one,
 };
-
-export const PRODUCT_GENERATION_MODE = {
-  one: 'one',
-  many: 'many',
-} as const;

@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, Card, Typography } from '@ordero/ui';
+import { Accordion, Button, Card } from '@ordero/ui';
 import { useState } from 'react';
 import { CreateProductTemplateFields } from './CreateProductTemplateFields';
 import { PRODUCT_GENERATION_MODE } from './constants';
@@ -29,28 +29,34 @@ export const CreateProduct = () => {
         }
       }}
     >
-      <Card.Root>
-        <Card.Content>
-          <div className="flex flex-col gap-[var(--space-2)]">
-            <Typography variant="h4">Create product template</Typography>
+      <Accordion.Root
+        aria-label="Product template"
+        defaultValue={['product-template']}
+      >
+        <Accordion.Item value="product-template">
+          <Accordion.Header>
+            <Accordion.Trigger>Product template</Accordion.Trigger>
+          </Accordion.Header>
+          <Accordion.Panel>
+            <div className="flex flex-col gap-[var(--space-2)]">
+              <CreateProductTemplateFields
+                form={form}
+                generationMode={generationMode}
+                onGenerationModeChange={setGenerationMode}
+              />
 
-            <CreateProductTemplateFields
-              form={form}
-              generationMode={generationMode}
-              onGenerationModeChange={setGenerationMode}
-            />
+              <ProductAttributeValuesField form={form} />
 
-            <ProductAttributeValuesField form={form} />
+              <GenerateProductActions
+                form={form}
+                generationMode={generationMode}
+              />
+            </div>
+          </Accordion.Panel>
+        </Accordion.Item>
+      </Accordion.Root>
 
-            <GenerateProductActions
-              form={form}
-              generationMode={generationMode}
-            />
-          </div>
-        </Card.Content>
-      </Card.Root>
-
-      <GeneratedProductVariants form={form} generationMode={generationMode} />
+      <GeneratedProductVariants form={form} />
       <form.Subscribe
         selector={(state) =>
           [
