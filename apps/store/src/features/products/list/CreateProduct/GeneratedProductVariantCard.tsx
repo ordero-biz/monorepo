@@ -170,7 +170,7 @@ export const GeneratedProductVariantCard = ({
                         );
                       }}
                       size="s"
-                      variant="outlined"
+                      variant="soft"
                     >
                       {attributeValue.name}
                     </Chip>
