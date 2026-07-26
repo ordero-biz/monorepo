@@ -1,7 +1,8 @@
 'use client';
 
-import { Accordion, Button, Card } from '@ordero/ui';
+import { Accordion, Button, ContextualActionBar, Typography } from '@ordero/ui';
 import { useState } from 'react';
+import { BaseLayoutContextualActionBar } from '@/features/app-shell';
 import { CreateProductTemplateFields } from './CreateProductTemplateFields';
 import { PRODUCT_GENERATION_MODE } from './constants';
 import { GeneratedProductVariants } from './GeneratedProductVariants';
@@ -68,16 +69,30 @@ export const CreateProduct = () => {
       >
         {([productVariants, isSubmitting, canSubmit]) =>
           productVariants.length > 0 ? (
-            <div className="flex justify-end">
-              <Button
-                color="primary"
-                disabled={isSubmitting || !canSubmit}
-                size="l"
-                type="submit"
-              >
-                {isSubmitting ? 'Creating product...' : 'Create product'}
-              </Button>
-            </div>
+            <>
+              <div aria-hidden="true" className="h-[var(--space-12)]" />
+              <BaseLayoutContextualActionBar>
+                <ContextualActionBar.Root ariaLabel="Product creation actions">
+                  <ContextualActionBar.Left>
+                    <Typography variant="body2">
+                      {productVariants.length === 1
+                        ? '1 product variant ready'
+                        : `${productVariants.length} product variants ready`}
+                    </Typography>
+                  </ContextualActionBar.Left>
+                  <ContextualActionBar.Right>
+                    <Button
+                      color="primary"
+                      disabled={isSubmitting || !canSubmit}
+                      size="l"
+                      type="submit"
+                    >
+                      {isSubmitting ? 'Creating product...' : 'Create product'}
+                    </Button>
+                  </ContextualActionBar.Right>
+                </ContextualActionBar.Root>
+              </BaseLayoutContextualActionBar>
+            </>
           ) : null
         }
       </form.Subscribe>
