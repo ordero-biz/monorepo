@@ -48,7 +48,6 @@ describe('UnitOfMeasurementDetail', () => {
     expect(screen.getByText('KG')).toBeVisible();
     expect(screen.getByText('kg')).toBeVisible();
     expect(screen.getByText('Weight unit')).toBeVisible();
-    expect(screen.getByRole('button', { name: 'Edit Kilogram' })).toBeVisible();
     expect(
       screen.getByRole('button', { name: 'Actions for Kilogram' })
     ).toBeVisible();
@@ -74,6 +73,29 @@ describe('UnitOfMeasurementDetail', () => {
 
     expect(
       screen.getByRole('dialog', { name: 'Delete unit of measurement' })
+    ).toBeVisible();
+  });
+
+  it('opens the edit dialog from the actions menu', async () => {
+    getUnitOfMeasurementMock.mockResolvedValue({
+      ok: true,
+      data: unitOfMeasurement,
+    });
+    const user = userEvent.setup();
+
+    setup();
+
+    await user.click(
+      await screen.findByRole('button', { name: 'Actions for Kilogram' })
+    );
+    await user.click(
+      await screen.findByRole('menuitem', {
+        name: 'Edit unit of measurement',
+      })
+    );
+
+    expect(
+      screen.getByRole('dialog', { name: 'Edit unit of measurement' })
     ).toBeVisible();
   });
 
