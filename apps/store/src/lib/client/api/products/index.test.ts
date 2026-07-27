@@ -1,7 +1,7 @@
 import {
-  createProduct,
-  getProducts,
-  getProductsPath,
+  createProductGroup,
+  getProductGroups,
+  getProductGroupsPath,
   getProductVariants,
   getProductVariantsPath,
 } from '.';
@@ -17,7 +17,7 @@ describe('products client helpers', () => {
 
   it('builds product pageable search params', () => {
     expect(
-      getProductsPath({
+      getProductGroupsPath({
         page: 2,
         size: 10,
         sort: ['name,asc', 'createdAt,desc'],
@@ -68,7 +68,7 @@ describe('products client helpers', () => {
       )
     );
 
-    await expect(getProducts()).resolves.toEqual({
+    await expect(getProductGroups()).resolves.toEqual({
       ok: true,
       data: {
         content: [
@@ -116,7 +116,7 @@ describe('products client helpers', () => {
       )
     );
 
-    await expect(getProducts()).resolves.toEqual({
+    await expect(getProductGroups()).resolves.toEqual({
       ok: false,
       error: {
         status: 503,
@@ -263,7 +263,7 @@ describe('products client helpers', () => {
     );
 
     await expect(
-      createProduct({
+      createProductGroup({
         name: 'Running Shoes',
         description: '',
         categoryId: 2,
@@ -314,7 +314,7 @@ describe('products client helpers', () => {
     );
 
     await expect(
-      createProduct({
+      createProductGroup({
         name: 'Running Shoes',
         description: '',
         categoryId: 2,

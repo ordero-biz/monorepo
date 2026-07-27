@@ -1,4 +1,4 @@
-import type { Product, ProductVariant } from '@/lib/domain/products';
+import type { ProductGroup, ProductVariant } from '@/lib/domain/products';
 import { formatDate } from '@/lib/utils/formatDate';
 import {
   DataTableCell,
@@ -15,7 +15,7 @@ const getProductVariantAttributesText = (productVariant: ProductVariant) => {
   return attributes.length > 0 ? attributes.join(', ') : '-';
 };
 
-export const productGroupColumns: DataTableColumnDef<Product>[] = [
+export const productGroupColumns: DataTableColumnDef<ProductGroup>[] = [
   {
     accessorKey: 'name',
     cell: ({ row }) => <DataTableCell>{row.original.name}</DataTableCell>,

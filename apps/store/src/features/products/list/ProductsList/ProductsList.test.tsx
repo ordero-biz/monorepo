@@ -1,6 +1,6 @@
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { getProducts, getProductVariants } from '@/lib/client/api/products';
+import { getProductGroups, getProductVariants } from '@/lib/client/api/products';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { PRODUCTS_LIST_MODE } from './constants';
 import { ProductsList } from './ProductsList';
@@ -26,12 +26,12 @@ vi.mock('@/lib/client/api/products', async () => ({
   ...(await vi.importActual<typeof import('@/lib/client/api/products')>(
     '@/lib/client/api/products'
   )),
+  getProductGroups: vi.fn(),
   getProductVariants: vi.fn(),
-  getProducts: vi.fn(),
 }));
 
 const getProductVariantsMock = vi.mocked(getProductVariants);
-const getProductsMock = vi.mocked(getProducts);
+const getProductGroupsMock = vi.mocked(getProductGroups);
 
 const productVariant = {
   id: 1,
@@ -74,14 +74,14 @@ const productGroup = {
 const { setup } = prepareStoreSetup({
   component: ProductsList,
   props: {
-    listMode: PRODUCTS_LIST_MODE.products,
+    listMode: PRODUCTS_LIST_MODE.productVariants,
   },
 });
 
 describe('ProductsList', () => {
   beforeEach(() => {
     getProductVariantsMock.mockReset();
-    getProductsMock.mockReset();
+    getProductGroupsMock.mockReset();
     mocks.push.mockReset();
     mocks.searchParams = new URLSearchParams();
   });
@@ -92,7 +92,7 @@ describe('ProductsList', () => {
     setup();
 
     expect(screen.getByText('Loading products...')).toBeVisible();
-    expect(getProductsMock).not.toHaveBeenCalled();
+    expect(getProductGroupsMock).not.toHaveBeenCalled();
   });
 
   it('renders an error state and retries loading products', async () => {
@@ -164,11 +164,11 @@ describe('ProductsList', () => {
     expect(
       screen.queryByRole('button', { name: /Barcode/ })
     ).not.toBeInTheDocument();
-    expect(getProductsMock).not.toHaveBeenCalled();
+    expect(getProductGroupsMock).not.toHaveBeenCalled();
   });
 
   it('renders product group rows when product groups mode is active', async () => {
-    getProductsMock.mockResolvedValue({
+    getProductGroupsMock.mockResolvedValue({
       ok: true,
       data: {
         content: [productGroup],

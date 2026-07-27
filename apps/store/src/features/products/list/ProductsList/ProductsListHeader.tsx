@@ -23,14 +23,14 @@ export const ProductsListHeader = ({
           onValueChange={(value) =>
             onListModeChange(
               (value[0] as ProductsListMode | undefined) ??
-                PRODUCTS_LIST_MODE.products
+                PRODUCTS_LIST_MODE.productVariants
             )
           }
           orientation="horizontal"
           size="s"
           value={[listMode]}
         >
-          <ToggleButton.Item value={PRODUCTS_LIST_MODE.products}>
+          <ToggleButton.Item value={PRODUCTS_LIST_MODE.productVariants}>
             Products
           </ToggleButton.Item>
           <ToggleButton.Item value={PRODUCTS_LIST_MODE.productGroups}>

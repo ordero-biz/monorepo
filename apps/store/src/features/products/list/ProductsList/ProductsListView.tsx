@@ -20,7 +20,7 @@ export const ProductsListView = ({
   } = usePaginationSearchParams({ paginationInput });
   const { filters, setFilters } = useListFilters<ProductsListFilters>({
     initialFilters: {
-      listMode: PRODUCTS_LIST_MODE.products,
+      listMode: PRODUCTS_LIST_MODE.productVariants,
     },
   });
   const handleListModeChange = (nextListMode: ProductsListMode) => {

@@ -1,9 +1,7 @@
 'use client';
 
-import {
-  useProductsQuery,
-  useProductVariantsQuery,
-} from '@/lib/hooks/products/useProductsQuery';
+import { useProductGroupsQuery } from '@/lib/hooks/products/useProductGroupsQuery';
+import { useProductVariantsQuery } from '@/lib/hooks/products/useProductVariantsQuery';
 import { useTablePagination } from '@/lib/hooks/useTablePagination';
 import { Button, Card, DataTable, Typography } from '@/ui/index';
 import { productGroupColumns, productVariantColumns } from './columns';
@@ -14,22 +12,23 @@ export const ProductsList = ({
   listMode,
   paginationInput,
 }: ProductsListProps) => {
-  const isProductsMode = listMode === PRODUCTS_LIST_MODE.products;
-  const productsQuery = useProductVariantsQuery(paginationInput, {
-    enabled: isProductsMode,
+  const isProductVariantsMode =
+    listMode === PRODUCTS_LIST_MODE.productVariants;
+  const productVariantsQuery = useProductVariantsQuery(paginationInput, {
+    enabled: isProductVariantsMode,
   });
-  const productGroupsQuery = useProductsQuery(paginationInput, {
-    enabled: !isProductsMode,
+  const productGroupsQuery = useProductGroupsQuery(paginationInput, {
+    enabled: !isProductVariantsMode,
   });
-  const selectedProductsQuery = isProductsMode
-    ? productsQuery
+  const selectedProductListQuery = isProductVariantsMode
+    ? productVariantsQuery
     : productGroupsQuery;
   const tablePagination = useTablePagination({
-    pageMetadata: selectedProductsQuery.data?.page,
+    pageMetadata: selectedProductListQuery.data?.page,
     paginationInput,
   });
 
-  if (selectedProductsQuery.isPending) {
+  if (selectedProductListQuery.isPending) {
     return (
       <Card.Root variant="filled">
         <Card.Content>
@@ -41,7 +40,7 @@ export const ProductsList = ({
     );
   }
 
-  if (selectedProductsQuery.isError) {
+  if (selectedProductListQuery.isError) {
     return (
       <Card.Root variant="filled">
         <Card.Content>
@@ -52,7 +51,7 @@ export const ProductsList = ({
             <div>
               <Button
                 color="inherit"
-                onClick={() => selectedProductsQuery.refetch()}
+                onClick={() => selectedProductListQuery.refetch()}
                 size="s"
                 type="button"
               >
@@ -65,12 +64,12 @@ export const ProductsList = ({
     );
   }
 
-  if (isProductsMode) {
+  if (isProductVariantsMode) {
     return (
       <DataTable
         ariaLabel="Products list"
         columns={productVariantColumns}
-        data={productsQuery.data?.content ?? []}
+        data={productVariantsQuery.data?.content ?? []}
         emptyMessage="No products found."
         getRowId={(row) => String(row.id)}
         manualPagination

@@ -1,13 +1,16 @@
 import type { ApiResult } from '@ordero/api-types';
 import { queryOptions } from '@tanstack/react-query';
-import type { Product, ProductVariant } from '@/lib/domain/products';
+import type { ProductGroup, ProductVariant } from '@/lib/domain/products';
 import type { PaginatedResponse } from '@/lib/server/types';
 import type { PaginationSearchInput } from '@/lib/utils/url';
-import { productsQueryKeys } from './productsQueryKeys';
+import {
+  productGroupsQueryKeys,
+  productVariantsQueryKeys,
+} from './productsQueryKeys';
 
-type ProductsFetcher = (
+type ProductGroupsFetcher = (
   input?: PaginationSearchInput
-) => Promise<ApiResult<PaginatedResponse<Product>>>;
+) => Promise<ApiResult<PaginatedResponse<ProductGroup>>>;
 
 type ProductVariantsFetcher = (
   input?: PaginationSearchInput
@@ -23,13 +26,13 @@ const unwrapApiResult = async <T>(request: Promise<ApiResult<T>>) => {
   return result.data;
 };
 
-export const productsListQueryOptions = (
-  fetchProducts: ProductsFetcher,
+export const productGroupsListQueryOptions = (
+  fetchProductGroups: ProductGroupsFetcher,
   input?: PaginationSearchInput
 ) =>
   queryOptions({
-    queryKey: productsQueryKeys.listPage(input),
-    queryFn: () => unwrapApiResult(fetchProducts(input)),
+    queryKey: productGroupsQueryKeys.listPage(input),
+    queryFn: () => unwrapApiResult(fetchProductGroups(input)),
   });
 
 export const productVariantsListQueryOptions = (
@@ -37,6 +40,6 @@ export const productVariantsListQueryOptions = (
   input?: PaginationSearchInput
 ) =>
   queryOptions({
-    queryKey: productsQueryKeys.variantsListPage(input),
+    queryKey: productVariantsQueryKeys.listPage(input),
     queryFn: () => unwrapApiResult(fetchProductVariants(input)),
   });

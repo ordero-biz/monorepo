@@ -17,7 +17,10 @@ import { useRouter } from 'next/navigation';
 import { useMemo, useState } from 'react';
 import { clientRoutes } from '@/lib/client/routes';
 import { useAttributesQuery } from '@/lib/hooks/attributes/useAttributesQuery';
-import { productsQueryKeys } from '@/lib/query/products/productsQueryKeys';
+import {
+  productGroupsQueryKeys,
+  productVariantsQueryKeys,
+} from '@/lib/query/products/productsQueryKeys';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
 import { CategoriesAsyncCombobox } from './CategoriesAsyncCombobox';
 import { PRODUCT_GENERATION_MODE } from './constants';
@@ -51,10 +54,10 @@ export const CreateProduct = () => {
     onCreated: async () => {
       await Promise.all([
         queryClient.invalidateQueries({
-          queryKey: productsQueryKeys.list,
+          queryKey: productGroupsQueryKeys.list,
         }),
         queryClient.invalidateQueries({
-          queryKey: productsQueryKeys.variantsList,
+          queryKey: productVariantsQueryKeys.list,
         }),
       ]);
       router.push(clientRoutes.products);

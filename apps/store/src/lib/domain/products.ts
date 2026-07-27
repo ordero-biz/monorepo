@@ -24,7 +24,7 @@ export type ProductVariantAttributeValueLink = {
   attributeValue: ProductVariantAttributeValue;
 };
 
-export type Product = {
+export type ProductGroup = {
   id: number;
   name: string;
   description: string;

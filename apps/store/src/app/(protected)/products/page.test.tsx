@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import { productsQueryKeys } from '@/lib/query/products/productsQueryKeys';
+import { productVariantsQueryKeys } from '@/lib/query/products/productsQueryKeys';
 import { getServerProductVariants } from '@/lib/server/api/products';
 import type { PaginationSearchInput } from '@/lib/utils/url';
 import {
@@ -94,7 +94,7 @@ describe('ProductsPage', () => {
     });
     expect(
       queryClient.getQueryData(
-        productsQueryKeys.variantsListPage({
+        productVariantsQueryKeys.listPage({
           page: 0,
           size: 10,
         })
@@ -144,7 +144,7 @@ describe('ProductsPage', () => {
     });
     expect(
       queryClient.getQueryData(
-        productsQueryKeys.variantsListPage(paginationInput)
+        productVariantsQueryKeys.listPage(paginationInput)
       )
     ).toEqual(productVariants);
   });

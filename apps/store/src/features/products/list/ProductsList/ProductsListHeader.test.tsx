@@ -21,7 +21,7 @@ vi.mock('next/navigation', async () => ({
 const { setup } = prepareStoreSetup({
   component: ProductsListHeader,
   props: {
-    listMode: PRODUCTS_LIST_MODE.products,
+    listMode: PRODUCTS_LIST_MODE.productVariants,
     onListModeChange: vi.fn(),
   },
 });

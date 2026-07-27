@@ -1,7 +1,7 @@
 import { AUTH_TOKEN_COOKIE_NAME } from '@ordero/next-api/server';
 import { cookies } from 'next/headers';
 import { fetchBackendResponse } from '@/lib/server/fetch';
-import { getServerProducts, getServerProductVariants } from '.';
+import { getServerProductGroups, getServerProductVariants } from '.';
 
 vi.mock('next/headers', () => ({
   cookies: vi.fn(),
@@ -61,7 +61,7 @@ describe('product server helpers', () => {
       data: new Response(JSON.stringify(response)),
     });
 
-    await expect(getServerProducts()).resolves.toEqual({
+    await expect(getServerProductGroups()).resolves.toEqual({
       ok: true,
       data: response,
     });
@@ -93,7 +93,7 @@ describe('product server helpers', () => {
       ),
     });
 
-    await getServerProducts({
+    await getServerProductGroups({
       page: 2,
       size: 10,
       sort: ['name,asc', 'createdAt,desc'],
@@ -203,7 +203,7 @@ describe('product server helpers', () => {
   it('returns an authentication error without a server token', async () => {
     mockAuthCookie();
 
-    await expect(getServerProducts()).resolves.toEqual({
+    await expect(getServerProductGroups()).resolves.toEqual({
       ok: false,
       error: {
         status: 401,

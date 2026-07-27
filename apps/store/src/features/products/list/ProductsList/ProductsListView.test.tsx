@@ -1,6 +1,6 @@
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { getProducts, getProductVariants } from '@/lib/client/api/products';
+import { getProductGroups, getProductVariants } from '@/lib/client/api/products';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { ProductsListView } from './ProductsListView';
 
@@ -25,12 +25,12 @@ vi.mock('@/lib/client/api/products', async () => ({
   ...(await vi.importActual<typeof import('@/lib/client/api/products')>(
     '@/lib/client/api/products'
   )),
+  getProductGroups: vi.fn(),
   getProductVariants: vi.fn(),
-  getProducts: vi.fn(),
 }));
 
 const getProductVariantsMock = vi.mocked(getProductVariants);
-const getProductsMock = vi.mocked(getProducts);
+const getProductGroupsMock = vi.mocked(getProductGroups);
 
 const { setup } = prepareStoreSetup({
   component: ProductsListView,
@@ -39,7 +39,7 @@ const { setup } = prepareStoreSetup({
 describe('ProductsListView', () => {
   beforeEach(() => {
     getProductVariantsMock.mockReset();
-    getProductsMock.mockReset();
+    getProductGroupsMock.mockReset();
     mocks.push.mockReset();
     mocks.searchParams = new URLSearchParams();
   });
@@ -70,7 +70,7 @@ describe('ProductsListView', () => {
         },
       },
     });
-    getProductsMock.mockResolvedValue({
+    getProductGroupsMock.mockResolvedValue({
       ok: true,
       data: {
         content: [
@@ -105,7 +105,7 @@ describe('ProductsListView', () => {
     });
 
     expect(await screen.findByText('Running Shoes / Blue / 42')).toBeVisible();
-    expect(getProductsMock).not.toHaveBeenCalled();
+    expect(getProductGroupsMock).not.toHaveBeenCalled();
 
     await user.click(screen.getByRole('button', { name: 'Products Groups' }));
 
@@ -116,7 +116,7 @@ describe('ProductsListView', () => {
 
     expect(await screen.findByText('Running Shoes')).toBeVisible();
     expect(screen.getByText('Footwear')).toBeVisible();
-    expect(getProductsMock).toHaveBeenCalledWith({
+    expect(getProductGroupsMock).toHaveBeenCalledWith({
       page: 0,
       size: 25,
       sort: ['name,asc'],
