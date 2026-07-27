@@ -1,5 +1,5 @@
 export const shellClassName =
-  'relative flex h-screen w-[var(--nav-width)] min-w-[var(--nav-width)] flex-col overflow-hidden border-r border-border bg-background z-[0]';
+  'sticky top-0 z-[0] flex h-screen w-[var(--nav-width)] min-w-[var(--nav-width)] flex-col overflow-hidden border-r border-border bg-background';
 
 export const headerClassName =
   'shrink-0 px-[var(--space-1-5)] pb-[var(--space-1)] pt-[var(--space-3)]';
