@@ -2,9 +2,9 @@
 
 import { Menu as MenuPrimitive } from '@base-ui/react/menu';
 import { cva } from 'class-variance-authority';
-import { dropdownSurfaceClassName } from '@/ui/classNames/dropdownSurfaceClassName';
 import { Button } from '@/ui/components/Button';
 import { IconButton } from '@/ui/components/IconButton';
+import { dropdownSurfaceClassName } from '@/ui/components/Select';
 import { cn } from '@/ui/lib/utils';
 import type {
   MenuItemProps,

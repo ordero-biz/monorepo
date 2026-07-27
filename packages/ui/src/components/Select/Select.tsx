@@ -7,7 +7,7 @@ import { useId, useMemo, useState } from 'react';
 import { Checkbox } from '@/ui/components/Checkbox';
 import { FieldHelperText } from '@/ui/components/FieldHelperText';
 import { FieldLabel } from '@/ui/components/FieldLabel';
-import { dropdownSurfaceClassName } from '@/ui/classNames/dropdownSurfaceClassName';
+import { dropdownSurfaceClassName } from '@/ui/components/Select';
 import { cn } from '@/ui/lib/utils';
 import type { SelectProps } from './types';
 
