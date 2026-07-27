@@ -1,6 +1,13 @@
 import { render, screen } from '@testing-library/react';
-import { productVariantsQueryKeys } from '@/lib/query/products/productsQueryKeys';
-import { getServerProductVariants } from '@/lib/server/api/products';
+import { PRODUCTS_LIST_MODE } from '@/features/products';
+import {
+  productGroupsQueryKeys,
+  productVariantsQueryKeys,
+} from '@/lib/query/products/productsQueryKeys';
+import {
+  getServerProductGroups,
+  getServerProductVariants,
+} from '@/lib/server/api/products';
 import type { PaginationSearchInput } from '@/lib/utils/url';
 import {
   createTestQueryClient,
@@ -22,13 +29,16 @@ vi.mock('@/features/products', async () => ({
 }));
 
 vi.mock('@/lib/server/api/products', () => ({
+  getServerProductGroups: vi.fn(),
   getServerProductVariants: vi.fn(),
 }));
 
+const getServerProductGroupsMock = vi.mocked(getServerProductGroups);
 const getServerProductVariantsMock = vi.mocked(getServerProductVariants);
 
 describe('ProductsPage', () => {
   beforeEach(() => {
+    getServerProductGroupsMock.mockReset();
     getServerProductVariantsMock.mockReset();
     productsListViewMock.mockReset();
   });
@@ -147,5 +157,45 @@ describe('ProductsPage', () => {
         productVariantsQueryKeys.listPage(paginationInput)
       )
     ).toEqual(productVariants);
+  });
+
+  it('prefetches product groups when requested by the URL search params', async () => {
+    const productGroups = {
+      content: [],
+      page: {
+        size: 10,
+        number: 0,
+        totalElements: 0,
+        totalPages: 0,
+      },
+    };
+    const paginationInput = {
+      page: 0,
+      size: 10,
+    };
+    const queryClient = createTestQueryClient();
+    const TestQueryProvider = createTestQueryProvider(queryClient);
+
+    getServerProductGroupsMock.mockResolvedValue({
+      ok: true,
+      data: productGroups,
+    });
+
+    render(
+      await ProductsPage({
+        searchParams: Promise.resolve({
+          listMode: PRODUCTS_LIST_MODE.productGroups,
+        }),
+      }),
+      {
+        wrapper: TestQueryProvider,
+      }
+    );
+
+    expect(getServerProductGroupsMock).toHaveBeenCalledWith(paginationInput);
+    expect(getServerProductVariantsMock).not.toHaveBeenCalled();
+    expect(
+      queryClient.getQueryData(productGroupsQueryKeys.listPage(paginationInput))
+    ).toEqual(productGroups);
   });
 });

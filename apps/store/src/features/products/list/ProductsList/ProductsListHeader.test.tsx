@@ -51,12 +51,11 @@ describe('ProductsListHeader', () => {
     expect(
       screen.getByRole('group', { name: 'Product list mode' })
     ).toBeVisible();
-    expect(screen.getByRole('button', { name: 'Products' })).toHaveAttribute(
-      'aria-pressed',
-      'true'
-    );
     expect(
-      screen.getByRole('button', { name: 'Products Groups' })
+      screen.getByRole('button', { name: 'Product Variants' })
+    ).toHaveAttribute('aria-pressed', 'true');
+    expect(
+      screen.getByRole('button', { name: 'Product Groups' })
     ).toHaveAttribute('aria-pressed', 'false');
   });
 
@@ -66,10 +65,11 @@ describe('ProductsListHeader', () => {
       onListModeChange: vi.fn(),
     });
 
-    await user.click(screen.getByRole('button', { name: 'Products Groups' }));
+    await user.click(screen.getByRole('button', { name: 'Product Groups' }));
 
     expect(onListModeChange).toHaveBeenCalledWith(
       PRODUCTS_LIST_MODE.productGroups
     );
+    expect(routerPushMock).not.toHaveBeenCalled();
   });
 });

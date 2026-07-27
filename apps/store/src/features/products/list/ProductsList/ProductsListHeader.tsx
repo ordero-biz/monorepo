@@ -12,6 +12,13 @@ export const ProductsListHeader = ({
 }: ProductsListHeaderProps) => {
   const router = useRouter();
 
+  const handleListModeChange = (value: string[]) => {
+    const nextListMode =
+      (value[0] as ProductsListMode | undefined) ??
+      PRODUCTS_LIST_MODE.productVariants;
+    onListModeChange(nextListMode);
+  };
+
   return (
     <PageHeader.Root>
       <PageHeader.Left>
@@ -20,21 +27,16 @@ export const ProductsListHeader = ({
       <PageHeader.Right>
         <ToggleButton.Group
           aria-label="Product list mode"
-          onValueChange={(value) =>
-            onListModeChange(
-              (value[0] as ProductsListMode | undefined) ??
-                PRODUCTS_LIST_MODE.productVariants
-            )
-          }
+          onValueChange={handleListModeChange}
           orientation="horizontal"
           size="s"
           value={[listMode]}
         >
           <ToggleButton.Item value={PRODUCTS_LIST_MODE.productVariants}>
-            Products
+            Product Variants
           </ToggleButton.Item>
           <ToggleButton.Item value={PRODUCTS_LIST_MODE.productGroups}>
-            Products Groups
+            Product Groups
           </ToggleButton.Item>
         </ToggleButton.Group>
         <div aria-hidden="true" className="h-[var(--space-4)] w-px bg-border" />

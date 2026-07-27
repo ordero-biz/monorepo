@@ -25,9 +25,7 @@ describe('usePaginationSearchParams', () => {
     navigationMocks.searchParams = new URLSearchParams(
       'page=2&size=25&sort=name%2Casc&filter=active'
     );
-    const { result } = renderHook(() =>
-      usePaginationSearchParams({})
-    );
+    const { result } = renderHook(() => usePaginationSearchParams({}));
 
     act(() => result.current.resetPagination());
 
@@ -48,5 +46,22 @@ describe('usePaginationSearchParams', () => {
     act(() => result.current.resetPagination());
 
     expect(navigationMocks.push).not.toHaveBeenCalled();
+  });
+
+  it('updates search params when resetting the first page', () => {
+    const { result } = renderHook(() => usePaginationSearchParams({}));
+
+    act(() =>
+      result.current.resetPagination({
+        updateSearchParams: (searchParams) => {
+          searchParams.set('listMode', 'product-groups');
+        },
+      })
+    );
+
+    expect(navigationMocks.push).toHaveBeenCalledWith(
+      '/products?listMode=product-groups',
+      { scroll: false }
+    );
   });
 });

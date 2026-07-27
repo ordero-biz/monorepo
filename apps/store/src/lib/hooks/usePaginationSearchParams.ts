@@ -11,11 +11,18 @@ import {
 type SetPaginationArgs = {
   page: number;
   size: number;
+  updateSearchParams?: SearchParamsUpdater;
 };
 
 type UsePaginationSearchParamsArgs = {
   paginationInput?: PaginationSearchInput;
 };
+
+type ResetPaginationArgs = {
+  updateSearchParams?: SearchParamsUpdater;
+};
+
+type SearchParamsUpdater = (searchParams: URLSearchParams) => void;
 
 export const usePaginationSearchParams = ({
   paginationInput,
@@ -37,9 +44,19 @@ export const usePaginationSearchParams = ({
     pendingPaginationInput ?? searchPaginationInput;
   const page = currentPaginationInput.page ?? DEFAULT_PAGE.page;
   const size = currentPaginationInput.size ?? DEFAULT_PAGE.size;
-  const setPagination = ({ page: nextPage, size: nextSize }: SetPaginationArgs) => {
+  const pushSearchParams = (nextSearchParams: URLSearchParams) => {
+    router.push(`${pathname}?${nextSearchParams.toString()}`, {
+      scroll: false,
+    });
+  };
+  const setPagination = ({
+    page: nextPage,
+    size: nextSize,
+    updateSearchParams,
+  }: SetPaginationArgs) => {
     const nextSearchParams = new URLSearchParams(searchParams.toString());
 
+    updateSearchParams?.(nextSearchParams);
     setPendingPaginationInput({
       ...currentPaginationInput,
       page: nextPage,
@@ -47,28 +64,36 @@ export const usePaginationSearchParams = ({
     });
     nextSearchParams.set('page', String(nextPage));
     nextSearchParams.set('size', String(nextSize));
-    router.push(`${pathname}?${nextSearchParams.toString()}`, {
-      scroll: false,
-    });
+    pushSearchParams(nextSearchParams);
   };
 
   useEffect(() => {
     if (
       pendingPaginationInput?.page === searchPaginationInput.page &&
-      pendingPaginationInput.size === searchPaginationInput.size
+      pendingPaginationInput?.size === searchPaginationInput.size
     ) {
       setPendingPaginationInput(undefined);
     }
   }, [pendingPaginationInput, searchPaginationInput]);
 
-  const resetPagination = () => {
+  const resetPagination = ({
+    updateSearchParams,
+  }: ResetPaginationArgs = {}) => {
     if (page === DEFAULT_PAGE.page) {
+      if (updateSearchParams) {
+        const nextSearchParams = new URLSearchParams(searchParams.toString());
+
+        updateSearchParams(nextSearchParams);
+        pushSearchParams(nextSearchParams);
+      }
+
       return;
     }
 
     setPagination({
       page: DEFAULT_PAGE.page,
       size,
+      updateSearchParams,
     });
   };
 

@@ -1,6 +1,9 @@
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { getProductGroups, getProductVariants } from '@/lib/client/api/products';
+import {
+  getProductGroups,
+  getProductVariants,
+} from '@/lib/client/api/products';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { ProductsListView } from './ProductsListView';
 
@@ -45,9 +48,7 @@ describe('ProductsListView', () => {
   });
 
   it('switches from product variants to product groups', async () => {
-    mocks.searchParams = new URLSearchParams(
-      'page=2&size=25&sort=name%2Casc'
-    );
+    mocks.searchParams = new URLSearchParams('page=2&size=25&sort=name%2Casc');
     getProductVariantsMock.mockResolvedValue({
       ok: true,
       data: {
@@ -107,10 +108,10 @@ describe('ProductsListView', () => {
     expect(await screen.findByText('Running Shoes / Blue / 42')).toBeVisible();
     expect(getProductGroupsMock).not.toHaveBeenCalled();
 
-    await user.click(screen.getByRole('button', { name: 'Products Groups' }));
+    await user.click(screen.getByRole('button', { name: 'Product Groups' }));
 
     expect(mocks.push).toHaveBeenCalledWith(
-      '/products?page=0&size=25&sort=name%2Casc',
+      '/products?page=0&size=25&sort=name%2Casc&listMode=product-groups',
       { scroll: false }
     );
 

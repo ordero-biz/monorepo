@@ -1,43 +1,24 @@
 'use client';
 
-import { useListFilters } from '@/lib/hooks/useListFilters';
-import { usePaginationSearchParams } from '@/lib/hooks/usePaginationSearchParams';
-import { PRODUCTS_LIST_MODE } from './constants';
+import { useProductsListMode } from './hooks/useProductsListMode';
 import { ProductsList } from './ProductsList';
 import { ProductsListHeader } from './ProductsListHeader';
-import type {
-  ProductsListFilters,
-  ProductsListMode,
-  ProductsListViewProps,
-} from './types';
+import type { ProductsListViewProps } from './types';
 
 export const ProductsListView = ({
   paginationInput,
 }: ProductsListViewProps) => {
   const {
+    listMode,
     paginationInput: currentPaginationInput,
-    resetPagination,
-  } = usePaginationSearchParams({ paginationInput });
-  const { filters, setFilters } = useListFilters<ProductsListFilters>({
-    initialFilters: {
-      listMode: PRODUCTS_LIST_MODE.productVariants,
-    },
-  });
-  const handleListModeChange = (nextListMode: ProductsListMode) => {
-    setFilters({
-      listMode: nextListMode,
-    });
-    resetPagination();
-  };
+    setListMode,
+  } = useProductsListMode({ paginationInput });
 
   return (
     <div className="flex flex-col gap-[var(--space-2)]">
-      <ProductsListHeader
-        listMode={filters.listMode}
-        onListModeChange={handleListModeChange}
-      />
+      <ProductsListHeader listMode={listMode} onListModeChange={setListMode} />
       <ProductsList
-        listMode={filters.listMode}
+        listMode={listMode}
         paginationInput={currentPaginationInput}
       />
     </div>
