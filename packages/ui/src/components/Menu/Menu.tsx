@@ -2,8 +2,10 @@
 
 import { Menu as MenuPrimitive } from '@base-ui/react/menu';
 import { cva } from 'class-variance-authority';
+import { dropdownSurfaceClassName } from '@/ui/classNames/dropdownSurfaceClassName';
 import { Button } from '@/ui/components/Button';
 import { IconButton } from '@/ui/components/IconButton';
+import { cn } from '@/ui/lib/utils';
 import type {
   MenuItemProps,
   MenuPopupProps,
@@ -13,8 +15,10 @@ import type {
   MenuTriggerProps,
 } from './types';
 
-const popupClassName =
-  'z-50 flex min-w-[var(--anchor-width)] flex-col gap-[var(--menu-list-spacing)] overflow-y-auto overscroll-contain rounded-[var(--radius)] border border-border bg-popover p-[var(--menu-list-p)] text-popover-foreground shadow-[var(--dropdown-x1)_var(--dropdown-y1)_var(--dropdown-blur1)_var(--dropdown-spread1)_var(--color-grey-16),var(--dropdown-x2)_var(--dropdown-y2)_var(--dropdown-blur2)_var(--dropdown-spread2)_var(--color-grey-20)] outline-none';
+const popupClassName = cn(
+  'z-50 flex min-w-[var(--anchor-width)] flex-col gap-[var(--menu-list-spacing)] overflow-y-auto overscroll-contain rounded-[var(--radius)] border border-border bg-popover p-[var(--menu-list-p)] text-popover-foreground shadow-[var(--dropdown-x1)_var(--dropdown-y1)_var(--dropdown-blur1)_var(--dropdown-spread1)_var(--color-grey-16),var(--dropdown-x2)_var(--dropdown-y2)_var(--dropdown-blur2)_var(--dropdown-spread2)_var(--color-grey-20)] outline-none',
+  dropdownSurfaceClassName
+);
 
 const menuItemVariants = cva(
   'flex min-h-[calc(var(--body2-line-height-desktop)+var(--menu-item-py)+var(--menu-item-py))] w-full cursor-pointer items-center gap-[var(--menu-item-spacing)] rounded-[var(--menu-item-radius)] px-[var(--menu-item-px)] py-[var(--menu-item-py)] text-left text-[length:var(--body2-size-desktop)] leading-[var(--body2-line-height-desktop)] font-[var(--body2-weight)] outline-none transition-[background-color,color] hover:bg-muted data-[highlighted]:bg-muted data-[disabled]:cursor-not-allowed data-[disabled]:text-[var(--text-disabled)] data-[disabled]:hover:bg-transparent',
