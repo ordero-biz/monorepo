@@ -45,6 +45,9 @@ describe('ProductsListView', () => {
   });
 
   it('switches from product variants to product groups', async () => {
+    mocks.searchParams = new URLSearchParams(
+      'page=2&size=25&sort=name%2Casc'
+    );
     getProductVariantsMock.mockResolvedValue({
       ok: true,
       data: {
@@ -93,15 +96,30 @@ describe('ProductsListView', () => {
     });
     const user = userEvent.setup();
 
-    setup();
+    setup({
+      paginationInput: {
+        page: 2,
+        size: 25,
+        sort: ['name,asc'],
+      },
+    });
 
     expect(await screen.findByText('Running Shoes / Blue / 42')).toBeVisible();
     expect(getProductsMock).not.toHaveBeenCalled();
 
     await user.click(screen.getByRole('button', { name: 'Products Groups' }));
 
+    expect(mocks.push).toHaveBeenCalledWith(
+      '/products?page=0&size=25&sort=name%2Casc',
+      { scroll: false }
+    );
+
     expect(await screen.findByText('Running Shoes')).toBeVisible();
     expect(screen.getByText('Footwear')).toBeVisible();
-    expect(getProductsMock).toHaveBeenCalledTimes(1);
+    expect(getProductsMock).toHaveBeenCalledWith({
+      page: 0,
+      size: 25,
+      sort: ['name,asc'],
+    });
   });
 });
