@@ -1,5 +1,5 @@
 export const PRODUCTS_LIST_MODE = {
-  productVariants: 'products',
+  productVariants: 'product-variants',
   productGroups: 'product-groups',
 } as const;
 

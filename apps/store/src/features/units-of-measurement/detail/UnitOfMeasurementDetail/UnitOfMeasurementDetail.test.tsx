@@ -4,6 +4,15 @@ import { getUnitOfMeasurement } from '@/lib/client/api/units-of-measurement';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { UnitOfMeasurementDetail } from './UnitOfMeasurementDetail';
 
+vi.mock('next/navigation', async () => ({
+  ...(await vi.importActual<typeof import('next/navigation')>(
+    'next/navigation'
+  )),
+  useRouter: () => ({
+    push: vi.fn(),
+  }),
+}));
+
 vi.mock('@/lib/client/api/units-of-measurement', async () => ({
   ...(await vi.importActual<
     typeof import('@/lib/client/api/units-of-measurement')
