@@ -24,7 +24,7 @@ describe('category client helpers', () => {
         sort: ['name,asc', 'sortOrder,desc'],
       })
     ).toBe(
-      '/api/backend/api/v1/categories?page=2&size=10&sort=name%2Casc&sort=sortOrder%2Cdesc'
+      '/api/backend/api/v1/categories?page=1&size=10&sort=name%2Casc&sort=sortOrder%2Cdesc'
     );
   });
 

@@ -36,7 +36,7 @@ describe('AsyncCombobox', () => {
 
     expect(await screen.findByRole('option', { name: 'Shoes' })).toBeVisible();
     expect(defaultProps.loadOptions).toHaveBeenCalledWith({
-      page: 0,
+      page: 1,
       pageSize: 25,
     });
   });

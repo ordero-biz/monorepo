@@ -74,7 +74,7 @@ describe('attribute server helpers', () => {
 
     expect(fetchBackendResponseMock).toHaveBeenCalledWith({
       path: '/api/v1/attributes',
-      search: 'page=2&size=10&sort=name%2Casc',
+      search: 'page=1&size=10&sort=name%2Casc',
       token: 'server-token',
       init: {
         method: 'GET',

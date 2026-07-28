@@ -222,7 +222,7 @@ describe('CategoryList', () => {
   });
 
   it('pushes pagination changes to the URL', async () => {
-    mocks.searchParams = new URLSearchParams('page=0&size=25&sort=name%2Casc');
+    mocks.searchParams = new URLSearchParams('page=1&size=25&sort=name%2Casc');
     getCategoriesMock.mockResolvedValue({
       ok: true,
       data: {
@@ -240,7 +240,7 @@ describe('CategoryList', () => {
 
     setup({
       paginationInput: {
-        page: 0,
+        page: 1,
         size: 10,
         sort: ['name,asc'],
       },
@@ -251,7 +251,7 @@ describe('CategoryList', () => {
     );
 
     expect(mocks.push).toHaveBeenCalledWith(
-      '/products/categories?page=1&size=25&sort=name%2Casc',
+      '/products/categories?page=2&size=25&sort=name%2Casc',
       { scroll: false }
     );
   });

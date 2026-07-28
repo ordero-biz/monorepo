@@ -69,7 +69,7 @@ describe('CategoriesAsyncCombobox', () => {
     await user.click(await screen.findByRole('option', { name: 'Shoes' }));
 
     expect(getCategoriesMock).toHaveBeenCalledWith({
-      page: 0,
+      page: 1,
       size: 100,
       sort: ['name,asc'],
     });

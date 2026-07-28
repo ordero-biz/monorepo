@@ -11,7 +11,7 @@ type SearchParamsLike =
   | Pick<URLSearchParams, 'get' | 'getAll'>;
 
 export const DEFAULT_PAGE = {
-  page: 0,
+  page: 1,
   size: 10,
 } as const;
 
@@ -54,7 +54,7 @@ export const getPaginationSearchInput = (
   const sort = getSearchParamValues(searchParams, 'sort').filter(Boolean);
 
   return {
-    page: getIntegerSearchParam(searchParams, 'page', 0) ?? DEFAULT_PAGE.page,
+    page: getIntegerSearchParam(searchParams, 'page', 1) ?? DEFAULT_PAGE.page,
     size: getIntegerSearchParam(searchParams, 'size', 1) ?? DEFAULT_PAGE.size,
     ...(sort.length > 0 ? { sort } : {}),
   };
@@ -66,7 +66,7 @@ export const getPaginationSearch = ({
   sort,
 }: PaginationSearchInput = {}) => {
   const searchParams = new URLSearchParams({
-    page: String(page),
+    page: String(Math.max(0, page - 1)),
     size: String(size),
   });
 

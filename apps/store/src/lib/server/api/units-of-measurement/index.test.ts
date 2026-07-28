@@ -97,7 +97,7 @@ describe('units of measurement server helpers', () => {
 
     expect(fetchBackendResponseMock).toHaveBeenCalledWith({
       path: '/api/v1/units-of-measurement',
-      search: 'page=2&size=10&sort=name%2Casc&sort=code%2Cdesc',
+      search: 'page=1&size=10&sort=name%2Casc&sort=code%2Cdesc',
       token: 'server-token',
       init: {
         method: 'GET',

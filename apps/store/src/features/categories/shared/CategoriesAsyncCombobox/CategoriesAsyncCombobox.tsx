@@ -26,8 +26,8 @@ const loadCategoryOptions = async ({
 
   return {
     nextPage:
-      result.data.page.number + 1 < result.data.page.totalPages
-        ? result.data.page.number + 1
+      page < result.data.page.totalPages
+        ? page + 1
         : undefined,
     options: result.data.content.map((category) => ({
       label: category.name,
