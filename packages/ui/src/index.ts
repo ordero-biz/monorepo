@@ -146,6 +146,8 @@ export type {
   InputVariant,
 } from './components/Input/index';
 export { Input } from './components/Input/index';
+export type { NumericFieldProps } from './components/NumericField';
+export { NumericField } from './components/NumericField';
 export type {
   PageHeaderLeftProps,
   PageHeaderProps,
