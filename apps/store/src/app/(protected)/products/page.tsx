@@ -1,9 +1,9 @@
 import { dehydrate, HydrationBoundary } from '@tanstack/react-query';
+import { ProductsListView } from '@/features/products';
 import {
   getProductsListMode,
   PRODUCTS_LIST_MODE,
-  ProductsListView,
-} from '@/features/products';
+} from '@/lib/domain/products/constants';
 import {
   productGroupsListQueryOptions,
   productVariantsListQueryOptions,

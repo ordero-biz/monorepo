@@ -124,4 +124,58 @@ describe('ProductsListView', () => {
       sort: ['name,asc'],
     });
   });
+
+  it('keeps pagination reset when list modes change before navigation settles', async () => {
+    mocks.searchParams = new URLSearchParams('page=2&size=25&sort=name%2Casc');
+    getProductVariantsMock.mockResolvedValue({
+      ok: true,
+      data: {
+        content: [],
+        page: {
+          size: 25,
+          number: 0,
+          totalElements: 0,
+          totalPages: 0,
+        },
+      },
+    });
+    getProductGroupsMock.mockResolvedValue({
+      ok: true,
+      data: {
+        content: [],
+        page: {
+          size: 25,
+          number: 0,
+          totalElements: 0,
+          totalPages: 0,
+        },
+      },
+    });
+    const user = userEvent.setup();
+
+    setup({
+      paginationInput: {
+        page: 2,
+        size: 25,
+        sort: ['name,asc'],
+      },
+    });
+
+    await user.click(
+      await screen.findByRole('button', { name: 'Product Groups' })
+    );
+    await user.click(
+      screen.getByRole('button', { name: 'Product Variants' })
+    );
+
+    expect(mocks.push).toHaveBeenLastCalledWith(
+      '/products?page=0&size=25&sort=name%2Casc&listMode=product-variants',
+      { scroll: false }
+    );
+    expect(getProductVariantsMock).toHaveBeenLastCalledWith({
+      page: 0,
+      size: 25,
+      sort: ['name,asc'],
+    });
+  });
 });

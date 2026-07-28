@@ -3,9 +3,9 @@
 import { useProductGroupsQuery } from '@/lib/hooks/products/useProductGroupsQuery';
 import { useProductVariantsQuery } from '@/lib/hooks/products/useProductVariantsQuery';
 import { getTablePagination } from '@/lib/hooks/useTablePagination';
+import { PRODUCTS_LIST_MODE } from '@/lib/domain/products/constants';
 import { Button, Card, DataTable, Typography } from '@/ui/index';
 import { productGroupColumns, productVariantColumns } from './columns';
-import { PRODUCTS_LIST_MODE } from './constants';
 import type { ProductsListProps } from './types';
 
 export const ProductsList = ({

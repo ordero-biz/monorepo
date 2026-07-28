@@ -81,14 +81,7 @@ export const usePaginationSearchParams = ({
   const resetPagination: ResetPagination = ({
     updateSearchParams,
   }: ResetPaginationArgs = {}) => {
-    if (page === DEFAULT_PAGE.page) {
-      if (updateSearchParams) {
-        const nextSearchParams = new URLSearchParams(searchParams.toString());
-
-        updateSearchParams(nextSearchParams);
-        pushSearchParams(nextSearchParams);
-      }
-
+    if (page === DEFAULT_PAGE.page && !updateSearchParams) {
       return;
     }
 

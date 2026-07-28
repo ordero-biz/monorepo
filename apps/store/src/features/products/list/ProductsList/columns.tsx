@@ -1,4 +1,4 @@
-import type { ProductGroup, ProductVariant } from '@/lib/domain/products';
+import type { ProductGroup, ProductVariant } from '@/lib/domain/products/types';
 import { formatDate } from '@/lib/utils/formatDate';
 import {
   DataTableCell,

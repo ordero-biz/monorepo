@@ -4,8 +4,8 @@ import {
   getProductGroups,
   getProductVariants,
 } from '@/lib/client/api/products';
+import { PRODUCTS_LIST_MODE } from '@/lib/domain/products/constants';
 import { prepareStoreSetup } from '@/test/prepareSetup';
-import { PRODUCTS_LIST_MODE } from './constants';
 import { ProductsList } from './ProductsList';
 import type { ProductsListProps } from './types';
 

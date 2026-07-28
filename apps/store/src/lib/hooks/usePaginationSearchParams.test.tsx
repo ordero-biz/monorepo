@@ -60,7 +60,7 @@ describe('usePaginationSearchParams', () => {
     );
 
     expect(navigationMocks.push).toHaveBeenCalledWith(
-      '/products?listMode=product-groups',
+      '/products?page=0&size=10&listMode=product-groups',
       { scroll: false }
     );
   });

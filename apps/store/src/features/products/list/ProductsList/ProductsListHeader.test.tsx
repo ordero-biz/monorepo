@@ -1,8 +1,8 @@
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { clientRoutes } from '@/lib/client/routes';
+import { PRODUCTS_LIST_MODE } from '@/lib/domain/products/constants';
 import { prepareStoreSetup } from '@/test/prepareSetup';
-import { PRODUCTS_LIST_MODE } from './constants';
 import { ProductsListHeader } from './ProductsListHeader';
 
 const { routerPushMock } = vi.hoisted(() => ({

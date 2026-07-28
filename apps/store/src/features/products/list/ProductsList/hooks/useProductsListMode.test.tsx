@@ -1,5 +1,5 @@
 import { act, renderHook } from '@testing-library/react';
-import { PRODUCTS_LIST_MODE } from '../constants';
+import { PRODUCTS_LIST_MODE } from '@/lib/domain/products/constants';
 import { useProductsListMode } from './useProductsListMode';
 
 const navigationMocks = vi.hoisted(() => ({

@@ -2,11 +2,11 @@
 
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import type { ResetPagination } from '@/lib/hooks/usePaginationSearchParams';
 import {
   getProductsListMode,
   PRODUCTS_LIST_MODE_SEARCH_PARAM,
-} from '../constants';
+} from '@/lib/domain/products/constants';
+import type { ResetPagination } from '@/lib/hooks/usePaginationSearchParams';
 import type { ProductsListMode } from '../types';
 
 type UseProductsListModeArgs = {

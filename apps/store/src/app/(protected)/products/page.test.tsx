@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import { PRODUCTS_LIST_MODE } from '@/features/products';
+import { PRODUCTS_LIST_MODE } from '@/lib/domain/products/constants';
 import {
   productGroupsQueryKeys,
   productVariantsQueryKeys,

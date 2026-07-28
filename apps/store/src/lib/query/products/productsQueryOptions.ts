@@ -1,6 +1,6 @@
 import type { ApiResult } from '@ordero/api-types';
 import { queryOptions } from '@tanstack/react-query';
-import type { ProductGroup, ProductVariant } from '@/lib/domain/products';
+import type { ProductGroup, ProductVariant } from '@/lib/domain/products/types';
 import type { PaginatedResponse } from '@/lib/server/types';
 import type { PaginationSearchInput } from '@/lib/utils/url';
 import {

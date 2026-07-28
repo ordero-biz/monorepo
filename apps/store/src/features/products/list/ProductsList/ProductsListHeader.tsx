@@ -2,8 +2,8 @@
 
 import { useRouter } from 'next/navigation';
 import { clientRoutes } from '@/lib/client/routes';
+import { PRODUCTS_LIST_MODE } from '@/lib/domain/products/constants';
 import { Button, PageHeader, ToggleButton, Typography } from '@/ui/index';
-import { PRODUCTS_LIST_MODE } from './constants';
 import type { ProductsListHeaderProps, ProductsListMode } from './types';
 
 export const ProductsListHeader = ({

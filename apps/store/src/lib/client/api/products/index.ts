@@ -1,7 +1,7 @@
 'use client';
 
 import { apiFetch } from '@ordero/api-client';
-import type { ProductGroup, ProductVariant } from '@/lib/domain/products';
+import type { ProductGroup, ProductVariant } from '@/lib/domain/products/types';
 import type { PaginatedResponse } from '@/lib/server/types';
 import {
   getPaginationSearch,
