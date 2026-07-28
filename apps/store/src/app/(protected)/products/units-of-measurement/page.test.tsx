@@ -69,19 +69,19 @@ describe('UnitsOfMeasurementPage', () => {
     expect(screen.getByText('Units of measurement header')).toBeVisible();
     expect(screen.getByText('Units of measurement list')).toBeVisible();
     expect(getServerUnitsOfMeasurementMock).toHaveBeenCalledWith({
-      page: 0,
+      page: 1,
       size: 10,
     });
     expect(unitsOfMeasurementListMock).toHaveBeenCalledWith({
       paginationInput: {
-        page: 0,
+        page: 1,
         size: 10,
       },
     });
     expect(
       queryClient.getQueryData(
         unitsOfMeasurementQueryKeys.listPage({
-          page: 0,
+          page: 1,
           size: 10,
         })
       )

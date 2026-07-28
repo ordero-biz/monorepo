@@ -291,7 +291,7 @@ describe('ProductsList', () => {
   });
 
   it('delegates pagination changes to the supplied controller', async () => {
-    mocks.searchParams = new URLSearchParams('page=0&size=25&sort=name%2Casc');
+    mocks.searchParams = new URLSearchParams('page=1&size=25&sort=name%2Casc');
     getProductVariantsMock.mockResolvedValue({
       ok: true,
       data: {
@@ -308,12 +308,12 @@ describe('ProductsList', () => {
 
     const { pagination } = setup({
       paginationInput: {
-        page: 0,
+        page: 1,
         size: 25,
         sort: ['name,asc'],
       },
       pagination: createPagination({
-        page: 0,
+        page: 1,
         size: 25,
       }),
     });
@@ -327,7 +327,7 @@ describe('ProductsList', () => {
     }
 
     expect(pagination.setPagination).toHaveBeenCalledWith({
-      page: 1,
+      page: 2,
       size: 25,
     });
   });

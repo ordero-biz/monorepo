@@ -272,7 +272,7 @@ describe('UnitsOfMeasurementList', () => {
 
     setup({
       paginationInput: {
-        page: 0,
+        page: 1,
         size: 2,
       },
     });
@@ -422,7 +422,7 @@ describe('UnitsOfMeasurementList', () => {
   });
 
   it('pushes pagination changes to the URL', async () => {
-    mocks.searchParams = new URLSearchParams('page=0&size=25&sort=name%2Casc');
+    mocks.searchParams = new URLSearchParams('page=1&size=25&sort=name%2Casc');
     getUnitsOfMeasurementMock.mockResolvedValue({
       ok: true,
       data: {
@@ -439,7 +439,7 @@ describe('UnitsOfMeasurementList', () => {
 
     setup({
       paginationInput: {
-        page: 0,
+        page: 1,
         size: 10,
         sort: ['name,asc'],
       },
@@ -450,7 +450,7 @@ describe('UnitsOfMeasurementList', () => {
     );
 
     expect(mocks.push).toHaveBeenCalledWith(
-      '/products/units-of-measurement?page=1&size=25&sort=name%2Casc',
+      '/products/units-of-measurement?page=2&size=25&sort=name%2Casc',
       { scroll: false }
     );
   });

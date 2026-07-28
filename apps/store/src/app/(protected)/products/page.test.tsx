@@ -93,19 +93,19 @@ describe('ProductsPage', () => {
 
     expect(screen.getByText('Products list view')).toBeVisible();
     expect(getServerProductVariantsMock).toHaveBeenCalledWith({
-      page: 0,
+      page: 1,
       size: 10,
     });
     expect(productsListViewMock).toHaveBeenCalledWith({
       paginationInput: {
-        page: 0,
+        page: 1,
         size: 10,
       },
     });
     expect(
       queryClient.getQueryData(
         productVariantsQueryKeys.listPage({
-          page: 0,
+          page: 1,
           size: 10,
         })
       )
@@ -170,7 +170,7 @@ describe('ProductsPage', () => {
       },
     };
     const paginationInput = {
-      page: 0,
+      page: 1,
       size: 10,
     };
     const queryClient = createTestQueryClient();

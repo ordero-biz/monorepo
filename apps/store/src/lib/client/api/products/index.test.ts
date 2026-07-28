@@ -23,7 +23,7 @@ describe('products client helpers', () => {
         sort: ['name,asc', 'createdAt,desc'],
       })
     ).toBe(
-      '/api/backend/api/v1/products?page=2&size=10&sort=name%2Casc&sort=createdAt%2Cdesc'
+      '/api/backend/api/v1/products?page=1&size=10&sort=name%2Casc&sort=createdAt%2Cdesc'
     );
   });
 
@@ -35,7 +35,7 @@ describe('products client helpers', () => {
         sort: ['name,asc', 'createdAt,desc'],
       })
     ).toBe(
-      '/api/backend/api/v1/products/variants?page=2&size=10&sort=name%2Casc&sort=createdAt%2Cdesc'
+      '/api/backend/api/v1/products/variants?page=1&size=10&sort=name%2Casc&sort=createdAt%2Cdesc'
     );
   });
 

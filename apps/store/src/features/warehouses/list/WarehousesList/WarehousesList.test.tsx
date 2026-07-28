@@ -208,7 +208,7 @@ describe('WarehousesList', () => {
   });
 
   it('pushes pagination changes to the URL', async () => {
-    mocks.searchParams = new URLSearchParams('page=0&size=25&sort=name%2Casc');
+    mocks.searchParams = new URLSearchParams('page=1&size=25&sort=name%2Casc');
     getWarehousesMock.mockResolvedValue({
       ok: true,
       data: {
@@ -225,7 +225,7 @@ describe('WarehousesList', () => {
 
     setup({
       paginationInput: {
-        page: 0,
+        page: 1,
         size: 10,
         sort: ['name,asc'],
       },
@@ -236,7 +236,7 @@ describe('WarehousesList', () => {
     );
 
     expect(mocks.push).toHaveBeenCalledWith(
-      '/products/warehouse?page=1&size=25&sort=name%2Casc',
+      '/products/warehouse?page=2&size=25&sort=name%2Casc',
       { scroll: false }
     );
   });

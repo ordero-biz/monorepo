@@ -31,7 +31,7 @@ describe('useTablePagination', () => {
       useTablePagination({
         pageMetadata: {
           size: 10,
-          number: 2,
+          number: 1,
           totalElements: 42,
           totalPages: 5,
         },
@@ -39,7 +39,7 @@ describe('useTablePagination', () => {
     );
 
     expect(result.current.count).toBe(42);
-    expect(result.current.page).toBe(2);
+    expect(result.current.page).toBe(1);
     expect(result.current.rowsPerPage).toBe(10);
   });
 
@@ -52,14 +52,14 @@ describe('useTablePagination', () => {
       useTablePagination({
         pageMetadata: {
           size: 10,
-          number: 2,
+          number: 1,
           totalElements: 42,
           totalPages: 5,
         },
       })
     );
 
-    result.current.onPageChange(3);
+    result.current.onPageChange(2);
 
     expect(navigationMocks.push).toHaveBeenCalledWith(
       '/products/categories?page=3&size=10&sort=name%2Casc&sort=id%2Cdesc&filter=active',
@@ -76,7 +76,7 @@ describe('useTablePagination', () => {
       useTablePagination({
         pageMetadata: {
           size: 10,
-          number: 2,
+          number: 1,
           totalElements: 42,
           totalPages: 5,
         },
@@ -86,7 +86,7 @@ describe('useTablePagination', () => {
     result.current.onRowsPerPageChange?.(25, {} as never);
 
     expect(navigationMocks.push).toHaveBeenCalledWith(
-      '/products/categories?page=0&size=25&sort=name%2Casc',
+      '/products/categories?page=1&size=25&sort=name%2Casc',
       { scroll: false }
     );
   });
@@ -101,7 +101,7 @@ describe('useTablePagination', () => {
       })
     );
 
-    expect(result.current.page).toBe(1);
+    expect(result.current.page).toBe(0);
     expect(result.current.rowsPerPage).toBe(50);
   });
 });
