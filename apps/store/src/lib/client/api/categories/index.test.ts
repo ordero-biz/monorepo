@@ -1,4 +1,11 @@
-import { createCategory, getCategories, getCategoriesPath } from '.';
+import {
+  createCategory,
+  getCategories,
+  getCategoriesPath,
+  getCategory,
+  getCategoryChildren,
+  updateCategory,
+} from '.';
 
 describe('category client helpers', () => {
   beforeEach(() => {
@@ -197,5 +204,125 @@ describe('category client helpers', () => {
         },
       },
     });
+  });
+
+  it('gets a category from the backend proxy', async () => {
+    const fetchMock = vi.mocked(fetch);
+    const category = {
+      id: 3,
+      name: 'Sneakers',
+      sortOrder: 15,
+      color: '#16a34a',
+      createdAt: '2026-07-01T11:22:53.562Z',
+    };
+
+    fetchMock.mockResolvedValue(new Response(JSON.stringify(category)));
+
+    await expect(getCategory(3)).resolves.toEqual({
+      ok: true,
+      data: category,
+    });
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/backend/api/v1/categories/3',
+      expect.objectContaining({
+        method: 'GET',
+        cache: 'no-store',
+      })
+    );
+  });
+
+  it("gets a category's children from the backend proxy", async () => {
+    const fetchMock = vi.mocked(fetch);
+    const children = [
+      {
+        id: 3,
+        name: 'Running shoes',
+        sortOrder: 20,
+        color: '#15803d',
+        createdAt: '2026-07-01T11:22:53.562Z',
+        parentCategory: {
+          id: 2,
+          name: 'Shoes',
+          createdAt: '2026-07-01T10:54:34.839Z',
+        },
+      },
+    ];
+
+    fetchMock.mockResolvedValue(new Response(JSON.stringify(children)));
+
+    await expect(getCategoryChildren(2)).resolves.toEqual({
+      ok: true,
+      data: children,
+    });
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/backend/api/v1/categories/2/children',
+      expect.objectContaining({
+        method: 'GET',
+        cache: 'no-store',
+      })
+    );
+  });
+
+  it('returns normalized failures from category children lookup', async () => {
+    vi.mocked(fetch).mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          message: 'Category children lookup failed.',
+          code: 'CATEGORY_CHILDREN_LOOKUP_FAILED',
+        }),
+        {
+          status: 503,
+          statusText: 'Service Unavailable',
+        }
+      )
+    );
+
+    await expect(getCategoryChildren(2)).resolves.toEqual({
+      ok: false,
+      error: {
+        status: 503,
+        message: 'Category children lookup failed.',
+        code: 'CATEGORY_CHILDREN_LOOKUP_FAILED',
+        fieldErrors: undefined,
+      },
+    });
+  });
+
+  it('patches a category through the backend proxy', async () => {
+    const fetchMock = vi.mocked(fetch);
+    const category = {
+      id: 3,
+      name: 'Running shoes',
+      sortOrder: 20,
+      color: '#15803d',
+      createdAt: '2026-07-01T11:22:53.562Z',
+    };
+
+    fetchMock.mockResolvedValue(new Response(JSON.stringify(category)));
+
+    await expect(
+      updateCategory({
+        categoryId: 3,
+        name: 'Running shoes',
+        parentId: null,
+      })
+    ).resolves.toEqual({
+      ok: true,
+      data: category,
+    });
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/backend/api/v1/categories/3',
+      expect.objectContaining({
+        method: 'PATCH',
+        body: JSON.stringify({
+          name: 'Running shoes',
+          parentId: null,
+        }),
+        cache: 'no-store',
+      })
+    );
   });
 });

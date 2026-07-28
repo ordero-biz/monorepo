@@ -50,11 +50,9 @@ export const CategoryList = ({ paginationInput }: CategoryListProps) => {
     );
   }
 
-  const availableCategories = categoriesQuery.data?.content ?? [];
-
   return (
     <div className="flex flex-col gap-[var(--space-2)]">
-      <CategoryListHeader availableCategories={availableCategories} />
+      <CategoryListHeader />
       <DataTable
         ariaLabel="Category list"
         columns={columns}

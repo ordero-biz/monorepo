@@ -275,6 +275,14 @@ For writes and mutations, expect:
 - mutation errors to be surfaced through the shared toast surface unless they
   are mapped to visible form fields
 
+### Cache invalidation audit
+
+For writes, apply the cache-invalidation impact map in
+`platform-http-requests`. Raise a finding when any list, detail, selector, or
+nested/old/new owner collection can remain fresh but stale. Expect workflow
+tests to assert each new invalidation or removal key; a generic list
+invalidation does not prove a child-resource key is refreshed.
+
 For tests, expect coverage at the nearest useful boundary:
 
 - query hooks and query options cover success and normalized error behavior

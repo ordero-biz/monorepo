@@ -14,6 +14,9 @@ export const clientRoutes = {
 export const getAttributeDetailRoute = (attributeId: string | number) =>
   `/products/attributes/${attributeId}`;
 
+export const getCategoryDetailRoute = (categoryId: string | number) =>
+  `/products/categories/${categoryId}`;
+
 export const getSupplierDetailRoute = (supplierId: string | number) =>
   `/products/suppliers/${supplierId}`;
 

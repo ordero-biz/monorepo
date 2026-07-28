@@ -4,6 +4,7 @@ import { getCategories } from '@/lib/client/api/categories';
 import { categoriesQueryKeys } from '@/lib/query/categories/categoriesQueryKeys';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { CategoriesAsyncCombobox } from './CategoriesAsyncCombobox';
+import type { CategoriesAsyncComboboxProps } from './types';
 
 const mocks = vi.hoisted(() => ({
   getCategories: vi.fn(),
@@ -19,7 +20,7 @@ vi.mock('@/lib/client/api/categories', async () => ({
 
 const getCategoriesMock = vi.mocked(getCategories);
 
-const { setup } = prepareStoreSetup({
+const { setup } = prepareStoreSetup<CategoriesAsyncComboboxProps>({
   component: CategoriesAsyncCombobox,
   props: {
     'aria-label': 'Category',
@@ -76,6 +77,17 @@ describe('CategoriesAsyncCombobox', () => {
       '1',
       expect.any(Object)
     );
+  });
+
+  it('disables specified categories while leaving them visible', async () => {
+    const user = userEvent.setup();
+
+    mockSuccessfulCategories();
+    setup({ disabledCategoryIds: [1] });
+
+    await user.click(screen.getByRole('combobox', { name: 'Category' }));
+
+    expect(await screen.findByRole('option', { name: 'Shoes' })).toBeDisabled();
   });
 
   it('refetches when category list queries are invalidated', async () => {
