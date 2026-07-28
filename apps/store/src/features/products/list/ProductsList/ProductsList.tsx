@@ -2,7 +2,7 @@
 
 import { useProductGroupsQuery } from '@/lib/hooks/products/useProductGroupsQuery';
 import { useProductVariantsQuery } from '@/lib/hooks/products/useProductVariantsQuery';
-import { useTablePagination } from '@/lib/hooks/useTablePagination';
+import { getTablePagination } from '@/lib/hooks/useTablePagination';
 import { Button, Card, DataTable, Typography } from '@/ui/index';
 import { productGroupColumns, productVariantColumns } from './columns';
 import { PRODUCTS_LIST_MODE } from './constants';
@@ -10,22 +10,26 @@ import type { ProductsListProps } from './types';
 
 export const ProductsList = ({
   listMode,
+  pagination,
   paginationInput,
 }: ProductsListProps) => {
-  const isProductVariantsMode =
-    listMode === PRODUCTS_LIST_MODE.productVariants;
+  const isProductVariantsMode = listMode === PRODUCTS_LIST_MODE.productVariants;
+
   const productVariantsQuery = useProductVariantsQuery(paginationInput, {
     enabled: isProductVariantsMode,
   });
+
   const productGroupsQuery = useProductGroupsQuery(paginationInput, {
     enabled: !isProductVariantsMode,
   });
+
   const selectedProductListQuery = isProductVariantsMode
     ? productVariantsQuery
     : productGroupsQuery;
-  const tablePagination = useTablePagination({
+
+  const tablePagination = getTablePagination({
     pageMetadata: selectedProductListQuery.data?.page,
-    paginationInput,
+    pagination,
   });
 
   if (selectedProductListQuery.isPending) {

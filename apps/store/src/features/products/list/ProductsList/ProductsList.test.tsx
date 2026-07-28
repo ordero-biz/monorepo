@@ -1,9 +1,13 @@
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { getProductGroups, getProductVariants } from '@/lib/client/api/products';
+import {
+  getProductGroups,
+  getProductVariants,
+} from '@/lib/client/api/products';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { PRODUCTS_LIST_MODE } from './constants';
 import { ProductsList } from './ProductsList';
+import type { ProductsListProps } from './types';
 
 const mocks = vi.hoisted(() => ({
   pathname: '/products',
@@ -32,6 +36,13 @@ vi.mock('@/lib/client/api/products', async () => ({
 
 const getProductVariantsMock = vi.mocked(getProductVariants);
 const getProductGroupsMock = vi.mocked(getProductGroups);
+const setPaginationMock = vi.fn();
+
+const createPagination = ({ page = 0, size = 10 } = {}) => ({
+  page,
+  setPagination: setPaginationMock,
+  size,
+});
 
 const productVariant = {
   id: 1,
@@ -71,10 +82,11 @@ const productGroup = {
   },
 };
 
-const { setup } = prepareStoreSetup({
+const { setup } = prepareStoreSetup<ProductsListProps>({
   component: ProductsList,
   props: {
     listMode: PRODUCTS_LIST_MODE.productVariants,
+    pagination: createPagination(),
   },
 });
 
@@ -82,6 +94,7 @@ describe('ProductsList', () => {
   beforeEach(() => {
     getProductVariantsMock.mockReset();
     getProductGroupsMock.mockReset();
+    setPaginationMock.mockReset();
     mocks.push.mockReset();
     mocks.searchParams = new URLSearchParams();
   });
@@ -248,6 +261,10 @@ describe('ProductsList', () => {
         page: 1,
         size: 1,
       },
+      pagination: createPagination({
+        page: 1,
+        size: 1,
+      }),
     });
 
     expect(await screen.findByText('Trail Shoes / Green / 42')).toBeVisible();
@@ -273,7 +290,7 @@ describe('ProductsList', () => {
     expect(await screen.findByText('No products found.')).toBeVisible();
   });
 
-  it('pushes pagination changes to the URL', async () => {
+  it('delegates pagination changes to the supplied controller', async () => {
     mocks.searchParams = new URLSearchParams('page=0&size=25&sort=name%2Casc');
     getProductVariantsMock.mockResolvedValue({
       ok: true,
@@ -289,21 +306,29 @@ describe('ProductsList', () => {
     });
     const user = userEvent.setup();
 
-    setup({
+    const { pagination } = setup({
       paginationInput: {
         page: 0,
-        size: 10,
+        size: 25,
         sort: ['name,asc'],
       },
+      pagination: createPagination({
+        page: 0,
+        size: 25,
+      }),
     });
 
     await user.click(
       await screen.findByRole('button', { name: 'Go to next page' })
     );
 
-    expect(mocks.push).toHaveBeenCalledWith(
-      '/products?page=1&size=25&sort=name%2Casc',
-      { scroll: false }
-    );
+    if (!pagination) {
+      throw new Error('Expected a pagination controller.');
+    }
+
+    expect(pagination.setPagination).toHaveBeenCalledWith({
+      page: 1,
+      size: 25,
+    });
   });
 });

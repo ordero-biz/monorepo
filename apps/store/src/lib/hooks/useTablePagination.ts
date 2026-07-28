@@ -10,10 +10,47 @@ type UseTablePaginationArgs = {
   paginationInput?: PaginationSearchInput;
 };
 
+type SetTablePaginationArgs = {
+  page: number;
+  size: number;
+};
+
+export type TablePaginationController = {
+  page: number;
+  setPagination: (args: SetTablePaginationArgs) => void;
+  size: number;
+};
+
 type UseTablePaginationResult = Pick<
   TablePaginationProps,
   'count' | 'onPageChange' | 'onRowsPerPageChange' | 'page' | 'rowsPerPage'
 >;
+
+type GetTablePaginationArgs = {
+  pageMetadata?: PageMetadata;
+  pagination: TablePaginationController;
+};
+
+export const getTablePagination = ({
+  pageMetadata,
+  pagination,
+}: GetTablePaginationArgs): UseTablePaginationResult => ({
+  count: pageMetadata?.totalElements ?? 0,
+  onPageChange: (nextPage) => {
+    pagination.setPagination({
+      page: nextPage,
+      size: pagination.size,
+    });
+  },
+  onRowsPerPageChange: (nextRowsPerPage) => {
+    pagination.setPagination({
+      page: 0,
+      size: nextRowsPerPage,
+    });
+  },
+  page: pagination.page,
+  rowsPerPage: pagination.size,
+});
 
 export const useTablePagination = ({
   pageMetadata,
@@ -23,21 +60,12 @@ export const useTablePagination = ({
     paginationInput,
   });
 
-  return {
-    count: pageMetadata?.totalElements ?? 0,
-    onPageChange: (nextPage) => {
-      setPagination({
-        page: nextPage,
-        size,
-      });
+  return getTablePagination({
+    pageMetadata,
+    pagination: {
+      page,
+      setPagination,
+      size,
     },
-    onRowsPerPageChange: (nextRowsPerPage) => {
-      setPagination({
-        page: 0,
-        size: nextRowsPerPage,
-      });
-    },
-    page,
-    rowsPerPage: size,
-  };
+  });
 };

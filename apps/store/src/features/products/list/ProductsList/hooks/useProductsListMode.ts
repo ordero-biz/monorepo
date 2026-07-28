@@ -2,8 +2,7 @@
 
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { usePaginationSearchParams } from '@/lib/hooks/usePaginationSearchParams';
-import type { PaginationSearchInput } from '@/lib/utils/url';
+import type { ResetPagination } from '@/lib/hooks/usePaginationSearchParams';
 import {
   getProductsListMode,
   PRODUCTS_LIST_MODE_SEARCH_PARAM,
@@ -11,19 +10,17 @@ import {
 import type { ProductsListMode } from '../types';
 
 type UseProductsListModeArgs = {
-  paginationInput?: PaginationSearchInput;
+  resetPagination: ResetPagination;
 };
 
 export const useProductsListMode = ({
-  paginationInput,
+  resetPagination,
 }: UseProductsListModeArgs) => {
   const searchParams = useSearchParams();
   const searchParamsListMode = getProductsListMode(
     searchParams.get(PRODUCTS_LIST_MODE_SEARCH_PARAM)
   );
   const [listMode, setListModeState] = useState(searchParamsListMode);
-  const { paginationInput: currentPaginationInput, resetPagination } =
-    usePaginationSearchParams({ paginationInput });
 
   useEffect(() => {
     setListModeState(searchParamsListMode);
@@ -40,7 +37,6 @@ export const useProductsListMode = ({
 
   return {
     listMode,
-    paginationInput: currentPaginationInput,
     setListMode,
   };
 };

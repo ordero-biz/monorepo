@@ -80,11 +80,9 @@ describe('productVariantsListQueryOptions', () => {
       input
     );
 
-    expect(productVariantsListQueryOptions(fetchProductVariants).queryKey).toEqual([
-      'product-variants',
-      'list',
-      {},
-    ]);
+    expect(
+      productVariantsListQueryOptions(fetchProductVariants).queryKey
+    ).toEqual(['product-variants', 'list', {}]);
     expect(options.queryKey).toEqual(['product-variants', 'list', input]);
     await expect(createQueryClient().fetchQuery(options)).resolves.toEqual(
       productVariants

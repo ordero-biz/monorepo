@@ -117,6 +117,7 @@ describe('ProductsListView', () => {
 
     expect(await screen.findByText('Running Shoes')).toBeVisible();
     expect(screen.getByText('Footwear')).toBeVisible();
+    expect(screen.getByText('1-1 of 1')).toBeVisible();
     expect(getProductGroupsMock).toHaveBeenCalledWith({
       page: 0,
       size: 25,

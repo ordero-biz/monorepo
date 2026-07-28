@@ -24,6 +24,8 @@ type ResetPaginationArgs = {
 
 type SearchParamsUpdater = (searchParams: URLSearchParams) => void;
 
+export type ResetPagination = (args?: ResetPaginationArgs) => void;
+
 export const usePaginationSearchParams = ({
   paginationInput,
 }: UsePaginationSearchParamsArgs) => {
@@ -76,7 +78,7 @@ export const usePaginationSearchParams = ({
     }
   }, [pendingPaginationInput, searchPaginationInput]);
 
-  const resetPagination = ({
+  const resetPagination: ResetPagination = ({
     updateSearchParams,
   }: ResetPaginationArgs = {}) => {
     if (page === DEFAULT_PAGE.page) {

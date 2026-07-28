@@ -8,7 +8,10 @@ const navigationMocks = vi.hoisted(() => ({
   searchParams: new URLSearchParams(),
 }));
 
-vi.mock('next/navigation', () => ({
+vi.mock('next/navigation', async () => ({
+  ...(await vi.importActual<typeof import('next/navigation')>(
+    'next/navigation'
+  )),
   usePathname: () => navigationMocks.pathname,
   useRouter: () => ({
     push: navigationMocks.push,
@@ -17,13 +20,18 @@ vi.mock('next/navigation', () => ({
 }));
 
 describe('useProductsListMode', () => {
+  const resetPaginationMock = vi.fn();
+
   beforeEach(() => {
+    resetPaginationMock.mockReset();
     navigationMocks.push.mockReset();
     navigationMocks.searchParams = new URLSearchParams();
   });
 
   it('defaults to product variants', () => {
-    const { result } = renderHook(() => useProductsListMode({}));
+    const { result } = renderHook(() =>
+      useProductsListMode({ resetPagination: resetPaginationMock })
+    );
 
     expect(result.current.listMode).toBe(PRODUCTS_LIST_MODE.productVariants);
   });
@@ -33,36 +41,23 @@ describe('useProductsListMode', () => {
       'listMode=product-groups'
     );
 
-    const { result } = renderHook(() => useProductsListMode({}));
+    const { result } = renderHook(() =>
+      useProductsListMode({ resetPagination: resetPaginationMock })
+    );
 
     expect(result.current.listMode).toBe(PRODUCTS_LIST_MODE.productGroups);
   });
 
-  it('updates the list mode and resets pagination in one navigation', () => {
-    navigationMocks.searchParams = new URLSearchParams(
-      'page=2&size=25&sort=name%2Casc'
-    );
+  it('updates the list mode while resetting pagination', () => {
     const { result } = renderHook(() =>
-      useProductsListMode({
-        paginationInput: {
-          page: 2,
-          size: 25,
-          sort: ['name,asc'],
-        },
-      })
+      useProductsListMode({ resetPagination: resetPaginationMock })
     );
 
     act(() => result.current.setListMode(PRODUCTS_LIST_MODE.productGroups));
 
     expect(result.current.listMode).toBe(PRODUCTS_LIST_MODE.productGroups);
-    expect(result.current.paginationInput).toEqual({
-      page: 0,
-      size: 25,
-      sort: ['name,asc'],
+    expect(resetPaginationMock).toHaveBeenCalledWith({
+      updateSearchParams: expect.any(Function),
     });
-    expect(navigationMocks.push).toHaveBeenCalledWith(
-      '/products?page=0&size=25&sort=name%2Casc&listMode=product-groups',
-      { scroll: false }
-    );
   });
 });
