@@ -4,6 +4,7 @@ import { usePaginationSearchParams } from './usePaginationSearchParams';
 const navigationMocks = vi.hoisted(() => ({
   pathname: '/products',
   push: vi.fn(),
+  replace: vi.fn(),
   searchParams: new URLSearchParams(),
 }));
 
@@ -11,6 +12,7 @@ vi.mock('next/navigation', () => ({
   usePathname: () => navigationMocks.pathname,
   useRouter: () => ({
     push: navigationMocks.push,
+    replace: navigationMocks.replace,
   }),
   useSearchParams: () => navigationMocks.searchParams,
 }));
@@ -18,6 +20,7 @@ vi.mock('next/navigation', () => ({
 describe('usePaginationSearchParams', () => {
   beforeEach(() => {
     navigationMocks.push.mockReset();
+    navigationMocks.replace.mockReset();
     navigationMocks.searchParams = new URLSearchParams();
   });
 
@@ -30,12 +33,12 @@ describe('usePaginationSearchParams', () => {
     act(() => result.current.resetPagination());
 
     expect(result.current.paginationInput).toEqual({
-      page: 0,
+      page: 1,
       size: 25,
       sort: ['name,asc'],
     });
     expect(navigationMocks.push).toHaveBeenCalledWith(
-      '/products?page=0&size=25&sort=name%2Casc&filter=active',
+      '/products?page=1&size=25&sort=name%2Casc&filter=active',
       { scroll: false }
     );
   });
@@ -46,6 +49,19 @@ describe('usePaginationSearchParams', () => {
     act(() => result.current.resetPagination());
 
     expect(navigationMocks.push).not.toHaveBeenCalled();
+  });
+
+  it('replaces legacy zero-based page URLs with the first page', () => {
+    navigationMocks.searchParams = new URLSearchParams(
+      'page=0&size=25&sort=name%2Casc&filter=active'
+    );
+
+    renderHook(() => usePaginationSearchParams({}));
+
+    expect(navigationMocks.replace).toHaveBeenCalledWith(
+      '/products?page=1&size=25&sort=name%2Casc&filter=active',
+      { scroll: false }
+    );
   });
 
   it('updates search params when resetting the first page', () => {
@@ -60,7 +76,7 @@ describe('usePaginationSearchParams', () => {
     );
 
     expect(navigationMocks.push).toHaveBeenCalledWith(
-      '/products?page=0&size=10&listMode=product-groups',
+      '/products?page=1&size=10&listMode=product-groups',
       { scroll: false }
     );
   });

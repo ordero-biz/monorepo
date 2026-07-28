@@ -38,7 +38,7 @@ export const AsyncCombobox = (props: AsyncComboboxProps) => {
   >({
     enabled: isOpen,
     getNextPageParam: (lastPage) => lastPage.nextPage,
-    initialPageParam: 0,
+    initialPageParam: 1,
     queryFn: ({ pageParam }) =>
       loadOptions({
         page: pageParam,

@@ -8,7 +8,7 @@ describe('url utils', () => {
   it('builds default pagination search params', () => {
     expect(getPaginationSearch()).toBe('page=0&size=10');
     expect(DEFAULT_PAGE).toEqual({
-      page: 0,
+      page: 1,
       size: 10,
     });
   });
@@ -20,7 +20,7 @@ describe('url utils', () => {
         size: 10,
         sort: ['name,asc', 'code,desc'],
       })
-    ).toBe('page=2&size=10&sort=name%2Casc&sort=code%2Cdesc');
+    ).toBe('page=1&size=10&sort=name%2Casc&sort=code%2Cdesc');
   });
 
   it('reads pagination input from URLSearchParams', () => {
@@ -52,11 +52,11 @@ describe('url utils', () => {
   it('falls back to default pagination for missing or invalid values', () => {
     expect(
       getPaginationSearchInput({
-        page: '-1',
+      page: '0',
         size: '0',
       })
     ).toEqual({
-      page: 0,
+      page: 1,
       size: 10,
     });
   });

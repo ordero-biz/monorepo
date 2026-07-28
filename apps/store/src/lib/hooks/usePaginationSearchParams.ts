@@ -32,6 +32,7 @@ export const usePaginationSearchParams = ({
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
+  const requestedPage = searchParams.get('page');
   const searchPaginationInput = useMemo(
     () =>
       searchParams.has('page') || searchParams.has('size')
@@ -77,6 +78,22 @@ export const usePaginationSearchParams = ({
       setPendingPaginationInput(undefined);
     }
   }, [pendingPaginationInput, searchPaginationInput]);
+
+  useEffect(() => {
+    if (
+      requestedPage === null ||
+      requestedPage === String(searchPaginationInput.page)
+    ) {
+      return;
+    }
+
+    const nextSearchParams = new URLSearchParams(searchParams.toString());
+
+    nextSearchParams.set('page', String(searchPaginationInput.page));
+    router.replace(`${pathname}?${nextSearchParams.toString()}`, {
+      scroll: false,
+    });
+  }, [pathname, requestedPage, router, searchPaginationInput.page, searchParams]);
 
   const resetPagination: ResetPagination = ({
     updateSearchParams,

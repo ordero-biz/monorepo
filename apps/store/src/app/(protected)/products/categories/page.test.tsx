@@ -70,19 +70,19 @@ describe('CategoriesPage', () => {
 
     expect(screen.getByText('Category list')).toBeVisible();
     expect(getServerCategoriesMock).toHaveBeenCalledWith({
-      page: 0,
+      page: 1,
       size: 10,
     });
     expect(categoryListMock).toHaveBeenCalledWith({
       paginationInput: {
-        page: 0,
+        page: 1,
         size: 10,
       },
     });
     expect(
       queryClient.getQueryData(
         categoriesQueryKeys.listPage({
-          page: 0,
+          page: 1,
           size: 10,
         })
       )
