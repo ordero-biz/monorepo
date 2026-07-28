@@ -44,7 +44,7 @@ describe('CategoryDetail', () => {
     getCategoryMock.mockReset();
   });
 
-  it('renders category details and its edit action', async () => {
+  it('renders category details and opens its edit dialog from the actions menu', async () => {
     getCategoryMock.mockResolvedValue({ ok: true, data: category });
     setup();
 
@@ -55,9 +55,14 @@ describe('CategoryDetail', () => {
     expect(screen.getByText('Shoes')).toBeVisible();
     expect(screen.getByText('Child categories 2')).toBeVisible();
 
-    await userEvent
-      .setup()
-      .click(screen.getByRole('button', { name: 'Edit Sneakers' }));
+    const user = userEvent.setup();
+
+    await user.click(
+      screen.getByRole('button', { name: 'Actions for Sneakers' })
+    );
+    await user.click(
+      await screen.findByRole('menuitem', { name: 'Edit category' })
+    );
 
     expect(screen.getByRole('dialog', { name: 'Edit category' })).toBeVisible();
   });
