@@ -1,13 +1,16 @@
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { createProduct } from '@/lib/client/api/products';
+import { createProductGroup } from '@/lib/client/api/products';
 import { clientRoutes } from '@/lib/client/routes';
-import { productsQueryKeys } from '@/lib/query/products/productsQueryKeys';
+import {
+  productGroupsQueryKeys,
+  productVariantsQueryKeys,
+} from '@/lib/query/products/productsQueryKeys';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { CreateProduct } from './CreateProduct';
 
 const mocks = vi.hoisted(() => ({
-  createProduct: vi.fn(),
+  createProductGroup: vi.fn(),
   push: vi.fn(),
   useAttributesQuery: vi.fn(),
 }));
@@ -25,7 +28,7 @@ vi.mock('@/lib/client/api/products', async () => ({
   ...(await vi.importActual<typeof import('@/lib/client/api/products')>(
     '@/lib/client/api/products'
   )),
-  createProduct: mocks.createProduct,
+  createProductGroup: mocks.createProductGroup,
 }));
 
 vi.mock('@/lib/hooks/attributes/useAttributesQuery', async () => ({
@@ -49,7 +52,7 @@ vi.mock('./CategoriesAsyncCombobox', () => ({
   ),
 }));
 
-const createProductMock = vi.mocked(createProduct);
+const createProductGroupMock = vi.mocked(createProductGroup);
 
 const { setup } = prepareStoreSetup({
   component: CreateProduct,
@@ -77,7 +80,7 @@ const completeRequiredFields = async (
 
 describe('CreateProduct', () => {
   beforeEach(() => {
-    createProductMock.mockReset();
+    createProductGroupMock.mockReset();
     mocks.push.mockReset();
     setAvailableAttributes();
   });
@@ -105,8 +108,8 @@ describe('CreateProduct', () => {
     expect(continueButton).toBeEnabled();
   });
 
-  it('creates a product, invalidates the list, and returns to products', async () => {
-    createProductMock.mockResolvedValue({
+  it('creates a product, invalidates product lists, and returns to products', async () => {
+    createProductGroupMock.mockResolvedValue({
       ok: true,
       data: {
         id: 3,
@@ -129,25 +132,28 @@ describe('CreateProduct', () => {
       screen.getByRole('button', { name: 'Next: Configure product' })
     );
 
-    expect(createProductMock).toHaveBeenCalledWith({
+    expect(createProductGroupMock).toHaveBeenCalledWith({
       categoryId: 2,
       description: '',
       name: 'Running Shoes',
     });
     await waitFor(() =>
       expect(invalidateQueriesSpy).toHaveBeenCalledWith({
-        queryKey: productsQueryKeys.list,
+        queryKey: productGroupsQueryKeys.list,
       })
     );
+    expect(invalidateQueriesSpy).toHaveBeenCalledWith({
+      queryKey: productVariantsQueryKeys.list,
+    });
     expect(mocks.push).toHaveBeenCalledWith(clientRoutes.products);
   });
 
   it('prevents another product creation while the request is in flight', async () => {
     let resolveCreate:
-      | ((value: Awaited<ReturnType<typeof createProduct>>) => void)
+      | ((value: Awaited<ReturnType<typeof createProductGroup>>) => void)
       | undefined;
 
-    createProductMock.mockReturnValue(
+    createProductGroupMock.mockReturnValue(
       new Promise((resolve) => {
         resolveCreate = resolve;
       })
@@ -184,7 +190,7 @@ describe('CreateProduct', () => {
   });
 
   it('shows backend field errors without leaving the page', async () => {
-    createProductMock.mockResolvedValue({
+    createProductGroupMock.mockResolvedValue({
       ok: false,
       error: {
         status: 422,

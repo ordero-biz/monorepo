@@ -1,8 +1,13 @@
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { getProducts } from '@/lib/client/api/products';
+import {
+  getProductGroups,
+  getProductVariants,
+} from '@/lib/client/api/products';
+import { PRODUCTS_LIST_MODE } from '@/lib/domain/products/constants';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { ProductsList } from './ProductsList';
+import type { ProductsListProps } from './types';
 
 const mocks = vi.hoisted(() => ({
   pathname: '/products',
@@ -25,32 +30,86 @@ vi.mock('@/lib/client/api/products', async () => ({
   ...(await vi.importActual<typeof import('@/lib/client/api/products')>(
     '@/lib/client/api/products'
   )),
-  getProducts: vi.fn(),
+  getProductGroups: vi.fn(),
+  getProductVariants: vi.fn(),
 }));
 
-const getProductsMock = vi.mocked(getProducts);
+const getProductVariantsMock = vi.mocked(getProductVariants);
+const getProductGroupsMock = vi.mocked(getProductGroups);
+const setPaginationMock = vi.fn();
 
-const { setup } = prepareStoreSetup({
+const createPagination = ({ page = 0, size = 10 } = {}) => ({
+  page,
+  setPagination: setPaginationMock,
+  size,
+});
+
+const productVariant = {
+  id: 1,
+  name: 'Running Shoes / Blue / 42',
+  description: 'Lightweight daily trainer',
+  sku: 'RUN-BLU-42',
+  barcode: '1234567890',
+  createdAt: '2026-07-20T18:23:01.675Z',
+  productVariantAttributeValues: [
+    {
+      id: 1,
+      attribute: {
+        id: 2,
+        name: 'Color',
+        sortOrder: 1,
+        createdAt: '2026-07-20T18:23:01.675Z',
+      },
+      attributeValue: {
+        id: 3,
+        name: 'Blue',
+        sortOrder: 1,
+        createdAt: '2026-07-20T18:23:01.675Z',
+      },
+    },
+  ],
+};
+
+const productGroup = {
+  id: 2,
+  name: 'Running Shoes',
+  description: 'Lightweight daily trainer',
+  createdAt: '2026-07-03T07:20:30.291Z',
+  category: {
+    id: 2,
+    name: 'Footwear',
+    createdAt: '2026-07-01T07:20:30.291Z',
+  },
+};
+
+const { setup } = prepareStoreSetup<ProductsListProps>({
   component: ProductsList,
+  props: {
+    listMode: PRODUCTS_LIST_MODE.productVariants,
+    pagination: createPagination(),
+  },
 });
 
 describe('ProductsList', () => {
   beforeEach(() => {
-    getProductsMock.mockReset();
+    getProductVariantsMock.mockReset();
+    getProductGroupsMock.mockReset();
+    setPaginationMock.mockReset();
     mocks.push.mockReset();
     mocks.searchParams = new URLSearchParams();
   });
 
   it('renders a loading state while products are loading', () => {
-    getProductsMock.mockReturnValue(new Promise(() => {}));
+    getProductVariantsMock.mockReturnValue(new Promise(() => {}));
 
     setup();
 
     expect(screen.getByText('Loading products...')).toBeVisible();
+    expect(getProductGroupsMock).not.toHaveBeenCalled();
   });
 
   it('renders an error state and retries loading products', async () => {
-    getProductsMock
+    getProductVariantsMock
       .mockResolvedValueOnce({
         ok: false,
         error: {
@@ -61,19 +120,7 @@ describe('ProductsList', () => {
       .mockResolvedValueOnce({
         ok: true,
         data: {
-          content: [
-            {
-              id: 1,
-              name: 'Running Shoes',
-              description: 'Lightweight daily trainer',
-              createdAt: '2026-07-03T07:20:30.291Z',
-              category: {
-                id: 2,
-                name: 'Footwear',
-                createdAt: '2026-07-01T07:20:30.291Z',
-              },
-            },
-          ],
+          content: [productVariant],
           page: {
             size: 10,
             number: 0,
@@ -93,27 +140,15 @@ describe('ProductsList', () => {
 
     await user.click(screen.getByRole('button', { name: 'Retry' }));
 
-    expect(await screen.findByText('Running Shoes')).toBeVisible();
-    expect(getProductsMock).toHaveBeenCalledTimes(2);
+    expect(await screen.findByText('Running Shoes / Blue / 42')).toBeVisible();
+    expect(getProductVariantsMock).toHaveBeenCalledTimes(2);
   });
 
-  it('renders the products table rows', async () => {
-    getProductsMock.mockResolvedValue({
+  it('renders product variant table rows by default', async () => {
+    getProductVariantsMock.mockResolvedValue({
       ok: true,
       data: {
-        content: [
-          {
-            id: 1,
-            name: 'Running Shoes',
-            description: 'Lightweight daily trainer',
-            createdAt: '2026-07-03T07:20:30.291Z',
-            category: {
-              id: 2,
-              name: 'Footwear',
-              createdAt: '2026-07-01T07:20:30.291Z',
-            },
-          },
-        ],
+        content: [productVariant],
         page: {
           size: 10,
           number: 0,
@@ -128,20 +163,58 @@ describe('ProductsList', () => {
     expect(
       await screen.findByRole('table', { name: 'Products list' })
     ).toBeVisible();
-    expect(screen.getByText('Running Shoes')).toBeVisible();
-    expect(screen.getByText('Lightweight daily trainer')).toBeVisible();
-    expect(screen.getByText('Footwear')).toBeVisible();
-    expect(screen.getByText('03 Jul 2026')).toBeVisible();
+    expect(screen.getByText('Running Shoes / Blue / 42')).toBeVisible();
+    expect(
+      screen.queryByText('Lightweight daily trainer')
+    ).not.toBeInTheDocument();
+    expect(screen.getByText('RUN-BLU-42')).toBeVisible();
+    expect(screen.getByText('1234567890')).toBeVisible();
+    expect(screen.getByText('Color: Blue')).toBeVisible();
+    expect(screen.getByText('20 Jul 2026')).toBeVisible();
+    expect(
+      screen.queryByRole('button', { name: /SKU/ })
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /Barcode/ })
+    ).not.toBeInTheDocument();
+    expect(getProductGroupsMock).not.toHaveBeenCalled();
   });
 
-  it('requests products with pagination input', async () => {
+  it('renders product group rows when product groups mode is active', async () => {
+    getProductGroupsMock.mockResolvedValue({
+      ok: true,
+      data: {
+        content: [productGroup],
+        page: {
+          size: 10,
+          number: 0,
+          totalElements: 1,
+          totalPages: 1,
+        },
+      },
+    });
+
+    setup({
+      listMode: PRODUCTS_LIST_MODE.productGroups,
+    });
+
+    expect(await screen.findByText('Running Shoes')).toBeVisible();
+    expect(
+      screen.queryByText('Lightweight daily trainer')
+    ).not.toBeInTheDocument();
+    expect(screen.getByText('Footwear')).toBeVisible();
+    expect(screen.getByText('03 Jul 2026')).toBeVisible();
+    expect(getProductVariantsMock).not.toHaveBeenCalled();
+  });
+
+  it('requests product variants with pagination input', async () => {
     const paginationInput = {
       page: 2,
       size: 10,
       sort: ['name,asc'],
     };
 
-    getProductsMock.mockResolvedValue({
+    getProductVariantsMock.mockResolvedValue({
       ok: true,
       data: {
         content: [],
@@ -159,25 +232,19 @@ describe('ProductsList', () => {
     });
 
     await waitFor(() => {
-      expect(getProductsMock).toHaveBeenCalledWith(paginationInput);
+      expect(getProductVariantsMock).toHaveBeenCalledWith(paginationInput);
     });
   });
 
   it('renders current server page rows without client-side pagination', async () => {
-    getProductsMock.mockResolvedValue({
+    getProductVariantsMock.mockResolvedValue({
       ok: true,
       data: {
         content: [
           {
+            ...productVariant,
             id: 2,
-            name: 'Trail Shoes',
-            description: 'Stable off-road trainer',
-            createdAt: '2026-07-04T07:20:30.291Z',
-            category: {
-              id: 2,
-              name: 'Footwear',
-              createdAt: '2026-07-01T07:20:30.291Z',
-            },
+            name: 'Trail Shoes / Green / 42',
           },
         ],
         page: {
@@ -194,14 +261,18 @@ describe('ProductsList', () => {
         page: 1,
         size: 1,
       },
+      pagination: createPagination({
+        page: 1,
+        size: 1,
+      }),
     });
 
-    expect(await screen.findByText('Trail Shoes')).toBeVisible();
+    expect(await screen.findByText('Trail Shoes / Green / 42')).toBeVisible();
     expect(screen.getByText('2-2 of 2')).toBeVisible();
   });
 
   it('renders an empty state when there are no products', async () => {
-    getProductsMock.mockResolvedValue({
+    getProductVariantsMock.mockResolvedValue({
       ok: true,
       data: {
         content: [],
@@ -219,9 +290,9 @@ describe('ProductsList', () => {
     expect(await screen.findByText('No products found.')).toBeVisible();
   });
 
-  it('pushes pagination changes to the URL', async () => {
+  it('delegates pagination changes to the supplied controller', async () => {
     mocks.searchParams = new URLSearchParams('page=0&size=25&sort=name%2Casc');
-    getProductsMock.mockResolvedValue({
+    getProductVariantsMock.mockResolvedValue({
       ok: true,
       data: {
         content: [],
@@ -235,21 +306,29 @@ describe('ProductsList', () => {
     });
     const user = userEvent.setup();
 
-    setup({
+    const { pagination } = setup({
       paginationInput: {
         page: 0,
-        size: 10,
+        size: 25,
         sort: ['name,asc'],
       },
+      pagination: createPagination({
+        page: 0,
+        size: 25,
+      }),
     });
 
     await user.click(
       await screen.findByRole('button', { name: 'Go to next page' })
     );
 
-    expect(mocks.push).toHaveBeenCalledWith(
-      '/products?page=1&size=25&sort=name%2Casc',
-      { scroll: false }
-    );
+    if (!pagination) {
+      throw new Error('Expected a pagination controller.');
+    }
+
+    expect(pagination.setPagination).toHaveBeenCalledWith({
+      page: 1,
+      size: 25,
+    });
   });
 });

@@ -1,8 +1,18 @@
 import { dehydrate, HydrationBoundary } from '@tanstack/react-query';
-import { ProductsList, ProductsListHeader } from '@/features/products';
-import { productsListQueryOptions } from '@/lib/query/products/productsQueryOptions';
+import { ProductsListView } from '@/features/products';
+import {
+  getProductsListMode,
+  PRODUCTS_LIST_MODE,
+} from '@/lib/domain/products/constants';
+import {
+  productGroupsListQueryOptions,
+  productVariantsListQueryOptions,
+} from '@/lib/query/products/productsQueryOptions';
 import { makeQueryClient } from '@/lib/query/queryClient';
-import { getServerProducts } from '@/lib/server/api/products';
+import {
+  getServerProductGroups,
+  getServerProductVariants,
+} from '@/lib/server/api/products';
 import {
   getPaginationSearchInput,
   type SearchParamsInput,
@@ -15,19 +25,24 @@ type ProductsPageProps = {
 export default async function ProductsPage({
   searchParams,
 }: ProductsPageProps = {}) {
-  const paginationInput = getPaginationSearchInput(await searchParams);
+  const resolvedSearchParams = await searchParams;
+  const paginationInput = getPaginationSearchInput(resolvedSearchParams);
+  const listMode = getProductsListMode(resolvedSearchParams?.listMode);
   const queryClient = makeQueryClient();
 
-  await queryClient.prefetchQuery(
-    productsListQueryOptions(getServerProducts, paginationInput)
-  );
+  if (listMode === PRODUCTS_LIST_MODE.productGroups) {
+    await queryClient.prefetchQuery(
+      productGroupsListQueryOptions(getServerProductGroups, paginationInput)
+    );
+  } else {
+    await queryClient.prefetchQuery(
+      productVariantsListQueryOptions(getServerProductVariants, paginationInput)
+    );
+  }
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <div className="flex flex-col gap-[var(--space-2)]">
-        <ProductsListHeader />
-        <ProductsList paginationInput={paginationInput} />
-      </div>
+      <ProductsListView paginationInput={paginationInput} />
     </HydrationBoundary>
   );
 }
