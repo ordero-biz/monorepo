@@ -1,6 +1,13 @@
 import { render, screen } from '@testing-library/react';
-import { productsQueryKeys } from '@/lib/query/products/productsQueryKeys';
-import { getServerProducts } from '@/lib/server/api/products';
+import { PRODUCTS_LIST_MODE } from '@/lib/domain/products/constants';
+import {
+  productGroupsQueryKeys,
+  productVariantsQueryKeys,
+} from '@/lib/query/products/productsQueryKeys';
+import {
+  getServerProductGroups,
+  getServerProductVariants,
+} from '@/lib/server/api/products';
 import type { PaginationSearchInput } from '@/lib/utils/url';
 import {
   createTestQueryClient,
@@ -8,45 +15,61 @@ import {
 } from '@/test/prepareSetup';
 import ProductsPage from './page';
 
-const productsListMock = vi.hoisted(() => vi.fn());
+const productsListViewMock = vi.hoisted(() => vi.fn());
 
 vi.mock('@/features/products', async () => ({
   ...(await vi.importActual<typeof import('@/features/products')>(
     '@/features/products'
   )),
-  ProductsList: (props: { paginationInput?: PaginationSearchInput }) => {
-    productsListMock(props);
+  ProductsListView: (props: { paginationInput?: PaginationSearchInput }) => {
+    productsListViewMock(props);
 
-    return <div>Products list</div>;
+    return <div>Products list view</div>;
   },
-  ProductsListHeader: () => <div>Products header</div>,
 }));
 
 vi.mock('@/lib/server/api/products', () => ({
-  getServerProducts: vi.fn(),
+  getServerProductGroups: vi.fn(),
+  getServerProductVariants: vi.fn(),
 }));
 
-const getServerProductsMock = vi.mocked(getServerProducts);
+const getServerProductGroupsMock = vi.mocked(getServerProductGroups);
+const getServerProductVariantsMock = vi.mocked(getServerProductVariants);
 
 describe('ProductsPage', () => {
   beforeEach(() => {
-    getServerProductsMock.mockReset();
-    productsListMock.mockReset();
+    getServerProductGroupsMock.mockReset();
+    getServerProductVariantsMock.mockReset();
+    productsListViewMock.mockReset();
   });
 
-  it('prefetches products and hydrates the query cache', async () => {
-    const products = {
+  it('prefetches product variants and hydrates the query cache', async () => {
+    const productVariants = {
       content: [
         {
           id: 1,
-          name: 'Running Shoes',
+          name: 'Running Shoes / Blue / 42',
           description: 'Lightweight daily trainer',
-          createdAt: '2026-07-03T07:20:30.291Z',
-          category: {
-            id: 2,
-            name: 'Footwear',
-            createdAt: '2026-07-01T07:20:30.291Z',
-          },
+          sku: 'RUN-BLU-42',
+          barcode: '1234567890',
+          createdAt: '2026-07-20T18:23:01.675Z',
+          productVariantAttributeValues: [
+            {
+              id: 1,
+              attribute: {
+                id: 2,
+                name: 'Color',
+                sortOrder: 1,
+                createdAt: '2026-07-20T18:23:01.675Z',
+              },
+              attributeValue: {
+                id: 3,
+                name: 'Blue',
+                sortOrder: 1,
+                createdAt: '2026-07-20T18:23:01.675Z',
+              },
+            },
+          ],
         },
       ],
       page: {
@@ -59,22 +82,21 @@ describe('ProductsPage', () => {
     const queryClient = createTestQueryClient();
     const TestQueryProvider = createTestQueryProvider(queryClient);
 
-    getServerProductsMock.mockResolvedValue({
+    getServerProductVariantsMock.mockResolvedValue({
       ok: true,
-      data: products,
+      data: productVariants,
     });
 
     render(await ProductsPage(), {
       wrapper: TestQueryProvider,
     });
 
-    expect(screen.getByText('Products header')).toBeVisible();
-    expect(screen.getByText('Products list')).toBeVisible();
-    expect(getServerProductsMock).toHaveBeenCalledWith({
+    expect(screen.getByText('Products list view')).toBeVisible();
+    expect(getServerProductVariantsMock).toHaveBeenCalledWith({
       page: 0,
       size: 10,
     });
-    expect(productsListMock).toHaveBeenCalledWith({
+    expect(productsListViewMock).toHaveBeenCalledWith({
       paginationInput: {
         page: 0,
         size: 10,
@@ -82,16 +104,16 @@ describe('ProductsPage', () => {
     });
     expect(
       queryClient.getQueryData(
-        productsQueryKeys.listPage({
+        productVariantsQueryKeys.listPage({
           page: 0,
           size: 10,
         })
       )
-    ).toEqual(products);
+    ).toEqual(productVariants);
   });
 
-  it('prefetches products with pagination from the URL search params', async () => {
-    const products = {
+  it('prefetches product variants with pagination from the URL search params', async () => {
+    const productVariants = {
       content: [],
       page: {
         size: 10,
@@ -108,9 +130,9 @@ describe('ProductsPage', () => {
     const queryClient = createTestQueryClient();
     const TestQueryProvider = createTestQueryProvider(queryClient);
 
-    getServerProductsMock.mockResolvedValue({
+    getServerProductVariantsMock.mockResolvedValue({
       ok: true,
-      data: products,
+      data: productVariants,
     });
 
     render(
@@ -126,12 +148,54 @@ describe('ProductsPage', () => {
       }
     );
 
-    expect(getServerProductsMock).toHaveBeenCalledWith(paginationInput);
-    expect(productsListMock).toHaveBeenCalledWith({
+    expect(getServerProductVariantsMock).toHaveBeenCalledWith(paginationInput);
+    expect(productsListViewMock).toHaveBeenCalledWith({
       paginationInput,
     });
     expect(
-      queryClient.getQueryData(productsQueryKeys.listPage(paginationInput))
-    ).toEqual(products);
+      queryClient.getQueryData(
+        productVariantsQueryKeys.listPage(paginationInput)
+      )
+    ).toEqual(productVariants);
+  });
+
+  it('prefetches product groups when requested by the URL search params', async () => {
+    const productGroups = {
+      content: [],
+      page: {
+        size: 10,
+        number: 0,
+        totalElements: 0,
+        totalPages: 0,
+      },
+    };
+    const paginationInput = {
+      page: 0,
+      size: 10,
+    };
+    const queryClient = createTestQueryClient();
+    const TestQueryProvider = createTestQueryProvider(queryClient);
+
+    getServerProductGroupsMock.mockResolvedValue({
+      ok: true,
+      data: productGroups,
+    });
+
+    render(
+      await ProductsPage({
+        searchParams: Promise.resolve({
+          listMode: PRODUCTS_LIST_MODE.productGroups,
+        }),
+      }),
+      {
+        wrapper: TestQueryProvider,
+      }
+    );
+
+    expect(getServerProductGroupsMock).toHaveBeenCalledWith(paginationInput);
+    expect(getServerProductVariantsMock).not.toHaveBeenCalled();
+    expect(
+      queryClient.getQueryData(productGroupsQueryKeys.listPage(paginationInput))
+    ).toEqual(productGroups);
   });
 });

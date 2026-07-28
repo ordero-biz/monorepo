@@ -1,28 +1,28 @@
 import { renderHook, waitFor } from '@testing-library/react';
-import { getProducts } from '@/lib/client/api/products';
+import { getProductGroups } from '@/lib/client/api/products';
 import {
   createTestQueryClient,
   createTestQueryProvider,
 } from '@/test/prepareSetup';
-import { useProductsQuery } from './useProductsQuery';
+import { useProductGroupsQuery } from './useProductGroupsQuery';
 
 vi.mock('@/lib/client/api/products', async () => ({
   ...(await vi.importActual<typeof import('@/lib/client/api/products')>(
     '@/lib/client/api/products'
   )),
-  getProducts: vi.fn(),
+  getProductGroups: vi.fn(),
 }));
 
-const getProductsMock = vi.mocked(getProducts);
+const getProductGroupsMock = vi.mocked(getProductGroups);
 
-describe('useProductsQuery', () => {
+describe('useProductGroupsQuery', () => {
   beforeEach(() => {
-    getProductsMock.mockReset();
+    getProductGroupsMock.mockReset();
   });
 
-  it('returns paginated products and reuses fresh cached data', async () => {
+  it('returns paginated product groups and reuses fresh cached data', async () => {
     const paginationInput = { page: 1, size: 1 };
-    const products = {
+    const productGroups = {
       content: [
         {
           id: 1,
@@ -38,34 +38,37 @@ describe('useProductsQuery', () => {
       ],
       page: { size: 1, number: 1, totalElements: 2, totalPages: 2 },
     };
-    getProductsMock.mockResolvedValue({ ok: true, data: products });
+    getProductGroupsMock.mockResolvedValue({ ok: true, data: productGroups });
     const queryClient = createTestQueryClient();
     const TestQueryProvider = createTestQueryProvider(queryClient);
     const { result, rerender } = renderHook(
-      () => useProductsQuery(paginationInput),
+      () => useProductGroupsQuery(paginationInput),
       { wrapper: TestQueryProvider }
     );
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
-    expect(result.current.data).toEqual(products);
+    expect(result.current.data).toEqual(productGroups);
 
     rerender();
 
-    expect(getProductsMock).toHaveBeenCalledTimes(1);
-    expect(getProductsMock).toHaveBeenCalledWith(paginationInput);
+    expect(getProductGroupsMock).toHaveBeenCalledTimes(1);
+    expect(getProductGroupsMock).toHaveBeenCalledWith(paginationInput);
   });
 
   it('exposes a normalized request error without retrying', async () => {
-    const error = { status: 500, message: 'Could not load products.' };
-    getProductsMock.mockResolvedValue({ ok: false, error });
+    const error = {
+      status: 500,
+      message: 'Could not load product groups.',
+    };
+    getProductGroupsMock.mockResolvedValue({ ok: false, error });
     const queryClient = createTestQueryClient();
     const TestQueryProvider = createTestQueryProvider(queryClient);
-    const { result } = renderHook(() => useProductsQuery(), {
+    const { result } = renderHook(() => useProductGroupsQuery(), {
       wrapper: TestQueryProvider,
     });
 
     await waitFor(() => expect(result.current.isError).toBe(true));
     expect(result.current.error).toEqual(error);
-    expect(getProductsMock).toHaveBeenCalledTimes(1);
+    expect(getProductGroupsMock).toHaveBeenCalledTimes(1);
   });
 });

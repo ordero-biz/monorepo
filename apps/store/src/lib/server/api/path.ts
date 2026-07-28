@@ -15,7 +15,8 @@ export const BACKEND_CATEGORY_PATHS = {
 } as const;
 
 export const BACKEND_PRODUCT_PATHS = {
-  products: '/api/v1/products',
+  productGroups: '/api/v1/products',
+  productVariants: '/api/v1/products/variants',
 } as const;
 
 export const BACKEND_SUPPLIER_PATHS = {

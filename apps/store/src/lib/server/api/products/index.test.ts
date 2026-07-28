@@ -1,7 +1,7 @@
 import { AUTH_TOKEN_COOKIE_NAME } from '@ordero/next-api/server';
 import { cookies } from 'next/headers';
 import { fetchBackendResponse } from '@/lib/server/fetch';
-import { getServerProducts } from '.';
+import { getServerProductGroups, getServerProductVariants } from '.';
 
 vi.mock('next/headers', () => ({
   cookies: vi.fn(),
@@ -61,7 +61,7 @@ describe('product server helpers', () => {
       data: new Response(JSON.stringify(response)),
     });
 
-    await expect(getServerProducts()).resolves.toEqual({
+    await expect(getServerProductGroups()).resolves.toEqual({
       ok: true,
       data: response,
     });
@@ -93,7 +93,7 @@ describe('product server helpers', () => {
       ),
     });
 
-    await getServerProducts({
+    await getServerProductGroups({
       page: 2,
       size: 10,
       sort: ['name,asc', 'createdAt,desc'],
@@ -109,10 +109,101 @@ describe('product server helpers', () => {
     });
   });
 
+  it('gets product variants with the server auth token', async () => {
+    const response = {
+      content: [
+        {
+          id: 7,
+          name: 'Running Shoes / Blue / 42',
+          description: 'Lightweight daily trainer',
+          sku: 'RUN-BLU-42',
+          barcode: '1234567890',
+          createdAt: '2026-07-20T18:23:01.675Z',
+          productVariantAttributeValues: [
+            {
+              id: 1,
+              attribute: {
+                id: 2,
+                name: 'Color',
+                sortOrder: 1,
+                createdAt: '2026-07-20T18:23:01.675Z',
+              },
+              attributeValue: {
+                id: 3,
+                name: 'Blue',
+                sortOrder: 1,
+                createdAt: '2026-07-20T18:23:01.675Z',
+              },
+            },
+          ],
+        },
+      ],
+      page: {
+        size: 10,
+        number: 0,
+        totalElements: 1,
+        totalPages: 1,
+      },
+    };
+
+    mockAuthCookie('server-token');
+    fetchBackendResponseMock.mockResolvedValue({
+      ok: true,
+      data: new Response(JSON.stringify(response)),
+    });
+
+    await expect(getServerProductVariants()).resolves.toEqual({
+      ok: true,
+      data: response,
+    });
+
+    expect(fetchBackendResponseMock).toHaveBeenCalledWith({
+      path: '/api/v1/products/variants',
+      search: 'page=0&size=10',
+      token: 'server-token',
+      init: {
+        method: 'GET',
+      },
+    });
+  });
+
+  it('gets product variants with pagination input', async () => {
+    mockAuthCookie('server-token');
+    fetchBackendResponseMock.mockResolvedValue({
+      ok: true,
+      data: new Response(
+        JSON.stringify({
+          content: [],
+          page: {
+            size: 10,
+            number: 2,
+            totalElements: 0,
+            totalPages: 0,
+          },
+        })
+      ),
+    });
+
+    await getServerProductVariants({
+      page: 2,
+      size: 10,
+      sort: ['name,asc', 'createdAt,desc'],
+    });
+
+    expect(fetchBackendResponseMock).toHaveBeenCalledWith({
+      path: '/api/v1/products/variants',
+      search: 'page=2&size=10&sort=name%2Casc&sort=createdAt%2Cdesc',
+      token: 'server-token',
+      init: {
+        method: 'GET',
+      },
+    });
+  });
+
   it('returns an authentication error without a server token', async () => {
     mockAuthCookie();
 
-    await expect(getServerProducts()).resolves.toEqual({
+    await expect(getServerProductGroups()).resolves.toEqual({
       ok: false,
       error: {
         status: 401,

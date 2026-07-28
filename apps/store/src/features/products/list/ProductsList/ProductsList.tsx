@@ -1,19 +1,38 @@
 'use client';
 
-import { useProductsQuery } from '@/lib/hooks/products/useProductsQuery';
-import { useTablePagination } from '@/lib/hooks/useTablePagination';
+import { useProductGroupsQuery } from '@/lib/hooks/products/useProductGroupsQuery';
+import { useProductVariantsQuery } from '@/lib/hooks/products/useProductVariantsQuery';
+import { getTablePagination } from '@/lib/hooks/useTablePagination';
+import { PRODUCTS_LIST_MODE } from '@/lib/domain/products/constants';
 import { Button, Card, DataTable, Typography } from '@/ui/index';
-import { columns } from './columns';
+import { productGroupColumns, productVariantColumns } from './columns';
 import type { ProductsListProps } from './types';
 
-export const ProductsList = ({ paginationInput }: ProductsListProps) => {
-  const productsQuery = useProductsQuery(paginationInput);
-  const tablePagination = useTablePagination({
-    pageMetadata: productsQuery.data?.page,
-    paginationInput,
+export const ProductsList = ({
+  listMode,
+  pagination,
+  paginationInput,
+}: ProductsListProps) => {
+  const isProductVariantsMode = listMode === PRODUCTS_LIST_MODE.productVariants;
+
+  const productVariantsQuery = useProductVariantsQuery(paginationInput, {
+    enabled: isProductVariantsMode,
   });
 
-  if (productsQuery.isPending) {
+  const productGroupsQuery = useProductGroupsQuery(paginationInput, {
+    enabled: !isProductVariantsMode,
+  });
+
+  const selectedProductListQuery = isProductVariantsMode
+    ? productVariantsQuery
+    : productGroupsQuery;
+
+  const tablePagination = getTablePagination({
+    pageMetadata: selectedProductListQuery.data?.page,
+    pagination,
+  });
+
+  if (selectedProductListQuery.isPending) {
     return (
       <Card.Root variant="filled">
         <Card.Content>
@@ -25,7 +44,7 @@ export const ProductsList = ({ paginationInput }: ProductsListProps) => {
     );
   }
 
-  if (productsQuery.isError) {
+  if (selectedProductListQuery.isError) {
     return (
       <Card.Root variant="filled">
         <Card.Content>
@@ -36,7 +55,7 @@ export const ProductsList = ({ paginationInput }: ProductsListProps) => {
             <div>
               <Button
                 color="inherit"
-                onClick={() => productsQuery.refetch()}
+                onClick={() => selectedProductListQuery.refetch()}
                 size="s"
                 type="button"
               >
@@ -49,11 +68,25 @@ export const ProductsList = ({ paginationInput }: ProductsListProps) => {
     );
   }
 
+  if (isProductVariantsMode) {
+    return (
+      <DataTable
+        ariaLabel="Products list"
+        columns={productVariantColumns}
+        data={productVariantsQuery.data?.content ?? []}
+        emptyMessage="No products found."
+        getRowId={(row) => String(row.id)}
+        manualPagination
+        pagination={tablePagination}
+      />
+    );
+  }
+
   return (
     <DataTable
       ariaLabel="Products list"
-      columns={columns}
-      data={productsQuery.data.content}
+      columns={productGroupColumns}
+      data={productGroupsQuery.data?.content ?? []}
       emptyMessage="No products found."
       getRowId={(row) => String(row.id)}
       manualPagination
