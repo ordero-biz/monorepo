@@ -3,11 +3,8 @@
 import { Button } from '@ordero/ui';
 import { useState } from 'react';
 import { CreateCategoryDialog } from './CreateCategoryDialog';
-import type { CreateCategoryDialogTriggerProps } from './types';
 
-export const CreateCategoryDialogTrigger = ({
-  availableCategories,
-}: CreateCategoryDialogTriggerProps) => {
+export const CreateCategoryDialogTrigger = () => {
   const [open, setOpen] = useState(false);
 
   return (
@@ -16,11 +13,7 @@ export const CreateCategoryDialogTrigger = ({
         Add Category
       </Button>
 
-      <CreateCategoryDialog
-        availableCategories={availableCategories}
-        onOpenChange={setOpen}
-        open={open}
-      />
+      <CreateCategoryDialog onOpenChange={setOpen} open={open} />
     </>
   );
 };

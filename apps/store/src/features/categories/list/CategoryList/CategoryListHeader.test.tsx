@@ -10,9 +10,6 @@ vi.mock('../CreateCategory', () => ({
 
 const { setup } = prepareStoreSetup({
   component: CategoryListHeader,
-  props: {
-    availableCategories: [],
-  },
 });
 
 describe('CategoryListHeader', () => {

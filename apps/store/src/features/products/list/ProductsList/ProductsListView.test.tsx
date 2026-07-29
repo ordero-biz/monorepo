@@ -111,7 +111,7 @@ describe('ProductsListView', () => {
     await user.click(screen.getByRole('button', { name: 'Product Groups' }));
 
     expect(mocks.push).toHaveBeenCalledWith(
-      '/products?page=0&size=25&sort=name%2Casc&listMode=product-groups',
+      '/products?page=1&size=25&sort=name%2Casc&listMode=product-groups',
       { scroll: false }
     );
 
@@ -119,7 +119,7 @@ describe('ProductsListView', () => {
     expect(screen.getByText('Footwear')).toBeVisible();
     expect(screen.getByText('1-1 of 1')).toBeVisible();
     expect(getProductGroupsMock).toHaveBeenCalledWith({
-      page: 0,
+      page: 1,
       size: 25,
       sort: ['name,asc'],
     });
@@ -169,11 +169,11 @@ describe('ProductsListView', () => {
     );
 
     expect(mocks.push).toHaveBeenLastCalledWith(
-      '/products?page=0&size=25&sort=name%2Casc&listMode=product-variants',
+      '/products?page=1&size=25&sort=name%2Casc&listMode=product-variants',
       { scroll: false }
     );
     expect(getProductVariantsMock).toHaveBeenLastCalledWith({
-      page: 0,
+      page: 1,
       size: 25,
       sort: ['name,asc'],
     });

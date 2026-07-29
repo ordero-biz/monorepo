@@ -38,7 +38,7 @@ vi.mock('@/lib/hooks/attributes/useAttributesQuery', async () => ({
   useAttributesQuery: mocks.useAttributesQuery,
 }));
 
-vi.mock('./CategoriesAsyncCombobox', () => ({
+vi.mock('@/features/categories', () => ({
   CategoriesAsyncCombobox: ({
     label,
     onValueChange,

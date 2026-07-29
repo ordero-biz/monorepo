@@ -38,17 +38,17 @@ export const getTablePagination = ({
   count: pageMetadata?.totalElements ?? 0,
   onPageChange: (nextPage) => {
     pagination.setPagination({
-      page: nextPage,
+      page: nextPage + 1,
       size: pagination.size,
     });
   },
   onRowsPerPageChange: (nextRowsPerPage) => {
     pagination.setPagination({
-      page: 0,
+      page: 1,
       size: nextRowsPerPage,
     });
   },
-  page: pagination.page,
+  page: Math.max(0, pagination.page - 1),
   rowsPerPage: pagination.size,
 });
 

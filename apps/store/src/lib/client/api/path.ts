@@ -12,6 +12,8 @@ export const CLIENT_BACKEND_PATHS = {
   attributeValuesDelete: '/api/backend/api/v1/attributes/values',
   attributeValue: '/api/backend/api/v1/attributes/values/{id}',
   categories: '/api/backend/api/v1/categories',
+  category: '/api/backend/api/v1/categories/{id}',
+  categoryChildren: '/api/backend/api/v1/categories/{parentId}/children',
   productGroups: '/api/backend/api/v1/products',
   productVariants: '/api/backend/api/v1/products/variants',
   suppliers: '/api/backend/api/v1/suppliers',

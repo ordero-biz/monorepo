@@ -67,19 +67,19 @@ describe('AttributesPage', () => {
     expect(screen.getByText('Attributes header')).toBeVisible();
     expect(screen.getByText('Attributes list')).toBeVisible();
     expect(getServerAttributesMock).toHaveBeenCalledWith({
-      page: 0,
+      page: 1,
       size: 10,
     });
     expect(attributesListMock).toHaveBeenCalledWith({
       paginationInput: {
-        page: 0,
+        page: 1,
         size: 10,
       },
     });
     expect(
       queryClient.getQueryData(
         attributesQueryKeys.listPage({
-          page: 0,
+          page: 1,
           size: 10,
         })
       )
