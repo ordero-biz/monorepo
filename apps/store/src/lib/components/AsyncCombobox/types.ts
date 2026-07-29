@@ -16,6 +16,7 @@ export type AsyncComboboxLoadOptionsResult = {
 };
 
 type AsyncComboboxCommonProps = {
+  isOptionDisabled?: (option: ComboboxOption) => boolean;
   loadErrorText?: ComboboxSingleProps['listErrorText'];
   loadOptions: (
     args: AsyncComboboxLoadOptionsArgs
@@ -23,6 +24,7 @@ type AsyncComboboxCommonProps = {
   onListScroll?: ComboboxSingleProps['onListScroll'];
   pageSize?: number;
   queryKey: QueryKey;
+  staticOptions?: ComboboxOption[];
 };
 
 export type AsyncComboboxSingleProps = Omit<

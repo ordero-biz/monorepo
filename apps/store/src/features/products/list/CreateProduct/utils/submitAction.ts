@@ -1,4 +1,4 @@
-import { createProduct } from '@/lib/client/api/products';
+import { createProductGroup } from '@/lib/client/api/products';
 import type { CreateProductValues } from '../types';
 
 const mapProductFieldErrors = (fieldErrors?: Record<string, string>) => ({
@@ -8,7 +8,7 @@ const mapProductFieldErrors = (fieldErrors?: Record<string, string>) => ({
 });
 
 export const submitCreateProduct = async (value: CreateProductValues) => {
-  const result = await createProduct({
+  const result = await createProductGroup({
     categoryId: Number(value.category ?? 0),
     description: value.description,
     name: value.productName.trim(),

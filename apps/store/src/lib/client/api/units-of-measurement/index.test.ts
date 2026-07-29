@@ -24,7 +24,7 @@ describe('units of measurement client helpers', () => {
         sort: ['name,asc', 'code,desc'],
       })
     ).toBe(
-      '/api/backend/api/v1/units-of-measurement?page=2&size=10&sort=name%2Casc&sort=code%2Cdesc'
+      '/api/backend/api/v1/units-of-measurement?page=1&size=10&sort=name%2Casc&sort=code%2Cdesc'
     );
   });
 

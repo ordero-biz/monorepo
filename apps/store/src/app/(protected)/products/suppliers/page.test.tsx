@@ -68,19 +68,19 @@ describe('SuppliersPage', () => {
     expect(screen.getByText('Suppliers header')).toBeVisible();
     expect(screen.getByText('Suppliers list')).toBeVisible();
     expect(getServerSuppliersMock).toHaveBeenCalledWith({
-      page: 0,
+      page: 1,
       size: 10,
     });
     expect(suppliersListMock).toHaveBeenCalledWith({
       paginationInput: {
-        page: 0,
+        page: 1,
         size: 10,
       },
     });
     expect(
       queryClient.getQueryData(
         suppliersQueryKeys.listPage({
-          page: 0,
+          page: 1,
           size: 10,
         })
       )

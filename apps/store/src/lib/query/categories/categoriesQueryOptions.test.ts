@@ -1,5 +1,8 @@
 import { QueryClient } from '@tanstack/react-query';
-import { categoriesListQueryOptions } from './categoriesQueryOptions';
+import {
+  categoriesListQueryOptions,
+  categoryChildrenQueryOptions,
+} from './categoriesQueryOptions';
 
 const createQueryClient = () =>
   new QueryClient({
@@ -52,5 +55,31 @@ describe('categoriesListQueryOptions', () => {
     await expect(createQueryClient().fetchQuery(options)).rejects.toEqual(
       error
     );
+  });
+});
+
+describe('categoryChildrenQueryOptions', () => {
+  it('uses a category child-resource key and unwraps children', async () => {
+    const children = [
+      {
+        id: 3,
+        name: 'Running shoes',
+        sortOrder: 20,
+        color: '#15803d',
+        createdAt: '2026-07-01T11:22:53.562Z',
+        parentCategory: null,
+      },
+    ];
+    const fetchCategoryChildren = vi.fn(async () => ({
+      ok: true as const,
+      data: children,
+    }));
+    const options = categoryChildrenQueryOptions(2, fetchCategoryChildren);
+
+    expect(options.queryKey).toEqual(['categories', 'detail', '2', 'children']);
+    await expect(createQueryClient().fetchQuery(options)).resolves.toEqual(
+      children
+    );
+    expect(fetchCategoryChildren).toHaveBeenCalledWith(2);
   });
 });

@@ -1,5 +1,6 @@
 'use client';
 
+import { useCallback, useMemo } from 'react';
 import { getCategories } from '@/lib/client/api/categories';
 import {
   AsyncCombobox,
@@ -7,7 +8,6 @@ import {
   type AsyncComboboxLoadOptionsResult,
 } from '@/lib/components/AsyncCombobox';
 import { categoriesQueryKeys } from '@/lib/query/categories/categoriesQueryKeys';
-
 import type { CategoriesAsyncComboboxProps } from './types';
 
 const loadCategoryOptions = async ({
@@ -26,8 +26,8 @@ const loadCategoryOptions = async ({
 
   return {
     nextPage:
-      result.data.page.number + 1 < result.data.page.totalPages
-        ? result.data.page.number + 1
+      page < result.data.page.totalPages
+        ? page + 1
         : undefined,
     options: result.data.content.map((category) => ({
       label: category.name,
@@ -46,6 +46,7 @@ export const CategoriesAsyncCombobox = ({
   defaultOpen,
   defaultValue,
   disabled,
+  disabledCategoryIds,
   endAdornment,
   endIcon,
   errorIcon,
@@ -72,9 +73,19 @@ export const CategoriesAsyncCombobox = ({
   size,
   startAdornment,
   startIcon,
+  staticOptions,
   value,
   variant,
 }: CategoriesAsyncComboboxProps) => {
+  const disabledCategoryIdSet = useMemo(
+    () => new Set(disabledCategoryIds?.map(String)),
+    [disabledCategoryIds]
+  );
+  const isOptionDisabled = useCallback(
+    (option: { value: string }) => disabledCategoryIdSet.has(option.value),
+    [disabledCategoryIdSet]
+  );
+
   return (
     <AsyncCombobox
       aria-describedby={ariaDescribedBy}
@@ -96,6 +107,7 @@ export const CategoriesAsyncCombobox = ({
       id={id}
       inputValue={inputValue}
       invalid={invalid}
+      isOptionDisabled={isOptionDisabled}
       label={label}
       loadErrorText="We couldn't load categories right now."
       loadOptions={loadCategoryOptions}
@@ -118,6 +130,7 @@ export const CategoriesAsyncCombobox = ({
       size={size}
       startAdornment={startAdornment}
       startIcon={startIcon}
+      staticOptions={staticOptions}
       value={value}
       variant={variant}
     />

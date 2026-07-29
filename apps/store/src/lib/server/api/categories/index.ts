@@ -8,6 +8,7 @@ import type { Category } from '@/lib/domain/categories';
 import { BACKEND_CATEGORY_PATHS } from '@/lib/server/api/path';
 import { fetchBackendResponse } from '@/lib/server/fetch';
 import type { PaginatedResponse } from '@/lib/server/types';
+import { tokenizePath } from '@/lib/utils/tokenizePath';
 import {
   getPaginationSearch,
   type PaginationSearchInput,
@@ -55,4 +56,9 @@ export const getServerCategories = (input?: PaginationSearchInput) =>
   fetchCategoryResource<PaginatedResponse<Category>>(
     BACKEND_CATEGORY_PATHS.categories,
     getPaginationSearch(input)
+  );
+
+export const getServerCategory = (categoryId: string | number) =>
+  fetchCategoryResource<Category>(
+    tokenizePath(BACKEND_CATEGORY_PATHS.category, { id: categoryId })
   );

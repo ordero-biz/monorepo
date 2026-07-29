@@ -45,7 +45,7 @@ describe('CreateAttributeDialogTrigger', () => {
     await user.type(nameField, 'Material');
     await user.type(firstValueField, 'Green');
     await user.click(
-      within(dialog).getByRole('button', { name: 'Add attribute value' })
+      within(dialog).getByRole('button', { name: '+ Add another value' })
     );
     await user.keyboard('{Escape}');
 

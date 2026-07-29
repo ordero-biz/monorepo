@@ -23,7 +23,7 @@ describe('supplier client helpers', () => {
         sort: ['name,asc', 'email,desc'],
       })
     ).toBe(
-      '/api/backend/api/v1/suppliers?page=2&size=10&sort=name%2Casc&sort=email%2Cdesc'
+      '/api/backend/api/v1/suppliers?page=1&size=10&sort=name%2Casc&sort=email%2Cdesc'
     );
   });
 

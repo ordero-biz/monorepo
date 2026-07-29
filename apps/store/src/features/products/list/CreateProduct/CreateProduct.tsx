@@ -15,11 +15,14 @@ import { useQueryClient } from '@tanstack/react-query';
 import { Plus } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useMemo, useState } from 'react';
+import { CategoriesAsyncCombobox } from '@/features/categories';
 import { clientRoutes } from '@/lib/client/routes';
 import { useAttributesQuery } from '@/lib/hooks/attributes/useAttributesQuery';
-import { productsQueryKeys } from '@/lib/query/products/productsQueryKeys';
+import {
+  productGroupsQueryKeys,
+  productVariantsQueryKeys,
+} from '@/lib/query/products/productsQueryKeys';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
-import { CategoriesAsyncCombobox } from './CategoriesAsyncCombobox';
 import { PRODUCT_GENERATION_MODE } from './constants';
 import { useCreateProductForm } from './hooks/useCreateProductForm';
 import type { ProductGenerationMode } from './types';
@@ -49,9 +52,14 @@ export const CreateProduct = () => {
 
   const { form } = useCreateProductForm({
     onCreated: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: productsQueryKeys.list,
-      });
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: productGroupsQueryKeys.list,
+        }),
+        queryClient.invalidateQueries({
+          queryKey: productVariantsQueryKeys.list,
+        }),
+      ]);
       router.push(clientRoutes.products);
     },
   });

@@ -125,6 +125,31 @@ For writes:
   to visible form fields
 - keep form backend errors mapped into TanStack Form submit errors when applicable
 
+### Cache Invalidation Impact Map
+
+Before implementing a successful write, identify every cached representation
+that can show its result: details, resource lists, filtered or paginated lists,
+selectors/comboboxes, and nested collections. Treat a collection as affected
+when the changed entity is one of its rows.
+
+For relationship-owned collections, identify the owners before and after the
+write. Creation affects the new owner collection; an update or reparent can
+affect both old and new owner collections; deletion affects the old owner
+collection and normally makes the deleted entity's detail and nested caches
+invalid by definition.
+
+Use the mutation response for the post-write relationship. Use the pre-write
+entity or submitted value for the prior relationship when the response no
+longer contains it. Do not assume a top-level list invalidation refreshes a
+child-resource key unless their key prefixes prove it.
+
+Keep invalidation or cache seeding in the workflow or a narrow success callback.
+Pass the smallest mutation result needed for this work through that callback.
+Prefer exact known owner/child keys and established resource-list prefixes over
+unscoped cache invalidation. Invalidate when a write can affect an unknown page,
+filter, sort order, or nested result; seed only when the exact cache update is
+complete and authoritative.
+
 For auth:
 
 - login should set or seed `authQueryKeys.session` when a session is returned
@@ -210,6 +235,8 @@ Required coverage for new request flows:
 - cache seeding or invalidation when cached state is affected, including list
   invalidation after create flows; verify this at the cache/helper integration
   layer rather than in library-agnostic form tests
+- for relationship changes, every affected old/new owner or child-resource key;
+  a generic list invalidation alone is not sufficient coverage
 - auth cookie clearing on backend `401` when relevant
 
 ## Validation
