@@ -67,19 +67,19 @@ describe('WarehousePage', () => {
     expect(screen.getByText('Warehouses header')).toBeVisible();
     expect(screen.getByText('Warehouses list')).toBeVisible();
     expect(getServerWarehousesMock).toHaveBeenCalledWith({
-      page: 0,
+      page: 1,
       size: 10,
     });
     expect(warehousesListMock).toHaveBeenCalledWith({
       paginationInput: {
-        page: 0,
+        page: 1,
         size: 10,
       },
     });
     expect(
       queryClient.getQueryData(
         warehousesQueryKeys.listPage({
-          page: 0,
+          page: 1,
           size: 10,
         })
       )

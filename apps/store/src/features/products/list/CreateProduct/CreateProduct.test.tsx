@@ -1,22 +1,37 @@
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { createProduct } from '@/lib/client/api/products';
+import { createProductGroup } from '@/lib/client/api/products';
+import { clientRoutes } from '@/lib/client/routes';
 import type { AttributeDropdown } from '@/lib/domain/attributes';
+import {
+  productGroupsQueryKeys,
+  productVariantsQueryKeys,
+} from '@/lib/query/products/productsQueryKeys';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { CreateProduct } from './CreateProduct';
 
 const mocks = vi.hoisted(() => ({
-  createProduct: vi.fn(),
+  createProductGroup: vi.fn(),
+  push: vi.fn(),
+}));
+
+vi.mock('next/navigation', async () => ({
+  ...(await vi.importActual<typeof import('next/navigation')>(
+    'next/navigation'
+  )),
+  useRouter: () => ({
+    push: mocks.push,
+  }),
 }));
 
 vi.mock('@/lib/client/api/products', async () => ({
   ...(await vi.importActual<typeof import('@/lib/client/api/products')>(
     '@/lib/client/api/products'
   )),
-  createProduct: mocks.createProduct,
+  createProductGroup: mocks.createProductGroup,
 }));
 
-vi.mock('./CategoriesAsyncCombobox', () => ({
+vi.mock('@/features/categories', () => ({
   CategoriesAsyncCombobox: ({
     label,
     onValueChange,
@@ -112,7 +127,7 @@ vi.mock('./AttributesAsyncCombobox', () => ({
   },
 }));
 
-const createProductMock = vi.mocked(createProduct);
+const createProductGroupMock = vi.mocked(createProductGroup);
 
 const { setup } = prepareStoreSetup({
   component: CreateProduct,
@@ -130,7 +145,8 @@ const completeRequiredFields = async (
 
 describe('CreateProduct', () => {
   beforeEach(() => {
-    createProductMock.mockReset();
+    createProductGroupMock.mockReset();
+    mocks.push.mockReset();
   });
 
   it('requires a product name and category before continuing', async () => {
@@ -171,11 +187,11 @@ describe('CreateProduct', () => {
     expect(screen.getByDisplayValue('Running Shoes Blue')).toBeInTheDocument();
     expect(screen.getByText('Attributes')).toBeVisible();
     expect(screen.getAllByText('Blue')).toHaveLength(2);
-    expect(createProductMock).not.toHaveBeenCalled();
+    expect(createProductGroupMock).not.toHaveBeenCalled();
   });
 
   it('submits a single generated product without attribute values', async () => {
-    createProductMock.mockResolvedValue({
+    createProductGroupMock.mockResolvedValue({
       ok: true,
       data: {
         id: 3,
@@ -190,8 +206,8 @@ describe('CreateProduct', () => {
       },
     });
     const user = userEvent.setup();
-
-    setup();
+    const { queryClient } = setup();
+    const invalidateQueriesSpy = vi.spyOn(queryClient, 'invalidateQueries');
 
     await completeRequiredFields(user);
     await user.click(
@@ -205,7 +221,7 @@ describe('CreateProduct', () => {
     await user.click(screen.getByRole('button', { name: 'Create product' }));
 
     await waitFor(() =>
-      expect(createProductMock).toHaveBeenCalledWith({
+      expect(createProductGroupMock).toHaveBeenCalledWith({
         name: 'Running Shoes',
         description: '',
         categoryId: 2,
@@ -220,6 +236,15 @@ describe('CreateProduct', () => {
         ],
       })
     );
+    await waitFor(() =>
+      expect(invalidateQueriesSpy).toHaveBeenCalledWith({
+        queryKey: productGroupsQueryKeys.list,
+      })
+    );
+    expect(invalidateQueriesSpy).toHaveBeenCalledWith({
+      queryKey: productVariantsQueryKeys.list,
+    });
+    expect(mocks.push).toHaveBeenCalledWith(clientRoutes.products);
   });
 
   it('adds another variant attribute value from the same attribute for a single product', async () => {
@@ -252,7 +277,7 @@ describe('CreateProduct', () => {
 
     expect(within(variantAttributes).getByText('Red')).toBeVisible();
     expect(within(variantAttributes).getByText('Blue')).toBeVisible();
-    expect(createProductMock).not.toHaveBeenCalled();
+    expect(createProductGroupMock).not.toHaveBeenCalled();
   });
 
   it('keeps generated product variants when switching generation modes', async () => {
@@ -272,7 +297,7 @@ describe('CreateProduct', () => {
     await user.click(screen.getByRole('button', { name: 'Multiple products' }));
 
     expect(screen.getByDisplayValue('Running Shoes Blue')).toBeInTheDocument();
-    expect(createProductMock).not.toHaveBeenCalled();
+    expect(createProductGroupMock).not.toHaveBeenCalled();
   });
 
   it('shows only template-selected attributes in the variant attribute editor', async () => {
@@ -303,7 +328,7 @@ describe('CreateProduct', () => {
     expect(
       within(dialog).queryByRole('button', { name: 'China' })
     ).not.toBeInTheDocument();
-    expect(createProductMock).not.toHaveBeenCalled();
+    expect(createProductGroupMock).not.toHaveBeenCalled();
   });
 
   it('generates multiple product previews from selected attribute value combinations', async () => {
@@ -344,7 +369,7 @@ describe('CreateProduct', () => {
     expect(
       screen.queryByDisplayValue('Running Shoes Ukraine Red')
     ).not.toBeInTheDocument();
-    expect(createProductMock).not.toHaveBeenCalled();
+    expect(createProductGroupMock).not.toHaveBeenCalled();
   });
 
   it('generates multiple-mode previews from any selected attribute values', async () => {
@@ -364,11 +389,11 @@ describe('CreateProduct', () => {
     expect(
       screen.queryByDisplayValue('Running Shoes China Blue')
     ).not.toBeInTheDocument();
-    expect(createProductMock).not.toHaveBeenCalled();
+    expect(createProductGroupMock).not.toHaveBeenCalled();
   });
 
   it('submits the generated product variant collection', async () => {
-    createProductMock.mockResolvedValue({
+    createProductGroupMock.mockResolvedValue({
       ok: true,
       data: {
         id: 3,
@@ -406,7 +431,7 @@ describe('CreateProduct', () => {
     await user.click(createButton);
 
     await waitFor(() =>
-      expect(createProductMock).toHaveBeenCalledWith({
+      expect(createProductGroupMock).toHaveBeenCalledWith({
         name: 'Running Shoes',
         description: '',
         categoryId: 2,
@@ -421,6 +446,50 @@ describe('CreateProduct', () => {
         ],
       })
     );
+  });
+
+  it('shows backend field errors without leaving the page', async () => {
+    createProductGroupMock.mockResolvedValue({
+      ok: false,
+      error: {
+        status: 422,
+        message: 'Product creation failed.',
+        fieldErrors: {
+          name: 'Product name already exists.',
+        },
+      },
+    });
+    const user = userEvent.setup();
+
+    setup();
+
+    await completeRequiredFields(user);
+    await user.click(screen.getByRole('button', { name: 'Select Attributes' }));
+    await user.click(screen.getByRole('button', { name: 'Blue' }));
+    await user.click(
+      screen.getByRole('button', { name: 'Next: Configure product' })
+    );
+    await user.type(screen.getByRole('textbox', { name: 'SKU' }), 'SHOE-BLUE');
+    await user.type(
+      screen.getByRole('textbox', { name: 'Barcode' }),
+      'barcode-1'
+    );
+    await user.click(screen.getByRole('button', { name: 'Create product' }));
+
+    const nameField = screen.getByRole('textbox', {
+      name: 'Base product name',
+    });
+
+    expect(
+      await screen.findByText('Product name already exists.')
+    ).toBeVisible();
+    expect(nameField).toHaveAccessibleDescription(
+      'Product name already exists.'
+    );
+    expect(
+      await screen.findByRole('dialog', { name: 'Product creation failed.' })
+    ).toBeVisible();
+    expect(mocks.push).not.toHaveBeenCalled();
   });
 
   it('renders values for selected attributes', async () => {

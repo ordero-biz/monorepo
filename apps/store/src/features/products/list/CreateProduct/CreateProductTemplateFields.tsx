@@ -1,7 +1,7 @@
 import { Textarea, TextField, ToggleButton } from '@ordero/ui';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
 import { AttributesAsyncCombobox } from './AttributesAsyncCombobox';
-import { CategoriesAsyncCombobox } from './CategoriesAsyncCombobox';
+import { CategoriesAsyncCombobox } from '@/features/categories';
 import { PRODUCT_GENERATION_MODE } from './constants';
 import { ProductImageDropzone } from './ProductImageDropzone';
 import type {

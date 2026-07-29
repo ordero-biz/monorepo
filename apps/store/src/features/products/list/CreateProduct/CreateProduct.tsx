@@ -1,10 +1,17 @@
 'use client';
 
 import { Accordion, Button, ContextualActionBar, Typography } from '@ordero/ui';
+import { useQueryClient } from '@tanstack/react-query';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { BaseLayoutContextualActionBar } from '@/features/app-shell';
-import { CreateProductTemplateFields } from './CreateProductTemplateFields';
+import { clientRoutes } from '@/lib/client/routes';
+import {
+  productGroupsQueryKeys,
+  productVariantsQueryKeys,
+} from '@/lib/query/products/productsQueryKeys';
 import { PRODUCT_GENERATION_MODE } from './constants';
+import { CreateProductTemplateFields } from './CreateProductTemplateFields';
 import { GeneratedProductVariants } from './GeneratedProductVariants';
 import { GenerateProductActions } from './GenerateProductActions';
 import { useCreateProductForm } from './hooks/useCreateProductForm';
@@ -12,11 +19,24 @@ import { ProductAttributeValuesField } from './ProductAttributeValuesField';
 import type { ProductGenerationMode } from './types';
 
 export const CreateProduct = () => {
+  const queryClient = useQueryClient();
+  const router = useRouter();
+
   const [generationMode, setGenerationMode] = useState<ProductGenerationMode>(
     PRODUCT_GENERATION_MODE.one
   );
   const { form } = useCreateProductForm({
-    onCreated: () => undefined,
+    onCreated: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: productGroupsQueryKeys.list,
+        }),
+        queryClient.invalidateQueries({
+          queryKey: productVariantsQueryKeys.list,
+        }),
+      ]);
+      router.push(clientRoutes.products);
+    },
   });
 
   return (

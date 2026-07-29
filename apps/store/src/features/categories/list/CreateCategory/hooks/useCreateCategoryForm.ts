@@ -1,10 +1,11 @@
 import { useToastManager } from '@ordero/ui';
 import { useForm } from '@tanstack/react-form';
+import type { Category } from '@/lib/domain/categories';
 import { createCategoryDefaultValues } from '../constants';
 import { submitCreateCategory } from '../utils/submitAction';
 
 type UseCreateCategoryFormArgs = {
-  onCreated: () => Promise<void> | void;
+  onCreated: (category: Category) => Promise<void> | void;
 };
 
 export const useCreateCategoryForm = ({
@@ -39,7 +40,7 @@ export const useCreateCategoryForm = ({
       });
 
       formApi.reset();
-      await onCreated();
+      await onCreated(result.data);
     },
   });
 

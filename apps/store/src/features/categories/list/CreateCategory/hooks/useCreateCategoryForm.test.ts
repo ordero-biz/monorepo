@@ -69,7 +69,14 @@ describe('useCreateCategoryForm', () => {
 
     await user.click(submitButton);
 
-    await waitFor(() => expect(onCreated).toHaveBeenCalledTimes(1));
+    await waitFor(() =>
+      expect(onCreated).toHaveBeenCalledWith(
+        expect.objectContaining({
+          id: 3,
+          name: 'Sneakers',
+        })
+      )
+    );
     expect(addToastMock).toHaveBeenCalledWith({
       description: 'Category Sneakers was added',
       type: 'success',

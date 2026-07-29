@@ -1,22 +1,10 @@
-import type {
-  AsyncComboboxMultipleProps,
-  AsyncComboboxSingleProps,
-} from '@/lib/components/AsyncCombobox';
+import type { AsyncComboboxMultipleProps } from '@/lib/components/AsyncCombobox';
 import type { AttributeDropdown } from '@/lib/domain/attributes';
 import type { PRODUCT_GENERATION_MODE } from './constants';
 import type { useCreateProductForm } from './hooks/useCreateProductForm';
 
 export type CreateProductForm = ReturnType<typeof useCreateProductForm>['form'];
 
-export type CategoriesAsyncComboboxProps = Omit<
-  AsyncComboboxSingleProps,
-  | 'emptyText'
-  | 'loadErrorText'
-  | 'loadingText'
-  | 'loadOptions'
-  | 'pageSize'
-  | 'queryKey'
->;
 
 export type AttributesAsyncComboboxProps = Omit<
   AsyncComboboxMultipleProps,

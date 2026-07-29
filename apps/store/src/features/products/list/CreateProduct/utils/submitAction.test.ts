@@ -1,4 +1,4 @@
-import { createProduct } from '@/lib/client/api/products';
+import { createProductGroup } from '@/lib/client/api/products';
 import { PRODUCT_GENERATION_MODE } from '../constants';
 import { submitCreateProduct } from './submitAction';
 
@@ -6,18 +6,18 @@ vi.mock('@/lib/client/api/products', async () => ({
   ...(await vi.importActual<typeof import('@/lib/client/api/products')>(
     '@/lib/client/api/products'
   )),
-  createProduct: vi.fn(),
+  createProductGroup: vi.fn(),
 }));
 
-const createProductMock = vi.mocked(createProduct);
+const createProductGroupMock = vi.mocked(createProductGroup);
 
 describe('submitCreateProduct', () => {
   beforeEach(() => {
-    createProductMock.mockReset();
+    createProductGroupMock.mockReset();
   });
 
   it('creates a product with the submitted values', async () => {
-    createProductMock.mockResolvedValue({
+    createProductGroupMock.mockResolvedValue({
       ok: true,
       data: {
         id: 3,
@@ -65,7 +65,7 @@ describe('submitCreateProduct', () => {
       },
     });
 
-    expect(createProductMock).toHaveBeenCalledWith({
+    expect(createProductGroupMock).toHaveBeenCalledWith({
       categoryId: 2,
       description: 'Lightweight daily trainer',
       name: 'Running Shoes',
@@ -82,7 +82,7 @@ describe('submitCreateProduct', () => {
   });
 
   it('maps backend product field errors to form field names', async () => {
-    createProductMock.mockResolvedValue({
+    createProductGroupMock.mockResolvedValue({
       ok: false,
       error: {
         status: 422,

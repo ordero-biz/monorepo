@@ -102,7 +102,7 @@ describe('category server helpers', () => {
 
     expect(fetchBackendResponseMock).toHaveBeenCalledWith({
       path: '/api/v1/categories',
-      search: 'page=2&size=10&sort=name%2Casc&sort=sortOrder%2Cdesc',
+      search: 'page=1&size=10&sort=name%2Casc&sort=sortOrder%2Cdesc',
       token: 'server-token',
       init: {
         method: 'GET',

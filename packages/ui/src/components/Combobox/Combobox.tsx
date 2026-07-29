@@ -7,6 +7,7 @@ import { useId, useMemo, useState } from 'react';
 import { Chip } from '@/ui/components/Chip';
 import { FieldHelperText } from '@/ui/components/FieldHelperText';
 import { FieldLabel } from '@/ui/components/FieldLabel';
+import { dropdownSurfaceClassName } from '@/ui/components/Select';
 import { cn } from '@/ui/lib/utils';
 import type { ComboboxOption, ComboboxProps } from './types';
 
@@ -42,8 +43,10 @@ const inputClassName =
 const triggerClassName =
   'ml-[var(--textfield-select-arrow-mr)] flex shrink-0 cursor-pointer items-center justify-center rounded-full text-[var(--text-secondary)] outline-none transition-[color,transform] data-[popup-open]:rotate-180 focus-visible:ring-2 focus-visible:ring-ring/50 disabled:cursor-not-allowed [&_svg]:size-[var(--textfield-select-arrow-icon)]';
 
-const popupClassName =
-  'overflow-hidden rounded-[var(--radius)] border border-[var(--color-grey-16)] bg-[var(--white-main)] p-[var(--menu-list-p)] shadow-[var(--dropdown-x1)_var(--dropdown-y1)_var(--dropdown-blur1)_var(--dropdown-spread1)_var(--color-grey-16),var(--dropdown-x2)_var(--dropdown-y2)_var(--dropdown-blur2)_var(--dropdown-spread2)_var(--color-grey-20)]';
+const popupClassName = cn(
+  'overflow-hidden rounded-[var(--radius)] border border-[var(--color-grey-16)] bg-[var(--white-main)] p-[var(--menu-list-p)] shadow-[var(--dropdown-x1)_var(--dropdown-y1)_var(--dropdown-blur1)_var(--dropdown-spread1)_var(--color-grey-16),var(--dropdown-x2)_var(--dropdown-y2)_var(--dropdown-blur2)_var(--dropdown-spread2)_var(--color-grey-20)]',
+  dropdownSurfaceClassName
+);
 
 const listClassName =
   'flex max-h-[min(var(--available-height),320px)] flex-col gap-[var(--menu-list-spacing)] overflow-y-auto rounded-[calc(var(--radius)-4px)]';

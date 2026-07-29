@@ -4,7 +4,7 @@ import {
   parseBackendResponseData,
 } from '@ordero/next-api/server';
 import { cookies } from 'next/headers';
-import type { Product } from '@/lib/domain/products';
+import type { ProductGroup, ProductVariant } from '@/lib/domain/products/types';
 import { BACKEND_PRODUCT_PATHS } from '@/lib/server/api/path';
 import { fetchBackendResponse } from '@/lib/server/fetch';
 import type { PaginatedResponse } from '@/lib/server/types';
@@ -51,8 +51,14 @@ const fetchProductResource = async <T>(
   };
 };
 
-export const getServerProducts = (input?: PaginationSearchInput) =>
-  fetchProductResource<PaginatedResponse<Product>>(
-    BACKEND_PRODUCT_PATHS.products,
+export const getServerProductVariants = (input?: PaginationSearchInput) =>
+  fetchProductResource<PaginatedResponse<ProductVariant>>(
+    BACKEND_PRODUCT_PATHS.productVariants,
+    getPaginationSearch(input)
+  );
+
+export const getServerProductGroups = (input?: PaginationSearchInput) =>
+  fetchProductResource<PaginatedResponse<ProductGroup>>(
+    BACKEND_PRODUCT_PATHS.productGroups,
     getPaginationSearch(input)
   );

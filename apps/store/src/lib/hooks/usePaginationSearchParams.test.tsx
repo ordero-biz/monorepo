@@ -1,0 +1,83 @@
+import { act, renderHook } from '@testing-library/react';
+import { usePaginationSearchParams } from './usePaginationSearchParams';
+
+const navigationMocks = vi.hoisted(() => ({
+  pathname: '/products',
+  push: vi.fn(),
+  replace: vi.fn(),
+  searchParams: new URLSearchParams(),
+}));
+
+vi.mock('next/navigation', () => ({
+  usePathname: () => navigationMocks.pathname,
+  useRouter: () => ({
+    push: navigationMocks.push,
+    replace: navigationMocks.replace,
+  }),
+  useSearchParams: () => navigationMocks.searchParams,
+}));
+
+describe('usePaginationSearchParams', () => {
+  beforeEach(() => {
+    navigationMocks.push.mockReset();
+    navigationMocks.replace.mockReset();
+    navigationMocks.searchParams = new URLSearchParams();
+  });
+
+  it('resets pagination while preserving active filters', () => {
+    navigationMocks.searchParams = new URLSearchParams(
+      'page=2&size=25&sort=name%2Casc&filter=active'
+    );
+    const { result } = renderHook(() => usePaginationSearchParams({}));
+
+    act(() => result.current.resetPagination());
+
+    expect(result.current.paginationInput).toEqual({
+      page: 1,
+      size: 25,
+      sort: ['name,asc'],
+    });
+    expect(navigationMocks.push).toHaveBeenCalledWith(
+      '/products?page=1&size=25&sort=name%2Casc&filter=active',
+      { scroll: false }
+    );
+  });
+
+  it('does not navigate when pagination is already reset', () => {
+    const { result } = renderHook(() => usePaginationSearchParams({}));
+
+    act(() => result.current.resetPagination());
+
+    expect(navigationMocks.push).not.toHaveBeenCalled();
+  });
+
+  it('replaces legacy zero-based page URLs with the first page', () => {
+    navigationMocks.searchParams = new URLSearchParams(
+      'page=0&size=25&sort=name%2Casc&filter=active'
+    );
+
+    renderHook(() => usePaginationSearchParams({}));
+
+    expect(navigationMocks.replace).toHaveBeenCalledWith(
+      '/products?page=1&size=25&sort=name%2Casc&filter=active',
+      { scroll: false }
+    );
+  });
+
+  it('updates search params when resetting the first page', () => {
+    const { result } = renderHook(() => usePaginationSearchParams({}));
+
+    act(() =>
+      result.current.resetPagination({
+        updateSearchParams: (searchParams) => {
+          searchParams.set('listMode', 'product-groups');
+        },
+      })
+    );
+
+    expect(navigationMocks.push).toHaveBeenCalledWith(
+      '/products?page=1&size=10&listMode=product-groups',
+      { scroll: false }
+    );
+  });
+});
