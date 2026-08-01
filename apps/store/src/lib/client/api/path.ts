@@ -16,6 +16,7 @@ export const CLIENT_BACKEND_PATHS = {
   categoryChildren: '/api/backend/api/v1/categories/{parentId}/children',
   productGroups: '/api/backend/api/v1/products',
   productVariants: '/api/backend/api/v1/products/variants',
+  supplies: '/api/backend/api/v1/supplies',
   suppliers: '/api/backend/api/v1/suppliers',
   supplier: '/api/backend/api/v1/suppliers/{id}',
   unitsOfMeasurement: '/api/backend/api/v1/units-of-measurement',
