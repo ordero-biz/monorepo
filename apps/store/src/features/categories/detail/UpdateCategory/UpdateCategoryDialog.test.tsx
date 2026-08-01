@@ -112,12 +112,17 @@ describe('UpdateCategoryDialog', () => {
 
     const dialog = screen.getByRole('dialog', { name: 'Edit category' });
 
-    await user.click(
-      within(dialog).getByRole('combobox', { name: 'Parent category' })
-    );
+    const parentCategoryField = within(dialog).getByRole('combobox', {
+      name: 'Parent category',
+    });
 
-    expect(screen.getByRole('option', { name: 'Shoes' })).toBeVisible();
-    expect(screen.getByRole('option', { name: 'Sneakers' })).toBeDisabled();
+    await user.clear(parentCategoryField);
+    await user.click(parentCategoryField);
+
+    expect(await screen.findByRole('option', { name: 'Shoes' })).toBeVisible();
+    expect(
+      await screen.findByRole('option', { name: 'Sneakers' })
+    ).toHaveAttribute('aria-disabled', 'true');
   });
 
   it('renders missing editable values as empty strings', () => {

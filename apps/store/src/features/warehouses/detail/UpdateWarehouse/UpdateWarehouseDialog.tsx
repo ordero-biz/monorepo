@@ -20,12 +20,14 @@ export const UpdateWarehouseDialog = ({
     onUpdated: async (updatedWarehouse) => {
       form.reset(getWarehouseDefaultValues(updatedWarehouse));
       onOpenChange(false);
-      await queryClient.invalidateQueries({
-        queryKey: warehousesQueryKeys.list,
-      });
-      await queryClient.invalidateQueries({
-        queryKey: warehousesQueryKeys.detail(warehouse.id),
-      });
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: warehousesQueryKeys.list,
+        }),
+        queryClient.invalidateQueries({
+          queryKey: warehousesQueryKeys.detail(warehouse.id),
+        }),
+      ]);
       await onUpdated();
     },
   });

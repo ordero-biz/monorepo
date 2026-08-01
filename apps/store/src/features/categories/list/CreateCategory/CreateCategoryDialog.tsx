@@ -16,17 +16,20 @@ export const CreateCategoryDialog = ({
   const { form } = useCreateCategoryForm({
     onCreated: async (createdCategory) => {
       onOpenChange(false);
-      await queryClient.invalidateQueries({
-        queryKey: categoriesQueryKeys.list,
-      });
-
-      if (createdCategory.parentCategory) {
-        await queryClient.invalidateQueries({
-          queryKey: categoriesQueryKeys.children(
-            createdCategory.parentCategory.id
-          ),
-        });
-      }
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: categoriesQueryKeys.list,
+        }),
+        ...(createdCategory.parentCategory
+          ? [
+              queryClient.invalidateQueries({
+                queryKey: categoriesQueryKeys.children(
+                  createdCategory.parentCategory.id
+                ),
+              }),
+            ]
+          : []),
+      ]);
     },
   });
 

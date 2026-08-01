@@ -25,12 +25,14 @@ export const UpdateSupplierDialog = ({
       setFormSupplier(updatedSupplier);
       form.reset(getSupplierDefaultValues(updatedSupplier));
       onOpenChange(false);
-      await queryClient.invalidateQueries({
-        queryKey: suppliersQueryKeys.list,
-      });
-      await queryClient.invalidateQueries({
-        queryKey: suppliersQueryKeys.detail(supplier.id),
-      });
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: suppliersQueryKeys.list,
+        }),
+        queryClient.invalidateQueries({
+          queryKey: suppliersQueryKeys.detail(supplier.id),
+        }),
+      ]);
       await onUpdated(updatedSupplier);
     },
   });

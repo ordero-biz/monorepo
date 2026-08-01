@@ -20,12 +20,6 @@ export const UpdateCategoryDialog = ({
     onUpdated: async (updatedCategory) => {
       form.reset(getCategoryDefaultValues(updatedCategory));
       onOpenChange(false);
-      await queryClient.invalidateQueries({
-        queryKey: categoriesQueryKeys.list,
-      });
-      await queryClient.invalidateQueries({
-        queryKey: categoriesQueryKeys.detail(category.id),
-      });
       const parentCategoryIds = new Set(
         [
           category.parentCategory?.id,
@@ -33,13 +27,19 @@ export const UpdateCategoryDialog = ({
         ].filter((categoryId): categoryId is number => categoryId !== undefined)
       );
 
-      await Promise.all(
-        [...parentCategoryIds].map((parentCategoryId) =>
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: categoriesQueryKeys.list,
+        }),
+        queryClient.invalidateQueries({
+          queryKey: categoriesQueryKeys.detail(category.id),
+        }),
+        ...[...parentCategoryIds].map((parentCategoryId) =>
           queryClient.invalidateQueries({
             queryKey: categoriesQueryKeys.children(parentCategoryId),
           })
-        )
-      );
+        ),
+      ]);
       await onUpdated();
     },
   });
