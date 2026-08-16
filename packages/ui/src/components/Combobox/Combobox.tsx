@@ -412,7 +412,7 @@ export const Combobox = (props: ComboboxProps) => {
       }
       items={options}
       name={name}
-      onInputValueChange={() => onInputValueChange}
+      onInputValueChange={onInputValueChange}
       onOpenChange={(nextOpen, details) => {
         setOpenState(nextOpen);
         onOpenChange?.(nextOpen, details);

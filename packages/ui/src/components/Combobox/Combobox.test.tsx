@@ -70,7 +70,11 @@ describe('Combobox', () => {
     await user.click(screen.getByRole('option', { name: 'Python' }));
 
     expect(onOptionSelect).toHaveBeenLastCalledWith(
-      { label: 'Python', value: 'python' }
+      {
+        displayValue: 'Python',
+        label: 'Python',
+        value: 'python',
+      }
     );
   });
 

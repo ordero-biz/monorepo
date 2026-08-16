@@ -9,12 +9,12 @@ import {
 } from '@/ui/components/Combobox';
 
 const options = [
-  { label: 'JavaScript', value: 'javascript' },
-  { label: 'TypeScript', value: 'typescript' },
-  { label: 'Python', value: 'python' },
-  { label: 'Ruby', value: 'ruby' },
-  { label: 'Go', value: 'go' },
-  { label: 'Rust', value: 'rust' },
+  { displayValue: 'JavaScript', label: 'JavaScript', value: 'javascript' },
+  { displayValue: 'TypeScript', label: 'TypeScript', value: 'typescript' },
+  { displayValue: 'Python', label: 'Python', value: 'python' },
+  { displayValue: 'Ruby', label: 'Ruby', value: 'ruby' },
+  { displayValue: 'Go', label: 'Go', value: 'go' },
+  { displayValue: 'Rust', label: 'Rust', value: 'rust' },
 ] satisfies readonly ComboboxOption[];
 
 const previewGridClassName = 'grid gap-8 md:grid-cols-2';

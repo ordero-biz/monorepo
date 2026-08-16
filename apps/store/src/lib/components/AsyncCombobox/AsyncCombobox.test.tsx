@@ -25,7 +25,7 @@ describe('AsyncCombobox', () => {
     const user = userEvent.setup();
 
     defaultProps.loadOptions.mockResolvedValue({
-      options: [{ label: 'Shoes', value: '1' }],
+      options: [{ displayValue: 'Shoes', label: 'Shoes', value: '1' }],
     });
 
     setup();
