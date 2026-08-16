@@ -20,16 +20,13 @@ export const getCategories = (input?: PaginationSearchInput) =>
     method: 'GET',
   });
 
-type CategoryInput = {
+type CreateCategoryInput = {
   name: string;
   parentId: number | null;
-};
-
-type CreateCategoryInput = CategoryInput & {
   status: CategoryStatus;
 };
 
-type UpdateCategoryInput = CategoryInput & {
+type UpdateCategoryInput = Partial<CreateCategoryInput> & {
   categoryId: string | number;
 };
 

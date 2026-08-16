@@ -1,4 +1,5 @@
 import {
+  Chip,
   DataTableCell,
   type DataTableColumnDef,
   DataTableColumnHeader,
@@ -7,6 +8,11 @@ import Link from 'next/link';
 import { getCategoryDetailRoute } from '@/lib/client/routes';
 import type { Category } from '@/lib/domain/categories';
 import { formatDate } from '@/lib/utils/formatDate';
+
+const statusLabels = {
+  ACTIVE: 'Active',
+  DRAFT: 'Draft',
+} as const;
 
 export const columns: DataTableColumnDef<Category>[] = [
   {
@@ -25,7 +31,28 @@ export const columns: DataTableColumnDef<Category>[] = [
       <DataTableColumnHeader column={column} title="Name" />
     ),
     meta: {
-      width: '70%',
+      width: '60%',
+    },
+  },
+  {
+    accessorKey: 'status',
+    cell: ({ row }) =>
+      row.original.status ? (
+        <DataTableCell>
+          <Chip
+            color={row.original.status === 'ACTIVE' ? 'primary' : 'warning'}
+            size="s"
+            variant="soft"
+          >
+            {statusLabels[row.original.status]}
+          </Chip>
+        </DataTableCell>
+      ) : null,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Status" />
+    ),
+    meta: {
+      width: '20%',
     },
   },
   {
@@ -37,7 +64,7 @@ export const columns: DataTableColumnDef<Category>[] = [
       <DataTableColumnHeader column={column} title="Created at" />
     ),
     meta: {
-      width: '30%',
+      width: '20%',
     },
   },
 ];

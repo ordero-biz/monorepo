@@ -1,6 +1,7 @@
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getCategoryChildren } from '@/lib/client/api/categories';
+import { CATEGORY_STATUS, type Category } from '@/lib/domain/categories';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { CategoryDetailChildren } from './CategoryDetailChildren';
 
@@ -20,12 +21,12 @@ const { setup } = prepareStoreSetup({
   },
 });
 
-const children = [
+const children: Category[] = [
   {
     id: 3,
     name: 'Running shoes',
     sortOrder: 20,
-    color: '#15803d',
+    status: CATEGORY_STATUS.ACTIVE,
     createdAt: '2026-07-01T11:22:53.562Z',
     parentCategory: {
       id: 2,
@@ -40,7 +41,7 @@ describe('CategoryDetailChildren', () => {
     getCategoryChildrenMock.mockReset();
   });
 
-  it('shows child categories in a table with name and creation date columns', async () => {
+  it('shows child categories in a table with name, status, and creation date columns', async () => {
     getCategoryChildrenMock.mockResolvedValue({ ok: true, data: children });
 
     setup();
@@ -49,6 +50,7 @@ describe('CategoryDetailChildren', () => {
       await screen.findByRole('table', { name: 'Child categories' })
     ).toBeVisible();
     expect(screen.getByRole('columnheader', { name: 'Name' })).toBeVisible();
+    expect(screen.getByRole('columnheader', { name: 'Status' })).toBeVisible();
     expect(
       screen.getByRole('columnheader', { name: 'Created at' })
     ).toBeVisible();
@@ -56,6 +58,7 @@ describe('CategoryDetailChildren', () => {
       'href',
       '/products/categories/3'
     );
+    expect(screen.getByText('Active')).toBeVisible();
     expect(screen.getByText('01 Jul 2026')).toBeVisible();
   });
 

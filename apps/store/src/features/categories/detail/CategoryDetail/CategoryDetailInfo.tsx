@@ -7,10 +7,6 @@ const getCategoryDetailData = (category: Category): CategoryDetailField[] => [
     label: 'Parent category',
     value: category.parentCategory?.name,
   },
-  {
-    label: 'Color',
-    value: category.color,
-  },
 ];
 
 export const CategoryDetailInfo = ({ category }: CategoryDetailInfoProps) => (

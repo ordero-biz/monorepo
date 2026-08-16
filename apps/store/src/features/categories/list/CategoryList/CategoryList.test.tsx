@@ -72,7 +72,6 @@ describe('CategoryList', () => {
               name: 'Shoes',
               sortOrder: 10,
               status: 'ACTIVE',
-              color: '#2563eb',
               createdAt: '2026-07-01T10:54:34.839Z',
               parentCategory: {
                 id: 2,
@@ -114,7 +113,6 @@ describe('CategoryList', () => {
             name: 'Shoes',
             sortOrder: 10,
             status: 'ACTIVE',
-            color: '#2563eb',
             createdAt: '2026-07-01T10:54:34.839Z',
             parentCategory: {
               id: 2,
@@ -154,7 +152,6 @@ describe('CategoryList', () => {
             name: 'Accessories',
             sortOrder: 20,
             status: 'DRAFT',
-            color: '#16a34a',
             createdAt: '2026-07-02T10:54:34.839Z',
             parentCategory: null,
           },

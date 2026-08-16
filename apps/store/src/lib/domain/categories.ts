@@ -9,7 +9,6 @@ export type Category = {
   name: string;
   sortOrder: number;
   status?: CategoryStatus;
-  color: string;
   createdAt: string;
   parentCategory?: CategoryParent | null;
 };
