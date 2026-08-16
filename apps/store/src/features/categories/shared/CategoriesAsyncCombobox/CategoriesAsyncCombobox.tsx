@@ -1,6 +1,8 @@
 'use client';
 
 import { useCallback, useMemo } from 'react';
+import { Chip } from '@ordero/ui';
+import { CATEGORY_STATUS } from '@/lib/domain/categories';
 import { getCategories } from '@/lib/client/api/categories';
 import {
   AsyncCombobox,
@@ -25,12 +27,18 @@ const loadCategoryOptions = async ({
   }
 
   return {
-    nextPage:
-      page < result.data.page.totalPages
-        ? page + 1
-        : undefined,
+    nextPage: page < result.data.page.totalPages ? page + 1 : undefined,
     options: result.data.content.map((category) => ({
-      label: category.name,
+      data: category,
+      label: (
+        <span className="flex min-w-0 items-center gap-[var(--space-1)]">
+          <span className="truncate">{category.name}</span>
+          {category.status === CATEGORY_STATUS.DRAFT ? (
+            <Chip size="s" variant="soft">Draft</Chip>
+          ) : null}
+        </span>
+      ),
+      displayValue: category.name,
       value: String(category.id),
     })),
   };
@@ -64,6 +72,7 @@ export const CategoriesAsyncCombobox = ({
   onKeyDown,
   onListScroll,
   onOpenChange,
+  onOptionSelect,
   onValueChange,
   open,
   placeholder,
@@ -119,6 +128,7 @@ export const CategoriesAsyncCombobox = ({
       onKeyDown={onKeyDown}
       onListScroll={onListScroll}
       onOpenChange={onOpenChange}
+      onOptionSelect={onOptionSelect}
       onValueChange={onValueChange}
       open={open}
       pageSize={100}

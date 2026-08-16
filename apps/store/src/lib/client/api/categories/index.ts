@@ -1,7 +1,7 @@
 'use client';
 
 import { apiFetch } from '@ordero/api-client';
-import type { Category } from '@/lib/domain/categories';
+import type { Category, CategoryStatus } from '@/lib/domain/categories';
 import type { PaginatedResponse } from '@/lib/server/types';
 import { tokenizePath } from '@/lib/utils/tokenizePath';
 import {
@@ -20,12 +20,16 @@ export const getCategories = (input?: PaginationSearchInput) =>
     method: 'GET',
   });
 
-type CreateCategoryInput = {
+type CategoryInput = {
   name: string;
   parentId: number | null;
 };
 
-type UpdateCategoryInput = CreateCategoryInput & {
+type CreateCategoryInput = CategoryInput & {
+  status: CategoryStatus;
+};
+
+type UpdateCategoryInput = CategoryInput & {
   categoryId: string | number;
 };
 

@@ -52,7 +52,7 @@ describe('CreateCategoryDialog', () => {
     onOpenChangeMock.mockClear();
   });
 
-  it('requires a category name before create is available', async () => {
+  it('shows validation after users submit without a category name', async () => {
     const user = userEvent.setup();
 
     setup();
@@ -61,20 +61,96 @@ describe('CreateCategoryDialog', () => {
     const nameField = within(dialog).getByRole('textbox', {
       name: 'Name',
     });
-    const createButton = within(dialog).getByRole('button', { name: 'Add' });
+    const createButton = within(dialog).getByRole('button', {
+      name: 'Save draft',
+    });
 
-    expect(createButton).toBeDisabled();
+    expect(createButton).toBeEnabled();
+
+    await user.click(createButton);
+
+    expect(within(dialog).getByText('Category name is required')).toBeVisible();
 
     await user.type(nameField, '   ');
     await user.tab();
 
     expect(within(dialog).getByText('Category name is required')).toBeVisible();
-    expect(createButton).toBeDisabled();
+    expect(createButton).toBeEnabled();
 
     await user.clear(nameField);
     await user.type(nameField, 'Sneakers');
 
     expect(createButton).toBeEnabled();
+  });
+
+  it('shows category status guidance and changes the action for drafts', async () => {
+    const user = userEvent.setup();
+
+    setup();
+
+    const dialog = screen.getByRole('dialog', { name: 'Add new category' });
+
+    expect(
+      within(dialog).getByRole('radiogroup', { name: 'Category status' })
+    ).toBeRequired();
+    expect(
+      within(dialog).getByText(
+        'Editable only. Cannot be assigned to products or tracked in analytics. Can be activated later'
+      )
+    ).toBeVisible();
+    expect(
+      within(dialog).getByText(
+        'Fully functional. Can be assigned to products and tracked in analytics. Cannot be edited after publishing'
+      )
+    ).toBeVisible();
+
+    await user.click(within(dialog).getByRole('radio', { name: /^Draft\b/ }));
+
+    expect(
+      within(dialog).getByRole('button', { name: 'Save draft' })
+    ).toBeVisible();
+  });
+
+  it('forces Draft when the selected parent category is a draft', async () => {
+    getCategoriesMock.mockResolvedValue({
+      ok: true,
+      data: {
+        content: [
+          {
+            id: 1,
+            name: 'Shoes',
+            sortOrder: 10,
+            color: '#2563eb',
+            createdAt: '2026-07-01T10:54:34.839Z',
+            status: 'DRAFT',
+          },
+        ],
+        page: { number: 0, size: 100, totalElements: 1, totalPages: 1 },
+      },
+    });
+    const user = userEvent.setup();
+
+    setup();
+
+    const dialog = screen.getByRole('dialog', { name: 'Add new category' });
+
+    await user.click(within(dialog).getByRole('radio', { name: /^Active\b/ }));
+    await user.click(
+      within(dialog).getByRole('combobox', { name: 'Parent category' })
+    );
+    await user.click(await screen.findByRole('option', { name: 'Shoes' }));
+
+    expect(
+      within(dialog).getByRole('radio', { name: /^Active\b/ })
+    ).toHaveAttribute('aria-disabled', 'true');
+    expect(
+      within(dialog).getByText(
+        'Cannot be selected because the parent category is a draft'
+      )
+    ).toBeVisible();
+    expect(
+      within(dialog).getByRole('button', { name: 'Save draft' })
+    ).toBeVisible();
   });
 
   it('creates a category with the selected parent category', async () => {
@@ -105,12 +181,14 @@ describe('CreateCategoryDialog', () => {
     await user.click(
       within(dialog).getByRole('combobox', { name: 'Parent category' })
     );
-    await user.click(screen.getByRole('option', { name: 'Shoes' }));
-    await user.click(within(dialog).getByRole('button', { name: 'Add' }));
+    await user.click(screen.getByRole('option', { name: /^Shoes\b/ }));
+    await user.click(within(dialog).getByRole('radio', { name: /^Active\b/ }));
+    await user.click(within(dialog).getByRole('button', { name: 'Publish' }));
 
     expect(createCategoryMock).toHaveBeenCalledWith({
       name: 'Sneakers',
       parentId: 1,
+      status: 'ACTIVE',
     });
     await waitFor(() =>
       expect(invalidateQueriesSpy).toHaveBeenCalledWith({
@@ -143,13 +221,16 @@ describe('CreateCategoryDialog', () => {
     });
 
     await user.type(nameField, 'Sneakers');
+    await user.click(within(dialog).getByRole('radio', { name: /^Active\b/ }));
 
-    const createButton = within(dialog).getByRole('button', { name: 'Add' });
+    const createButton = within(dialog).getByRole('button', {
+      name: 'Publish',
+    });
 
     await user.click(createButton);
 
-    expect(createButton).toBeDisabled();
-    expect(screen.getByRole('button', { name: 'Adding...' })).toBeVisible();
+    expect(createButton).toBeEnabled();
+    expect(screen.getByRole('button', { name: 'Publishing...' })).toBeVisible();
 
     resolveCreate?.({
       ok: true,
@@ -162,7 +243,7 @@ describe('CreateCategoryDialog', () => {
       },
     });
 
-    await screen.findByRole('button', { name: 'Add' });
+    await screen.findByRole('button', { name: 'Save draft' });
   });
 
   it('shows backend errors and keeps the dialog open when submit fails', async () => {
@@ -186,11 +267,13 @@ describe('CreateCategoryDialog', () => {
     });
 
     await user.type(nameField, 'Sneakers');
-    await user.click(within(dialog).getByRole('button', { name: 'Add' }));
+    await user.click(within(dialog).getByRole('radio', { name: /^Active\b/ }));
+    await user.click(within(dialog).getByRole('button', { name: 'Publish' }));
 
     expect(createCategoryMock).toHaveBeenCalledWith({
       name: 'Sneakers',
       parentId: null,
+      status: 'ACTIVE',
     });
     expect(
       await within(dialog).findByText('Category name already exists.')
