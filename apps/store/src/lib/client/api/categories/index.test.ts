@@ -167,7 +167,7 @@ describe('category client helpers', () => {
         body: JSON.stringify({
           name: 'Sneakers',
           parentId: 1,
-          status: 'active',
+          status: 'ACTIVE',
         }),
         cache: 'no-store',
       })
@@ -323,6 +323,41 @@ describe('category client helpers', () => {
         body: JSON.stringify({
           name: 'Running shoes',
           parentId: null,
+        }),
+        cache: 'no-store',
+      })
+    );
+  });
+
+  it('patches a category status through the backend proxy', async () => {
+    const fetchMock = vi.mocked(fetch);
+    const category = {
+      id: 3,
+      name: 'Running shoes',
+      sortOrder: 20,
+      status: 'ACTIVE' as const,
+      color: '#15803d',
+      createdAt: '2026-07-01T11:22:53.562Z',
+    };
+
+    fetchMock.mockResolvedValue(new Response(JSON.stringify(category)));
+
+    await expect(
+      updateCategory({
+        categoryId: 3,
+        status: 'ACTIVE',
+      })
+    ).resolves.toEqual({
+      ok: true,
+      data: category,
+    });
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/backend/api/v1/categories/3',
+      expect.objectContaining({
+        method: 'PATCH',
+        body: JSON.stringify({
+          status: 'ACTIVE',
         }),
         cache: 'no-store',
       })

@@ -55,7 +55,7 @@ export const columns: DataTableColumnDef<Category>[] = [
       row.original.status ? (
         <DataTableCell>
           <Chip
-            color={row.original.status === 'ACTIVE' ? 'primary' : 'inherit'}
+            color={row.original.status === 'ACTIVE' ? 'primary' : 'warning'}
             size="s"
             variant="soft"
           >
