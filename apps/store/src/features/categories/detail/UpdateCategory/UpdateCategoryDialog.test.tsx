@@ -116,7 +116,7 @@ describe('UpdateCategoryDialog', () => {
       within(dialog).getByRole('combobox', { name: 'Parent category' })
     );
 
-    expect(screen.getByRole('option', { name: 'Shoes' })).toBeVisible();
+    expect(screen.getByRole('option', { name: /^Shoes\b/ })).toBeVisible();
     expect(
       screen.queryByRole('option', { name: 'Sneakers' })
     ).not.toBeInTheDocument();

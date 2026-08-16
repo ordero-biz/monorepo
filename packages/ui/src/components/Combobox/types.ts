@@ -15,7 +15,8 @@ export type ComboboxVariant = 'outlined' | 'filled';
 export type ComboboxOption = {
   data?: unknown;
   disabled?: boolean;
-  label: ReactNode;
+  displayValue: string;
+  label?: ReactNode;
   value: string;
 };
 

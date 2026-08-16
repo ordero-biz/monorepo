@@ -66,7 +66,7 @@ describe('CategoriesAsyncCombobox', () => {
     setup();
 
     await user.click(screen.getByRole('combobox', { name: 'Category' }));
-    await user.click(await screen.findByRole('option', { name: 'Shoes' }));
+    await user.click(await screen.findByRole('option', { name: /^Shoes\b/ }));
 
     expect(getCategoriesMock).toHaveBeenCalledWith({
       page: 1,
@@ -87,7 +87,41 @@ describe('CategoriesAsyncCombobox', () => {
 
     await user.click(screen.getByRole('combobox', { name: 'Category' }));
 
-    expect(await screen.findByRole('option', { name: 'Shoes' })).toBeDisabled();
+    expect(
+      await screen.findByRole('option', { name: /^Shoes\b/ })
+    ).toHaveAttribute('aria-disabled', 'true');
+  });
+
+  it('shows a Draft chip for draft category options', async () => {
+    getCategoriesMock.mockResolvedValue({
+      ok: true,
+      data: {
+        content: [
+          {
+            color: '#2563eb',
+            createdAt: '2026-07-01T10:54:34.839Z',
+            id: 1,
+            name: 'Shoes',
+            sortOrder: 10,
+            status: 'DRAFT',
+          },
+        ],
+        page: {
+          number: 0,
+          size: 100,
+          totalElements: 1,
+          totalPages: 1,
+        },
+      },
+    });
+    const user = userEvent.setup();
+
+    setup();
+
+    await user.click(screen.getByRole('combobox', { name: 'Category' }));
+
+    expect(await screen.findByRole('option', { name: /Shoes/ })).toBeVisible();
+    expect(screen.getByText('Draft')).toBeVisible();
   });
 
   it('refetches when category list queries are invalidated', async () => {

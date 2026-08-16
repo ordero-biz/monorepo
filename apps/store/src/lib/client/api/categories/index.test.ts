@@ -142,7 +142,7 @@ describe('category client helpers', () => {
       createCategory({
         name: 'Sneakers',
         parentId: 1,
-        status: 'active',
+        status: 'ACTIVE',
       })
     ).resolves.toEqual({
       ok: true,
@@ -194,7 +194,7 @@ describe('category client helpers', () => {
       createCategory({
         name: 'Sneakers',
         parentId: 1,
-        status: 'active',
+        status: 'ACTIVE',
       })
     ).resolves.toEqual({
       ok: false,

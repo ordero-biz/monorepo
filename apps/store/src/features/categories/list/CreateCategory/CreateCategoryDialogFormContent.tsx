@@ -8,7 +8,7 @@ import {
 } from '@ordero/ui';
 import { useState } from 'react';
 import { CategoriesAsyncCombobox } from '@/features/categories';
-import { CATEGORY_STATUS, type Category } from '@/lib/domain/categories';
+import { CATEGORY_STATUS, type Category, type CategoryStatus } from '@/lib/domain/categories';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
 import {
   validateCategoryName,
@@ -19,6 +19,7 @@ import { validateCategoryStatus } from './utils/validations';
 
 const PARENT_CATEGORY_STATIC_OPTIONS = [
   {
+    displayValue: 'No parent category',
     label: 'No parent category',
     value: '',
   },
@@ -115,7 +116,7 @@ export const CreateCategoryDialogFormContent = ({
                       label="Category status"
                       name={field.name}
                       onValueChange={(value) =>
-                        field.handleChange(value as 'DRAFT' | 'ACTIVE')
+                        field.handleChange(value as CategoryStatus)
                       }
                       orientation="vertical"
                       required

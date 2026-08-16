@@ -6,9 +6,9 @@ import { Combobox } from './Combobox';
 import type { ComboboxProps } from './types';
 
 const options = [
-  { label: 'JavaScript', value: 'javascript' },
-  { label: 'TypeScript', value: 'typescript' },
-  { label: 'Python', value: 'python' },
+  { displayValue: 'JavaScript', label: 'JavaScript', value: 'javascript' },
+  { displayValue: 'TypeScript', label: 'TypeScript', value: 'typescript' },
+  { displayValue: 'Python', label: 'Python', value: 'python' },
 ] satisfies ComboboxProps['options'];
 
 describe('Combobox', () => {
@@ -71,6 +71,23 @@ describe('Combobox', () => {
 
     expect(onOptionSelect).toHaveBeenLastCalledWith(
       { label: 'Python', value: 'python' }
+    );
+  });
+
+  it('uses displayValue when rendering a selected JSX label', () => {
+    setup({
+      defaultValue: 'python',
+      options: [
+        {
+          label: <span>Python <span>Draft</span></span>,
+          displayValue: 'Python',
+          value: 'python',
+        },
+      ],
+    });
+
+    expect(screen.getByRole('combobox', { name: 'Language' })).toHaveValue(
+      'Python'
     );
   });
 

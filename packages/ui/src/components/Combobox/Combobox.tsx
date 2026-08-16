@@ -135,11 +135,7 @@ const getOptionText = (option: ComboboxOption | undefined, value: string) => {
     return value;
   }
 
-  if (typeof option.label === 'string' || typeof option.label === 'number') {
-    return String(option.label);
-  }
-
-  return option.value;
+  return option.displayValue;
 };
 
 export const Combobox = (props: ComboboxProps) => {
@@ -296,7 +292,9 @@ export const Combobox = (props: ComboboxProps) => {
                 <Check aria-hidden="true" />
               </ComboboxPrimitive.ItemIndicator>
             ) : null}
-            <span className={itemTextClassName}>{option.label}</span>
+            <span className={itemTextClassName}>
+              {option.label ?? option.displayValue}
+            </span>
           </ComboboxPrimitive.Item>
         )}
       </ComboboxPrimitive.List>

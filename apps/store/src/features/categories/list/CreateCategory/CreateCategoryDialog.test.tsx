@@ -181,14 +181,14 @@ describe('CreateCategoryDialog', () => {
     await user.click(
       within(dialog).getByRole('combobox', { name: 'Parent category' })
     );
-    await user.click(screen.getByRole('option', { name: 'Shoes' }));
+    await user.click(screen.getByRole('option', { name: /^Shoes\b/ }));
     await user.click(within(dialog).getByRole('radio', { name: /^Active\b/ }));
     await user.click(within(dialog).getByRole('button', { name: 'Publish' }));
 
     expect(createCategoryMock).toHaveBeenCalledWith({
       name: 'Sneakers',
       parentId: 1,
-      status: 'active',
+      status: 'ACTIVE',
     });
     await waitFor(() =>
       expect(invalidateQueriesSpy).toHaveBeenCalledWith({
@@ -273,7 +273,7 @@ describe('CreateCategoryDialog', () => {
     expect(createCategoryMock).toHaveBeenCalledWith({
       name: 'Sneakers',
       parentId: null,
-      status: 'active',
+      status: 'ACTIVE',
     });
     expect(
       await within(dialog).findByText('Category name already exists.')

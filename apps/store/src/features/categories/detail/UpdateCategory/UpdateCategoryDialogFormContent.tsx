@@ -9,6 +9,7 @@ import type { UpdateCategoryDialogFormContentProps } from './types';
 
 const PARENT_CATEGORY_STATIC_OPTIONS = [
   {
+    displayValue: 'No parent category',
     label: 'No parent category',
     value: '',
   },
