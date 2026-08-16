@@ -105,7 +105,7 @@ describe('UpdateCategoryDialog', () => {
     expect(onUpdated).toHaveBeenCalled();
   });
 
-  it('disables the category itself as a parent', async () => {
+  it('prevents the category itself from being selected as a parent', async () => {
     const user = userEvent.setup();
 
     setup();
@@ -117,7 +117,9 @@ describe('UpdateCategoryDialog', () => {
     );
 
     expect(screen.getByRole('option', { name: 'Shoes' })).toBeVisible();
-    expect(screen.getByRole('option', { name: 'Sneakers' })).toBeDisabled();
+    expect(
+      screen.queryByRole('option', { name: 'Sneakers' })
+    ).not.toBeInTheDocument();
   });
 
   it('renders missing editable values as empty strings', () => {
@@ -133,6 +135,6 @@ describe('UpdateCategoryDialog', () => {
     expect(within(dialog).getByRole('textbox', { name: 'Name' })).toHaveValue(
       ''
     );
-    expect(within(dialog).getByRole('button', { name: 'Save' })).toBeDisabled();
+    expect(within(dialog).getByRole('button', { name: 'Save' })).toBeEnabled();
   });
 });

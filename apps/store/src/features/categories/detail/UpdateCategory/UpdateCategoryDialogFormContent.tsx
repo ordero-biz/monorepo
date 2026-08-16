@@ -1,8 +1,11 @@
 import { Button, Dialog, TextField } from '@ordero/ui';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
-import { CategoriesAsyncCombobox } from '../CategoriesAsyncCombobox';
-import { validateCategoryName, validateCategoryParentId } from '../validations';
-import type { CategoryFormDialogContentProps } from './types';
+import { CategoriesAsyncCombobox } from '@/features/categories';
+import {
+  validateCategoryName,
+  validateCategoryParentId,
+} from '../../shared/validations';
+import type { UpdateCategoryDialogFormContentProps } from './types';
 
 const PARENT_CATEGORY_STATIC_OPTIONS = [
   {
@@ -11,12 +14,10 @@ const PARENT_CATEGORY_STATIC_OPTIONS = [
   },
 ];
 
-export const CategoryFormDialogContent = ({
+export const UpdateCategoryDialogFormContent = ({
   disabledCategoryIds,
   form,
-  pendingText,
-  submitText,
-}: CategoryFormDialogContentProps) => {
+}: UpdateCategoryDialogFormContentProps) => {
   return (
     <>
       <Dialog.Content>
@@ -65,7 +66,7 @@ export const CategoryFormDialogContent = ({
                   label="Parent category"
                   name={field.name}
                   onBlur={field.handleBlur}
-                  onValueChange={(value) => field.handleChange(value || null)}
+                  onValueChange={field.handleChange}
                   placeholder=""
                   size="s"
                   staticOptions={PARENT_CATEGORY_STATIC_OPTIONS}
@@ -78,13 +79,9 @@ export const CategoryFormDialogContent = ({
       </Dialog.Content>
 
       <Dialog.Footer>
-        <form.Subscribe
-          selector={(state) => [state.values.name, state.isSubmitting] as const}
-        >
-          {([name, isSubmitting]) => (
-            <Button disabled={isSubmitting || !name.trim()} type="submit">
-              {isSubmitting ? pendingText : submitText}
-            </Button>
+        <form.Subscribe selector={(state) => state.isSubmitting}>
+          {(isSubmitting) => (
+            <Button type="submit">{isSubmitting ? 'Saving...' : 'Save'}</Button>
           )}
         </form.Subscribe>
       </Dialog.Footer>
