@@ -419,7 +419,12 @@ export const Combobox = (props: ComboboxProps) => {
         setOpenState(nextOpen);
         onOpenChange?.(nextOpen, details);
       }}
-      onValueChange={props.onValueChange}
+      onValueChange={(nextValue, details) => {
+        props.onValueChange?.(nextValue, details);
+        props.onOptionSelect?.(
+          nextValue ? optionLabelMap.get(nextValue) ?? null : null
+        );
+      }}
       open={open}
       readOnly={readOnly}
       required={required}

@@ -13,6 +13,7 @@ export type ComboboxSize = 's' | 'm';
 export type ComboboxVariant = 'outlined' | 'filled';
 
 export type ComboboxOption = {
+  data?: unknown;
   disabled?: boolean;
   label: ReactNode;
   value: string;
@@ -72,6 +73,9 @@ export type ComboboxSingleProps = ComboboxCommonProps & {
   onValueChange?: (
     value: string | null,
     details: ComboboxChangeEventDetails
+  ) => void;
+  onOptionSelect?: (
+    option: ComboboxOption | null
   ) => void;
   value?: string | null;
 };

@@ -59,6 +59,21 @@ describe('Combobox', () => {
     );
   });
 
+  it('returns the selected option through onOptionSelect', async () => {
+    const user = userEvent.setup();
+
+    const { 'aria-label': ariaLabel, onOptionSelect } = setup({
+      onOptionSelect: vi.fn(),
+    });
+
+    await user.click(screen.getByRole('combobox', { name: ariaLabel }));
+    await user.click(screen.getByRole('option', { name: 'Python' }));
+
+    expect(onOptionSelect).toHaveBeenLastCalledWith(
+      { label: 'Python', value: 'python' }
+    );
+  });
+
   it('supports selecting and removing multiple options', async () => {
     const user = userEvent.setup();
 
