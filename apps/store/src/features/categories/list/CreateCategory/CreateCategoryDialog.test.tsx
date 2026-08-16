@@ -37,7 +37,6 @@ describe('CreateCategoryDialog', () => {
             id: 1,
             name: 'Shoes',
             sortOrder: 10,
-            color: '#2563eb',
             createdAt: '2026-07-01T10:54:34.839Z',
           },
         ],
@@ -120,7 +119,6 @@ describe('CreateCategoryDialog', () => {
             id: 1,
             name: 'Shoes',
             sortOrder: 10,
-            color: '#2563eb',
             createdAt: '2026-07-01T10:54:34.839Z',
             status: 'DRAFT',
           },
@@ -160,7 +158,6 @@ describe('CreateCategoryDialog', () => {
         id: 3,
         name: 'Sneakers',
         sortOrder: 15,
-        color: '#16a34a',
         createdAt: '2026-07-01T11:22:53.562Z',
         parentCategory: {
           id: 1,
@@ -238,7 +235,6 @@ describe('CreateCategoryDialog', () => {
         id: 3,
         name: 'Sneakers',
         sortOrder: 15,
-        color: '#16a34a',
         createdAt: '2026-07-01T11:22:53.562Z',
       },
     });

@@ -41,7 +41,6 @@ describe('CategoriesAsyncCombobox', () => {
       data: {
         content: [
           {
-            color: '#2563eb',
             createdAt: '2026-07-01T10:54:34.839Z',
             id: 1,
             name: 'Shoes',
@@ -98,7 +97,6 @@ describe('CategoriesAsyncCombobox', () => {
       data: {
         content: [
           {
-            color: '#2563eb',
             createdAt: '2026-07-01T10:54:34.839Z',
             id: 1,
             name: 'Shoes',

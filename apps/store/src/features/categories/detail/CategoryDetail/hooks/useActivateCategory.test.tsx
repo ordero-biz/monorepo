@@ -66,7 +66,6 @@ describe('useActivateCategory', () => {
         id: 2,
         name: 'Sneakers',
         sortOrder: 15,
-        color: '#16a34a',
         createdAt: '2026-07-01T11:22:53.562Z',
         parentCategory: null,
       },

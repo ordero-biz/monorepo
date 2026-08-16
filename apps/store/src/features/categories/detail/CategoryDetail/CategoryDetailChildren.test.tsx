@@ -27,7 +27,6 @@ const children: Category[] = [
     name: 'Running shoes',
     sortOrder: 20,
     status: CATEGORY_STATUS.ACTIVE,
-    color: '#15803d',
     createdAt: '2026-07-01T11:22:53.562Z',
     parentCategory: {
       id: 2,

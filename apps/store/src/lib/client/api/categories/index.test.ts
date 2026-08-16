@@ -39,7 +39,6 @@ describe('category client helpers', () => {
               id: 1,
               name: 'Shoes',
               sortOrder: 10,
-              color: '#2563eb',
               createdAt: '2026-07-01T10:54:34.839Z',
               parentCategory: {
                 id: 2,
@@ -66,7 +65,6 @@ describe('category client helpers', () => {
             id: 1,
             name: 'Shoes',
             sortOrder: 10,
-            color: '#2563eb',
             createdAt: '2026-07-01T10:54:34.839Z',
             parentCategory: {
               id: 2,
@@ -127,7 +125,6 @@ describe('category client helpers', () => {
           id: 3,
           name: 'Sneakers',
           sortOrder: 15,
-          color: '#16a34a',
           createdAt: '2026-07-01T11:22:53.562Z',
           parentCategory: {
             id: 1,
@@ -150,7 +147,6 @@ describe('category client helpers', () => {
         id: 3,
         name: 'Sneakers',
         sortOrder: 15,
-        color: '#16a34a',
         createdAt: '2026-07-01T11:22:53.562Z',
         parentCategory: {
           id: 1,
@@ -215,7 +211,6 @@ describe('category client helpers', () => {
       id: 3,
       name: 'Sneakers',
       sortOrder: 15,
-      color: '#16a34a',
       createdAt: '2026-07-01T11:22:53.562Z',
     };
 
@@ -242,7 +237,6 @@ describe('category client helpers', () => {
         id: 3,
         name: 'Running shoes',
         sortOrder: 20,
-        color: '#15803d',
         createdAt: '2026-07-01T11:22:53.562Z',
         parentCategory: {
           id: 2,
@@ -299,7 +293,6 @@ describe('category client helpers', () => {
       id: 3,
       name: 'Running shoes',
       sortOrder: 20,
-      color: '#15803d',
       createdAt: '2026-07-01T11:22:53.562Z',
     };
 
@@ -336,7 +329,6 @@ describe('category client helpers', () => {
       name: 'Running shoes',
       sortOrder: 20,
       status: 'ACTIVE' as const,
-      color: '#15803d',
       createdAt: '2026-07-01T11:22:53.562Z',
     };
 
