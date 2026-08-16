@@ -111,6 +111,48 @@ describe('CreateCategoryDialog', () => {
     ).toBeVisible();
   });
 
+  it('forces Draft when the selected parent category is a draft', async () => {
+    getCategoriesMock.mockResolvedValue({
+      ok: true,
+      data: {
+        content: [
+          {
+            id: 1,
+            name: 'Shoes',
+            sortOrder: 10,
+            color: '#2563eb',
+            createdAt: '2026-07-01T10:54:34.839Z',
+            status: 'DRAFT',
+          },
+        ],
+        page: { number: 0, size: 100, totalElements: 1, totalPages: 1 },
+      },
+    });
+    const user = userEvent.setup();
+
+    setup();
+
+    const dialog = screen.getByRole('dialog', { name: 'Add new category' });
+
+    await user.click(within(dialog).getByRole('radio', { name: /^Active\b/ }));
+    await user.click(
+      within(dialog).getByRole('combobox', { name: 'Parent category' })
+    );
+    await user.click(await screen.findByRole('option', { name: 'Shoes' }));
+
+    expect(
+      within(dialog).getByRole('radio', { name: /^Active\b/ })
+    ).toHaveAttribute('aria-disabled', 'true');
+    expect(
+      within(dialog).getByText(
+        'Cannot be selected because the parent category is a draft'
+      )
+    ).toBeVisible();
+    expect(
+      within(dialog).getByRole('button', { name: 'Save draft' })
+    ).toBeVisible();
+  });
+
   it('creates a category with the selected parent category', async () => {
     createCategoryMock.mockResolvedValue({
       ok: true,

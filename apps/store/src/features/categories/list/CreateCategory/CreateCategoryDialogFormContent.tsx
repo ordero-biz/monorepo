@@ -6,7 +6,9 @@ import {
   TextField,
   Typography,
 } from '@ordero/ui';
+import { useState } from 'react';
 import { CategoriesAsyncCombobox } from '@/features/categories';
+import { CATEGORY_STATUS, type Category } from '@/lib/domain/categories';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
 import {
   validateCategoryName,
@@ -25,6 +27,9 @@ const PARENT_CATEGORY_STATIC_OPTIONS = [
 export const CreateCategoryDialogFormContent = ({
   form,
 }: CreateCategoryDialogFormContentProps) => {
+  const [parentStatus, setParentStatus] = useState<Category['status']>();
+  const hasDraftParent = parentStatus?.toLowerCase() === 'draft';
+
   return (
     <>
       <Dialog.Content>
@@ -72,6 +77,15 @@ export const CreateCategoryDialogFormContent = ({
                   label="Parent category"
                   name={field.name}
                   onBlur={field.handleBlur}
+                  onOptionSelect={(option) => {
+                    const category = option?.data as Category | undefined;
+
+                    setParentStatus(category?.status);
+
+                    if (category?.status?.toLowerCase() === CATEGORY_STATUS.DRAFT.toLowerCase()) {
+                      form.setFieldValue('status', CATEGORY_STATUS.DRAFT);
+                    }
+                  }}
                   onValueChange={field.handleChange}
                   placeholder=""
                   size="s"
@@ -101,13 +115,13 @@ export const CreateCategoryDialogFormContent = ({
                       label="Category status"
                       name={field.name}
                       onValueChange={(value) =>
-                        field.handleChange(value as 'draft' | 'active')
+                        field.handleChange(value as 'DRAFT' | 'ACTIVE')
                       }
                       orientation="vertical"
                       required
                       value={field.state.value}
                     >
-                      <Radio value="draft" align="start">
+                      <Radio value={CATEGORY_STATUS.DRAFT} align="start">
                         <div className="flex flex-col">
                           Draft
                           <Typography color="text-secondary" variant="caption">
@@ -116,11 +130,13 @@ export const CreateCategoryDialogFormContent = ({
                           </Typography>
                         </div>
                       </Radio>
-                      <Radio value="active" align="start">
+                      <Radio disabled={hasDraftParent} value={CATEGORY_STATUS.ACTIVE} align="start">
                         <div className="flex flex-col">
                           Active
-                          <Typography color="text-secondary" variant="caption">
-                            Fully functional. Can be assigned to products and tracked in analytics. Cannot be edited after publishing
+                          <Typography color={hasDraftParent ? 'warning' : 'text-secondary'} variant="caption">
+                            {hasDraftParent
+                              ? 'Cannot be selected because the parent category is a draft'
+                              : 'Fully functional. Can be assigned to products and tracked in analytics. Cannot be edited after publishing'}
                           </Typography>
                         </div>
                       </Radio>
@@ -140,10 +156,10 @@ export const CreateCategoryDialogFormContent = ({
           {([isSubmitting, status]) => (
             <Button type="submit">
               {isSubmitting
-                ? status === 'draft'
+                ? status === CATEGORY_STATUS.DRAFT
                   ? 'Saving...'
                   : 'Publishing...'
-                : status === 'draft'
+                : status === CATEGORY_STATUS.DRAFT
                   ? 'Save draft'
                   : 'Publish'}
             </Button>

@@ -27,6 +27,7 @@ const loadCategoryOptions = async ({
   return {
     nextPage: page < result.data.page.totalPages ? page + 1 : undefined,
     options: result.data.content.map((category) => ({
+      data: category,
       label: category.name,
       value: String(category.id),
     })),
@@ -61,6 +62,7 @@ export const CategoriesAsyncCombobox = ({
   onKeyDown,
   onListScroll,
   onOpenChange,
+  onOptionSelect,
   onValueChange,
   open,
   placeholder,
@@ -116,6 +118,7 @@ export const CategoriesAsyncCombobox = ({
       onKeyDown={onKeyDown}
       onListScroll={onListScroll}
       onOpenChange={onOpenChange}
+      onOptionSelect={onOptionSelect}
       onValueChange={onValueChange}
       open={open}
       pageSize={100}

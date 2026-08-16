@@ -1,8 +1,9 @@
 import { z } from 'zod';
+import { CATEGORY_STATUS } from '@/lib/domain/categories';
 import type { ValidationArgs } from '@/lib/utils/form/validation/types';
 import type { CategoryFormValues } from '../../../shared/validations';
 
-export const categoryStatusSchema = z.enum(['draft', 'active'], {
+export const categoryStatusSchema = z.enum([CATEGORY_STATUS.DRAFT, CATEGORY_STATUS.ACTIVE], {
   error: 'Category status is required',
 });
 
