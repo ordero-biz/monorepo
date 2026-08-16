@@ -71,6 +71,7 @@ describe('CategoryList', () => {
               id: 1,
               name: 'Shoes',
               sortOrder: 10,
+              status: 'ACTIVE',
               color: '#2563eb',
               createdAt: '2026-07-01T10:54:34.839Z',
               parentCategory: {
@@ -112,6 +113,7 @@ describe('CategoryList', () => {
             id: 1,
             name: 'Shoes',
             sortOrder: 10,
+            status: 'ACTIVE',
             color: '#2563eb',
             createdAt: '2026-07-01T10:54:34.839Z',
             parentCategory: {
@@ -137,6 +139,7 @@ describe('CategoryList', () => {
     ).toBeVisible();
     expect(screen.getByText('Shoes')).toBeVisible();
     expect(screen.getByText('Fashion')).toBeVisible();
+    expect(screen.getByText('Active')).toBeVisible();
     expect(screen.getByText('01 Jul 2026')).toBeVisible();
     expect(screen.getByText('1-1 of 1')).toBeVisible();
   });
@@ -150,6 +153,7 @@ describe('CategoryList', () => {
             id: 2,
             name: 'Accessories',
             sortOrder: 20,
+            status: 'DRAFT',
             color: '#16a34a',
             createdAt: '2026-07-02T10:54:34.839Z',
             parentCategory: null,
@@ -173,6 +177,7 @@ describe('CategoryList', () => {
 
     expect(await screen.findByText('Accessories')).toBeVisible();
     expect(screen.getByText('None')).toBeVisible();
+    expect(screen.getByText('Draft')).toBeVisible();
     expect(screen.getByText('2-2 of 2')).toBeVisible();
   });
 
