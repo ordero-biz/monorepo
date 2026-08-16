@@ -154,7 +154,12 @@ export type {
 export { PageHeader } from './components/PageHeader';
 export type { PasswordFieldProps } from './components/PasswordField';
 export { PasswordField } from './components/PasswordField';
-export type { RadioColor, RadioProps, RadioSize } from './components/Radio';
+export type {
+  RadioAlignment,
+  RadioColor,
+  RadioProps,
+  RadioSize,
+} from './components/Radio';
 export { Radio } from './components/Radio';
 export type {
   RadioGroupOrientation,

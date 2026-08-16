@@ -112,6 +112,7 @@ const getLabelColorClassName = ({ disabled }: { disabled: boolean }) =>
   disabled ? 'text-[var(--text-disabled)]' : 'text-[var(--text-primary)]';
 
 export const Radio = ({
+  align: alignProp,
   'aria-describedby': ariaDescribedBy,
   'aria-label': ariaLabel,
   'aria-labelledby': ariaLabelledBy,
@@ -132,6 +133,7 @@ export const Radio = ({
   title,
   value,
 }: RadioProps) => {
+  const align = alignProp ?? 'center';
   const generatedId = useId();
   const controlId = id ?? generatedId;
   const generatedLabelId = useId();
@@ -181,7 +183,10 @@ export const Radio = ({
   return (
     <label
       className={cn(
-        'inline-flex max-w-fit items-center gap-0 align-top',
+        'inline-flex max-w-fit gap-0 align-top',
+        align === 'start' && 'items-start',
+        align === 'center' && 'items-center',
+        align === 'end' && 'items-end',
         disabled ? 'cursor-not-allowed' : 'cursor-pointer'
       )}
       htmlFor={controlId}
