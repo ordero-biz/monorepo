@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "dev:local": "node scripts/start-dev.mjs local --port 3001",
-    "dev:remote": "node scripts/start-dev.mjs remote --port 3001",
+    "dev:local": "dotenv -e .env.backend-local -- next dev --port 3001",
+    "dev:remote": "dotenv -e .env.backend-remote -- next dev --port 3001",
     "build": "next build",
     "start": "next start",
     "lint": "biome check",
@@ -43,6 +43,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@vitejs/plugin-react": "^5.1.4",
+    "dotenv-cli": "^11.0.0",
     "jsdom": "^28.1.0",
     "tailwindcss": "^4.3.1",
     "typescript": "^5",
