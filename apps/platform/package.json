@@ -4,6 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:local": "node scripts/start-dev.mjs local",
+    "dev:remote": "node scripts/start-dev.mjs remote",
     "build": "next build",
     "start": "next start",
     "lint": "biome check",
