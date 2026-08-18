@@ -8,7 +8,7 @@
     "dev": {
       "cache": false
     },
-    "dev:local": {
+    "dev:remote": {
       "cache": false
     },
     "lint": {
