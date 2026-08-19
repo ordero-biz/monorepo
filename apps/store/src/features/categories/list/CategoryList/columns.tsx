@@ -6,7 +6,7 @@ import {
 } from '@ordero/ui';
 import Link from 'next/link';
 import { getCategoryDetailRoute } from '@/lib/client/routes';
-import type { Category } from '@/lib/domain/categories';
+import type { Category } from '@/lib/domain/categories/types';
 import { formatDate } from '@/lib/utils/formatDate';
 
 const statusLabels = {

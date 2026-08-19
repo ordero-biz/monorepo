@@ -3,7 +3,7 @@
 import { Button, Dialog, TextField } from '@ordero/ui';
 import { useQueryClient } from '@tanstack/react-query';
 import { useRef, useState } from 'react';
-import type { Attribute } from '@/lib/domain/attributes';
+import type { Attribute } from '@/lib/domain/attributes/types';
 import { attributesQueryKeys } from '@/lib/query/attributes/attributesQueryKeys';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
 import { useUpdateAttributeForm } from './hooks/useUpdateAttributeForm';

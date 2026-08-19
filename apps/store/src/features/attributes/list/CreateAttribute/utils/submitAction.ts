@@ -1,17 +1,25 @@
 import { createAttribute } from '@/lib/client/api/attributes';
+import { ATTRIBUTE_STATUS } from '@/lib/domain/attributes/constants';
 import type {
   AttributeValueFormValue,
   CreateAttributeFormValues,
 } from './validations';
 
-const normalizeAttributeValues = (attributeValues: AttributeValueFormValue[]) =>
-  attributeValues
-    .map((attributeValue) => attributeValue.value.trim())
-    .filter(Boolean)
-    .map((name) => ({
-      name,
-      sortOrder: 0,
-    }));
+const normalizeAttributeValues = ({
+  attributeStatus,
+  attributeValues,
+}: {
+  attributeStatus: CreateAttributeFormValues['status'];
+  attributeValues: AttributeValueFormValue[];
+}) =>
+  attributeValues.map((attributeValue) => ({
+    name: attributeValue.value.trim(),
+    sortOrder: 0,
+    status:
+      attributeStatus === ATTRIBUTE_STATUS.DRAFT
+        ? ATTRIBUTE_STATUS.DRAFT
+        : attributeValue.status,
+  }));
 
 export const submitCreateAttribute = async (
   value: CreateAttributeFormValues
@@ -19,7 +27,11 @@ export const submitCreateAttribute = async (
   const result = await createAttribute({
     name: value.name.trim(),
     sortOrder: 0,
-    attributeValues: normalizeAttributeValues(value.attributeValues),
+    status: value.status,
+    attributeValues: normalizeAttributeValues({
+      attributeStatus: value.status,
+      attributeValues: value.attributeValues,
+    }).filter((attributeValue) => attributeValue.name),
   });
 
   if (!result.ok) {

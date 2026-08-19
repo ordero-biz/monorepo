@@ -8,7 +8,11 @@ import {
 } from '@ordero/ui';
 import { useState } from 'react';
 import { CategoriesAsyncCombobox } from '@/features/categories';
-import { CATEGORY_STATUS, type Category, type CategoryStatus } from '@/lib/domain/categories';
+import { CATEGORY_STATUS } from '@/lib/domain/categories/constants';
+import type {
+  Category,
+  CategoryStatus,
+} from '@/lib/domain/categories/types';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
 import {
   validateCategoryName,
@@ -136,7 +140,7 @@ export const CreateCategoryDialogFormContent = ({
                           Active
                           <Typography color={hasDraftParent ? 'warning' : 'text-secondary'} variant="caption">
                             {hasDraftParent
-                              ? 'Cannot be selected because the parent category is a draft'
+                              ? 'Parent category is a draft. Choose an active parent to enable this'
                               : 'Fully functional. Can be assigned to products and tracked in analytics. Cannot be edited after publishing'}
                           </Typography>
                         </div>

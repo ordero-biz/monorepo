@@ -1,7 +1,8 @@
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getCategory, updateCategory } from '@/lib/client/api/categories';
-import { CATEGORY_STATUS, type Category } from '@/lib/domain/categories';
+import { CATEGORY_STATUS } from '@/lib/domain/categories/constants';
+import type { Category } from '@/lib/domain/categories/types';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { CategoryDetail } from './CategoryDetail';
 

@@ -143,7 +143,7 @@ describe('CreateCategoryDialog', () => {
     ).toHaveAttribute('aria-disabled', 'true');
     expect(
       within(dialog).getByText(
-        'Cannot be selected because the parent category is a draft'
+        'Parent category is a draft. Choose an active parent to enable this'
       )
     ).toBeVisible();
     expect(

@@ -1,4 +1,5 @@
 import { createAttribute } from '@/lib/client/api/attributes';
+import { ATTRIBUTE_STATUS } from '@/lib/domain/attributes/constants';
 import { submitCreateAttribute } from './submitAction';
 
 vi.mock('@/lib/client/api/attributes', async () => ({
@@ -30,17 +31,21 @@ describe('submitCreateAttribute', () => {
     await expect(
       submitCreateAttribute({
         name: '  Material  ',
+        status: ATTRIBUTE_STATUS.ACTIVE,
         attributeValues: [
           {
             id: 'attribute-value-0',
+            status: ATTRIBUTE_STATUS.ACTIVE,
             value: '  Cotton  ',
           },
           {
             id: 'attribute-value-1',
+            status: ATTRIBUTE_STATUS.DRAFT,
             value: '   ',
           },
           {
             id: 'attribute-value-2',
+            status: ATTRIBUTE_STATUS.DRAFT,
             value: 'Linen',
           },
         ],
@@ -53,14 +58,17 @@ describe('submitCreateAttribute', () => {
     expect(createAttributeMock).toHaveBeenCalledWith({
       name: 'Material',
       sortOrder: 0,
+      status: ATTRIBUTE_STATUS.ACTIVE,
       attributeValues: [
         {
           name: 'Cotton',
           sortOrder: 0,
+          status: ATTRIBUTE_STATUS.ACTIVE,
         },
         {
           name: 'Linen',
           sortOrder: 0,
+          status: ATTRIBUTE_STATUS.DRAFT,
         },
       ],
     });
@@ -81,6 +89,7 @@ describe('submitCreateAttribute', () => {
     await expect(
       submitCreateAttribute({
         name: 'Material',
+        status: ATTRIBUTE_STATUS.DRAFT,
         attributeValues: [],
       })
     ).resolves.toEqual({
@@ -91,6 +100,44 @@ describe('submitCreateAttribute', () => {
         },
         formError: 'Attribute creation failed.',
       },
+    });
+  });
+
+  it('forces all values to draft when the attribute is a draft', async () => {
+    const attribute = {
+      id: 7,
+      name: 'Material',
+      sortOrder: 10,
+      createdAt: '2026-05-26T20:55:51.542Z',
+    };
+    createAttributeMock.mockResolvedValue({
+      ok: true,
+      data: attribute,
+    });
+
+    await submitCreateAttribute({
+      name: 'Material',
+      status: ATTRIBUTE_STATUS.DRAFT,
+      attributeValues: [
+        {
+          id: 'attribute-value-0',
+          status: ATTRIBUTE_STATUS.ACTIVE,
+          value: 'Cotton',
+        },
+      ],
+    });
+
+    expect(createAttributeMock).toHaveBeenCalledWith({
+      name: 'Material',
+      sortOrder: 0,
+      status: ATTRIBUTE_STATUS.DRAFT,
+      attributeValues: [
+        {
+          name: 'Cotton',
+          sortOrder: 0,
+          status: ATTRIBUTE_STATUS.DRAFT,
+        },
+      ],
     });
   });
 });

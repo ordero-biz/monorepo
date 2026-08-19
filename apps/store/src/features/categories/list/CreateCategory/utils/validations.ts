@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { CATEGORY_STATUS } from '@/lib/domain/categories';
+import { CATEGORY_STATUS } from '@/lib/domain/categories/constants';
 import type { ValidationArgs } from '@/lib/utils/form/validation/types';
 import type { CategoryFormValues } from '../../../shared/validations';
 
