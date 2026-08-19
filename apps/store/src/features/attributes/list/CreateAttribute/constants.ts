@@ -11,3 +11,14 @@ export const createAttributeDefaultValues: CreateAttributeFormValues = {
     getEmptyAttributeValueField(INITIAL_ATTRIBUTE_VALUE_FIELD_INDEX),
   ],
 };
+
+export const ATTRIBUTE_VALUE_STATUS_OPTIONS = [
+  {
+    label: 'Draft',
+    value: ATTRIBUTE_STATUS.DRAFT,
+  },
+  {
+    label: 'Active',
+    value: ATTRIBUTE_STATUS.ACTIVE,
+  },
+];

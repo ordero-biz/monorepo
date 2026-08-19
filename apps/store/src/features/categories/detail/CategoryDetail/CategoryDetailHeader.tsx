@@ -27,7 +27,7 @@ export const CategoryDetailHeader = ({
         {category.status ? (
           <Chip
             color={isCategoryActive ? 'primary' : 'warning'}
-            size="m"
+            size="s"
             variant="soft"
           >
             {statusLabels[category.status]}

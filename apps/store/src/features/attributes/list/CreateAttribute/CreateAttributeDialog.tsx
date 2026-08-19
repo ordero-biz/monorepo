@@ -19,7 +19,7 @@ import { ATTRIBUTE_STATUS } from '@/lib/domain/attributes/constants';
 import type { AttributeStatus } from '@/lib/domain/attributes/types';
 import { attributesQueryKeys } from '@/lib/query/attributes/attributesQueryKeys';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
-import { INITIAL_ATTRIBUTE_VALUE_FIELD_INDEX } from './constants';
+import {ATTRIBUTE_VALUE_STATUS_OPTIONS, INITIAL_ATTRIBUTE_VALUE_FIELD_INDEX} from './constants';
 import { useCreateAttributeForm } from './hooks/useCreateAttributeForm';
 import type { CreateAttributeDialogProps } from './types';
 import {
@@ -31,17 +31,6 @@ import {
   validateAttributeStatus,
   validateAttributeValueStatus,
 } from './utils/validations';
-
-const ATTRIBUTE_VALUE_STATUS_OPTIONS = [
-  {
-    label: 'Draft',
-    value: ATTRIBUTE_STATUS.DRAFT,
-  },
-  {
-    label: 'Active',
-    value: ATTRIBUTE_STATUS.ACTIVE,
-  },
-];
 
 export const CreateAttributeDialog = ({
   onOpenChange,
