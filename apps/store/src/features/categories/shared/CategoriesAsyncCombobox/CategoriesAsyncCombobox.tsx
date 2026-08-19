@@ -2,7 +2,7 @@
 
 import { useCallback, useMemo } from 'react';
 import { Chip } from '@ordero/ui';
-import { CATEGORY_STATUS } from '@/lib/domain/categories';
+import { CATEGORY_STATUS } from '@/lib/domain/categories/constants';
 import { getCategories } from '@/lib/client/api/categories';
 import {
   AsyncCombobox,

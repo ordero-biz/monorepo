@@ -1,7 +1,7 @@
 'use client';
 
 import { apiFetch } from '@ordero/api-client';
-import type { Category, CategoryStatus } from '@/lib/domain/categories';
+import type { Category, CategoryStatus } from '@/lib/domain/categories/types';
 import type { PaginatedResponse } from '@/lib/server/types';
 import { tokenizePath } from '@/lib/utils/tokenizePath';
 import {

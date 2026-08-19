@@ -42,7 +42,7 @@ describe('CreateAttributeDialog', () => {
     routerPushMock.mockClear();
   });
 
-  it('requires an attribute name before create is available', async () => {
+  it('keeps submit available while showing attribute name validation', async () => {
     const user = userEvent.setup();
 
     setup();
@@ -51,9 +51,11 @@ describe('CreateAttributeDialog', () => {
     const nameField = within(dialog).getByRole('textbox', {
       name: 'Name',
     });
-    const createButton = within(dialog).getByRole('button', { name: 'Add' });
+    const createButton = within(dialog).getByRole('button', {
+      name: 'Save draft',
+    });
 
-    expect(createButton).toBeDisabled();
+    expect(createButton).toBeEnabled();
 
     await user.type(nameField, '   ');
     await user.tab();
@@ -61,12 +63,74 @@ describe('CreateAttributeDialog', () => {
     expect(
       within(dialog).getByText('Attribute name is required')
     ).toBeVisible();
-    expect(createButton).toBeDisabled();
+    expect(createButton).toBeEnabled();
 
     await user.clear(nameField);
     await user.type(nameField, 'Material');
 
     expect(createButton).toBeEnabled();
+  });
+
+  it('locks value statuses for draft attributes and unlocks them when active', async () => {
+    const user = userEvent.setup();
+
+    setup();
+
+    const dialog = screen.getByRole('dialog', { name: 'Add new attribute' });
+    const valueStatus = within(dialog).getByRole('combobox', {
+      name: 'Attribute value status 1',
+    });
+
+    expect(
+      within(dialog).getByRole('radiogroup', { name: 'Attribute status' })
+    ).toBeRequired();
+    expect(
+      within(dialog).getByText(
+        'Editable only. Cannot be assigned to products or tracked in analytics. Can be activated later'
+      )
+    ).toBeVisible();
+    expect(
+      within(dialog).getByText(
+        'Fully functional. Can be assigned to products and tracked in analytics. Cannot be edited after publishing'
+      )
+    ).toBeVisible();
+    expect(
+      within(dialog).getByRole('radio', { name: /^Draft\b/ })
+    ).toBeChecked();
+    expect(valueStatus).toBeDisabled();
+    expect(valueStatus).toBeRequired();
+    expect(
+      within(dialog).getByText(
+        'Attribute values cannot be active while the attribute is a draft'
+      )
+    ).toBeVisible();
+    expect(
+      within(dialog).getByRole('button', { name: 'Save draft' })
+    ).toBeVisible();
+
+    await user.click(within(dialog).getByRole('radio', { name: /^Active\b/ }));
+
+    expect(valueStatus).toBeEnabled();
+    expect(
+      within(dialog).queryByText(
+        'Attribute values cannot be active while the attribute is a draft'
+      )
+    ).not.toBeInTheDocument();
+    expect(
+      within(dialog).getByRole('button', { name: 'Publish' })
+    ).toBeVisible();
+
+    await user.click(valueStatus);
+    await user.click(await screen.findByRole('option', { name: 'Active' }));
+
+    await user.click(within(dialog).getByRole('radio', { name: /^Draft\b/ }));
+
+    expect(valueStatus).toBeDisabled();
+    expect(
+      within(dialog).getByText(
+        'Attribute values cannot be active while the attribute is a draft'
+      )
+    ).toBeVisible();
   });
 
   it('adds, focuses, and removes attribute value fields dynamically', async () => {
@@ -152,19 +216,24 @@ describe('CreateAttributeDialog', () => {
       within(dialog).getByRole('textbox', { name: 'Attribute value 2' }),
       'Blue'
     );
-    await user.click(within(dialog).getByRole('button', { name: 'Add' }));
+    await user.click(
+      within(dialog).getByRole('button', { name: 'Save draft' })
+    );
 
     expect(createAttributeMock).toHaveBeenCalledWith({
       name: 'Material',
       sortOrder: 0,
+      status: 'DRAFT',
       attributeValues: [
         {
           name: 'Green',
           sortOrder: 0,
+          status: 'DRAFT',
         },
         {
           name: 'Blue',
           sortOrder: 0,
+          status: 'DRAFT',
         },
       ],
     });
@@ -204,15 +273,19 @@ describe('CreateAttributeDialog', () => {
     await user.click(
       within(dialog).getByRole('button', { name: '+ Add another value' })
     );
-    await user.click(within(dialog).getByRole('button', { name: 'Add' }));
+    await user.click(
+      within(dialog).getByRole('button', { name: 'Save draft' })
+    );
 
     expect(createAttributeMock).toHaveBeenCalledWith({
       name: 'Material',
       sortOrder: 0,
+      status: 'DRAFT',
       attributeValues: [
         {
           name: 'Green',
           sortOrder: 0,
+          status: 'DRAFT',
         },
       ],
     });
@@ -245,12 +318,14 @@ describe('CreateAttributeDialog', () => {
 
     await user.type(nameField, 'Material');
 
-    const createButton = within(dialog).getByRole('button', { name: 'Add' });
+    const createButton = within(dialog).getByRole('button', {
+      name: 'Save draft',
+    });
 
     await user.click(createButton);
 
-    expect(createButton).toBeDisabled();
-    expect(screen.getByRole('button', { name: 'Adding...' })).toBeVisible();
+    expect(createButton).toBeEnabled();
+    expect(screen.getByRole('button', { name: 'Saving...' })).toBeVisible();
     expect(attributeValueField).toBeDisabled();
     expect(addAnotherValueButton).toBeDisabled();
     expect(
@@ -267,7 +342,7 @@ describe('CreateAttributeDialog', () => {
       },
     });
 
-    await screen.findByRole('button', { name: 'Add' });
+    await screen.findByRole('button', { name: 'Save draft' });
   });
 
   it('shows backend errors and keeps the dialog open when submit fails', async () => {
@@ -291,11 +366,14 @@ describe('CreateAttributeDialog', () => {
     });
 
     await user.type(nameField, 'Material');
-    await user.click(within(dialog).getByRole('button', { name: 'Add' }));
+    await user.click(
+      within(dialog).getByRole('button', { name: 'Save draft' })
+    );
 
     expect(createAttributeMock).toHaveBeenCalledWith({
       name: 'Material',
       sortOrder: 0,
+      status: 'DRAFT',
       attributeValues: [],
     });
     expect(

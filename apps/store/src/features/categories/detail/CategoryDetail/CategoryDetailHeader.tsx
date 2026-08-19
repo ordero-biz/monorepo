@@ -4,7 +4,7 @@ import { Chip, Menu, PageHeader, Typography } from '@ordero/ui';
 import { EllipsisVertical, Pencil } from 'lucide-react';
 import { useState } from 'react';
 import { UpdateCategoryDialog } from '@/features/categories/detail/UpdateCategory';
-import { CATEGORY_STATUS } from '@/lib/domain/categories';
+import { CATEGORY_STATUS } from '@/lib/domain/categories/constants';
 import { ActivateCategoryDialogTrigger } from './ActivateCategoryDialogTrigger';
 import type { CategoryDetailHeaderProps } from './types';
 
@@ -27,7 +27,7 @@ export const CategoryDetailHeader = ({
         {category.status ? (
           <Chip
             color={isCategoryActive ? 'primary' : 'warning'}
-            size="m"
+            size="s"
             variant="soft"
           >
             {statusLabels[category.status]}

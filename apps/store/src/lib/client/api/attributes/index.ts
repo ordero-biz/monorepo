@@ -1,7 +1,11 @@
 'use client';
 
 import { apiFetch } from '@ordero/api-client';
-import type { Attribute, AttributeValue } from '@/lib/domain/attributes';
+import type {
+  Attribute,
+  AttributeStatus,
+  AttributeValue,
+} from '@/lib/domain/attributes/types';
 import type { PaginatedResponse } from '@/lib/server/types';
 import { tokenizePath } from '@/lib/utils/tokenizePath';
 import {
@@ -63,9 +67,11 @@ export const createAttributeValues = ({
 type CreateAttributeInput = {
   name: string;
   sortOrder: number;
+  status: AttributeStatus;
   attributeValues: {
     name: string;
     sortOrder: number;
+    status: AttributeStatus;
   }[];
 };
 

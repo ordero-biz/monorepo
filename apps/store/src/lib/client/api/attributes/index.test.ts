@@ -279,14 +279,17 @@ describe('attribute client helpers', () => {
       createAttribute({
         name: 'Material',
         sortOrder: 0,
+        status: 'ACTIVE',
         attributeValues: [
           {
             name: 'Green',
             sortOrder: 0,
+            status: 'ACTIVE',
           },
           {
             name: 'Blue',
             sortOrder: 1,
+            status: 'DRAFT',
           },
         ],
       })
@@ -307,14 +310,17 @@ describe('attribute client helpers', () => {
         body: JSON.stringify({
           name: 'Material',
           sortOrder: 0,
+          status: 'ACTIVE',
           attributeValues: [
             {
               name: 'Green',
               sortOrder: 0,
+              status: 'ACTIVE',
             },
             {
               name: 'Blue',
               sortOrder: 1,
+              status: 'DRAFT',
             },
           ],
         }),
@@ -574,10 +580,12 @@ describe('attribute client helpers', () => {
       createAttribute({
         name: 'Material',
         sortOrder: 0,
+        status: 'DRAFT',
         attributeValues: [
           {
             name: 'Green',
             sortOrder: 0,
+            status: 'DRAFT',
           },
         ],
       })

@@ -1,6 +1,6 @@
 import { useToastManager } from '@ordero/ui';
 import { useForm } from '@tanstack/react-form';
-import type { Attribute } from '@/lib/domain/attributes';
+import type { Attribute } from '@/lib/domain/attributes/types';
 import { submitUpdateAttribute } from '../utils/submitAction';
 
 type UseUpdateAttributeFormArgs = {

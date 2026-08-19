@@ -2,11 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Eye, Search } from 'lucide-react';
 import { Button } from '@/ui/components/Button';
 import { IconButton } from '@/ui/components/IconButton';
-import {
-  Input,
-  type InputProps,
-  type InputVariant,
-} from '@/ui/components/Input';
+import { Input, type InputProps } from '@/ui/components/Input';
 
 const previewGridClassName = 'grid gap-8 md:grid-cols-2';
 const previewColumnClassName = 'min-w-0';

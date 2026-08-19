@@ -2,7 +2,7 @@ import type { ApiError } from '@ordero/api-types';
 import { useToastManager } from '@ordero/ui';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { updateCategory } from '@/lib/client/api/categories';
-import { CATEGORY_STATUS } from '@/lib/domain/categories';
+import { CATEGORY_STATUS } from '@/lib/domain/categories/constants';
 import { categoriesQueryKeys } from '@/lib/query/categories/categoriesQueryKeys';
 
 type UseActivateCategoryArgs = {

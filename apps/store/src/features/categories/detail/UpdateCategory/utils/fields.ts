@@ -1,4 +1,4 @@
-import type { Category } from '@/lib/domain/categories';
+import type { Category } from '@/lib/domain/categories/types';
 import type { CategoryFormValues } from '../../../shared/validations';
 
 export const getCategoryDefaultValues = (

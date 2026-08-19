@@ -5,7 +5,7 @@ import {
   Menu,
 } from '@ordero/ui';
 import { EllipsisVertical, Pencil, Trash2 } from 'lucide-react';
-import type { AttributeValue } from '@/lib/domain/attributes';
+import type { AttributeValue } from '@/lib/domain/attributes/types';
 
 type GetColumnsArgs = {
   onDeleteAttributeValue: (attributeValue: AttributeValue) => void;

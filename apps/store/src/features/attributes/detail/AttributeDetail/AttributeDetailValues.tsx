@@ -11,7 +11,7 @@ import {
 import { Trash2 } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { BaseLayoutContextualActionBar } from '@/features/app-shell';
-import type { AttributeValue } from '@/lib/domain/attributes';
+import type { AttributeValue } from '@/lib/domain/attributes/types';
 import { useAttributeValuesQuery } from '@/lib/hooks/attributes/useAttributeValuesQuery';
 import {
   DeleteAttributeValueDialog,

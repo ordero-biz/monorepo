@@ -1,5 +1,5 @@
 import type { AsyncComboboxSingleProps } from '@/lib/components/AsyncCombobox';
-import type { Category } from '@/lib/domain/categories';
+import type { Category } from '@/lib/domain/categories/types';
 
 export type CategoriesAsyncComboboxProps = Omit<
   AsyncComboboxSingleProps,
