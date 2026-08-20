@@ -221,6 +221,10 @@ from the backend. Keep feature-facing request helpers under
 `src/lib/client/api/[resource]/index.ts` and use the generic `apiFetch()`
 transport/error-normalization helper from `@ordero/api-client`.
 
+Keep request DTOs next to the API helper rather than deriving them from feature
+form-value types. For partial updates, feature submit utilities normalize and
+compare form values, then call the helper with only changed DTO fields.
+
 ```mermaid
 sequenceDiagram
   participant UI as Client UI

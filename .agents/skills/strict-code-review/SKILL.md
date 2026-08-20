@@ -383,8 +383,16 @@ Expect these boundaries:
 - backend endpoint constants live in `src/lib/server/api/path.ts`
 - app-domain schemas, app routes, form payloads, and feature request helpers
   stay app-owned unless multiple apps truly need them
+- client API DTOs stay near their API helper and do not import or derive from
+  feature form-value types
 - app-wide Query, toast, and similar providers are added through
   `src/app/AppProviders.tsx`
+
+For PATCH request changes, verify that feature submit utilities compare
+normalized initial and current values and call the API with only changed fields.
+Raise a finding when a PATCH helper receives unchanged form fields, or when an
+API DTO is narrowed to a specific form and no longer supports valid non-form
+callers.
 
 Raise a finding when a change crosses these boundaries without a clear reason,
 such as putting a platform-only store model into `@ordero/api-types`, importing
