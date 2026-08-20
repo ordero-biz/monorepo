@@ -24,18 +24,15 @@ describe('submitUpdateCategory', () => {
     updateCategoryMock.mockReset();
   });
 
-  it('sends null without unchanged fields when removing the parent category', async () => {
+  it('transfers prepared category update data', async () => {
     updateCategoryMock.mockResolvedValue({
       ok: true,
       data: { ...category, parentCategory: undefined },
     });
 
     await submitUpdateCategory({
-      initialData: category,
-      submitData: {
-        name: 'Sneakers',
-        parentId: null,
-      },
+      categoryId: category.id,
+      submitData: { parentId: null },
     });
 
     expect(updateCategoryMock).toHaveBeenCalledWith({

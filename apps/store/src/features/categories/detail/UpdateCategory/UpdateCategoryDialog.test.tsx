@@ -114,7 +114,8 @@ describe('UpdateCategoryDialog', () => {
 
     expect(updateCategoryMock).not.toHaveBeenCalled();
     await waitFor(() => expect(onOpenChange).toHaveBeenCalledWith(false));
-    expect(onUpdated).toHaveBeenCalled();
+    expect(onUpdated).not.toHaveBeenCalled();
+    expect(screen.queryByText(/was updated/)).not.toBeInTheDocument();
   });
 
   it('prevents the category itself from being selected as a parent', async () => {
