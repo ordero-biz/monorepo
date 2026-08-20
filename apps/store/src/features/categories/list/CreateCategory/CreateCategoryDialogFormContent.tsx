@@ -17,9 +17,9 @@ import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
 import {
   validateCategoryName,
   validateCategoryParentId,
+  validateCategoryStatus,
 } from '../../shared/validations';
 import type { CreateCategoryDialogFormContentProps } from './types';
-import { validateCategoryStatus } from './utils/validations';
 
 const PARENT_CATEGORY_STATIC_OPTIONS = [
   {

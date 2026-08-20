@@ -66,6 +66,20 @@ groups start competing inside the same component.
 
 ---
 
+## Partial Updates
+
+For a `PATCH` form, keep form values and API request data separate. Form values
+may use UI-specific representations such as `string | null` ids, while the API
+expects normalized values such as `number | null` and may also serve non-form
+commands.
+
+The feature submit utility should normalize both the initial and submitted form
+values, compare them, and pass only changed fields to the API helper. When no
+normalized fields changed, do not send a PATCH; let the workflow close or reset
+through its explicit no-op behavior.
+
+---
+
 ## Validation & UX Model
 
 To ensure a calmer, less intrusive user experience, implement this validation visibility model:

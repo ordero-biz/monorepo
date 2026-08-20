@@ -15,6 +15,7 @@ storybook-static
 
 # tooling
 .biome
+plan/
 
 # IDE
 .idea/
