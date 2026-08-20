@@ -1,6 +1,6 @@
 import {updateCategory, UpdateCategoryFieldData} from '@/lib/client/api/categories';
 import type { Category } from '@/lib/domain/categories/types';
-import { createPatchPayload } from '@/lib/utils/form/patch/createPatchPayload';
+import { getChangedValues } from '@/lib/utils/form/comparison/getChangedValues';
 import type { UpdateCategoryFormValues } from './validations';
 import { getCategoryDefaultValues } from './fields';
 
@@ -23,7 +23,7 @@ export const getCategoryUpdateChanges = ({
   category,
   formValue,
 }: GetCategoryUpdateChangesArgs) =>
-  createPatchPayload({
+  getChangedValues({
     initialData: normalizeUpdateCategoryFormData(getCategoryDefaultValues(category)),
     submitData: normalizeUpdateCategoryFormData(formValue),
   });

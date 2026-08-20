@@ -16,7 +16,7 @@ export const ActivateCategoryDialogTrigger = ({
       <Button
         color="primary"
         onClick={() => setOpen(true)}
-        size="s"
+        size="m"
         type="button"
       >
         Publish

@@ -1,9 +1,9 @@
-import { createPatchPayload } from './createPatchPayload';
+import { getChangedValues, type ChangedValues } from './getChangedValues';
 
-describe('createPatchPayload', () => {
+describe('getChangedValues', () => {
   it('returns undefined when values are unchanged', () => {
     expect(
-      createPatchPayload({
+      getChangedValues({
         initialData: {
           name: 'Shoes',
           parentId: 1,
@@ -18,7 +18,7 @@ describe('createPatchPayload', () => {
 
   it('includes only changed top-level values', () => {
     expect(
-      createPatchPayload({
+      getChangedValues({
         initialData: {
           name: 'Shoes',
           parentId: 1,
@@ -35,7 +35,7 @@ describe('createPatchPayload', () => {
 
   it('preserves the structure of changed nested values', () => {
     expect(
-      createPatchPayload({
+      getChangedValues({
         initialData: {
           name: 'Shoes',
           settings: {
@@ -60,7 +60,7 @@ describe('createPatchPayload', () => {
 
   it('preserves null values used to clear fields', () => {
     expect(
-      createPatchPayload({
+      getChangedValues({
         initialData: {
           parentId: 1 as number | null,
         },
@@ -73,9 +73,9 @@ describe('createPatchPayload', () => {
     });
   });
 
-  it('omits undefined values', () => {
+  it('preserves changed undefined values', () => {
     expect(
-      createPatchPayload({
+      getChangedValues({
         initialData: {
           description: 'All shoes' as string | undefined,
           name: 'Shoes',
@@ -86,13 +86,63 @@ describe('createPatchPayload', () => {
         },
       })
     ).toEqual({
+      description: undefined,
       name: 'Running shoes',
+    });
+  });
+
+  it('preserves removed nested values as undefined', () => {
+    type ProductValues = {
+      settings: {
+        description?: string;
+        title: string;
+      };
+    };
+
+    const expectedChanges: ChangedValues<ProductValues> = {
+      settings: {
+        description: undefined,
+      },
+    };
+
+    expect(
+      getChangedValues<ProductValues>({
+        initialData: {
+          settings: {
+            description: 'All shoes',
+            title: 'Footwear',
+          },
+        },
+        submitData: {
+          settings: {
+            title: 'Footwear',
+          },
+        },
+      })
+    ).toEqual(expectedChanges);
+  });
+
+  it('keeps non-plain objects as complete changed values', () => {
+    const initialDate = new Date('2026-01-01T00:00:00.000Z');
+    const submitDate = new Date('2026-01-02T00:00:00.000Z');
+
+    expect(
+      getChangedValues({
+        initialData: {
+          scheduledAt: initialDate,
+        },
+        submitData: {
+          scheduledAt: submitDate,
+        },
+      })
+    ).toEqual({
+      scheduledAt: submitDate,
     });
   });
 
   it('includes a complete changed array', () => {
     expect(
-      createPatchPayload({
+      getChangedValues({
         initialData: {
           tags: ['running', 'shoes'],
         },
@@ -107,7 +157,7 @@ describe('createPatchPayload', () => {
 
   it('omits an unchanged array', () => {
     expect(
-      createPatchPayload({
+      getChangedValues({
         initialData: {
           tags: [{ id: 1, name: 'Running' }],
         },
