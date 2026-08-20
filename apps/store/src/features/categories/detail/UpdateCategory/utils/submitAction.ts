@@ -1,12 +1,32 @@
-import { updateCategory } from '@/lib/client/api/categories';
+import {updateCategory, UpdateCategoryFieldData} from '@/lib/client/api/categories';
+import type { Category } from '@/lib/domain/categories/types';
+import { createPatchPayload } from '@/lib/utils/form/patch/createPatchPayload';
+import type { UpdateCategoryFormValues } from './validations';
+import { getCategoryDefaultValues } from './fields';
 
 type SubmitUpdateCategoryArgs = {
   categoryId: string | number;
-  submitData: {
-    name?: string;
-    parentId?: number | null;
-  };
+  submitData: UpdateCategoryFieldData;
 };
+
+type GetCategoryUpdateChangesArgs = {
+  category: Category;
+  formValue: UpdateCategoryFormValues;
+};
+
+const normalizeUpdateCategoryFormData = (data: UpdateCategoryFormValues) => ({
+  name: data.name.trim(),
+  parentId: data.parentId ? Number(data.parentId) : null,
+});
+
+export const getCategoryUpdateChanges = ({
+  category,
+  formValue,
+}: GetCategoryUpdateChangesArgs) =>
+  createPatchPayload({
+    initialData: normalizeUpdateCategoryFormData(getCategoryDefaultValues(category)),
+    submitData: normalizeUpdateCategoryFormData(formValue),
+  });
 
 export const submitUpdateCategory = async ({
   categoryId,

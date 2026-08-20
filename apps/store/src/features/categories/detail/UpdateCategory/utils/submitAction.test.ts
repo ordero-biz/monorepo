@@ -1,5 +1,5 @@
 import { updateCategory } from '@/lib/client/api/categories';
-import { submitUpdateCategory } from './submitAction';
+import { getCategoryUpdateChanges, submitUpdateCategory } from './submitAction';
 
 vi.mock('@/lib/client/api/categories', () => ({
   updateCategory: vi.fn(),
@@ -22,6 +22,33 @@ const category = {
 describe('submitUpdateCategory', () => {
   beforeEach(() => {
     updateCategoryMock.mockReset();
+  });
+
+  it('normalizes form values before creating the update patch', () => {
+    expect(
+      getCategoryUpdateChanges({
+        category,
+        formValue: {
+          name: ' Running shoes ',
+          parentId: null,
+        },
+      })
+    ).toEqual({
+      name: 'Running shoes',
+      parentId: null,
+    });
+  });
+
+  it('returns no patch when normalized form values are unchanged', () => {
+    expect(
+      getCategoryUpdateChanges({
+        category,
+        formValue: {
+          name: ' Sneakers ',
+          parentId: '1',
+        },
+      })
+    ).toBeUndefined();
   });
 
   it('transfers prepared category update data', async () => {

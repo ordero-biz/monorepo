@@ -1,12 +1,15 @@
 import { createCategory } from '@/lib/client/api/categories';
 import type { CreateCategoryFormValues } from './validations';
 
+const normalizeCreateCategoryFormData = (data: CreateCategoryFormValues) => ({
+  name: data.name.trim(),
+  parentId: data.parentId ? Number(data.parentId) : null,
+  status: data.status,
+});
+
 export const submitCreateCategory = async (value: CreateCategoryFormValues) => {
-  const result = await createCategory({
-    name: value.name.trim(),
-    parentId: value.parentId ? Number(value.parentId) : null,
-    status: value.status,
-  });
+  const normalizedFormData = normalizeCreateCategoryFormData(value);
+  const result = await createCategory(normalizedFormData);
 
   if (!result.ok) {
     return {

@@ -1,21 +1,17 @@
 import { useToastManager } from '@ordero/ui';
 import { useForm } from '@tanstack/react-form';
 import type { Category } from '@/lib/domain/categories/types';
-import { createPatchPayload } from '@/lib/utils/form/patch/createPatchPayload';
-import type { CategoryFormValues } from '../../../shared/validations';
 import { getCategoryDefaultValues } from '../utils/fields';
-import { submitUpdateCategory } from '../utils/submitAction';
+import {
+  getCategoryUpdateChanges,
+  submitUpdateCategory,
+} from '../utils/submitAction';
 
 type UseUpdateCategoryFormArgs = {
   category: Category;
   onNoChanges: () => void;
   onUpdated: (category: Category) => Promise<void> | void;
 };
-
-const normalizeCategoryFormData = (data: CategoryFormValues) => ({
-  name: data.name.trim(),
-  parentId: data.parentId ? Number(data.parentId) : null,
-});
 
 export const useUpdateCategoryForm = ({
   category,
@@ -26,21 +22,16 @@ export const useUpdateCategoryForm = ({
   const form = useForm({
     defaultValues: getCategoryDefaultValues(category),
     onSubmit: async ({ formApi, value }) => {
-      const submitData = createPatchPayload({
-        initialData: normalizeCategoryFormData(
-          getCategoryDefaultValues(category)
-        ),
-        submitData: normalizeCategoryFormData(value),
-      });
+      const updateChanges = getCategoryUpdateChanges({ category, formValue: value });
 
-      if (!submitData) {
+      if (!updateChanges) {
         onNoChanges();
         return;
       }
 
       const result = await submitUpdateCategory({
         categoryId: category.id,
-        submitData,
+        submitData: updateChanges,
       });
 
       if (!result.ok) {
