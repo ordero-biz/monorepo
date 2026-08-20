@@ -88,6 +88,13 @@ The form hook should not own:
 - field JSX, labels, adornments, icons, or validation message rendering
 - cross-feature abstractions before the pattern appears in several real forms
 
+For partial updates, the feature submit utility should normalize form values,
+compare them with the initial normalized values, and return only changed API
+fields. Keep the API request DTO separate from the form-value type: form values
+may contain UI-specific strings or omit fields supported by non-form commands.
+When no normalized fields changed, let the workflow perform its normal no-op
+close/reset behavior instead of issuing a request.
+
 ### Field Sections
 
 Extract dense or repeated field groups into local components or field-section hooks when they have cohesive UI behavior:

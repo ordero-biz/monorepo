@@ -1,19 +1,40 @@
-import { updateCategory } from '@/lib/client/api/categories';
-import type { CategoryFormValues } from '../../../shared/validations';
+import {updateCategory, UpdateCategoryFieldData} from '@/lib/client/api/categories';
+import type { Category } from '@/lib/domain/categories/types';
+import { getChangedValues } from '@/lib/utils/form/comparison/getChangedValues';
+import type { UpdateCategoryFormValues } from './validations';
+import { getCategoryDefaultValues } from './fields';
 
 type SubmitUpdateCategoryArgs = {
   categoryId: string | number;
-  value: CategoryFormValues;
+  submitData: UpdateCategoryFieldData;
 };
+
+type GetCategoryUpdateChangesArgs = {
+  category: Category;
+  formValue: UpdateCategoryFormValues;
+};
+
+const normalizeUpdateCategoryFormData = (data: UpdateCategoryFormValues) => ({
+  name: data.name.trim(),
+  parentId: data.parentId ? Number(data.parentId) : null,
+});
+
+export const getCategoryUpdateChanges = ({
+  category,
+  formValue,
+}: GetCategoryUpdateChangesArgs) =>
+  getChangedValues({
+    initialData: normalizeUpdateCategoryFormData(getCategoryDefaultValues(category)),
+    submitData: normalizeUpdateCategoryFormData(formValue),
+  });
 
 export const submitUpdateCategory = async ({
   categoryId,
-  value,
+  submitData,
 }: SubmitUpdateCategoryArgs) => {
   const result = await updateCategory({
     categoryId,
-    name: value.name.trim(),
-    parentId: value.parentId ? Number(value.parentId) : null,
+    ...submitData,
   });
 
   if (!result.ok) {

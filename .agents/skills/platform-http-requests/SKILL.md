@@ -45,6 +45,10 @@ Use the existing architecture unless the user explicitly asks for a redesign.
 - Keep request/response DTOs near the API helper when backend wire shapes
   differ from domain entities, and map DTOs to domain entities before returning
   them to feature code.
+- Define create and update helper arguments as API DTOs, not feature form-value
+  types. Form values can have UI-specific representations such as string ids;
+  request DTOs must model the normalized backend contract and may serve
+  non-form callers.
 - Browser code must not import server-only packages such as `@ordero/next-api`.
 - Keep app-wide client providers in `src/app/AppProviders.tsx`; add Query,
   toast, or other app-wide providers there instead of nesting parallel wrappers
@@ -70,6 +74,14 @@ For authenticated backend REST calls:
   the client
 - let `app/api/backend/[...path]/route.ts` attach the Bearer token
 - do not introduce direct browser calls to `BACKEND_API_URL`
+
+For `PATCH` helpers:
+
+- keep the API argument as a partial normalized DTO plus the resource id
+- normalize and compare form values in the feature submit utility before
+  calling the helper
+- send only fields whose normalized values changed; treat an empty change set
+  as a no-op rather than sending a PATCH
 
 ## Adding A Cached Query Hook
 
