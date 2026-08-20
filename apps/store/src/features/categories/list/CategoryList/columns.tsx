@@ -14,6 +14,22 @@ const statusLabels = {
   DRAFT: 'Draft',
 } as const;
 
+const getStatusChip = (status?: Category['status']) => {
+  if (!status) {
+    return null;
+  }
+
+  return (
+    <Chip
+      color={status === 'ACTIVE' ? 'primary' : 'warning'}
+      size="s"
+      variant="soft"
+    >
+      {statusLabels[status]}
+    </Chip>
+  );
+};
+
 export const columns: DataTableColumnDef<Category>[] = [
   {
     accessorKey: 'name',
@@ -31,14 +47,35 @@ export const columns: DataTableColumnDef<Category>[] = [
       <DataTableColumnHeader column={column} title="Name" />
     ),
     meta: {
-      width: '30%',
+      width: '25%',
+    },
+  },
+  {
+    accessorKey: 'status',
+    cell: ({ row }) => (
+      <DataTableCell>{getStatusChip(row.original.status)}</DataTableCell>
+    ),
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Status" />
+    ),
+    meta: {
+      width: '15%',
     },
   },
   {
     accessorFn: (row) => row.parentCategory?.name ?? 'None',
     cell: ({ row }) => (
       <DataTableCell>
-        {row.original.parentCategory?.name ?? 'None'}
+        {row.original.parentCategory ? (
+          <Link
+            className="w-full rounded-[var(--radius-sm)] outline-none transition-colors hover:text-[var(--color-text-body)] hover:underline"
+            href={getCategoryDetailRoute(row.original.parentCategory.id)}
+          >
+            {row.original.parentCategory.name}
+          </Link>
+        ) : (
+          'None'
+        )}
       </DataTableCell>
     ),
     header: ({ column }) => (
@@ -46,28 +83,22 @@ export const columns: DataTableColumnDef<Category>[] = [
     ),
     id: 'parentCategory',
     meta: {
-      width: '30%',
+      width: '25%',
     },
   },
   {
-    accessorKey: 'status',
-    cell: ({ row }) =>
-      row.original.status ? (
-        <DataTableCell>
-          <Chip
-            color={row.original.status === 'ACTIVE' ? 'primary' : 'warning'}
-            size="s"
-            variant="soft"
-          >
-            {statusLabels[row.original.status]}
-          </Chip>
-        </DataTableCell>
-      ) : null,
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Status" />
+    accessorFn: (row) => row.parentCategory?.status ?? '',
+    cell: ({ row }) => (
+      <DataTableCell>
+        {getStatusChip(row.original.parentCategory?.status)}
+      </DataTableCell>
     ),
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Parent status" />
+    ),
+    id: 'parentStatus',
     meta: {
-      width: '20%',
+      width: '15%',
     },
   },
   {

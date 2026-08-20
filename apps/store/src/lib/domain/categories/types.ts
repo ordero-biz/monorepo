@@ -6,6 +6,7 @@ export type CategoryStatus =
 export type CategoryParent = {
   id: number;
   name: string;
+  status?: CategoryStatus;
   createdAt: string;
 };
 
