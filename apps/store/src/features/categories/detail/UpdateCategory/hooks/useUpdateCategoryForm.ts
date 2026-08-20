@@ -18,8 +18,8 @@ export const useUpdateCategoryForm = ({
     defaultValues: getCategoryDefaultValues(category),
     onSubmit: async ({ formApi, value }) => {
       const result = await submitUpdateCategory({
-        categoryId: category.id,
-        value,
+        initialData: category,
+        submitData: value,
       });
 
       if (!result.ok) {
