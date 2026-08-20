@@ -8,7 +8,7 @@ import { submitUpdateCategory } from '../utils/submitAction';
 
 type UseUpdateCategoryFormArgs = {
   category: Category;
-  handleCloseDialog: () => void;
+  onNoChanges: () => void;
   onUpdated: (category: Category) => Promise<void> | void;
 };
 
@@ -19,7 +19,7 @@ const normalizeCategoryFormData = (data: CategoryFormValues) => ({
 
 export const useUpdateCategoryForm = ({
   category,
-  handleCloseDialog,
+  onNoChanges,
   onUpdated,
 }: UseUpdateCategoryFormArgs) => {
   const { add: addToast } = useToastManager();
@@ -34,7 +34,7 @@ export const useUpdateCategoryForm = ({
       });
 
       if (!submitData) {
-        handleCloseDialog();
+        onNoChanges();
         return;
       }
 

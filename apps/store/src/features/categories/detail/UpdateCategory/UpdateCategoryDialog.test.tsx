@@ -104,7 +104,7 @@ describe('UpdateCategoryDialog', () => {
 
   it('does not send normalized values that match the initial category', async () => {
     const user = userEvent.setup();
-    const { onOpenChange, onUpdated } = setup();
+    const { onOpenChange, onUpdated, renderResult } = setup();
     const dialog = screen.getByRole('dialog', { name: 'Edit category' });
     const nameField = within(dialog).getByRole('textbox', { name: 'Name' });
 
@@ -116,6 +116,16 @@ describe('UpdateCategoryDialog', () => {
     await waitFor(() => expect(onOpenChange).toHaveBeenCalledWith(false));
     expect(onUpdated).not.toHaveBeenCalled();
     expect(screen.queryByText(/was updated/)).not.toBeInTheDocument();
+
+    renderResult.rerender({ open: false });
+    renderResult.rerender({ open: true });
+
+    expect(
+      within(screen.getByRole('dialog', { name: 'Edit category' })).getByRole(
+        'textbox',
+        { name: 'Name' }
+      )
+    ).toHaveValue('Sneakers');
   });
 
   it('prevents the category itself from being selected as a parent', async () => {

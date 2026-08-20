@@ -17,7 +17,7 @@ export const UpdateCategoryDialog = ({
   const queryClient = useQueryClient();
   const { form } = useUpdateCategoryForm({
     category,
-    handleCloseDialog: () => onOpenChange(false),
+    onNoChanges: () => handleOpenChange(false),
     onUpdated: async (updatedCategory) => {
       form.reset(getCategoryDefaultValues(updatedCategory));
       onOpenChange(false);
