@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ATTRIBUTE_STATUS } from '@/lib/domain/attributes/constants';
+import { ATTRIBUTE_VALUE_STATUS } from '@/lib/domain/attributes/constants';
 import type { ValidationArgs } from '@/lib/utils/form/validation/types';
 
 export const attributeValueNameSchema = z
@@ -8,7 +8,7 @@ export const attributeValueNameSchema = z
   .min(1, 'Enter an attribute value or remove this empty field');
 
 export const attributeValueStatusSchema = z.enum(
-  [ATTRIBUTE_STATUS.DRAFT, ATTRIBUTE_STATUS.ACTIVE],
+  [ATTRIBUTE_VALUE_STATUS.DRAFT, ATTRIBUTE_VALUE_STATUS.ACTIVE],
   {
     error: 'Attribute value status must be Draft or Active',
   }

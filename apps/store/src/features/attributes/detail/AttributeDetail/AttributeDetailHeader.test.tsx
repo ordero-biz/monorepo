@@ -1,4 +1,4 @@
-import { screen, waitFor } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getAttribute, updateAttribute } from '@/lib/client/api/attributes';
 import { prepareStoreSetup } from '@/test/prepareSetup';
@@ -61,10 +61,83 @@ describe('AttributeDetailHeader', () => {
     setup();
 
     expect(await screen.findByRole('heading', { name: 'Color' })).toBeVisible();
+    expect(screen.getByText('Draft')).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Publish' })).toBeVisible();
     expect(screen.getByRole('button', { name: 'Add Value' })).toBeVisible();
     expect(
       screen.getByRole('button', { name: 'Actions for Color' })
     ).toBeVisible();
+  });
+
+  it('opens the publish dialog for draft attributes', async () => {
+    getAttributeMock.mockResolvedValue({
+      ok: true,
+      data: {
+        id: 7,
+        name: 'Color',
+        sortOrder: 10,
+        status: 'DRAFT',
+        createdAt: '2026-06-24T20:07:32.467Z',
+      },
+    });
+    const user = userEvent.setup();
+
+    setup();
+
+    await user.click(await screen.findByRole('button', { name: 'Publish' }));
+
+    expect(
+      screen.getByRole('dialog', { name: 'Publish attribute' })
+    ).toBeVisible();
+  });
+
+  it('publishes the attribute and refreshes the header as active', async () => {
+    const draftAttribute = {
+      id: 7,
+      name: 'Color',
+      sortOrder: 10,
+      status: 'DRAFT' as const,
+      createdAt: '2026-06-24T20:07:32.467Z',
+    };
+    getAttributeMock
+      .mockResolvedValueOnce({
+        ok: true,
+        data: draftAttribute,
+      })
+      .mockResolvedValue({
+        ok: true,
+        data: {
+          ...draftAttribute,
+          status: 'ACTIVE',
+        },
+      });
+    updateAttributeMock.mockResolvedValue({
+      ok: true,
+      data: {
+        ...draftAttribute,
+        status: 'ACTIVE',
+      },
+    });
+    const user = userEvent.setup();
+
+    setup();
+
+    await user.click(await screen.findByRole('button', { name: 'Publish' }));
+    await user.click(
+      within(
+        screen.getByRole('dialog', { name: 'Publish attribute' })
+      ).getByRole('button', { name: 'Publish' })
+    );
+
+    expect(updateAttributeMock).toHaveBeenCalledWith({
+      attributeId: 7,
+      status: 'ACTIVE',
+    });
+    await waitFor(() =>
+      expect(
+        screen.queryByRole('button', { name: 'Publish' })
+      ).not.toBeInTheDocument()
+    );
   });
 
   it('opens the delete dialog from the actions menu', async () => {
@@ -116,8 +189,12 @@ describe('AttributeDetailHeader', () => {
       await screen.findByRole('button', { name: 'Actions for Color' })
     );
 
+    expect(screen.getByText('Active')).toBeVisible();
     expect(
       screen.queryByRole('menuitem', { name: 'Edit attribute name' })
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Publish' })
     ).not.toBeInTheDocument();
     expect(
       await screen.findByRole('menuitem', { name: 'Delete attribute' })

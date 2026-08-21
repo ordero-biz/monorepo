@@ -12,7 +12,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { CircleAlert, Minus } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { ATTRIBUTE_STATUS } from '@/lib/domain/attributes/constants';
-import type { AttributeStatus } from '@/lib/domain/attributes/types';
+import type { AttributeValueStatus } from '@/lib/domain/attributes/types';
 import { attributesQueryKeys } from '@/lib/query/attributes/attributesQueryKeys';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
 import {
@@ -220,7 +220,7 @@ export const CreateAttributeValuesDialog = ({
                                                             value
                                                           ) =>
                                                             statusField.handleChange(
-                                                              value as AttributeStatus
+                                                              value as AttributeValueStatus
                                                             )
                                                           }
                                                           options={

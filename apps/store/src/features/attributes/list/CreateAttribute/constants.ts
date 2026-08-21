@@ -1,4 +1,7 @@
-import { ATTRIBUTE_STATUS } from '@/lib/domain/attributes/constants';
+import {
+  ATTRIBUTE_STATUS,
+  ATTRIBUTE_VALUE_STATUS,
+} from '@/lib/domain/attributes/constants';
 import { getEmptyAttributeValueField } from './utils/fields';
 import type { CreateAttributeFormValues } from './utils/validations';
 
@@ -15,10 +18,10 @@ export const createAttributeDefaultValues: CreateAttributeFormValues = {
 export const ATTRIBUTE_VALUE_STATUS_OPTIONS = [
   {
     label: 'Draft',
-    value: ATTRIBUTE_STATUS.DRAFT,
+    value: ATTRIBUTE_VALUE_STATUS.DRAFT,
   },
   {
     label: 'Active',
-    value: ATTRIBUTE_STATUS.ACTIVE,
+    value: ATTRIBUTE_VALUE_STATUS.ACTIVE,
   },
 ];

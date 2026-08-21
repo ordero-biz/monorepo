@@ -1,6 +1,7 @@
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { updateAttribute } from '@/lib/client/api/attributes';
+import { API_ERROR_CODES } from '@/lib/constants/apiErrorCodes';
 import { attributesQueryKeys } from '@/lib/query/attributes/attributesQueryKeys';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { UpdateAttributeDialog } from './UpdateAttributeDialog';
@@ -149,15 +150,13 @@ describe('UpdateAttributeDialog', () => {
     await screen.findByRole('button', { name: 'Save' });
   });
 
-  it('shows backend errors and keeps the dialog open when submit fails', async () => {
+  it('shows mapped backend errors and keeps the dialog open when submit fails', async () => {
     updateAttributeMock.mockResolvedValue({
       ok: false,
       error: {
-        status: 422,
-        message: 'Attribute update failed.',
-        fieldErrors: {
-          name: 'Attribute name already exists.',
-        },
+        status: 409,
+        code: API_ERROR_CODES.ATTRIBUTE_MODIFICATION_NOT_ALLOWED,
+        message: 'Conflict',
       },
     });
     const user = userEvent.setup();
@@ -172,13 +171,9 @@ describe('UpdateAttributeDialog', () => {
     await user.click(within(dialog).getByRole('button', { name: 'Save' }));
 
     expect(
-      await within(dialog).findByText('Attribute name already exists.')
-    ).toBeVisible();
-    expect(nameField).toHaveAccessibleDescription(
-      'Attribute name already exists.'
-    );
-    expect(
-      await screen.findByRole('dialog', { name: 'Attribute update failed.' })
+      await screen.findByRole('dialog', {
+        name: 'Active attributes cannot be edited',
+      })
     ).toBeVisible();
     expect(onOpenChange).not.toHaveBeenCalledWith(false);
     expect(onUpdated).not.toHaveBeenCalled();

@@ -6,6 +6,7 @@ import {
 } from '@ordero/ui';
 import Link from 'next/link';
 import { getAttributeDetailRoute } from '@/lib/client/routes';
+import { ATTRIBUTE_STATUS } from '@/lib/domain/attributes/constants';
 import type { Attribute } from '@/lib/domain/attributes/types';
 import { formatDate } from '@/lib/utils/formatDate';
 
@@ -21,7 +22,7 @@ const getStatusChip = (status?: Attribute['status']) => {
 
   return (
     <Chip
-      color={status === 'ACTIVE' ? 'primary' : 'warning'}
+      color={status === ATTRIBUTE_STATUS.ACTIVE ? 'primary' : 'warning'}
       size="s"
       variant="soft"
     >

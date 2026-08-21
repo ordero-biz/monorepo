@@ -1,5 +1,8 @@
 import { createAttributeValues } from '@/lib/client/api/attributes';
-import { ATTRIBUTE_STATUS } from '@/lib/domain/attributes/constants';
+import {
+  ATTRIBUTE_STATUS,
+  ATTRIBUTE_VALUE_STATUS,
+} from '@/lib/domain/attributes/constants';
 import { submitCreateAttributeValues } from './submitAction';
 
 vi.mock('@/lib/client/api/attributes', async () => ({
@@ -38,12 +41,12 @@ describe('submitCreateAttributeValues', () => {
           attributeValues: [
             {
               id: 'attribute-value-0',
-              status: ATTRIBUTE_STATUS.DRAFT,
+              status: ATTRIBUTE_VALUE_STATUS.DRAFT,
               value: '  Green  ',
             },
             {
               id: 'attribute-value-1',
-              status: ATTRIBUTE_STATUS.DRAFT,
+              status: ATTRIBUTE_VALUE_STATUS.DRAFT,
               value: '   ',
             },
           ],
@@ -60,7 +63,7 @@ describe('submitCreateAttributeValues', () => {
         {
           name: 'Green',
           sortOrder: 0,
-          status: ATTRIBUTE_STATUS.DRAFT,
+          status: ATTRIBUTE_VALUE_STATUS.DRAFT,
         },
       ],
     });
@@ -86,7 +89,7 @@ describe('submitCreateAttributeValues', () => {
           attributeValues: [
             {
               id: 'attribute-value-0',
-              status: ATTRIBUTE_STATUS.DRAFT,
+              status: ATTRIBUTE_VALUE_STATUS.DRAFT,
               value: 'Green',
             },
           ],
@@ -116,7 +119,7 @@ describe('submitCreateAttributeValues', () => {
         attributeValues: [
           {
             id: 'attribute-value-0',
-            status: ATTRIBUTE_STATUS.ACTIVE,
+            status: ATTRIBUTE_VALUE_STATUS.ACTIVE,
             value: 'Green',
           },
         ],
@@ -129,7 +132,7 @@ describe('submitCreateAttributeValues', () => {
         {
           name: 'Green',
           sortOrder: 0,
-          status: ATTRIBUTE_STATUS.DRAFT,
+          status: ATTRIBUTE_VALUE_STATUS.DRAFT,
         },
       ],
     });

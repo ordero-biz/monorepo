@@ -11,8 +11,11 @@ import {
 import { Trash2 } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { BaseLayoutContextualActionBar } from '@/features/app-shell';
+import { ATTRIBUTE_STATUS } from '@/lib/domain/attributes/constants';
 import type { AttributeValue } from '@/lib/domain/attributes/types';
+import { useAttributeQuery } from '@/lib/hooks/attributes/useAttributeQuery';
 import { useAttributeValuesQuery } from '@/lib/hooks/attributes/useAttributeValuesQuery';
+import { ActivateAttributeValueDialog } from '../ActivateAttributeValue';
 import {
   DeleteAttributeValueDialog,
   DeleteAttributeValuesDialog,
@@ -30,9 +33,12 @@ const getAttributeValueCheckboxAriaLabel = (attributeValue: AttributeValue) =>
 export const AttributeDetailValues = ({
   attributeId,
 }: AttributeDetailValuesProps) => {
+  const attributeQuery = useAttributeQuery(attributeId);
   const attributeValuesQuery = useAttributeValuesQuery(attributeId);
 
   const [updatingAttributeValue, setUpdatingAttributeValue] =
+    useState<AttributeValue | null>(null);
+  const [activatingAttributeValue, setActivatingAttributeValue] =
     useState<AttributeValue | null>(null);
   const [deletingAttributeValue, setDeletingAttributeValue] =
     useState<AttributeValue | null>(null);
@@ -43,10 +49,13 @@ export const AttributeDetailValues = ({
   const columns = useMemo(
     () =>
       getColumns({
+        canPublishAttributeValue:
+          attributeQuery.data?.status === ATTRIBUTE_STATUS.ACTIVE,
+        onActivateAttributeValue: setActivatingAttributeValue,
         onDeleteAttributeValue: setDeletingAttributeValue,
         onUpdateAttributeValue: setUpdatingAttributeValue,
       }),
-    []
+    [attributeQuery.data?.status]
   );
   const {
     clearSelection,
@@ -149,6 +158,22 @@ export const AttributeDetailValues = ({
             }
           }}
           open={Boolean(updatingAttributeValue)}
+        />
+      )}
+
+      {activatingAttributeValue && (
+        <ActivateAttributeValueDialog
+          attributeId={attributeId}
+          attributeValue={activatingAttributeValue}
+          onOpenChange={(nextOpen) => {
+            if (!nextOpen) {
+              setActivatingAttributeValue(null);
+            }
+          }}
+          onUpdated={async () => {
+            await attributeValuesQuery.refetch();
+          }}
+          open={Boolean(activatingAttributeValue)}
         />
       )}
 

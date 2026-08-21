@@ -5,7 +5,8 @@ import {
   DataTableColumnHeader,
   Menu,
 } from '@ordero/ui';
-import { EllipsisVertical, Pencil, Trash2 } from 'lucide-react';
+import { CircleCheck, EllipsisVertical, Pencil, Trash2 } from 'lucide-react';
+import { ATTRIBUTE_VALUE_STATUS } from '@/lib/domain/attributes/constants';
 import type { AttributeValue } from '@/lib/domain/attributes/types';
 
 const statusLabels = {
@@ -20,7 +21,7 @@ const getStatusChip = (status?: AttributeValue['status']) => {
 
   return (
     <Chip
-      color={status === 'ACTIVE' ? 'primary' : 'warning'}
+      color={status === ATTRIBUTE_VALUE_STATUS.ACTIVE ? 'primary' : 'warning'}
       size="s"
       variant="soft"
     >
@@ -30,11 +31,15 @@ const getStatusChip = (status?: AttributeValue['status']) => {
 };
 
 type GetColumnsArgs = {
+  canPublishAttributeValue: boolean;
+  onActivateAttributeValue: (attributeValue: AttributeValue) => void;
   onDeleteAttributeValue: (attributeValue: AttributeValue) => void;
   onUpdateAttributeValue: (attributeValue: AttributeValue) => void;
 };
 
 export const getColumns = ({
+  canPublishAttributeValue,
+  onActivateAttributeValue,
   onDeleteAttributeValue,
   onUpdateAttributeValue,
 }: GetColumnsArgs): DataTableColumnDef<AttributeValue>[] => [
@@ -75,16 +80,29 @@ export const getColumns = ({
           <Menu.Portal>
             <Menu.Positioner align="end">
               <Menu.Popup>
-                {row.original.status !== 'ACTIVE' ? (
-                  <Menu.Item
-                    onClick={() => onUpdateAttributeValue(row.original)}
-                  >
-                    <Pencil
-                      aria-hidden="true"
-                      className="size-[var(--icon-button-xs-icon)]"
-                    />
-                    Edit
-                  </Menu.Item>
+                {row.original.status !== ATTRIBUTE_VALUE_STATUS.ACTIVE ? (
+                  <>
+                    <Menu.Item
+                      onClick={() => onUpdateAttributeValue(row.original)}
+                    >
+                      <Pencil
+                        aria-hidden="true"
+                        className="size-[var(--icon-button-xs-icon)]"
+                      />
+                      Edit
+                    </Menu.Item>
+                    {canPublishAttributeValue ? (
+                      <Menu.Item
+                        onClick={() => onActivateAttributeValue(row.original)}
+                      >
+                        <CircleCheck
+                          aria-hidden="true"
+                          className="size-[var(--icon-button-xs-icon)]"
+                        />
+                        Publish
+                      </Menu.Item>
+                    ) : null}
+                  </>
                 ) : null}
                 <Menu.Item
                   color="error"

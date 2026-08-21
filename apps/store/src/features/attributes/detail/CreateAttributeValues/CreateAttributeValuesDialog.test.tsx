@@ -1,7 +1,10 @@
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createAttributeValues } from '@/lib/client/api/attributes';
-import { ATTRIBUTE_STATUS } from '@/lib/domain/attributes/constants';
+import {
+  ATTRIBUTE_STATUS,
+  ATTRIBUTE_VALUE_STATUS,
+} from '@/lib/domain/attributes/constants';
 import { attributesQueryKeys } from '@/lib/query/attributes/attributesQueryKeys';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { CreateAttributeValuesDialog } from './CreateAttributeValuesDialog';
@@ -119,7 +122,7 @@ describe('CreateAttributeValuesDialog', () => {
         {
           name: 'Green',
           sortOrder: 0,
-          status: ATTRIBUTE_STATUS.DRAFT,
+          status: ATTRIBUTE_VALUE_STATUS.DRAFT,
         },
       ],
     });

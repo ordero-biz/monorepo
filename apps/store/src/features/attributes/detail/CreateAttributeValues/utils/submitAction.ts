@@ -1,5 +1,8 @@
 import { createAttributeValues } from '@/lib/client/api/attributes';
-import { ATTRIBUTE_STATUS } from '@/lib/domain/attributes/constants';
+import {
+  ATTRIBUTE_STATUS,
+  ATTRIBUTE_VALUE_STATUS,
+} from '@/lib/domain/attributes/constants';
 import type { AttributeStatus } from '@/lib/domain/attributes/types';
 import type {
   AttributeValueFormValue,
@@ -27,7 +30,7 @@ const normalizeAttributeValues = ({
       sortOrder: 0,
       status:
         attributeStatus === ATTRIBUTE_STATUS.DRAFT
-          ? ATTRIBUTE_STATUS.DRAFT
+          ? ATTRIBUTE_VALUE_STATUS.DRAFT
           : attributeValue.status,
     }))
     .filter((attributeValue) => attributeValue.name);

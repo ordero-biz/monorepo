@@ -1,5 +1,8 @@
 import { createAttribute } from '@/lib/client/api/attributes';
-import { ATTRIBUTE_STATUS } from '@/lib/domain/attributes/constants';
+import {
+  ATTRIBUTE_STATUS,
+  ATTRIBUTE_VALUE_STATUS,
+} from '@/lib/domain/attributes/constants';
 import { submitCreateAttribute } from './submitAction';
 
 vi.mock('@/lib/client/api/attributes', async () => ({
@@ -35,17 +38,17 @@ describe('submitCreateAttribute', () => {
         attributeValues: [
           {
             id: 'attribute-value-0',
-            status: ATTRIBUTE_STATUS.ACTIVE,
+            status: ATTRIBUTE_VALUE_STATUS.ACTIVE,
             value: '  Cotton  ',
           },
           {
             id: 'attribute-value-1',
-            status: ATTRIBUTE_STATUS.DRAFT,
+            status: ATTRIBUTE_VALUE_STATUS.DRAFT,
             value: '   ',
           },
           {
             id: 'attribute-value-2',
-            status: ATTRIBUTE_STATUS.DRAFT,
+            status: ATTRIBUTE_VALUE_STATUS.DRAFT,
             value: 'Linen',
           },
         ],
@@ -63,12 +66,12 @@ describe('submitCreateAttribute', () => {
         {
           name: 'Cotton',
           sortOrder: 0,
-          status: ATTRIBUTE_STATUS.ACTIVE,
+          status: ATTRIBUTE_VALUE_STATUS.ACTIVE,
         },
         {
           name: 'Linen',
           sortOrder: 0,
-          status: ATTRIBUTE_STATUS.DRAFT,
+          status: ATTRIBUTE_VALUE_STATUS.DRAFT,
         },
       ],
     });
@@ -121,7 +124,7 @@ describe('submitCreateAttribute', () => {
       attributeValues: [
         {
           id: 'attribute-value-0',
-          status: ATTRIBUTE_STATUS.ACTIVE,
+          status: ATTRIBUTE_VALUE_STATUS.ACTIVE,
           value: 'Cotton',
         },
       ],
@@ -135,7 +138,7 @@ describe('submitCreateAttribute', () => {
         {
           name: 'Cotton',
           sortOrder: 0,
-          status: ATTRIBUTE_STATUS.DRAFT,
+          status: ATTRIBUTE_VALUE_STATUS.DRAFT,
         },
       ],
     });

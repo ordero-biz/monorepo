@@ -34,6 +34,11 @@ Use the existing architecture unless the user explicitly asks for a redesign.
 - Keep backend endpoint constants in `src/lib/server/api/path.ts`.
 - Normalize backend failures into the shared `ApiError` shape.
 - Use `ApiResult<T>` for client helper return values instead of throwing for ordinary HTTP failures.
+- Keep known backend error-code copy in an app-owned catalog, such as
+  `src/lib/constants/apiErrorCodes.ts`, unless the code contract is genuinely
+  shared by multiple apps. Use a shared app resolver before showing mutation
+  toasts or returning form-level errors. Unknown codes must fall back to
+  `ApiError.message`, and field errors must remain available for field mapping.
 - Keep shared HTTP/auth contracts in `@ordero/api-types`.
 - Keep browser-safe request transport in `@ordero/api-client`.
 - Keep Next.js server/BFF helpers in `@ordero/next-api`.
@@ -136,6 +141,9 @@ For writes:
 - show mutation errors through the shared toast surface unless the failure maps
   to visible form fields
 - keep form backend errors mapped into TanStack Form submit errors when applicable
+- For a known backend `error.code`, resolve the user-facing message before
+  showing the toast or returning a form-level error. Do not duplicate code-to-copy
+  `switch` statements in individual features.
 
 ### Cache Invalidation Impact Map
 
@@ -249,6 +257,8 @@ Required coverage for new request flows:
   layer rather than in library-agnostic form tests
 - for relationship changes, every affected old/new owner or child-resource key;
   a generic list invalidation alone is not sufficient coverage
+- known error-code mappings and the fallback behavior for unknown codes when a
+  mutation introduces or consumes backend error codes
 - auth cookie clearing on backend `401` when relevant
 
 ## Validation

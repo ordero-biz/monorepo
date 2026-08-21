@@ -1,4 +1,7 @@
-import { ATTRIBUTE_STATUS } from '@/lib/domain/attributes/constants';
+import {
+  ATTRIBUTE_STATUS,
+  ATTRIBUTE_VALUE_STATUS,
+} from '@/lib/domain/attributes/constants';
 import {
   validateAttributeName,
   validateAttributeStatus,
@@ -23,7 +26,7 @@ describe('attribute status validation', () => {
       validateAttributeStatus({ value: ATTRIBUTE_STATUS.DRAFT })
     ).toBeUndefined();
     expect(
-      validateAttributeValueStatus({ value: ATTRIBUTE_STATUS.ACTIVE })
+      validateAttributeValueStatus({ value: ATTRIBUTE_VALUE_STATUS.ACTIVE })
     ).toBeUndefined();
   });
 

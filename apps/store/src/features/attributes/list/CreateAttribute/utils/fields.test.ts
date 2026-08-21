@@ -1,3 +1,4 @@
+import { ATTRIBUTE_VALUE_STATUS } from '@/lib/domain/attributes/constants';
 import {
   getAttributeValueFieldId,
   getEmptyAttributeValueField,
@@ -11,7 +12,7 @@ describe('attribute value fields', () => {
   it('creates an empty attribute value field', () => {
     expect(getEmptyAttributeValueField(2)).toEqual({
       id: 'attribute-value-2',
-      status: 'DRAFT',
+      status: ATTRIBUTE_VALUE_STATUS.DRAFT,
       value: '',
     });
   });

@@ -6,6 +6,7 @@ import {
 } from '@ordero/ui';
 import Link from 'next/link';
 import { getCategoryDetailRoute } from '@/lib/client/routes';
+import { CATEGORY_STATUS } from '@/lib/domain/categories/constants';
 import type { Category } from '@/lib/domain/categories/types';
 import { formatDate } from '@/lib/utils/formatDate';
 
@@ -21,7 +22,7 @@ const getStatusChip = (status?: Category['status']) => {
 
   return (
     <Chip
-      color={status === 'ACTIVE' ? 'primary' : 'warning'}
+      color={status === CATEGORY_STATUS.ACTIVE ? 'primary' : 'warning'}
       size="s"
       variant="soft"
     >
