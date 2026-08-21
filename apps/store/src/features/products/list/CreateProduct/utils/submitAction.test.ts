@@ -91,6 +91,8 @@ describe('submitCreateProduct', () => {
           categoryId: 'Category is required.',
           description: 'Description is too long.',
           name: 'Product name already exists.',
+          'productVariants.0.sku': 'SKU already exists.',
+          'productVariants[1].barcode': 'Barcode already exists.',
         },
       },
     });
@@ -112,6 +114,8 @@ describe('submitCreateProduct', () => {
           category: 'Category is required.',
           description: 'Description is too long.',
           productName: 'Product name already exists.',
+          'productVariants[0].sku': 'SKU already exists.',
+          'productVariants[1].barcode': 'Barcode already exists.',
         },
         formError: 'Product creation failed.',
       },

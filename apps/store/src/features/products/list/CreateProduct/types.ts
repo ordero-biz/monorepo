@@ -5,15 +5,17 @@ import type { useCreateProductForm } from './hooks/useCreateProductForm';
 
 export type CreateProductForm = ReturnType<typeof useCreateProductForm>['form'];
 
-
 export type AttributesAsyncComboboxProps = Omit<
   AsyncComboboxMultipleProps,
   | 'emptyText'
+  | 'isOptionDisabled'
   | 'loadErrorText'
   | 'loadingText'
   | 'loadOptions'
+  | 'onOptionSelect'
   | 'pageSize'
   | 'queryKey'
+  | 'staticOptions'
 > & {
   onSelectedAttributesChange?: (attributes: AttributeDropdown[]) => void;
   selectedAttributes?: AttributeDropdown[];
