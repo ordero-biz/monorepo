@@ -1,8 +1,12 @@
-import {updateCategory, UpdateCategoryFieldData} from '@/lib/client/api/categories';
+import {
+  type UpdateCategoryFieldData,
+  updateCategory,
+} from '@/lib/client/api/categories';
 import type { Category } from '@/lib/domain/categories/types';
+import { getApiErrorMessage } from '@/lib/utils/apiError';
 import { getChangedValues } from '@/lib/utils/form/comparison/getChangedValues';
-import type { UpdateCategoryFormValues } from './validations';
 import { getCategoryDefaultValues } from './fields';
+import type { UpdateCategoryFormValues } from './validations';
 
 type SubmitUpdateCategoryArgs = {
   categoryId: string | number;
@@ -24,7 +28,9 @@ export const getCategoryUpdateChanges = ({
   formValue,
 }: GetCategoryUpdateChangesArgs) =>
   getChangedValues({
-    initialData: normalizeUpdateCategoryFormData(getCategoryDefaultValues(category)),
+    initialData: normalizeUpdateCategoryFormData(
+      getCategoryDefaultValues(category)
+    ),
     submitData: normalizeUpdateCategoryFormData(formValue),
   });
 
@@ -42,7 +48,7 @@ export const submitUpdateCategory = async ({
       ok: false,
       error: {
         fieldErrors: result.error.fieldErrors,
-        formError: result.error.message,
+        formError: getApiErrorMessage(result.error),
       },
     } as const;
   }

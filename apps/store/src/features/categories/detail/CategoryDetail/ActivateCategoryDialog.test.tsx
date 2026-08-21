@@ -1,6 +1,7 @@
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { updateCategory } from '@/lib/client/api/categories';
+import { API_ERROR_CODES } from '@/lib/constants/apiErrorCodes';
 import { CATEGORY_STATUS } from '@/lib/domain/categories/constants';
 import type { Category } from '@/lib/domain/categories/types';
 import { categoriesQueryKeys } from '@/lib/query/categories/categoriesQueryKeys';
@@ -138,8 +139,9 @@ describe('ActivateCategoryDialog', () => {
     updateCategoryMock.mockResolvedValue({
       ok: false,
       error: {
-        status: 500,
-        message: 'Could not activate category',
+        status: 409,
+        code: API_ERROR_CODES.CATEGORY_MODIFICATION_NOT_ALLOWED,
+        message: 'Conflict',
       },
     });
     const user = userEvent.setup();
@@ -150,7 +152,7 @@ describe('ActivateCategoryDialog', () => {
 
     expect(
       await screen.findByRole('dialog', {
-        name: 'Could not activate category',
+        name: 'Active categories cannot be edited',
       })
     ).toBeVisible();
     expect(

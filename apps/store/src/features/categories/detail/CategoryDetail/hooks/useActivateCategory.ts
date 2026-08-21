@@ -4,6 +4,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { updateCategory } from '@/lib/client/api/categories';
 import { CATEGORY_STATUS } from '@/lib/domain/categories/constants';
 import { categoriesQueryKeys } from '@/lib/query/categories/categoriesQueryKeys';
+import { getApiErrorMessage } from '@/lib/utils/apiError';
 
 type UseActivateCategoryArgs = {
   categoryId: number;
@@ -32,7 +33,7 @@ export const useActivateCategory = ({
     },
     onError: (error) => {
       addToast({
-        description: error.message,
+        description: getApiErrorMessage(error),
         type: 'error',
       });
     },

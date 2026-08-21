@@ -29,6 +29,15 @@ describe('getApiErrorMessage', () => {
     ).toBe('Active attribute values cannot be edited');
   });
 
+  it('maps the active category modification error', () => {
+    expect(
+      getApiErrorMessage({
+        code: API_ERROR_CODES.CATEGORY_MODIFICATION_NOT_ALLOWED,
+        message: 'Conflict',
+      })
+    ).toBe('Active categories cannot be edited');
+  });
+
   it('returns the backend message when the error code has no mapping', () => {
     expect(
       getApiErrorMessage({
