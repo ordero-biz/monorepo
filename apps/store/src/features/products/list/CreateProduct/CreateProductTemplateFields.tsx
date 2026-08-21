@@ -1,7 +1,7 @@
 import { Textarea, TextField, ToggleButton } from '@ordero/ui';
+import { CategoriesAsyncCombobox } from '@/features/categories';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
 import { AttributesAsyncCombobox } from './AttributesAsyncCombobox';
-import { CategoriesAsyncCombobox } from '@/features/categories';
 import { PRODUCT_GENERATION_MODE } from './constants';
 import { ProductImageDropzone } from './ProductImageDropzone';
 import type {
@@ -155,6 +155,10 @@ export const CreateProductTemplateFields = ({
                 (value[0] as ProductGenerationMode | undefined) ??
                 PRODUCT_GENERATION_MODE.one;
 
+              form.setFieldValue(
+                'productVariantsGenerationMode',
+                nextGenerationMode
+              );
               onGenerationModeChange(nextGenerationMode);
             }}
             orientation="horizontal"

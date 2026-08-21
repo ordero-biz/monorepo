@@ -300,6 +300,30 @@ describe('CreateProduct', () => {
     expect(createProductGroupMock).not.toHaveBeenCalled();
   });
 
+  it('requires attribute values after switching a generated variant to multiple products', async () => {
+    const user = userEvent.setup();
+
+    setup();
+
+    await completeRequiredFields(user);
+    await user.click(
+      screen.getByRole('button', { name: 'Next: Configure product' })
+    );
+    await user.type(screen.getByRole('textbox', { name: 'SKU' }), 'SHOE');
+    await user.type(
+      screen.getByRole('textbox', { name: 'Barcode' }),
+      'barcode-1'
+    );
+    const createButton = screen.getByRole('button', { name: 'Create product' });
+
+    expect(createButton).toBeEnabled();
+
+    await user.click(screen.getByRole('button', { name: 'Multiple products' }));
+
+    await waitFor(() => expect(createButton).toBeDisabled());
+    expect(createProductGroupMock).not.toHaveBeenCalled();
+  });
+
   it('shows only template-selected attributes in the variant attribute editor', async () => {
     const user = userEvent.setup();
 
