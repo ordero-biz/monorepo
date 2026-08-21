@@ -300,6 +300,32 @@ describe('CreateProduct', () => {
     expect(createProductGroupMock).not.toHaveBeenCalled();
   });
 
+  it('clears generated variants when template attributes change', async () => {
+    const user = userEvent.setup();
+
+    setup();
+
+    await completeRequiredFields(user);
+    await user.click(screen.getByRole('button', { name: 'Select Attributes' }));
+    await user.click(screen.getByRole('button', { name: 'Blue' }));
+    await user.click(
+      screen.getByRole('button', { name: 'Next: Configure product' })
+    );
+
+    expect(screen.getByDisplayValue('Running Shoes Blue')).toBeInTheDocument();
+
+    await user.click(
+      screen.getByRole('button', { name: 'Select Color Attribute' })
+    );
+
+    expect(
+      screen.queryByDisplayValue('Running Shoes Blue')
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Create product' })
+    ).not.toBeInTheDocument();
+  });
+
   it('requires attribute values after switching a generated variant to multiple products', async () => {
     const user = userEvent.setup();
 

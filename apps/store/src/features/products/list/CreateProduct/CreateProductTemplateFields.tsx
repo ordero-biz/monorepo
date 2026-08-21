@@ -111,6 +111,7 @@ export const CreateProductTemplateFields = ({
                     form.setFieldValue('attributeValues', (currentValue) =>
                       getAttributeValueSelections(currentValue, attributes)
                     );
+                    form.setFieldValue('productVariants', []);
                   }}
                   placeholder="Select attributes"
                   required={isMultipleProducts}

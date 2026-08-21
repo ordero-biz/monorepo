@@ -33,7 +33,7 @@ export const ProductAttributeValuesField = ({
                         <ToggleButton.Item
                           key={attributeValue.id}
                           onPressedChange={(pressed) => {
-                            field.handleChange({
+                            const nextAttributeValues = {
                               ...field.state.value,
                               [attributeId]: pressed
                                 ? [
@@ -45,7 +45,10 @@ export const ProductAttributeValuesField = ({
                                       selectedAttributeValueId !==
                                       attributeValueId
                                   ),
-                            });
+                            };
+
+                            field.handleChange(nextAttributeValues);
+                            form.setFieldValue('productVariants', []);
                           }}
                           pressed={selectedAttributeValueIds.includes(
                             attributeValueId
