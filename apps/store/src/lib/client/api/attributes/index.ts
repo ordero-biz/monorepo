@@ -45,6 +45,7 @@ type CreateAttributeValuesInput = {
   attributeValues: {
     name: string;
     sortOrder: number;
+    status: AttributeStatus;
   }[];
 };
 

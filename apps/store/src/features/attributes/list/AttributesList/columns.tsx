@@ -1,4 +1,5 @@
 import {
+  Chip,
   DataTableCell,
   type DataTableColumnDef,
   DataTableColumnHeader,
@@ -7,6 +8,27 @@ import Link from 'next/link';
 import { getAttributeDetailRoute } from '@/lib/client/routes';
 import type { Attribute } from '@/lib/domain/attributes/types';
 import { formatDate } from '@/lib/utils/formatDate';
+
+const statusLabels = {
+  ACTIVE: 'Active',
+  DRAFT: 'Draft',
+} as const;
+
+const getStatusChip = (status?: Attribute['status']) => {
+  if (!status) {
+    return null;
+  }
+
+  return (
+    <Chip
+      color={status === 'ACTIVE' ? 'primary' : 'warning'}
+      size="s"
+      variant="soft"
+    >
+      {statusLabels[status]}
+    </Chip>
+  );
+};
 
 export const columns: DataTableColumnDef<Attribute>[] = [
   {
@@ -29,6 +51,18 @@ export const columns: DataTableColumnDef<Attribute>[] = [
     },
   },
   {
+    accessorKey: 'status',
+    cell: ({ row }) => (
+      <DataTableCell>{getStatusChip(row.original.status)}</DataTableCell>
+    ),
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Status" />
+    ),
+    meta: {
+      width: '25%',
+    },
+  },
+  {
     accessorKey: 'createdAt',
     cell: ({ row }) => (
       <DataTableCell>{formatDate(row.original.createdAt)}</DataTableCell>
@@ -37,7 +71,7 @@ export const columns: DataTableColumnDef<Attribute>[] = [
       <DataTableColumnHeader column={column} title="Created at" />
     ),
     meta: {
-      width: '50%',
+      width: '25%',
     },
   },
 ];

@@ -103,14 +103,23 @@ describe('AttributesList', () => {
             id: 1,
             name: 'Size',
             sortOrder: 10,
+            status: 'ACTIVE',
             values: ['S', 'M', 'L'],
             createdAt: '2026-05-26T20:55:51.542Z',
+          },
+          {
+            id: 2,
+            name: 'Material',
+            sortOrder: 20,
+            status: 'DRAFT',
+            values: ['Cotton'],
+            createdAt: '2026-05-27T20:55:51.542Z',
           },
         ],
         page: {
           size: 10,
           number: 0,
-          totalElements: 1,
+          totalElements: 2,
           totalPages: 1,
         },
       },
@@ -124,8 +133,11 @@ describe('AttributesList', () => {
     expect(
       screen.queryByRole('columnheader', { name: 'Sort order' })
     ).not.toBeInTheDocument();
+    expect(screen.getByRole('columnheader', { name: 'Status' })).toBeVisible();
     expect(screen.getByText('Size')).toBeVisible();
     expect(screen.getByText('26 May 2026')).toBeVisible();
+    expect(screen.getByText('Active')).toBeVisible();
+    expect(screen.getByText('Draft')).toBeVisible();
   });
 
   it('renders attribute names as detail page links', async () => {
@@ -230,12 +242,12 @@ describe('AttributesList', () => {
 
     setup({
       paginationInput: {
-        page: 1,
+        page: 2,
         size: 1,
       },
     });
 
     expect(await screen.findByText('Material')).toBeVisible();
-    expect(screen.getByText('2-2 of 2')).toBeVisible();
+    expect(await screen.findByText('2-2 of 2')).toBeVisible();
   });
 });

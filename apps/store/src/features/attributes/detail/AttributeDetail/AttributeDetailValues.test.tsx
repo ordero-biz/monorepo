@@ -44,6 +44,14 @@ describe('AttributeDetailValues', () => {
           id: 3,
           name: 'Blue',
           sortOrder: 0,
+          status: 'ACTIVE',
+          createdAt: '2026-06-24T20:07:32.467Z',
+        },
+        {
+          id: 4,
+          name: 'Green',
+          sortOrder: 1,
+          status: 'DRAFT',
           createdAt: '2026-06-24T20:07:32.467Z',
         },
       ],
@@ -55,7 +63,10 @@ describe('AttributeDetailValues', () => {
       await screen.findByRole('table', { name: 'Attribute values' })
     ).toBeVisible();
     expect(screen.getByText('Name')).toBeVisible();
+    expect(screen.getByRole('columnheader', { name: 'Status' })).toBeVisible();
     expect(screen.getByText('Blue')).toBeVisible();
+    expect(screen.getByText('Active')).toBeVisible();
+    expect(screen.getByText('Draft')).toBeVisible();
     expect(
       screen.getByRole('button', { name: 'Actions for Blue' })
     ).toBeVisible();
@@ -75,6 +86,7 @@ describe('AttributeDetailValues', () => {
           id: 3,
           name: 'Blue',
           sortOrder: 0,
+          status: 'DRAFT',
           createdAt: '2026-06-24T20:07:32.467Z',
         },
       ],
@@ -94,6 +106,35 @@ describe('AttributeDetailValues', () => {
     expect(
       screen.getByRole('textbox', { name: 'Attribute value name' })
     ).toHaveValue('Blue');
+  });
+
+  it('hides the edit action for active attribute values', async () => {
+    getAttributeValuesMock.mockResolvedValue({
+      ok: true,
+      data: [
+        {
+          id: 3,
+          name: 'Blue',
+          sortOrder: 0,
+          status: 'ACTIVE',
+          createdAt: '2026-06-24T20:07:32.467Z',
+        },
+      ],
+    });
+    const user = userEvent.setup();
+
+    setup();
+
+    await user.click(
+      await screen.findByRole('button', { name: 'Actions for Blue' })
+    );
+
+    expect(
+      await screen.findByRole('menuitem', { name: 'Delete' })
+    ).toBeVisible();
+    expect(
+      screen.queryByRole('menuitem', { name: 'Edit' })
+    ).not.toBeInTheDocument();
   });
 
   it('opens the delete dialog for the selected value', async () => {

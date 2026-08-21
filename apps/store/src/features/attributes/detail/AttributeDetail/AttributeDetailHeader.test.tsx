@@ -53,6 +53,7 @@ describe('AttributeDetailHeader', () => {
         id: 7,
         name: 'Color',
         sortOrder: 10,
+        status: 'DRAFT',
         createdAt: '2026-06-24T20:07:32.467Z',
       },
     });
@@ -73,6 +74,7 @@ describe('AttributeDetailHeader', () => {
         id: 7,
         name: 'Color',
         sortOrder: 10,
+        status: 'DRAFT',
         createdAt: '2026-06-24T20:07:32.467Z',
       },
     });
@@ -92,6 +94,33 @@ describe('AttributeDetailHeader', () => {
 
     expect(
       screen.getByRole('dialog', { name: 'Delete attribute' })
+    ).toBeVisible();
+  });
+
+  it('hides the edit action for active attributes', async () => {
+    getAttributeMock.mockResolvedValue({
+      ok: true,
+      data: {
+        id: 7,
+        name: 'Color',
+        sortOrder: 10,
+        status: 'ACTIVE',
+        createdAt: '2026-06-24T20:07:32.467Z',
+      },
+    });
+    const user = userEvent.setup();
+
+    setup();
+
+    await user.click(
+      await screen.findByRole('button', { name: 'Actions for Color' })
+    );
+
+    expect(
+      screen.queryByRole('menuitem', { name: 'Edit attribute name' })
+    ).not.toBeInTheDocument();
+    expect(
+      await screen.findByRole('menuitem', { name: 'Delete attribute' })
     ).toBeVisible();
   });
 

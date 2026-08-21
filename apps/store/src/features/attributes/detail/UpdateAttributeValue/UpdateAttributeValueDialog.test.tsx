@@ -75,7 +75,7 @@ describe('UpdateAttributeValueDialog', () => {
     expect(onOpenChangeMock).toHaveBeenCalledWith(false);
   });
 
-  it('requires an attribute value name before save is available', async () => {
+  it('keeps save available and rejects an empty attribute value name', async () => {
     const user = userEvent.setup();
 
     setup();
@@ -88,18 +88,24 @@ describe('UpdateAttributeValueDialog', () => {
     });
     const saveButton = within(dialog).getByRole('button', { name: 'Save' });
 
+    expect(within(dialog).getByText('Name')).toBeVisible();
+    expect(nameField).toBeRequired();
+    expect(nameField).not.toHaveAttribute('placeholder');
     expect(saveButton).toBeEnabled();
 
     await user.clear(nameField);
 
-    expect(saveButton).toBeDisabled();
-
-    await user.type(nameField, 'Navy');
-
     expect(saveButton).toBeEnabled();
+
+    await user.click(saveButton);
+
+    expect(
+      await within(dialog).findByText('Attribute value name is required')
+    ).toBeVisible();
+    expect(updateAttributeValueMock).not.toHaveBeenCalled();
   });
 
-  it('prevents another save while the update is in flight', async () => {
+  it('keeps save available while the update is in flight', async () => {
     let resolveUpdate:
       | ((value: Awaited<ReturnType<typeof updateAttributeValue>>) => void)
       | undefined;
@@ -120,8 +126,7 @@ describe('UpdateAttributeValueDialog', () => {
 
     await user.click(saveButton);
 
-    expect(saveButton).toBeDisabled();
-    expect(screen.getByRole('button', { name: 'Saving...' })).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Saving...' })).toBeEnabled();
 
     resolveUpdate?.({
       ok: true,

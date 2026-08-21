@@ -72,12 +72,13 @@ export const UpdateAttributeValueDialog = ({
                         aria-label="Attribute value name"
                         errorText={errorText}
                         invalid={Boolean(errorText)}
+                        label="Name"
                         name={field.name}
                         onBlur={field.handleBlur}
                         onValueChange={field.handleChange}
-                        placeholder="Blue"
                         required
                         value={field.state.value}
+                        size="s"
                       />
                     );
                   }}
@@ -85,16 +86,9 @@ export const UpdateAttributeValueDialog = ({
               </Dialog.Content>
 
               <Dialog.Footer>
-                <form.Subscribe
-                  selector={(state) =>
-                    [state.values.name, state.isSubmitting] as const
-                  }
-                >
-                  {([name, isSubmitting]) => (
-                    <Button
-                      disabled={isSubmitting || !name.trim()}
-                      type="submit"
-                    >
+                <form.Subscribe selector={(state) => state.isSubmitting}>
+                  {(isSubmitting) => (
+                    <Button type="submit">
                       {isSubmitting ? 'Saving...' : 'Save'}
                     </Button>
                   )}

@@ -352,6 +352,7 @@ describe('attribute client helpers', () => {
           {
             name: 'Green',
             sortOrder: 0,
+            status: 'DRAFT',
           },
         ],
       })
@@ -376,6 +377,7 @@ describe('attribute client helpers', () => {
             {
               name: 'Green',
               sortOrder: 0,
+              status: 'DRAFT',
             },
           ],
         }),
@@ -408,6 +410,7 @@ describe('attribute client helpers', () => {
           {
             name: 'Green',
             sortOrder: 0,
+            status: 'DRAFT',
           },
         ],
       })

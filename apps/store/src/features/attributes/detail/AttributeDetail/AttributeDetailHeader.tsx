@@ -3,6 +3,7 @@
 import { Button, Card, Menu, PageHeader, Typography } from '@ordero/ui';
 import { EllipsisVertical, Pencil, Trash2 } from 'lucide-react';
 import { useState } from 'react';
+import { ATTRIBUTE_STATUS } from '@/lib/domain/attributes/constants';
 import { useAttributeQuery } from '@/lib/hooks/attributes/useAttributeQuery';
 import { CreateAttributeValuesDialogTrigger } from '../CreateAttributeValues';
 import { DeleteAttributeDialog } from '../DeleteAttribute';
@@ -58,7 +59,10 @@ export const AttributeDetailHeader = ({
         <Typography variant="h5">{attributeQuery.data.name}</Typography>
       </PageHeader.Left>
       <PageHeader.Right>
-        <CreateAttributeValuesDialogTrigger attributeId={attributeId} />
+        <CreateAttributeValuesDialogTrigger
+          attributeId={attributeId}
+          attributeStatus={attributeQuery.data.status ?? ATTRIBUTE_STATUS.DRAFT}
+        />
 
         <Menu.Root>
           <Menu.Trigger
@@ -72,13 +76,15 @@ export const AttributeDetailHeader = ({
           <Menu.Portal>
             <Menu.Positioner align="end">
               <Menu.Popup>
-                <Menu.Item onClick={() => setIsUpdateDialogOpen(true)}>
-                  <Pencil
-                    aria-hidden="true"
-                    className="size-[var(--icon-button-xs-icon)]"
-                  />
-                  Edit attribute name
-                </Menu.Item>
+                {attributeQuery.data.status !== 'ACTIVE' ? (
+                  <Menu.Item onClick={() => setIsUpdateDialogOpen(true)}>
+                    <Pencil
+                      aria-hidden="true"
+                      className="size-[var(--icon-button-xs-icon)]"
+                    />
+                    Edit attribute name
+                  </Menu.Item>
+                ) : null}
                 <Menu.Item
                   color="error"
                   onClick={() => setIsDeleteDialogOpen(true)}
