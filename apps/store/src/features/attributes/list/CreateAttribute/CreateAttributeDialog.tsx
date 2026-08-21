@@ -15,11 +15,20 @@ import { CircleAlert, Minus } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { getAttributeDetailRoute } from '@/lib/client/routes';
-import { ATTRIBUTE_STATUS } from '@/lib/domain/attributes/constants';
-import type { AttributeStatus } from '@/lib/domain/attributes/types';
+import {
+  ATTRIBUTE_STATUS,
+  ATTRIBUTE_VALUE_STATUS,
+} from '@/lib/domain/attributes/constants';
+import type {
+  AttributeStatus,
+  AttributeValueStatus,
+} from '@/lib/domain/attributes/types';
 import { attributesQueryKeys } from '@/lib/query/attributes/attributesQueryKeys';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
-import {ATTRIBUTE_VALUE_STATUS_OPTIONS, INITIAL_ATTRIBUTE_VALUE_FIELD_INDEX} from './constants';
+import {
+  ATTRIBUTE_VALUE_STATUS_OPTIONS,
+  INITIAL_ATTRIBUTE_VALUE_FIELD_INDEX,
+} from './constants';
 import { useCreateAttributeForm } from './hooks/useCreateAttributeForm';
 import type { CreateAttributeDialogProps } from './types';
 import {
@@ -90,7 +99,7 @@ export const CreateAttributeDialog = ({
       'attributeValues',
       form.state.values.attributeValues.map((attributeValue) => ({
         ...attributeValue,
-        status: ATTRIBUTE_STATUS.DRAFT,
+        status: ATTRIBUTE_VALUE_STATUS.DRAFT,
       }))
     );
   };
@@ -284,7 +293,7 @@ export const CreateAttributeDialog = ({
                                                         disabled={
                                                           isSubmitting ||
                                                           attributeStatus ===
-                                                            ATTRIBUTE_STATUS.DRAFT
+                                                            ATTRIBUTE_VALUE_STATUS.DRAFT
                                                         }
                                                         errorText={errorText}
                                                         invalid={Boolean(
@@ -298,7 +307,7 @@ export const CreateAttributeDialog = ({
                                                           value
                                                         ) =>
                                                           statusField.handleChange(
-                                                            value as AttributeStatus
+                                                            value as AttributeValueStatus
                                                           )
                                                         }
                                                         options={

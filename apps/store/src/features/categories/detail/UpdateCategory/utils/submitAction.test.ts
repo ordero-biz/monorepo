@@ -1,4 +1,5 @@
 import { updateCategory } from '@/lib/client/api/categories';
+import { API_ERROR_CODES } from '@/lib/constants/apiErrorCodes';
 import { getCategoryUpdateChanges, submitUpdateCategory } from './submitAction';
 
 vi.mock('@/lib/client/api/categories', () => ({
@@ -65,6 +66,30 @@ describe('submitUpdateCategory', () => {
     expect(updateCategoryMock).toHaveBeenCalledWith({
       categoryId: 2,
       parentId: null,
+    });
+  });
+
+  it('maps active category modification errors for the form', async () => {
+    updateCategoryMock.mockResolvedValue({
+      ok: false,
+      error: {
+        status: 409,
+        code: API_ERROR_CODES.CATEGORY_MODIFICATION_NOT_ALLOWED,
+        message: 'Conflict',
+      },
+    });
+
+    await expect(
+      submitUpdateCategory({
+        categoryId: category.id,
+        submitData: { name: 'Running shoes' },
+      })
+    ).resolves.toEqual({
+      ok: false,
+      error: {
+        fieldErrors: undefined,
+        formError: 'Active categories cannot be edited',
+      },
     });
   });
 });

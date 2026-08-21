@@ -6,6 +6,7 @@ import {
 } from '@ordero/ui';
 import Link from 'next/link';
 import { getCategoryDetailRoute } from '@/lib/client/routes';
+import { CATEGORY_STATUS } from '@/lib/domain/categories/constants';
 import type { Category } from '@/lib/domain/categories/types';
 import { formatDate } from '@/lib/utils/formatDate';
 
@@ -40,7 +41,11 @@ export const columns: DataTableColumnDef<Category>[] = [
       row.original.status ? (
         <DataTableCell>
           <Chip
-            color={row.original.status === 'ACTIVE' ? 'primary' : 'warning'}
+            color={
+              row.original.status === CATEGORY_STATUS.ACTIVE
+                ? 'primary'
+                : 'warning'
+            }
             size="s"
             variant="soft"
           >

@@ -1,4 +1,9 @@
 import { createAttributeValues } from '@/lib/client/api/attributes';
+import {
+  ATTRIBUTE_STATUS,
+  ATTRIBUTE_VALUE_STATUS,
+} from '@/lib/domain/attributes/constants';
+import type { AttributeStatus } from '@/lib/domain/attributes/types';
 import type {
   AttributeValueFormValue,
   CreateAttributeValuesFormValues,
@@ -6,17 +11,29 @@ import type {
 
 type SubmitCreateAttributeValuesArgs = {
   attributeId: string | number;
+  attributeStatus: AttributeStatus;
   value: CreateAttributeValuesFormValues;
 };
 
-const normalizeAttributeValues = (attributeValues: AttributeValueFormValue[]) =>
+type NormalizeAttributeValuesArgs = {
+  attributeStatus: AttributeStatus;
+  attributeValues: AttributeValueFormValue[];
+};
+
+const normalizeAttributeValues = ({
+  attributeStatus,
+  attributeValues,
+}: NormalizeAttributeValuesArgs) =>
   attributeValues
-    .map((attributeValue) => attributeValue.value.trim())
-    .filter(Boolean)
-    .map((name) => ({
-      name,
+    .map((attributeValue) => ({
+      name: attributeValue.value.trim(),
       sortOrder: 0,
-    }));
+      status:
+        attributeStatus === ATTRIBUTE_STATUS.DRAFT
+          ? ATTRIBUTE_VALUE_STATUS.DRAFT
+          : attributeValue.status,
+    }))
+    .filter((attributeValue) => attributeValue.name);
 
 const mapAttributeValueFieldErrors = (
   fieldErrors: Record<string, string> | undefined
@@ -35,11 +52,15 @@ const mapAttributeValueFieldErrors = (
 
 export const submitCreateAttributeValues = async ({
   attributeId,
+  attributeStatus,
   value,
 }: SubmitCreateAttributeValuesArgs) => {
   const result = await createAttributeValues({
     attributeId,
-    attributeValues: normalizeAttributeValues(value.attributeValues),
+    attributeValues: normalizeAttributeValues({
+      attributeStatus,
+      attributeValues: value.attributeValues,
+    }),
   });
 
   if (!result.ok) {

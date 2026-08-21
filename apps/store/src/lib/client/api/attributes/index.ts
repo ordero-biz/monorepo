@@ -5,6 +5,7 @@ import type {
   Attribute,
   AttributeStatus,
   AttributeValue,
+  AttributeValueStatus,
 } from '@/lib/domain/attributes/types';
 import type { PaginatedResponse } from '@/lib/server/types';
 import { tokenizePath } from '@/lib/utils/tokenizePath';
@@ -45,6 +46,7 @@ type CreateAttributeValuesInput = {
   attributeValues: {
     name: string;
     sortOrder: number;
+    status: AttributeValueStatus;
   }[];
 };
 
@@ -64,58 +66,58 @@ export const createAttributeValues = ({
     }
   );
 
-type CreateAttributeInput = {
+export type CreateAttributeData = {
   name: string;
   sortOrder: number;
   status: AttributeStatus;
   attributeValues: {
     name: string;
     sortOrder: number;
-    status: AttributeStatus;
+    status: AttributeValueStatus;
   }[];
 };
 
-export const createAttribute = (input: CreateAttributeInput) =>
+export type UpdateAttributeFieldData = Partial<
+  Pick<CreateAttributeData, 'name' | 'status'>
+>;
+
+export type UpdateAttributeData = UpdateAttributeFieldData & {
+  attributeId: string | number;
+};
+
+export const createAttribute = (input: CreateAttributeData) =>
   apiFetch<Attribute>(CLIENT_BACKEND_PATHS.attributes, {
     method: 'POST',
     body: input,
   });
 
-type UpdateAttributeInput = {
-  attributeId: string | number;
-  name: string;
-};
-
-export const updateAttribute = ({ attributeId, name }: UpdateAttributeInput) =>
+export const updateAttribute = ({
+  attributeId,
+  ...input
+}: UpdateAttributeData) =>
   apiFetch<Attribute>(
     tokenizePath(CLIENT_BACKEND_PATHS.attribute, { id: attributeId }),
     {
       method: 'PATCH',
-      body: {
-        name,
-      },
+      body: input,
     }
   );
 
-type UpdateAttributeValueInput = {
+export type UpdateAttributeValueData = Partial<
+  Pick<AttributeValue, 'name' | 'sortOrder' | 'status'>
+> & {
   attributeValueId: string | number;
-  name: string;
-  sortOrder: number;
 };
 
 export const updateAttributeValue = ({
   attributeValueId,
-  name,
-  sortOrder,
-}: UpdateAttributeValueInput) =>
+  ...input
+}: UpdateAttributeValueData) =>
   apiFetch<AttributeValue>(
     tokenizePath(CLIENT_BACKEND_PATHS.attributeValue, { id: attributeValueId }),
     {
       method: 'PATCH',
-      body: {
-        name,
-        sortOrder,
-      },
+      body: input,
     }
   );
 

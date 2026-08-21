@@ -1,5 +1,8 @@
 import { z } from 'zod';
-import { ATTRIBUTE_STATUS } from '@/lib/domain/attributes/constants';
+import {
+  ATTRIBUTE_STATUS,
+  ATTRIBUTE_VALUE_STATUS,
+} from '@/lib/domain/attributes/constants';
 import type { ValidationArgs } from '@/lib/utils/form/validation/types';
 
 export const attributeNameSchema = z
@@ -15,7 +18,7 @@ export const attributeStatusSchema = z.enum(
 );
 
 export const attributeValueStatusSchema = z.enum(
-  [ATTRIBUTE_STATUS.DRAFT, ATTRIBUTE_STATUS.ACTIVE],
+  [ATTRIBUTE_VALUE_STATUS.DRAFT, ATTRIBUTE_VALUE_STATUS.ACTIVE],
   {
     error: 'Attribute value status must be Draft or Active',
   }

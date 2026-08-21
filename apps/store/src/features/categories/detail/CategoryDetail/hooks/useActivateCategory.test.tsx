@@ -1,5 +1,6 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { updateCategory } from '@/lib/client/api/categories';
+import { API_ERROR_CODES } from '@/lib/constants/apiErrorCodes';
 import { CATEGORY_STATUS } from '@/lib/domain/categories/constants';
 import { categoriesQueryKeys } from '@/lib/query/categories/categoriesQueryKeys';
 import {
@@ -103,8 +104,9 @@ describe('useActivateCategory', () => {
     updateCategoryMock.mockResolvedValue({
       ok: false,
       error: {
-        status: 500,
-        message: 'Could not activate category',
+        status: 409,
+        code: API_ERROR_CODES.CATEGORY_MODIFICATION_NOT_ALLOWED,
+        message: 'Conflict',
       },
     });
     const { onActivated, result } = setupActivateCategoryHook();
@@ -115,7 +117,7 @@ describe('useActivateCategory', () => {
 
     await waitFor(() =>
       expect(addToastMock).toHaveBeenCalledWith({
-        description: 'Could not activate category',
+        description: 'Active categories cannot be edited',
         type: 'error',
       })
     );

@@ -148,6 +148,7 @@ describe('CategoryDetail', () => {
     expect(
       await screen.findByRole('heading', { name: 'Sneakers' })
     ).toBeVisible();
+    expect(screen.getByText('Active')).toBeVisible();
     expect(
       screen.queryByRole('button', { name: 'Publish' })
     ).not.toBeInTheDocument();

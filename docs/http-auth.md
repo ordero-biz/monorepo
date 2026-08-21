@@ -81,6 +81,18 @@ type ApiError = {
 };
 ```
 
+## Backend Error-Code Mapping
+
+Backends may return a stable `ApiError.code` alongside a generic message such
+as `Conflict`. For known, user-actionable codes, each app should keep a single
+app-owned code and message catalog (for example,
+`src/lib/constants/apiErrorCodes.ts`) and resolve it before showing a mutation
+toast or returning a form-level error.
+
+Keep codes app-owned unless the same backend contract is used by more than one
+app. Preserve `fieldErrors` for field-level form mapping. When a code is unknown
+or has no user-facing mapping, fall back to `ApiError.message`.
+
 Server-side session resolution uses a separate internal result shape:
 
 ```ts
