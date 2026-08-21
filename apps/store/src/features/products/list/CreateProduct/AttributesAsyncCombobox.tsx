@@ -6,7 +6,7 @@ import {
   AsyncCombobox,
   type AsyncComboboxLoadOptionsResult,
 } from '@/lib/components/AsyncCombobox';
-import type { AttributeDropdown } from '@/lib/domain/attributes';
+import type { AttributeDropdown } from '@/lib/domain/attributes/types';
 import { attributesQueryKeys } from '@/lib/query/attributes/attributesQueryKeys';
 import type { AttributesAsyncComboboxProps } from './types';
 
@@ -90,6 +90,7 @@ export const AttributesAsyncCombobox = ({
 
       return {
         options: result.data.map((attribute) => ({
+          displayValue: attribute.name,
           label: attribute.name,
           value: String(attribute.id),
         })),

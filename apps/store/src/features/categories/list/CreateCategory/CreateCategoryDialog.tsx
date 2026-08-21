@@ -3,7 +3,7 @@
 import { Dialog } from '@ordero/ui';
 import { useQueryClient } from '@tanstack/react-query';
 import { categoriesQueryKeys } from '@/lib/query/categories/categoriesQueryKeys';
-import { CategoryFormDialogContent } from '../../shared/CategoryFormDialogContent';
+import { CreateCategoryDialogFormContent } from './CreateCategoryDialogFormContent';
 import { createCategoryDefaultValues } from './constants';
 import { useCreateCategoryForm } from './hooks/useCreateCategoryForm';
 import type { CreateCategoryDialogProps } from './types';
@@ -58,11 +58,7 @@ export const CreateCategoryDialog = ({
                 <Dialog.Title>Add new category</Dialog.Title>
               </Dialog.Header>
 
-              <CategoryFormDialogContent
-                form={form}
-                pendingText="Adding..."
-                submitText="Add"
-              />
+              <CreateCategoryDialogFormContent form={form} />
             </form>
           </Dialog.Popup>
         </Dialog.Viewport>

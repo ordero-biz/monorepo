@@ -1,5 +1,5 @@
 import type { AsyncComboboxMultipleProps } from '@/lib/components/AsyncCombobox';
-import type { AttributeDropdown } from '@/lib/domain/attributes';
+import type { AttributeDropdown } from '@/lib/domain/attributes/types';
 import type { PRODUCT_GENERATION_MODE } from './constants';
 import type { useCreateProductForm } from './hooks/useCreateProductForm';
 

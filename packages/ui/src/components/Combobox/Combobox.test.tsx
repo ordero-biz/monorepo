@@ -6,9 +6,9 @@ import { Combobox } from './Combobox';
 import type { ComboboxProps } from './types';
 
 const options = [
-  { label: 'JavaScript', value: 'javascript' },
-  { label: 'TypeScript', value: 'typescript' },
-  { label: 'Python', value: 'python' },
+  { displayValue: 'JavaScript', label: 'JavaScript', value: 'javascript' },
+  { displayValue: 'TypeScript', label: 'TypeScript', value: 'typescript' },
+  { displayValue: 'Python', label: 'Python', value: 'python' },
 ] satisfies ComboboxProps['options'];
 
 describe('Combobox', () => {
@@ -56,6 +56,42 @@ describe('Combobox', () => {
     expect(onValueChange).toHaveBeenLastCalledWith(
       'typescript',
       expect.any(Object)
+    );
+  });
+
+  it('returns the selected option through onOptionSelect', async () => {
+    const user = userEvent.setup();
+
+    const { 'aria-label': ariaLabel, onOptionSelect } = setup({
+      onOptionSelect: vi.fn(),
+    });
+
+    await user.click(screen.getByRole('combobox', { name: ariaLabel }));
+    await user.click(screen.getByRole('option', { name: 'Python' }));
+
+    expect(onOptionSelect).toHaveBeenLastCalledWith(
+      {
+        displayValue: 'Python',
+        label: 'Python',
+        value: 'python',
+      }
+    );
+  });
+
+  it('uses displayValue when rendering a selected JSX label', () => {
+    setup({
+      defaultValue: 'python',
+      options: [
+        {
+          label: <span>Python <span>Draft</span></span>,
+          displayValue: 'Python',
+          value: 'python',
+        },
+      ],
+    });
+
+    expect(screen.getByRole('combobox', { name: 'Language' })).toHaveValue(
+      'Python'
     );
   });
 

@@ -17,7 +17,10 @@ export type RadioColor =
 
 export type RadioSize = 's' | 'm';
 
+export type RadioAlignment = 'start' | 'center' | 'end';
+
 export type RadioProps = {
+  align?: RadioAlignment;
   'aria-describedby'?: string;
   'aria-label'?: string;
   'aria-labelledby'?: string;

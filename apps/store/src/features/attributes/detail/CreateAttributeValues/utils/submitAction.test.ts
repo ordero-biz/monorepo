@@ -1,4 +1,8 @@
 import { createAttributeValues } from '@/lib/client/api/attributes';
+import {
+  ATTRIBUTE_STATUS,
+  ATTRIBUTE_VALUE_STATUS,
+} from '@/lib/domain/attributes/constants';
 import { submitCreateAttributeValues } from './submitAction';
 
 vi.mock('@/lib/client/api/attributes', async () => ({
@@ -32,14 +36,17 @@ describe('submitCreateAttributeValues', () => {
     await expect(
       submitCreateAttributeValues({
         attributeId: 7,
+        attributeStatus: ATTRIBUTE_STATUS.ACTIVE,
         value: {
           attributeValues: [
             {
               id: 'attribute-value-0',
+              status: ATTRIBUTE_VALUE_STATUS.DRAFT,
               value: '  Green  ',
             },
             {
               id: 'attribute-value-1',
+              status: ATTRIBUTE_VALUE_STATUS.DRAFT,
               value: '   ',
             },
           ],
@@ -56,6 +63,7 @@ describe('submitCreateAttributeValues', () => {
         {
           name: 'Green',
           sortOrder: 0,
+          status: ATTRIBUTE_VALUE_STATUS.DRAFT,
         },
       ],
     });
@@ -76,10 +84,12 @@ describe('submitCreateAttributeValues', () => {
     await expect(
       submitCreateAttributeValues({
         attributeId: 7,
+        attributeStatus: ATTRIBUTE_STATUS.ACTIVE,
         value: {
           attributeValues: [
             {
               id: 'attribute-value-0',
+              status: ATTRIBUTE_VALUE_STATUS.DRAFT,
               value: 'Green',
             },
           ],
@@ -93,6 +103,38 @@ describe('submitCreateAttributeValues', () => {
         },
         formError: 'Attribute values could not be added.',
       },
+    });
+  });
+
+  it('forces all values to draft when the attribute is a draft', async () => {
+    createAttributeValuesMock.mockResolvedValue({
+      ok: true,
+      data: [],
+    });
+
+    await submitCreateAttributeValues({
+      attributeId: 7,
+      attributeStatus: ATTRIBUTE_STATUS.DRAFT,
+      value: {
+        attributeValues: [
+          {
+            id: 'attribute-value-0',
+            status: ATTRIBUTE_VALUE_STATUS.ACTIVE,
+            value: 'Green',
+          },
+        ],
+      },
+    });
+
+    expect(createAttributeValuesMock).toHaveBeenCalledWith({
+      attributeId: 7,
+      attributeValues: [
+        {
+          name: 'Green',
+          sortOrder: 0,
+          status: ATTRIBUTE_VALUE_STATUS.DRAFT,
+        },
+      ],
     });
   });
 });

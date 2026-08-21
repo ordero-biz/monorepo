@@ -1,4 +1,5 @@
 import { updateAttribute } from '@/lib/client/api/attributes';
+import { getApiErrorMessage } from '@/lib/utils/apiError';
 import type { UpdateAttributeFormValues } from './validations';
 
 type SubmitUpdateAttributeArgs = {
@@ -20,7 +21,7 @@ export const submitUpdateAttribute = async ({
       ok: false,
       error: {
         fieldErrors: result.error.fieldErrors,
-        formError: result.error.message,
+        formError: getApiErrorMessage(result.error),
       },
     } as const;
   }

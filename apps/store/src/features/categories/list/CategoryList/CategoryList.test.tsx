@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getCategories } from '@/lib/client/api/categories';
 import { prepareStoreSetup } from '@/test/prepareSetup';
@@ -71,11 +71,12 @@ describe('CategoryList', () => {
               id: 1,
               name: 'Shoes',
               sortOrder: 10,
-              color: '#2563eb',
+              status: 'ACTIVE',
               createdAt: '2026-07-01T10:54:34.839Z',
               parentCategory: {
                 id: 2,
                 name: 'Fashion',
+                status: 'ACTIVE',
                 createdAt: '2026-06-30T10:54:34.839Z',
               },
             },
@@ -112,11 +113,12 @@ describe('CategoryList', () => {
             id: 1,
             name: 'Shoes',
             sortOrder: 10,
-            color: '#2563eb',
+            status: 'ACTIVE',
             createdAt: '2026-07-01T10:54:34.839Z',
             parentCategory: {
               id: 2,
               name: 'Fashion',
+              status: 'ACTIVE',
               createdAt: '2026-06-30T10:54:34.839Z',
             },
           },
@@ -136,9 +138,22 @@ describe('CategoryList', () => {
       await screen.findByRole('table', { name: 'Category list' })
     ).toBeVisible();
     expect(screen.getByText('Shoes')).toBeVisible();
-    expect(screen.getByText('Fashion')).toBeVisible();
+    expect(screen.getByRole('link', { name: 'Fashion' })).toHaveAttribute(
+      'href',
+      '/products/categories/2'
+    );
+    expect(screen.getAllByText('Active')).toHaveLength(2);
     expect(screen.getByText('01 Jul 2026')).toBeVisible();
     expect(screen.getByText('1-1 of 1')).toBeVisible();
+    expect(
+      screen.getAllByRole('columnheader').map((header) => header.textContent)
+    ).toEqual([
+      'Name',
+      'Status',
+      'Parent category',
+      'Parent status',
+      'Created at',
+    ]);
   });
 
   it('renders current server page rows without client-side pagination', async () => {
@@ -150,7 +165,7 @@ describe('CategoryList', () => {
             id: 2,
             name: 'Accessories',
             sortOrder: 20,
-            color: '#16a34a',
+            status: 'DRAFT',
             createdAt: '2026-07-02T10:54:34.839Z',
             parentCategory: null,
           },
@@ -166,14 +181,69 @@ describe('CategoryList', () => {
 
     setup({
       paginationInput: {
-        page: 1,
+        page: 2,
         size: 1,
       },
     });
 
     expect(await screen.findByText('Accessories')).toBeVisible();
     expect(screen.getByText('None')).toBeVisible();
+    expect(screen.getByText('Draft')).toBeVisible();
     expect(screen.getByText('2-2 of 2')).toBeVisible();
+    expect(
+      within(
+        screen.getByRole('row', { name: 'Accessories Draft None 02 Jul 2026' })
+      ).queryByRole('link', { name: 'None' })
+    ).not.toBeInTheDocument();
+    expect(
+      within(
+        screen.getByRole('row', { name: 'Accessories Draft None 02 Jul 2026' })
+      ).queryByText('Active')
+    ).not.toBeInTheDocument();
+  });
+
+  it('leaves the parent status cell empty when the parent has no status', async () => {
+    getCategoriesMock.mockResolvedValue({
+      ok: true,
+      data: {
+        content: [
+          {
+            id: 3,
+            name: 'Socks',
+            sortOrder: 30,
+            status: 'DRAFT',
+            createdAt: '2026-07-03T10:54:34.839Z',
+            parentCategory: {
+              id: 4,
+              name: 'Clothing',
+              createdAt: '2026-06-30T10:54:34.839Z',
+            },
+          },
+        ],
+        page: {
+          size: 10,
+          number: 0,
+          totalElements: 1,
+          totalPages: 1,
+        },
+      },
+    });
+
+    setup();
+
+    const row = await screen.findByRole('row', {
+      name: 'Socks Draft Clothing 03 Jul 2026',
+    });
+
+    expect(within(row).getByRole('link', { name: 'Clothing' })).toHaveAttribute(
+      'href',
+      '/products/categories/4'
+    );
+    expect(
+      within(row)
+        .getAllByRole('cell')
+        .map((cell) => cell.textContent)
+    ).toEqual(['Socks', 'Draft', 'Clothing', '', '03 Jul 2026']);
   });
 
   it('renders an empty state when there are no categories', async () => {

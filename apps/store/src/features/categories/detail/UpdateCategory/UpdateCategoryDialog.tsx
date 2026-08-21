@@ -3,9 +3,9 @@
 import { Dialog } from '@ordero/ui';
 import { useQueryClient } from '@tanstack/react-query';
 import { categoriesQueryKeys } from '@/lib/query/categories/categoriesQueryKeys';
-import { CategoryFormDialogContent } from '../../shared/CategoryFormDialogContent';
 import { useUpdateCategoryForm } from './hooks/useUpdateCategoryForm';
 import type { UpdateCategoryDialogProps } from './types';
+import { UpdateCategoryDialogFormContent } from './UpdateCategoryDialogFormContent';
 import { getCategoryDefaultValues } from './utils/fields';
 
 export const UpdateCategoryDialog = ({
@@ -17,6 +17,7 @@ export const UpdateCategoryDialog = ({
   const queryClient = useQueryClient();
   const { form } = useUpdateCategoryForm({
     category,
+    onNoChanges: () => handleOpenChange(false),
     onUpdated: async (updatedCategory) => {
       form.reset(getCategoryDefaultValues(updatedCategory));
       onOpenChange(false);
@@ -69,11 +70,9 @@ export const UpdateCategoryDialog = ({
                 <Dialog.Title>Edit category</Dialog.Title>
               </Dialog.Header>
 
-              <CategoryFormDialogContent
+              <UpdateCategoryDialogFormContent
                 disabledCategoryIds={[category.id]}
                 form={form}
-                pendingText="Saving..."
-                submitText="Save"
               />
             </form>
           </Dialog.Popup>

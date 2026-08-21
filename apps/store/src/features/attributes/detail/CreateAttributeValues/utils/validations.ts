@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { ATTRIBUTE_VALUE_STATUS } from '@/lib/domain/attributes/constants';
 import type { ValidationArgs } from '@/lib/utils/form/validation/types';
 
 export const attributeValueNameSchema = z
@@ -6,8 +7,16 @@ export const attributeValueNameSchema = z
   .trim()
   .min(1, 'Enter an attribute value or remove this empty field');
 
+export const attributeValueStatusSchema = z.enum(
+  [ATTRIBUTE_VALUE_STATUS.DRAFT, ATTRIBUTE_VALUE_STATUS.ACTIVE],
+  {
+    error: 'Attribute value status must be Draft or Active',
+  }
+);
+
 export const attributeValueSchema = z.object({
   id: z.string(),
+  status: attributeValueStatusSchema,
   value: attributeValueNameSchema,
 });
 
@@ -26,6 +35,14 @@ export const validateAttributeValueName = ({
   value,
 }: ValidationArgs<string>) => {
   const result = attributeValueNameSchema.safeParse(value);
+
+  return result.success ? undefined : result.error.issues[0]?.message;
+};
+
+export const validateAttributeValueStatus = ({
+  value,
+}: ValidationArgs<AttributeValueFormValue['status']>) => {
+  const result = attributeValueStatusSchema.safeParse(value);
 
   return result.success ? undefined : result.error.issues[0]?.message;
 };

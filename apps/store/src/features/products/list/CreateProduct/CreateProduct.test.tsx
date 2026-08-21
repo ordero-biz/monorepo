@@ -2,7 +2,7 @@ import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createProductGroup } from '@/lib/client/api/products';
 import { clientRoutes } from '@/lib/client/routes';
-import type { AttributeDropdown } from '@/lib/domain/attributes';
+import type { AttributeDropdown } from '@/lib/domain/attributes/types';
 import {
   productGroupsQueryKeys,
   productVariantsQueryKeys,

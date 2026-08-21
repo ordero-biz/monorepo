@@ -1,4 +1,5 @@
 import { updateAttribute } from '@/lib/client/api/attributes';
+import { API_ERROR_CODES } from '@/lib/constants/apiErrorCodes';
 import { submitUpdateAttribute } from './submitAction';
 
 vi.mock('@/lib/client/api/attributes', async () => ({
@@ -45,15 +46,13 @@ describe('submitUpdateAttribute', () => {
     });
   });
 
-  it('maps backend errors to submit action errors', async () => {
+  it('maps known backend error codes to submit action errors', async () => {
     updateAttributeMock.mockResolvedValue({
       ok: false,
       error: {
-        status: 422,
-        message: 'Attribute update failed.',
-        fieldErrors: {
-          name: 'Attribute name already exists.',
-        },
+        status: 409,
+        code: API_ERROR_CODES.ATTRIBUTE_MODIFICATION_NOT_ALLOWED,
+        message: 'Conflict',
       },
     });
 
@@ -67,10 +66,8 @@ describe('submitUpdateAttribute', () => {
     ).resolves.toEqual({
       ok: false,
       error: {
-        fieldErrors: {
-          name: 'Attribute name already exists.',
-        },
-        formError: 'Attribute update failed.',
+        fieldErrors: undefined,
+        formError: 'Active attributes cannot be edited',
       },
     });
   });

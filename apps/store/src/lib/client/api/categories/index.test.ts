@@ -39,7 +39,6 @@ describe('category client helpers', () => {
               id: 1,
               name: 'Shoes',
               sortOrder: 10,
-              color: '#2563eb',
               createdAt: '2026-07-01T10:54:34.839Z',
               parentCategory: {
                 id: 2,
@@ -66,7 +65,6 @@ describe('category client helpers', () => {
             id: 1,
             name: 'Shoes',
             sortOrder: 10,
-            color: '#2563eb',
             createdAt: '2026-07-01T10:54:34.839Z',
             parentCategory: {
               id: 2,
@@ -127,7 +125,6 @@ describe('category client helpers', () => {
           id: 3,
           name: 'Sneakers',
           sortOrder: 15,
-          color: '#16a34a',
           createdAt: '2026-07-01T11:22:53.562Z',
           parentCategory: {
             id: 1,
@@ -142,6 +139,7 @@ describe('category client helpers', () => {
       createCategory({
         name: 'Sneakers',
         parentId: 1,
+        status: 'ACTIVE',
       })
     ).resolves.toEqual({
       ok: true,
@@ -149,7 +147,6 @@ describe('category client helpers', () => {
         id: 3,
         name: 'Sneakers',
         sortOrder: 15,
-        color: '#16a34a',
         createdAt: '2026-07-01T11:22:53.562Z',
         parentCategory: {
           id: 1,
@@ -166,6 +163,7 @@ describe('category client helpers', () => {
         body: JSON.stringify({
           name: 'Sneakers',
           parentId: 1,
+          status: 'ACTIVE',
         }),
         cache: 'no-store',
       })
@@ -192,6 +190,7 @@ describe('category client helpers', () => {
       createCategory({
         name: 'Sneakers',
         parentId: 1,
+        status: 'ACTIVE',
       })
     ).resolves.toEqual({
       ok: false,
@@ -212,7 +211,6 @@ describe('category client helpers', () => {
       id: 3,
       name: 'Sneakers',
       sortOrder: 15,
-      color: '#16a34a',
       createdAt: '2026-07-01T11:22:53.562Z',
     };
 
@@ -239,7 +237,6 @@ describe('category client helpers', () => {
         id: 3,
         name: 'Running shoes',
         sortOrder: 20,
-        color: '#15803d',
         createdAt: '2026-07-01T11:22:53.562Z',
         parentCategory: {
           id: 2,
@@ -296,7 +293,6 @@ describe('category client helpers', () => {
       id: 3,
       name: 'Running shoes',
       sortOrder: 20,
-      color: '#15803d',
       createdAt: '2026-07-01T11:22:53.562Z',
     };
 
@@ -320,6 +316,40 @@ describe('category client helpers', () => {
         body: JSON.stringify({
           name: 'Running shoes',
           parentId: null,
+        }),
+        cache: 'no-store',
+      })
+    );
+  });
+
+  it('patches a category status through the backend proxy', async () => {
+    const fetchMock = vi.mocked(fetch);
+    const category = {
+      id: 3,
+      name: 'Running shoes',
+      sortOrder: 20,
+      status: 'ACTIVE' as const,
+      createdAt: '2026-07-01T11:22:53.562Z',
+    };
+
+    fetchMock.mockResolvedValue(new Response(JSON.stringify(category)));
+
+    await expect(
+      updateCategory({
+        categoryId: 3,
+        status: 'ACTIVE',
+      })
+    ).resolves.toEqual({
+      ok: true,
+      data: category,
+    });
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/backend/api/v1/categories/3',
+      expect.objectContaining({
+        method: 'PATCH',
+        body: JSON.stringify({
+          status: 'ACTIVE',
         }),
         cache: 'no-store',
       })

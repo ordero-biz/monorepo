@@ -1,15 +1,18 @@
 import { useToastManager } from '@ordero/ui';
 import { useForm } from '@tanstack/react-form';
+import type { AttributeStatus } from '@/lib/domain/attributes/types';
 import { createAttributeValuesDefaultValues } from '../constants';
 import { submitCreateAttributeValues } from '../utils/submitAction';
 
 type UseCreateAttributeValuesFormArgs = {
   attributeId: string | number;
+  attributeStatus: AttributeStatus;
   onAdded: () => Promise<void> | void;
 };
 
 export const useCreateAttributeValuesForm = ({
   attributeId,
+  attributeStatus,
   onAdded,
 }: UseCreateAttributeValuesFormArgs) => {
   const { add: addToast } = useToastManager();
@@ -18,6 +21,7 @@ export const useCreateAttributeValuesForm = ({
     onSubmit: async ({ formApi, value }) => {
       const result = await submitCreateAttributeValues({
         attributeId,
+        attributeStatus,
         value,
       });
 

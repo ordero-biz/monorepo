@@ -1,5 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { Radio, type RadioColor, type RadioSize } from '@/ui/components/Radio';
+import {
+  Radio,
+  type RadioAlignment,
+  type RadioColor,
+  type RadioSize,
+} from '@/ui/components/Radio';
 import { RadioGroup } from '@/ui/components/RadioGroup';
 
 const colors = [
@@ -12,6 +17,7 @@ const colors = [
   'error',
 ] satisfies readonly RadioColor[];
 const sizes = ['s', 'm'] satisfies readonly RadioSize[];
+const alignments = ['start', 'center', 'end'] satisfies readonly RadioAlignment[];
 
 const meta = {
   title: 'Components/Radio',
@@ -88,6 +94,21 @@ export const Sizes: Story = {
             value={size === 's' ? 'small' : 'medium'}
           >
             {size === 's' ? 'Small' : 'Medium'}
+          </Radio>
+        ))}
+      </div>
+    </RadioGroup>
+  ),
+  decorators: [],
+};
+
+export const LabelAlignments: Story = {
+  render: () => (
+    <RadioGroup defaultValue="center" label="Label alignment">
+      <div className="flex flex-col gap-4">
+        {alignments.map((align) => (
+          <Radio align={align} key={align} value={align}>
+            {`${align[0].toUpperCase()}${align.slice(1)} aligned label that wraps onto a second line.`}
           </Radio>
         ))}
       </div>

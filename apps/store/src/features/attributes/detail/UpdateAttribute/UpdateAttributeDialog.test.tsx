@@ -1,6 +1,7 @@
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { updateAttribute } from '@/lib/client/api/attributes';
+import { API_ERROR_CODES } from '@/lib/constants/apiErrorCodes';
 import { attributesQueryKeys } from '@/lib/query/attributes/attributesQueryKeys';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { UpdateAttributeDialog } from './UpdateAttributeDialog';
@@ -46,6 +47,13 @@ describe('UpdateAttributeDialog', () => {
     expect(
       within(dialog).getByRole('textbox', { name: 'Attribute name' })
     ).toHaveValue('Color');
+    expect(within(dialog).getByText('Name')).toBeVisible();
+    expect(
+      within(dialog).getByRole('textbox', { name: 'Attribute name' })
+    ).toBeRequired();
+    expect(
+      within(dialog).getByRole('textbox', { name: 'Attribute name' })
+    ).not.toHaveAttribute('placeholder');
   });
 
   it('submits the updated name, closes, invalidates the list, and reports success', async () => {
@@ -83,7 +91,7 @@ describe('UpdateAttributeDialog', () => {
     await waitFor(() => expect(onUpdated).toHaveBeenCalled());
   });
 
-  it('requires an attribute name before save is available', async () => {
+  it('keeps save available and rejects an empty attribute name', async () => {
     const user = userEvent.setup();
 
     setup();
@@ -98,14 +106,17 @@ describe('UpdateAttributeDialog', () => {
 
     await user.clear(nameField);
 
-    expect(saveButton).toBeDisabled();
-
-    await user.type(nameField, 'Material');
-
     expect(saveButton).toBeEnabled();
+
+    await user.click(saveButton);
+
+    expect(
+      await within(dialog).findByText('Attribute name is required')
+    ).toBeVisible();
+    expect(updateAttributeMock).not.toHaveBeenCalled();
   });
 
-  it('prevents another save while the update is in flight', async () => {
+  it('keeps save available while the update is in flight', async () => {
     let resolveUpdate:
       | ((value: Awaited<ReturnType<typeof updateAttribute>>) => void)
       | undefined;
@@ -124,8 +135,7 @@ describe('UpdateAttributeDialog', () => {
 
     await user.click(saveButton);
 
-    expect(saveButton).toBeDisabled();
-    expect(screen.getByRole('button', { name: 'Saving...' })).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Saving...' })).toBeEnabled();
 
     resolveUpdate?.({
       ok: true,
@@ -140,15 +150,13 @@ describe('UpdateAttributeDialog', () => {
     await screen.findByRole('button', { name: 'Save' });
   });
 
-  it('shows backend errors and keeps the dialog open when submit fails', async () => {
+  it('shows mapped backend errors and keeps the dialog open when submit fails', async () => {
     updateAttributeMock.mockResolvedValue({
       ok: false,
       error: {
-        status: 422,
-        message: 'Attribute update failed.',
-        fieldErrors: {
-          name: 'Attribute name already exists.',
-        },
+        status: 409,
+        code: API_ERROR_CODES.ATTRIBUTE_MODIFICATION_NOT_ALLOWED,
+        message: 'Conflict',
       },
     });
     const user = userEvent.setup();
@@ -163,13 +171,9 @@ describe('UpdateAttributeDialog', () => {
     await user.click(within(dialog).getByRole('button', { name: 'Save' }));
 
     expect(
-      await within(dialog).findByText('Attribute name already exists.')
-    ).toBeVisible();
-    expect(nameField).toHaveAccessibleDescription(
-      'Attribute name already exists.'
-    );
-    expect(
-      await screen.findByRole('dialog', { name: 'Attribute update failed.' })
+      await screen.findByRole('dialog', {
+        name: 'Active attributes cannot be edited',
+      })
     ).toBeVisible();
     expect(onOpenChange).not.toHaveBeenCalledWith(false);
     expect(onUpdated).not.toHaveBeenCalled();

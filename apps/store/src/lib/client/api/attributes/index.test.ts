@@ -1,4 +1,8 @@
 import {
+  ATTRIBUTE_STATUS,
+  ATTRIBUTE_VALUE_STATUS,
+} from '@/lib/domain/attributes/constants';
+import {
   createAttribute,
   createAttributeValues,
   deleteAttributes,
@@ -358,14 +362,17 @@ describe('attribute client helpers', () => {
       createAttribute({
         name: 'Material',
         sortOrder: 0,
+        status: ATTRIBUTE_STATUS.ACTIVE,
         attributeValues: [
           {
             name: 'Green',
             sortOrder: 0,
+            status: ATTRIBUTE_VALUE_STATUS.ACTIVE,
           },
           {
             name: 'Blue',
             sortOrder: 1,
+            status: ATTRIBUTE_VALUE_STATUS.DRAFT,
           },
         ],
       })
@@ -386,14 +393,17 @@ describe('attribute client helpers', () => {
         body: JSON.stringify({
           name: 'Material',
           sortOrder: 0,
+          status: ATTRIBUTE_STATUS.ACTIVE,
           attributeValues: [
             {
               name: 'Green',
               sortOrder: 0,
+              status: ATTRIBUTE_VALUE_STATUS.ACTIVE,
             },
             {
               name: 'Blue',
               sortOrder: 1,
+              status: ATTRIBUTE_VALUE_STATUS.DRAFT,
             },
           ],
         }),
@@ -425,6 +435,7 @@ describe('attribute client helpers', () => {
           {
             name: 'Green',
             sortOrder: 0,
+            status: 'DRAFT',
           },
         ],
       })
@@ -449,6 +460,7 @@ describe('attribute client helpers', () => {
             {
               name: 'Green',
               sortOrder: 0,
+              status: 'DRAFT',
             },
           ],
         }),
@@ -481,6 +493,7 @@ describe('attribute client helpers', () => {
           {
             name: 'Green',
             sortOrder: 0,
+            status: 'DRAFT',
           },
         ],
       })
@@ -538,6 +551,49 @@ describe('attribute client helpers', () => {
     );
   });
 
+  it('patches an attribute status through the backend proxy', async () => {
+    const fetchMock = vi.mocked(fetch);
+
+    fetchMock.mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          id: 7,
+          name: 'Material',
+          sortOrder: 10,
+          status: ATTRIBUTE_STATUS.ACTIVE,
+          createdAt: '2026-06-25T18:13:29.608Z',
+        })
+      )
+    );
+
+    await expect(
+      updateAttribute({
+        attributeId: 7,
+        status: ATTRIBUTE_STATUS.ACTIVE,
+      })
+    ).resolves.toEqual({
+      ok: true,
+      data: {
+        id: 7,
+        name: 'Material',
+        sortOrder: 10,
+        status: ATTRIBUTE_STATUS.ACTIVE,
+        createdAt: '2026-06-25T18:13:29.608Z',
+      },
+    });
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/backend/api/v1/attributes/7',
+      expect.objectContaining({
+        method: 'PATCH',
+        body: JSON.stringify({
+          status: ATTRIBUTE_STATUS.ACTIVE,
+        }),
+        cache: 'no-store',
+      })
+    );
+  });
+
   it('patches an attribute value through the backend proxy', async () => {
     const fetchMock = vi.mocked(fetch);
 
@@ -579,6 +635,79 @@ describe('attribute client helpers', () => {
         cache: 'no-store',
       })
     );
+  });
+
+  it('patches an attribute value status through the backend proxy', async () => {
+    const fetchMock = vi.mocked(fetch);
+
+    fetchMock.mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          id: 3,
+          name: 'Navy',
+          sortOrder: 0,
+          status: ATTRIBUTE_VALUE_STATUS.ACTIVE,
+          createdAt: '2026-06-25T18:13:29.608Z',
+        })
+      )
+    );
+
+    await expect(
+      updateAttributeValue({
+        attributeValueId: 3,
+        status: ATTRIBUTE_VALUE_STATUS.ACTIVE,
+      })
+    ).resolves.toEqual({
+      ok: true,
+      data: {
+        id: 3,
+        name: 'Navy',
+        sortOrder: 0,
+        status: ATTRIBUTE_VALUE_STATUS.ACTIVE,
+        createdAt: '2026-06-25T18:13:29.608Z',
+      },
+    });
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/backend/api/v1/attributes/values/3',
+      expect.objectContaining({
+        method: 'PATCH',
+        body: JSON.stringify({
+          status: ATTRIBUTE_VALUE_STATUS.ACTIVE,
+        }),
+        cache: 'no-store',
+      })
+    );
+  });
+
+  it('returns normalized errors when publishing an attribute value fails', async () => {
+    vi.mocked(fetch).mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          code: 'ATTRIBUTE_VALUE_MODIFICATION_NOT_ALLOWED',
+          message: 'Conflict',
+        }),
+        {
+          status: 409,
+          statusText: 'Conflict',
+        }
+      )
+    );
+
+    await expect(
+      updateAttributeValue({
+        attributeValueId: 3,
+        status: ATTRIBUTE_VALUE_STATUS.ACTIVE,
+      })
+    ).resolves.toEqual({
+      ok: false,
+      error: {
+        status: 409,
+        code: 'ATTRIBUTE_VALUE_MODIFICATION_NOT_ALLOWED',
+        message: 'Conflict',
+        fieldErrors: undefined,
+      },
+    });
   });
 
   it('deletes attributes through the backend proxy', async () => {
@@ -653,10 +782,12 @@ describe('attribute client helpers', () => {
       createAttribute({
         name: 'Material',
         sortOrder: 0,
+        status: 'DRAFT',
         attributeValues: [
           {
             name: 'Green',
             sortOrder: 0,
+            status: 'DRAFT',
           },
         ],
       })

@@ -1,19 +1,46 @@
-import { updateCategory } from '@/lib/client/api/categories';
-import type { CategoryFormValues } from '../../../shared/validations';
+import {
+  type UpdateCategoryFieldData,
+  updateCategory,
+} from '@/lib/client/api/categories';
+import type { Category } from '@/lib/domain/categories/types';
+import { getApiErrorMessage } from '@/lib/utils/apiError';
+import { getChangedValues } from '@/lib/utils/form/comparison/getChangedValues';
+import { getCategoryDefaultValues } from './fields';
+import type { UpdateCategoryFormValues } from './validations';
 
 type SubmitUpdateCategoryArgs = {
   categoryId: string | number;
-  value: CategoryFormValues;
+  submitData: UpdateCategoryFieldData;
 };
+
+type GetCategoryUpdateChangesArgs = {
+  category: Category;
+  formValue: UpdateCategoryFormValues;
+};
+
+const normalizeUpdateCategoryFormData = (data: UpdateCategoryFormValues) => ({
+  name: data.name.trim(),
+  parentId: data.parentId ? Number(data.parentId) : null,
+});
+
+export const getCategoryUpdateChanges = ({
+  category,
+  formValue,
+}: GetCategoryUpdateChangesArgs) =>
+  getChangedValues({
+    initialData: normalizeUpdateCategoryFormData(
+      getCategoryDefaultValues(category)
+    ),
+    submitData: normalizeUpdateCategoryFormData(formValue),
+  });
 
 export const submitUpdateCategory = async ({
   categoryId,
-  value,
+  submitData,
 }: SubmitUpdateCategoryArgs) => {
   const result = await updateCategory({
     categoryId,
-    name: value.name.trim(),
-    parentId: value.parentId ? Number(value.parentId) : null,
+    ...submitData,
   });
 
   if (!result.ok) {
@@ -21,7 +48,7 @@ export const submitUpdateCategory = async ({
       ok: false,
       error: {
         fieldErrors: result.error.fieldErrors,
-        formError: result.error.message,
+        formError: getApiErrorMessage(result.error),
       },
     } as const;
   }

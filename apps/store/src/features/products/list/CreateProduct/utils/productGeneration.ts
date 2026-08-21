@@ -1,4 +1,4 @@
-import type { AttributeDropdown } from '@/lib/domain/attributes';
+import type { AttributeDropdown } from '@/lib/domain/attributes/types';
 import type { CreateProductVariantValues } from '../types';
 
 export type GeneratedProductAttributeValue = {

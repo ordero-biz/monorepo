@@ -1,2 +1,7 @@
 export { Radio } from './Radio';
-export type { RadioColor, RadioProps, RadioSize } from './types';
+export type {
+  RadioAlignment,
+  RadioColor,
+  RadioProps,
+  RadioSize,
+} from './types';

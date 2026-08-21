@@ -1,6 +1,6 @@
 import { useToastManager } from '@ordero/ui';
 import { useForm } from '@tanstack/react-form';
-import type { Category } from '@/lib/domain/categories';
+import type { Category } from '@/lib/domain/categories/types';
 import { createCategoryDefaultValues } from '../constants';
 import { submitCreateCategory } from '../utils/submitAction';
 
