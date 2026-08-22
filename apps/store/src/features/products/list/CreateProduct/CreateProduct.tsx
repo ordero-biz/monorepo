@@ -3,20 +3,24 @@
 import { Accordion, Button, ContextualActionBar, Typography } from '@ordero/ui';
 import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { BaseLayoutContextualActionBar } from '@/features/app-shell';
 import { clientRoutes } from '@/lib/client/routes';
+import type { AttributeDropdown } from '@/lib/domain/attributes/types';
 import {
   productGroupsQueryKeys,
   productVariantsQueryKeys,
 } from '@/lib/query/products/productsQueryKeys';
-import { PRODUCT_GENERATION_MODE } from './constants';
 import { CreateProductTemplateFields } from './CreateProductTemplateFields';
+import { PRODUCT_GENERATION_MODE } from './constants';
 import { GeneratedProductVariants } from './GeneratedProductVariants';
 import { GenerateProductActions } from './GenerateProductActions';
 import { useCreateProductForm } from './hooks/useCreateProductForm';
 import { ProductAttributeValuesField } from './ProductAttributeValuesField';
-import type { ProductGenerationMode } from './types';
+import type {
+  ProductGenerationMode,
+  ProductVariantsGeneratedArgs,
+} from './types';
 
 export const CreateProduct = () => {
   const queryClient = useQueryClient();
@@ -25,6 +29,12 @@ export const CreateProduct = () => {
   const [generationMode, setGenerationMode] = useState<ProductGenerationMode>(
     PRODUCT_GENERATION_MODE.one
   );
+  const [generatedAttributes, setGeneratedAttributes] = useState<
+    AttributeDropdown[]
+  >([]);
+  const [generatedTemplateSignature, setGeneratedTemplateSignature] =
+    useState<string>();
+  const [generationVersion, setGenerationVersion] = useState(0);
   const { form } = useCreateProductForm({
     onCreated: async () => {
       await Promise.all([
@@ -38,16 +48,24 @@ export const CreateProduct = () => {
       router.push(clientRoutes.products);
     },
   });
+  const handleProductVariantsGenerated = useCallback(
+    ({ attributes, generationSignature }: ProductVariantsGeneratedArgs) => {
+      setGeneratedAttributes(attributes);
+      setGeneratedTemplateSignature(generationSignature);
+      setGenerationVersion((currentVersion) => currentVersion + 1);
+    },
+    []
+  );
+  const handleCreateProduct = () => {
+    void form.handleSubmit();
+  };
 
   return (
     <form
       noValidate
       onSubmit={(event) => {
         event.preventDefault();
-
-        if (form.state.values.productVariants.length > 0) {
-          form.handleSubmit();
-        }
+        handleCreateProduct();
       }}
     >
       <Accordion.Root
@@ -70,45 +88,50 @@ export const CreateProduct = () => {
 
               <GenerateProductActions
                 form={form}
+                generatedTemplateSignature={generatedTemplateSignature}
                 generationMode={generationMode}
+                onProductVariantsGenerated={handleProductVariantsGenerated}
               />
             </div>
           </Accordion.Panel>
         </Accordion.Item>
       </Accordion.Root>
 
-      <GeneratedProductVariants form={form} />
-      <form.Subscribe
-        selector={(state) =>
-          [
-            state.values.productVariants,
-            state.isSubmitting,
-            state.canSubmit,
-          ] as const
-        }
-      >
-        {([productVariants, isSubmitting, canSubmit]) =>
-          productVariants.length > 0 ? (
+      <GeneratedProductVariants
+        form={form}
+        generatedAttributes={generatedAttributes}
+        generationVersion={generationVersion}
+      />
+      <form.Subscribe selector={(state) => state.values.productVariants.length}>
+        {(productVariantCount) =>
+          productVariantCount > 0 ? (
             <>
               <div aria-hidden="true" className="h-[var(--space-12)]" />
               <BaseLayoutContextualActionBar>
                 <ContextualActionBar.Root ariaLabel="Product creation actions">
                   <ContextualActionBar.Left>
                     <Typography variant="body2">
-                      {productVariants.length === 1
+                      {productVariantCount === 1
                         ? '1 product variant ready'
-                        : `${productVariants.length} product variants ready`}
+                        : `${productVariantCount} product variants ready`}
                     </Typography>
                   </ContextualActionBar.Left>
                   <ContextualActionBar.Right>
-                    <Button
-                      color="primary"
-                      disabled={isSubmitting || !canSubmit}
-                      size="l"
-                      type="submit"
-                    >
-                      {isSubmitting ? 'Creating product...' : 'Create product'}
-                    </Button>
+                    <form.Subscribe selector={(state) => state.isSubmitting}>
+                      {(isSubmitting) => (
+                        <Button
+                          color="primary"
+                          disabled={isSubmitting}
+                          size="l"
+                          onClick={handleCreateProduct}
+                          type="button"
+                        >
+                          {isSubmitting
+                            ? 'Creating product...'
+                            : 'Create product'}
+                        </Button>
+                      )}
+                    </form.Subscribe>
                   </ContextualActionBar.Right>
                 </ContextualActionBar.Root>
               </BaseLayoutContextualActionBar>

@@ -2,7 +2,7 @@ import { useToastManager } from '@ordero/ui';
 import { useForm } from '@tanstack/react-form';
 import { createProductDefaultValues } from '../constants';
 import { submitCreateProduct } from '../utils/submitAction';
-import { validateProductVariants } from '../utils/validations';
+import { validateCreateProduct } from '../utils/validations';
 
 type UseCreateProductFormArgs = {
   onCreated: () => Promise<void> | void;
@@ -15,8 +15,7 @@ export const useCreateProductForm = ({
   const form = useForm({
     defaultValues: createProductDefaultValues,
     validators: {
-      onChange: validateProductVariants,
-      onSubmit: validateProductVariants,
+      onSubmit: validateCreateProduct,
     },
     onSubmit: async ({ formApi, value }) => {
       const result = await submitCreateProduct(value);

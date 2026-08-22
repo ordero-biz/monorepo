@@ -1,5 +1,8 @@
 import type { AttributeDropdown } from '@/lib/domain/attributes/types';
-import type { CreateProductVariantValues } from '../types';
+import type {
+  CreateProductVariantValues,
+  ProductGenerationMode,
+} from '../types';
 
 export type GeneratedProductAttributeValue = {
   id: number;
@@ -12,6 +15,38 @@ type GetGeneratedProductVariantsArgs = {
   description: string;
   productName: string;
 };
+
+type GetProductVariantGenerationSignatureArgs = {
+  attributeValuesByAttributeId: Record<string, string[]>;
+  attributes: AttributeDropdown[];
+  description: string;
+  generationMode: ProductGenerationMode;
+  productName: string;
+};
+
+export const getProductVariantGenerationSignature = ({
+  attributeValuesByAttributeId,
+  attributes,
+  description,
+  generationMode,
+  productName,
+}: GetProductVariantGenerationSignatureArgs) =>
+  JSON.stringify({
+    attributeValues: attributes
+      .map((attribute) => ({
+        attributeId: attribute.id,
+        valueIds: [
+          ...new Set(attributeValuesByAttributeId[String(attribute.id)] ?? []),
+        ].sort(),
+      }))
+      .sort(
+        (firstAttribute, secondAttribute) =>
+          firstAttribute.attributeId - secondAttribute.attributeId
+      ),
+    description,
+    generationMode,
+    productName: productName.trim(),
+  });
 
 export const getAttributeValueSelections = (
   currentValue: Record<string, string[]>,

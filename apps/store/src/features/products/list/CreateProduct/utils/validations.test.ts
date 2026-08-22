@@ -1,15 +1,16 @@
 import { PRODUCT_GENERATION_MODE } from '../constants';
 import type { CreateProductValues } from '../types';
 import {
+  validateCreateProduct,
   validateProductCategory,
   validateProductName,
+  validateProductTemplate,
   validateProductVariants,
 } from './validations';
 
 const getProductValues = (
   productVariants: CreateProductValues['productVariants'],
-  productVariantsGenerationMode: CreateProductValues['productVariantsGenerationMode'] =
-    PRODUCT_GENERATION_MODE.many
+  productVariantsGenerationMode: CreateProductValues['productVariantsGenerationMode'] = PRODUCT_GENERATION_MODE.many
 ): CreateProductValues => ({
   attributes: [],
   attributeValues: {},
@@ -41,6 +42,40 @@ describe('validateProductCategory', () => {
 
   it('accepts a selected category', () => {
     expect(validateProductCategory({ value: '2' })).toBeUndefined();
+  });
+});
+
+describe('validateProductTemplate', () => {
+  it('requires a name and category before a product preview can be generated', () => {
+    expect(
+      validateProductTemplate({
+        value: {
+          ...getProductValues([], PRODUCT_GENERATION_MODE.one),
+          category: null,
+          productName: '   ',
+        },
+      })
+    ).toEqual({
+      fields: {
+        category: 'Category is required',
+        productName: 'Product name is required',
+      },
+    });
+  });
+
+  it('requires attributes in multiple-products mode', () => {
+    expect(
+      validateProductTemplate({
+        value: {
+          ...getProductValues([]),
+          attributes: [],
+        },
+      })
+    ).toEqual({
+      fields: {
+        attributes: 'Select at least one attribute.',
+      },
+    });
   });
 });
 
@@ -110,11 +145,9 @@ describe('validateProductVariants', () => {
       })
     ).toEqual({
       fields: {
-        'productVariants[0].barcode':
-          'Barcode must be unique across variants',
+        'productVariants[0].barcode': 'Barcode must be unique across variants',
         'productVariants[0].sku': 'SKU must be unique across variants',
-        'productVariants[1].barcode':
-          'Barcode must be unique across variants',
+        'productVariants[1].barcode': 'Barcode must be unique across variants',
         'productVariants[1].sku': 'SKU must be unique across variants',
       },
     });
@@ -171,5 +204,38 @@ describe('validateProductVariants', () => {
         ]),
       })
     ).toBeUndefined();
+  });
+});
+
+describe('validateCreateProduct', () => {
+  it('returns template and variant errors together on submit', () => {
+    expect(
+      validateCreateProduct({
+        value: {
+          ...getProductValues(
+            [
+              {
+                attributeValueIds: [],
+                barcode: '',
+                description: '',
+                name: '',
+                sku: '',
+              },
+            ],
+            PRODUCT_GENERATION_MODE.one
+          ),
+          category: null,
+          productName: '',
+        },
+      })
+    ).toEqual({
+      fields: {
+        'productVariants[0].barcode': 'Barcode is required',
+        'productVariants[0].name': 'Product variant name is required',
+        'productVariants[0].sku': 'SKU is required',
+        category: 'Category is required',
+        productName: 'Product name is required',
+      },
+    });
   });
 });

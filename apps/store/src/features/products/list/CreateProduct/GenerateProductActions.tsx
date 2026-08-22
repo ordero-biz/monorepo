@@ -4,13 +4,17 @@ import type { GenerateProductActionsProps } from './types';
 import {
   getGeneratedProductVariants,
   getGeneratedSingleProductVariant,
+  getProductVariantGenerationSignature,
   getSelectedAttributeValueGroups,
   getSelectedAttributeValues,
 } from './utils/productGeneration';
+import { validateProductTemplate } from './utils/validations';
 
 export const GenerateProductActions = ({
   form,
+  generatedTemplateSignature,
   generationMode,
+  onProductVariantsGenerated,
 }: GenerateProductActionsProps) => {
   const isMultipleProducts = generationMode === PRODUCT_GENERATION_MODE.many;
 
@@ -22,11 +26,10 @@ export const GenerateProductActions = ({
           state.values.attributes,
           state.values.attributeValues,
           state.values.description,
-          state.values.category,
         ] as const
       }
     >
-      {([productName, attributes, attributeValues, description, category]) => {
+      {([productName, attributes, attributeValues, description]) => {
         const selectedAttributeValueGroups = getSelectedAttributeValueGroups(
           attributes,
           attributeValues
@@ -39,62 +42,102 @@ export const GenerateProductActions = ({
               1
             )
           : 0;
-        const isGenerateDisabled =
-          !productName.trim() ||
-          !category ||
-          (isMultipleProducts && !hasSelectedAttributeValues);
+        const generationSignature = getProductVariantGenerationSignature({
+          attributeValuesByAttributeId: attributeValues,
+          attributes,
+          description,
+          generationMode,
+          productName,
+        });
 
         return (
-          <div className="flex flex-col items-end gap-[var(--space-1)]">
-            <Button
-              color="primary"
-              disabled={isGenerateDisabled}
-              onClick={() => {
-                form.setFieldValue(
-                  'productVariantsGenerationMode',
-                  generationMode
-                );
+          <form.Subscribe
+            selector={(state) => state.values.productVariants.length}
+          >
+            {(productVariantCount) => {
+              const hasTemplateChanges =
+                productVariantCount > 0 &&
+                generatedTemplateSignature !== undefined &&
+                generatedTemplateSignature !== generationSignature;
 
-                if (isMultipleProducts) {
-                  form.setFieldValue(
-                    'productVariants',
-                    getGeneratedProductVariants({
-                      attributeValuesByAttributeId: attributeValues,
-                      attributes,
-                      description,
-                      productName,
-                    })
-                  );
+              return (
+                <div className="flex flex-col items-end gap-[var(--space-1)]">
+                  <Button
+                    color="primary"
+                    onClick={() => {
+                      const templateValidationResult = validateProductTemplate({
+                        value: form.state.values,
+                      });
 
-                  return;
-                }
+                      form.setErrorMap({
+                        onSubmit: templateValidationResult,
+                      });
 
-                const selectedAttributeValues = getSelectedAttributeValues(
-                  attributes,
-                  attributeValues
-                );
+                      if (templateValidationResult) {
+                        return;
+                      }
 
-                form.setFieldValue('productVariants', [
-                  getGeneratedSingleProductVariant({
-                    attributeValues: selectedAttributeValues,
-                    description,
-                    productName,
-                  }),
-                ]);
-              }}
-              size="l"
-              type="button"
-            >
-              {isMultipleProducts
-                ? 'Next: Configure products'
-                : 'Next: Configure product'}
-            </Button>
-            {isMultipleProducts ? (
-              <FieldHelperText align="end">
-                {generatedProductsCount} products will be generated
-              </FieldHelperText>
-            ) : null}
-          </div>
+                      form.setFieldValue(
+                        'productVariantsGenerationMode',
+                        generationMode
+                      );
+
+                      if (isMultipleProducts) {
+                        form.setFieldValue(
+                          'productVariants',
+                          getGeneratedProductVariants({
+                            attributeValuesByAttributeId: attributeValues,
+                            attributes,
+                            description,
+                            productName,
+                          })
+                        );
+                      } else {
+                        const selectedAttributeValues =
+                          getSelectedAttributeValues(
+                            attributes,
+                            attributeValues
+                          );
+
+                        form.setFieldValue('productVariants', [
+                          getGeneratedSingleProductVariant({
+                            attributeValues: selectedAttributeValues,
+                            description,
+                            productName,
+                          }),
+                        ]);
+                      }
+
+                      onProductVariantsGenerated({
+                        attributes,
+                        generationSignature,
+                      });
+                    }}
+                    size="l"
+                    type="button"
+                  >
+                    {hasTemplateChanges
+                      ? isMultipleProducts
+                        ? 'Regenerate products'
+                        : 'Regenerate product'
+                      : isMultipleProducts
+                        ? 'Next: Configure products'
+                        : 'Next: Configure product'}
+                  </Button>
+                  {hasTemplateChanges ? (
+                    <FieldHelperText align="end">
+                      Template changes apply when you regenerate. Existing
+                      variants will be submitted unchanged.
+                    </FieldHelperText>
+                  ) : isMultipleProducts ? (
+                    <FieldHelperText align="end">
+                      {generatedProductsCount} products will be generated
+                    </FieldHelperText>
+                  ) : null}
+                </div>
+              );
+            }}
+          </form.Subscribe>
         );
       }}
     </form.Subscribe>

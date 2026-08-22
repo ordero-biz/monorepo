@@ -46,6 +46,10 @@ type ProductVariantFieldErrors = Partial<
   Record<ProductVariantFieldPath, string>
 >;
 
+type ProductTemplateField = 'attributes' | 'category' | 'productName';
+
+type ProductTemplateFieldErrors = Partial<Record<ProductTemplateField, string>>;
+
 const getValidationMessage = (schema: z.ZodString, value: string) => {
   const result = schema.safeParse(value);
 
@@ -194,6 +198,34 @@ export const validateProductCategory = ({
   return result.success ? undefined : result.error.issues[0]?.message;
 };
 
+export const validateProductTemplate = ({
+  value,
+}: ValidationArgs<CreateProductValues>) => {
+  const errors: ProductTemplateFieldErrors = {};
+  const productNameError = validateProductName({ value: value.productName });
+  const categoryError = validateProductCategory({ value: value.category });
+  const requiresAttributes =
+    value.productVariantsGenerationMode === PRODUCT_GENERATION_MODE.many;
+
+  if (productNameError) {
+    errors.productName = productNameError;
+  }
+
+  if (categoryError) {
+    errors.category = categoryError;
+  }
+
+  if (requiresAttributes && value.attributes.length === 0) {
+    errors.attributes = 'Select at least one attribute.';
+  }
+
+  return Object.keys(errors).length > 0
+    ? {
+        fields: errors,
+      }
+    : undefined;
+};
+
 export const validateProductVariants = ({
   value,
 }: ValidationArgs<CreateProductValues>) => {
@@ -244,6 +276,23 @@ export const validateProductVariants = ({
   return Object.keys(errors).length > 0
     ? {
         fields: errors,
+      }
+    : undefined;
+};
+
+export const validateCreateProduct = ({
+  value,
+}: ValidationArgs<CreateProductValues>) => {
+  const templateErrors = validateProductTemplate({ value });
+  const variantErrors = validateProductVariants({ value });
+  const fields = {
+    ...templateErrors?.fields,
+    ...variantErrors?.fields,
+  };
+
+  return Object.keys(fields).length > 0
+    ? {
+        fields,
       }
     : undefined;
 };

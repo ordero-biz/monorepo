@@ -48,7 +48,6 @@ export const ProductAttributeValuesField = ({
                             };
 
                             field.handleChange(nextAttributeValues);
-                            form.setFieldValue('productVariants', []);
                           }}
                           pressed={selectedAttributeValueIds.includes(
                             attributeValueId

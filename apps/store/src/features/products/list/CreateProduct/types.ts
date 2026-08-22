@@ -33,28 +33,36 @@ export type ProductAttributeValuesFieldProps = {
 
 export type GenerateProductActionsProps = {
   form: CreateProductForm;
+  generatedTemplateSignature?: string;
   generationMode: ProductGenerationMode;
+  onProductVariantsGenerated: (args: ProductVariantsGeneratedArgs) => void;
 };
 
 export type GeneratedProductVariantsProps = {
   form: CreateProductForm;
+  generatedAttributes: AttributeDropdown[];
+  generationVersion: number;
 };
 
 export type GeneratedProductVariantListProps = {
   attributes: AttributeDropdown[];
   form: CreateProductForm;
   onEditAttributes: (variantIndex: number) => void;
-  productVariants: CreateProductVariantValues[];
+  productVariantCount: number;
   requireAttributeValueIds: boolean;
 };
 
 export type GeneratedProductVariantCardProps = {
   attributes: AttributeDropdown[];
   form: CreateProductForm;
-  onEditAttributes: () => void;
-  productVariant: CreateProductVariantValues;
+  onEditAttributes: (variantIndex: number) => void;
   requireAttributeValueIds: boolean;
   variantIndex: number;
+};
+
+export type ProductVariantsGeneratedArgs = {
+  attributes: AttributeDropdown[];
+  generationSignature: string;
 };
 
 export type EditProductVariantAttributesDialogProps = {
