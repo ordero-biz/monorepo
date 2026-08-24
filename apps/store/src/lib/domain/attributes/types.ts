@@ -22,3 +22,7 @@ export type AttributeValue = {
   status?: AttributeValueStatus;
   createdAt: string;
 };
+
+export type AttributeDropdown = Attribute & {
+  attributeValues: AttributeValue[];
+};

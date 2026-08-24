@@ -5,7 +5,7 @@ vi.mock('@/features/products', async () => ({
   ...(await vi.importActual<typeof import('@/features/products')>(
     '@/features/products'
   )),
-  CreateProduct: () => <h1>Create product template</h1>,
+  CreateProduct: () => <h1>Product template</h1>,
 }));
 
 describe('AddProductPage', () => {
@@ -13,7 +13,7 @@ describe('AddProductPage', () => {
     render(<AddProductPage />);
 
     expect(
-      screen.getByRole('heading', { name: 'Create product template' })
+      screen.getByRole('heading', { name: 'Product template' })
     ).toBeVisible();
   });
 });

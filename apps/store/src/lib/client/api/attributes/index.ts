@@ -3,6 +3,7 @@
 import { apiFetch } from '@ordero/api-client';
 import type {
   Attribute,
+  AttributeDropdown,
   AttributeStatus,
   AttributeValue,
   AttributeValueStatus,
@@ -22,6 +23,11 @@ export const getAttributesPath = (input?: PaginationSearchInput) =>
 
 export const getAttributes = (input?: PaginationSearchInput) =>
   apiFetch<AttributesListResponse>(getAttributesPath(input), {
+    method: 'GET',
+  });
+
+export const getAttributesDropdown = () =>
+  apiFetch<AttributeDropdown[]>(CLIENT_BACKEND_PATHS.attributesDropdown, {
     method: 'GET',
   });
 

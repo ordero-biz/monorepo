@@ -267,6 +267,15 @@ describe('products client helpers', () => {
         name: 'Running Shoes',
         description: '',
         categoryId: 2,
+        productVariants: [
+          {
+            name: 'Running Shoes Blue',
+            description: '',
+            sku: 'SHOE-BLUE',
+            barcode: 'barcode-1',
+            attributeValueIds: [71],
+          },
+        ],
       })
     ).resolves.toEqual({
       ok: true,
@@ -291,6 +300,15 @@ describe('products client helpers', () => {
           name: 'Running Shoes',
           description: '',
           categoryId: 2,
+          productVariants: [
+            {
+              name: 'Running Shoes Blue',
+              description: '',
+              sku: 'SHOE-BLUE',
+              barcode: 'barcode-1',
+              attributeValueIds: [71],
+            },
+          ],
         }),
         cache: 'no-store',
       })
@@ -318,6 +336,7 @@ describe('products client helpers', () => {
         name: 'Running Shoes',
         description: '',
         categoryId: 2,
+        productVariants: [],
       })
     ).resolves.toEqual({
       ok: false,

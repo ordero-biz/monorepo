@@ -1,4 +1,5 @@
 import { createProductGroup } from '@/lib/client/api/products';
+import { PRODUCT_GENERATION_MODE } from '../constants';
 import { submitCreateProduct } from './submitAction';
 
 vi.mock('@/lib/client/api/products', async () => ({
@@ -33,10 +34,21 @@ describe('submitCreateProduct', () => {
 
     await expect(
       submitCreateProduct({
-        attributes: null,
+        attributes: [],
+        attributeValues: {},
         productName: ' Running Shoes ',
         description: 'Lightweight daily trainer',
         category: '2',
+        productVariants: [
+          {
+            attributeValueIds: [71],
+            barcode: ' barcode-1 ',
+            description: 'Blue variant',
+            name: ' Running Shoes Blue ',
+            sku: ' SHOE-BLUE ',
+          },
+        ],
+        productVariantsGenerationMode: PRODUCT_GENERATION_MODE.one,
       })
     ).resolves.toEqual({
       ok: true,
@@ -57,6 +69,15 @@ describe('submitCreateProduct', () => {
       categoryId: 2,
       description: 'Lightweight daily trainer',
       name: 'Running Shoes',
+      productVariants: [
+        {
+          attributeValueIds: [71],
+          barcode: 'barcode-1',
+          description: 'Blue variant',
+          name: 'Running Shoes Blue',
+          sku: 'SHOE-BLUE',
+        },
+      ],
     });
   });
 
@@ -70,16 +91,21 @@ describe('submitCreateProduct', () => {
           categoryId: 'Category is required.',
           description: 'Description is too long.',
           name: 'Product name already exists.',
+          'productVariants.0.sku': 'SKU already exists.',
+          'productVariants[1].barcode': 'Barcode already exists.',
         },
       },
     });
 
     await expect(
       submitCreateProduct({
-        attributes: null,
+        attributes: [],
+        attributeValues: {},
         productName: 'Running Shoes',
         description: 'Lightweight daily trainer',
         category: '2',
+        productVariants: [],
+        productVariantsGenerationMode: PRODUCT_GENERATION_MODE.one,
       })
     ).resolves.toEqual({
       ok: false,
@@ -88,6 +114,8 @@ describe('submitCreateProduct', () => {
           category: 'Category is required.',
           description: 'Description is too long.',
           productName: 'Product name already exists.',
+          'productVariants[0].sku': 'SKU already exists.',
+          'productVariants[1].barcode': 'Barcode already exists.',
         },
         formError: 'Product creation failed.',
       },

@@ -9,6 +9,7 @@ import {
   deleteAttributeValues,
   getAttribute,
   getAttributes,
+  getAttributesDropdown,
   getAttributesPath,
   getAttributeValues,
   updateAttribute,
@@ -121,6 +122,59 @@ describe('attribute client helpers', () => {
     );
   });
 
+  it('gets dropdown attributes with values from the backend proxy', async () => {
+    const fetchMock = vi.mocked(fetch);
+
+    fetchMock.mockResolvedValue(
+      new Response(
+        JSON.stringify([
+          {
+            id: 1,
+            name: 'Color',
+            sortOrder: 10,
+            createdAt: '2026-07-14T17:54:42.035Z',
+            attributeValues: [
+              {
+                id: 3,
+                name: 'Blue',
+                sortOrder: 0,
+                createdAt: '2026-07-14T17:54:42.036Z',
+              },
+            ],
+          },
+        ])
+      )
+    );
+
+    await expect(getAttributesDropdown()).resolves.toEqual({
+      ok: true,
+      data: [
+        {
+          id: 1,
+          name: 'Color',
+          sortOrder: 10,
+          createdAt: '2026-07-14T17:54:42.035Z',
+          attributeValues: [
+            {
+              id: 3,
+              name: 'Blue',
+              sortOrder: 0,
+              createdAt: '2026-07-14T17:54:42.036Z',
+            },
+          ],
+        },
+      ],
+    });
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/backend/api/v1/attributes/dropdown',
+      expect.objectContaining({
+        method: 'GET',
+        cache: 'no-store',
+      })
+    );
+  });
+
   it('returns normalized failures from the attributes route', async () => {
     vi.mocked(fetch).mockResolvedValue(
       new Response(
@@ -141,6 +195,31 @@ describe('attribute client helpers', () => {
         status: 503,
         message: 'Attributes lookup failed.',
         code: 'ATTRIBUTES_LOOKUP_FAILED',
+        fieldErrors: undefined,
+      },
+    });
+  });
+
+  it('returns normalized failures from the attributes dropdown route', async () => {
+    vi.mocked(fetch).mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          message: 'Attributes dropdown lookup failed.',
+          code: 'ATTRIBUTES_DROPDOWN_LOOKUP_FAILED',
+        }),
+        {
+          status: 503,
+          statusText: 'Service Unavailable',
+        }
+      )
+    );
+
+    await expect(getAttributesDropdown()).resolves.toEqual({
+      ok: false,
+      error: {
+        status: 503,
+        message: 'Attributes dropdown lookup failed.',
+        code: 'ATTRIBUTES_DROPDOWN_LOOKUP_FAILED',
         fieldErrors: undefined,
       },
     });

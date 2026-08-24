@@ -4,6 +4,8 @@ export const attributesQueryKeys = {
   list: ['attributes', 'list'] as const,
   listPage: (input?: PaginationSearchInput) =>
     [...attributesQueryKeys.list, input ?? {}] as const,
+  attributeDropdown: () =>
+    [...attributesQueryKeys.list, 'attribute-dropdown'] as const,
   detail: (attributeId: string | number) =>
     ['attributes', 'detail', String(attributeId)] as const,
   values: (attributeId: string | number) =>
