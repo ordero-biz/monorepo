@@ -8,6 +8,7 @@ describe('getFieldSubmitChangeErrorText', () => {
           onChange: 'Name is required',
         },
         isBlurred: false,
+        isDirty: true,
       })
     ).toBeUndefined();
   });
@@ -19,6 +20,7 @@ describe('getFieldSubmitChangeErrorText', () => {
           onChange: 'Name is required',
         },
         isBlurred: true,
+        isDirty: true,
       })
     ).toBe('Name is required');
   });
@@ -30,6 +32,7 @@ describe('getFieldSubmitChangeErrorText', () => {
           onSubmit: 'Name already exists',
         },
         isBlurred: false,
+        isDirty: false,
       })
     ).toBe('Name already exists');
   });
@@ -42,7 +45,33 @@ describe('getFieldSubmitChangeErrorText', () => {
           onSubmit: 'Name already exists',
         },
         isBlurred: true,
+        isDirty: true,
       })
     ).toBe('Name already exists');
+  });
+
+  it('shows a blur error before the field has changed', () => {
+    expect(
+      getFieldSubmitChangeErrorText({
+        errorMap: {
+          onBlur: 'Name is required',
+        },
+        isBlurred: true,
+        isDirty: false,
+      })
+    ).toBe('Name is required');
+  });
+
+  it('uses the current change result after a field is edited', () => {
+    expect(
+      getFieldSubmitChangeErrorText({
+        errorMap: {
+          onBlur: 'Name is required',
+          onChange: undefined,
+        },
+        isBlurred: true,
+        isDirty: true,
+      })
+    ).toBeUndefined();
   });
 });

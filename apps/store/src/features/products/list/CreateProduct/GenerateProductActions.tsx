@@ -65,6 +65,13 @@ export const GenerateProductActions = ({
                   <Button
                     color="primary"
                     onClick={() => {
+                      if (
+                        productVariantCount > 0 &&
+                        generatedTemplateSignature === generationSignature
+                      ) {
+                        return;
+                      }
+
                       const templateValidationResult = validateProductTemplate({
                         value: form.state.values,
                       });

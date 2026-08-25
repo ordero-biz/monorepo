@@ -222,6 +222,74 @@ describe('CreateProduct', () => {
     expect(createProductGroupMock).not.toHaveBeenCalled();
   });
 
+  it('shows generated variant errors when the product template is invalid', async () => {
+    const user = userEvent.setup();
+
+    setup();
+
+    await completeRequiredFields(user);
+    await user.click(
+      screen.getByRole('button', { name: 'Next: Configure product' })
+    );
+    await user.clear(
+      screen.getByRole('textbox', { name: 'Base product name' })
+    );
+    await user.click(
+      screen.getByRole('button', { name: 'Regenerate product' })
+    );
+
+    expect(await screen.findByText('Product name is required')).toBeVisible();
+
+    await user.click(screen.getByRole('button', { name: 'Create product' }));
+
+    expect(await screen.findByText('Barcode is required')).toBeVisible();
+    expect(await screen.findByText('SKU is required')).toBeVisible();
+    expect(createProductGroupMock).not.toHaveBeenCalled();
+  });
+
+  it('shows a template field error after blur and clears it on correction', async () => {
+    const user = userEvent.setup();
+
+    setup();
+
+    const productName = screen.getByRole('textbox', {
+      name: 'Base product name',
+    });
+
+    await user.click(productName);
+    await user.tab();
+
+    expect(await screen.findByText('Product name is required')).toBeVisible();
+
+    await user.type(productName, 'Running Shoes');
+
+    expect(
+      screen.queryByText('Product name is required')
+    ).not.toBeInTheDocument();
+  });
+
+  it('requires a selected attribute value before generating multiple products', async () => {
+    const user = userEvent.setup();
+
+    setup();
+
+    await completeRequiredFields(user);
+    await user.click(screen.getByRole('button', { name: 'Multiple products' }));
+    await user.click(
+      screen.getByRole('button', { name: 'Select Color Attribute' })
+    );
+    await user.click(
+      screen.getByRole('button', { name: 'Next: Configure products' })
+    );
+
+    expect(
+      await screen.findByText('Select at least one attribute value.')
+    ).toBeVisible();
+    expect(
+      screen.queryByRole('heading', { name: 'Generated product variants' })
+    ).not.toBeInTheDocument();
+  });
+
   it('generates a single product preview without creating the product', async () => {
     const user = userEvent.setup();
 
@@ -347,6 +415,26 @@ describe('CreateProduct', () => {
     await user.click(screen.getByRole('button', { name: 'Multiple products' }));
 
     expect(screen.getByDisplayValue('Running Shoes Blue')).toBeInTheDocument();
+    expect(createProductGroupMock).not.toHaveBeenCalled();
+  });
+
+  it('keeps filled variants when generating again without template changes', async () => {
+    const user = userEvent.setup();
+
+    setup();
+
+    await completeRequiredFields(user);
+    await user.click(
+      screen.getByRole('button', { name: 'Next: Configure product' })
+    );
+
+    const sku = screen.getByRole('textbox', { name: 'SKU' });
+    await user.type(sku, 'RUNNING-SHOES');
+    await user.click(
+      screen.getByRole('button', { name: 'Next: Configure product' })
+    );
+
+    expect(sku).toHaveValue('RUNNING-SHOES');
     expect(createProductGroupMock).not.toHaveBeenCalled();
   });
 
@@ -586,7 +674,7 @@ describe('CreateProduct', () => {
     expect(twentyFirstVariantSku).toHaveValue('SKU-21');
   });
 
-  it('validates generated variants loaded after the first page', async () => {
+  it('shows submit errors for generated variants loaded after the first page', async () => {
     const user = userEvent.setup();
 
     setup();
@@ -616,14 +704,17 @@ describe('CreateProduct', () => {
       screen.getByRole('button', { name: 'Next: Configure products' })
     );
 
+    await user.click(screen.getByRole('button', { name: 'Create product' }));
+
+    expect(await screen.findAllByText('Barcode is required')).toHaveLength(20);
+    expect(screen.getAllByText('SKU is required')).toHaveLength(20);
+
     act(() => {
       intersectionObserverCallbacks[0]?.(
         [{ isIntersecting: true } as IntersectionObserverEntry],
         {} as IntersectionObserver
       );
     });
-
-    await user.click(screen.getByRole('button', { name: 'Create product' }));
 
     expect(await screen.findAllByText('Barcode is required')).toHaveLength(21);
     expect(screen.getAllByText('SKU is required')).toHaveLength(21);
@@ -670,6 +761,9 @@ describe('CreateProduct', () => {
       screen.getByRole('textbox', { name: 'Barcode' }),
       'barcode-1'
     );
+
+    expect(screen.queryByText('Barcode is required')).not.toBeInTheDocument();
+    expect(screen.queryByText('SKU is required')).not.toBeInTheDocument();
     expect(createButton).toBeEnabled();
 
     await user.click(createButton);
@@ -733,6 +827,13 @@ describe('CreateProduct', () => {
     expect(
       await screen.findByRole('dialog', { name: 'Product creation failed.' })
     ).toBeVisible();
+
+    await user.type(
+      screen.getAllByRole('textbox', { name: 'Description' })[0],
+      'Updated product description'
+    );
+
+    expect(screen.getByText('Product name already exists.')).toBeVisible();
     expect(mocks.push).not.toHaveBeenCalled();
   });
 

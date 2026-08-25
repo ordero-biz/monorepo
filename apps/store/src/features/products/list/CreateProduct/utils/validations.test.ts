@@ -1,3 +1,4 @@
+import type { AttributeDropdown } from '@/lib/domain/attributes/types';
 import { PRODUCT_GENERATION_MODE } from '../constants';
 import type { CreateProductValues } from '../types';
 import {
@@ -20,6 +21,14 @@ const getProductValues = (
   productVariants,
   productVariantsGenerationMode,
 });
+
+const colorAttribute = {
+  id: 7,
+  name: 'Color',
+  sortOrder: 1,
+  createdAt: '2026-07-14T17:54:42.035Z',
+  attributeValues: [],
+} satisfies AttributeDropdown;
 
 describe('validateProductName', () => {
   it('rejects a whitespace-only product name', () => {
@@ -74,6 +83,21 @@ describe('validateProductTemplate', () => {
     ).toEqual({
       fields: {
         attributes: 'Select at least one attribute.',
+      },
+    });
+  });
+
+  it('requires an attribute value in multiple-products mode', () => {
+    expect(
+      validateProductTemplate({
+        value: {
+          ...getProductValues([]),
+          attributes: [colorAttribute],
+        },
+      })
+    ).toEqual({
+      fields: {
+        attributeValues: 'Select at least one attribute value.',
       },
     });
   });
@@ -149,6 +173,45 @@ describe('validateProductVariants', () => {
         'productVariants[0].sku': 'SKU must be unique across variants',
         'productVariants[1].barcode': 'Barcode must be unique across variants',
         'productVariants[1].sku': 'SKU must be unique across variants',
+      },
+    });
+  });
+
+  it('marks every variant that shares a barcode or SKU', () => {
+    expect(
+      validateProductVariants({
+        value: getProductValues([
+          {
+            attributeValueIds: [70],
+            barcode: 'barcode-1',
+            description: '',
+            name: 'Running Shoes Red',
+            sku: 'SHOE',
+          },
+          {
+            attributeValueIds: [71],
+            barcode: 'barcode-1',
+            description: '',
+            name: 'Running Shoes Green',
+            sku: 'SHOE',
+          },
+          {
+            attributeValueIds: [72],
+            barcode: 'barcode-1',
+            description: '',
+            name: 'Running Shoes Blue',
+            sku: 'SHOE',
+          },
+        ]),
+      })
+    ).toEqual({
+      fields: {
+        'productVariants[0].barcode': 'Barcode must be unique across variants',
+        'productVariants[0].sku': 'SKU must be unique across variants',
+        'productVariants[1].barcode': 'Barcode must be unique across variants',
+        'productVariants[1].sku': 'SKU must be unique across variants',
+        'productVariants[2].barcode': 'Barcode must be unique across variants',
+        'productVariants[2].sku': 'SKU must be unique across variants',
       },
     });
   });
