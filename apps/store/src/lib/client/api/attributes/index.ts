@@ -109,9 +109,11 @@ export const updateAttribute = ({
     }
   );
 
-export type UpdateAttributeValueData = Partial<
+export type UpdateAttributeValueFieldData = Partial<
   Pick<AttributeValue, 'name' | 'sortOrder' | 'status'>
-> & {
+>;
+
+export type UpdateAttributeValueData = UpdateAttributeValueFieldData & {
   attributeValueId: string | number;
 };
 

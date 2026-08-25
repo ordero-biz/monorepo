@@ -18,11 +18,21 @@ export const UpdateAttributeValueDialog = ({
     attributeValueId: attributeValue.id,
     initialName: attributeValue.name,
     initialSortOrder: attributeValue.sortOrder,
-    onUpdated: async () => {
-      onOpenChange(false);
-      await queryClient.invalidateQueries({
-        queryKey: attributesQueryKeys.values(attributeId),
+    onNoChanges: () => handleOpenChange(false),
+    onUpdated: async (updatedAttributeValue) => {
+      form.reset({
+        name: updatedAttributeValue.name,
+        sortOrder: updatedAttributeValue.sortOrder,
       });
+      onOpenChange(false);
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: attributesQueryKeys.list,
+        }),
+        queryClient.invalidateQueries({
+          queryKey: attributesQueryKeys.values(attributeId),
+        }),
+      ]);
     },
   });
 
@@ -88,7 +98,7 @@ export const UpdateAttributeValueDialog = ({
               <Dialog.Footer>
                 <form.Subscribe selector={(state) => state.isSubmitting}>
                   {(isSubmitting) => (
-                    <Button type="submit">
+                    <Button disabled={isSubmitting} type="submit">
                       {isSubmitting ? 'Saving...' : 'Save'}
                     </Button>
                   )}

@@ -1,19 +1,41 @@
-import { updateAttribute } from '@/lib/client/api/attributes';
+import {
+  type UpdateAttributeFieldData,
+  updateAttribute,
+} from '@/lib/client/api/attributes';
 import { getApiErrorMessage } from '@/lib/utils/apiError';
+import { getChangedValues } from '@/lib/utils/form/comparison/getChangedValues';
 import type { UpdateAttributeFormValues } from './validations';
 
 type SubmitUpdateAttributeArgs = {
   attributeId: string | number;
-  value: UpdateAttributeFormValues;
+  submitData: UpdateAttributeFieldData;
 };
+
+type GetAttributeUpdateChangesArgs = {
+  formValue: UpdateAttributeFormValues;
+  initialName: string;
+};
+
+const normalizeUpdateAttributeFormData = (data: UpdateAttributeFormValues) => ({
+  name: data.name.trim(),
+});
+
+export const getAttributeUpdateChanges = ({
+  formValue,
+  initialName,
+}: GetAttributeUpdateChangesArgs) =>
+  getChangedValues({
+    initialData: normalizeUpdateAttributeFormData({ name: initialName }),
+    submitData: normalizeUpdateAttributeFormData(formValue),
+  });
 
 export const submitUpdateAttribute = async ({
   attributeId,
-  value,
+  submitData,
 }: SubmitUpdateAttributeArgs) => {
   const result = await updateAttribute({
     attributeId,
-    name: value.name.trim(),
+    ...submitData,
   });
 
   if (!result.ok) {

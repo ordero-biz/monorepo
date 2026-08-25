@@ -87,8 +87,29 @@ describe('UpdateAttributeDialog', () => {
         queryKey: attributesQueryKeys.list,
       })
     );
+    expect(invalidateQueriesSpy).toHaveBeenCalledWith({
+      queryKey: attributesQueryKeys.detail(7),
+    });
     expect(onOpenChange).toHaveBeenCalledWith(false);
     await waitFor(() => expect(onUpdated).toHaveBeenCalled());
+  });
+
+  it('closes without sending a normalized name that matches the attribute', async () => {
+    const user = userEvent.setup();
+    const { onOpenChange, onUpdated } = setup();
+    const dialog = screen.getByRole('dialog', { name: 'Edit Attribute' });
+    const nameField = within(dialog).getByRole('textbox', {
+      name: 'Attribute name',
+    });
+
+    await user.clear(nameField);
+    await user.type(nameField, ' Color ');
+    await user.click(within(dialog).getByRole('button', { name: 'Save' }));
+
+    expect(updateAttributeMock).not.toHaveBeenCalled();
+    await waitFor(() => expect(onOpenChange).toHaveBeenCalledWith(false));
+    expect(onUpdated).not.toHaveBeenCalled();
+    expect(screen.queryByText(/was updated/)).not.toBeInTheDocument();
   });
 
   it('keeps save available and rejects an empty attribute name', async () => {
@@ -116,7 +137,7 @@ describe('UpdateAttributeDialog', () => {
     expect(updateAttributeMock).not.toHaveBeenCalled();
   });
 
-  it('keeps save available while the update is in flight', async () => {
+  it('disables save while the update is in flight', async () => {
     let resolveUpdate:
       | ((value: Awaited<ReturnType<typeof updateAttribute>>) => void)
       | undefined;
@@ -131,17 +152,22 @@ describe('UpdateAttributeDialog', () => {
     setup();
 
     const dialog = screen.getByRole('dialog', { name: 'Edit Attribute' });
+    const nameField = within(dialog).getByRole('textbox', {
+      name: 'Attribute name',
+    });
     const saveButton = within(dialog).getByRole('button', { name: 'Save' });
 
+    await user.clear(nameField);
+    await user.type(nameField, 'Material');
     await user.click(saveButton);
 
-    expect(screen.getByRole('button', { name: 'Saving...' })).toBeEnabled();
+    expect(screen.getByRole('button', { name: 'Saving...' })).toBeDisabled();
 
     resolveUpdate?.({
       ok: true,
       data: {
         id: 7,
-        name: 'Color',
+        name: 'Material',
         sortOrder: 10,
         createdAt: '2026-06-24T20:07:32.467Z',
       },

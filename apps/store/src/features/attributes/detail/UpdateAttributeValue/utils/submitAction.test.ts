@@ -1,6 +1,9 @@
 import { updateAttributeValue } from '@/lib/client/api/attributes';
 import { API_ERROR_CODES } from '@/lib/constants/apiErrorCodes';
-import { submitUpdateAttributeValue } from './submitAction';
+import {
+  getAttributeValueUpdateChanges,
+  submitUpdateAttributeValue,
+} from './submitAction';
 
 vi.mock('@/lib/client/api/attributes', async () => ({
   ...(await vi.importActual<typeof import('@/lib/client/api/attributes')>(
@@ -16,7 +19,36 @@ describe('submitUpdateAttributeValue', () => {
     updateAttributeValueMock.mockReset();
   });
 
-  it('normalizes form values before updating the attribute value', async () => {
+  it('normalizes form values before creating the update patch', () => {
+    expect(
+      getAttributeValueUpdateChanges({
+        initialName: 'Blue',
+        initialSortOrder: 0,
+        formValue: {
+          name: ' Navy ',
+          sortOrder: 1,
+        },
+      })
+    ).toEqual({
+      name: 'Navy',
+      sortOrder: 1,
+    });
+  });
+
+  it('returns no patch when normalized form values are unchanged', () => {
+    expect(
+      getAttributeValueUpdateChanges({
+        initialName: 'Blue',
+        initialSortOrder: 0,
+        formValue: {
+          name: ' Blue ',
+          sortOrder: 0,
+        },
+      })
+    ).toBeUndefined();
+  });
+
+  it('transfers prepared attribute value update data', async () => {
     const attributeValue = {
       id: 3,
       name: 'Navy',
@@ -31,10 +63,7 @@ describe('submitUpdateAttributeValue', () => {
     await expect(
       submitUpdateAttributeValue({
         attributeValueId: 3,
-        value: {
-          name: '  Navy  ',
-          sortOrder: 0,
-        },
+        submitData: { name: 'Navy' },
       })
     ).resolves.toEqual({
       ok: true,
@@ -44,7 +73,6 @@ describe('submitUpdateAttributeValue', () => {
     expect(updateAttributeValueMock).toHaveBeenCalledWith({
       attributeValueId: 3,
       name: 'Navy',
-      sortOrder: 0,
     });
   });
 
@@ -61,10 +89,7 @@ describe('submitUpdateAttributeValue', () => {
     await expect(
       submitUpdateAttributeValue({
         attributeValueId: 3,
-        value: {
-          name: 'Navy',
-          sortOrder: 0,
-        },
+        submitData: { name: 'Navy' },
       })
     ).resolves.toEqual({
       ok: false,

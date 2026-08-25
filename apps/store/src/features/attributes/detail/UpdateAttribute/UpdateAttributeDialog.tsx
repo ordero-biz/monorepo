@@ -26,6 +26,7 @@ export const UpdateAttributeDialog = ({
   const { form } = useUpdateAttributeForm({
     attributeId: attribute.id,
     initialName: formValues.name,
+    onNoChanges: () => handleOpenChange(false),
     onUpdated: async (updatedAttribute) => {
       const updatedFormValues = getAttributeFormValues(updatedAttribute);
 
@@ -35,6 +36,9 @@ export const UpdateAttributeDialog = ({
       onOpenChange(false);
       await queryClient.invalidateQueries({
         queryKey: attributesQueryKeys.list,
+      });
+      await queryClient.invalidateQueries({
+        queryKey: attributesQueryKeys.detail(attribute.id),
       });
       await onUpdated(updatedAttribute);
     },
@@ -97,7 +101,7 @@ export const UpdateAttributeDialog = ({
               <Dialog.Footer>
                 <form.Subscribe selector={(state) => state.isSubmitting}>
                   {(isSubmitting) => (
-                    <Button type="submit">
+                    <Button disabled={isSubmitting} type="submit">
                       {isSubmitting ? 'Saving...' : 'Save'}
                     </Button>
                   )}
