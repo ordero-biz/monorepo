@@ -30,7 +30,7 @@ describe('CreateUnitOfMeasurementDialog', () => {
     onOpenChangeMock.mockClear();
   });
 
-  it('requires name and symbol before add is available', async () => {
+  it('requires name and symbol before saving a draft is available', async () => {
     const user = userEvent.setup();
 
     setup();
@@ -44,7 +44,9 @@ describe('CreateUnitOfMeasurementDialog', () => {
     const symbolField = within(dialog).getByRole('textbox', {
       name: 'Symbol',
     });
-    const addButton = within(dialog).getByRole('button', { name: 'Add' });
+    const addButton = within(dialog).getByRole('button', {
+      name: 'Save draft',
+    });
 
     expect(addButton).toBeDisabled();
 
@@ -83,6 +85,8 @@ describe('CreateUnitOfMeasurementDialog', () => {
       name: 'Add unit of measurement',
     });
 
+    await user.click(within(dialog).getByRole('radio', { name: /^Active/ }));
+
     await user.type(
       within(dialog).getByRole('textbox', { name: 'Name' }),
       ' Kilogram '
@@ -95,11 +99,11 @@ describe('CreateUnitOfMeasurementDialog', () => {
       within(dialog).getByRole('textbox', { name: 'Comment' }),
       ' Weight unit '
     );
-    await user.click(within(dialog).getByRole('button', { name: 'Add' }));
+    await user.click(within(dialog).getByRole('button', { name: 'Publish' }));
 
     expect(createUnitOfMeasurementMock).toHaveBeenCalledWith({
       name: 'Kilogram',
-      status: 'DRAFT',
+      status: 'ACTIVE',
       symbol: 'kg',
       comment: 'Weight unit',
     });
@@ -138,7 +142,9 @@ describe('CreateUnitOfMeasurementDialog', () => {
       within(dialog).getByRole('textbox', { name: 'Symbol' }),
       'kg'
     );
-    await user.click(within(dialog).getByRole('button', { name: 'Add' }));
+    await user.click(
+      within(dialog).getByRole('button', { name: 'Save draft' })
+    );
 
     expect(createUnitOfMeasurementMock).toHaveBeenCalledWith({
       name: 'Kilogram',

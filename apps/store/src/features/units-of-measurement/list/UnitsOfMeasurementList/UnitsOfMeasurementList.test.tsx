@@ -130,7 +130,7 @@ describe('UnitsOfMeasurementList', () => {
         name: 'Units of measurement list',
       })
     ).toBeVisible();
-    expect(screen.getByText('ACTIVE')).toBeVisible();
+    expect(screen.getByText('Active')).toBeVisible();
     expect(screen.getByText('Kilogram')).toBeVisible();
     expect(screen.getByText('kg')).toBeVisible();
     expect(screen.getByText('Weight unit')).toBeVisible();

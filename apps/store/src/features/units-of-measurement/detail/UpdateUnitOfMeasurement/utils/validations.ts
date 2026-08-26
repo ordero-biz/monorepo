@@ -1,10 +1,6 @@
 import { z } from 'zod';
+import { UNIT_OF_MEASUREMENT_STATUS } from '@/lib/domain/unitsOfMeasurement';
 import type { ValidationArgs } from '@/lib/utils/form/validation/types';
-
-export const updateUnitOfMeasurementCodeSchema = z
-  .string()
-  .trim()
-  .min(1, 'Unit code is required');
 
 export const updateUnitOfMeasurementNameSchema = z
   .string()
@@ -17,8 +13,8 @@ export const updateUnitOfMeasurementSymbolSchema = z
   .min(1, 'Unit symbol is required');
 
 export const updateUnitOfMeasurementSchema = z.object({
-  code: updateUnitOfMeasurementCodeSchema,
   name: updateUnitOfMeasurementNameSchema,
+  status: z.enum(UNIT_OF_MEASUREMENT_STATUS),
   symbol: updateUnitOfMeasurementSymbolSchema,
   comment: z.string(),
 });
@@ -32,11 +28,6 @@ const getValidationMessage = (schema: z.ZodString, value: string) => {
 
   return result.success ? undefined : result.error.issues[0]?.message;
 };
-
-export const validateUpdateUnitOfMeasurementCode = ({
-  value,
-}: ValidationArgs<string>) =>
-  getValidationMessage(updateUnitOfMeasurementCodeSchema, value);
 
 export const validateUpdateUnitOfMeasurementName = ({
   value,

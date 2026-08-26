@@ -1,13 +1,21 @@
 'use client';
 
-import { Button, Dialog, TextField } from '@ordero/ui';
+import {
+  Button,
+  Dialog,
+  Radio,
+  RadioGroup,
+  TextField,
+  Typography,
+} from '@ordero/ui';
 import { useQueryClient } from '@tanstack/react-query';
+import type { UnitOfMeasurementStatus } from '@/lib/domain/unitsOfMeasurement';
+import { UNIT_OF_MEASUREMENT_STATUS } from '@/lib/domain/unitsOfMeasurement';
 import { unitsOfMeasurementQueryKeys } from '@/lib/query/units-of-measurement/unitsOfMeasurementQueryKeys';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
 import { useCreateUnitOfMeasurementForm } from './hooks/useCreateUnitOfMeasurementForm';
 import type { CreateUnitOfMeasurementDialogProps } from './types';
 import {
-  validateUnitOfMeasurementCode,
   validateUnitOfMeasurementName,
   validateUnitOfMeasurementSymbol,
 } from './utils/validations';
@@ -54,34 +62,6 @@ export const CreateUnitOfMeasurementDialog = ({
 
               <Dialog.Content>
                 <div className="flex flex-col gap-[var(--space-2)]">
-                  <form.Field
-                    name="code"
-                    validators={{
-                      onChange: validateUnitOfMeasurementCode,
-                      onSubmit: validateUnitOfMeasurementCode,
-                    }}
-                  >
-                    {(field) => {
-                      const errorText = getFieldSubmitChangeErrorText(
-                        field.state.meta
-                      );
-
-                      return (
-                        <TextField
-                          errorText={errorText}
-                          invalid={Boolean(errorText)}
-                          label="Code"
-                          name={field.name}
-                          onBlur={field.handleBlur}
-                          onValueChange={field.handleChange}
-                          required
-                          size="s"
-                          value={field.state.value}
-                        />
-                      );
-                    }}
-                  </form.Field>
-
                   <form.Field
                     name="name"
                     validators={{
@@ -138,6 +118,61 @@ export const CreateUnitOfMeasurementDialog = ({
                     }}
                   </form.Field>
 
+                  <form.Field name="status">
+                    {(field) => {
+                      const errorText = getFieldSubmitChangeErrorText(
+                        field.state.meta
+                      );
+
+                      return (
+                        <RadioGroup
+                          errorText={errorText}
+                          invalid={Boolean(errorText)}
+                          label="Unit status"
+                          name={field.name}
+                          onValueChange={(value) =>
+                            field.handleChange(value as UnitOfMeasurementStatus)
+                          }
+                          orientation="vertical"
+                          required
+                          value={field.state.value}
+                        >
+                          <Radio
+                            align="start"
+                            value={UNIT_OF_MEASUREMENT_STATUS.DRAFT}
+                          >
+                            <div className="flex flex-col">
+                              Draft
+                              <Typography
+                                color="text-secondary"
+                                variant="caption"
+                              >
+                                Editable only. Cannot be assigned to products or
+                                tracked in analytics. Can be activated later
+                              </Typography>
+                            </div>
+                          </Radio>
+                          <Radio
+                            align="start"
+                            value={UNIT_OF_MEASUREMENT_STATUS.ACTIVE}
+                          >
+                            <div className="flex flex-col">
+                              Active
+                              <Typography
+                                color="text-secondary"
+                                variant="caption"
+                              >
+                                Fully functional. Can be assigned to products
+                                and tracked in analytics. Cannot be edited after
+                                publishing
+                              </Typography>
+                            </div>
+                          </Radio>
+                        </RadioGroup>
+                      );
+                    }}
+                  </form.Field>
+
                   <form.Field name="comment">
                     {(field) => {
                       const errorText = getFieldSubmitChangeErrorText(
@@ -165,24 +200,25 @@ export const CreateUnitOfMeasurementDialog = ({
                 <form.Subscribe
                   selector={(state) =>
                     [
-                      state.values.code,
                       state.values.name,
+                      state.values.status,
                       state.values.symbol,
                       state.isSubmitting,
                     ] as const
                   }
                 >
-                  {([code, name, symbol, isSubmitting]) => (
+                  {([name, status, symbol, isSubmitting]) => (
                     <Button
-                      disabled={
-                        isSubmitting ||
-                        !code.trim() ||
-                        !name.trim() ||
-                        !symbol.trim()
-                      }
+                      disabled={isSubmitting || !name.trim() || !symbol.trim()}
                       type="submit"
                     >
-                      {isSubmitting ? 'Adding...' : 'Add'}
+                      {isSubmitting
+                        ? status === UNIT_OF_MEASUREMENT_STATUS.DRAFT
+                          ? 'Saving...'
+                          : 'Publishing...'
+                        : status === UNIT_OF_MEASUREMENT_STATUS.DRAFT
+                          ? 'Save draft'
+                          : 'Publish'}
                     </Button>
                   )}
                 </form.Subscribe>

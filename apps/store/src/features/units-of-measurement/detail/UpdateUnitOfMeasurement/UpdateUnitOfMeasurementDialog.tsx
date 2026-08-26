@@ -1,28 +1,38 @@
 'use client';
 
-import { Button, Dialog, TextField } from '@ordero/ui';
+import {
+  Button,
+  Dialog,
+  Radio,
+  RadioGroup,
+  TextField,
+  Typography,
+} from '@ordero/ui';
 import { useQueryClient } from '@tanstack/react-query';
 import { useRef, useState } from 'react';
-import type { UnitOfMeasurement } from '@/lib/domain/unitsOfMeasurement';
+import type {
+  UnitOfMeasurement,
+  UnitOfMeasurementStatus,
+} from '@/lib/domain/unitsOfMeasurement';
+import { UNIT_OF_MEASUREMENT_STATUS } from '@/lib/domain/unitsOfMeasurement';
 import { unitsOfMeasurementQueryKeys } from '@/lib/query/units-of-measurement/unitsOfMeasurementQueryKeys';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
 import { useUpdateUnitOfMeasurementForm } from './hooks/useUpdateUnitOfMeasurementForm';
 import type { UpdateUnitOfMeasurementDialogProps } from './types';
 import {
   type UpdateUnitOfMeasurementFormValues,
-  validateUpdateUnitOfMeasurementCode,
   validateUpdateUnitOfMeasurementName,
   validateUpdateUnitOfMeasurementSymbol,
 } from './utils/validations';
 
 const getUnitOfMeasurementFormValues = ({
-  code,
   name,
+  status = UNIT_OF_MEASUREMENT_STATUS.DRAFT,
   symbol,
   comment,
 }: UnitOfMeasurement): UpdateUnitOfMeasurementFormValues => ({
-  code,
   name,
+  status,
   symbol,
   comment,
 });
@@ -84,34 +94,6 @@ export const UpdateUnitOfMeasurementDialog = ({
               <Dialog.Content>
                 <div className="flex flex-col gap-[var(--space-2)]">
                   <form.Field
-                    name="code"
-                    validators={{
-                      onChange: validateUpdateUnitOfMeasurementCode,
-                      onSubmit: validateUpdateUnitOfMeasurementCode,
-                    }}
-                  >
-                    {(field) => {
-                      const errorText = getFieldSubmitChangeErrorText(
-                        field.state.meta
-                      );
-
-                      return (
-                        <TextField
-                          errorText={errorText}
-                          invalid={Boolean(errorText)}
-                          label="Code"
-                          name={field.name}
-                          onBlur={field.handleBlur}
-                          onValueChange={field.handleChange}
-                          required
-                          size="s"
-                          value={field.state.value}
-                        />
-                      );
-                    }}
-                  </form.Field>
-
-                  <form.Field
                     name="name"
                     validators={{
                       onChange: validateUpdateUnitOfMeasurementName,
@@ -167,6 +149,61 @@ export const UpdateUnitOfMeasurementDialog = ({
                     }}
                   </form.Field>
 
+                  <form.Field name="status">
+                    {(field) => {
+                      const errorText = getFieldSubmitChangeErrorText(
+                        field.state.meta
+                      );
+
+                      return (
+                        <RadioGroup
+                          errorText={errorText}
+                          invalid={Boolean(errorText)}
+                          label="Unit status"
+                          name={field.name}
+                          onValueChange={(value) =>
+                            field.handleChange(value as UnitOfMeasurementStatus)
+                          }
+                          orientation="vertical"
+                          required
+                          value={field.state.value}
+                        >
+                          <Radio
+                            align="start"
+                            value={UNIT_OF_MEASUREMENT_STATUS.DRAFT}
+                          >
+                            <div className="flex flex-col">
+                              Draft
+                              <Typography
+                                color="text-secondary"
+                                variant="caption"
+                              >
+                                Editable only. Cannot be assigned to products or
+                                tracked in analytics. Can be activated later
+                              </Typography>
+                            </div>
+                          </Radio>
+                          <Radio
+                            align="start"
+                            value={UNIT_OF_MEASUREMENT_STATUS.ACTIVE}
+                          >
+                            <div className="flex flex-col">
+                              Active
+                              <Typography
+                                color="text-secondary"
+                                variant="caption"
+                              >
+                                Fully functional. Can be assigned to products
+                                and tracked in analytics. Cannot be edited after
+                                publishing
+                              </Typography>
+                            </div>
+                          </Radio>
+                        </RadioGroup>
+                      );
+                    }}
+                  </form.Field>
+
                   <form.Field name="comment">
                     {(field) => {
                       const errorText = getFieldSubmitChangeErrorText(
@@ -194,21 +231,15 @@ export const UpdateUnitOfMeasurementDialog = ({
                 <form.Subscribe
                   selector={(state) =>
                     [
-                      state.values.code,
                       state.values.name,
                       state.values.symbol,
                       state.isSubmitting,
                     ] as const
                   }
                 >
-                  {([code, name, symbol, isSubmitting]) => (
+                  {([name, symbol, isSubmitting]) => (
                     <Button
-                      disabled={
-                        isSubmitting ||
-                        !code.trim() ||
-                        !name.trim() ||
-                        !symbol.trim()
-                      }
+                      disabled={isSubmitting || !name.trim() || !symbol.trim()}
                       type="submit"
                     >
                       {isSubmitting ? 'Saving...' : 'Save'}

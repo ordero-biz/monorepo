@@ -1,15 +1,21 @@
 'use client';
 
-import { Button, Card, Menu, PageHeader, Typography } from '@ordero/ui';
+import { Button, Card, Chip, Menu, PageHeader, Typography } from '@ordero/ui';
 import { EllipsisVertical, Pencil, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { clientRoutes } from '@/lib/client/routes';
+import { UNIT_OF_MEASUREMENT_STATUS } from '@/lib/domain/unitsOfMeasurement';
 import { useUnitOfMeasurementQuery } from '@/lib/hooks/units-of-measurement/useUnitOfMeasurementQuery';
 import { DeleteUnitsOfMeasurementDialog } from '../../shared';
 import { UpdateUnitOfMeasurementDialog } from '../UpdateUnitOfMeasurement/UpdateUnitOfMeasurementDialog';
 import type { UnitOfMeasurementDetailProps } from './types';
 import { UnitOfMeasurementDetailInfo } from './UnitOfMeasurementDetailInfo';
+
+const statusLabels = {
+  ACTIVE: 'Active',
+  DRAFT: 'Draft',
+} as const;
 
 export const UnitOfMeasurementDetail = ({
   unitOfMeasurementId,
@@ -55,6 +61,9 @@ export const UnitOfMeasurementDetail = ({
     );
   }
 
+  const isUnitOfMeasurementActive =
+    unitOfMeasurementQuery.data.status === UNIT_OF_MEASUREMENT_STATUS.ACTIVE;
+
   return (
     <div className="flex flex-col gap-[var(--space-2)]">
       <PageHeader.Root>
@@ -62,6 +71,13 @@ export const UnitOfMeasurementDetail = ({
           <Typography variant="h5">
             {unitOfMeasurementQuery.data.name}
           </Typography>
+          <Chip
+            color={isUnitOfMeasurementActive ? 'primary' : 'warning'}
+            size="s"
+            variant="soft"
+          >
+            {statusLabels[unitOfMeasurementQuery.data.status]}
+          </Chip>
         </PageHeader.Left>
         <PageHeader.Right>
           <Menu.Root>
@@ -76,13 +92,15 @@ export const UnitOfMeasurementDetail = ({
             <Menu.Portal>
               <Menu.Positioner align="end">
                 <Menu.Popup>
-                  <Menu.Item onClick={() => setIsUpdateDialogOpen(true)}>
-                    <Pencil
-                      aria-hidden="true"
-                      className="size-[var(--icon-button-xs-icon)]"
-                    />
-                    Edit unit of measurement
-                  </Menu.Item>
+                  {!isUnitOfMeasurementActive ? (
+                    <Menu.Item onClick={() => setIsUpdateDialogOpen(true)}>
+                      <Pencil
+                        aria-hidden="true"
+                        className="size-[var(--icon-button-xs-icon)]"
+                      />
+                      Edit unit of measurement
+                    </Menu.Item>
+                  ) : null}
                   <Menu.Item
                     color="error"
                     onClick={() => setIsDeleteDialogOpen(true)}

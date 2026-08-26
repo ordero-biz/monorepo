@@ -49,8 +49,9 @@ describe('UpdateUnitOfMeasurementDialog', () => {
     });
 
     expect(
-      within(dialog).getByRole('combobox', { name: 'Status' })
-    ).toHaveTextContent('Draft');
+      within(dialog).getByRole('radiogroup', { name: 'Unit status' })
+    ).toBeVisible();
+    expect(within(dialog).getByRole('radio', { name: /^Draft/ })).toBeChecked();
     expect(within(dialog).getByRole('textbox', { name: 'Name' })).toHaveValue(
       'Kilogram'
     );

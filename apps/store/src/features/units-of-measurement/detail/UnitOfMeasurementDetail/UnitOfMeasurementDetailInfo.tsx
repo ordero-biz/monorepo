@@ -9,10 +9,6 @@ const getUnitOfMeasurementDetailData = (
   unitOfMeasurement: UnitOfMeasurement
 ): UnitOfMeasurementDetailField[] => [
   {
-    label: 'Status',
-    value: unitOfMeasurement.status,
-  },
-  {
     label: 'Symbol',
     value: unitOfMeasurement.symbol,
   },

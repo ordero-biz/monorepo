@@ -1,7 +1,10 @@
 'use client';
 
 import { apiFetch } from '@ordero/api-client';
-import type { UnitOfMeasurement } from '@/lib/domain/unitsOfMeasurement';
+import type {
+  UnitOfMeasurement,
+  UnitOfMeasurementStatus,
+} from '@/lib/domain/unitsOfMeasurement';
 import type { PaginatedResponse } from '@/lib/server/types';
 import { tokenizePath } from '@/lib/utils/tokenizePath';
 import {
@@ -13,8 +16,8 @@ import { CLIENT_BACKEND_PATHS } from '../path';
 type UnitsOfMeasurementListResponse = PaginatedResponse<UnitOfMeasurement>;
 
 type CreateUnitOfMeasurementInput = {
-  code: string;
   name: string;
+  status: UnitOfMeasurementStatus;
   symbol: string;
   comment: string;
 };
@@ -45,16 +48,16 @@ export const createUnitOfMeasurement = (input: CreateUnitOfMeasurementInput) =>
 
 type UpdateUnitOfMeasurementInput = {
   unitOfMeasurementId: string | number;
-  code: string;
   name: string;
+  status: UnitOfMeasurementStatus;
   symbol: string;
   comment: string;
 };
 
 export const updateUnitOfMeasurement = ({
   unitOfMeasurementId,
-  code,
   name,
+  status,
   symbol,
   comment,
 }: UpdateUnitOfMeasurementInput) =>
@@ -65,8 +68,8 @@ export const updateUnitOfMeasurement = ({
     {
       method: 'PATCH',
       body: {
-        code,
         name,
+        status,
         symbol,
         comment,
       },

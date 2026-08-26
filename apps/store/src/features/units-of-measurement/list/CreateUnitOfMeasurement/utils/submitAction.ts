@@ -5,8 +5,8 @@ export const submitCreateUnitOfMeasurement = async (
   value: CreateUnitOfMeasurementFormValues
 ) => {
   const result = await createUnitOfMeasurement({
-    code: value.code.trim(),
     name: value.name.trim(),
+    status: value.status,
     symbol: value.symbol.trim(),
     comment: value.comment.trim(),
   });

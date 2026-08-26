@@ -54,7 +54,7 @@ describe('UnitOfMeasurementDetail', () => {
       await screen.findByRole('heading', { name: 'Kilogram' })
     ).toBeVisible();
     expect(screen.getByText('Unit of measurement details')).toBeVisible();
-    expect(screen.getByText('ACTIVE')).toBeVisible();
+    expect(screen.getByText('Active')).toBeVisible();
     expect(screen.getByText('kg')).toBeVisible();
     expect(screen.getByText('Weight unit')).toBeVisible();
     expect(
@@ -85,10 +85,31 @@ describe('UnitOfMeasurementDetail', () => {
     ).toBeVisible();
   });
 
-  it('opens the edit dialog from the actions menu', async () => {
+  it('does not render an edit action for an active unit of measurement', async () => {
     getUnitOfMeasurementMock.mockResolvedValue({
       ok: true,
       data: unitOfMeasurement,
+    });
+    const user = userEvent.setup();
+
+    setup();
+
+    await user.click(
+      await screen.findByRole('button', { name: 'Actions for Kilogram' })
+    );
+
+    expect(
+      screen.queryByRole('menuitem', { name: 'Edit unit of measurement' })
+    ).not.toBeInTheDocument();
+  });
+
+  it('opens the edit dialog for a draft unit of measurement', async () => {
+    getUnitOfMeasurementMock.mockResolvedValue({
+      ok: true,
+      data: {
+        ...unitOfMeasurement,
+        status: 'DRAFT',
+      },
     });
     const user = userEvent.setup();
 
