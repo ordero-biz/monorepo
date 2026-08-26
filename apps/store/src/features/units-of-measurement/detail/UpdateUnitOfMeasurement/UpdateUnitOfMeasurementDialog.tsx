@@ -1,19 +1,9 @@
 'use client';
 
-import {
-  Button,
-  Dialog,
-  Radio,
-  RadioGroup,
-  TextField,
-  Typography,
-} from '@ordero/ui';
+import { Button, Dialog, TextField } from '@ordero/ui';
 import { useQueryClient } from '@tanstack/react-query';
 import { useRef, useState } from 'react';
-import type {
-  UnitOfMeasurement,
-  UnitOfMeasurementStatus,
-} from '@/lib/domain/unitsOfMeasurement';
+import type { UnitOfMeasurement } from '@/lib/domain/unitsOfMeasurement';
 import { UNIT_OF_MEASUREMENT_STATUS } from '@/lib/domain/unitsOfMeasurement';
 import { unitsOfMeasurementQueryKeys } from '@/lib/query/units-of-measurement/unitsOfMeasurementQueryKeys';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
@@ -145,61 +135,6 @@ export const UpdateUnitOfMeasurementDialog = ({
                           size="s"
                           value={field.state.value}
                         />
-                      );
-                    }}
-                  </form.Field>
-
-                  <form.Field name="status">
-                    {(field) => {
-                      const errorText = getFieldSubmitChangeErrorText(
-                        field.state.meta
-                      );
-
-                      return (
-                        <RadioGroup
-                          errorText={errorText}
-                          invalid={Boolean(errorText)}
-                          label="Unit status"
-                          name={field.name}
-                          onValueChange={(value) =>
-                            field.handleChange(value as UnitOfMeasurementStatus)
-                          }
-                          orientation="vertical"
-                          required
-                          value={field.state.value}
-                        >
-                          <Radio
-                            align="start"
-                            value={UNIT_OF_MEASUREMENT_STATUS.DRAFT}
-                          >
-                            <div className="flex flex-col">
-                              Draft
-                              <Typography
-                                color="text-secondary"
-                                variant="caption"
-                              >
-                                Editable only. Cannot be assigned to products or
-                                tracked in analytics. Can be activated later
-                              </Typography>
-                            </div>
-                          </Radio>
-                          <Radio
-                            align="start"
-                            value={UNIT_OF_MEASUREMENT_STATUS.ACTIVE}
-                          >
-                            <div className="flex flex-col">
-                              Active
-                              <Typography
-                                color="text-secondary"
-                                variant="caption"
-                              >
-                                Fully functional. Can be assigned to products
-                                and tracked in analytics. Cannot be edited after
-                                publishing
-                              </Typography>
-                            </div>
-                          </Radio>
-                        </RadioGroup>
                       );
                     }}
                   </form.Field>

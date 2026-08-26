@@ -1,6 +1,7 @@
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { updateUnitOfMeasurement } from '@/lib/client/api/units-of-measurement';
+import { UNIT_OF_MEASUREMENT_STATUS } from '@/lib/domain/unitsOfMeasurement';
 import { unitsOfMeasurementQueryKeys } from '@/lib/query/units-of-measurement/unitsOfMeasurementQueryKeys';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { UpdateUnitOfMeasurementDialog } from './UpdateUnitOfMeasurementDialog';
@@ -19,7 +20,7 @@ const onUpdatedMock = vi.fn();
 const unitOfMeasurement = {
   id: 1,
   name: 'Kilogram',
-  status: 'DRAFT' as const,
+  status: UNIT_OF_MEASUREMENT_STATUS.DRAFT,
   symbol: 'kg',
   comment: 'Weight unit',
 };
@@ -49,9 +50,8 @@ describe('UpdateUnitOfMeasurementDialog', () => {
     });
 
     expect(
-      within(dialog).getByRole('radiogroup', { name: 'Unit status' })
-    ).toBeVisible();
-    expect(within(dialog).getByRole('radio', { name: /^Draft/ })).toBeChecked();
+      within(dialog).queryByRole('radiogroup', { name: 'Unit status' })
+    ).not.toBeInTheDocument();
     expect(within(dialog).getByRole('textbox', { name: 'Name' })).toHaveValue(
       'Kilogram'
     );

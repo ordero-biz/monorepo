@@ -9,6 +9,7 @@ import { UNIT_OF_MEASUREMENT_STATUS } from '@/lib/domain/unitsOfMeasurement';
 import { useUnitOfMeasurementQuery } from '@/lib/hooks/units-of-measurement/useUnitOfMeasurementQuery';
 import { DeleteUnitsOfMeasurementDialog } from '../../shared';
 import { UpdateUnitOfMeasurementDialog } from '../UpdateUnitOfMeasurement/UpdateUnitOfMeasurementDialog';
+import { ActivateUnitOfMeasurementDialogTrigger } from './ActivateUnitOfMeasurementDialogTrigger';
 import type { UnitOfMeasurementDetailProps } from './types';
 import { UnitOfMeasurementDetailInfo } from './UnitOfMeasurementDetailInfo';
 
@@ -80,6 +81,14 @@ export const UnitOfMeasurementDetail = ({
           </Chip>
         </PageHeader.Left>
         <PageHeader.Right>
+          {!isUnitOfMeasurementActive ? (
+            <ActivateUnitOfMeasurementDialogTrigger
+              onUpdated={async () => {
+                await unitOfMeasurementQuery.refetch();
+              }}
+              unitOfMeasurement={unitOfMeasurementQuery.data}
+            />
+          ) : null}
           <Menu.Root>
             <Menu.Trigger
               aria-label={`Actions for ${unitOfMeasurementQuery.data.name}`}

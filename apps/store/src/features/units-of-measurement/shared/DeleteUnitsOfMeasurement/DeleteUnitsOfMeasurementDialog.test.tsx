@@ -1,6 +1,7 @@
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { deleteUnitsOfMeasurement } from '@/lib/client/api/units-of-measurement';
+import { UNIT_OF_MEASUREMENT_STATUS } from '@/lib/domain/unitsOfMeasurement';
 import { unitsOfMeasurementQueryKeys } from '@/lib/query/units-of-measurement/unitsOfMeasurementQueryKeys';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { DeleteUnitsOfMeasurementDialog } from './DeleteUnitsOfMeasurementDialog';
@@ -16,7 +17,7 @@ const deleteUnitsOfMeasurementMock = vi.mocked(deleteUnitsOfMeasurement);
 
 const singleUnit = {
   id: 7,
-  status: 'ACTIVE' as const,
+  status: UNIT_OF_MEASUREMENT_STATUS.ACTIVE,
   name: 'Kilogram',
   symbol: 'kg',
   comment: 'Weight unit',
@@ -26,7 +27,7 @@ const multipleUnits = [
   singleUnit,
   {
     id: 8,
-    status: 'DRAFT' as const,
+    status: UNIT_OF_MEASUREMENT_STATUS.DRAFT,
     name: 'Gram',
     symbol: 'g',
     comment: 'Weight unit',

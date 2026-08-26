@@ -1,6 +1,7 @@
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getUnitOfMeasurement } from '@/lib/client/api/units-of-measurement';
+import { UNIT_OF_MEASUREMENT_STATUS } from '@/lib/domain/unitsOfMeasurement';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { UnitOfMeasurementDetail } from './UnitOfMeasurementDetail';
 
@@ -31,7 +32,7 @@ const { setup } = prepareStoreSetup({
 
 const unitOfMeasurement = {
   id: 1,
-  status: 'ACTIVE' as const,
+  status: UNIT_OF_MEASUREMENT_STATUS.ACTIVE,
   name: 'Kilogram',
   symbol: 'kg',
   comment: 'Weight unit',
@@ -126,6 +127,25 @@ describe('UnitOfMeasurementDetail', () => {
 
     expect(
       screen.getByRole('dialog', { name: 'Edit unit of measurement' })
+    ).toBeVisible();
+  });
+
+  it('opens a confirmation dialog before publishing a draft unit of measurement', async () => {
+    getUnitOfMeasurementMock.mockResolvedValue({
+      ok: true,
+      data: {
+        ...unitOfMeasurement,
+        status: 'DRAFT',
+      },
+    });
+    const user = userEvent.setup();
+
+    setup();
+
+    await user.click(await screen.findByRole('button', { name: 'Publish' }));
+
+    expect(
+      screen.getByRole('dialog', { name: 'Publish unit of measurement' })
     ).toBeVisible();
   });
 

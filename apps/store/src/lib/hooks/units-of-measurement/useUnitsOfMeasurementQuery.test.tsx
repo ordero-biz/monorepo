@@ -1,5 +1,6 @@
 import { renderHook, waitFor } from '@testing-library/react';
 import { getUnitsOfMeasurement } from '@/lib/client/api/units-of-measurement';
+import { UNIT_OF_MEASUREMENT_STATUS } from '@/lib/domain/unitsOfMeasurement';
 import {
   createTestQueryClient,
   createTestQueryProvider,
@@ -26,7 +27,7 @@ describe('useUnitsOfMeasurementQuery', () => {
       content: [
         {
           id: 1,
-          status: 'ACTIVE' as const,
+          status: UNIT_OF_MEASUREMENT_STATUS.ACTIVE,
           name: 'Kilogram',
           symbol: 'kg',
           comment: 'Weight unit',

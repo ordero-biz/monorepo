@@ -1,4 +1,5 @@
 import { QueryClient } from '@tanstack/react-query';
+import { UNIT_OF_MEASUREMENT_STATUS } from '@/lib/domain/unitsOfMeasurement';
 import {
   unitOfMeasurementQueryOptions,
   unitsOfMeasurementListQueryOptions,
@@ -18,7 +19,7 @@ describe('unitsOfMeasurementListQueryOptions', () => {
       content: [
         {
           id: 1,
-          status: 'ACTIVE' as const,
+          status: UNIT_OF_MEASUREMENT_STATUS.ACTIVE,
           name: 'Kilogram',
           symbol: 'kg',
           comment: 'Weight unit',
@@ -56,7 +57,7 @@ describe('unitsOfMeasurementListQueryOptions', () => {
   it('uses a stable detail key and unwraps a fetched unit of measurement', async () => {
     const unitOfMeasurement = {
       id: 1,
-      status: 'ACTIVE' as const,
+      status: UNIT_OF_MEASUREMENT_STATUS.ACTIVE,
       name: 'Kilogram',
       symbol: 'kg',
       comment: 'Weight unit',

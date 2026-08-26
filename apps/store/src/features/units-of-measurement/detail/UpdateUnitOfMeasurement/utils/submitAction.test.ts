@@ -1,4 +1,5 @@
 import { updateUnitOfMeasurement } from '@/lib/client/api/units-of-measurement';
+import { UNIT_OF_MEASUREMENT_STATUS } from '@/lib/domain/unitsOfMeasurement';
 import { submitUpdateUnitOfMeasurement } from './submitAction';
 
 vi.mock('@/lib/client/api/units-of-measurement', async () => ({
@@ -18,7 +19,7 @@ describe('submitUpdateUnitOfMeasurement', () => {
   it('normalizes form values before updating the unit of measurement', async () => {
     const unitOfMeasurement = {
       id: 1,
-      status: 'ACTIVE' as const,
+      status: UNIT_OF_MEASUREMENT_STATUS.ACTIVE,
       name: 'Gram',
       symbol: 'g',
       comment: 'Metric weight',

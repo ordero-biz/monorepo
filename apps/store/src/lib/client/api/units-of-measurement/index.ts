@@ -46,12 +46,11 @@ export const createUnitOfMeasurement = (input: CreateUnitOfMeasurementInput) =>
     body: input,
   });
 
-type UpdateUnitOfMeasurementInput = {
+type UpdateUnitOfMeasurementInput = Partial<
+  Omit<CreateUnitOfMeasurementInput, 'status'>
+> & {
   unitOfMeasurementId: string | number;
-  name: string;
-  status: UnitOfMeasurementStatus;
-  symbol: string;
-  comment: string;
+  status?: UnitOfMeasurementStatus;
 };
 
 export const updateUnitOfMeasurement = ({
@@ -68,10 +67,10 @@ export const updateUnitOfMeasurement = ({
     {
       method: 'PATCH',
       body: {
-        name,
-        status,
-        symbol,
-        comment,
+        ...(name === undefined ? {} : { name }),
+        ...(status === undefined ? {} : { status }),
+        ...(symbol === undefined ? {} : { symbol }),
+        ...(comment === undefined ? {} : { comment }),
       },
     }
   );
