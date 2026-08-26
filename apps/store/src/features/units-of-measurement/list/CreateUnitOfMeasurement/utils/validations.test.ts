@@ -1,13 +1,11 @@
 import {
   createUnitOfMeasurementSchema,
-  validateUnitOfMeasurementCode,
   validateUnitOfMeasurementName,
   validateUnitOfMeasurementSymbol,
 } from './validations';
 
 describe('unit of measurement field validation', () => {
   it.each([
-    ['code', validateUnitOfMeasurementCode, '   ', 'Unit code is required'],
     ['name', validateUnitOfMeasurementName, '   ', 'Unit name is required'],
     [
       'symbol',
@@ -20,7 +18,6 @@ describe('unit of measurement field validation', () => {
   });
 
   it.each([
-    ['code', validateUnitOfMeasurementCode, 'KG'],
     ['name', validateUnitOfMeasurementName, 'Kilogram'],
     ['symbol', validateUnitOfMeasurementSymbol, 'kg'],
   ])('accepts a valid unit %s', (_, validate, value) => {
@@ -30,13 +27,13 @@ describe('unit of measurement field validation', () => {
   it('trims required values while retaining the optional comment', () => {
     expect(
       createUnitOfMeasurementSchema.parse({
-        code: ' KG ',
+        status: 'ACTIVE',
         name: ' Kilogram ',
         symbol: ' kg ',
         comment: ' Weight unit ',
       })
     ).toEqual({
-      code: 'KG',
+      status: 'ACTIVE',
       name: 'Kilogram',
       symbol: 'kg',
       comment: ' Weight unit ',

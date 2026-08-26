@@ -18,8 +18,8 @@ const onUpdatedMock = vi.fn();
 
 const unitOfMeasurement = {
   id: 1,
-  code: 'KG',
   name: 'Kilogram',
+  status: 'DRAFT' as const,
   symbol: 'kg',
   comment: 'Weight unit',
 };
@@ -48,9 +48,9 @@ describe('UpdateUnitOfMeasurementDialog', () => {
       name: 'Edit unit of measurement',
     });
 
-    expect(within(dialog).getByRole('textbox', { name: 'Code' })).toHaveValue(
-      'KG'
-    );
+    expect(
+      within(dialog).getByRole('combobox', { name: 'Status' })
+    ).toHaveTextContent('Draft');
     expect(within(dialog).getByRole('textbox', { name: 'Name' })).toHaveValue(
       'Kilogram'
     );
@@ -67,8 +67,8 @@ describe('UpdateUnitOfMeasurementDialog', () => {
       ok: true,
       data: {
         ...unitOfMeasurement,
-        code: 'G',
         name: 'Gram',
+        status: 'DRAFT',
         symbol: 'g',
       },
     });
@@ -79,14 +79,11 @@ describe('UpdateUnitOfMeasurementDialog', () => {
       name: 'Edit unit of measurement',
     });
 
-    const codeField = within(dialog).getByRole('textbox', { name: 'Code' });
     const nameField = within(dialog).getByRole('textbox', { name: 'Name' });
     const symbolField = within(dialog).getByRole('textbox', {
       name: 'Symbol',
     });
 
-    await user.clear(codeField);
-    await user.type(codeField, ' G ');
     await user.clear(nameField);
     await user.type(nameField, ' Gram ');
     await user.clear(symbolField);
@@ -100,8 +97,8 @@ describe('UpdateUnitOfMeasurementDialog', () => {
 
     expect(updateUnitOfMeasurementMock).toHaveBeenCalledWith({
       unitOfMeasurementId: 1,
-      code: 'G',
       name: 'Gram',
+      status: 'DRAFT',
       symbol: 'g',
       comment: 'Metric weight',
     });
@@ -114,7 +111,7 @@ describe('UpdateUnitOfMeasurementDialog', () => {
     await waitFor(() => expect(onUpdated).toHaveBeenCalled());
   });
 
-  it('requires code, name, and symbol before save is available', async () => {
+  it('requires name and symbol before save is available', async () => {
     const user = userEvent.setup();
 
     setup();
@@ -122,16 +119,16 @@ describe('UpdateUnitOfMeasurementDialog', () => {
     const dialog = screen.getByRole('dialog', {
       name: 'Edit unit of measurement',
     });
-    const codeField = within(dialog).getByRole('textbox', { name: 'Code' });
+    const nameField = within(dialog).getByRole('textbox', { name: 'Name' });
     const saveButton = within(dialog).getByRole('button', { name: 'Save' });
 
     expect(saveButton).toBeEnabled();
 
-    await user.clear(codeField);
+    await user.clear(nameField);
 
     expect(saveButton).toBeDisabled();
 
-    await user.type(codeField, 'G');
+    await user.type(nameField, 'Gram');
 
     expect(saveButton).toBeEnabled();
   });
@@ -175,7 +172,7 @@ describe('UpdateUnitOfMeasurementDialog', () => {
         status: 422,
         message: 'Unit of measurement update failed.',
         fieldErrors: {
-          code: 'Unit code already exists.',
+          name: 'Unit name already exists.',
         },
       },
     });
@@ -184,16 +181,16 @@ describe('UpdateUnitOfMeasurementDialog', () => {
     const dialog = screen.getByRole('dialog', {
       name: 'Edit unit of measurement',
     });
-    const codeField = within(dialog).getByRole('textbox', { name: 'Code' });
+    const nameField = within(dialog).getByRole('textbox', { name: 'Name' });
 
-    await user.clear(codeField);
-    await user.type(codeField, 'G');
+    await user.clear(nameField);
+    await user.type(nameField, 'Gram');
     await user.click(within(dialog).getByRole('button', { name: 'Save' }));
 
     expect(
-      await within(dialog).findByText('Unit code already exists.')
+      await within(dialog).findByText('Unit name already exists.')
     ).toBeVisible();
-    expect(codeField).toHaveAccessibleDescription('Unit code already exists.');
+    expect(nameField).toHaveAccessibleDescription('Unit name already exists.');
     expect(
       await screen.findByRole('dialog', {
         name: 'Unit of measurement update failed.',

@@ -18,7 +18,7 @@ describe('submitUpdateUnitOfMeasurement', () => {
   it('normalizes form values before updating the unit of measurement', async () => {
     const unitOfMeasurement = {
       id: 1,
-      code: 'G',
+      status: 'ACTIVE' as const,
       name: 'Gram',
       symbol: 'g',
       comment: 'Metric weight',
@@ -32,7 +32,7 @@ describe('submitUpdateUnitOfMeasurement', () => {
       submitUpdateUnitOfMeasurement({
         unitOfMeasurementId: 1,
         value: {
-          code: ' G ',
+          status: 'ACTIVE',
           name: ' Gram ',
           symbol: ' g ',
           comment: ' Metric weight ',
@@ -45,8 +45,8 @@ describe('submitUpdateUnitOfMeasurement', () => {
 
     expect(updateUnitOfMeasurementMock).toHaveBeenCalledWith({
       unitOfMeasurementId: 1,
-      code: 'G',
       name: 'Gram',
+      status: 'ACTIVE',
       symbol: 'g',
       comment: 'Metric weight',
     });
@@ -58,9 +58,7 @@ describe('submitUpdateUnitOfMeasurement', () => {
       error: {
         status: 422,
         message: 'Unit of measurement update failed.',
-        fieldErrors: {
-          code: 'Unit code already exists.',
-        },
+        fieldErrors: { status: 'Invalid status.' },
       },
     });
 
@@ -68,7 +66,7 @@ describe('submitUpdateUnitOfMeasurement', () => {
       submitUpdateUnitOfMeasurement({
         unitOfMeasurementId: 1,
         value: {
-          code: 'G',
+          status: 'ACTIVE',
           name: 'Gram',
           symbol: 'g',
           comment: '',
@@ -77,9 +75,7 @@ describe('submitUpdateUnitOfMeasurement', () => {
     ).resolves.toEqual({
       ok: false,
       error: {
-        fieldErrors: {
-          code: 'Unit code already exists.',
-        },
+        fieldErrors: { status: 'Invalid status.' },
         formError: 'Unit of measurement update failed.',
       },
     });

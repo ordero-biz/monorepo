@@ -41,7 +41,7 @@ describe('UnitsOfMeasurementPage', () => {
       content: [
         {
           id: 1,
-          code: 'KG',
+        status: 'ACTIVE' as const,
           name: 'Kilogram',
           symbol: 'kg',
           comment: 'Weight unit',

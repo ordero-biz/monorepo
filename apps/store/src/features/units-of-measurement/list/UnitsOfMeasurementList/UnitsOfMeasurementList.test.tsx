@@ -70,7 +70,7 @@ describe('UnitsOfMeasurementList', () => {
           content: [
             {
               id: 1,
-              code: 'KG',
+              status: 'ACTIVE',
               name: 'Kilogram',
               symbol: 'kg',
               comment: 'Weight unit',
@@ -108,7 +108,7 @@ describe('UnitsOfMeasurementList', () => {
         content: [
           {
             id: 1,
-            code: 'KG',
+            status: 'ACTIVE',
             name: 'Kilogram',
             symbol: 'kg',
             comment: 'Weight unit',
@@ -130,7 +130,7 @@ describe('UnitsOfMeasurementList', () => {
         name: 'Units of measurement list',
       })
     ).toBeVisible();
-    expect(screen.getByText('KG')).toBeVisible();
+    expect(screen.getByText('ACTIVE')).toBeVisible();
     expect(screen.getByText('Kilogram')).toBeVisible();
     expect(screen.getByText('kg')).toBeVisible();
     expect(screen.getByText('Weight unit')).toBeVisible();
@@ -143,7 +143,7 @@ describe('UnitsOfMeasurementList', () => {
         content: [
           {
             id: 1,
-            code: 'KG',
+            status: 'ACTIVE',
             name: 'Kilogram',
             symbol: 'kg',
             comment: 'Weight unit',
@@ -186,14 +186,14 @@ describe('UnitsOfMeasurementList', () => {
         content: [
           {
             id: 1,
-            code: 'KG',
+            status: 'ACTIVE',
             name: 'Kilogram',
             symbol: 'kg',
             comment: 'Weight unit',
           },
           {
             id: 2,
-            code: 'L',
+            status: 'DRAFT',
             name: 'Liter',
             symbol: 'l',
             comment: 'Volume unit',
@@ -221,7 +221,7 @@ describe('UnitsOfMeasurementList', () => {
     await user.click(
       screen.getByRole('button', { name: 'Actions for Kilogram' })
     );
-    await user.click(screen.getByRole('menuitem', { name: 'Delete' }));
+    await user.click(await screen.findByRole('menuitem', { name: 'Delete' }));
 
     expect(
       screen.getByRole('dialog', { name: 'Delete unit of measurement' })
@@ -247,14 +247,14 @@ describe('UnitsOfMeasurementList', () => {
         content: [
           {
             id: 1,
-            code: 'KG',
+            status: 'ACTIVE',
             name: 'Kilogram',
             symbol: 'kg',
             comment: 'Weight unit',
           },
           {
             id: 2,
-            code: 'L',
+            status: 'DRAFT',
             name: 'Liter',
             symbol: 'l',
             comment: 'Volume unit',
@@ -294,7 +294,7 @@ describe('UnitsOfMeasurementList', () => {
         content: [
           {
             id: 1,
-            code: 'KG',
+            status: 'ACTIVE',
             name: 'Kilogram',
             symbol: 'kg',
             comment: 'Weight unit',
@@ -374,7 +374,7 @@ describe('UnitsOfMeasurementList', () => {
         content: [
           {
             id: 2,
-            code: 'L',
+            status: 'DRAFT',
             name: 'Liter',
             symbol: 'l',
             comment: 'Volume unit',
@@ -397,7 +397,9 @@ describe('UnitsOfMeasurementList', () => {
     });
 
     expect(await screen.findByText('Liter')).toBeVisible();
-    expect(screen.getByText('2-2 of 2')).toBeVisible();
+    expect(
+      screen.getByRole('navigation', { name: 'Table pagination' })
+    ).toHaveTextContent('1-1 of 2');
   });
 
   it('renders an empty state when there are no units of measurement', async () => {

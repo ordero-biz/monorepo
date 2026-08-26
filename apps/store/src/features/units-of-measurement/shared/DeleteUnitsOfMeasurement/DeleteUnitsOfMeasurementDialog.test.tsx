@@ -16,7 +16,7 @@ const deleteUnitsOfMeasurementMock = vi.mocked(deleteUnitsOfMeasurement);
 
 const singleUnit = {
   id: 7,
-  code: 'KG',
+  status: 'ACTIVE' as const,
   name: 'Kilogram',
   symbol: 'kg',
   comment: 'Weight unit',
@@ -26,7 +26,7 @@ const multipleUnits = [
   singleUnit,
   {
     id: 8,
-    code: 'G',
+    status: 'DRAFT' as const,
     name: 'Gram',
     symbol: 'g',
     comment: 'Weight unit',

@@ -59,7 +59,7 @@ describe('useCreateUnitOfMeasurementForm', () => {
       ok: true,
       data: {
         id: 1,
-        code: 'KG',
+        status: 'DRAFT',
         name: 'Kilogram',
         symbol: 'kg',
         comment: 'Weight unit',

@@ -31,7 +31,7 @@ const { setup } = prepareStoreSetup({
 
 const unitOfMeasurement = {
   id: 1,
-  code: 'KG',
+  status: 'ACTIVE' as const,
   name: 'Kilogram',
   symbol: 'kg',
   comment: 'Weight unit',
@@ -54,7 +54,7 @@ describe('UnitOfMeasurementDetail', () => {
       await screen.findByRole('heading', { name: 'Kilogram' })
     ).toBeVisible();
     expect(screen.getByText('Unit of measurement details')).toBeVisible();
-    expect(screen.getByText('KG')).toBeVisible();
+    expect(screen.getByText('ACTIVE')).toBeVisible();
     expect(screen.getByText('kg')).toBeVisible();
     expect(screen.getByText('Weight unit')).toBeVisible();
     expect(

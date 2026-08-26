@@ -29,7 +29,7 @@ const submitUpdateUnitOfMeasurementMock = vi.mocked(
 const { setup } = prepareFormHookTestSetup({
   hookProps: {
     initialValues: {
-      code: 'KG',
+      status: 'DRAFT',
       name: 'Kilogram',
       symbol: 'kg',
       comment: 'Weight unit',
@@ -45,7 +45,7 @@ const setupUpdateUnitOfMeasurementFormHook = () => {
   const result = setup({
     hookProps: {
       initialValues: {
-        code: 'KG',
+        status: 'DRAFT',
         name: 'Kilogram',
         symbol: 'kg',
         comment: 'Weight unit',
@@ -73,7 +73,7 @@ describe('useUpdateUnitOfMeasurementForm', () => {
       ok: true,
       data: {
         id: 1,
-        code: 'G',
+        status: 'ACTIVE',
         name: 'Gram',
         symbol: 'g',
         comment: 'Weight unit',
@@ -88,7 +88,7 @@ describe('useUpdateUnitOfMeasurementForm', () => {
       expect(submitUpdateUnitOfMeasurementMock).toHaveBeenCalledWith({
         unitOfMeasurementId: 1,
         value: {
-          code: 'KG',
+          status: 'DRAFT',
           name: 'Kilogram',
           symbol: 'kg',
           comment: 'Weight unit',
@@ -101,7 +101,7 @@ describe('useUpdateUnitOfMeasurementForm', () => {
     });
     expect(onUpdated).toHaveBeenCalledWith({
       id: 1,
-      code: 'G',
+      status: 'ACTIVE',
       name: 'Gram',
       symbol: 'g',
       comment: 'Weight unit',

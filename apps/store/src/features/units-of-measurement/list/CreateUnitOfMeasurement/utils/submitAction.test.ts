@@ -18,7 +18,7 @@ describe('submitCreateUnitOfMeasurement', () => {
   it('normalizes form values before creating the unit of measurement', async () => {
     const unitOfMeasurement = {
       id: 1,
-      code: 'KG',
+      status: 'ACTIVE' as const,
       name: 'Kilogram',
       symbol: 'kg',
       comment: 'Weight unit',
@@ -30,7 +30,7 @@ describe('submitCreateUnitOfMeasurement', () => {
 
     await expect(
       submitCreateUnitOfMeasurement({
-        code: ' KG ',
+        status: 'ACTIVE',
         name: ' Kilogram ',
         symbol: ' kg ',
         comment: ' Weight unit ',
@@ -41,8 +41,8 @@ describe('submitCreateUnitOfMeasurement', () => {
     });
 
     expect(createUnitOfMeasurementMock).toHaveBeenCalledWith({
-      code: 'KG',
       name: 'Kilogram',
+      status: 'ACTIVE',
       symbol: 'kg',
       comment: 'Weight unit',
     });
@@ -54,15 +54,13 @@ describe('submitCreateUnitOfMeasurement', () => {
       error: {
         status: 422,
         message: 'Unit of measurement creation failed.',
-        fieldErrors: {
-          code: 'Unit code already exists.',
-        },
+        fieldErrors: { status: 'Invalid status.' },
       },
     });
 
     await expect(
       submitCreateUnitOfMeasurement({
-        code: 'KG',
+        status: 'ACTIVE',
         name: 'Kilogram',
         symbol: 'kg',
         comment: '',
@@ -70,9 +68,7 @@ describe('submitCreateUnitOfMeasurement', () => {
     ).resolves.toEqual({
       ok: false,
       error: {
-        fieldErrors: {
-          code: 'Unit code already exists.',
-        },
+        fieldErrors: { status: 'Invalid status.' },
         formError: 'Unit of measurement creation failed.',
       },
     });

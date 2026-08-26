@@ -19,7 +19,7 @@ const { setup } = prepareStoreSetup({
     onUpdated: vi.fn(),
     unitOfMeasurement: {
       id: 1,
-      code: 'KG',
+      status: 'DRAFT',
       name: 'Kilogram',
       symbol: 'kg',
       comment: 'Weight unit',
@@ -73,7 +73,7 @@ describe('UpdateUnitOfMeasurementDialogTrigger', () => {
       ok: true,
       data: {
         id: 1,
-        code: 'G',
+        status: 'ACTIVE',
         name: 'Gram',
         symbol: 'g',
         comment: 'Metric weight',

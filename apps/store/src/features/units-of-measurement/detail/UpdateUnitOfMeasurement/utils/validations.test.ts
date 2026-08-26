@@ -1,18 +1,11 @@
 import {
   updateUnitOfMeasurementSchema,
-  validateUpdateUnitOfMeasurementCode,
   validateUpdateUnitOfMeasurementName,
   validateUpdateUnitOfMeasurementSymbol,
 } from './validations';
 
 describe('update unit of measurement field validation', () => {
   it.each([
-    [
-      'code',
-      validateUpdateUnitOfMeasurementCode,
-      '   ',
-      'Unit code is required',
-    ],
     [
       'name',
       validateUpdateUnitOfMeasurementName,
@@ -32,13 +25,13 @@ describe('update unit of measurement field validation', () => {
   it('trims required values while retaining the optional comment', () => {
     expect(
       updateUnitOfMeasurementSchema.parse({
-        code: ' G ',
+        status: 'DRAFT',
         name: ' Gram ',
         symbol: ' g ',
         comment: ' Metric weight ',
       })
     ).toEqual({
-      code: 'G',
+      status: 'DRAFT',
       name: 'Gram',
       symbol: 'g',
       comment: ' Metric weight ',

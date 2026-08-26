@@ -18,7 +18,7 @@ describe('unitsOfMeasurementListQueryOptions', () => {
       content: [
         {
           id: 1,
-          code: 'KG',
+          status: 'ACTIVE' as const,
           name: 'Kilogram',
           symbol: 'kg',
           comment: 'Weight unit',
@@ -56,7 +56,7 @@ describe('unitsOfMeasurementListQueryOptions', () => {
   it('uses a stable detail key and unwraps a fetched unit of measurement', async () => {
     const unitOfMeasurement = {
       id: 1,
-      code: 'KG',
+      status: 'ACTIVE' as const,
       name: 'Kilogram',
       symbol: 'kg',
       comment: 'Weight unit',
