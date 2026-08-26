@@ -2,6 +2,7 @@ import { Dialog } from '@ordero/ui';
 import { useForm } from '@tanstack/react-form';
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { SUPPLIER_STATUS } from '@/lib/domain/suppliers';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { SupplierFormDialogContent } from './SupplierFormDialogContent';
 import type { SupplierEntityFormValues } from './validations';
@@ -14,6 +15,7 @@ type SupplierFormDialogContentTestFixtureProps = {
 
 const defaultValues: SupplierEntityFormValues = {
   name: '',
+  status: SUPPLIER_STATUS.DRAFT,
   email: '',
   phone: '',
   address: '',

@@ -1,6 +1,7 @@
 import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { updateSupplier } from '@/lib/client/api/suppliers';
+import { SUPPLIER_STATUS } from '@/lib/domain/suppliers';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { UpdateSupplierDialogTrigger } from './UpdateSupplierDialogTrigger';
 
@@ -20,6 +21,7 @@ const { setup } = prepareStoreSetup({
     supplier: {
       id: 1,
       name: 'Fresh Farms',
+      status: SUPPLIER_STATUS.DRAFT,
       email: 'orders@fresh.example',
       phone: '+1 555 0100',
       address: '123 Market St',
@@ -77,6 +79,7 @@ describe('UpdateSupplierDialogTrigger', () => {
       data: {
         id: 1,
         name: 'Fresh Farms Updated',
+        status: SUPPLIER_STATUS.DRAFT,
         email: 'orders.updated@fresh.example',
         phone: '+1 555 0101',
         address: '124 Market St',

@@ -1,5 +1,6 @@
 import { renderHook, waitFor } from '@testing-library/react';
 import { getSuppliers } from '@/lib/client/api/suppliers';
+import { SUPPLIER_STATUS } from '@/lib/domain/suppliers';
 import {
   createTestQueryClient,
   createTestQueryProvider,
@@ -27,6 +28,7 @@ describe('useSuppliersQuery', () => {
         {
           id: 1,
           name: 'Fresh Farms',
+          status: SUPPLIER_STATUS.DRAFT,
           email: 'orders@fresh.example',
           phone: '+1 555 0100',
           address: '123 Market St',

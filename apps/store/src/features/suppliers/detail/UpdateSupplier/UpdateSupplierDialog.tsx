@@ -62,7 +62,10 @@ export const UpdateSupplierDialog = ({
 
               <SupplierFormDialogContent
                 form={form}
+                isCreate={false}
                 pendingText="Saving..."
+                showEmail={false}
+                showStatus={false}
                 submitText="Save"
               />
             </form>

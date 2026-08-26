@@ -1,5 +1,6 @@
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { SUPPLIER_STATUS } from '@/lib/domain/suppliers';
 import { prepareFormHookTestSetup } from '@/test/prepareFormHookTestSetup';
 import { submitUpdateSupplier } from '../utils/submitAction';
 import { useUpdateSupplierForm } from './useUpdateSupplierForm';
@@ -27,6 +28,7 @@ const submitUpdateSupplierMock = vi.mocked(submitUpdateSupplier);
 const supplier = {
   id: 1,
   name: 'Fresh Farms',
+  status: SUPPLIER_STATUS.DRAFT,
   email: 'orders@fresh.example',
   phone: '+1 555 0100',
   address: '123 Market St',
@@ -71,6 +73,7 @@ describe('useUpdateSupplierForm', () => {
       data: {
         id: 1,
         name: 'Fresh Farms Updated',
+        status: SUPPLIER_STATUS.DRAFT,
         email: 'orders.updated@fresh.example',
         phone: '+1 555 0101',
         address: '124 Market St',
@@ -86,6 +89,7 @@ describe('useUpdateSupplierForm', () => {
         supplierId: 1,
         value: {
           name: 'Fresh Farms',
+          status: SUPPLIER_STATUS.DRAFT,
           email: 'orders@fresh.example',
           phone: '+1 555 0100',
           address: '123 Market St',
@@ -100,6 +104,7 @@ describe('useUpdateSupplierForm', () => {
     expect(onUpdated).toHaveBeenCalledWith({
       id: 1,
       name: 'Fresh Farms Updated',
+      status: SUPPLIER_STATUS.DRAFT,
       email: 'orders.updated@fresh.example',
       phone: '+1 555 0101',
       address: '124 Market St',

@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { SUPPLIER_STATUS } from '@/lib/domain/suppliers';
 import type { ValidationArgs } from '@/lib/utils/form/validation/types';
 
 export const supplierNameSchema = z
@@ -24,6 +25,7 @@ export const supplierAddressSchema = z
 
 export const supplierEntitySchema = z.object({
   name: supplierNameSchema,
+  status: z.enum([SUPPLIER_STATUS.DRAFT, SUPPLIER_STATUS.ACTIVE]),
   email: supplierEmailSchema,
   phone: supplierPhoneSchema,
   address: supplierAddressSchema,

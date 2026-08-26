@@ -1,3 +1,4 @@
+import { SUPPLIER_STATUS } from '@/lib/domain/suppliers';
 import {
   supplierEntitySchema,
   validateSupplierAddress,
@@ -35,6 +36,7 @@ describe('supplier field validation', () => {
     expect(
       supplierEntitySchema.parse({
         name: ' Fresh Farms ',
+        status: SUPPLIER_STATUS.DRAFT,
         email: ' orders@fresh.example ',
         phone: ' +1 555 0100 ',
         address: ' 123 Market St ',
@@ -42,6 +44,7 @@ describe('supplier field validation', () => {
       })
     ).toEqual({
       name: 'Fresh Farms',
+      status: SUPPLIER_STATUS.DRAFT,
       email: 'orders@fresh.example',
       phone: '+1 555 0100',
       address: '123 Market St',

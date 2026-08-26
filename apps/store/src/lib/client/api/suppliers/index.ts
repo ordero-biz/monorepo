@@ -1,7 +1,7 @@
 'use client';
 
 import { apiFetch } from '@ordero/api-client';
-import type { Supplier } from '@/lib/domain/suppliers';
+import type { Supplier, SupplierStatus } from '@/lib/domain/suppliers';
 import type { PaginatedResponse } from '@/lib/server/types';
 import { tokenizePath } from '@/lib/utils/tokenizePath';
 import {
@@ -14,13 +14,14 @@ type SuppliersListResponse = PaginatedResponse<Supplier>;
 
 type CreateSupplierInput = {
   name: string;
+  status: SupplierStatus;
   email: string;
   phone: string;
   address: string;
   comment: string;
 };
 
-type UpdateSupplierInput = CreateSupplierInput & {
+type UpdateSupplierInput = Partial<CreateSupplierInput> & {
   supplierId: string | number;
 };
 
@@ -46,7 +47,11 @@ export const createSupplier = (input: CreateSupplierInput) =>
     body: input,
   });
 
-export const updateSupplier = ({ supplierId, ...input }: UpdateSupplierInput) =>
+export const updateSupplier = ({
+  supplierId,
+  email: _email,
+  ...input
+}: UpdateSupplierInput) =>
   apiFetch<Supplier>(
     tokenizePath(CLIENT_BACKEND_PATHS.supplier, { id: supplierId }),
     {

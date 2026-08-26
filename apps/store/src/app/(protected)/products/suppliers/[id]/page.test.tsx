@@ -1,3 +1,4 @@
+import { SUPPLIER_STATUS } from '@/lib/domain/suppliers';
 import { render, screen } from '@testing-library/react';
 import { suppliersQueryKeys } from '@/lib/query/suppliers/suppliersQueryKeys';
 import { getServerSupplier } from '@/lib/server/api/suppliers';
@@ -31,6 +32,7 @@ describe('SupplierDetailPage', () => {
     const supplier = {
       id: 1,
       name: 'Fresh Farms',
+      status: SUPPLIER_STATUS.DRAFT,
       email: 'orders@fresh.example',
       phone: '+1 555 0100',
       address: '123 Market St',

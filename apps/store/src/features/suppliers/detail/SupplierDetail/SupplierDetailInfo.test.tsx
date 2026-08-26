@@ -1,4 +1,5 @@
 import { screen } from '@testing-library/react';
+import { SUPPLIER_STATUS } from '@/lib/domain/suppliers';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { SupplierDetailInfo } from './SupplierDetailInfo';
 
@@ -8,6 +9,7 @@ const { setup } = prepareStoreSetup({
     supplier: {
       id: 1,
       name: 'Fresh Farms',
+      status: SUPPLIER_STATUS.DRAFT,
       email: 'orders@fresh.example',
       phone: '+1 555 0100',
       address: '123 Market St',
@@ -36,6 +38,7 @@ describe('SupplierDetailInfo', () => {
       supplier: {
         id: 1,
         name: 'Fresh Farms',
+        status: SUPPLIER_STATUS.DRAFT,
         email: 'orders@fresh.example',
         phone: '+1 555 0100',
         address: '123 Market St',

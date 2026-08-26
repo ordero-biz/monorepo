@@ -33,6 +33,9 @@ type SupplierEntityFormApi = FormControls<SupplierEntityFormValues>;
 
 export type SupplierFormDialogContentProps = {
   form: SupplierEntityFormApi;
+  isCreate?: boolean;
   pendingText: string;
+  showEmail?: boolean;
+  showStatus?: boolean;
   submitText: string;
 };

@@ -4,6 +4,7 @@ import type { SupplierEntityFormValues } from '../../../shared/SupplierFormDialo
 export const submitCreateSupplier = async (value: SupplierEntityFormValues) => {
   const result = await createSupplier({
     name: value.name.trim(),
+    status: value.status,
     email: value.email.trim(),
     phone: value.phone.trim(),
     address: value.address.trim(),

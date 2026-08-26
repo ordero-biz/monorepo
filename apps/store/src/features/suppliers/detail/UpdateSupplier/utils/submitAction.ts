@@ -13,7 +13,7 @@ export const submitUpdateSupplier = async ({
   const result = await updateSupplier({
     supplierId,
     name: value.name.trim(),
-    email: value.email.trim(),
+    status: value.status,
     phone: value.phone.trim(),
     address: value.address.trim(),
     comment: value.comment.trim(),

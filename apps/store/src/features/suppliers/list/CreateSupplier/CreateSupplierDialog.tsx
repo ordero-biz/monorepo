@@ -50,6 +50,7 @@ export const CreateSupplierDialog = ({
 
               <SupplierFormDialogContent
                 form={form}
+                isCreate
                 pendingText="Adding..."
                 submitText="Add"
               />

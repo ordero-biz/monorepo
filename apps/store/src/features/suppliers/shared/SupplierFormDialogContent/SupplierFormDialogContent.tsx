@@ -1,5 +1,14 @@
+import type { SupplierStatus } from '@/lib/domain/suppliers';
+import { SUPPLIER_STATUS } from '@/lib/domain/suppliers';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
-import { Button, Dialog, TextField } from '@/ui/index';
+import {
+  Button,
+  Dialog,
+  Radio,
+  RadioGroup,
+  TextField,
+  Typography,
+} from '@/ui/index';
 import type { SupplierFormDialogContentProps } from './types';
 import {
   validateSupplierAddress,
@@ -10,7 +19,10 @@ import {
 
 export const SupplierFormDialogContent = ({
   form,
+  isCreate = false,
   pendingText,
+  showEmail = true,
+  showStatus = true,
   submitText,
 }: SupplierFormDialogContentProps) => {
   return (
@@ -43,31 +55,80 @@ export const SupplierFormDialogContent = ({
             }}
           </form.Field>
 
-          <form.Field
-            name="email"
-            validators={{
-              onChange: validateSupplierEmail,
-              onSubmit: validateSupplierEmail,
-            }}
-          >
-            {(field) => {
-              const errorText = getFieldSubmitChangeErrorText(field.state.meta);
+          {showStatus ? (
+            <form.Field name="status">
+              {(field) => {
+                const errorText = getFieldSubmitChangeErrorText(
+                  field.state.meta
+                );
 
-              return (
-                <TextField
-                  errorText={errorText}
-                  invalid={Boolean(errorText)}
-                  label="Email"
-                  name={field.name}
-                  onBlur={field.handleBlur}
-                  onValueChange={field.handleChange}
-                  required
-                  size="s"
-                  value={field.state.value}
-                />
-              );
-            }}
-          </form.Field>
+                return (
+                  <RadioGroup
+                    errorText={errorText}
+                    invalid={Boolean(errorText)}
+                    label="Supplier status"
+                    name={field.name}
+                    onValueChange={(value) =>
+                      field.handleChange(value as SupplierStatus)
+                    }
+                    orientation="vertical"
+                    required
+                    value={field.state.value}
+                  >
+                    <Radio align="start" value={SUPPLIER_STATUS.DRAFT}>
+                      <div className="flex flex-col">
+                        Draft
+                        <Typography color="text-secondary" variant="caption">
+                          Editable only. Cannot be assigned to products or
+                          tracked in analytics. Can be activated later
+                        </Typography>
+                      </div>
+                    </Radio>
+                    <Radio align="start" value={SUPPLIER_STATUS.ACTIVE}>
+                      <div className="flex flex-col">
+                        Active
+                        <Typography color="text-secondary" variant="caption">
+                          Fully functional. Can be assigned to products and
+                          tracked in analytics. Cannot be edited after
+                          publishing
+                        </Typography>
+                      </div>
+                    </Radio>
+                  </RadioGroup>
+                );
+              }}
+            </form.Field>
+          ) : null}
+
+          {showEmail ? (
+            <form.Field
+              name="email"
+              validators={{
+                onChange: validateSupplierEmail,
+                onSubmit: validateSupplierEmail,
+              }}
+            >
+              {(field) => {
+                const errorText = getFieldSubmitChangeErrorText(
+                  field.state.meta
+                );
+
+                return (
+                  <TextField
+                    errorText={errorText}
+                    invalid={Boolean(errorText)}
+                    label="Email"
+                    name={field.name}
+                    onBlur={field.handleBlur}
+                    onValueChange={field.handleChange}
+                    required
+                    size="s"
+                    value={field.state.value}
+                  />
+                );
+              }}
+            </form.Field>
+          ) : null}
 
           <form.Field
             name="phone"
@@ -147,25 +208,31 @@ export const SupplierFormDialogContent = ({
           selector={(state) =>
             [
               state.values.name,
-              state.values.email,
+              state.values.status,
               state.values.phone,
               state.values.address,
               state.isSubmitting,
             ] as const
           }
         >
-          {([name, email, phone, address, isSubmitting]) => (
+          {([name, status, phone, address, isSubmitting]) => (
             <Button
               disabled={
-                isSubmitting ||
-                !name.trim() ||
-                !email.trim() ||
-                !phone.trim() ||
-                !address.trim()
+                isSubmitting || !name.trim() || !phone.trim() || !address.trim()
               }
               type="submit"
             >
-              {isSubmitting ? pendingText : submitText}
+              {isCreate
+                ? isSubmitting
+                  ? status === SUPPLIER_STATUS.DRAFT
+                    ? 'Saving...'
+                    : 'Publishing...'
+                  : status === SUPPLIER_STATUS.DRAFT
+                    ? 'Save draft'
+                    : 'Publish'
+                : isSubmitting
+                  ? pendingText
+                  : submitText}
             </Button>
           )}
         </form.Subscribe>

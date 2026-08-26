@@ -1,4 +1,5 @@
 import { createSupplier } from '@/lib/client/api/suppliers';
+import { SUPPLIER_STATUS } from '@/lib/domain/suppliers';
 import { submitCreateSupplier } from './submitAction';
 
 vi.mock('@/lib/client/api/suppliers', async () => ({
@@ -19,6 +20,7 @@ describe('submitCreateSupplier', () => {
     const supplier = {
       id: 1,
       name: 'Fresh Farms',
+      status: SUPPLIER_STATUS.DRAFT,
       email: 'orders@fresh.example',
       phone: '+1 555 0100',
       address: '123 Market St',
@@ -32,6 +34,7 @@ describe('submitCreateSupplier', () => {
     await expect(
       submitCreateSupplier({
         name: ' Fresh Farms ',
+        status: SUPPLIER_STATUS.DRAFT,
         email: ' orders@fresh.example ',
         phone: ' +1 555 0100 ',
         address: ' 123 Market St ',
@@ -44,6 +47,7 @@ describe('submitCreateSupplier', () => {
 
     expect(createSupplierMock).toHaveBeenCalledWith({
       name: 'Fresh Farms',
+      status: SUPPLIER_STATUS.DRAFT,
       email: 'orders@fresh.example',
       phone: '+1 555 0100',
       address: '123 Market St',
@@ -66,6 +70,7 @@ describe('submitCreateSupplier', () => {
     await expect(
       submitCreateSupplier({
         name: 'Fresh Farms',
+        status: SUPPLIER_STATUS.DRAFT,
         email: 'orders@fresh.example',
         phone: '+1 555 0100',
         address: '123 Market St',

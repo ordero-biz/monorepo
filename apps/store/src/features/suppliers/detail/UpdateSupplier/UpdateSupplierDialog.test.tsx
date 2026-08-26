@@ -1,6 +1,7 @@
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { updateSupplier } from '@/lib/client/api/suppliers';
+import { SUPPLIER_STATUS } from '@/lib/domain/suppliers';
 import { suppliersQueryKeys } from '@/lib/query/suppliers/suppliersQueryKeys';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { UpdateSupplierDialog } from './UpdateSupplierDialog';
@@ -20,6 +21,7 @@ const updateSupplierMock = vi.mocked(updateSupplier);
 const supplier = {
   id: 1,
   name: 'Fresh Farms',
+  status: SUPPLIER_STATUS.DRAFT,
   email: 'orders@fresh.example',
   phone: '+1 555 0100',
   address: '123 Market St',
@@ -51,9 +53,6 @@ describe('UpdateSupplierDialog', () => {
     expect(within(dialog).getByRole('textbox', { name: 'Name' })).toHaveValue(
       'Fresh Farms'
     );
-    expect(within(dialog).getByRole('textbox', { name: 'Email' })).toHaveValue(
-      'orders@fresh.example'
-    );
     expect(within(dialog).getByRole('textbox', { name: 'Phone' })).toHaveValue(
       '+1 555 0100'
     );
@@ -63,6 +62,9 @@ describe('UpdateSupplierDialog', () => {
     expect(
       within(dialog).getByRole('textbox', { name: 'Comment' })
     ).toHaveValue('Preferred produce supplier');
+    expect(
+      within(dialog).queryByRole('radiogroup', { name: 'Supplier status' })
+    ).not.toBeInTheDocument();
   });
 
   it('submits updated values, closes, invalidates caches, and reports success', async () => {
@@ -71,6 +73,7 @@ describe('UpdateSupplierDialog', () => {
       data: {
         id: 1,
         name: 'Fresh Farms Updated',
+        status: SUPPLIER_STATUS.DRAFT,
         email: 'orders@fresh.example',
         phone: '+1 555 0100',
         address: '123 Market St',
@@ -90,7 +93,7 @@ describe('UpdateSupplierDialog', () => {
     expect(updateSupplierMock).toHaveBeenCalledWith({
       supplierId: 1,
       name: 'Fresh Farms Updated',
-      email: 'orders@fresh.example',
+      status: SUPPLIER_STATUS.DRAFT,
       phone: '+1 555 0100',
       address: '123 Market St',
       comment: 'Preferred produce supplier',
@@ -119,7 +122,7 @@ describe('UpdateSupplierDialog', () => {
         status: 422,
         message: 'Supplier update failed.',
         fieldErrors: {
-          email: 'Supplier email already exists.',
+          name: 'Supplier name already exists.',
         },
       },
     });
@@ -127,17 +130,18 @@ describe('UpdateSupplierDialog', () => {
     const { onOpenChange, onUpdated } = setup();
 
     const dialog = screen.getByRole('dialog', { name: 'Edit supplier' });
-    const emailField = within(dialog).getByRole('textbox', {
-      name: 'Email',
-    });
+    const nameField = within(dialog).getByRole('textbox', { name: 'Name' });
+
+    await user.clear(nameField);
+    await user.type(nameField, 'Fresh Farms Updated');
 
     await user.click(within(dialog).getByRole('button', { name: 'Save' }));
 
     expect(
-      await within(dialog).findByText('Supplier email already exists.')
+      await within(dialog).findByText('Supplier name already exists.')
     ).toBeVisible();
-    expect(emailField).toHaveAccessibleDescription(
-      'Supplier email already exists.'
+    expect(nameField).toHaveAccessibleDescription(
+      'Supplier name already exists.'
     );
     expect(
       await screen.findByRole('dialog', { name: 'Supplier update failed.' })

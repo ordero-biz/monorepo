@@ -2,6 +2,7 @@ import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getSuppliers } from '@/lib/client/api/suppliers';
 import { getSupplierDetailRoute } from '@/lib/client/routes';
+import { SUPPLIER_STATUS } from '@/lib/domain/suppliers';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { SuppliersList } from './SuppliersList';
 
@@ -66,6 +67,7 @@ describe('SuppliersList', () => {
             {
               id: 1,
               name: 'Fresh Farms',
+              status: SUPPLIER_STATUS.DRAFT,
               email: 'orders@fresh.example',
               phone: '+1 555 0100',
               address: '123 Market St',
@@ -103,6 +105,7 @@ describe('SuppliersList', () => {
           {
             id: 1,
             name: 'Fresh Farms',
+            status: SUPPLIER_STATUS.DRAFT,
             email: 'orders@fresh.example',
             phone: '+1 555 0100',
             address: '123 Market St',
@@ -170,6 +173,7 @@ describe('SuppliersList', () => {
           {
             id: 2,
             name: 'Harvest Goods',
+            status: SUPPLIER_STATUS.DRAFT,
             email: 'orders@harvest.example',
             phone: '+1 555 0101',
             address: '124 Market St',

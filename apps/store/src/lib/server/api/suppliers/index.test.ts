@@ -1,5 +1,6 @@
 import { AUTH_TOKEN_COOKIE_NAME } from '@ordero/next-api/server';
 import { cookies } from 'next/headers';
+import { SUPPLIER_STATUS } from '@/lib/domain/suppliers';
 import { fetchBackendResponse } from '@/lib/server/fetch';
 import { getServerSupplier, getServerSuppliers } from '.';
 
@@ -38,6 +39,7 @@ describe('supplier server helpers', () => {
         {
           id: 1,
           name: 'Fresh Farms',
+          status: SUPPLIER_STATUS.DRAFT,
           email: 'orders@fresh.example',
           phone: '+1 555 0100',
           address: '123 Market St',
@@ -110,6 +112,7 @@ describe('supplier server helpers', () => {
     const response = {
       id: 1,
       name: 'Fresh Farms',
+      status: SUPPLIER_STATUS.DRAFT,
       email: 'orders@fresh.example',
       phone: '+1 555 0100',
       address: '123 Market St',

@@ -1,4 +1,5 @@
 import { updateSupplier } from '@/lib/client/api/suppliers';
+import { SUPPLIER_STATUS } from '@/lib/domain/suppliers';
 import { submitUpdateSupplier } from './submitAction';
 
 vi.mock('@/lib/client/api/suppliers', async () => ({
@@ -19,6 +20,7 @@ describe('submitUpdateSupplier', () => {
     const supplier = {
       id: 1,
       name: 'Fresh Farms Updated',
+      status: SUPPLIER_STATUS.DRAFT,
       email: 'orders.updated@fresh.example',
       phone: '+1 555 0101',
       address: '124 Market St',
@@ -34,6 +36,7 @@ describe('submitUpdateSupplier', () => {
         supplierId: 1,
         value: {
           name: '  Fresh Farms Updated  ',
+          status: SUPPLIER_STATUS.DRAFT,
           email: '  orders.updated@fresh.example  ',
           phone: '  +1 555 0101  ',
           address: '  124 Market St  ',
@@ -48,7 +51,7 @@ describe('submitUpdateSupplier', () => {
     expect(updateSupplierMock).toHaveBeenCalledWith({
       supplierId: 1,
       name: 'Fresh Farms Updated',
-      email: 'orders.updated@fresh.example',
+      status: SUPPLIER_STATUS.DRAFT,
       phone: '+1 555 0101',
       address: '124 Market St',
       comment: 'Updated supplier',
@@ -72,6 +75,7 @@ describe('submitUpdateSupplier', () => {
         supplierId: 1,
         value: {
           name: 'Fresh Farms',
+          status: SUPPLIER_STATUS.DRAFT,
           email: 'orders@fresh.example',
           phone: '+1 555 0100',
           address: '123 Market St',

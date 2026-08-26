@@ -1,4 +1,5 @@
 import type { Supplier } from '@/lib/domain/suppliers';
+import { SUPPLIER_STATUS } from '@/lib/domain/suppliers';
 import { getSupplierDefaultValues } from './fields';
 
 describe('getSupplierDefaultValues', () => {
@@ -6,6 +7,7 @@ describe('getSupplierDefaultValues', () => {
     const mockSupplier: Supplier = {
       id: 1,
       name: 'Acme Corp',
+      status: SUPPLIER_STATUS.DRAFT,
       email: 'contact@acme.com',
       phone: '123-456-7890',
       address: '123 Acme St',
@@ -16,6 +18,7 @@ describe('getSupplierDefaultValues', () => {
 
     expect(result).toEqual({
       name: 'Acme Corp',
+      status: SUPPLIER_STATUS.DRAFT,
       email: 'contact@acme.com',
       phone: '123-456-7890',
       address: '123 Acme St',
