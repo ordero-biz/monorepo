@@ -1,6 +1,6 @@
 import { useToastManager } from '@ordero/ui';
 import { useForm } from '@tanstack/react-form';
-import type { Supplier } from '@/lib/domain/suppliers';
+import type { Supplier } from '@/lib/domain/suppliers/types';
 import { getSupplierDefaultValues } from '../utils/fields';
 import { submitUpdateSupplier } from '../utils/submitAction';
 
@@ -19,6 +19,7 @@ export const useUpdateSupplierForm = ({
     onSubmit: async ({ formApi, value }) => {
       const result = await submitUpdateSupplier({
         supplierId: supplier.id,
+        supplierStatus: supplier.status,
         value,
       });
 

@@ -1,28 +1,12 @@
 import Link from 'next/link';
 import { getSupplierDetailRoute } from '@/lib/client/routes';
-import type { Supplier } from '@/lib/domain/suppliers';
-import { SUPPLIER_STATUS } from '@/lib/domain/suppliers';
+import type { Supplier } from '@/lib/domain/suppliers/types';
 import {
-  Chip,
   DataTableCell,
   type DataTableColumnDef,
   DataTableColumnHeader,
 } from '@/ui/index';
-
-const statusLabels = {
-  [SUPPLIER_STATUS.ACTIVE]: 'Active',
-  [SUPPLIER_STATUS.DRAFT]: 'Draft',
-} as const;
-
-const getStatusChip = (status: Supplier['status']) => (
-  <Chip
-    color={status === SUPPLIER_STATUS.ACTIVE ? 'primary' : 'warning'}
-    size="s"
-    variant="soft"
-  >
-    {statusLabels[status]}
-  </Chip>
-);
+import { SupplierStatusChip } from '../../shared/SupplierStatusChip';
 
 export const columns: DataTableColumnDef<Supplier>[] = [
   {
@@ -47,7 +31,9 @@ export const columns: DataTableColumnDef<Supplier>[] = [
   {
     accessorKey: 'status',
     cell: ({ row }) => (
-      <DataTableCell>{getStatusChip(row.original.status)}</DataTableCell>
+      <DataTableCell>
+        <SupplierStatusChip status={row.original.status} />
+      </DataTableCell>
     ),
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Status" />

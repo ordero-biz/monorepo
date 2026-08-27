@@ -1,5 +1,5 @@
-import { SUPPLIER_STATUS } from '@/lib/domain/suppliers';
 import { render, screen } from '@testing-library/react';
+import { SUPPLIER_STATUS } from '@/lib/domain/suppliers/constants';
 import { suppliersQueryKeys } from '@/lib/query/suppliers/suppliersQueryKeys';
 import { getServerSuppliers } from '@/lib/server/api/suppliers';
 import type { PaginationSearchInput } from '@/lib/utils/url';

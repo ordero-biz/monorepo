@@ -1,5 +1,5 @@
 import { QueryClient } from '@tanstack/react-query';
-import { SUPPLIER_STATUS } from '@/lib/domain/suppliers';
+import { SUPPLIER_STATUS } from '@/lib/domain/suppliers/constants';
 import {
   supplierQueryOptions,
   suppliersListQueryOptions,

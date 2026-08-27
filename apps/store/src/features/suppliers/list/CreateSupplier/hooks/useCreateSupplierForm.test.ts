@@ -1,6 +1,6 @@
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { SUPPLIER_STATUS } from '@/lib/domain/suppliers';
+import { SUPPLIER_STATUS } from '@/lib/domain/suppliers/constants';
 import { prepareFormHookTestSetup } from '@/test/prepareFormHookTestSetup';
 import { submitCreateSupplier } from '../utils/submitAction';
 import { useCreateSupplierForm } from './useCreateSupplierForm';

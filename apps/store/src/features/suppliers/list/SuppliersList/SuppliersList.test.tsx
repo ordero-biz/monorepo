@@ -2,7 +2,7 @@ import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getSuppliers } from '@/lib/client/api/suppliers';
 import { getSupplierDetailRoute } from '@/lib/client/routes';
-import { SUPPLIER_STATUS } from '@/lib/domain/suppliers';
+import { SUPPLIER_STATUS } from '@/lib/domain/suppliers/constants';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { SuppliersList } from './SuppliersList';
 

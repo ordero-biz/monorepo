@@ -1,6 +1,6 @@
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { SUPPLIER_STATUS } from '@/lib/domain/suppliers';
+import { SUPPLIER_STATUS } from '@/lib/domain/suppliers/constants';
 import { prepareFormHookTestSetup } from '@/test/prepareFormHookTestSetup';
 import { submitUpdateSupplier } from '../utils/submitAction';
 import { useUpdateSupplierForm } from './useUpdateSupplierForm';
@@ -87,9 +87,9 @@ describe('useUpdateSupplierForm', () => {
     await waitFor(() =>
       expect(submitUpdateSupplierMock).toHaveBeenCalledWith({
         supplierId: 1,
+        supplierStatus: SUPPLIER_STATUS.DRAFT,
         value: {
           name: 'Fresh Farms',
-          status: SUPPLIER_STATUS.DRAFT,
           email: 'orders@fresh.example',
           phone: '+1 555 0100',
           address: '123 Market St',

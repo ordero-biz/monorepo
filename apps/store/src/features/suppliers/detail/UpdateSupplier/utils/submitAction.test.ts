@@ -1,5 +1,5 @@
 import { updateSupplier } from '@/lib/client/api/suppliers';
-import { SUPPLIER_STATUS } from '@/lib/domain/suppliers';
+import { SUPPLIER_STATUS } from '@/lib/domain/suppliers/constants';
 import { submitUpdateSupplier } from './submitAction';
 
 vi.mock('@/lib/client/api/suppliers', async () => ({
@@ -34,9 +34,9 @@ describe('submitUpdateSupplier', () => {
     await expect(
       submitUpdateSupplier({
         supplierId: 1,
+        supplierStatus: SUPPLIER_STATUS.DRAFT,
         value: {
           name: '  Fresh Farms Updated  ',
-          status: SUPPLIER_STATUS.DRAFT,
           email: '  orders.updated@fresh.example  ',
           phone: '  +1 555 0101  ',
           address: '  124 Market St  ',
@@ -51,7 +51,7 @@ describe('submitUpdateSupplier', () => {
     expect(updateSupplierMock).toHaveBeenCalledWith({
       supplierId: 1,
       name: 'Fresh Farms Updated',
-      status: SUPPLIER_STATUS.DRAFT,
+      email: 'orders.updated@fresh.example',
       phone: '+1 555 0101',
       address: '124 Market St',
       comment: 'Updated supplier',
@@ -73,9 +73,9 @@ describe('submitUpdateSupplier', () => {
     await expect(
       submitUpdateSupplier({
         supplierId: 1,
+        supplierStatus: SUPPLIER_STATUS.DRAFT,
         value: {
           name: 'Fresh Farms',
-          status: SUPPLIER_STATUS.DRAFT,
           email: 'orders@fresh.example',
           phone: '+1 555 0100',
           address: '123 Market St',
@@ -90,6 +90,41 @@ describe('submitUpdateSupplier', () => {
         },
         formError: 'Supplier update failed.',
       },
+    });
+  });
+
+  it('does not send a name when updating an active supplier', async () => {
+    updateSupplierMock.mockResolvedValue({
+      ok: true,
+      data: {
+        id: 1,
+        name: 'Fresh Farms',
+        status: SUPPLIER_STATUS.ACTIVE,
+        email: 'orders.updated@fresh.example',
+        phone: '+1 555 0100',
+        address: '123 Market St',
+        comment: 'Preferred produce supplier',
+      },
+    });
+
+    await submitUpdateSupplier({
+      supplierId: 1,
+      supplierStatus: SUPPLIER_STATUS.ACTIVE,
+      value: {
+        name: 'Fresh Farms',
+        email: 'orders.updated@fresh.example',
+        phone: '+1 555 0100',
+        address: '123 Market St',
+        comment: 'Preferred produce supplier',
+      },
+    });
+
+    expect(updateSupplierMock).toHaveBeenCalledWith({
+      supplierId: 1,
+      email: 'orders.updated@fresh.example',
+      phone: '+1 555 0100',
+      address: '123 Market St',
+      comment: 'Preferred produce supplier',
     });
   });
 });

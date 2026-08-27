@@ -2,7 +2,7 @@ import type { ApiError } from '@ordero/api-types';
 import { useToastManager } from '@ordero/ui';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { updateSupplier } from '@/lib/client/api/suppliers';
-import { SUPPLIER_STATUS } from '@/lib/domain/suppliers';
+import { SUPPLIER_STATUS } from '@/lib/domain/suppliers/constants';
 import { suppliersQueryKeys } from '@/lib/query/suppliers/suppliersQueryKeys';
 import { getApiErrorMessage } from '@/lib/utils/apiError';
 

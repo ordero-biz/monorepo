@@ -1,4 +1,4 @@
-import { SUPPLIER_STATUS } from '@/lib/domain/suppliers';
+import { SUPPLIER_STATUS } from '@/lib/domain/suppliers/constants';
 import {
   createSupplier,
   getSupplier,
@@ -317,6 +317,7 @@ describe('supplier client helpers', () => {
         body: JSON.stringify({
           name: 'Fresh Farms Updated',
           status: SUPPLIER_STATUS.DRAFT,
+          email: 'orders.updated@fresh.example',
           phone: '+1 555 0101',
           address: '124 Market St',
           comment: 'Updated supplier',

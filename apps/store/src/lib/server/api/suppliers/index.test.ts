@@ -1,6 +1,6 @@
 import { AUTH_TOKEN_COOKIE_NAME } from '@ordero/next-api/server';
 import { cookies } from 'next/headers';
-import { SUPPLIER_STATUS } from '@/lib/domain/suppliers';
+import { SUPPLIER_STATUS } from '@/lib/domain/suppliers/constants';
 import { fetchBackendResponse } from '@/lib/server/fetch';
 import { getServerSupplier, getServerSuppliers } from '.';
 

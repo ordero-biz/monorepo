@@ -1,7 +1,7 @@
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createSupplier } from '@/lib/client/api/suppliers';
-import { SUPPLIER_STATUS } from '@/lib/domain/suppliers';
+import { SUPPLIER_STATUS } from '@/lib/domain/suppliers/constants';
 import { suppliersQueryKeys } from '@/lib/query/suppliers/suppliersQueryKeys';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { CreateSupplierDialog } from './CreateSupplierDialog';
@@ -29,6 +29,37 @@ describe('CreateSupplierDialog', () => {
   beforeEach(() => {
     createSupplierMock.mockReset();
     onOpenChangeMock.mockClear();
+  });
+
+  it('shows name validation when submitted without the required value', async () => {
+    const user = userEvent.setup();
+
+    setup();
+
+    const dialog = screen.getByRole('dialog', { name: 'Add supplier' });
+
+    await user.click(
+      within(dialog).getByRole('button', { name: 'Save draft' })
+    );
+
+    expect(within(dialog).getByText('Supplier name is required')).toBeVisible();
+  });
+
+  it('explains the effects of each supplier status', () => {
+    setup();
+
+    const dialog = screen.getByRole('dialog', { name: 'Add supplier' });
+
+    expect(
+      within(dialog).getByText(
+        'Editable only. Cannot be used in supplies or tracked in analytics. Can be activated later'
+      )
+    ).toBeVisible();
+    expect(
+      within(dialog).getByText(
+        'Fully functional. Can be used in supplies and tracked in analytics. Name and status cannot be edited after publishing'
+      )
+    ).toBeVisible();
   });
 
   it('creates a supplier, closes the dialog, and invalidates the list', async () => {

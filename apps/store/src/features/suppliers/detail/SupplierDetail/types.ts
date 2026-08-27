@@ -1,4 +1,4 @@
-import type { Supplier } from '@/lib/domain/suppliers';
+import type { Supplier } from '@/lib/domain/suppliers/types';
 
 export type SupplierDetailProps = {
   supplierId: string;

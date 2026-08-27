@@ -1,7 +1,7 @@
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getSupplier } from '@/lib/client/api/suppliers';
-import { SUPPLIER_STATUS } from '@/lib/domain/suppliers';
+import { SUPPLIER_STATUS } from '@/lib/domain/suppliers/constants';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { SupplierDetail } from './SupplierDetail';
 import type { SupplierDetailHeaderProps } from './types';

@@ -1,5 +1,5 @@
 import { screen } from '@testing-library/react';
-import { SUPPLIER_STATUS } from '@/lib/domain/suppliers';
+import { SUPPLIER_STATUS } from '@/lib/domain/suppliers/constants';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { SupplierDetailInfo } from './SupplierDetailInfo';
 

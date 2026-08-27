@@ -62,9 +62,16 @@ describe('SupplierDetailHeader', () => {
     expect(
       screen.getByRole('dialog', { name: 'Publish supplier' })
     ).toBeVisible();
+    expect(
+      screen.getByText(
+        'This action cannot be undone. However, you will still be able to update contact details and comments.'
+      )
+    ).toBeVisible();
   });
 
-  it('does not show actions for an active supplier', () => {
+  it('shows edit actions but not Publish for an active supplier', async () => {
+    const user = userEvent.setup();
+
     setup({
       supplier: {
         id: 1,
@@ -78,7 +85,15 @@ describe('SupplierDetailHeader', () => {
     });
 
     expect(
-      screen.queryByRole('button', { name: 'Actions for Fresh Farms' })
+      screen.queryByRole('button', { name: 'Publish' })
     ).not.toBeInTheDocument();
+
+    await user.click(
+      screen.getByRole('button', { name: 'Actions for Fresh Farms' })
+    );
+
+    expect(
+      await screen.findByRole('menuitem', { name: 'Edit supplier' })
+    ).toBeVisible();
   });
 });

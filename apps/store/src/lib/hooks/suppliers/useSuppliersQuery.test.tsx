@@ -1,6 +1,6 @@
 import { renderHook, waitFor } from '@testing-library/react';
 import { getSuppliers } from '@/lib/client/api/suppliers';
-import { SUPPLIER_STATUS } from '@/lib/domain/suppliers';
+import { SUPPLIER_STATUS } from '@/lib/domain/suppliers/constants';
 import {
   createTestQueryClient,
   createTestQueryProvider,

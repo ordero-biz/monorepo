@@ -5,6 +5,7 @@ export const API_ERROR_CODES = {
   ATTRIBUTE_VALUE_MODIFICATION_NOT_ALLOWED:
     'ATTRIBUTE_VALUE_MODIFICATION_NOT_ALLOWED',
   CATEGORY_MODIFICATION_NOT_ALLOWED: 'CATEGORY_MODIFICATION_NOT_ALLOWED',
+  SUPPLIER_MODIFICATION_NOT_ALLOWED: 'SUPPLIER_MODIFICATION_NOT_ALLOWED',
 } as const;
 
 export type ApiErrorCode =
@@ -19,4 +20,6 @@ export const API_ERROR_MESSAGES: Record<ApiErrorCode, string> = {
     'Active attribute values cannot be edited',
   [API_ERROR_CODES.CATEGORY_MODIFICATION_NOT_ALLOWED]:
     'Active categories cannot be edited',
+  [API_ERROR_CODES.SUPPLIER_MODIFICATION_NOT_ALLOWED]:
+    'Cannot edit name or status of an active supplier',
 };

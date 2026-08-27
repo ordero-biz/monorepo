@@ -41,8 +41,8 @@ export const ActivateSupplierDialog = ({
                 </Typography>
                 <Typography variant="body1">
                   <strong>
-                    This action cannot be undone, and the supplier will no
-                    longer be editable.
+                    This action cannot be undone. However, you will still be
+                    able to update contact details and comments.
                   </strong>
                 </Typography>
               </div>

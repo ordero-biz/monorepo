@@ -1,7 +1,8 @@
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { updateSupplier } from '@/lib/client/api/suppliers';
-import { SUPPLIER_STATUS } from '@/lib/domain/suppliers';
+import { SUPPLIER_STATUS } from '@/lib/domain/suppliers/constants';
+import type { Supplier } from '@/lib/domain/suppliers/types';
 import { suppliersQueryKeys } from '@/lib/query/suppliers/suppliersQueryKeys';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { UpdateSupplierDialog } from './UpdateSupplierDialog';
@@ -18,7 +19,7 @@ vi.mock('@/lib/client/api/suppliers', async () => ({
 
 const updateSupplierMock = vi.mocked(updateSupplier);
 
-const supplier = {
+const supplier: Supplier = {
   id: 1,
   name: 'Fresh Farms',
   status: SUPPLIER_STATUS.DRAFT,
@@ -53,6 +54,9 @@ describe('UpdateSupplierDialog', () => {
     expect(within(dialog).getByRole('textbox', { name: 'Name' })).toHaveValue(
       'Fresh Farms'
     );
+    expect(within(dialog).getByRole('textbox', { name: 'Email' })).toHaveValue(
+      'orders@fresh.example'
+    );
     expect(within(dialog).getByRole('textbox', { name: 'Phone' })).toHaveValue(
       '+1 555 0100'
     );
@@ -65,6 +69,47 @@ describe('UpdateSupplierDialog', () => {
     expect(
       within(dialog).queryByRole('radiogroup', { name: 'Supplier status' })
     ).not.toBeInTheDocument();
+  });
+
+  it('treats nullable contact details as empty optional values', () => {
+    setup({
+      supplier: {
+        ...supplier,
+        email: null,
+        phone: null,
+        address: null,
+        comment: null,
+      },
+    });
+
+    const dialog = screen.getByRole('dialog', { name: 'Edit supplier' });
+
+    expect(within(dialog).getByRole('textbox', { name: 'Email' })).toHaveValue(
+      ''
+    );
+    expect(
+      within(dialog).queryByText(
+        'Invalid input: expected string, received null'
+      )
+    ).not.toBeInTheDocument();
+  });
+
+  it('hides the name field for an active supplier', () => {
+    setup({
+      supplier: {
+        ...supplier,
+        status: SUPPLIER_STATUS.ACTIVE,
+      },
+    });
+
+    const dialog = screen.getByRole('dialog', { name: 'Edit supplier' });
+
+    expect(
+      within(dialog).queryByRole('textbox', { name: 'Name' })
+    ).not.toBeInTheDocument();
+    expect(
+      within(dialog).getByRole('textbox', { name: 'Email' })
+    ).toBeVisible();
   });
 
   it('submits updated values, closes, invalidates caches, and reports success', async () => {
@@ -93,7 +138,7 @@ describe('UpdateSupplierDialog', () => {
     expect(updateSupplierMock).toHaveBeenCalledWith({
       supplierId: 1,
       name: 'Fresh Farms Updated',
-      status: SUPPLIER_STATUS.DRAFT,
+      email: 'orders@fresh.example',
       phone: '+1 555 0100',
       address: '123 Market St',
       comment: 'Preferred produce supplier',
