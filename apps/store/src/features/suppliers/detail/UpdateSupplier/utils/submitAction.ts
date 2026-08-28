@@ -1,32 +1,19 @@
-import { updateSupplier } from '@/lib/client/api/suppliers';
-import { SUPPLIER_STATUS } from '@/lib/domain/suppliers/constants';
-import type { SupplierStatus } from '@/lib/domain/suppliers/types';
+import {
+  type UpdateSupplierFieldData,
+  updateSupplier,
+} from '@/lib/client/api/suppliers';
 import { getApiErrorMessage } from '@/lib/utils/apiError';
-import type { UpdateSupplierFormValues } from './validations';
 
 type SubmitUpdateSupplierArgs = {
   supplierId: string | number;
-  supplierStatus: SupplierStatus;
-  value: UpdateSupplierFormValues;
+  submitData: UpdateSupplierFieldData;
 };
 
 export const submitUpdateSupplier = async ({
   supplierId,
-  supplierStatus,
-  value,
+  submitData,
 }: SubmitUpdateSupplierArgs) => {
-  const updateInput = {
-    supplierId,
-    email: value.email?.trim(),
-    phone: value.phone?.trim(),
-    address: value.address?.trim(),
-    comment: value.comment?.trim(),
-  };
-  const result = await updateSupplier(
-    supplierStatus === SUPPLIER_STATUS.ACTIVE
-      ? updateInput
-      : { ...updateInput, name: value.name.trim() }
-  );
+  const result = await updateSupplier({ supplierId, ...submitData });
 
   if (!result.ok) {
     return {

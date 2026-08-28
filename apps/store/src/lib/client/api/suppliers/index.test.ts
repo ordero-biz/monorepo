@@ -327,6 +327,33 @@ describe('supplier client helpers', () => {
     );
   });
 
+  it('patches only the status when publishing a supplier', async () => {
+    const fetchMock = vi.mocked(fetch);
+
+    fetchMock.mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          id: 1,
+          name: 'Fresh Farms',
+          status: SUPPLIER_STATUS.ACTIVE,
+        })
+      )
+    );
+
+    await updateSupplier({
+      supplierId: 1,
+      status: SUPPLIER_STATUS.ACTIVE,
+    });
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/backend/api/v1/suppliers/1',
+      expect.objectContaining({
+        method: 'PATCH',
+        body: JSON.stringify({ status: SUPPLIER_STATUS.ACTIVE }),
+      })
+    );
+  });
+
   it('returns normalized failures from the update supplier route', async () => {
     vi.mocked(fetch).mockResolvedValue(
       new Response(

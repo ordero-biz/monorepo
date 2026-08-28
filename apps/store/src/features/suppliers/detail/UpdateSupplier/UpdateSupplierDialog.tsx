@@ -17,6 +17,7 @@ export const UpdateSupplierDialog = ({
 }: UpdateSupplierDialogProps) => {
   const queryClient = useQueryClient();
   const { form } = useUpdateSupplierForm({
+    onNoChanges: () => handleOpenChange(false),
     supplier,
     onUpdated: async (updatedSupplier) => {
       form.reset(getSupplierDefaultValues(updatedSupplier));

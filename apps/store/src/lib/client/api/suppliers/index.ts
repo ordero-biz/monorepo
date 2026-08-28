@@ -12,7 +12,7 @@ import { CLIENT_BACKEND_PATHS } from '../path';
 
 type SuppliersListResponse = PaginatedResponse<Supplier>;
 
-type CreateSupplierInput = {
+export type CreateSupplierData = {
   name: string;
   status: SupplierStatus;
   email?: string;
@@ -21,7 +21,9 @@ type CreateSupplierInput = {
   comment?: string;
 };
 
-type UpdateSupplierInput = Partial<CreateSupplierInput> & {
+export type UpdateSupplierFieldData = Partial<CreateSupplierData>;
+
+export type UpdateSupplierData = UpdateSupplierFieldData & {
   supplierId: string | number;
 };
 
@@ -41,13 +43,13 @@ export const getSupplier = (supplierId: string | number) =>
     }
   );
 
-export const createSupplier = (input: CreateSupplierInput) =>
+export const createSupplier = (input: CreateSupplierData) =>
   apiFetch<Supplier>(CLIENT_BACKEND_PATHS.suppliers, {
     method: 'POST',
     body: input,
   });
 
-export const updateSupplier = ({ supplierId, ...input }: UpdateSupplierInput) =>
+export const updateSupplier = ({ supplierId, ...input }: UpdateSupplierData) =>
   apiFetch<Supplier>(
     tokenizePath(CLIENT_BACKEND_PATHS.supplier, { id: supplierId }),
     {

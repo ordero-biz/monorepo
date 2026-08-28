@@ -106,6 +106,7 @@ describe('SuppliersList', () => {
             id: 1,
             name: 'Fresh Farms',
             status: SUPPLIER_STATUS.DRAFT,
+            createdAt: '2026-08-01T10:30:00.000Z',
             email: 'orders@fresh.example',
             phone: '+1 555 0100',
             address: '123 Market St',
@@ -126,14 +127,42 @@ describe('SuppliersList', () => {
     expect(
       await screen.findByRole('table', { name: 'Suppliers list' })
     ).toBeVisible();
+    expect(screen.getByText('Created at')).toBeVisible();
     expect(screen.getByRole('link', { name: 'Fresh Farms' })).toHaveAttribute(
       'href',
       getSupplierDetailRoute(1)
     );
     expect(screen.getByText('orders@fresh.example')).toBeVisible();
+    expect(screen.getByText('01 Aug 2026')).toBeVisible();
     expect(screen.getByText('+1 555 0100')).toBeVisible();
     expect(screen.getByText('123 Market St')).toBeVisible();
     expect(screen.getByText('Preferred produce supplier')).toBeVisible();
+  });
+
+  it('renders a dash when a supplier has no created date', async () => {
+    getSuppliersMock.mockResolvedValue({
+      ok: true,
+      data: {
+        content: [
+          {
+            id: 1,
+            name: 'Fresh Farms',
+            status: SUPPLIER_STATUS.DRAFT,
+            createdAt: null,
+          },
+        ],
+        page: {
+          size: 10,
+          number: 0,
+          totalElements: 1,
+          totalPages: 1,
+        },
+      },
+    });
+
+    setup();
+
+    expect(await screen.findByText('-')).toBeVisible();
   });
 
   it('requests suppliers with pagination input', async () => {
@@ -191,7 +220,7 @@ describe('SuppliersList', () => {
 
     setup({
       paginationInput: {
-        page: 1,
+        page: 2,
         size: 1,
       },
     });

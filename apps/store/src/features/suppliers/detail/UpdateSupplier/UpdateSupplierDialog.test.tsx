@@ -138,10 +138,6 @@ describe('UpdateSupplierDialog', () => {
     expect(updateSupplierMock).toHaveBeenCalledWith({
       supplierId: 1,
       name: 'Fresh Farms Updated',
-      email: 'orders@fresh.example',
-      phone: '+1 555 0100',
-      address: '123 Market St',
-      comment: 'Preferred produce supplier',
     });
     await waitFor(() =>
       expect(invalidateQueriesSpy).toHaveBeenCalledWith({
@@ -194,5 +190,41 @@ describe('UpdateSupplierDialog', () => {
     expect(screen.getByRole('dialog', { name: 'Edit supplier' })).toBeVisible();
     expect(onOpenChange).not.toHaveBeenCalledWith(false);
     expect(onUpdated).not.toHaveBeenCalled();
+  });
+
+  it('updates active supplier contact details without submitting a name', async () => {
+    updateSupplierMock.mockResolvedValue({
+      ok: true,
+      data: {
+        ...supplier,
+        status: SUPPLIER_STATUS.ACTIVE,
+        email: 'updated@fresh.example',
+      },
+    });
+    const user = userEvent.setup();
+    const { onOpenChange, queryClient } = setup({
+      supplier: {
+        ...supplier,
+        status: SUPPLIER_STATUS.ACTIVE,
+      },
+    });
+    const invalidateQueriesSpy = vi.spyOn(queryClient, 'invalidateQueries');
+    const dialog = screen.getByRole('dialog', { name: 'Edit supplier' });
+    const emailField = within(dialog).getByRole('textbox', { name: 'Email' });
+
+    await user.clear(emailField);
+    await user.type(emailField, 'updated@fresh.example');
+    await user.click(within(dialog).getByRole('button', { name: 'Save' }));
+
+    expect(updateSupplierMock).toHaveBeenCalledWith({
+      supplierId: 1,
+      email: 'updated@fresh.example',
+    });
+    await waitFor(() =>
+      expect(invalidateQueriesSpy).toHaveBeenCalledWith({
+        queryKey: suppliersQueryKeys.list,
+      })
+    );
+    expect(onOpenChange).toHaveBeenCalledWith(false);
   });
 });

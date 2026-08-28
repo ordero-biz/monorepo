@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { getSupplierDetailRoute } from '@/lib/client/routes';
 import type { Supplier } from '@/lib/domain/suppliers/types';
+import { formatDate } from '@/lib/utils/formatDate';
 import {
   DataTableCell,
   type DataTableColumnDef,
@@ -82,6 +83,20 @@ export const columns: DataTableColumnDef<Supplier>[] = [
     meta: {
       width: '20%',
       wrap: 'wrap',
+    },
+  },
+  {
+    accessorKey: 'createdAt',
+    cell: ({ row }) => (
+      <DataTableCell>
+        {row.original.createdAt ? formatDate(row.original.createdAt) : '-'}
+      </DataTableCell>
+    ),
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Created at" />
+    ),
+    meta: {
+      width: '14%',
     },
   },
 ];
