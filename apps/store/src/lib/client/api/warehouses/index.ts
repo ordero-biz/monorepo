@@ -19,7 +19,7 @@ type CreateWarehouseInput = {
   status: WarehouseStatus;
 };
 
-type UpdateWarehouseInput = Omit<CreateWarehouseInput, 'status'> & {
+type UpdateWarehouseInput = Partial<CreateWarehouseInput> & {
   warehouseId: string | number;
 };
 

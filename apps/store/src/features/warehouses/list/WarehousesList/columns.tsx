@@ -1,11 +1,33 @@
 import {
+  Chip,
   DataTableCell,
   type DataTableColumnDef,
   DataTableColumnHeader,
 } from '@ordero/ui';
 import Link from 'next/link';
 import { getWarehouseDetailRoute } from '@/lib/client/routes';
-import type { Warehouse } from '@/lib/domain/warehouses';
+import { WAREHOUSE_STATUS, type Warehouse } from '@/lib/domain/warehouses';
+
+const statusLabels = {
+  ACTIVE: 'Active',
+  DRAFT: 'Draft',
+} as const;
+
+const getStatusChip = (status?: Warehouse['status']) => {
+  if (!status) {
+    return null;
+  }
+
+  return (
+    <Chip
+      color={status === WAREHOUSE_STATUS.ACTIVE ? 'primary' : 'warning'}
+      size="s"
+      variant="soft"
+    >
+      {statusLabels[status]}
+    </Chip>
+  );
+};
 
 export const columns: DataTableColumnDef<Warehouse>[] = [
   {
@@ -24,7 +46,19 @@ export const columns: DataTableColumnDef<Warehouse>[] = [
       <DataTableColumnHeader column={column} title="Name" />
     ),
     meta: {
-      width: '32%',
+      width: '25%',
+    },
+  },
+  {
+    accessorKey: 'status',
+    cell: ({ row }) => (
+      <DataTableCell>{getStatusChip(row.original.status)}</DataTableCell>
+    ),
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Status" />
+    ),
+    meta: {
+      width: '15%',
     },
   },
   {
@@ -34,7 +68,7 @@ export const columns: DataTableColumnDef<Warehouse>[] = [
       <DataTableColumnHeader column={column} title="Address" />
     ),
     meta: {
-      width: '38%',
+      width: '35%',
       wrap: 'wrap',
     },
   },
@@ -45,7 +79,7 @@ export const columns: DataTableColumnDef<Warehouse>[] = [
       <DataTableColumnHeader column={column} title="Comment" />
     ),
     meta: {
-      width: '30%',
+      width: '25%',
       wrap: 'wrap',
     },
   },

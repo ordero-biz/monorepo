@@ -76,25 +76,6 @@ export const CreateWarehouseDialogFormContent = ({
           }}
         </form.Field>
 
-        <form.Field name="comment">
-          {(field) => {
-            const errorText = getFieldSubmitChangeErrorText(field.state.meta);
-
-            return (
-              <TextField
-                errorText={errorText}
-                invalid={Boolean(errorText)}
-                label="Comment"
-                name={field.name}
-                onBlur={field.handleBlur}
-                onValueChange={field.handleChange}
-                size="s"
-                value={field.state.value}
-              />
-            );
-          }}
-        </form.Field>
-
         <form.Field
           name="status"
           validators={{
@@ -135,6 +116,25 @@ export const CreateWarehouseDialogFormContent = ({
                   </div>
                 </Radio>
               </RadioGroup>
+            );
+          }}
+        </form.Field>
+
+        <form.Field name="comment">
+          {(field) => {
+            const errorText = getFieldSubmitChangeErrorText(field.state.meta);
+
+            return (
+              <TextField
+                errorText={errorText}
+                invalid={Boolean(errorText)}
+                label="Comment"
+                name={field.name}
+                onBlur={field.handleBlur}
+                onValueChange={field.handleChange}
+                size="s"
+                value={field.state.value}
+              />
             );
           }}
         </form.Field>

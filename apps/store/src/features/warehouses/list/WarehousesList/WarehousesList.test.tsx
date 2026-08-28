@@ -1,6 +1,7 @@
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getWarehouses } from '@/lib/client/api/warehouses';
+import { WAREHOUSE_STATUS } from '@/lib/domain/warehouses';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { WarehousesList } from './WarehousesList';
 
@@ -100,6 +101,7 @@ describe('WarehousesList', () => {
           {
             id: 1,
             name: 'Main Warehouse',
+            status: WAREHOUSE_STATUS.DRAFT,
             address: '123 Commerce Ave',
             comment: 'Primary stock location',
           },
@@ -121,6 +123,7 @@ describe('WarehousesList', () => {
     expect(
       screen.getByRole('link', { name: 'Main Warehouse' })
     ).toHaveAttribute('href', '/products/warehouse/1');
+    expect(screen.getByText('Draft')).toBeVisible();
     expect(screen.getByText('123 Commerce Ave')).toBeVisible();
     expect(screen.getByText('Primary stock location')).toBeVisible();
   });

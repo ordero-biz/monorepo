@@ -1,6 +1,7 @@
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getWarehouse } from '@/lib/client/api/warehouses';
+import { WAREHOUSE_STATUS } from '@/lib/domain/warehouses';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { WarehouseDetail } from './WarehouseDetail';
 
@@ -23,6 +24,7 @@ const { setup } = prepareStoreSetup({
 const warehouse = {
   id: 1,
   name: 'Main Warehouse',
+  status: WAREHOUSE_STATUS.DRAFT,
   address: '123 Commerce Ave',
   comment: 'Primary stock location',
 };
@@ -41,8 +43,24 @@ describe('WarehouseDetail', () => {
       await screen.findByRole('heading', { name: 'Main Warehouse' })
     ).toBeVisible();
     expect(screen.getByText('Warehouse details')).toBeVisible();
+    expect(screen.getByText('Draft')).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Publish' })).toBeVisible();
     expect(screen.getByText('123 Commerce Ave')).toBeVisible();
     expect(screen.getByText('Primary stock location')).toBeVisible();
+  });
+
+  it('shows an Active badge and hides edit actions for active warehouses', async () => {
+    getWarehouseMock.mockResolvedValue({
+      ok: true,
+      data: { ...warehouse, status: WAREHOUSE_STATUS.ACTIVE },
+    });
+
+    setup();
+
+    expect(await screen.findByText('Active')).toBeVisible();
+    expect(
+      screen.queryByRole('button', { name: 'Actions for Main Warehouse' })
+    ).not.toBeInTheDocument();
   });
 
   it('renders an error state and retries loading the warehouse', async () => {
