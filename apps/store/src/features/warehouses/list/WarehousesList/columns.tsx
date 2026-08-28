@@ -1,33 +1,12 @@
 import {
-  Chip,
   DataTableCell,
   type DataTableColumnDef,
   DataTableColumnHeader,
 } from '@ordero/ui';
 import Link from 'next/link';
 import { getWarehouseDetailRoute } from '@/lib/client/routes';
-import { WAREHOUSE_STATUS, type Warehouse } from '@/lib/domain/warehouses';
-
-const statusLabels = {
-  ACTIVE: 'Active',
-  DRAFT: 'Draft',
-} as const;
-
-const getStatusChip = (status?: Warehouse['status']) => {
-  if (!status) {
-    return null;
-  }
-
-  return (
-    <Chip
-      color={status === WAREHOUSE_STATUS.ACTIVE ? 'primary' : 'warning'}
-      size="s"
-      variant="soft"
-    >
-      {statusLabels[status]}
-    </Chip>
-  );
-};
+import type { Warehouse } from '@/lib/domain/warehouses';
+import { WarehouseStatusChip } from '../../shared/WarehouseStatusChip';
 
 export const columns: DataTableColumnDef<Warehouse>[] = [
   {
@@ -52,7 +31,9 @@ export const columns: DataTableColumnDef<Warehouse>[] = [
   {
     accessorKey: 'status',
     cell: ({ row }) => (
-      <DataTableCell>{getStatusChip(row.original.status)}</DataTableCell>
+      <DataTableCell>
+        <WarehouseStatusChip status={row.original.status} />
+      </DataTableCell>
     ),
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Status" />

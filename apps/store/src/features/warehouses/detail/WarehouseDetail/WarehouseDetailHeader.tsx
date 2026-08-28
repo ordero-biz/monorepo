@@ -1,15 +1,11 @@
-import { Chip, Menu, PageHeader, Typography } from '@ordero/ui';
+import { Menu, PageHeader, Typography } from '@ordero/ui';
 import { EllipsisVertical, Pencil } from 'lucide-react';
 import { useState } from 'react';
 import { WAREHOUSE_STATUS } from '@/lib/domain/warehouses';
+import { WarehouseStatusChip } from '../../shared/WarehouseStatusChip';
 import { UpdateWarehouseDialog } from '../UpdateWarehouse/UpdateWarehouseDialog';
 import { ActivateWarehouseDialogTrigger } from './ActivateWarehouseDialogTrigger';
 import type { WarehouseDetailHeaderProps } from './types';
-
-const statusLabels = {
-  ACTIVE: 'Active',
-  DRAFT: 'Draft',
-} as const;
 
 export const WarehouseDetailHeader = ({
   onUpdated,
@@ -22,15 +18,7 @@ export const WarehouseDetailHeader = ({
     <PageHeader.Root>
       <PageHeader.Left>
         <Typography variant="h5">{warehouse.name}</Typography>
-        {warehouse.status ? (
-          <Chip
-            color={isWarehouseActive ? 'primary' : 'warning'}
-            size="s"
-            variant="soft"
-          >
-            {statusLabels[warehouse.status]}
-          </Chip>
-        ) : null}
+        <WarehouseStatusChip status={warehouse.status} />
       </PageHeader.Left>
       {!isWarehouseActive ? (
         <PageHeader.Right>
