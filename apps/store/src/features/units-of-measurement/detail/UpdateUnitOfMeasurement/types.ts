@@ -1,4 +1,4 @@
-import type { UnitOfMeasurement } from '@/lib/domain/unitsOfMeasurement';
+import type { UnitOfMeasurement } from '@/lib/domain/units-of-measurement/types';
 
 export type UpdateUnitOfMeasurementDialogProps = {
   onOpenChange: (open: boolean) => void;

@@ -34,9 +34,9 @@ describe('CreateUnitOfMeasurementDialogTrigger', () => {
     const dialog = screen.getByRole('dialog', {
       name: 'Add unit of measurement',
     });
-    const codeField = within(dialog).getByRole('textbox', { name: 'Code' });
+    const nameField = within(dialog).getByRole('textbox', { name: 'Name' });
 
-    await user.type(codeField, 'KG');
+    await user.type(nameField, 'Kilogram');
     await user.keyboard('{Escape}');
 
     expect(
@@ -50,7 +50,7 @@ describe('CreateUnitOfMeasurementDialogTrigger', () => {
     expect(
       within(
         screen.getByRole('dialog', { name: 'Add unit of measurement' })
-      ).getByRole('textbox', { name: 'Code' })
+      ).getByRole('textbox', { name: 'Name' })
     ).toHaveValue('');
   });
 });

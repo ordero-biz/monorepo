@@ -1,14 +1,11 @@
 'use client';
 
-import { Button, Card, Menu, PageHeader, Typography } from '@ordero/ui';
-import { EllipsisVertical, Pencil, Trash2 } from 'lucide-react';
+import { Button, Card, Typography } from '@ordero/ui';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
 import { clientRoutes } from '@/lib/client/routes';
 import { useUnitOfMeasurementQuery } from '@/lib/hooks/units-of-measurement/useUnitOfMeasurementQuery';
-import { DeleteUnitsOfMeasurementDialog } from '../../shared';
-import { UpdateUnitOfMeasurementDialog } from '../UpdateUnitOfMeasurement/UpdateUnitOfMeasurementDialog';
 import type { UnitOfMeasurementDetailProps } from './types';
+import { UnitOfMeasurementDetailHeader } from './UnitOfMeasurementDetailHeader';
 import { UnitOfMeasurementDetailInfo } from './UnitOfMeasurementDetailInfo';
 
 export const UnitOfMeasurementDetail = ({
@@ -16,8 +13,6 @@ export const UnitOfMeasurementDetail = ({
 }: UnitOfMeasurementDetailProps) => {
   const router = useRouter();
   const unitOfMeasurementQuery = useUnitOfMeasurementQuery(unitOfMeasurementId);
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
 
   if (unitOfMeasurementQuery.isPending) {
     return (
@@ -57,65 +52,15 @@ export const UnitOfMeasurementDetail = ({
 
   return (
     <div className="flex flex-col gap-[var(--space-2)]">
-      <PageHeader.Root>
-        <PageHeader.Left>
-          <Typography variant="h5">
-            {unitOfMeasurementQuery.data.name}
-          </Typography>
-        </PageHeader.Left>
-        <PageHeader.Right>
-          <Menu.Root>
-            <Menu.Trigger
-              aria-label={`Actions for ${unitOfMeasurementQuery.data.name}`}
-              appearance="iconButton"
-              size="s"
-              title={`Actions for ${unitOfMeasurementQuery.data.name}`}
-            >
-              <EllipsisVertical aria-hidden="true" />
-            </Menu.Trigger>
-            <Menu.Portal>
-              <Menu.Positioner align="end">
-                <Menu.Popup>
-                  <Menu.Item onClick={() => setIsUpdateDialogOpen(true)}>
-                    <Pencil
-                      aria-hidden="true"
-                      className="size-[var(--icon-button-xs-icon)]"
-                    />
-                    Edit unit of measurement
-                  </Menu.Item>
-                  <Menu.Item
-                    color="error"
-                    onClick={() => setIsDeleteDialogOpen(true)}
-                  >
-                    <Trash2
-                      aria-hidden="true"
-                      className="size-[var(--icon-button-xs-icon)]"
-                    />
-                    Delete unit of measurement
-                  </Menu.Item>
-                </Menu.Popup>
-              </Menu.Positioner>
-            </Menu.Portal>
-          </Menu.Root>
-
-          <DeleteUnitsOfMeasurementDialog
-            onDeleted={async () => {
-              router.push(clientRoutes.unitsOfMeasurement);
-            }}
-            onOpenChange={setIsDeleteDialogOpen}
-            open={isDeleteDialogOpen}
-            unitsOfMeasurement={[unitOfMeasurementQuery.data]}
-          />
-          <UpdateUnitOfMeasurementDialog
-            onOpenChange={setIsUpdateDialogOpen}
-            onUpdated={async () => {
-              await unitOfMeasurementQuery.refetch();
-            }}
-            open={isUpdateDialogOpen}
-            unitOfMeasurement={unitOfMeasurementQuery.data}
-          />
-        </PageHeader.Right>
-      </PageHeader.Root>
+      <UnitOfMeasurementDetailHeader
+        onDeleted={() => {
+          router.push(clientRoutes.unitsOfMeasurement);
+        }}
+        onUpdated={async () => {
+          await unitOfMeasurementQuery.refetch();
+        }}
+        unitOfMeasurement={unitOfMeasurementQuery.data}
+      />
       <UnitOfMeasurementDetailInfo
         unitOfMeasurement={unitOfMeasurementQuery.data}
       />
