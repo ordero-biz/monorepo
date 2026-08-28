@@ -72,6 +72,7 @@ describe('useUpdateAttributeForm', () => {
       id: 7,
       name: 'Material',
       sortOrder: 10,
+      status: 'DRAFT' as const,
       createdAt: '2026-06-25T18:13:29.608Z',
     };
     submitUpdateAttributeMock.mockResolvedValue({

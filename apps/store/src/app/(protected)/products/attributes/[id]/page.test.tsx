@@ -35,6 +35,7 @@ describe('AttributeDetailPage', () => {
       id: 7,
       name: 'Color',
       sortOrder: 10,
+      status: 'DRAFT' as const,
       createdAt: '2026-06-24T20:07:32.467Z',
     };
     const values = [
@@ -42,6 +43,7 @@ describe('AttributeDetailPage', () => {
         id: 3,
         name: 'Blue',
         sortOrder: 0,
+        status: 'DRAFT' as const,
         createdAt: '2026-06-24T20:07:32.467Z',
       },
     ];

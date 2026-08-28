@@ -35,7 +35,7 @@ export const UpdateAttributeDialog = ({
           queryKey: attributesQueryKeys.detail(attribute.id),
         }),
       ]);
-      await onUpdated(updatedAttribute);
+      await onUpdated?.(updatedAttribute);
     },
   });
 

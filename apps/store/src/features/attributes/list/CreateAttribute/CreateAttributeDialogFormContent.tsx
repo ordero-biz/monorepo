@@ -106,7 +106,8 @@ export const CreateAttributeDialogFormContent = ({
                       Active
                       <Typography color="text-secondary" variant="caption">
                         Fully functional. Can be assigned to products and
-                        tracked in analytics. Cannot be edited after publishing
+                        tracked in analytics. Name cannot be edited after
+                        publishing, values remain editable
                       </Typography>
                     </div>
                   </Radio>

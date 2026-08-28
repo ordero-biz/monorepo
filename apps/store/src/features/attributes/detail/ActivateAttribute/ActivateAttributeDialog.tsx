@@ -38,8 +38,9 @@ export const ActivateAttributeDialog = ({
                 </Typography>
                 <Typography variant="body1">
                   <strong>
-                    This action cannot be undone, and the attribute will no
-                    longer be editable.
+                    This action cannot be undone. Once active, the attribute
+                    name cannot be edited, but you can still add and manage
+                    values.
                   </strong>
                 </Typography>
               </div>
