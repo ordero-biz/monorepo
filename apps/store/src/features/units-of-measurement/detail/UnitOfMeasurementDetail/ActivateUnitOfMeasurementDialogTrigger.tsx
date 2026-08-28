@@ -3,12 +3,12 @@
 import { Button } from '@ordero/ui';
 import { useState } from 'react';
 import { ActivateUnitOfMeasurementDialog } from './ActivateUnitOfMeasurementDialog';
-import type { UnitOfMeasurementDetailInfoProps } from './types';
+import type { UnitOfMeasurementDetailHeaderProps } from './types';
 
-type ActivateUnitOfMeasurementDialogTriggerProps =
-  UnitOfMeasurementDetailInfoProps & {
-    onUpdated: () => Promise<void> | void;
-  };
+type ActivateUnitOfMeasurementDialogTriggerProps = Pick<
+  UnitOfMeasurementDetailHeaderProps,
+  'onUpdated' | 'unitOfMeasurement'
+>;
 
 export const ActivateUnitOfMeasurementDialogTrigger = ({
   onUpdated,

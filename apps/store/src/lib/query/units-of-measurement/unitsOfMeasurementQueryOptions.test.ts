@@ -1,5 +1,5 @@
 import { QueryClient } from '@tanstack/react-query';
-import { UNIT_OF_MEASUREMENT_STATUS } from '@/lib/domain/unitsOfMeasurement';
+import { UNIT_OF_MEASUREMENT_STATUS } from '@/lib/domain/units-of-measurement/constants';
 import {
   unitOfMeasurementQueryOptions,
   unitsOfMeasurementListQueryOptions,

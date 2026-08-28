@@ -1,5 +1,5 @@
 import { createUnitOfMeasurement } from '@/lib/client/api/units-of-measurement';
-import { UNIT_OF_MEASUREMENT_STATUS } from '@/lib/domain/unitsOfMeasurement';
+import { UNIT_OF_MEASUREMENT_STATUS } from '@/lib/domain/units-of-measurement/constants';
 import { submitCreateUnitOfMeasurement } from './submitAction';
 
 vi.mock('@/lib/client/api/units-of-measurement', async () => ({
@@ -33,7 +33,6 @@ describe('submitCreateUnitOfMeasurement', () => {
       submitCreateUnitOfMeasurement({
         status: 'ACTIVE',
         name: ' Kilogram ',
-        symbol: ' kg ',
         comment: ' Weight unit ',
       })
     ).resolves.toEqual({
@@ -44,7 +43,6 @@ describe('submitCreateUnitOfMeasurement', () => {
     expect(createUnitOfMeasurementMock).toHaveBeenCalledWith({
       name: 'Kilogram',
       status: 'ACTIVE',
-      symbol: 'kg',
       comment: 'Weight unit',
     });
   });
@@ -64,7 +62,6 @@ describe('submitCreateUnitOfMeasurement', () => {
         status: 'ACTIVE',
         name: 'Kilogram',
         symbol: 'kg',
-        comment: '',
       })
     ).resolves.toEqual({
       ok: false,

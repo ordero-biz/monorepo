@@ -4,7 +4,7 @@ import { apiFetch } from '@ordero/api-client';
 import type {
   UnitOfMeasurement,
   UnitOfMeasurementStatus,
-} from '@/lib/domain/unitsOfMeasurement';
+} from '@/lib/domain/units-of-measurement/types';
 import type { PaginatedResponse } from '@/lib/server/types';
 import { tokenizePath } from '@/lib/utils/tokenizePath';
 import {
@@ -15,11 +15,18 @@ import { CLIENT_BACKEND_PATHS } from '../path';
 
 type UnitsOfMeasurementListResponse = PaginatedResponse<UnitOfMeasurement>;
 
-type CreateUnitOfMeasurementInput = {
+export type CreateUnitOfMeasurementData = {
   name: string;
   status: UnitOfMeasurementStatus;
-  symbol: string;
-  comment: string;
+  symbol?: string | null;
+  comment?: string | null;
+};
+
+export type UpdateUnitOfMeasurementFieldData =
+  Partial<CreateUnitOfMeasurementData>;
+
+export type UpdateUnitOfMeasurementData = UpdateUnitOfMeasurementFieldData & {
+  unitOfMeasurementId: string | number;
 };
 
 export const getUnitsOfMeasurementPath = (input?: PaginationSearchInput) =>
@@ -40,38 +47,23 @@ export const getUnitOfMeasurement = (unitOfMeasurementId: string | number) =>
     }
   );
 
-export const createUnitOfMeasurement = (input: CreateUnitOfMeasurementInput) =>
+export const createUnitOfMeasurement = (input: CreateUnitOfMeasurementData) =>
   apiFetch<UnitOfMeasurement>(CLIENT_BACKEND_PATHS.unitsOfMeasurement, {
     method: 'POST',
     body: input,
   });
 
-type UpdateUnitOfMeasurementInput = Partial<
-  Omit<CreateUnitOfMeasurementInput, 'status'>
-> & {
-  unitOfMeasurementId: string | number;
-  status?: UnitOfMeasurementStatus;
-};
-
 export const updateUnitOfMeasurement = ({
   unitOfMeasurementId,
-  name,
-  status,
-  symbol,
-  comment,
-}: UpdateUnitOfMeasurementInput) =>
+  ...input
+}: UpdateUnitOfMeasurementData) =>
   apiFetch<UnitOfMeasurement>(
     tokenizePath(CLIENT_BACKEND_PATHS.unitOfMeasurement, {
       id: unitOfMeasurementId,
     }),
     {
       method: 'PATCH',
-      body: {
-        ...(name === undefined ? {} : { name }),
-        ...(status === undefined ? {} : { status }),
-        ...(symbol === undefined ? {} : { symbol }),
-        ...(comment === undefined ? {} : { comment }),
-      },
+      body: input,
     }
   );
 

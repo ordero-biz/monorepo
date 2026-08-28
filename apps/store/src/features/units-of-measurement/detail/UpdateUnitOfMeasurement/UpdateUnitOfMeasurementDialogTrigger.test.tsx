@@ -69,19 +69,20 @@ describe('UpdateUnitOfMeasurementDialogTrigger', () => {
   });
 
   it('uses the saved values when the dialog is reopened after an update', async () => {
+    const updatedUnitOfMeasurement = {
+      id: 1,
+      status: 'DRAFT' as const,
+      name: 'Gram',
+      symbol: 'g',
+      comment: 'Metric weight',
+    };
     updateUnitOfMeasurementMock.mockResolvedValue({
       ok: true,
-      data: {
-        id: 1,
-        status: 'ACTIVE',
-        name: 'Gram',
-        symbol: 'g',
-        comment: 'Metric weight',
-      },
+      data: updatedUnitOfMeasurement,
     });
     const user = userEvent.setup();
 
-    setup();
+    const { renderResult } = setup();
 
     await user.click(screen.getByRole('button', { name: 'Edit Kilogram' }));
 
@@ -98,8 +99,14 @@ describe('UpdateUnitOfMeasurementDialogTrigger', () => {
       screen.queryByRole('dialog', { name: 'Edit unit of measurement' })
     ).not.toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', { name: 'Edit Kilogram' }));
+    renderResult.rerender({ unitOfMeasurement: updatedUnitOfMeasurement });
+
+    await user.click(screen.getByRole('button', { name: 'Edit Gram' }));
 
     expect(screen.getByRole('textbox', { name: 'Name' })).toHaveValue('Gram');
+    expect(screen.getByRole('textbox', { name: 'Symbol' })).toHaveValue('g');
+    expect(screen.getByRole('textbox', { name: 'Comment' })).toHaveValue(
+      'Metric weight'
+    );
   });
 });

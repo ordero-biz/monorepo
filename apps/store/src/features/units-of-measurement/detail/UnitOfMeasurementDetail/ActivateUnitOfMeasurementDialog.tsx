@@ -2,11 +2,13 @@
 
 import { Button, Dialog, Typography } from '@ordero/ui';
 import { useActivateUnitOfMeasurement } from './hooks/useActivateUnitOfMeasurement';
-import type { UnitOfMeasurementDetailInfoProps } from './types';
+import type { UnitOfMeasurementDetailHeaderProps } from './types';
 
-type ActivateUnitOfMeasurementDialogProps = UnitOfMeasurementDetailInfoProps & {
+type ActivateUnitOfMeasurementDialogProps = Pick<
+  UnitOfMeasurementDetailHeaderProps,
+  'onUpdated' | 'unitOfMeasurement'
+> & {
   onOpenChange: (open: boolean) => void;
-  onUpdated: () => Promise<void> | void;
   open: boolean;
 };
 
@@ -42,8 +44,8 @@ export const ActivateUnitOfMeasurementDialog = ({
                 </Typography>
                 <Typography variant="body1">
                   <strong>
-                    This action cannot be undone, and the unit of measurement
-                    will no longer be editable.
+                    This action cannot be undone. However, you will still be
+                    able to update the symbol and comment.
                   </strong>
                 </Typography>
               </div>

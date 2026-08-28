@@ -2,7 +2,7 @@ import type { ApiError } from '@ordero/api-types';
 import { useToastManager } from '@ordero/ui';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { updateUnitOfMeasurement } from '@/lib/client/api/units-of-measurement';
-import { UNIT_OF_MEASUREMENT_STATUS } from '@/lib/domain/unitsOfMeasurement';
+import { UNIT_OF_MEASUREMENT_STATUS } from '@/lib/domain/units-of-measurement/constants';
 import { unitsOfMeasurementQueryKeys } from '@/lib/query/units-of-measurement/unitsOfMeasurementQueryKeys';
 import { getApiErrorMessage } from '@/lib/utils/apiError';
 

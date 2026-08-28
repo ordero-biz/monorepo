@@ -1,7 +1,7 @@
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getUnitOfMeasurement } from '@/lib/client/api/units-of-measurement';
-import { UNIT_OF_MEASUREMENT_STATUS } from '@/lib/domain/unitsOfMeasurement';
+import { UNIT_OF_MEASUREMENT_STATUS } from '@/lib/domain/units-of-measurement/constants';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { UnitOfMeasurementDetail } from './UnitOfMeasurementDetail';
 
@@ -86,7 +86,7 @@ describe('UnitOfMeasurementDetail', () => {
     ).toBeVisible();
   });
 
-  it('does not render an edit action for an active unit of measurement', async () => {
+  it('opens an edit dialog without a name field for an active unit of measurement', async () => {
     getUnitOfMeasurementMock.mockResolvedValue({
       ok: true,
       data: unitOfMeasurement,
@@ -99,9 +99,20 @@ describe('UnitOfMeasurementDetail', () => {
       await screen.findByRole('button', { name: 'Actions for Kilogram' })
     );
 
+    await user.click(
+      await screen.findByRole('menuitem', {
+        name: 'Edit unit of measurement',
+      })
+    );
+
+    screen.getByRole('dialog', {
+      name: 'Edit unit of measurement',
+    });
+
     expect(
-      screen.queryByRole('menuitem', { name: 'Edit unit of measurement' })
+      screen.queryByRole('textbox', { name: 'Name' })
     ).not.toBeInTheDocument();
+    expect(screen.getByRole('textbox', { name: 'Symbol' })).toBeVisible();
   });
 
   it('opens the edit dialog for a draft unit of measurement', async () => {

@@ -1,5 +1,5 @@
 import { Chip } from '@ordero/ui';
-import { UNIT_OF_MEASUREMENT_STATUS } from '@/lib/domain/unitsOfMeasurement';
+import { UNIT_OF_MEASUREMENT_STATUS } from '@/lib/domain/units-of-measurement/constants';
 import type { UnitOfMeasurementStatusChipProps } from './types';
 
 const statusLabels = {

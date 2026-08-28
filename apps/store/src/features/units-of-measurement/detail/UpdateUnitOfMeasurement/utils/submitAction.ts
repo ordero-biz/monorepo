@@ -1,21 +1,21 @@
-import { updateUnitOfMeasurement } from '@/lib/client/api/units-of-measurement';
-import type { UpdateUnitOfMeasurementFormValues } from './validations';
+import {
+  type UpdateUnitOfMeasurementFieldData,
+  updateUnitOfMeasurement,
+} from '@/lib/client/api/units-of-measurement';
+import { getApiErrorMessage } from '@/lib/utils/apiError';
 
 type SubmitUpdateUnitOfMeasurementArgs = {
+  submitData: UpdateUnitOfMeasurementFieldData;
   unitOfMeasurementId: string | number;
-  value: UpdateUnitOfMeasurementFormValues;
 };
 
 export const submitUpdateUnitOfMeasurement = async ({
+  submitData,
   unitOfMeasurementId,
-  value,
 }: SubmitUpdateUnitOfMeasurementArgs) => {
   const result = await updateUnitOfMeasurement({
     unitOfMeasurementId,
-    name: value.name.trim(),
-    status: value.status,
-    symbol: value.symbol.trim(),
-    comment: value.comment.trim(),
+    ...submitData,
   });
 
   if (!result.ok) {
@@ -23,7 +23,7 @@ export const submitUpdateUnitOfMeasurement = async ({
       ok: false,
       error: {
         fieldErrors: result.error.fieldErrors,
-        formError: result.error.message,
+        formError: getApiErrorMessage(result.error),
       },
     } as const;
   }

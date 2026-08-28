@@ -1,8 +1,6 @@
 import { screen } from '@testing-library/react';
-import {
-  UNIT_OF_MEASUREMENT_STATUS,
-  type UnitOfMeasurementStatus,
-} from '@/lib/domain/unitsOfMeasurement';
+import { UNIT_OF_MEASUREMENT_STATUS } from '@/lib/domain/units-of-measurement/constants';
+import type { UnitOfMeasurementStatus } from '@/lib/domain/units-of-measurement/types';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { UnitOfMeasurementStatusChip } from './UnitOfMeasurementStatusChip';
 

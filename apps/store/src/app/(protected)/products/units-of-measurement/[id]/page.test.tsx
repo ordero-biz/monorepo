@@ -1,5 +1,5 @@
-import { UNIT_OF_MEASUREMENT_STATUS } from '@/lib/domain/unitsOfMeasurement';
 import { render, screen } from '@testing-library/react';
+import { UNIT_OF_MEASUREMENT_STATUS } from '@/lib/domain/units-of-measurement/constants';
 import { unitsOfMeasurementQueryKeys } from '@/lib/query/units-of-measurement/unitsOfMeasurementQueryKeys';
 import { getServerUnitOfMeasurement } from '@/lib/server/api/units-of-measurement';
 import {
@@ -33,7 +33,7 @@ describe('UnitOfMeasurementDetailPage', () => {
   it('prefetches unit of measurement details and hydrates the query cache', async () => {
     const unitOfMeasurement = {
       id: 1,
-    status: UNIT_OF_MEASUREMENT_STATUS.ACTIVE,
+      status: UNIT_OF_MEASUREMENT_STATUS.ACTIVE,
       name: 'Kilogram',
       symbol: 'kg',
       comment: 'Weight unit',

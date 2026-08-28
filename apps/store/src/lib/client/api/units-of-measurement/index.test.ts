@@ -217,7 +217,7 @@ describe('units of measurement client helpers', () => {
     });
   });
 
-  it('patches a unit of measurement through the backend proxy', async () => {
+  it('patches only supplied unit of measurement fields through the backend proxy', async () => {
     const fetchMock = vi.mocked(fetch);
     const unitOfMeasurement = {
       id: 1,
@@ -234,10 +234,8 @@ describe('units of measurement client helpers', () => {
     await expect(
       updateUnitOfMeasurement({
         unitOfMeasurementId: 1,
-        status: 'ACTIVE',
         name: 'Gram',
-        symbol: 'g',
-        comment: 'Weight unit',
+        symbol: null,
       })
     ).resolves.toEqual({
       ok: true,
@@ -250,9 +248,7 @@ describe('units of measurement client helpers', () => {
         method: 'PATCH',
         body: JSON.stringify({
           name: 'Gram',
-          status: 'ACTIVE',
-          symbol: 'g',
-          comment: 'Weight unit',
+          symbol: null,
         }),
         cache: 'no-store',
       })
