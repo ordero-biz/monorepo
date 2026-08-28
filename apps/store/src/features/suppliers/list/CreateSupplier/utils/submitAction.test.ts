@@ -1,4 +1,5 @@
 import { createSupplier } from '@/lib/client/api/suppliers';
+import { SUPPLIER_STATUS } from '@/lib/domain/suppliers/constants';
 import { submitCreateSupplier } from './submitAction';
 
 vi.mock('@/lib/client/api/suppliers', async () => ({
@@ -19,6 +20,7 @@ describe('submitCreateSupplier', () => {
     const supplier = {
       id: 1,
       name: 'Fresh Farms',
+      status: SUPPLIER_STATUS.DRAFT,
       email: 'orders@fresh.example',
       phone: '+1 555 0100',
       address: '123 Market St',
@@ -32,6 +34,7 @@ describe('submitCreateSupplier', () => {
     await expect(
       submitCreateSupplier({
         name: ' Fresh Farms ',
+        status: SUPPLIER_STATUS.DRAFT,
         email: ' orders@fresh.example ',
         phone: ' +1 555 0100 ',
         address: ' 123 Market St ',
@@ -44,6 +47,7 @@ describe('submitCreateSupplier', () => {
 
     expect(createSupplierMock).toHaveBeenCalledWith({
       name: 'Fresh Farms',
+      status: SUPPLIER_STATUS.DRAFT,
       email: 'orders@fresh.example',
       phone: '+1 555 0100',
       address: '123 Market St',
@@ -66,6 +70,7 @@ describe('submitCreateSupplier', () => {
     await expect(
       submitCreateSupplier({
         name: 'Fresh Farms',
+        status: SUPPLIER_STATUS.DRAFT,
         email: 'orders@fresh.example',
         phone: '+1 555 0100',
         address: '123 Market St',
@@ -79,6 +84,35 @@ describe('submitCreateSupplier', () => {
         },
         formError: 'Supplier creation failed.',
       },
+    });
+  });
+
+  it('omits blank optional fields from the create request', async () => {
+    createSupplierMock.mockResolvedValue({
+      ok: true,
+      data: {
+        id: 1,
+        name: 'Fresh Farms',
+        status: SUPPLIER_STATUS.DRAFT,
+        email: '',
+        phone: '',
+        address: '',
+        comment: '',
+      },
+    });
+
+    await submitCreateSupplier({
+      name: 'Fresh Farms',
+      status: SUPPLIER_STATUS.DRAFT,
+      email: '',
+      phone: '',
+      address: '',
+      comment: '',
+    });
+
+    expect(createSupplierMock).toHaveBeenCalledWith({
+      name: 'Fresh Farms',
+      status: SUPPLIER_STATUS.DRAFT,
     });
   });
 });

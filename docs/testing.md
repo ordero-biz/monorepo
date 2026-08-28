@@ -140,6 +140,9 @@ For writes, keep tests aligned with the caller shape:
   succeeds
 - request-helper tests assert the same-origin path, HTTP method, body shape,
   and normalized `ApiResult`
+- for optional fields, request and submit tests cover create-time omission of
+  blank values, update-time `null` for a cleared persisted value, and no request
+  for unchanged normalized update data
 
 ## Commands
 

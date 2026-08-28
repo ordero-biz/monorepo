@@ -1,6 +1,7 @@
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createSupplier } from '@/lib/client/api/suppliers';
+import { SUPPLIER_STATUS } from '@/lib/domain/suppliers/constants';
 import { suppliersQueryKeys } from '@/lib/query/suppliers/suppliersQueryKeys';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { CreateSupplierDialog } from './CreateSupplierDialog';
@@ -30,12 +31,44 @@ describe('CreateSupplierDialog', () => {
     onOpenChangeMock.mockClear();
   });
 
+  it('shows name validation when submitted without the required value', async () => {
+    const user = userEvent.setup();
+
+    setup();
+
+    const dialog = screen.getByRole('dialog', { name: 'Add supplier' });
+
+    await user.click(
+      within(dialog).getByRole('button', { name: 'Save draft' })
+    );
+
+    expect(within(dialog).getByText('Supplier name is required')).toBeVisible();
+  });
+
+  it('explains the effects of each supplier status', () => {
+    setup();
+
+    const dialog = screen.getByRole('dialog', { name: 'Add supplier' });
+
+    expect(
+      within(dialog).getByText(
+        'Editable only. Cannot be used in supplies or tracked in analytics. Can be activated later'
+      )
+    ).toBeVisible();
+    expect(
+      within(dialog).getByText(
+        'Fully functional. Can be used in supplies and tracked in analytics. Name and status cannot be edited after publishing'
+      )
+    ).toBeVisible();
+  });
+
   it('creates a supplier, closes the dialog, and invalidates the list', async () => {
     createSupplierMock.mockResolvedValue({
       ok: true,
       data: {
         id: 1,
         name: 'Fresh Farms',
+        status: SUPPLIER_STATUS.DRAFT,
         email: 'orders@fresh.example',
         phone: '+1 555 0100',
         address: '123 Market St',
@@ -57,10 +90,12 @@ describe('CreateSupplierDialog', () => {
     await user.paste(' 123 Market St ');
     await user.click(within(dialog).getByRole('textbox', { name: 'Comment' }));
     await user.paste(' Preferred produce supplier ');
-    await user.click(within(dialog).getByRole('button', { name: 'Add' }));
+    await user.click(within(dialog).getByRole('radio', { name: /^Active/ }));
+    await user.click(within(dialog).getByRole('button', { name: 'Publish' }));
 
     expect(createSupplierMock).toHaveBeenCalledWith({
       name: 'Fresh Farms',
+      status: SUPPLIER_STATUS.ACTIVE,
       email: 'orders@fresh.example',
       phone: '+1 555 0100',
       address: '123 Market St',
@@ -101,7 +136,9 @@ describe('CreateSupplierDialog', () => {
     await user.paste('+1 555 0100');
     await user.click(within(dialog).getByRole('textbox', { name: 'Address' }));
     await user.paste('123 Market St');
-    await user.click(within(dialog).getByRole('button', { name: 'Add' }));
+    await user.click(
+      within(dialog).getByRole('button', { name: 'Save draft' })
+    );
 
     expect(
       await within(dialog).findByText('Supplier email already exists.')

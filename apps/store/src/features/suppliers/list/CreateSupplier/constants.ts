@@ -1,7 +1,9 @@
-import type { SupplierEntityFormValues } from '../../shared/SupplierFormDialogContent';
+import { SUPPLIER_STATUS } from '@/lib/domain/suppliers/constants';
+import type { CreateSupplierFormValues } from './utils/validations';
 
-export const createSupplierDefaultValues: SupplierEntityFormValues = {
+export const createSupplierDefaultValues: CreateSupplierFormValues = {
   name: '',
+  status: SUPPLIER_STATUS.DRAFT,
   email: '',
   phone: '',
   address: '',

@@ -38,6 +38,15 @@ describe('getApiErrorMessage', () => {
     ).toBe('Active categories cannot be edited');
   });
 
+  it('maps the active supplier modification error', () => {
+    expect(
+      getApiErrorMessage({
+        code: API_ERROR_CODES.SUPPLIER_MODIFICATION_NOT_ALLOWED,
+        message: 'Conflict',
+      })
+    ).toBe('Cannot edit name or status of an active supplier');
+  });
+
   it('returns the backend message when the error code has no mapping', () => {
     expect(
       getApiErrorMessage({
