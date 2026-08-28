@@ -1,6 +1,9 @@
 import { updateUnitOfMeasurement } from '@/lib/client/api/units-of-measurement';
 import { UNIT_OF_MEASUREMENT_STATUS } from '@/lib/domain/unitsOfMeasurement';
-import { submitUpdateUnitOfMeasurement } from './submitAction';
+import {
+  getUnitOfMeasurementUpdateChanges,
+  submitUpdateUnitOfMeasurement,
+} from './submitAction';
 
 vi.mock('@/lib/client/api/units-of-measurement', async () => ({
   ...(await vi.importActual<
@@ -16,7 +19,7 @@ describe('submitUpdateUnitOfMeasurement', () => {
     updateUnitOfMeasurementMock.mockReset();
   });
 
-  it('normalizes form values before updating the unit of measurement', async () => {
+  it('normalizes changed form values before updating the unit of measurement', async () => {
     const unitOfMeasurement = {
       id: 1,
       status: UNIT_OF_MEASUREMENT_STATUS.ACTIVE,
@@ -32,11 +35,9 @@ describe('submitUpdateUnitOfMeasurement', () => {
     await expect(
       submitUpdateUnitOfMeasurement({
         unitOfMeasurementId: 1,
-        value: {
-          status: 'ACTIVE',
-          name: ' Gram ',
-          symbol: ' g ',
-          comment: ' Metric weight ',
+        submitData: {
+          name: 'Gram',
+          symbol: 'g',
         },
       })
     ).resolves.toEqual({
@@ -47,9 +48,7 @@ describe('submitUpdateUnitOfMeasurement', () => {
     expect(updateUnitOfMeasurementMock).toHaveBeenCalledWith({
       unitOfMeasurementId: 1,
       name: 'Gram',
-      status: 'ACTIVE',
       symbol: 'g',
-      comment: 'Metric weight',
     });
   });
 
@@ -66,12 +65,7 @@ describe('submitUpdateUnitOfMeasurement', () => {
     await expect(
       submitUpdateUnitOfMeasurement({
         unitOfMeasurementId: 1,
-        value: {
-          status: 'ACTIVE',
-          name: 'Gram',
-          symbol: 'g',
-          comment: '',
-        },
+        submitData: { name: 'Gram' },
       })
     ).resolves.toEqual({
       ok: false,
@@ -80,5 +74,24 @@ describe('submitUpdateUnitOfMeasurement', () => {
         formError: 'Unit of measurement update failed.',
       },
     });
+  });
+
+  it('returns only normalized values that changed', () => {
+    expect(
+      getUnitOfMeasurementUpdateChanges({
+        initialValues: {
+          status: UNIT_OF_MEASUREMENT_STATUS.DRAFT,
+          name: 'Kilogram',
+          symbol: 'kg',
+          comment: 'Weight unit',
+        },
+        formValue: {
+          status: UNIT_OF_MEASUREMENT_STATUS.DRAFT,
+          name: ' Kilogram ',
+          symbol: 'g',
+          comment: ' Weight unit ',
+        },
+      })
+    ).toEqual({ symbol: 'g' });
   });
 });

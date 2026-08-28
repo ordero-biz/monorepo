@@ -1,21 +1,45 @@
-import { updateUnitOfMeasurement } from '@/lib/client/api/units-of-measurement';
+import {
+  type UpdateUnitOfMeasurementFieldData,
+  updateUnitOfMeasurement,
+} from '@/lib/client/api/units-of-measurement';
+import { getChangedValues } from '@/lib/utils/form/comparison/getChangedValues';
 import type { UpdateUnitOfMeasurementFormValues } from './validations';
 
 type SubmitUpdateUnitOfMeasurementArgs = {
   unitOfMeasurementId: string | number;
-  value: UpdateUnitOfMeasurementFormValues;
+  submitData: UpdateUnitOfMeasurementFieldData;
 };
+
+type GetUnitOfMeasurementUpdateChangesArgs = {
+  formValue: UpdateUnitOfMeasurementFormValues;
+  initialValues: UpdateUnitOfMeasurementFormValues;
+};
+
+const normalizeUpdateUnitOfMeasurementFormData = (
+  data: UpdateUnitOfMeasurementFormValues
+) => ({
+  name: data.name.trim(),
+  status: data.status,
+  symbol: data.symbol.trim(),
+  comment: data.comment.trim(),
+});
+
+export const getUnitOfMeasurementUpdateChanges = ({
+  formValue,
+  initialValues,
+}: GetUnitOfMeasurementUpdateChangesArgs) =>
+  getChangedValues({
+    initialData: normalizeUpdateUnitOfMeasurementFormData(initialValues),
+    submitData: normalizeUpdateUnitOfMeasurementFormData(formValue),
+  });
 
 export const submitUpdateUnitOfMeasurement = async ({
   unitOfMeasurementId,
-  value,
+  submitData,
 }: SubmitUpdateUnitOfMeasurementArgs) => {
   const result = await updateUnitOfMeasurement({
     unitOfMeasurementId,
-    name: value.name.trim(),
-    status: value.status,
-    symbol: value.symbol.trim(),
-    comment: value.comment.trim(),
+    ...submitData,
   });
 
   if (!result.ok) {

@@ -46,11 +46,11 @@ export const createUnitOfMeasurement = (input: CreateUnitOfMeasurementInput) =>
     body: input,
   });
 
-type UpdateUnitOfMeasurementInput = Partial<
-  Omit<CreateUnitOfMeasurementInput, 'status'>
-> & {
+export type UpdateUnitOfMeasurementFieldData =
+  Partial<CreateUnitOfMeasurementInput>;
+
+export type UpdateUnitOfMeasurementInput = UpdateUnitOfMeasurementFieldData & {
   unitOfMeasurementId: string | number;
-  status?: UnitOfMeasurementStatus;
 };
 
 export const updateUnitOfMeasurement = ({

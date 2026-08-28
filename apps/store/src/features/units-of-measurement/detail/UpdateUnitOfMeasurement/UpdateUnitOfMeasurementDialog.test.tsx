@@ -99,7 +99,6 @@ describe('UpdateUnitOfMeasurementDialog', () => {
     expect(updateUnitOfMeasurementMock).toHaveBeenCalledWith({
       unitOfMeasurementId: 1,
       name: 'Gram',
-      status: 'DRAFT',
       symbol: 'g',
       comment: 'Metric weight',
     });
@@ -151,8 +150,11 @@ describe('UpdateUnitOfMeasurementDialog', () => {
     const dialog = screen.getByRole('dialog', {
       name: 'Edit unit of measurement',
     });
+    const nameField = within(dialog).getByRole('textbox', { name: 'Name' });
     const saveButton = within(dialog).getByRole('button', { name: 'Save' });
 
+    await user.clear(nameField);
+    await user.type(nameField, 'Gram');
     await user.click(saveButton);
 
     expect(saveButton).toBeDisabled();
@@ -164,6 +166,19 @@ describe('UpdateUnitOfMeasurementDialog', () => {
     });
 
     await screen.findByRole('button', { name: 'Save' });
+  });
+
+  it('closes without PATCHing when no normalized values changed', async () => {
+    const user = userEvent.setup();
+    const { onOpenChange } = setup();
+    const dialog = screen.getByRole('dialog', {
+      name: 'Edit unit of measurement',
+    });
+
+    await user.click(within(dialog).getByRole('button', { name: 'Save' }));
+
+    expect(updateUnitOfMeasurementMock).not.toHaveBeenCalled();
+    expect(onOpenChange).toHaveBeenCalledWith(false);
   });
 
   it('shows backend errors and keeps the dialog open when submit fails', async () => {

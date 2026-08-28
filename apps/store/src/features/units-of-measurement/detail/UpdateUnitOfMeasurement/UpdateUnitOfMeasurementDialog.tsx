@@ -40,6 +40,7 @@ export const UpdateUnitOfMeasurementDialog = ({
   );
   const { form } = useUpdateUnitOfMeasurementForm({
     initialValues: formValues,
+    onNoChanges: () => handleOpenChange(false),
     onUpdated: async (updatedUnitOfMeasurement) => {
       const updatedFormValues = getUnitOfMeasurementFormValues(
         updatedUnitOfMeasurement

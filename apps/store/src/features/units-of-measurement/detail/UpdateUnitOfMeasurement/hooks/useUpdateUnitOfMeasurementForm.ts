@@ -1,17 +1,22 @@
 import { useToastManager } from '@ordero/ui';
 import { useForm } from '@tanstack/react-form';
 import type { UnitOfMeasurement } from '@/lib/domain/unitsOfMeasurement';
-import { submitUpdateUnitOfMeasurement } from '../utils/submitAction';
+import {
+  getUnitOfMeasurementUpdateChanges,
+  submitUpdateUnitOfMeasurement,
+} from '../utils/submitAction';
 import type { UpdateUnitOfMeasurementFormValues } from '../utils/validations';
 
 type UseUpdateUnitOfMeasurementFormArgs = {
   initialValues: UpdateUnitOfMeasurementFormValues;
+  onNoChanges: () => void;
   onUpdated: (unitOfMeasurement: UnitOfMeasurement) => Promise<void> | void;
   unitOfMeasurementId: string | number;
 };
 
 export const useUpdateUnitOfMeasurementForm = ({
   initialValues,
+  onNoChanges,
   onUpdated,
   unitOfMeasurementId,
 }: UseUpdateUnitOfMeasurementFormArgs) => {
@@ -19,9 +24,19 @@ export const useUpdateUnitOfMeasurementForm = ({
   const form = useForm({
     defaultValues: initialValues,
     onSubmit: async ({ formApi, value }) => {
+      const updateChanges = getUnitOfMeasurementUpdateChanges({
+        initialValues,
+        formValue: value,
+      });
+
+      if (!updateChanges) {
+        onNoChanges();
+        return;
+      }
+
       const result = await submitUpdateUnitOfMeasurement({
         unitOfMeasurementId,
-        value,
+        submitData: updateChanges,
       });
 
       if (!result.ok) {

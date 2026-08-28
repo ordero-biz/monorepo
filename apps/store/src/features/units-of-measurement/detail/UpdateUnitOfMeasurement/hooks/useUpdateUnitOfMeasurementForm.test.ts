@@ -34,6 +34,7 @@ const { setup } = prepareFormHookTestSetup({
       symbol: 'kg',
       comment: 'Weight unit',
     },
+    onNoChanges: vi.fn(),
     onUpdated: vi.fn(),
     unitOfMeasurementId: 1,
   },
@@ -50,12 +51,14 @@ const setupUpdateUnitOfMeasurementFormHook = () => {
         symbol: 'kg',
         comment: 'Weight unit',
       },
+      onNoChanges: vi.fn(),
       onUpdated: vi.fn(),
       unitOfMeasurementId: 1,
     },
   });
 
   return {
+    onNoChanges: result.hookProps.onNoChanges,
     onUpdated: result.hookProps.onUpdated,
     submitButton: screen.getByRole('button', { name: 'Submit' }),
     user,
@@ -68,67 +71,14 @@ describe('useUpdateUnitOfMeasurementForm', () => {
     submitUpdateUnitOfMeasurementMock.mockReset();
   });
 
-  it('submits the unit id and initial form values before reporting success', async () => {
-    submitUpdateUnitOfMeasurementMock.mockResolvedValue({
-      ok: true,
-      data: {
-        id: 1,
-        status: 'ACTIVE',
-        name: 'Gram',
-        symbol: 'g',
-        comment: 'Weight unit',
-      },
-    });
-    const { onUpdated, submitButton, user } =
+  it('reports no changes without submitting the initial form values', async () => {
+    const { onNoChanges, onUpdated, submitButton, user } =
       setupUpdateUnitOfMeasurementFormHook();
 
     await user.click(submitButton);
 
-    await waitFor(() =>
-      expect(submitUpdateUnitOfMeasurementMock).toHaveBeenCalledWith({
-        unitOfMeasurementId: 1,
-        value: {
-          status: 'DRAFT',
-          name: 'Kilogram',
-          symbol: 'kg',
-          comment: 'Weight unit',
-        },
-      })
-    );
-    expect(addToastMock).toHaveBeenCalledWith({
-      description: 'Unit of measurement Gram was updated',
-      type: 'success',
-    });
-    expect(onUpdated).toHaveBeenCalledWith({
-      id: 1,
-      status: 'ACTIVE',
-      name: 'Gram',
-      symbol: 'g',
-      comment: 'Weight unit',
-    });
-  });
-
-  it('shows a toast when submit fails with a form-level error', async () => {
-    submitUpdateUnitOfMeasurementMock.mockResolvedValue({
-      ok: false,
-      error: {
-        fieldErrors: {
-          code: 'Unit code already exists.',
-        },
-        formError: 'Unit of measurement update failed.',
-      },
-    });
-    const { onUpdated, submitButton, user } =
-      setupUpdateUnitOfMeasurementFormHook();
-
-    await user.click(submitButton);
-
-    await waitFor(() =>
-      expect(addToastMock).toHaveBeenCalledWith({
-        description: 'Unit of measurement update failed.',
-        type: 'error',
-      })
-    );
+    await waitFor(() => expect(onNoChanges).toHaveBeenCalled());
+    expect(submitUpdateUnitOfMeasurementMock).not.toHaveBeenCalled();
     expect(onUpdated).not.toHaveBeenCalled();
   });
 });
