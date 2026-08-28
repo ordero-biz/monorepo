@@ -49,7 +49,7 @@ describe('UpdateAttributeValueDialog', () => {
       },
     });
     const user = userEvent.setup();
-    const { queryClient } = setup();
+    const { onOpenChange, queryClient } = setup();
     const invalidateQueriesSpy = vi.spyOn(queryClient, 'invalidateQueries');
 
     const dialog = screen.getByRole('dialog', {
@@ -66,14 +66,40 @@ describe('UpdateAttributeValueDialog', () => {
     expect(updateAttributeValueMock).toHaveBeenCalledWith({
       attributeValueId: 3,
       name: 'Navy',
-      sortOrder: 0,
     });
     await waitFor(() =>
       expect(invalidateQueriesSpy).toHaveBeenCalledWith({
         queryKey: attributesQueryKeys.values(7),
       })
     );
-    expect(onOpenChangeMock).toHaveBeenCalledWith(false);
+    expect(invalidateQueriesSpy).toHaveBeenCalledWith({
+      queryKey: attributesQueryKeys.list,
+    });
+    expect(onOpenChange).toHaveBeenCalledWith(false);
+    expect(
+      await screen.findByRole('dialog', {
+        name: 'Attribute value Navy was updated',
+      })
+    ).toBeVisible();
+  });
+
+  it('closes without sending normalized values that match the attribute value', async () => {
+    const user = userEvent.setup();
+    const { onOpenChange } = setup();
+    const dialog = screen.getByRole('dialog', {
+      name: 'Edit Attribute Value',
+    });
+    const nameField = within(dialog).getByRole('textbox', {
+      name: 'Attribute value name',
+    });
+
+    await user.clear(nameField);
+    await user.type(nameField, ' Blue ');
+    await user.click(within(dialog).getByRole('button', { name: 'Save' }));
+
+    expect(updateAttributeValueMock).not.toHaveBeenCalled();
+    await waitFor(() => expect(onOpenChange).toHaveBeenCalledWith(false));
+    expect(screen.queryByText(/was updated/)).not.toBeInTheDocument();
   });
 
   it('keeps save available and rejects an empty attribute value name', async () => {
@@ -106,7 +132,7 @@ describe('UpdateAttributeValueDialog', () => {
     expect(updateAttributeValueMock).not.toHaveBeenCalled();
   });
 
-  it('keeps save available while the update is in flight', async () => {
+  it('disables save while the update is in flight', async () => {
     let resolveUpdate:
       | ((value: Awaited<ReturnType<typeof updateAttributeValue>>) => void)
       | undefined;
@@ -123,17 +149,22 @@ describe('UpdateAttributeValueDialog', () => {
     const dialog = screen.getByRole('dialog', {
       name: 'Edit Attribute Value',
     });
+    const nameField = within(dialog).getByRole('textbox', {
+      name: 'Attribute value name',
+    });
     const saveButton = within(dialog).getByRole('button', { name: 'Save' });
 
+    await user.clear(nameField);
+    await user.type(nameField, 'Navy');
     await user.click(saveButton);
 
-    expect(screen.getByRole('button', { name: 'Saving...' })).toBeEnabled();
+    expect(screen.getByRole('button', { name: 'Saving...' })).toBeDisabled();
 
     resolveUpdate?.({
       ok: true,
       data: {
         id: 3,
-        name: 'Blue',
+        name: 'Navy',
         sortOrder: 0,
         createdAt: '2026-06-24T20:07:32.467Z',
       },

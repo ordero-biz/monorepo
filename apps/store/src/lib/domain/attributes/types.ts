@@ -10,7 +10,7 @@ export type Attribute = {
   id: number;
   name: string;
   sortOrder: number;
-  status?: AttributeStatus;
+  status: AttributeStatus;
   values?: string[];
   createdAt: string;
 };

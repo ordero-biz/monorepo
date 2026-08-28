@@ -55,6 +55,9 @@ export const AttributeDetailHeader = ({
     );
   }
 
+  const isAttributeActive =
+    attributeQuery.data.status === ATTRIBUTE_STATUS.ACTIVE;
+
   return (
     <PageHeader.Root>
       <PageHeader.Left>
@@ -62,7 +65,7 @@ export const AttributeDetailHeader = ({
         <AttributeStatusChip status={attributeQuery.data.status} />
       </PageHeader.Left>
       <PageHeader.Right>
-        {attributeQuery.data.status !== ATTRIBUTE_STATUS.ACTIVE ? (
+        {!isAttributeActive ? (
           <ActivateAttributeDialogTrigger
             attribute={attributeQuery.data}
             onUpdated={async () => {
@@ -73,7 +76,7 @@ export const AttributeDetailHeader = ({
 
         <CreateAttributeValuesDialogTrigger
           attributeId={attributeId}
-          attributeStatus={attributeQuery.data.status ?? ATTRIBUTE_STATUS.DRAFT}
+          attributeStatus={attributeQuery.data.status}
         />
 
         <Menu.Root>
@@ -88,7 +91,7 @@ export const AttributeDetailHeader = ({
           <Menu.Portal>
             <Menu.Positioner align="end">
               <Menu.Popup>
-                {attributeQuery.data.status !== ATTRIBUTE_STATUS.ACTIVE ? (
+                {!isAttributeActive ? (
                   <Menu.Item onClick={() => setIsUpdateDialogOpen(true)}>
                     <Pencil
                       aria-hidden="true"
@@ -120,9 +123,6 @@ export const AttributeDetailHeader = ({
         <UpdateAttributeDialog
           attribute={attributeQuery.data}
           onOpenChange={setIsUpdateDialogOpen}
-          onUpdated={async () => {
-            await attributeQuery.refetch();
-          }}
           open={isUpdateDialogOpen}
         />
       </PageHeader.Right>

@@ -59,7 +59,7 @@ describe('ActivateAttributeDialog', () => {
     ).toBeVisible();
     expect(
       screen.getByText(
-        'This action cannot be undone, and the attribute will no longer be editable.'
+        'This action cannot be undone. Once active, the attribute name cannot be edited, but you can still add and manage values.'
       )
     ).toBeVisible();
     expect(screen.getByRole('button', { name: 'Cancel' })).toBeVisible();

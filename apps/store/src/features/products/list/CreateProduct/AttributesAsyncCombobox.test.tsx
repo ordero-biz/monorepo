@@ -46,12 +46,14 @@ describe('AttributesAsyncCombobox', () => {
           id: 1,
           name: 'Color',
           sortOrder: 10,
+          status: 'DRAFT' as const,
           createdAt: '2026-07-14T17:54:42.035Z',
           attributeValues: [
             {
               id: 3,
               name: 'Blue',
               sortOrder: 0,
+              status: 'DRAFT' as const,
               createdAt: '2026-07-14T17:54:42.036Z',
             },
           ],
@@ -80,12 +82,14 @@ describe('AttributesAsyncCombobox', () => {
         id: 1,
         name: 'Color',
         sortOrder: 10,
+        status: 'DRAFT' as const,
         createdAt: '2026-07-14T17:54:42.035Z',
         attributeValues: [
           {
             id: 3,
             name: 'Blue',
             sortOrder: 0,
+            status: 'DRAFT' as const,
             createdAt: '2026-07-14T17:54:42.036Z',
           },
         ],

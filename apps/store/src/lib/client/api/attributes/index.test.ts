@@ -594,6 +594,40 @@ describe('attribute client helpers', () => {
     );
   });
 
+  it('returns normalized failures from the update attribute route', async () => {
+    vi.mocked(fetch).mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          message: 'Attribute update failed.',
+          fieldErrors: {
+            name: 'Attribute name already exists.',
+          },
+        }),
+        {
+          status: 422,
+          statusText: 'Unprocessable Entity',
+        }
+      )
+    );
+
+    await expect(
+      updateAttribute({
+        attributeId: 7,
+        name: 'Material',
+      })
+    ).resolves.toEqual({
+      ok: false,
+      error: {
+        status: 422,
+        message: 'Attribute update failed.',
+        code: undefined,
+        fieldErrors: {
+          name: 'Attribute name already exists.',
+        },
+      },
+    });
+  });
+
   it('patches an attribute value through the backend proxy', async () => {
     const fetchMock = vi.mocked(fetch);
 
@@ -612,7 +646,6 @@ describe('attribute client helpers', () => {
       updateAttributeValue({
         attributeValueId: 3,
         name: 'Navy',
-        sortOrder: 0,
       })
     ).resolves.toEqual({
       ok: true,
@@ -630,7 +663,6 @@ describe('attribute client helpers', () => {
         method: 'PATCH',
         body: JSON.stringify({
           name: 'Navy',
-          sortOrder: 0,
         }),
         cache: 'no-store',
       })

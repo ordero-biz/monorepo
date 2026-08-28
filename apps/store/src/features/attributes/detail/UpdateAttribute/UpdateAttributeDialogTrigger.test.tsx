@@ -20,6 +20,7 @@ const { setup } = prepareStoreSetup({
       id: 7,
       name: 'Color',
       sortOrder: 10,
+      status: 'DRAFT' as const,
       createdAt: '2026-06-24T20:07:32.467Z',
     },
     onUpdated: vi.fn(),
@@ -74,6 +75,7 @@ describe('UpdateAttributeDialogTrigger', () => {
       id: 7,
       name: 'Material',
       sortOrder: 10,
+      status: 'DRAFT' as const,
       createdAt: '2026-06-25T18:13:29.608Z',
     };
     updateAttributeMock.mockResolvedValue({ ok: true, data: updatedAttribute });
