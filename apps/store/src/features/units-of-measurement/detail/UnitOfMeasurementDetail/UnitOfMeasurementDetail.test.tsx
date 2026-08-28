@@ -1,6 +1,7 @@
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getUnitOfMeasurement } from '@/lib/client/api/units-of-measurement';
+import { UNIT_OF_MEASUREMENT_STATUS } from '@/lib/domain/units-of-measurement/constants';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { UnitOfMeasurementDetail } from './UnitOfMeasurementDetail';
 
@@ -31,7 +32,7 @@ const { setup } = prepareStoreSetup({
 
 const unitOfMeasurement = {
   id: 1,
-  code: 'KG',
+  status: UNIT_OF_MEASUREMENT_STATUS.ACTIVE,
   name: 'Kilogram',
   symbol: 'kg',
   comment: 'Weight unit',
@@ -54,7 +55,7 @@ describe('UnitOfMeasurementDetail', () => {
       await screen.findByRole('heading', { name: 'Kilogram' })
     ).toBeVisible();
     expect(screen.getByText('Unit of measurement details')).toBeVisible();
-    expect(screen.getByText('KG')).toBeVisible();
+    expect(screen.getByText('Active')).toBeVisible();
     expect(screen.getByText('kg')).toBeVisible();
     expect(screen.getByText('Weight unit')).toBeVisible();
     expect(
@@ -85,10 +86,42 @@ describe('UnitOfMeasurementDetail', () => {
     ).toBeVisible();
   });
 
-  it('opens the edit dialog from the actions menu', async () => {
+  it('opens an edit dialog without a name field for an active unit of measurement', async () => {
     getUnitOfMeasurementMock.mockResolvedValue({
       ok: true,
       data: unitOfMeasurement,
+    });
+    const user = userEvent.setup();
+
+    setup();
+
+    await user.click(
+      await screen.findByRole('button', { name: 'Actions for Kilogram' })
+    );
+
+    await user.click(
+      await screen.findByRole('menuitem', {
+        name: 'Edit unit of measurement',
+      })
+    );
+
+    screen.getByRole('dialog', {
+      name: 'Edit unit of measurement',
+    });
+
+    expect(
+      screen.queryByRole('textbox', { name: 'Name' })
+    ).not.toBeInTheDocument();
+    expect(screen.getByRole('textbox', { name: 'Symbol' })).toBeVisible();
+  });
+
+  it('opens the edit dialog for a draft unit of measurement', async () => {
+    getUnitOfMeasurementMock.mockResolvedValue({
+      ok: true,
+      data: {
+        ...unitOfMeasurement,
+        status: 'DRAFT',
+      },
     });
     const user = userEvent.setup();
 
@@ -105,6 +138,25 @@ describe('UnitOfMeasurementDetail', () => {
 
     expect(
       screen.getByRole('dialog', { name: 'Edit unit of measurement' })
+    ).toBeVisible();
+  });
+
+  it('opens a confirmation dialog before publishing a draft unit of measurement', async () => {
+    getUnitOfMeasurementMock.mockResolvedValue({
+      ok: true,
+      data: {
+        ...unitOfMeasurement,
+        status: 'DRAFT',
+      },
+    });
+    const user = userEvent.setup();
+
+    setup();
+
+    await user.click(await screen.findByRole('button', { name: 'Publish' }));
+
+    expect(
+      screen.getByRole('dialog', { name: 'Publish unit of measurement' })
     ).toBeVisible();
   });
 

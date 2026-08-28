@@ -1,7 +1,10 @@
 'use client';
 
 import { apiFetch } from '@ordero/api-client';
-import type { UnitOfMeasurement } from '@/lib/domain/unitsOfMeasurement';
+import type {
+  UnitOfMeasurement,
+  UnitOfMeasurementStatus,
+} from '@/lib/domain/units-of-measurement/types';
 import type { PaginatedResponse } from '@/lib/server/types';
 import { tokenizePath } from '@/lib/utils/tokenizePath';
 import {
@@ -12,11 +15,18 @@ import { CLIENT_BACKEND_PATHS } from '../path';
 
 type UnitsOfMeasurementListResponse = PaginatedResponse<UnitOfMeasurement>;
 
-type CreateUnitOfMeasurementInput = {
-  code: string;
+export type CreateUnitOfMeasurementData = {
   name: string;
-  symbol: string;
-  comment: string;
+  status: UnitOfMeasurementStatus;
+  symbol?: string | null;
+  comment?: string | null;
+};
+
+export type UpdateUnitOfMeasurementFieldData =
+  Partial<CreateUnitOfMeasurementData>;
+
+export type UpdateUnitOfMeasurementData = UpdateUnitOfMeasurementFieldData & {
+  unitOfMeasurementId: string | number;
 };
 
 export const getUnitsOfMeasurementPath = (input?: PaginationSearchInput) =>
@@ -37,39 +47,23 @@ export const getUnitOfMeasurement = (unitOfMeasurementId: string | number) =>
     }
   );
 
-export const createUnitOfMeasurement = (input: CreateUnitOfMeasurementInput) =>
+export const createUnitOfMeasurement = (input: CreateUnitOfMeasurementData) =>
   apiFetch<UnitOfMeasurement>(CLIENT_BACKEND_PATHS.unitsOfMeasurement, {
     method: 'POST',
     body: input,
   });
 
-type UpdateUnitOfMeasurementInput = {
-  unitOfMeasurementId: string | number;
-  code: string;
-  name: string;
-  symbol: string;
-  comment: string;
-};
-
 export const updateUnitOfMeasurement = ({
   unitOfMeasurementId,
-  code,
-  name,
-  symbol,
-  comment,
-}: UpdateUnitOfMeasurementInput) =>
+  ...input
+}: UpdateUnitOfMeasurementData) =>
   apiFetch<UnitOfMeasurement>(
     tokenizePath(CLIENT_BACKEND_PATHS.unitOfMeasurement, {
       id: unitOfMeasurementId,
     }),
     {
       method: 'PATCH',
-      body: {
-        code,
-        name,
-        symbol,
-        comment,
-      },
+      body: input,
     }
   );
 
