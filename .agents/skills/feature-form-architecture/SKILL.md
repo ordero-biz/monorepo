@@ -95,6 +95,16 @@ may contain UI-specific strings or omit fields supported by non-form commands.
 When no normalized fields changed, let the workflow perform its normal no-op
 close/reset behavior instead of issuing a request.
 
+For optional text fields, keep create and update transport semantics explicit:
+
+- omit blank optional values on create unless the endpoint requires `null`
+- send `null` on update when a populated persisted value is cleared
+- omit unchanged normalized values so PATCH preserves them
+
+Do not force create and update through one normalizer when their transport
+semantics differ. Extract a shared pure field normalizer only after the same
+normalization rule is used by several workflows.
+
 ### Field Sections
 
 Extract dense or repeated field groups into local components or field-section hooks when they have cohesive UI behavior:

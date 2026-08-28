@@ -136,7 +136,7 @@ describe('CreateCategoryDialog', () => {
     await user.click(
       within(dialog).getByRole('combobox', { name: 'Parent category' })
     );
-    await user.click(await screen.findByRole('option', { name: 'Shoes' }));
+    await user.click(await screen.findByRole('option', { name: /^Shoes\b/ }));
 
     expect(
       within(dialog).getByRole('radio', { name: /^Active\b/ })
@@ -268,7 +268,6 @@ describe('CreateCategoryDialog', () => {
 
     expect(createCategoryMock).toHaveBeenCalledWith({
       name: 'Sneakers',
-      parentId: null,
       status: 'ACTIVE',
     });
     expect(
