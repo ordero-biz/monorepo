@@ -1,4 +1,4 @@
-import { WAREHOUSE_STATUS } from '@/lib/domain/warehouses';
+import { WAREHOUSE_STATUS } from '@/lib/domain/warehouses/constants';
 import { validateWarehouseStatus, warehouseStatusSchema } from './validations';
 
 describe('warehouse creation status validation', () => {

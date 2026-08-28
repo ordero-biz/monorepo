@@ -1,5 +1,5 @@
 import { Chip } from '@ordero/ui';
-import { WAREHOUSE_STATUS } from '@/lib/domain/warehouses';
+import { WAREHOUSE_STATUS } from '@/lib/domain/warehouses/constants';
 import type { WarehouseStatusChipProps } from './types';
 
 const statusLabels = {

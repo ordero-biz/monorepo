@@ -1,5 +1,5 @@
 import { createWarehouse } from '@/lib/client/api/warehouses';
-import { WAREHOUSE_STATUS } from '@/lib/domain/warehouses';
+import { WAREHOUSE_STATUS } from '@/lib/domain/warehouses/constants';
 import { submitCreateWarehouse } from './submitAction';
 
 vi.mock('@/lib/client/api/warehouses', async () => ({

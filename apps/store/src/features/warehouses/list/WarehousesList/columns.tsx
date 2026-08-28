@@ -5,7 +5,7 @@ import {
 } from '@ordero/ui';
 import Link from 'next/link';
 import { getWarehouseDetailRoute } from '@/lib/client/routes';
-import type { Warehouse } from '@/lib/domain/warehouses';
+import type { Warehouse } from '@/lib/domain/warehouses/types';
 import { WarehouseStatusChip } from '../../shared/WarehouseStatusChip';
 
 export const columns: DataTableColumnDef<Warehouse>[] = [

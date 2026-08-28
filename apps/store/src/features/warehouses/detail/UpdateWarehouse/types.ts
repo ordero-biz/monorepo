@@ -3,7 +3,7 @@ import type {
   FormValidateOrFn,
   ReactFormApi,
 } from '@tanstack/react-form';
-import type { Warehouse } from '@/lib/domain/warehouses';
+import type { Warehouse } from '@/lib/domain/warehouses/types';
 import type { WarehouseFormValues } from '../../shared/validations';
 
 type FormValidate = FormValidateOrFn<WarehouseFormValues> | undefined;

@@ -1,4 +1,4 @@
-import { WAREHOUSE_STATUS } from '@/lib/domain/warehouses';
+import { WAREHOUSE_STATUS } from '@/lib/domain/warehouses/constants';
 import {
   createWarehouse,
   getWarehouse,
@@ -134,6 +134,31 @@ describe('warehouse client helpers', () => {
           address: '124 Commerce Ave',
           comment: 'Updated stock location',
         }),
+      })
+    );
+  });
+
+  it('sends null when clearing a warehouse address', async () => {
+    const fetchMock = vi.mocked(fetch);
+    const warehouse = {
+      id: 1,
+      name: 'Main Warehouse',
+      address: null,
+      comment: 'Primary stock location',
+    };
+    fetchMock.mockResolvedValue(new Response(JSON.stringify(warehouse)));
+
+    await expect(
+      updateWarehouse({
+        warehouseId: 1,
+        address: null,
+      })
+    ).resolves.toEqual({ ok: true, data: warehouse });
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/backend/api/v1/warehouses/1',
+      expect.objectContaining({
+        method: 'PATCH',
+        body: JSON.stringify({ address: null }),
       })
     );
   });

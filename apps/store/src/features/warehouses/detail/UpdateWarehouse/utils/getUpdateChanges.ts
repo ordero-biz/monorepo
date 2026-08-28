@@ -1,5 +1,5 @@
 import type { UpdateWarehouseFieldData } from '@/lib/client/api/warehouses';
-import type { Warehouse } from '@/lib/domain/warehouses';
+import type { Warehouse } from '@/lib/domain/warehouses/types';
 import { getChangedValues } from '@/lib/utils/form/comparison/getChangedValues';
 import type { WarehouseFormValues } from '../../../shared/validations';
 import { getWarehouseDefaultValues } from './fields';

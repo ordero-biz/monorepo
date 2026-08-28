@@ -1,8 +1,6 @@
 import { screen } from '@testing-library/react';
-import {
-  WAREHOUSE_STATUS,
-  type WarehouseStatus,
-} from '@/lib/domain/warehouses';
+import { WAREHOUSE_STATUS } from '@/lib/domain/warehouses/constants';
+import type { WarehouseStatus } from '@/lib/domain/warehouses/types';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { WarehouseStatusChip } from './WarehouseStatusChip';
 

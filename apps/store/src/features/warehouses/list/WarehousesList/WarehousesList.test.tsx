@@ -1,7 +1,7 @@
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getWarehouses } from '@/lib/client/api/warehouses';
-import { WAREHOUSE_STATUS } from '@/lib/domain/warehouses';
+import { WAREHOUSE_STATUS } from '@/lib/domain/warehouses/constants';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { WarehousesList } from './WarehousesList';
 

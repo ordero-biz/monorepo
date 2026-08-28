@@ -1,7 +1,4 @@
-export const WAREHOUSE_STATUS = {
-  ACTIVE: 'ACTIVE',
-  DRAFT: 'DRAFT',
-} as const;
+import type { WAREHOUSE_STATUS } from './constants';
 
 export type WarehouseStatus =
   (typeof WAREHOUSE_STATUS)[keyof typeof WAREHOUSE_STATUS];

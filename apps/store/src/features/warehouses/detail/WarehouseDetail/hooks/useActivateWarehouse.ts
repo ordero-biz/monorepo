@@ -2,7 +2,7 @@ import type { ApiError } from '@ordero/api-types';
 import { useToastManager } from '@ordero/ui';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { updateWarehouse } from '@/lib/client/api/warehouses';
-import { WAREHOUSE_STATUS } from '@/lib/domain/warehouses';
+import { WAREHOUSE_STATUS } from '@/lib/domain/warehouses/constants';
 import { warehousesQueryKeys } from '@/lib/query/warehouses/warehousesQueryKeys';
 import { getApiErrorMessage } from '@/lib/utils/apiError';
 

@@ -1,7 +1,7 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { updateWarehouse } from '@/lib/client/api/warehouses';
 import { API_ERROR_CODES } from '@/lib/constants/apiErrorCodes';
-import { WAREHOUSE_STATUS } from '@/lib/domain/warehouses';
+import { WAREHOUSE_STATUS } from '@/lib/domain/warehouses/constants';
 import { warehousesQueryKeys } from '@/lib/query/warehouses/warehousesQueryKeys';
 import {
   createTestQueryClient,

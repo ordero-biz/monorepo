@@ -1,6 +1,6 @@
 import { useToastManager } from '@ordero/ui';
 import { useForm } from '@tanstack/react-form';
-import type { Warehouse } from '@/lib/domain/warehouses';
+import type { Warehouse } from '@/lib/domain/warehouses/types';
 import { getWarehouseDefaultValues } from '../utils/fields';
 import { getWarehouseUpdateChanges } from '../utils/getUpdateChanges';
 import { submitUpdateWarehouse } from '../utils/submitAction';

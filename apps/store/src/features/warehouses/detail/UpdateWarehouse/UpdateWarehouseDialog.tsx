@@ -2,7 +2,7 @@
 
 import { Dialog } from '@ordero/ui';
 import { useQueryClient } from '@tanstack/react-query';
-import { WAREHOUSE_STATUS } from '@/lib/domain/warehouses';
+import { WAREHOUSE_STATUS } from '@/lib/domain/warehouses/constants';
 import { warehousesQueryKeys } from '@/lib/query/warehouses/warehousesQueryKeys';
 import { useUpdateWarehouseForm } from './hooks/useUpdateWarehouseForm';
 import type { UpdateWarehouseDialogProps } from './types';

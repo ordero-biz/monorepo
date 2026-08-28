@@ -6,10 +6,8 @@ import {
   TextField,
   Typography,
 } from '@ordero/ui';
-import {
-  WAREHOUSE_STATUS,
-  type WarehouseStatus,
-} from '@/lib/domain/warehouses';
+import { WAREHOUSE_STATUS } from '@/lib/domain/warehouses/constants';
+import type { WarehouseStatus } from '@/lib/domain/warehouses/types';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
 import { validateWarehouseName } from '../../shared/validations';
 import type { CreateWarehouseDialogFormContentProps } from './types';

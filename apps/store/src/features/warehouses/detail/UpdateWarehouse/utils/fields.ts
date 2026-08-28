@@ -1,4 +1,4 @@
-import type { Warehouse } from '@/lib/domain/warehouses';
+import type { Warehouse } from '@/lib/domain/warehouses/types';
 import type { WarehouseFormValues } from '../../../shared/validations';
 
 export const getWarehouseDefaultValues = (

@@ -1,7 +1,7 @@
 import { Menu, PageHeader, Typography } from '@ordero/ui';
 import { EllipsisVertical, Pencil } from 'lucide-react';
 import { useState } from 'react';
-import { WAREHOUSE_STATUS } from '@/lib/domain/warehouses';
+import { WAREHOUSE_STATUS } from '@/lib/domain/warehouses/constants';
 import { WarehouseStatusChip } from '../../shared/WarehouseStatusChip';
 import { UpdateWarehouseDialog } from '../UpdateWarehouse/UpdateWarehouseDialog';
 import { ActivateWarehouseDialogTrigger } from './ActivateWarehouseDialogTrigger';

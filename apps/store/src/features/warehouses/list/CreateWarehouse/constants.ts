@@ -1,4 +1,4 @@
-import { WAREHOUSE_STATUS } from '@/lib/domain/warehouses';
+import { WAREHOUSE_STATUS } from '@/lib/domain/warehouses/constants';
 import type { CreateWarehouseFormValues } from './utils/validations';
 
 export const createWarehouseDefaultValues: CreateWarehouseFormValues = {
