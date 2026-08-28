@@ -31,39 +31,26 @@ describe('CreateWarehouseDialog', () => {
     onOpenChangeMock.mockClear();
   });
 
-  it('requires name and address before add is available', async () => {
+  it('keeps the action enabled and validates required fields on submit', async () => {
     const user = userEvent.setup();
 
     setup();
 
     const dialog = screen.getByRole('dialog', { name: 'Add warehouse' });
-    const nameField = within(dialog).getByRole('textbox', {
-      name: 'Name',
-    });
-    const addressField = within(dialog).getByRole('textbox', {
-      name: 'Address',
-    });
     const addButton = within(dialog).getByRole('button', {
       name: 'Save draft',
     });
 
-    expect(addButton).toBeDisabled();
+    expect(addButton).toBeEnabled();
+    await user.click(addButton);
 
-    await user.type(nameField, 'Main Warehouse');
-    expect(addButton).toBeDisabled();
-
-    await user.type(addressField, '   ');
-    await user.tab();
-
+    expect(
+      await within(dialog).findByText('Warehouse name is required')
+    ).toBeVisible();
     expect(
       within(dialog).getByText('Warehouse address is required')
     ).toBeVisible();
-    expect(addButton).toBeDisabled();
-
-    await user.clear(addressField);
-    await user.type(addressField, '123 Commerce Ave');
-
-    expect(addButton).toBeEnabled();
+    expect(createWarehouseMock).not.toHaveBeenCalled();
   });
 
   it('defaults to Draft and changes the action when Active is selected', async () => {

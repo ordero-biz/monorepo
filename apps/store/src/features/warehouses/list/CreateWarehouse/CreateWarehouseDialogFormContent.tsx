@@ -143,20 +143,10 @@ export const CreateWarehouseDialogFormContent = ({
 
     <Dialog.Footer>
       <form.Subscribe
-        selector={(state) =>
-          [
-            state.values.name,
-            state.values.address,
-            state.values.status,
-            state.isSubmitting,
-          ] as const
-        }
+        selector={(state) => [state.isSubmitting, state.values.status] as const}
       >
-        {([name, address, status, isSubmitting]) => (
-          <Button
-            disabled={isSubmitting || !name.trim() || !address.trim()}
-            type="submit"
-          >
+        {([isSubmitting, status]) => (
+          <Button disabled={isSubmitting} type="submit">
             {isSubmitting
               ? status === WAREHOUSE_STATUS.DRAFT
                 ? 'Saving...'
