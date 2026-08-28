@@ -6,10 +6,6 @@ const getWarehouseDetailData = (
   warehouse: Warehouse
 ): WarehouseDetailField[] => [
   {
-    label: 'Code',
-    value: warehouse.code,
-  },
-  {
     label: 'Address',
     value: warehouse.address,
   },

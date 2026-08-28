@@ -19,7 +19,6 @@ describe('submitCreateWarehouse', () => {
   it('normalizes form values before creating the warehouse', async () => {
     const warehouse = {
       id: 1,
-      code: 'WH-001',
       name: 'Main Warehouse',
       address: '123 Commerce Ave',
       comment: 'Primary stock location',
@@ -31,7 +30,6 @@ describe('submitCreateWarehouse', () => {
 
     await expect(
       submitCreateWarehouse({
-        code: ' WH-001 ',
         name: ' Main Warehouse ',
         address: ' 123 Commerce Ave ',
         comment: ' Primary stock location ',
@@ -43,7 +41,6 @@ describe('submitCreateWarehouse', () => {
     });
 
     expect(createWarehouseMock).toHaveBeenCalledWith({
-      code: 'WH-001',
       name: 'Main Warehouse',
       address: '123 Commerce Ave',
       comment: 'Primary stock location',
@@ -58,14 +55,13 @@ describe('submitCreateWarehouse', () => {
         status: 422,
         message: 'Warehouse creation failed.',
         fieldErrors: {
-          code: 'Warehouse code already exists.',
+          name: 'Warehouse name already exists.',
         },
       },
     });
 
     await expect(
       submitCreateWarehouse({
-        code: 'WH-001',
         name: 'Main Warehouse',
         address: '123 Commerce Ave',
         comment: '',
@@ -75,7 +71,7 @@ describe('submitCreateWarehouse', () => {
       ok: false,
       error: {
         fieldErrors: {
-          code: 'Warehouse code already exists.',
+          name: 'Warehouse name already exists.',
         },
         formError: 'Warehouse creation failed.',
       },

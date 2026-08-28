@@ -19,7 +19,6 @@ const updateWarehouseMock = vi.mocked(updateWarehouse);
 
 const warehouse = {
   id: 1,
-  code: 'WH-001',
   name: 'Main Warehouse',
   address: '123 Commerce Ave',
   comment: 'Primary stock location',
@@ -63,7 +62,6 @@ describe('UpdateWarehouseDialog', () => {
 
     expect(updateWarehouseMock).toHaveBeenCalledWith({
       warehouseId: 1,
-      code: 'WH-001',
       name: 'Updated Warehouse',
       address: '123 Commerce Ave',
       comment: 'Primary stock location',
@@ -91,26 +89,26 @@ describe('UpdateWarehouseDialog', () => {
     const user = userEvent.setup();
     setup();
     const dialog = screen.getByRole('dialog', { name: 'Edit warehouse' });
-    const codeField = within(dialog).getByRole('textbox', { name: 'Code' });
+    const nameField = within(dialog).getByRole('textbox', { name: 'Name' });
 
-    await user.clear(codeField);
+    await user.clear(nameField);
 
     expect(
-      within(dialog).queryByText('Warehouse code is required')
+      within(dialog).queryByText('Warehouse name is required')
     ).not.toBeInTheDocument();
 
     await user.tab();
 
     expect(
-      await within(dialog).findByText('Warehouse code is required')
+      await within(dialog).findByText('Warehouse name is required')
     ).toBeVisible();
 
-    await user.click(codeField);
-    await user.type(codeField, 'WH-001');
+    await user.click(nameField);
+    await user.type(nameField, 'Main Warehouse');
 
     await waitFor(() =>
       expect(
-        within(dialog).queryByText('Warehouse code is required')
+        within(dialog).queryByText('Warehouse name is required')
       ).not.toBeInTheDocument()
     );
   });
@@ -168,21 +166,21 @@ describe('UpdateWarehouseDialog', () => {
       error: {
         status: 422,
         message: 'Warehouse update failed.',
-        fieldErrors: { code: 'Warehouse code already exists.' },
+        fieldErrors: { name: 'Warehouse name already exists.' },
       },
     });
     const user = userEvent.setup();
     const { onOpenChange, onUpdated } = setup();
     const dialog = screen.getByRole('dialog', { name: 'Edit warehouse' });
-    const codeField = within(dialog).getByRole('textbox', { name: 'Code' });
+    const nameField = within(dialog).getByRole('textbox', { name: 'Name' });
 
     await user.click(within(dialog).getByRole('button', { name: 'Save' }));
 
     expect(
-      await within(dialog).findByText('Warehouse code already exists.')
+      await within(dialog).findByText('Warehouse name already exists.')
     ).toBeVisible();
-    expect(codeField).toHaveAccessibleDescription(
-      'Warehouse code already exists.'
+    expect(nameField).toHaveAccessibleDescription(
+      'Warehouse name already exists.'
     );
     expect(
       await screen.findByRole('dialog', { name: 'Warehouse update failed.' })

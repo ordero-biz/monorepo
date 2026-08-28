@@ -5,7 +5,6 @@ export const submitCreateWarehouse = async (
   value: CreateWarehouseFormValues
 ) => {
   const result = await createWarehouse({
-    code: value.code.trim(),
     name: value.name.trim(),
     address: value.address.trim(),
     comment: value.comment.trim(),

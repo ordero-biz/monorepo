@@ -1,13 +1,11 @@
 import {
   validateWarehouseAddress,
-  validateWarehouseCode,
   validateWarehouseName,
   warehouseFormSchema,
 } from './validations';
 
 describe('warehouse field validation', () => {
   it.each([
-    ['code', validateWarehouseCode, '   ', 'Warehouse code is required'],
     ['name', validateWarehouseName, '   ', 'Warehouse name is required'],
     [
       'address',
@@ -20,7 +18,6 @@ describe('warehouse field validation', () => {
   });
 
   it.each([
-    ['code', validateWarehouseCode, 'WH-001'],
     ['name', validateWarehouseName, 'Main Warehouse'],
     ['address', validateWarehouseAddress, '123 Commerce Ave'],
   ])('accepts a valid warehouse %s', (_, validate, value) => {
@@ -30,13 +27,11 @@ describe('warehouse field validation', () => {
   it('trims required values while retaining the optional comment', () => {
     expect(
       warehouseFormSchema.parse({
-        code: ' WH-001 ',
         name: ' Main Warehouse ',
         address: ' 123 Commerce Ave ',
         comment: ' Primary stock location ',
       })
     ).toEqual({
-      code: 'WH-001',
       name: 'Main Warehouse',
       address: '123 Commerce Ave',
       comment: ' Primary stock location ',

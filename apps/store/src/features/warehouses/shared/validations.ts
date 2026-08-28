@@ -1,11 +1,6 @@
 import { z } from 'zod';
 import type { ValidationArgs } from '@/lib/utils/form/validation/types';
 
-export const warehouseCodeSchema = z
-  .string()
-  .trim()
-  .min(1, 'Warehouse code is required');
-
 export const warehouseNameSchema = z
   .string()
   .trim()
@@ -17,7 +12,6 @@ export const warehouseAddressSchema = z
   .min(1, 'Warehouse address is required');
 
 export const warehouseFormSchema = z.object({
-  code: warehouseCodeSchema,
   name: warehouseNameSchema,
   address: warehouseAddressSchema,
   comment: z.string(),
@@ -30,9 +24,6 @@ const getValidationMessage = (schema: z.ZodString, value: string) => {
 
   return result.success ? undefined : result.error.issues[0]?.message;
 };
-
-export const validateWarehouseCode = ({ value }: ValidationArgs<string>) =>
-  getValidationMessage(warehouseCodeSchema, value);
 
 export const validateWarehouseName = ({ value }: ValidationArgs<string>) =>
   getValidationMessage(warehouseNameSchema, value);

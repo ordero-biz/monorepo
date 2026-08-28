@@ -31,15 +31,12 @@ describe('CreateWarehouseDialog', () => {
     onOpenChangeMock.mockClear();
   });
 
-  it('requires code, name, and address before add is available', async () => {
+  it('requires name and address before add is available', async () => {
     const user = userEvent.setup();
 
     setup();
 
     const dialog = screen.getByRole('dialog', { name: 'Add warehouse' });
-    const codeField = within(dialog).getByRole('textbox', {
-      name: 'Code',
-    });
     const nameField = within(dialog).getByRole('textbox', {
       name: 'Name',
     });
@@ -52,7 +49,6 @@ describe('CreateWarehouseDialog', () => {
 
     expect(addButton).toBeDisabled();
 
-    await user.type(codeField, 'WH-001');
     await user.type(nameField, 'Main Warehouse');
     expect(addButton).toBeDisabled();
 
@@ -97,7 +93,6 @@ describe('CreateWarehouseDialog', () => {
       ok: true,
       data: {
         id: 1,
-        code: 'WH-001',
         name: 'Main Warehouse',
         address: '123 Commerce Ave',
         comment: 'Primary stock location',
@@ -109,10 +104,6 @@ describe('CreateWarehouseDialog', () => {
 
     const dialog = screen.getByRole('dialog', { name: 'Add warehouse' });
 
-    await user.type(
-      within(dialog).getByRole('textbox', { name: 'Code' }),
-      ' WH-001 '
-    );
     await user.type(
       within(dialog).getByRole('textbox', { name: 'Name' }),
       ' Main Warehouse '
@@ -129,7 +120,6 @@ describe('CreateWarehouseDialog', () => {
     await user.click(within(dialog).getByRole('button', { name: 'Publish' }));
 
     expect(createWarehouseMock).toHaveBeenCalledWith({
-      code: 'WH-001',
       name: 'Main Warehouse',
       address: '123 Commerce Ave',
       comment: 'Primary stock location',
@@ -151,7 +141,7 @@ describe('CreateWarehouseDialog', () => {
         status: 422,
         message: 'Warehouse creation failed.',
         fieldErrors: {
-          code: 'Warehouse code already exists.',
+          name: 'Warehouse name already exists.',
         },
       },
     });
@@ -159,11 +149,6 @@ describe('CreateWarehouseDialog', () => {
     const { onOpenChange } = setup();
 
     const dialog = screen.getByRole('dialog', { name: 'Add warehouse' });
-    const codeField = within(dialog).getByRole('textbox', {
-      name: 'Code',
-    });
-
-    await user.type(codeField, 'WH-001');
     await user.type(
       within(dialog).getByRole('textbox', { name: 'Name' }),
       'Main Warehouse'
@@ -177,18 +162,17 @@ describe('CreateWarehouseDialog', () => {
     );
 
     expect(createWarehouseMock).toHaveBeenCalledWith({
-      code: 'WH-001',
       name: 'Main Warehouse',
       address: '123 Commerce Ave',
       comment: '',
       status: WAREHOUSE_STATUS.DRAFT,
     });
     expect(
-      await within(dialog).findByText('Warehouse code already exists.')
+      await within(dialog).findByText('Warehouse name already exists.')
     ).toBeVisible();
-    expect(codeField).toHaveAccessibleDescription(
-      'Warehouse code already exists.'
-    );
+    expect(
+      within(dialog).getByRole('textbox', { name: 'Name' })
+    ).toHaveAccessibleDescription('Warehouse name already exists.');
     expect(
       await screen.findByRole('dialog', { name: 'Warehouse creation failed.' })
     ).toBeVisible();

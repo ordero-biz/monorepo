@@ -13,7 +13,6 @@ import { CLIENT_BACKEND_PATHS } from '../path';
 type WarehousesListResponse = PaginatedResponse<Warehouse>;
 
 type CreateWarehouseInput = {
-  code: string;
   name: string;
   address: string;
   comment: string;

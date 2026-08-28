@@ -13,7 +13,6 @@ import {
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
 import {
   validateWarehouseAddress,
-  validateWarehouseCode,
   validateWarehouseName,
 } from '../../shared/validations';
 import type { CreateWarehouseDialogFormContentProps } from './types';
@@ -25,37 +24,11 @@ export const CreateWarehouseDialogFormContent = ({
   <>
     <Dialog.Content>
       <div className="flex flex-col gap-[var(--space-2)]">
-          <form.Field
-              name="name"
-              validators={{
-                  onChange: validateWarehouseName,
-                  onSubmit: validateWarehouseName,
-              }}
-          >
-              {(field) => {
-                  const errorText = getFieldSubmitChangeErrorText(field.state.meta);
-
-                  return (
-                      <TextField
-                          errorText={errorText}
-                          invalid={Boolean(errorText)}
-                          label="Name"
-                          name={field.name}
-                          onBlur={field.handleBlur}
-                          onValueChange={field.handleChange}
-                          required
-                          size="s"
-                          value={field.state.value}
-                      />
-                  );
-              }}
-          </form.Field>
-
         <form.Field
-          name="code"
+          name="name"
           validators={{
-            onChange: validateWarehouseCode,
-            onSubmit: validateWarehouseCode,
+            onChange: validateWarehouseName,
+            onSubmit: validateWarehouseName,
           }}
         >
           {(field) => {
@@ -65,7 +38,7 @@ export const CreateWarehouseDialogFormContent = ({
               <TextField
                 errorText={errorText}
                 invalid={Boolean(errorText)}
-                label="Code"
+                label="Name"
                 name={field.name}
                 onBlur={field.handleBlur}
                 onValueChange={field.handleChange}
@@ -172,7 +145,6 @@ export const CreateWarehouseDialogFormContent = ({
       <form.Subscribe
         selector={(state) =>
           [
-            state.values.code,
             state.values.name,
             state.values.address,
             state.values.status,
@@ -180,11 +152,9 @@ export const CreateWarehouseDialogFormContent = ({
           ] as const
         }
       >
-        {([code, name, address, status, isSubmitting]) => (
+        {([name, address, status, isSubmitting]) => (
           <Button
-            disabled={
-              isSubmitting || !code.trim() || !name.trim() || !address.trim()
-            }
+            disabled={isSubmitting || !name.trim() || !address.trim()}
             type="submit"
           >
             {isSubmitting

@@ -12,7 +12,6 @@ export const submitUpdateWarehouse = async ({
 }: SubmitUpdateWarehouseArgs) => {
   const result = await updateWarehouse({
     warehouseId,
-    code: value.code.trim(),
     name: value.name.trim(),
     address: value.address.trim(),
     comment: value.comment.trim(),

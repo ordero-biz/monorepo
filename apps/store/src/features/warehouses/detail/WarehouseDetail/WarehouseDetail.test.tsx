@@ -22,7 +22,6 @@ const { setup } = prepareStoreSetup({
 
 const warehouse = {
   id: 1,
-  code: 'WH-001',
   name: 'Main Warehouse',
   address: '123 Commerce Ave',
   comment: 'Primary stock location',
@@ -42,7 +41,6 @@ describe('WarehouseDetail', () => {
       await screen.findByRole('heading', { name: 'Main Warehouse' })
     ).toBeVisible();
     expect(screen.getByText('Warehouse details')).toBeVisible();
-    expect(screen.getByText('WH-001')).toBeVisible();
     expect(screen.getByText('123 Commerce Ave')).toBeVisible();
     expect(screen.getByText('Primary stock location')).toBeVisible();
   });

@@ -9,32 +9,22 @@ import type { Warehouse } from '@/lib/domain/warehouses';
 
 export const columns: DataTableColumnDef<Warehouse>[] = [
   {
-    accessorKey: 'code',
+    accessorKey: 'name',
     cell: ({ row }) => (
       <DataTableCell>
         <Link
           className="w-full font-600 rounded-[var(--radius-sm)] outline-none transition-colors hover:text-[var(--color-text-body)] hover:underline"
           href={getWarehouseDetailRoute(row.original.id)}
         >
-          {row.original.code}
+          {row.original.name}
         </Link>
       </DataTableCell>
     ),
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Code" />
-    ),
-    meta: {
-      width: '18%',
-    },
-  },
-  {
-    accessorKey: 'name',
-    cell: ({ row }) => <DataTableCell>{row.original.name}</DataTableCell>,
-    header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Name" />
     ),
     meta: {
-      width: '24%',
+      width: '32%',
     },
   },
   {
@@ -44,7 +34,7 @@ export const columns: DataTableColumnDef<Warehouse>[] = [
       <DataTableColumnHeader column={column} title="Address" />
     ),
     meta: {
-      width: '34%',
+      width: '38%',
       wrap: 'wrap',
     },
   },
@@ -55,7 +45,7 @@ export const columns: DataTableColumnDef<Warehouse>[] = [
       <DataTableColumnHeader column={column} title="Comment" />
     ),
     meta: {
-      width: '24%',
+      width: '30%',
       wrap: 'wrap',
     },
   },

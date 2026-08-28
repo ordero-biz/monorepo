@@ -64,7 +64,6 @@ describe('WarehousesList', () => {
           content: [
             {
               id: 1,
-              code: 'WH-001',
               name: 'Main Warehouse',
               address: '123 Commerce Ave',
               comment: 'Primary stock location',
@@ -100,7 +99,6 @@ describe('WarehousesList', () => {
         content: [
           {
             id: 1,
-            code: 'WH-001',
             name: 'Main Warehouse',
             address: '123 Commerce Ave',
             comment: 'Primary stock location',
@@ -120,8 +118,9 @@ describe('WarehousesList', () => {
     expect(
       await screen.findByRole('table', { name: 'Warehouses list' })
     ).toBeVisible();
-    expect(screen.getByText('WH-001')).toBeVisible();
-    expect(screen.getByText('Main Warehouse')).toBeVisible();
+    expect(
+      screen.getByRole('link', { name: 'Main Warehouse' })
+    ).toHaveAttribute('href', '/products/warehouse/1');
     expect(screen.getByText('123 Commerce Ave')).toBeVisible();
     expect(screen.getByText('Primary stock location')).toBeVisible();
   });
@@ -162,7 +161,6 @@ describe('WarehousesList', () => {
         content: [
           {
             id: 2,
-            code: 'WH-002',
             name: 'Overflow Warehouse',
             address: '124 Commerce Ave',
             comment: 'Overflow stock location',
@@ -179,7 +177,7 @@ describe('WarehousesList', () => {
 
     setup({
       paginationInput: {
-        page: 1,
+        page: 2,
         size: 1,
       },
     });
