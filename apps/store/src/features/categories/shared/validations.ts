@@ -1,6 +1,7 @@
 import { z } from 'zod';
+import { CATEGORY_STATUS } from '@/lib/domain/categories/constants';
+import { getValidationMessage } from '@/lib/utils/form/validation/message';
 import type { ValidationArgs } from '@/lib/utils/form/validation/types';
-import {CATEGORY_STATUS} from "@/lib/domain/categories/constants";
 
 export const categoryNameSchema = z
   .string()
@@ -9,28 +10,25 @@ export const categoryNameSchema = z
 
 export const categoryParentIdSchema = z.string().nullable();
 
-export const categoryStatusSchema = z.enum([CATEGORY_STATUS.DRAFT, CATEGORY_STATUS.ACTIVE], {
-  error: 'Category status is required',
-});
+export const categoryStatusSchema = z.enum(
+  [CATEGORY_STATUS.DRAFT, CATEGORY_STATUS.ACTIVE],
+  {
+    error: 'Category status is required',
+  }
+);
 
 export const validateCategoryName = ({ value }: ValidationArgs<string>) => {
-  const result = categoryNameSchema.safeParse(value);
-
-  return result.success ? undefined : result.error.issues[0]?.message;
+  return getValidationMessage(categoryNameSchema, value);
 };
 
 export const validateCategoryParentId = ({
   value,
 }: ValidationArgs<string | null>) => {
-  const result = categoryParentIdSchema.safeParse(value);
-
-  return result.success ? undefined : result.error.issues[0]?.message;
+  return getValidationMessage(categoryParentIdSchema, value);
 };
 
 export const validateCategoryStatus = ({
   value,
 }: ValidationArgs<z.infer<typeof categoryStatusSchema>>) => {
-  const result = categoryStatusSchema.safeParse(value);
-
-  return result.success ? undefined : result.error.issues[0]?.message;
+  return getValidationMessage(categoryStatusSchema, value);
 };

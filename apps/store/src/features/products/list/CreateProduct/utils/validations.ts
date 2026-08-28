@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { getValidationMessage } from '@/lib/utils/form/validation/message';
 import type { ValidationArgs } from '@/lib/utils/form/validation/types';
 import { PRODUCT_GENERATION_MODE } from '../constants';
 import type { CreateProductValues, CreateProductVariantValues } from '../types';
@@ -49,12 +50,6 @@ type ProductVariantFieldErrors = Partial<
 type ProductTemplateField = 'attributes' | 'category' | 'productName';
 
 type ProductTemplateFieldErrors = Partial<Record<ProductTemplateField, string>>;
-
-const getValidationMessage = (schema: z.ZodString, value: string) => {
-  const result = schema.safeParse(value);
-
-  return result.success ? undefined : result.error.issues[0]?.message;
-};
 
 const getDuplicateVariantFieldIndexes = ({
   fieldName,
@@ -166,14 +161,13 @@ const addProductVariantAttributeValueErrors = ({
     const fieldPath = `productVariants[${index}].attributeValueIds` as const;
 
     if (requireAttributeValueIds) {
-      const result = productVariantAttributeValueIdsSchema.safeParse(
+      const validationMessage = getValidationMessage(
+        productVariantAttributeValueIdsSchema,
         productVariant.attributeValueIds
       );
 
-      if (!result.success) {
-        errors[fieldPath] =
-          result.error.issues[0]?.message ??
-          'Select at least one attribute value';
+      if (validationMessage) {
+        errors[fieldPath] = validationMessage;
         return;
       }
     }
@@ -185,17 +179,13 @@ const addProductVariantAttributeValueErrors = ({
 };
 
 export const validateProductName = ({ value }: ValidationArgs<string>) => {
-  const result = productNameSchema.safeParse(value);
-
-  return result.success ? undefined : result.error.issues[0]?.message;
+  return getValidationMessage(productNameSchema, value);
 };
 
 export const validateProductCategory = ({
   value,
 }: ValidationArgs<string | null>) => {
-  const result = productCategorySchema.safeParse(value);
-
-  return result.success ? undefined : result.error.issues[0]?.message;
+  return getValidationMessage(productCategorySchema, value);
 };
 
 export const validateProductTemplate = ({

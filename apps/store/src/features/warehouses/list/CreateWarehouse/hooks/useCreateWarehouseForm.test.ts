@@ -57,7 +57,6 @@ describe('useCreateWarehouseForm', () => {
       ok: true,
       data: {
         id: 1,
-        code: 'WH-001',
         name: 'Main Warehouse',
         address: '123 Commerce Ave',
         comment: 'Primary stock location',
@@ -79,7 +78,7 @@ describe('useCreateWarehouseForm', () => {
       ok: false,
       error: {
         fieldErrors: {
-          code: 'Warehouse code already exists.',
+          name: 'Warehouse name already exists.',
         },
         formError: 'Warehouse creation failed.',
       },

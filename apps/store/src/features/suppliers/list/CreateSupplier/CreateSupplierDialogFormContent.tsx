@@ -187,7 +187,7 @@ export const CreateSupplierDialogFormContent = ({
           }
         >
           {([isSubmitting, status]) => (
-            <Button type="submit">
+            <Button disabled={isSubmitting} type="submit">
               {isSubmitting
                 ? status === SUPPLIER_STATUS.DRAFT
                   ? 'Saving...'

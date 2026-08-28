@@ -131,7 +131,9 @@ export const UpdateSupplierDialogFormContent = ({
       <Dialog.Footer>
         <form.Subscribe selector={(state) => state.isSubmitting}>
           {(isSubmitting) => (
-            <Button type="submit">{isSubmitting ? 'Saving...' : 'Save'}</Button>
+            <Button disabled={isSubmitting} type="submit">
+              {isSubmitting ? 'Saving...' : 'Save'}
+            </Button>
           )}
         </form.Subscribe>
       </Dialog.Footer>

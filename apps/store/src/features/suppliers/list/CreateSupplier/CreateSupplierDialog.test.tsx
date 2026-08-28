@@ -152,4 +152,45 @@ describe('CreateSupplierDialog', () => {
     expect(screen.getByRole('dialog', { name: 'Add supplier' })).toBeVisible();
     expect(onOpenChange).not.toHaveBeenCalledWith(false);
   });
+
+  it('prevents another save while creation is in flight', async () => {
+    let resolveCreate:
+      | ((value: Awaited<ReturnType<typeof createSupplier>>) => void)
+      | undefined;
+    createSupplierMock.mockReturnValue(
+      new Promise((resolve) => {
+        resolveCreate = resolve;
+      })
+    );
+    const user = userEvent.setup();
+
+    setup();
+
+    const dialog = screen.getByRole('dialog', { name: 'Add supplier' });
+    const nameField = within(dialog).getByRole('textbox', { name: 'Name' });
+    const saveButton = within(dialog).getByRole('button', {
+      name: 'Save draft',
+    });
+
+    await user.type(nameField, 'Fresh Farms');
+    await user.click(saveButton);
+
+    expect(saveButton).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Saving...' })).toBeVisible();
+
+    resolveCreate?.({
+      ok: true,
+      data: {
+        id: 1,
+        name: 'Fresh Farms',
+        status: SUPPLIER_STATUS.DRAFT,
+        email: null,
+        phone: null,
+        address: null,
+        comment: null,
+      },
+    });
+
+    await screen.findByRole('button', { name: 'Save draft' });
+  });
 });

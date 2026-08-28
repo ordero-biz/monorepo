@@ -1,6 +1,6 @@
 import { Button, Dialog, TextField } from '@ordero/ui';
-import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
 import { CategoriesAsyncCombobox } from '@/features/categories';
+import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
 import {
   validateCategoryName,
   validateCategoryParentId,
@@ -82,7 +82,9 @@ export const UpdateCategoryDialogFormContent = ({
       <Dialog.Footer>
         <form.Subscribe selector={(state) => state.isSubmitting}>
           {(isSubmitting) => (
-            <Button type="submit">{isSubmitting ? 'Saving...' : 'Save'}</Button>
+            <Button disabled={isSubmitting} type="submit">
+              {isSubmitting ? 'Saving...' : 'Save'}
+            </Button>
           )}
         </form.Subscribe>
       </Dialog.Footer>

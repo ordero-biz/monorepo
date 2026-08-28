@@ -227,4 +227,39 @@ describe('UpdateSupplierDialog', () => {
     );
     expect(onOpenChange).toHaveBeenCalledWith(false);
   });
+
+  it('prevents another save while the update is in flight', async () => {
+    let resolveUpdate:
+      | ((value: Awaited<ReturnType<typeof updateSupplier>>) => void)
+      | undefined;
+    updateSupplierMock.mockReturnValue(
+      new Promise((resolve) => {
+        resolveUpdate = resolve;
+      })
+    );
+    const user = userEvent.setup();
+
+    setup();
+
+    const dialog = screen.getByRole('dialog', { name: 'Edit supplier' });
+    const nameField = within(dialog).getByRole('textbox', { name: 'Name' });
+    const saveButton = within(dialog).getByRole('button', { name: 'Save' });
+
+    await user.clear(nameField);
+    await user.type(nameField, 'Fresh Farms Updated');
+    await user.click(saveButton);
+
+    expect(saveButton).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Saving...' })).toBeVisible();
+
+    resolveUpdate?.({
+      ok: true,
+      data: {
+        ...supplier,
+        name: 'Fresh Farms Updated',
+      },
+    });
+
+    await screen.findByRole('button', { name: 'Save' });
+  });
 });
