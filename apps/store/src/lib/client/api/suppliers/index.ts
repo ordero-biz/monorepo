@@ -15,10 +15,10 @@ type SuppliersListResponse = PaginatedResponse<Supplier>;
 export type CreateSupplierData = {
   name: string;
   status: SupplierStatus;
-  email?: string;
-  phone?: string;
-  address?: string;
-  comment?: string;
+  email?: string | null;
+  phone?: string | null;
+  address?: string | null;
+  comment?: string | null;
 };
 
 export type UpdateSupplierFieldData = Partial<CreateSupplierData>;

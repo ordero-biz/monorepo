@@ -10,10 +10,10 @@ type GetUpdateChangesArgs = {
 
 const normalizeUpdateSupplierFormData = (data: UpdateSupplierFormValues) => ({
   name: data.name.trim(),
-  email: data.email?.trim() ?? '',
-  phone: data.phone?.trim() ?? '',
-  address: data.address?.trim() ?? '',
-  comment: data.comment?.trim() ?? '',
+  email: data.email?.trim() || null,
+  phone: data.phone?.trim() || null,
+  address: data.address?.trim() || null,
+  comment: data.comment?.trim() || null,
 });
 
 export const getSupplierUpdateChanges = ({

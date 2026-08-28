@@ -39,4 +39,16 @@ describe('getCategoryUpdateChanges', () => {
       })
     ).toBeUndefined();
   });
+
+  it('sends null when clearing the parent category', () => {
+    expect(
+      getCategoryUpdateChanges({
+        category,
+        formValue: {
+          name: 'Sneakers',
+          parentId: null,
+        },
+      })
+    ).toEqual({ parentId: null });
+  });
 });

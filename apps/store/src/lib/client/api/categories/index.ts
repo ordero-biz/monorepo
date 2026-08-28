@@ -22,7 +22,7 @@ export const getCategories = (input?: PaginationSearchInput) =>
 
 export type CreateCategoryData = {
   name: string;
-  parentId: number | null;
+  parentId?: number | null;
   status: CategoryStatus;
 };
 

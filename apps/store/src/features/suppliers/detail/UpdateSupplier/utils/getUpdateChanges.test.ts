@@ -76,6 +76,6 @@ describe('getSupplierUpdateChanges', () => {
           comment: 'Preferred produce supplier',
         },
       })
-    ).toEqual({ email: '' });
+    ).toEqual({ email: null });
   });
 });

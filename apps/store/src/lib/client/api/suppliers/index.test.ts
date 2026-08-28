@@ -354,6 +354,34 @@ describe('supplier client helpers', () => {
     );
   });
 
+  it('sends null when clearing a supplier contact field', async () => {
+    const fetchMock = vi.mocked(fetch);
+
+    fetchMock.mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          id: 1,
+          name: 'Fresh Farms',
+          status: SUPPLIER_STATUS.DRAFT,
+          email: null,
+        })
+      )
+    );
+
+    await updateSupplier({
+      supplierId: 1,
+      email: null,
+    });
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/backend/api/v1/suppliers/1',
+      expect.objectContaining({
+        method: 'PATCH',
+        body: JSON.stringify({ email: null }),
+      })
+    );
+  });
+
   it('returns normalized failures from the update supplier route', async () => {
     vi.mocked(fetch).mockResolvedValue(
       new Response(
