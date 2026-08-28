@@ -1,35 +1,13 @@
 import {
-  Chip,
   DataTableCell,
   type DataTableColumnDef,
   DataTableColumnHeader,
 } from '@ordero/ui';
 import Link from 'next/link';
 import { getCategoryDetailRoute } from '@/lib/client/routes';
-import { CATEGORY_STATUS } from '@/lib/domain/categories/constants';
 import type { Category } from '@/lib/domain/categories/types';
 import { formatDate } from '@/lib/utils/formatDate';
-
-const statusLabels = {
-  ACTIVE: 'Active',
-  DRAFT: 'Draft',
-} as const;
-
-const getStatusChip = (status?: Category['status']) => {
-  if (!status) {
-    return null;
-  }
-
-  return (
-    <Chip
-      color={status === CATEGORY_STATUS.ACTIVE ? 'primary' : 'warning'}
-      size="s"
-      variant="soft"
-    >
-      {statusLabels[status]}
-    </Chip>
-  );
-};
+import { CategoryStatusChip } from '../../shared/CategoryStatusChip';
 
 export const columns: DataTableColumnDef<Category>[] = [
   {
@@ -54,7 +32,9 @@ export const columns: DataTableColumnDef<Category>[] = [
   {
     accessorKey: 'status',
     cell: ({ row }) => (
-      <DataTableCell>{getStatusChip(row.original.status)}</DataTableCell>
+      <DataTableCell>
+        <CategoryStatusChip status={row.original.status} />
+      </DataTableCell>
     ),
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Status" />
@@ -91,7 +71,7 @@ export const columns: DataTableColumnDef<Category>[] = [
     accessorFn: (row) => row.parentCategory?.status ?? '',
     cell: ({ row }) => (
       <DataTableCell>
-        {getStatusChip(row.original.parentCategory?.status)}
+        <CategoryStatusChip status={row.original.parentCategory?.status} />
       </DataTableCell>
     ),
     header: ({ column }) => (

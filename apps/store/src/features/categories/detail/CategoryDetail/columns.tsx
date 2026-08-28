@@ -1,19 +1,13 @@
 import {
-  Chip,
   DataTableCell,
   type DataTableColumnDef,
   DataTableColumnHeader,
 } from '@ordero/ui';
 import Link from 'next/link';
 import { getCategoryDetailRoute } from '@/lib/client/routes';
-import { CATEGORY_STATUS } from '@/lib/domain/categories/constants';
 import type { Category } from '@/lib/domain/categories/types';
 import { formatDate } from '@/lib/utils/formatDate';
-
-const statusLabels = {
-  ACTIVE: 'Active',
-  DRAFT: 'Draft',
-} as const;
+import { CategoryStatusChip } from '../../shared/CategoryStatusChip';
 
 export const columns: DataTableColumnDef<Category>[] = [
   {
@@ -40,17 +34,7 @@ export const columns: DataTableColumnDef<Category>[] = [
     cell: ({ row }) =>
       row.original.status ? (
         <DataTableCell>
-          <Chip
-            color={
-              row.original.status === CATEGORY_STATUS.ACTIVE
-                ? 'primary'
-                : 'warning'
-            }
-            size="s"
-            variant="soft"
-          >
-            {statusLabels[row.original.status]}
-          </Chip>
+          <CategoryStatusChip status={row.original.status} />
         </DataTableCell>
       ) : null,
     header: ({ column }) => (

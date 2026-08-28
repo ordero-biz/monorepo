@@ -1,17 +1,13 @@
 'use client';
 
-import { Chip, Menu, PageHeader, Typography } from '@ordero/ui';
+import { Menu, PageHeader, Typography } from '@ordero/ui';
 import { EllipsisVertical, Pencil } from 'lucide-react';
 import { useState } from 'react';
 import { UpdateCategoryDialog } from '@/features/categories/detail/UpdateCategory';
 import { CATEGORY_STATUS } from '@/lib/domain/categories/constants';
+import { CategoryStatusChip } from '../../shared/CategoryStatusChip';
 import { ActivateCategoryDialogTrigger } from './ActivateCategoryDialogTrigger';
 import type { CategoryDetailHeaderProps } from './types';
-
-const statusLabels = {
-  ACTIVE: 'Active',
-  DRAFT: 'Draft',
-} as const;
 
 export const CategoryDetailHeader = ({
   onUpdated,
@@ -24,15 +20,7 @@ export const CategoryDetailHeader = ({
     <PageHeader.Root>
       <PageHeader.Left>
         <Typography variant="h5">{category.name}</Typography>
-        {category.status ? (
-          <Chip
-            color={isCategoryActive ? 'primary' : 'warning'}
-            size="s"
-            variant="soft"
-          >
-            {statusLabels[category.status]}
-          </Chip>
-        ) : null}
+        <CategoryStatusChip status={category.status} />
       </PageHeader.Left>
 
       {!isCategoryActive ? (

@@ -78,6 +78,21 @@ values, compare them, and pass only changed fields to the API helper. When no
 normalized fields changed, do not send a PATCH; let the workflow close or reset
 through its explicit no-op behavior.
 
+For optional text fields, define the transport meaning of an empty form value
+at the feature boundary:
+
+- On create, omit a blank optional value unless the endpoint explicitly
+  requires `null`.
+- On update, send `null` when a previously populated optional value is cleared;
+  omitting that field would preserve the existing backend value.
+- Treat blank and absent form values consistently while comparing normalized
+  data, so an unchanged empty value does not create a PATCH.
+
+Create and update may need different payload assembly because omission and
+clearing have different meanings. Keep those command-specific rules local; only
+extract a shared field normalizer when the same pure normalization rule is used
+by several workflows.
+
 ---
 
 ## Validation & UX Model

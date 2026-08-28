@@ -1,18 +1,24 @@
+import { SUPPLIER_STATUS } from '@/lib/domain/suppliers/constants';
+import type { SupplierStatus } from '@/lib/domain/suppliers/types';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
-import { Button, Dialog, TextField } from '@/ui/index';
-import type { SupplierFormDialogContentProps } from './types';
 import {
-  validateSupplierAddress,
+  Button,
+  Dialog,
+  Radio,
+  RadioGroup,
+  TextField,
+  Typography,
+} from '@/ui/index';
+import {
   validateSupplierEmail,
   validateSupplierName,
-  validateSupplierPhone,
-} from './validations';
+  validateSupplierStatus,
+} from '../../shared/validations';
+import type { CreateSupplierDialogFormContentProps } from './types';
 
-export const SupplierFormDialogContent = ({
+export const CreateSupplierDialogFormContent = ({
   form,
-  pendingText,
-  submitText,
-}: SupplierFormDialogContentProps) => {
+}: CreateSupplierDialogFormContentProps) => {
   return (
     <>
       <Dialog.Content>
@@ -44,6 +50,53 @@ export const SupplierFormDialogContent = ({
           </form.Field>
 
           <form.Field
+            name="status"
+            validators={{
+              onChange: validateSupplierStatus,
+              onSubmit: validateSupplierStatus,
+            }}
+          >
+            {(field) => {
+              const errorText = getFieldSubmitChangeErrorText(field.state.meta);
+
+              return (
+                <RadioGroup
+                  errorText={errorText}
+                  invalid={Boolean(errorText)}
+                  label="Supplier status"
+                  name={field.name}
+                  onValueChange={(value) =>
+                    field.handleChange(value as SupplierStatus)
+                  }
+                  orientation="vertical"
+                  required
+                  value={field.state.value}
+                >
+                  <Radio align="start" value={SUPPLIER_STATUS.DRAFT}>
+                    <div className="flex flex-col">
+                      Draft
+                      <Typography color="text-secondary" variant="caption">
+                        Editable only. Cannot be used in supplies or tracked in
+                        analytics. Can be activated later
+                      </Typography>
+                    </div>
+                  </Radio>
+                  <Radio align="start" value={SUPPLIER_STATUS.ACTIVE}>
+                    <div className="flex flex-col">
+                      Active
+                      <Typography color="text-secondary" variant="caption">
+                        Fully functional. Can be used in supplies and tracked in
+                        analytics. Name and status cannot be edited after
+                        publishing
+                      </Typography>
+                    </div>
+                  </Radio>
+                </RadioGroup>
+              );
+            }}
+          </form.Field>
+
+          <form.Field
             name="email"
             validators={{
               onChange: validateSupplierEmail,
@@ -61,7 +114,6 @@ export const SupplierFormDialogContent = ({
                   name={field.name}
                   onBlur={field.handleBlur}
                   onValueChange={field.handleChange}
-                  required
                   size="s"
                   value={field.state.value}
                 />
@@ -69,13 +121,7 @@ export const SupplierFormDialogContent = ({
             }}
           </form.Field>
 
-          <form.Field
-            name="phone"
-            validators={{
-              onChange: validateSupplierPhone,
-              onSubmit: validateSupplierPhone,
-            }}
-          >
+          <form.Field name="phone">
             {(field) => {
               const errorText = getFieldSubmitChangeErrorText(field.state.meta);
 
@@ -87,7 +133,6 @@ export const SupplierFormDialogContent = ({
                   name={field.name}
                   onBlur={field.handleBlur}
                   onValueChange={field.handleChange}
-                  required
                   size="s"
                   value={field.state.value}
                 />
@@ -95,13 +140,7 @@ export const SupplierFormDialogContent = ({
             }}
           </form.Field>
 
-          <form.Field
-            name="address"
-            validators={{
-              onChange: validateSupplierAddress,
-              onSubmit: validateSupplierAddress,
-            }}
-          >
+          <form.Field name="address">
             {(field) => {
               const errorText = getFieldSubmitChangeErrorText(field.state.meta);
 
@@ -113,7 +152,6 @@ export const SupplierFormDialogContent = ({
                   name={field.name}
                   onBlur={field.handleBlur}
                   onValueChange={field.handleChange}
-                  required
                   size="s"
                   value={field.state.value}
                 />
@@ -134,7 +172,7 @@ export const SupplierFormDialogContent = ({
                   onBlur={field.handleBlur}
                   onValueChange={field.handleChange}
                   size="s"
-                  value={field.state.value}
+                  value={field.state.value ?? ''}
                 />
               );
             }}
@@ -145,27 +183,18 @@ export const SupplierFormDialogContent = ({
       <Dialog.Footer>
         <form.Subscribe
           selector={(state) =>
-            [
-              state.values.name,
-              state.values.email,
-              state.values.phone,
-              state.values.address,
-              state.isSubmitting,
-            ] as const
+            [state.isSubmitting, state.values.status] as const
           }
         >
-          {([name, email, phone, address, isSubmitting]) => (
-            <Button
-              disabled={
-                isSubmitting ||
-                !name.trim() ||
-                !email.trim() ||
-                !phone.trim() ||
-                !address.trim()
-              }
-              type="submit"
-            >
-              {isSubmitting ? pendingText : submitText}
+          {([isSubmitting, status]) => (
+            <Button type="submit">
+              {isSubmitting
+                ? status === SUPPLIER_STATUS.DRAFT
+                  ? 'Saving...'
+                  : 'Publishing...'
+                : status === SUPPLIER_STATUS.DRAFT
+                  ? 'Save draft'
+                  : 'Publish'}
             </Button>
           )}
         </form.Subscribe>
