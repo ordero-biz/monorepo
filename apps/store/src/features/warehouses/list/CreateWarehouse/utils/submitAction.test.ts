@@ -77,4 +77,28 @@ describe('submitCreateWarehouse', () => {
       },
     });
   });
+
+  it('omits a blank optional address from the create request', async () => {
+    createWarehouseMock.mockResolvedValue({
+      ok: true,
+      data: {
+        id: 1,
+        name: 'Main Warehouse',
+        comment: '',
+      },
+    });
+
+    await submitCreateWarehouse({
+      name: 'Main Warehouse',
+      address: '',
+      comment: '',
+      status: WAREHOUSE_STATUS.DRAFT,
+    });
+
+    expect(createWarehouseMock).toHaveBeenCalledWith({
+      name: 'Main Warehouse',
+      comment: '',
+      status: WAREHOUSE_STATUS.DRAFT,
+    });
+  });
 });

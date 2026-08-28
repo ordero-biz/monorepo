@@ -226,7 +226,7 @@ describe('CreateCategoryDialog', () => {
 
     await user.click(createButton);
 
-    expect(createButton).toBeEnabled();
+    expect(createButton).toBeDisabled();
     expect(screen.getByRole('button', { name: 'Publishing...' })).toBeVisible();
 
     resolveCreate?.({

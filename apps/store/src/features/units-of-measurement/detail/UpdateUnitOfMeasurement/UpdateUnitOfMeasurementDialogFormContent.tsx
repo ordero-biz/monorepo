@@ -1,25 +1,22 @@
 import { Button, Dialog, TextField } from '@ordero/ui';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
-import {
-  validateSupplierEmail,
-  validateSupplierName,
-} from '../../shared/validations';
-import type { UpdateSupplierDialogFormContentProps } from './types';
+import { validateUnitOfMeasurementName } from '../../shared/validations';
+import type { UpdateUnitOfMeasurementDialogFormContentProps } from './types';
 
-export const UpdateSupplierDialogFormContent = ({
+export const UpdateUnitOfMeasurementDialogFormContent = ({
   form,
-  isSupplierActive,
-}: UpdateSupplierDialogFormContentProps) => {
+  isUnitOfMeasurementActive,
+}: UpdateUnitOfMeasurementDialogFormContentProps) => {
   return (
     <>
       <Dialog.Content>
         <div className="flex flex-col gap-[var(--space-2)]">
-          {!isSupplierActive ? (
+          {!isUnitOfMeasurementActive ? (
             <form.Field
               name="name"
               validators={{
-                onChange: validateSupplierName,
-                onSubmit: validateSupplierName,
+                onChange: validateUnitOfMeasurementName,
+                onSubmit: validateUnitOfMeasurementName,
               }}
             >
               {(field) => {
@@ -44,59 +41,16 @@ export const UpdateSupplierDialogFormContent = ({
             </form.Field>
           ) : null}
 
-          <form.Field
-            name="email"
-            validators={{
-              onChange: validateSupplierEmail,
-              onSubmit: validateSupplierEmail,
-            }}
-          >
+          <form.Field name="symbol">
             {(field) => {
               const errorText = getFieldSubmitChangeErrorText(field.state.meta);
 
               return (
                 <TextField
                   errorText={errorText}
+                  helperText="Short abbreviation for the unit (e.g., kg, cm)"
                   invalid={Boolean(errorText)}
-                  label="Email"
-                  name={field.name}
-                  onBlur={field.handleBlur}
-                  onValueChange={field.handleChange}
-                  size="s"
-                  value={field.state.value ?? ''}
-                />
-              );
-            }}
-          </form.Field>
-
-          <form.Field name="phone">
-            {(field) => {
-              const errorText = getFieldSubmitChangeErrorText(field.state.meta);
-
-              return (
-                <TextField
-                  errorText={errorText}
-                  invalid={Boolean(errorText)}
-                  label="Phone"
-                  name={field.name}
-                  onBlur={field.handleBlur}
-                  onValueChange={field.handleChange}
-                  size="s"
-                  value={field.state.value ?? ''}
-                />
-              );
-            }}
-          </form.Field>
-
-          <form.Field name="address">
-            {(field) => {
-              const errorText = getFieldSubmitChangeErrorText(field.state.meta);
-
-              return (
-                <TextField
-                  errorText={errorText}
-                  invalid={Boolean(errorText)}
-                  label="Address"
+                  label="Symbol"
                   name={field.name}
                   onBlur={field.handleBlur}
                   onValueChange={field.handleChange}

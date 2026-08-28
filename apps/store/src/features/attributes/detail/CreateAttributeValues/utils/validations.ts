@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { ATTRIBUTE_VALUE_STATUS } from '@/lib/domain/attributes/constants';
+import { getValidationMessage } from '@/lib/utils/form/validation/message';
 import type { ValidationArgs } from '@/lib/utils/form/validation/types';
 
 export const attributeValueNameSchema = z
@@ -34,15 +35,11 @@ export type CreateAttributeValuesFormValues = z.infer<
 export const validateAttributeValueName = ({
   value,
 }: ValidationArgs<string>) => {
-  const result = attributeValueNameSchema.safeParse(value);
-
-  return result.success ? undefined : result.error.issues[0]?.message;
+  return getValidationMessage(attributeValueNameSchema, value);
 };
 
 export const validateAttributeValueStatus = ({
   value,
 }: ValidationArgs<AttributeValueFormValue['status']>) => {
-  const result = attributeValueStatusSchema.safeParse(value);
-
-  return result.success ? undefined : result.error.issues[0]?.message;
+  return getValidationMessage(attributeValueStatusSchema, value);
 };

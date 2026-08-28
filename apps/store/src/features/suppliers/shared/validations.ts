@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { SUPPLIER_STATUS } from '@/lib/domain/suppliers/constants';
+import { getValidationMessage } from '@/lib/utils/form/validation/message';
 import type { ValidationArgs } from '@/lib/utils/form/validation/types';
 
 export const supplierNameSchema = z
@@ -29,23 +30,17 @@ export const supplierStatusSchema = z.enum([
 ]);
 
 export const validateSupplierName = ({ value }: ValidationArgs<string>) => {
-  const result = supplierNameSchema.safeParse(value);
-
-  return result.success ? undefined : result.error.issues[0]?.message;
+  return getValidationMessage(supplierNameSchema, value);
 };
 
 export const validateSupplierStatus = ({
   value,
 }: ValidationArgs<z.infer<typeof supplierStatusSchema>>) => {
-  const result = supplierStatusSchema.safeParse(value);
-
-  return result.success ? undefined : result.error.issues[0]?.message;
+  return getValidationMessage(supplierStatusSchema, value);
 };
 
 export const validateSupplierEmail = ({
   value,
 }: ValidationArgs<z.infer<typeof supplierEmailSchema>>) => {
-  const result = supplierEmailSchema.safeParse(value);
-
-  return result.success ? undefined : result.error.issues[0]?.message;
+  return getValidationMessage(supplierEmailSchema, value);
 };

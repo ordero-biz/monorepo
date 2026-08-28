@@ -5,6 +5,6 @@ export const getWarehouseDefaultValues = (
   warehouse: Warehouse
 ): WarehouseFormValues => ({
   name: warehouse.name,
-  address: warehouse.address,
+  address: warehouse.address ?? undefined,
   comment: warehouse.comment,
 });

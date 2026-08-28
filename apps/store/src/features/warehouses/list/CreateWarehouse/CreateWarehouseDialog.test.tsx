@@ -47,9 +47,6 @@ describe('CreateWarehouseDialog', () => {
     expect(
       await within(dialog).findByText('Warehouse name is required')
     ).toBeVisible();
-    expect(
-      within(dialog).getByText('Warehouse address is required')
-    ).toBeVisible();
     expect(createWarehouseMock).not.toHaveBeenCalled();
   });
 
@@ -71,6 +68,23 @@ describe('CreateWarehouseDialog', () => {
 
     expect(
       within(dialog).getByRole('button', { name: 'Publish' })
+    ).toBeVisible();
+  });
+
+  it('explains the effects of each warehouse status', () => {
+    setup();
+
+    const dialog = screen.getByRole('dialog', { name: 'Add warehouse' });
+
+    expect(
+      within(dialog).getByText(
+        'Editable only. Cannot be used in supplies or tracked in analytics. Can be activated later'
+      )
+    ).toBeVisible();
+    expect(
+      within(dialog).getByText(
+        'Fully functional. Can be used in supplies and tracked in analytics. Name and status cannot be edited after publishing'
+      )
     ).toBeVisible();
   });
 
@@ -140,17 +154,12 @@ describe('CreateWarehouseDialog', () => {
       within(dialog).getByRole('textbox', { name: 'Name' }),
       'Main Warehouse'
     );
-    await user.type(
-      within(dialog).getByRole('textbox', { name: 'Address' }),
-      '123 Commerce Ave'
-    );
     await user.click(
       within(dialog).getByRole('button', { name: 'Save draft' })
     );
 
     expect(createWarehouseMock).toHaveBeenCalledWith({
       name: 'Main Warehouse',
-      address: '123 Commerce Ave',
       comment: '',
       status: WAREHOUSE_STATUS.DRAFT,
     });

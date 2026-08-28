@@ -1,6 +1,3 @@
-import { SUPPLIER_STATUS } from '@/lib/domain/suppliers/constants';
-import type { SupplierStatus } from '@/lib/domain/suppliers/types';
-import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
 import {
   Button,
   Dialog,
@@ -8,17 +5,19 @@ import {
   RadioGroup,
   TextField,
   Typography,
-} from '@/ui/index';
+} from '@ordero/ui';
+import { UNIT_OF_MEASUREMENT_STATUS } from '@/lib/domain/units-of-measurement/constants';
+import type { UnitOfMeasurementStatus } from '@/lib/domain/units-of-measurement/types';
+import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
 import {
-  validateSupplierEmail,
-  validateSupplierName,
-  validateSupplierStatus,
+  validateUnitOfMeasurementName,
+  validateUnitOfMeasurementStatus,
 } from '../../shared/validations';
-import type { CreateSupplierDialogFormContentProps } from './types';
+import type { CreateUnitOfMeasurementDialogFormContentProps } from './types';
 
-export const CreateSupplierDialogFormContent = ({
+export const CreateUnitOfMeasurementDialogFormContent = ({
   form,
-}: CreateSupplierDialogFormContentProps) => {
+}: CreateUnitOfMeasurementDialogFormContentProps) => {
   return (
     <>
       <Dialog.Content>
@@ -26,8 +25,8 @@ export const CreateSupplierDialogFormContent = ({
           <form.Field
             name="name"
             validators={{
-              onChange: validateSupplierName,
-              onSubmit: validateSupplierName,
+              onChange: validateUnitOfMeasurementName,
+              onSubmit: validateUnitOfMeasurementName,
             }}
           >
             {(field) => {
@@ -52,8 +51,8 @@ export const CreateSupplierDialogFormContent = ({
           <form.Field
             name="status"
             validators={{
-              onChange: validateSupplierStatus,
-              onSubmit: validateSupplierStatus,
+              onChange: validateUnitOfMeasurementStatus,
+              onSubmit: validateUnitOfMeasurementStatus,
             }}
           >
             {(field) => {
@@ -63,16 +62,16 @@ export const CreateSupplierDialogFormContent = ({
                 <RadioGroup
                   errorText={errorText}
                   invalid={Boolean(errorText)}
-                  label="Supplier status"
+                  label="Unit status"
                   name={field.name}
                   onValueChange={(value) =>
-                    field.handleChange(value as SupplierStatus)
+                    field.handleChange(value as UnitOfMeasurementStatus)
                   }
                   orientation="vertical"
                   required
                   value={field.state.value}
                 >
-                  <Radio align="start" value={SUPPLIER_STATUS.DRAFT}>
+                  <Radio align="start" value={UNIT_OF_MEASUREMENT_STATUS.DRAFT}>
                     <div className="flex flex-col">
                       Draft
                       <Typography color="text-secondary" variant="caption">
@@ -81,7 +80,10 @@ export const CreateSupplierDialogFormContent = ({
                       </Typography>
                     </div>
                   </Radio>
-                  <Radio align="start" value={SUPPLIER_STATUS.ACTIVE}>
+                  <Radio
+                    align="start"
+                    value={UNIT_OF_MEASUREMENT_STATUS.ACTIVE}
+                  >
                     <div className="flex flex-col">
                       Active
                       <Typography color="text-secondary" variant="caption">
@@ -96,64 +98,21 @@ export const CreateSupplierDialogFormContent = ({
             }}
           </form.Field>
 
-          <form.Field
-            name="email"
-            validators={{
-              onChange: validateSupplierEmail,
-              onSubmit: validateSupplierEmail,
-            }}
-          >
+          <form.Field name="symbol">
             {(field) => {
               const errorText = getFieldSubmitChangeErrorText(field.state.meta);
 
               return (
                 <TextField
                   errorText={errorText}
+                  helperText="Short abbreviation for the unit (e.g., kg, cm)"
                   invalid={Boolean(errorText)}
-                  label="Email"
+                  label="Symbol"
                   name={field.name}
                   onBlur={field.handleBlur}
                   onValueChange={field.handleChange}
                   size="s"
-                  value={field.state.value}
-                />
-              );
-            }}
-          </form.Field>
-
-          <form.Field name="phone">
-            {(field) => {
-              const errorText = getFieldSubmitChangeErrorText(field.state.meta);
-
-              return (
-                <TextField
-                  errorText={errorText}
-                  invalid={Boolean(errorText)}
-                  label="Phone"
-                  name={field.name}
-                  onBlur={field.handleBlur}
-                  onValueChange={field.handleChange}
-                  size="s"
-                  value={field.state.value}
-                />
-              );
-            }}
-          </form.Field>
-
-          <form.Field name="address">
-            {(field) => {
-              const errorText = getFieldSubmitChangeErrorText(field.state.meta);
-
-              return (
-                <TextField
-                  errorText={errorText}
-                  invalid={Boolean(errorText)}
-                  label="Address"
-                  name={field.name}
-                  onBlur={field.handleBlur}
-                  onValueChange={field.handleChange}
-                  size="s"
-                  value={field.state.value}
+                  value={field.state.value ?? ''}
                 />
               );
             }}
@@ -183,16 +142,16 @@ export const CreateSupplierDialogFormContent = ({
       <Dialog.Footer>
         <form.Subscribe
           selector={(state) =>
-            [state.isSubmitting, state.values.status] as const
+            [state.values.status, state.isSubmitting] as const
           }
         >
-          {([isSubmitting, status]) => (
+          {([status, isSubmitting]) => (
             <Button disabled={isSubmitting} type="submit">
               {isSubmitting
-                ? status === SUPPLIER_STATUS.DRAFT
+                ? status === UNIT_OF_MEASUREMENT_STATUS.DRAFT
                   ? 'Saving...'
                   : 'Publishing...'
-                : status === SUPPLIER_STATUS.DRAFT
+                : status === UNIT_OF_MEASUREMENT_STATUS.DRAFT
                   ? 'Save draft'
                   : 'Publish'}
             </Button>

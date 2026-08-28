@@ -2,6 +2,7 @@
 
 import { Dialog } from '@ordero/ui';
 import { useQueryClient } from '@tanstack/react-query';
+import { WAREHOUSE_STATUS } from '@/lib/domain/warehouses';
 import { warehousesQueryKeys } from '@/lib/query/warehouses/warehousesQueryKeys';
 import { useUpdateWarehouseForm } from './hooks/useUpdateWarehouseForm';
 import type { UpdateWarehouseDialogProps } from './types';
@@ -16,6 +17,7 @@ export const UpdateWarehouseDialog = ({
 }: UpdateWarehouseDialogProps) => {
   const queryClient = useQueryClient();
   const { form } = useUpdateWarehouseForm({
+    onNoChanges: () => handleOpenChange(false),
     warehouse,
     onUpdated: async (updatedWarehouse) => {
       form.reset(getWarehouseDefaultValues(updatedWarehouse));
@@ -40,6 +42,8 @@ export const UpdateWarehouseDialog = ({
     }
   };
 
+  const isWarehouseActive = warehouse.status === WAREHOUSE_STATUS.ACTIVE;
+
   return (
     <Dialog.Root onOpenChange={handleOpenChange} open={open}>
       <Dialog.Portal>
@@ -57,7 +61,10 @@ export const UpdateWarehouseDialog = ({
                 <Dialog.Title>Edit warehouse</Dialog.Title>
               </Dialog.Header>
 
-              <UpdateWarehouseFormDialogContent form={form} />
+              <UpdateWarehouseFormDialogContent
+                form={form}
+                isWarehouseActive={isWarehouseActive}
+              />
             </form>
           </Dialog.Popup>
         </Dialog.Viewport>

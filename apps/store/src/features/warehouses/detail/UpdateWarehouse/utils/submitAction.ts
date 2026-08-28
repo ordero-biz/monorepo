@@ -1,20 +1,21 @@
-import { updateWarehouse } from '@/lib/client/api/warehouses';
-import type { WarehouseFormValues } from '../../../shared/validations';
+import {
+  type UpdateWarehouseFieldData,
+  updateWarehouse,
+} from '@/lib/client/api/warehouses';
+import { getApiErrorMessage } from '@/lib/utils/apiError';
 
 type SubmitUpdateWarehouseArgs = {
-  value: WarehouseFormValues;
+  submitData: UpdateWarehouseFieldData;
   warehouseId: string | number;
 };
 
 export const submitUpdateWarehouse = async ({
-  value,
+  submitData,
   warehouseId,
 }: SubmitUpdateWarehouseArgs) => {
   const result = await updateWarehouse({
     warehouseId,
-    name: value.name.trim(),
-    address: value.address.trim(),
-    comment: value.comment.trim(),
+    ...submitData,
   });
 
   if (!result.ok) {
@@ -22,7 +23,7 @@ export const submitUpdateWarehouse = async ({
       ok: false,
       error: {
         fieldErrors: result.error.fieldErrors,
-        formError: result.error.message,
+        formError: getApiErrorMessage(result.error),
       },
     } as const;
   }

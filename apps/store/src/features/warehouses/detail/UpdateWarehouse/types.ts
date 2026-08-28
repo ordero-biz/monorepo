@@ -41,4 +41,5 @@ export type UpdateWarehouseDialogTriggerProps = {
 
 export type UpdateWarehouseFormDialogContentProps = {
   form: UpdateWarehouseFormApi;
+  isWarehouseActive: boolean;
 };

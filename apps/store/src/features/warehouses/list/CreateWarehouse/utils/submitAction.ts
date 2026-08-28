@@ -4,11 +4,13 @@ import type { CreateWarehouseFormValues } from './validations';
 export const submitCreateWarehouse = async (
   value: CreateWarehouseFormValues
 ) => {
+  const address = value.address?.trim();
+
   const result = await createWarehouse({
     name: value.name.trim(),
-    address: value.address.trim(),
     comment: value.comment.trim(),
     status: value.status,
+    ...(address ? { address } : {}),
   });
 
   if (!result.ok) {

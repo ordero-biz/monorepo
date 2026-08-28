@@ -8,6 +8,7 @@ export const API_ERROR_CODES = {
   SUPPLIER_MODIFICATION_NOT_ALLOWED: 'SUPPLIER_MODIFICATION_NOT_ALLOWED',
   UNIT_OF_MEASUREMENT_MODIFICATION_NOT_ALLOWED:
     'UNIT_OF_MEASUREMENT_MODIFICATION_NOT_ALLOWED',
+  WAREHOUSE_MODIFICATION_NOT_ALLOWED: 'WAREHOUSE_MODIFICATION_NOT_ALLOWED',
 } as const;
 
 export type ApiErrorCode =
@@ -26,4 +27,6 @@ export const API_ERROR_MESSAGES: Record<ApiErrorCode, string> = {
     'Cannot edit name or status of an active supplier',
   [API_ERROR_CODES.UNIT_OF_MEASUREMENT_MODIFICATION_NOT_ALLOWED]:
     'Cannot edit name or status of an active unit of measurement',
+  [API_ERROR_CODES.WAREHOUSE_MODIFICATION_NOT_ALLOWED]:
+    'Cannot edit name or status of an active warehouse',
 };

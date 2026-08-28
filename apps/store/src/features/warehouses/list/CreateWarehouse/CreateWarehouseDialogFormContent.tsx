@@ -11,10 +11,7 @@ import {
   type WarehouseStatus,
 } from '@/lib/domain/warehouses';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
-import {
-  validateWarehouseAddress,
-  validateWarehouseName,
-} from '../../shared/validations';
+import { validateWarehouseName } from '../../shared/validations';
 import type { CreateWarehouseDialogFormContentProps } from './types';
 import { validateWarehouseStatus } from './utils/validations';
 
@@ -39,32 +36,6 @@ export const CreateWarehouseDialogFormContent = ({
                 errorText={errorText}
                 invalid={Boolean(errorText)}
                 label="Name"
-                name={field.name}
-                onBlur={field.handleBlur}
-                onValueChange={field.handleChange}
-                required
-                size="s"
-                value={field.state.value}
-              />
-            );
-          }}
-        </form.Field>
-
-        <form.Field
-          name="address"
-          validators={{
-            onChange: validateWarehouseAddress,
-            onSubmit: validateWarehouseAddress,
-          }}
-        >
-          {(field) => {
-            const errorText = getFieldSubmitChangeErrorText(field.state.meta);
-
-            return (
-              <TextField
-                errorText={errorText}
-                invalid={Boolean(errorText)}
-                label="Address"
                 name={field.name}
                 onBlur={field.handleBlur}
                 onValueChange={field.handleChange}
@@ -103,7 +74,8 @@ export const CreateWarehouseDialogFormContent = ({
                   <div className="flex flex-col">
                     Draft
                     <Typography color="text-secondary" variant="caption">
-                      Editable only. Can be published later
+                      Editable only. Cannot be used in supplies or tracked in
+                      analytics. Can be activated later
                     </Typography>
                   </div>
                 </Radio>
@@ -111,11 +83,32 @@ export const CreateWarehouseDialogFormContent = ({
                   <div className="flex flex-col">
                     Active
                     <Typography color="text-secondary" variant="caption">
-                      Fully functional. Cannot be edited after publishing
+                      Fully functional. Can be used in supplies and tracked in
+                      analytics. Name and status cannot be edited after
+                      publishing
                     </Typography>
                   </div>
                 </Radio>
               </RadioGroup>
+            );
+          }}
+        </form.Field>
+
+        <form.Field name="address">
+          {(field) => {
+            const errorText = getFieldSubmitChangeErrorText(field.state.meta);
+
+            return (
+              <TextField
+                errorText={errorText}
+                invalid={Boolean(errorText)}
+                label="Address"
+                name={field.name}
+                onBlur={field.handleBlur}
+                onValueChange={field.handleChange}
+                size="s"
+                value={field.state.value ?? ''}
+              />
             );
           }}
         </form.Field>

@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { WAREHOUSE_STATUS } from '@/lib/domain/warehouses';
+import { getValidationMessage } from '@/lib/utils/form/validation/message';
 import type { ValidationArgs } from '@/lib/utils/form/validation/types';
 import { warehouseFormSchema } from '../../../shared/validations';
 
@@ -21,7 +22,5 @@ export type CreateWarehouseFormValues = z.infer<
 export const validateWarehouseStatus = ({
   value,
 }: ValidationArgs<CreateWarehouseFormValues['status']>) => {
-  const result = warehouseStatusSchema.safeParse(value);
-
-  return result.success ? undefined : result.error.issues[0]?.message;
+  return getValidationMessage(warehouseStatusSchema, value);
 };

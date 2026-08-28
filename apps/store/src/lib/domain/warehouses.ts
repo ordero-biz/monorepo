@@ -9,7 +9,7 @@ export type WarehouseStatus =
 export type Warehouse = {
   id: number;
   name: string;
-  address: string;
+  address?: string | null;
   comment: string;
   status?: WarehouseStatus;
 };

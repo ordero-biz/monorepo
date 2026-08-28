@@ -20,44 +20,44 @@ export const WarehouseDetailHeader = ({
         <Typography variant="h5">{warehouse.name}</Typography>
         <WarehouseStatusChip status={warehouse.status} />
       </PageHeader.Left>
-      {!isWarehouseActive ? (
-        <PageHeader.Right>
+      <PageHeader.Right>
+        {!isWarehouseActive ? (
           <ActivateWarehouseDialogTrigger
             onUpdated={onUpdated}
             warehouse={warehouse}
           />
-          <Menu.Root>
-            <Menu.Trigger
-              aria-label={`Actions for ${warehouse.name}`}
-              appearance="iconButton"
-              size="s"
-              title={`Actions for ${warehouse.name}`}
-            >
-              <EllipsisVertical aria-hidden="true" />
-            </Menu.Trigger>
-            <Menu.Portal>
-              <Menu.Positioner align="end">
-                <Menu.Popup>
-                  <Menu.Item onClick={() => setIsUpdateDialogOpen(true)}>
-                    <Pencil
-                      aria-hidden="true"
-                      className="size-[var(--icon-button-xs-icon)]"
-                    />
-                    Edit warehouse
-                  </Menu.Item>
-                </Menu.Popup>
-              </Menu.Positioner>
-            </Menu.Portal>
-          </Menu.Root>
+        ) : null}
+        <Menu.Root>
+          <Menu.Trigger
+            aria-label={`Actions for ${warehouse.name}`}
+            appearance="iconButton"
+            size="s"
+            title={`Actions for ${warehouse.name}`}
+          >
+            <EllipsisVertical aria-hidden="true" />
+          </Menu.Trigger>
+          <Menu.Portal>
+            <Menu.Positioner align="end">
+              <Menu.Popup>
+                <Menu.Item onClick={() => setIsUpdateDialogOpen(true)}>
+                  <Pencil
+                    aria-hidden="true"
+                    className="size-[var(--icon-button-xs-icon)]"
+                  />
+                  Edit warehouse
+                </Menu.Item>
+              </Menu.Popup>
+            </Menu.Positioner>
+          </Menu.Portal>
+        </Menu.Root>
 
-          <UpdateWarehouseDialog
-            onOpenChange={setIsUpdateDialogOpen}
-            onUpdated={onUpdated}
-            open={isUpdateDialogOpen}
-            warehouse={warehouse}
-          />
-        </PageHeader.Right>
-      ) : null}
+        <UpdateWarehouseDialog
+          onOpenChange={setIsUpdateDialogOpen}
+          onUpdated={onUpdated}
+          open={isUpdateDialogOpen}
+          warehouse={warehouse}
+        />
+      </PageHeader.Right>
     </PageHeader.Root>
   );
 };

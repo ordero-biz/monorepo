@@ -12,14 +12,16 @@ import { CLIENT_BACKEND_PATHS } from '../path';
 
 type WarehousesListResponse = PaginatedResponse<Warehouse>;
 
-type CreateWarehouseInput = {
+export type CreateWarehouseData = {
   name: string;
-  address: string;
+  address?: string | null;
   comment: string;
   status: WarehouseStatus;
 };
 
-type UpdateWarehouseInput = Partial<CreateWarehouseInput> & {
+export type UpdateWarehouseFieldData = Partial<CreateWarehouseData>;
+
+export type UpdateWarehouseData = UpdateWarehouseFieldData & {
   warehouseId: string | number;
 };
 
@@ -39,7 +41,7 @@ export const getWarehouse = (warehouseId: string | number) =>
     }
   );
 
-export const createWarehouse = (input: CreateWarehouseInput) =>
+export const createWarehouse = (input: CreateWarehouseData) =>
   apiFetch<Warehouse>(CLIENT_BACKEND_PATHS.warehouses, {
     method: 'POST',
     body: input,
@@ -48,7 +50,7 @@ export const createWarehouse = (input: CreateWarehouseInput) =>
 export const updateWarehouse = ({
   warehouseId,
   ...input
-}: UpdateWarehouseInput) =>
+}: UpdateWarehouseData) =>
   apiFetch<Warehouse>(
     tokenizePath(CLIENT_BACKEND_PATHS.warehouse, { id: warehouseId }),
     {

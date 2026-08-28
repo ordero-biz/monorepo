@@ -1,30 +1,29 @@
-import {
-  validateWarehouseAddress,
-  validateWarehouseName,
-  warehouseFormSchema,
-} from './validations';
+import { validateWarehouseName, warehouseFormSchema } from './validations';
 
 describe('warehouse field validation', () => {
-  it.each([
-    ['name', validateWarehouseName, '   ', 'Warehouse name is required'],
-    [
-      'address',
-      validateWarehouseAddress,
-      '   ',
-      'Warehouse address is required',
-    ],
-  ])('rejects an invalid warehouse %s', (_, validate, value, errorMessage) => {
-    expect(validate({ value })).toBe(errorMessage);
+  it('rejects an empty warehouse name', () => {
+    expect(validateWarehouseName({ value: '   ' })).toBe(
+      'Warehouse name is required'
+    );
   });
 
-  it.each([
-    ['name', validateWarehouseName, 'Main Warehouse'],
-    ['address', validateWarehouseAddress, '123 Commerce Ave'],
-  ])('accepts a valid warehouse %s', (_, validate, value) => {
-    expect(validate({ value })).toBeUndefined();
+  it('accepts a valid warehouse name', () => {
+    expect(validateWarehouseName({ value: 'Main Warehouse' })).toBeUndefined();
   });
 
-  it('trims required values while retaining the optional comment', () => {
+  it('allows an address to be omitted', () => {
+    expect(
+      warehouseFormSchema.parse({
+        name: 'Main Warehouse',
+        comment: 'Primary stock location',
+      })
+    ).toEqual({
+      name: 'Main Warehouse',
+      comment: 'Primary stock location',
+    });
+  });
+
+  it('trims required values while retaining optional values', () => {
     expect(
       warehouseFormSchema.parse({
         name: ' Main Warehouse ',

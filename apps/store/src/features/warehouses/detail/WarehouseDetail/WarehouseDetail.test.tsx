@@ -49,7 +49,7 @@ describe('WarehouseDetail', () => {
     expect(screen.getByText('Primary stock location')).toBeVisible();
   });
 
-  it('shows an Active badge and hides edit actions for active warehouses', async () => {
+  it('shows edit actions but not Publish for an active warehouse', async () => {
     getWarehouseMock.mockResolvedValue({
       ok: true,
       data: { ...warehouse, status: WAREHOUSE_STATUS.ACTIVE },
@@ -59,8 +59,11 @@ describe('WarehouseDetail', () => {
 
     expect(await screen.findByText('Active')).toBeVisible();
     expect(
-      screen.queryByRole('button', { name: 'Actions for Main Warehouse' })
+      screen.queryByRole('button', { name: 'Publish' })
     ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Actions for Main Warehouse' })
+    ).toBeVisible();
   });
 
   it('renders an error state and retries loading the warehouse', async () => {

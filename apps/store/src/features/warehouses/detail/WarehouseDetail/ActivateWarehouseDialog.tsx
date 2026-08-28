@@ -32,12 +32,12 @@ export const ActivateWarehouseDialog = ({
               <div className="flex flex-col gap-[var(--space-2)]">
                 <Typography variant="body1">
                   Are you sure you want to publish this warehouse? Once active,
-                  it will be fully functional and available for products.
+                  it will be fully functional.
                 </Typography>
                 <Typography variant="body1">
                   <strong>
-                    This action cannot be undone, and the warehouse will no
-                    longer be editable.
+                    This action cannot be undone. However, you will still be
+                    able to update address and comments.
                   </strong>
                 </Typography>
               </div>
