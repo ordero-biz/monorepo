@@ -30,7 +30,7 @@ describe('CreateUnitOfMeasurementDialog', () => {
     onOpenChangeMock.mockClear();
   });
 
-  it('requires name and symbol before saving a draft is available', async () => {
+  it('keeps the action enabled and validates required fields on submit', async () => {
     const user = userEvent.setup();
 
     setup();
@@ -38,31 +38,18 @@ describe('CreateUnitOfMeasurementDialog', () => {
     const dialog = screen.getByRole('dialog', {
       name: 'Add unit of measurement',
     });
-    const nameField = within(dialog).getByRole('textbox', {
-      name: 'Name',
-    });
-    const symbolField = within(dialog).getByRole('textbox', {
-      name: 'Symbol',
-    });
     const addButton = within(dialog).getByRole('button', {
       name: 'Save draft',
     });
 
-    expect(addButton).toBeDisabled();
-
-    await user.type(nameField, 'Kilogram');
-    expect(addButton).toBeDisabled();
-
-    await user.type(symbolField, '   ');
-    await user.tab();
-
-    expect(within(dialog).getByText('Unit symbol is required')).toBeVisible();
-    expect(addButton).toBeDisabled();
-
-    await user.clear(symbolField);
-    await user.type(symbolField, 'kg');
-
     expect(addButton).toBeEnabled();
+    await user.click(addButton);
+
+    expect(
+      await within(dialog).findByText('Unit name is required')
+    ).toBeVisible();
+    expect(within(dialog).getByText('Unit symbol is required')).toBeVisible();
+    expect(createUnitOfMeasurementMock).not.toHaveBeenCalled();
   });
 
   it('creates a unit of measurement, closes the dialog, and invalidates the list', async () => {

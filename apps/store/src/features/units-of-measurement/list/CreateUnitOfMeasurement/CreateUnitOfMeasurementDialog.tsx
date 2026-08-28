@@ -199,19 +199,11 @@ export const CreateUnitOfMeasurementDialog = ({
               <Dialog.Footer>
                 <form.Subscribe
                   selector={(state) =>
-                    [
-                      state.values.name,
-                      state.values.status,
-                      state.values.symbol,
-                      state.isSubmitting,
-                    ] as const
+                    [state.isSubmitting, state.values.status] as const
                   }
                 >
-                  {([name, status, symbol, isSubmitting]) => (
-                    <Button
-                      disabled={isSubmitting || !name.trim() || !symbol.trim()}
-                      type="submit"
-                    >
+                  {([isSubmitting, status]) => (
+                    <Button disabled={isSubmitting} type="submit">
                       {isSubmitting
                         ? status === UNIT_OF_MEASUREMENT_STATUS.DRAFT
                           ? 'Saving...'
