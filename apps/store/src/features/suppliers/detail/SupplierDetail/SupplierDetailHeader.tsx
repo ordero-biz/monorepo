@@ -1,7 +1,10 @@
 import { EllipsisVertical, Pencil } from 'lucide-react';
 import { useState } from 'react';
+import { SUPPLIER_STATUS } from '@/lib/domain/suppliers/constants';
 import { Menu, PageHeader, Typography } from '@/ui/index';
+import { SupplierStatusChip } from '../../shared/SupplierStatusChip';
 import { UpdateSupplierDialog } from '../UpdateSupplier/UpdateSupplierDialog';
+import { ActivateSupplierDialogTrigger } from './ActivateSupplierDialogTrigger';
 import type { SupplierDetailHeaderProps } from './types';
 
 export const SupplierDetailHeader = ({
@@ -9,13 +12,21 @@ export const SupplierDetailHeader = ({
   supplier,
 }: SupplierDetailHeaderProps) => {
   const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
+  const isSupplierActive = supplier.status === SUPPLIER_STATUS.ACTIVE;
 
   return (
     <PageHeader.Root>
       <PageHeader.Left>
         <Typography variant="h5">{supplier.name}</Typography>
+        <SupplierStatusChip status={supplier.status} />
       </PageHeader.Left>
       <PageHeader.Right>
+        {!isSupplierActive ? (
+          <ActivateSupplierDialogTrigger
+            onUpdated={onUpdated}
+            supplier={supplier}
+          />
+        ) : null}
         <Menu.Root>
           <Menu.Trigger
             aria-label={`Actions for ${supplier.name}`}

@@ -1,4 +1,5 @@
 import { createWarehouse } from '@/lib/client/api/warehouses';
+import { WAREHOUSE_STATUS } from '@/lib/domain/warehouses/constants';
 import { submitCreateWarehouse } from './submitAction';
 
 vi.mock('@/lib/client/api/warehouses', async () => ({
@@ -18,7 +19,6 @@ describe('submitCreateWarehouse', () => {
   it('normalizes form values before creating the warehouse', async () => {
     const warehouse = {
       id: 1,
-      code: 'WH-001',
       name: 'Main Warehouse',
       address: '123 Commerce Ave',
       comment: 'Primary stock location',
@@ -30,10 +30,10 @@ describe('submitCreateWarehouse', () => {
 
     await expect(
       submitCreateWarehouse({
-        code: ' WH-001 ',
         name: ' Main Warehouse ',
         address: ' 123 Commerce Ave ',
         comment: ' Primary stock location ',
+        status: WAREHOUSE_STATUS.ACTIVE,
       })
     ).resolves.toEqual({
       ok: true,
@@ -41,10 +41,10 @@ describe('submitCreateWarehouse', () => {
     });
 
     expect(createWarehouseMock).toHaveBeenCalledWith({
-      code: 'WH-001',
       name: 'Main Warehouse',
       address: '123 Commerce Ave',
       comment: 'Primary stock location',
+      status: WAREHOUSE_STATUS.ACTIVE,
     });
   });
 
@@ -55,26 +55,50 @@ describe('submitCreateWarehouse', () => {
         status: 422,
         message: 'Warehouse creation failed.',
         fieldErrors: {
-          code: 'Warehouse code already exists.',
+          name: 'Warehouse name already exists.',
         },
       },
     });
 
     await expect(
       submitCreateWarehouse({
-        code: 'WH-001',
         name: 'Main Warehouse',
         address: '123 Commerce Ave',
         comment: '',
+        status: WAREHOUSE_STATUS.DRAFT,
       })
     ).resolves.toEqual({
       ok: false,
       error: {
         fieldErrors: {
-          code: 'Warehouse code already exists.',
+          name: 'Warehouse name already exists.',
         },
         formError: 'Warehouse creation failed.',
       },
+    });
+  });
+
+  it('omits a blank optional address from the create request', async () => {
+    createWarehouseMock.mockResolvedValue({
+      ok: true,
+      data: {
+        id: 1,
+        name: 'Main Warehouse',
+        comment: '',
+      },
+    });
+
+    await submitCreateWarehouse({
+      name: 'Main Warehouse',
+      address: '',
+      comment: '',
+      status: WAREHOUSE_STATUS.DRAFT,
+    });
+
+    expect(createWarehouseMock).toHaveBeenCalledWith({
+      name: 'Main Warehouse',
+      comment: '',
+      status: WAREHOUSE_STATUS.DRAFT,
     });
   });
 });

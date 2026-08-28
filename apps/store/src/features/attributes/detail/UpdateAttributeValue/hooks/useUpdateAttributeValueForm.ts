@@ -33,7 +33,7 @@ export const useUpdateAttributeValueForm = ({
         initialName,
         initialSortOrder,
       });
-      console.log(updateChanges);
+
       if (!updateChanges) {
         onNoChanges();
         return;

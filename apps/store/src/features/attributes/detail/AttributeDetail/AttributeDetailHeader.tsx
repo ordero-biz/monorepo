@@ -1,20 +1,16 @@
 'use client';
 
-import { Button, Card, Chip, Menu, PageHeader, Typography } from '@ordero/ui';
+import { Button, Card, Menu, PageHeader, Typography } from '@ordero/ui';
 import { EllipsisVertical, Pencil, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { ATTRIBUTE_STATUS } from '@/lib/domain/attributes/constants';
 import { useAttributeQuery } from '@/lib/hooks/attributes/useAttributeQuery';
+import { AttributeStatusChip } from '../../shared/AttributeStatusChip';
 import { ActivateAttributeDialogTrigger } from '../ActivateAttribute';
 import { CreateAttributeValuesDialogTrigger } from '../CreateAttributeValues';
 import { DeleteAttributeDialog } from '../DeleteAttribute';
 import { UpdateAttributeDialog } from '../UpdateAttribute';
 import type { AttributeDetailHeaderProps } from './types';
-
-const statusLabels = {
-  ACTIVE: 'Active',
-  DRAFT: 'Draft',
-} as const;
 
 export const AttributeDetailHeader = ({
   attributeId,
@@ -63,19 +59,7 @@ export const AttributeDetailHeader = ({
     <PageHeader.Root>
       <PageHeader.Left>
         <Typography variant="h5">{attributeQuery.data.name}</Typography>
-        {attributeQuery.data.status ? (
-          <Chip
-            color={
-              attributeQuery.data.status === ATTRIBUTE_STATUS.ACTIVE
-                ? 'primary'
-                : 'warning'
-            }
-            size="s"
-            variant="soft"
-          >
-            {statusLabels[attributeQuery.data.status]}
-          </Chip>
-        ) : null}
+        <AttributeStatusChip status={attributeQuery.data.status} />
       </PageHeader.Left>
       <PageHeader.Right>
         {attributeQuery.data.status !== ATTRIBUTE_STATUS.ACTIVE ? (

@@ -7,7 +7,8 @@ import {
 import { EllipsisVertical, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import { getUnitOfMeasurementDetailRoute } from '@/lib/client/routes';
-import type { UnitOfMeasurement } from '@/lib/domain/unitsOfMeasurement';
+import type { UnitOfMeasurement } from '@/lib/domain/units-of-measurement/types';
+import { UnitOfMeasurementStatusChip } from '../../shared/UnitOfMeasurementStatusChip';
 
 type GetColumnsArgs = {
   onDeleteUnitOfMeasurement: (unitOfMeasurement: UnitOfMeasurement) => void;
@@ -36,10 +37,14 @@ export const getColumns = ({
     },
   },
   {
-    accessorKey: 'code',
-    cell: ({ row }) => <DataTableCell>{row.original.code}</DataTableCell>,
+    accessorKey: 'status',
+    cell: ({ row }) => (
+      <DataTableCell>
+        <UnitOfMeasurementStatusChip status={row.original.status} />
+      </DataTableCell>
+    ),
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Code" />
+      <DataTableColumnHeader column={column} title="Status" />
     ),
     meta: {
       width: '18%',

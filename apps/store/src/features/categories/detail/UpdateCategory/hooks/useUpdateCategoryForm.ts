@@ -2,10 +2,8 @@ import { useToastManager } from '@ordero/ui';
 import { useForm } from '@tanstack/react-form';
 import type { Category } from '@/lib/domain/categories/types';
 import { getCategoryDefaultValues } from '../utils/fields';
-import {
-  getCategoryUpdateChanges,
-  submitUpdateCategory,
-} from '../utils/submitAction';
+import { getCategoryUpdateChanges } from '../utils/getUpdateChanges';
+import { submitUpdateCategory } from '../utils/submitAction';
 
 type UseUpdateCategoryFormArgs = {
   category: Category;
@@ -22,7 +20,10 @@ export const useUpdateCategoryForm = ({
   const form = useForm({
     defaultValues: getCategoryDefaultValues(category),
     onSubmit: async ({ formApi, value }) => {
-      const updateChanges = getCategoryUpdateChanges({ category, formValue: value });
+      const updateChanges = getCategoryUpdateChanges({
+        category,
+        formValue: value,
+      });
 
       if (!updateChanges) {
         onNoChanges();

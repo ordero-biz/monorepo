@@ -87,6 +87,9 @@ For `PATCH` helpers:
   calling the helper
 - send only fields whose normalized values changed; treat an empty change set
   as a no-op rather than sending a PATCH
+- model nullable update fields as `string | null` (or the applicable nullable
+  DTO type) when `null` clears a persisted value; do not use an empty string as
+  a clearing sentinel unless that is the explicit backend contract
 
 ## Adding A Cached Query Hook
 
@@ -222,6 +225,9 @@ Choose the smallest layer that proves the behavior:
 - feature-facing client request helpers:
   `src/lib/client/api/[resource]/index.test.ts`, covering the stable
   same-origin path, method, body, and result shape through `apiFetch`
+- for optional PATCH fields, assert the serialized `null` clearing payload at
+  the client-helper boundary; cover blank-create omission and unchanged-update
+  no-ops in the owning submit utility
 - shared server helpers: test package behavior in `packages/next-api` when the
   package behavior changes; keep app route-handler tests focused on app wiring
 - header forwarding changes: cover `packages/next-api` allow-list behavior and

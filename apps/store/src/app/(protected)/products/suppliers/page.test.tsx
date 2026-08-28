@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react';
+import { SUPPLIER_STATUS } from '@/lib/domain/suppliers/constants';
 import { suppliersQueryKeys } from '@/lib/query/suppliers/suppliersQueryKeys';
 import { getServerSuppliers } from '@/lib/server/api/suppliers';
 import type { PaginationSearchInput } from '@/lib/utils/url';
@@ -40,6 +41,7 @@ describe('SuppliersPage', () => {
         {
           id: 1,
           name: 'Fresh Farms',
+          status: SUPPLIER_STATUS.DRAFT,
           email: 'orders@fresh.example',
           phone: '+1 555 0100',
           address: '123 Market St',

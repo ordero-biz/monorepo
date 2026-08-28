@@ -39,7 +39,6 @@ describe('WarehousePage', () => {
       content: [
         {
           id: 1,
-          code: 'WH-001',
           name: 'Main Warehouse',
           address: '123 Commerce Ave',
           comment: 'Primary stock location',
@@ -99,7 +98,7 @@ describe('WarehousePage', () => {
     const paginationInput = {
       page: 2,
       size: 10,
-      sort: ['name,asc', 'code,desc'],
+      sort: ['name,asc', 'address,desc'],
     };
     const queryClient = createTestQueryClient();
     const TestQueryProvider = createTestQueryProvider(queryClient);
@@ -114,7 +113,7 @@ describe('WarehousePage', () => {
         searchParams: Promise.resolve({
           page: '2',
           size: '10',
-          sort: ['name,asc', 'code,desc'],
+          sort: ['name,asc', 'address,desc'],
         }),
       }),
       {

@@ -1,5 +1,4 @@
 import {
-  Chip,
   DataTableCell,
   type DataTableColumnDef,
   DataTableColumnHeader,
@@ -8,27 +7,7 @@ import {
 import { CircleCheck, EllipsisVertical, Pencil, Trash2 } from 'lucide-react';
 import { ATTRIBUTE_VALUE_STATUS } from '@/lib/domain/attributes/constants';
 import type { AttributeValue } from '@/lib/domain/attributes/types';
-
-const statusLabels = {
-  ACTIVE: 'Active',
-  DRAFT: 'Draft',
-} as const;
-
-const getStatusChip = (status?: AttributeValue['status']) => {
-  if (!status) {
-    return null;
-  }
-
-  return (
-    <Chip
-      color={status === ATTRIBUTE_VALUE_STATUS.ACTIVE ? 'primary' : 'warning'}
-      size="s"
-      variant="soft"
-    >
-      {statusLabels[status]}
-    </Chip>
-  );
-};
+import { AttributeStatusChip } from '../../shared/AttributeStatusChip';
 
 type GetColumnsArgs = {
   canPublishAttributeValue: boolean;
@@ -56,7 +35,9 @@ export const getColumns = ({
   {
     accessorKey: 'status',
     cell: ({ row }) => (
-      <DataTableCell>{getStatusChip(row.original.status)}</DataTableCell>
+      <DataTableCell>
+        <AttributeStatusChip status={row.original.status} />
+      </DataTableCell>
     ),
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Status" />

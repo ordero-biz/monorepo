@@ -11,7 +11,7 @@ import {
 import { Trash2 } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { BaseLayoutContextualActionBar } from '@/features/app-shell';
-import type { UnitOfMeasurement } from '@/lib/domain/unitsOfMeasurement';
+import type { UnitOfMeasurement } from '@/lib/domain/units-of-measurement/types';
 import { useUnitsOfMeasurementQuery } from '@/lib/hooks/units-of-measurement/useUnitsOfMeasurementQuery';
 import { useTablePagination } from '@/lib/hooks/useTablePagination';
 import { DeleteUnitsOfMeasurementDialog } from '../../shared';

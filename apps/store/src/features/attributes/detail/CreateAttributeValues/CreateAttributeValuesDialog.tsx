@@ -1,34 +1,11 @@
 'use client';
 
-import {
-  Button,
-  Dialog,
-  IconButton,
-  Select,
-  TextField,
-  Typography,
-} from '@ordero/ui';
+import { Dialog } from '@ordero/ui';
 import { useQueryClient } from '@tanstack/react-query';
-import { CircleAlert, Minus } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
-import { ATTRIBUTE_STATUS } from '@/lib/domain/attributes/constants';
-import type { AttributeValueStatus } from '@/lib/domain/attributes/types';
 import { attributesQueryKeys } from '@/lib/query/attributes/attributesQueryKeys';
-import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
-import {
-  ATTRIBUTE_VALUE_STATUS_OPTIONS,
-  INITIAL_ATTRIBUTE_VALUE_FIELD_INDEX,
-} from './constants';
+import { CreateAttributeValuesDialogFormContent } from './CreateAttributeValuesDialogFormContent';
 import { useCreateAttributeValuesForm } from './hooks/useCreateAttributeValuesForm';
 import type { CreateAttributeValuesDialogProps } from './types';
-import {
-  getAttributeValueFieldId,
-  getEmptyAttributeValueField,
-} from './utils/fields';
-import {
-  validateAttributeValueName,
-  validateAttributeValueStatus,
-} from './utils/validations';
 
 export const CreateAttributeValuesDialog = ({
   attributeId,
@@ -37,11 +14,6 @@ export const CreateAttributeValuesDialog = ({
   open,
 }: CreateAttributeValuesDialogProps) => {
   const queryClient = useQueryClient();
-  const nextAttributeValueFieldIndex = useRef(
-    INITIAL_ATTRIBUTE_VALUE_FIELD_INDEX + 1
-  );
-  const [autoFocusAttributeValueId, setAutoFocusAttributeValueId] =
-    useState<string>();
   const { form } = useCreateAttributeValuesForm({
     attributeId,
     attributeStatus,
@@ -53,35 +25,12 @@ export const CreateAttributeValuesDialog = ({
     },
   });
 
-  useEffect(() => {
-    if (!autoFocusAttributeValueId) {
-      return;
-    }
-
-    const timeoutId = setTimeout(() => {
-      document.getElementById(autoFocusAttributeValueId)?.focus();
-    });
-
-    return () => clearTimeout(timeoutId);
-  }, [autoFocusAttributeValueId]);
-
   const handleOpenChange = (nextOpen: boolean) => {
     onOpenChange(nextOpen);
 
     if (!nextOpen) {
-      setAutoFocusAttributeValueId(undefined);
       form.reset();
     }
-  };
-
-  const createAttributeValue = () => {
-    const attributeValue = getEmptyAttributeValueField(
-      nextAttributeValueFieldIndex.current
-    );
-
-    nextAttributeValueFieldIndex.current += 1;
-
-    return attributeValue;
   };
 
   return (
@@ -101,235 +50,11 @@ export const CreateAttributeValuesDialog = ({
                 <Dialog.Title>Add attribute values</Dialog.Title>
               </Dialog.Header>
 
-              <Dialog.Content>
-                <div className="flex flex-col gap-[var(--space-2)]">
-                  <form.Subscribe
-                    selector={(state) =>
-                      [
-                        state.isSubmitting,
-                        state.values.attributeValues,
-                      ] as const
-                    }
-                  >
-                    {([isSubmitting, attributeValues]) => {
-                      const lastAttributeValue =
-                        attributeValues[attributeValues.length - 1]?.value ??
-                        '';
-
-                      return (
-                        <>
-                          <form.Field name="attributeValues" mode="array">
-                            {(field) => {
-                              return (
-                                <>
-                                  <div className="flex flex-col gap-[var(--space-0-5)]">
-                                    {field.state.value.map(
-                                      (attributeValue, index) => {
-                                        const fieldId =
-                                          attributeValue?.id ??
-                                          getAttributeValueFieldId(index);
-
-                                        return (
-                                          <form.Field
-                                            key={fieldId}
-                                            name={
-                                              `attributeValues[${index}].value` as const
-                                            }
-                                            validators={{
-                                              onChange:
-                                                validateAttributeValueName,
-                                              onSubmit:
-                                                validateAttributeValueName,
-                                            }}
-                                          >
-                                            {(subField) => {
-                                              const fieldError =
-                                                getFieldSubmitChangeErrorText(
-                                                  subField.state.meta
-                                                );
-                                              const attributeValue =
-                                                subField.state.value ?? '';
-
-                                              return (
-                                                <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,0.5fr)_auto] items-end gap-[var(--space-0-5)]">
-                                                  <TextField
-                                                    aria-label={`Attribute value ${index + 1}`}
-                                                    disabled={isSubmitting}
-                                                    errorText={fieldError}
-                                                    id={fieldId}
-                                                    invalid={Boolean(
-                                                      fieldError
-                                                    )}
-                                                    label={
-                                                      index === 0
-                                                        ? 'Attribute values'
-                                                        : undefined
-                                                    }
-                                                    name={subField.name}
-                                                    onBlur={() => {
-                                                      subField.handleBlur();
-
-                                                      if (attributeValue) {
-                                                        subField.handleChange(
-                                                          subField.state.value
-                                                        );
-                                                      }
-                                                    }}
-                                                    onValueChange={
-                                                      subField.handleChange
-                                                    }
-                                                    size="s"
-                                                    value={attributeValue}
-                                                  />
-                                                  <form.Field
-                                                    name={
-                                                      `attributeValues[${index}].status` as const
-                                                    }
-                                                    validators={{
-                                                      onChange:
-                                                        validateAttributeValueStatus,
-                                                      onSubmit:
-                                                        validateAttributeValueStatus,
-                                                    }}
-                                                  >
-                                                    {(statusField) => {
-                                                      const errorText =
-                                                        getFieldSubmitChangeErrorText(
-                                                          statusField.state.meta
-                                                        );
-
-                                                      return (
-                                                        <Select
-                                                          aria-label={`Attribute value status ${index + 1}`}
-                                                          disabled={
-                                                            isSubmitting ||
-                                                            attributeStatus ===
-                                                              ATTRIBUTE_STATUS.DRAFT
-                                                          }
-                                                          errorText={errorText}
-                                                          invalid={Boolean(
-                                                            errorText
-                                                          )}
-                                                          name={
-                                                            statusField.name
-                                                          }
-                                                          onBlur={
-                                                            statusField.handleBlur
-                                                          }
-                                                          onValueChange={(
-                                                            value
-                                                          ) =>
-                                                            statusField.handleChange(
-                                                              value as AttributeValueStatus
-                                                            )
-                                                          }
-                                                          options={
-                                                            ATTRIBUTE_VALUE_STATUS_OPTIONS
-                                                          }
-                                                          required
-                                                          size="s"
-                                                          value={
-                                                            statusField.state
-                                                              .value
-                                                          }
-                                                        />
-                                                      );
-                                                    }}
-                                                  </form.Field>
-                                                  {field.state.value.length >
-                                                    1 && (
-                                                    <div className="flex h-[var(--textfield-outlined-sm-height)] items-center">
-                                                      <IconButton
-                                                        aria-label={`Remove attribute value ${index + 1}`}
-                                                        color="default"
-                                                        disabled={isSubmitting}
-                                                        onClick={() =>
-                                                          field.removeValue(
-                                                            index
-                                                          )
-                                                        }
-                                                        size="xs"
-                                                        type="button"
-                                                        variant="soft"
-                                                      >
-                                                        <Minus aria-hidden="true" />
-                                                      </IconButton>
-                                                    </div>
-                                                  )}
-                                                </div>
-                                              );
-                                            }}
-                                          </form.Field>
-                                        );
-                                      }
-                                    )}
-                                  </div>
-                                  <Button
-                                    disabled={
-                                      isSubmitting || !lastAttributeValue.trim()
-                                    }
-                                    onClick={() => {
-                                      const newAttributeValue =
-                                        createAttributeValue();
-
-                                      setAutoFocusAttributeValueId(
-                                        newAttributeValue.id
-                                      );
-                                      field.pushValue(newAttributeValue);
-                                    }}
-                                    type="button"
-                                    variant="text"
-                                  >
-                                    + Add another value
-                                  </Button>
-                                </>
-                              );
-                            }}
-                          </form.Field>
-                          {attributeStatus === ATTRIBUTE_STATUS.DRAFT ? (
-                            <div className="flex items-center gap-[var(--space-0-5)] text-[var(--text-primary)]">
-                              <CircleAlert
-                                aria-hidden="true"
-                                className="size-[var(--form-helper-text-icon)] shrink-0"
-                              />
-                              <Typography
-                                color="text-primary"
-                                variant="caption"
-                              >
-                                Attribute values cannot be active while the
-                                attribute is a draft
-                              </Typography>
-                            </div>
-                          ) : null}
-                        </>
-                      );
-                    }}
-                  </form.Subscribe>
-                </div>
-              </Dialog.Content>
-
-              <form.Subscribe
-                selector={(state) =>
-                  [state.values.attributeValues, state.isSubmitting] as const
-                }
-              >
-                {([attributeValues, isSubmitting]) => {
-                  const hasAttributeValue = attributeValues.some(
-                    (attributeValue) => attributeValue.value.trim()
-                  );
-
-                  return (
-                    <Dialog.Footer closeDisabled={isSubmitting}>
-                      <Button
-                        disabled={isSubmitting || !hasAttributeValue}
-                        type="submit"
-                      >
-                        {isSubmitting ? 'Saving...' : 'Save'}
-                      </Button>
-                    </Dialog.Footer>
-                  );
-                }}
-              </form.Subscribe>
+              <CreateAttributeValuesDialogFormContent
+                attributeStatus={attributeStatus}
+                form={form}
+                open={open}
+              />
             </form>
           </Dialog.Popup>
         </Dialog.Viewport>

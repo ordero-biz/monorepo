@@ -1,12 +1,12 @@
-import type { Supplier } from '@/lib/domain/suppliers';
-import type { SupplierEntityFormValues } from '../../../shared/SupplierFormDialogContent';
+import type { Supplier } from '@/lib/domain/suppliers/types';
+import type { UpdateSupplierFormValues } from './validations';
 
 export const getSupplierDefaultValues = (
   supplier: Supplier
-): SupplierEntityFormValues => ({
+): UpdateSupplierFormValues => ({
   name: supplier.name,
-  email: supplier.email,
-  phone: supplier.phone,
-  address: supplier.address,
-  comment: supplier.comment,
+  email: supplier.email ?? undefined,
+  phone: supplier.phone ?? undefined,
+  address: supplier.address ?? undefined,
+  comment: supplier.comment ?? undefined,
 });

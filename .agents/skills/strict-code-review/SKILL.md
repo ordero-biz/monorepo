@@ -394,6 +394,21 @@ Raise a finding when a PATCH helper receives unchanged form fields, or when an
 API DTO is narrowed to a specific form and no longer supports valid non-form
 callers.
 
+For optional fields in create or PATCH flows, also verify the transport
+semantics and their coverage:
+
+- blank optional create values are omitted unless the endpoint requires `null`
+- clearing a persisted optional value sends `null`, not an empty-string sentinel,
+  and the update DTO models that nullable field
+- unchanged normalized blank or absent values produce no PATCH
+- the client-helper test asserts the serialized `null` PATCH body, while the
+  owning submit utility covers create omission and update comparison
+
+Do not raise a finding merely because create and update use separate
+normalizers: omission and clearing are distinct command semantics. Recommend a
+shared pure normalizer only when the same field-normalization rule is actually
+reused across several workflows.
+
 Raise a finding when a change crosses these boundaries without a clear reason,
 such as putting a platform-only store model into `@ordero/api-types`, importing
 server-only helpers into Client Components, or adding direct browser calls to

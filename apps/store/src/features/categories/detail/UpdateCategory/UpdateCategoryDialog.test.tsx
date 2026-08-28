@@ -163,4 +163,39 @@ describe('UpdateCategoryDialog', () => {
     );
     expect(within(dialog).getByRole('button', { name: 'Save' })).toBeEnabled();
   });
+
+  it('prevents another save while the update is in flight', async () => {
+    let resolveUpdate:
+      | ((value: Awaited<ReturnType<typeof updateCategory>>) => void)
+      | undefined;
+    updateCategoryMock.mockReturnValue(
+      new Promise((resolve) => {
+        resolveUpdate = resolve;
+      })
+    );
+    const user = userEvent.setup();
+
+    setup();
+
+    const dialog = screen.getByRole('dialog', { name: 'Edit category' });
+    const nameField = within(dialog).getByRole('textbox', { name: 'Name' });
+    const saveButton = within(dialog).getByRole('button', { name: 'Save' });
+
+    await user.clear(nameField);
+    await user.type(nameField, 'Running shoes');
+    await user.click(saveButton);
+
+    expect(saveButton).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Saving...' })).toBeVisible();
+
+    resolveUpdate?.({
+      ok: true,
+      data: {
+        ...category,
+        name: 'Running shoes',
+      },
+    });
+
+    await screen.findByRole('button', { name: 'Save' });
+  });
 });

@@ -1,31 +1,13 @@
 'use client';
 
-import { Button, Dialog, TextField } from '@ordero/ui';
+import { Dialog } from '@ordero/ui';
 import { useQueryClient } from '@tanstack/react-query';
-import { useRef, useState } from 'react';
-import type { UnitOfMeasurement } from '@/lib/domain/unitsOfMeasurement';
+import { UNIT_OF_MEASUREMENT_STATUS } from '@/lib/domain/units-of-measurement/constants';
 import { unitsOfMeasurementQueryKeys } from '@/lib/query/units-of-measurement/unitsOfMeasurementQueryKeys';
-import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
 import { useUpdateUnitOfMeasurementForm } from './hooks/useUpdateUnitOfMeasurementForm';
 import type { UpdateUnitOfMeasurementDialogProps } from './types';
-import {
-  type UpdateUnitOfMeasurementFormValues,
-  validateUpdateUnitOfMeasurementCode,
-  validateUpdateUnitOfMeasurementName,
-  validateUpdateUnitOfMeasurementSymbol,
-} from './utils/validations';
-
-const getUnitOfMeasurementFormValues = ({
-  code,
-  name,
-  symbol,
-  comment,
-}: UnitOfMeasurement): UpdateUnitOfMeasurementFormValues => ({
-  code,
-  name,
-  symbol,
-  comment,
-});
+import { UpdateUnitOfMeasurementDialogFormContent } from './UpdateUnitOfMeasurementDialogFormContent';
+import { getUnitOfMeasurementDefaultValues } from './utils/fields';
 
 export const UpdateUnitOfMeasurementDialog = ({
   onOpenChange,
@@ -34,35 +16,34 @@ export const UpdateUnitOfMeasurementDialog = ({
   unitOfMeasurement,
 }: UpdateUnitOfMeasurementDialogProps) => {
   const queryClient = useQueryClient();
-  const latestUnitOfMeasurementRef = useRef(unitOfMeasurement);
-  const [formValues, setFormValues] = useState(() =>
-    getUnitOfMeasurementFormValues(unitOfMeasurement)
-  );
   const { form } = useUpdateUnitOfMeasurementForm({
-    initialValues: formValues,
+    onNoChanges: () => handleOpenChange(false),
     onUpdated: async (updatedUnitOfMeasurement) => {
-      const updatedFormValues = getUnitOfMeasurementFormValues(
-        updatedUnitOfMeasurement
-      );
-
-      latestUnitOfMeasurementRef.current = updatedUnitOfMeasurement;
-      setFormValues(updatedFormValues);
-      form.reset(updatedFormValues);
+      form.reset(getUnitOfMeasurementDefaultValues(updatedUnitOfMeasurement));
       onOpenChange(false);
-      await queryClient.invalidateQueries({
-        queryKey: unitsOfMeasurementQueryKeys.list,
-      });
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: unitsOfMeasurementQueryKeys.list,
+        }),
+        queryClient.invalidateQueries({
+          queryKey: unitsOfMeasurementQueryKeys.detail(unitOfMeasurement.id),
+        }),
+      ]);
       await onUpdated(updatedUnitOfMeasurement);
     },
-    unitOfMeasurementId: unitOfMeasurement.id,
+    unitOfMeasurement,
   });
 
   const handleOpenChange = (nextOpen: boolean) => {
     onOpenChange(nextOpen);
-    form.reset(
-      getUnitOfMeasurementFormValues(latestUnitOfMeasurementRef.current)
-    );
+
+    if (!nextOpen) {
+      form.reset(getUnitOfMeasurementDefaultValues(unitOfMeasurement));
+    }
   };
+
+  const isUnitOfMeasurementActive =
+    unitOfMeasurement.status === UNIT_OF_MEASUREMENT_STATUS.ACTIVE;
 
   return (
     <Dialog.Root onOpenChange={handleOpenChange} open={open}>
@@ -81,141 +62,10 @@ export const UpdateUnitOfMeasurementDialog = ({
                 <Dialog.Title>Edit unit of measurement</Dialog.Title>
               </Dialog.Header>
 
-              <Dialog.Content>
-                <div className="flex flex-col gap-[var(--space-2)]">
-                  <form.Field
-                    name="code"
-                    validators={{
-                      onChange: validateUpdateUnitOfMeasurementCode,
-                      onSubmit: validateUpdateUnitOfMeasurementCode,
-                    }}
-                  >
-                    {(field) => {
-                      const errorText = getFieldSubmitChangeErrorText(
-                        field.state.meta
-                      );
-
-                      return (
-                        <TextField
-                          errorText={errorText}
-                          invalid={Boolean(errorText)}
-                          label="Code"
-                          name={field.name}
-                          onBlur={field.handleBlur}
-                          onValueChange={field.handleChange}
-                          required
-                          size="s"
-                          value={field.state.value}
-                        />
-                      );
-                    }}
-                  </form.Field>
-
-                  <form.Field
-                    name="name"
-                    validators={{
-                      onChange: validateUpdateUnitOfMeasurementName,
-                      onSubmit: validateUpdateUnitOfMeasurementName,
-                    }}
-                  >
-                    {(field) => {
-                      const errorText = getFieldSubmitChangeErrorText(
-                        field.state.meta
-                      );
-
-                      return (
-                        <TextField
-                          errorText={errorText}
-                          invalid={Boolean(errorText)}
-                          label="Name"
-                          name={field.name}
-                          onBlur={field.handleBlur}
-                          onValueChange={field.handleChange}
-                          required
-                          size="s"
-                          value={field.state.value}
-                        />
-                      );
-                    }}
-                  </form.Field>
-
-                  <form.Field
-                    name="symbol"
-                    validators={{
-                      onChange: validateUpdateUnitOfMeasurementSymbol,
-                      onSubmit: validateUpdateUnitOfMeasurementSymbol,
-                    }}
-                  >
-                    {(field) => {
-                      const errorText = getFieldSubmitChangeErrorText(
-                        field.state.meta
-                      );
-
-                      return (
-                        <TextField
-                          errorText={errorText}
-                          invalid={Boolean(errorText)}
-                          label="Symbol"
-                          name={field.name}
-                          onBlur={field.handleBlur}
-                          onValueChange={field.handleChange}
-                          required
-                          size="s"
-                          value={field.state.value}
-                        />
-                      );
-                    }}
-                  </form.Field>
-
-                  <form.Field name="comment">
-                    {(field) => {
-                      const errorText = getFieldSubmitChangeErrorText(
-                        field.state.meta
-                      );
-
-                      return (
-                        <TextField
-                          errorText={errorText}
-                          invalid={Boolean(errorText)}
-                          label="Comment"
-                          name={field.name}
-                          onBlur={field.handleBlur}
-                          onValueChange={field.handleChange}
-                          size="s"
-                          value={field.state.value}
-                        />
-                      );
-                    }}
-                  </form.Field>
-                </div>
-              </Dialog.Content>
-
-              <Dialog.Footer>
-                <form.Subscribe
-                  selector={(state) =>
-                    [
-                      state.values.code,
-                      state.values.name,
-                      state.values.symbol,
-                      state.isSubmitting,
-                    ] as const
-                  }
-                >
-                  {([code, name, symbol, isSubmitting]) => (
-                    <Button
-                      disabled={
-                        isSubmitting ||
-                        !code.trim() ||
-                        !name.trim() ||
-                        !symbol.trim()
-                      }
-                      type="submit"
-                    >
-                      {isSubmitting ? 'Saving...' : 'Save'}
-                    </Button>
-                  )}
-                </form.Subscribe>
-              </Dialog.Footer>
+              <UpdateUnitOfMeasurementDialogFormContent
+                form={form}
+                isUnitOfMeasurementActive={isUnitOfMeasurementActive}
+              />
             </form>
           </Dialog.Popup>
         </Dialog.Viewport>

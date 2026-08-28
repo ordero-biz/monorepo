@@ -26,9 +26,9 @@ describe('CreateWarehouseDialogTrigger', () => {
     await user.click(screen.getByRole('button', { name: 'Add Warehouse' }));
 
     const dialog = screen.getByRole('dialog', { name: 'Add warehouse' });
-    const codeField = within(dialog).getByRole('textbox', { name: 'Code' });
+    const nameField = within(dialog).getByRole('textbox', { name: 'Name' });
 
-    await user.type(codeField, 'WH-001');
+    await user.type(nameField, 'Main Warehouse');
     await user.keyboard('{Escape}');
 
     expect(
@@ -40,7 +40,7 @@ describe('CreateWarehouseDialogTrigger', () => {
     expect(
       within(screen.getByRole('dialog', { name: 'Add warehouse' })).getByRole(
         'textbox',
-        { name: 'Code' }
+        { name: 'Name' }
       )
     ).toHaveValue('');
   });
