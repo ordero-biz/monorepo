@@ -1,5 +1,4 @@
 import {
-  Chip,
   DataTableCell,
   type DataTableColumnDef,
   DataTableColumnHeader,
@@ -8,25 +7,8 @@ import {
 import { EllipsisVertical, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import { getUnitOfMeasurementDetailRoute } from '@/lib/client/routes';
-import {
-  UNIT_OF_MEASUREMENT_STATUS,
-  type UnitOfMeasurement,
-} from '@/lib/domain/unitsOfMeasurement';
-
-const statusLabels = {
-  ACTIVE: 'Active',
-  DRAFT: 'Draft',
-} as const;
-
-const getStatusChip = (status: UnitOfMeasurement['status']) => (
-  <Chip
-    color={status === UNIT_OF_MEASUREMENT_STATUS.ACTIVE ? 'primary' : 'warning'}
-    size="s"
-    variant="soft"
-  >
-    {statusLabels[status]}
-  </Chip>
-);
+import type { UnitOfMeasurement } from '@/lib/domain/unitsOfMeasurement';
+import { UnitOfMeasurementStatusChip } from '../../shared/UnitOfMeasurementStatusChip';
 
 type GetColumnsArgs = {
   onDeleteUnitOfMeasurement: (unitOfMeasurement: UnitOfMeasurement) => void;
@@ -57,7 +39,9 @@ export const getColumns = ({
   {
     accessorKey: 'status',
     cell: ({ row }) => (
-      <DataTableCell>{getStatusChip(row.original.status)}</DataTableCell>
+      <DataTableCell>
+        <UnitOfMeasurementStatusChip status={row.original.status} />
+      </DataTableCell>
     ),
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Status" />

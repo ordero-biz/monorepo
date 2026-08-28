@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, Card, Chip, Menu, PageHeader, Typography } from '@ordero/ui';
+import { Button, Card, Menu, PageHeader, Typography } from '@ordero/ui';
 import { EllipsisVertical, Pencil, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -8,15 +8,11 @@ import { clientRoutes } from '@/lib/client/routes';
 import { UNIT_OF_MEASUREMENT_STATUS } from '@/lib/domain/unitsOfMeasurement';
 import { useUnitOfMeasurementQuery } from '@/lib/hooks/units-of-measurement/useUnitOfMeasurementQuery';
 import { DeleteUnitsOfMeasurementDialog } from '../../shared';
+import { UnitOfMeasurementStatusChip } from '../../shared/UnitOfMeasurementStatusChip';
 import { UpdateUnitOfMeasurementDialog } from '../UpdateUnitOfMeasurement/UpdateUnitOfMeasurementDialog';
 import { ActivateUnitOfMeasurementDialogTrigger } from './ActivateUnitOfMeasurementDialogTrigger';
 import type { UnitOfMeasurementDetailProps } from './types';
 import { UnitOfMeasurementDetailInfo } from './UnitOfMeasurementDetailInfo';
-
-const statusLabels = {
-  ACTIVE: 'Active',
-  DRAFT: 'Draft',
-} as const;
 
 export const UnitOfMeasurementDetail = ({
   unitOfMeasurementId,
@@ -72,13 +68,9 @@ export const UnitOfMeasurementDetail = ({
           <Typography variant="h5">
             {unitOfMeasurementQuery.data.name}
           </Typography>
-          <Chip
-            color={isUnitOfMeasurementActive ? 'primary' : 'warning'}
-            size="s"
-            variant="soft"
-          >
-            {statusLabels[unitOfMeasurementQuery.data.status]}
-          </Chip>
+          <UnitOfMeasurementStatusChip
+            status={unitOfMeasurementQuery.data.status}
+          />
         </PageHeader.Left>
         <PageHeader.Right>
           {!isUnitOfMeasurementActive ? (
