@@ -1,3 +1,4 @@
+import { WAREHOUSE_STATUS } from '@/lib/domain/warehouses';
 import {
   createWarehouse,
   getWarehouse,
@@ -154,6 +155,7 @@ describe('warehouse client helpers', () => {
         name: 'Main Warehouse',
         address: '123 Commerce Ave',
         comment: 'Primary stock location',
+        status: WAREHOUSE_STATUS.ACTIVE,
       })
     ).resolves.toEqual({
       ok: true,
@@ -175,6 +177,7 @@ describe('warehouse client helpers', () => {
           name: 'Main Warehouse',
           address: '123 Commerce Ave',
           comment: 'Primary stock location',
+          status: WAREHOUSE_STATUS.ACTIVE,
         }),
         cache: 'no-store',
       })
@@ -203,6 +206,7 @@ describe('warehouse client helpers', () => {
         name: 'Main Warehouse',
         address: '123 Commerce Ave',
         comment: '',
+        status: WAREHOUSE_STATUS.DRAFT,
       })
     ).resolves.toEqual({
       ok: false,

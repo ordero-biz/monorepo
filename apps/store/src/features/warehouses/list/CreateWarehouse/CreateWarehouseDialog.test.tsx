@@ -1,6 +1,7 @@
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createWarehouse } from '@/lib/client/api/warehouses';
+import { WAREHOUSE_STATUS } from '@/lib/domain/warehouses';
 import { warehousesQueryKeys } from '@/lib/query/warehouses/warehousesQueryKeys';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { CreateWarehouseDialog } from './CreateWarehouseDialog';
@@ -45,7 +46,9 @@ describe('CreateWarehouseDialog', () => {
     const addressField = within(dialog).getByRole('textbox', {
       name: 'Address',
     });
-    const addButton = within(dialog).getByRole('button', { name: 'Add' });
+    const addButton = within(dialog).getByRole('button', {
+      name: 'Save draft',
+    });
 
     expect(addButton).toBeDisabled();
 
@@ -65,6 +68,27 @@ describe('CreateWarehouseDialog', () => {
     await user.type(addressField, '123 Commerce Ave');
 
     expect(addButton).toBeEnabled();
+  });
+
+  it('defaults to Draft and changes the action when Active is selected', async () => {
+    const user = userEvent.setup();
+
+    setup();
+
+    const dialog = screen.getByRole('dialog', { name: 'Add warehouse' });
+
+    expect(
+      within(dialog).getByRole('radio', { name: /^Draft\b/ })
+    ).toBeChecked();
+    expect(
+      within(dialog).getByRole('button', { name: 'Save draft' })
+    ).toBeVisible();
+
+    await user.click(within(dialog).getByRole('radio', { name: /^Active\b/ }));
+
+    expect(
+      within(dialog).getByRole('button', { name: 'Publish' })
+    ).toBeVisible();
   });
 
   it('creates a warehouse, closes the dialog, and invalidates the list', async () => {
@@ -101,13 +125,15 @@ describe('CreateWarehouseDialog', () => {
       within(dialog).getByRole('textbox', { name: 'Comment' }),
       ' Primary stock location '
     );
-    await user.click(within(dialog).getByRole('button', { name: 'Add' }));
+    await user.click(within(dialog).getByRole('radio', { name: /^Active\b/ }));
+    await user.click(within(dialog).getByRole('button', { name: 'Publish' }));
 
     expect(createWarehouseMock).toHaveBeenCalledWith({
       code: 'WH-001',
       name: 'Main Warehouse',
       address: '123 Commerce Ave',
       comment: 'Primary stock location',
+      status: WAREHOUSE_STATUS.ACTIVE,
     });
     await waitFor(() =>
       expect(invalidateQueriesSpy).toHaveBeenCalledWith({
@@ -146,13 +172,16 @@ describe('CreateWarehouseDialog', () => {
       within(dialog).getByRole('textbox', { name: 'Address' }),
       '123 Commerce Ave'
     );
-    await user.click(within(dialog).getByRole('button', { name: 'Add' }));
+    await user.click(
+      within(dialog).getByRole('button', { name: 'Save draft' })
+    );
 
     expect(createWarehouseMock).toHaveBeenCalledWith({
       code: 'WH-001',
       name: 'Main Warehouse',
       address: '123 Commerce Ave',
       comment: '',
+      status: WAREHOUSE_STATUS.DRAFT,
     });
     expect(
       await within(dialog).findByText('Warehouse code already exists.')

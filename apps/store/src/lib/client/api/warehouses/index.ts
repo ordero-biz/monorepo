@@ -1,7 +1,7 @@
 'use client';
 
 import { apiFetch } from '@ordero/api-client';
-import type { Warehouse } from '@/lib/domain/warehouses';
+import type { Warehouse, WarehouseStatus } from '@/lib/domain/warehouses';
 import type { PaginatedResponse } from '@/lib/server/types';
 import { tokenizePath } from '@/lib/utils/tokenizePath';
 import {
@@ -17,9 +17,10 @@ type CreateWarehouseInput = {
   name: string;
   address: string;
   comment: string;
+  status: WarehouseStatus;
 };
 
-type UpdateWarehouseInput = CreateWarehouseInput & {
+type UpdateWarehouseInput = Omit<CreateWarehouseInput, 'status'> & {
   warehouseId: string | number;
 };
 

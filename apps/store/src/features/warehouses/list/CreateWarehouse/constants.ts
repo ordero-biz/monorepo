@@ -1,8 +1,10 @@
-import type { WarehouseFormValues } from '../../shared/validations';
+import { WAREHOUSE_STATUS } from '@/lib/domain/warehouses';
+import type { CreateWarehouseFormValues } from './utils/validations';
 
-export const createWarehouseDefaultValues: WarehouseFormValues = {
+export const createWarehouseDefaultValues: CreateWarehouseFormValues = {
   code: '',
   name: '',
   address: '',
   comment: '',
+  status: WAREHOUSE_STATUS.DRAFT,
 };

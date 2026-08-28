@@ -1,12 +1,15 @@
 import { createWarehouse } from '@/lib/client/api/warehouses';
-import type { WarehouseFormValues } from '../../../shared/validations';
+import type { CreateWarehouseFormValues } from './validations';
 
-export const submitCreateWarehouse = async (value: WarehouseFormValues) => {
+export const submitCreateWarehouse = async (
+  value: CreateWarehouseFormValues
+) => {
   const result = await createWarehouse({
     code: value.code.trim(),
     name: value.name.trim(),
     address: value.address.trim(),
     comment: value.comment.trim(),
+    status: value.status,
   });
 
   if (!result.ok) {
