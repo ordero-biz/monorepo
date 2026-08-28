@@ -26,7 +26,7 @@ export const columns: DataTableColumnDef<Supplier>[] = [
       <DataTableColumnHeader column={column} title="Name" />
     ),
     meta: {
-      width: '18%',
+      width: '13%',
     },
   },
   {
@@ -50,7 +50,7 @@ export const columns: DataTableColumnDef<Supplier>[] = [
       <DataTableColumnHeader column={column} title="Email" />
     ),
     meta: {
-      width: '22%',
+      width: '16%',
     },
   },
   {
@@ -60,7 +60,7 @@ export const columns: DataTableColumnDef<Supplier>[] = [
       <DataTableColumnHeader column={column} title="Phone" />
     ),
     meta: {
-      width: '16%',
+      width: '12%',
     },
   },
   {
@@ -70,7 +70,7 @@ export const columns: DataTableColumnDef<Supplier>[] = [
       <DataTableColumnHeader column={column} title="Address" />
     ),
     meta: {
-      width: '24%',
+      width: '18%',
       wrap: 'wrap',
     },
   },
@@ -81,7 +81,7 @@ export const columns: DataTableColumnDef<Supplier>[] = [
       <DataTableColumnHeader column={column} title="Comment" />
     ),
     meta: {
-      width: '20%',
+      width: '15%',
       wrap: 'wrap',
     },
   },
