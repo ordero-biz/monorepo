@@ -63,8 +63,6 @@ describe('UpdateWarehouseDialog', () => {
     expect(updateWarehouseMock).toHaveBeenCalledWith({
       warehouseId: 1,
       name: 'Updated Warehouse',
-      address: '123 Commerce Ave',
-      comment: 'Primary stock location',
     });
     await waitFor(() =>
       expect(invalidateQueriesSpy).toHaveBeenCalledWith({
@@ -133,6 +131,17 @@ describe('UpdateWarehouseDialog', () => {
     );
   });
 
+  it('closes without PATCHing when no normalized values changed', async () => {
+    const user = userEvent.setup();
+    const { onOpenChange } = setup();
+    const dialog = screen.getByRole('dialog', { name: 'Edit warehouse' });
+
+    await user.click(within(dialog).getByRole('button', { name: 'Save' }));
+
+    expect(updateWarehouseMock).not.toHaveBeenCalled();
+    expect(onOpenChange).toHaveBeenCalledWith(false);
+  });
+
   it('disables another save while the update is in flight', async () => {
     let resolveUpdate:
       | ((value: Awaited<ReturnType<typeof updateWarehouse>>) => void)
@@ -148,8 +157,11 @@ describe('UpdateWarehouseDialog', () => {
     setup();
 
     const dialog = screen.getByRole('dialog', { name: 'Edit warehouse' });
+    const nameField = within(dialog).getByRole('textbox', { name: 'Name' });
     const saveButton = within(dialog).getByRole('button', { name: 'Save' });
 
+    await user.clear(nameField);
+    await user.type(nameField, 'Updated Warehouse');
     await user.click(saveButton);
 
     expect(saveButton).toBeDisabled();
@@ -174,6 +186,8 @@ describe('UpdateWarehouseDialog', () => {
     const dialog = screen.getByRole('dialog', { name: 'Edit warehouse' });
     const nameField = within(dialog).getByRole('textbox', { name: 'Name' });
 
+    await user.clear(nameField);
+    await user.type(nameField, 'Existing warehouse');
     await user.click(within(dialog).getByRole('button', { name: 'Save' }));
 
     expect(

@@ -17,6 +17,7 @@ export const UpdateWarehouseDialog = ({
   const queryClient = useQueryClient();
   const { form } = useUpdateWarehouseForm({
     warehouse,
+    onNoChanges: () => handleOpenChange(false),
     onUpdated: async (updatedWarehouse) => {
       form.reset(getWarehouseDefaultValues(updatedWarehouse));
       onOpenChange(false);

@@ -19,7 +19,9 @@ type CreateWarehouseInput = {
   status: WarehouseStatus;
 };
 
-type UpdateWarehouseInput = Partial<CreateWarehouseInput> & {
+export type UpdateWarehouseFieldData = Partial<CreateWarehouseInput>;
+
+export type UpdateWarehouseInput = UpdateWarehouseFieldData & {
   warehouseId: string | number;
 };
 
