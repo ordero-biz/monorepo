@@ -1,6 +1,7 @@
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createWarehouse } from '@/lib/client/api/warehouses';
+import { WAREHOUSE_STATUS } from '@/lib/domain/warehouses/constants';
 import { warehousesQueryKeys } from '@/lib/query/warehouses/warehousesQueryKeys';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { CreateWarehouseDialog } from './CreateWarehouseDialog';
@@ -30,41 +31,61 @@ describe('CreateWarehouseDialog', () => {
     onOpenChangeMock.mockClear();
   });
 
-  it('requires code, name, and address before add is available', async () => {
+  it('keeps the action enabled and validates required fields on submit', async () => {
     const user = userEvent.setup();
 
     setup();
 
     const dialog = screen.getByRole('dialog', { name: 'Add warehouse' });
-    const codeField = within(dialog).getByRole('textbox', {
-      name: 'Code',
+    const addButton = within(dialog).getByRole('button', {
+      name: 'Save draft',
     });
-    const nameField = within(dialog).getByRole('textbox', {
-      name: 'Name',
-    });
-    const addressField = within(dialog).getByRole('textbox', {
-      name: 'Address',
-    });
-    const addButton = within(dialog).getByRole('button', { name: 'Add' });
-
-    expect(addButton).toBeDisabled();
-
-    await user.type(codeField, 'WH-001');
-    await user.type(nameField, 'Main Warehouse');
-    expect(addButton).toBeDisabled();
-
-    await user.type(addressField, '   ');
-    await user.tab();
-
-    expect(
-      within(dialog).getByText('Warehouse address is required')
-    ).toBeVisible();
-    expect(addButton).toBeDisabled();
-
-    await user.clear(addressField);
-    await user.type(addressField, '123 Commerce Ave');
 
     expect(addButton).toBeEnabled();
+    await user.click(addButton);
+
+    expect(
+      await within(dialog).findByText('Warehouse name is required')
+    ).toBeVisible();
+    expect(createWarehouseMock).not.toHaveBeenCalled();
+  });
+
+  it('defaults to Draft and changes the action when Active is selected', async () => {
+    const user = userEvent.setup();
+
+    setup();
+
+    const dialog = screen.getByRole('dialog', { name: 'Add warehouse' });
+
+    expect(
+      within(dialog).getByRole('radio', { name: /^Draft\b/ })
+    ).toBeChecked();
+    expect(
+      within(dialog).getByRole('button', { name: 'Save draft' })
+    ).toBeVisible();
+
+    await user.click(within(dialog).getByRole('radio', { name: /^Active\b/ }));
+
+    expect(
+      within(dialog).getByRole('button', { name: 'Publish' })
+    ).toBeVisible();
+  });
+
+  it('explains the effects of each warehouse status', () => {
+    setup();
+
+    const dialog = screen.getByRole('dialog', { name: 'Add warehouse' });
+
+    expect(
+      within(dialog).getByText(
+        'Editable only. Cannot be used in supplies or tracked in analytics. Can be activated later'
+      )
+    ).toBeVisible();
+    expect(
+      within(dialog).getByText(
+        'Fully functional. Can be used in supplies and tracked in analytics. Name and status cannot be edited after publishing'
+      )
+    ).toBeVisible();
   });
 
   it('creates a warehouse, closes the dialog, and invalidates the list', async () => {
@@ -73,7 +94,6 @@ describe('CreateWarehouseDialog', () => {
       ok: true,
       data: {
         id: 1,
-        code: 'WH-001',
         name: 'Main Warehouse',
         address: '123 Commerce Ave',
         comment: 'Primary stock location',
@@ -86,10 +106,6 @@ describe('CreateWarehouseDialog', () => {
     const dialog = screen.getByRole('dialog', { name: 'Add warehouse' });
 
     await user.type(
-      within(dialog).getByRole('textbox', { name: 'Code' }),
-      ' WH-001 '
-    );
-    await user.type(
       within(dialog).getByRole('textbox', { name: 'Name' }),
       ' Main Warehouse '
     );
@@ -101,13 +117,14 @@ describe('CreateWarehouseDialog', () => {
       within(dialog).getByRole('textbox', { name: 'Comment' }),
       ' Primary stock location '
     );
-    await user.click(within(dialog).getByRole('button', { name: 'Add' }));
+    await user.click(within(dialog).getByRole('radio', { name: /^Active\b/ }));
+    await user.click(within(dialog).getByRole('button', { name: 'Publish' }));
 
     expect(createWarehouseMock).toHaveBeenCalledWith({
-      code: 'WH-001',
       name: 'Main Warehouse',
       address: '123 Commerce Ave',
       comment: 'Primary stock location',
+      status: WAREHOUSE_STATUS.ACTIVE,
     });
     await waitFor(() =>
       expect(invalidateQueriesSpy).toHaveBeenCalledWith({
@@ -125,7 +142,7 @@ describe('CreateWarehouseDialog', () => {
         status: 422,
         message: 'Warehouse creation failed.',
         fieldErrors: {
-          code: 'Warehouse code already exists.',
+          name: 'Warehouse name already exists.',
         },
       },
     });
@@ -133,33 +150,25 @@ describe('CreateWarehouseDialog', () => {
     const { onOpenChange } = setup();
 
     const dialog = screen.getByRole('dialog', { name: 'Add warehouse' });
-    const codeField = within(dialog).getByRole('textbox', {
-      name: 'Code',
-    });
-
-    await user.type(codeField, 'WH-001');
     await user.type(
       within(dialog).getByRole('textbox', { name: 'Name' }),
       'Main Warehouse'
     );
-    await user.type(
-      within(dialog).getByRole('textbox', { name: 'Address' }),
-      '123 Commerce Ave'
+    await user.click(
+      within(dialog).getByRole('button', { name: 'Save draft' })
     );
-    await user.click(within(dialog).getByRole('button', { name: 'Add' }));
 
     expect(createWarehouseMock).toHaveBeenCalledWith({
-      code: 'WH-001',
       name: 'Main Warehouse',
-      address: '123 Commerce Ave',
       comment: '',
+      status: WAREHOUSE_STATUS.DRAFT,
     });
     expect(
-      await within(dialog).findByText('Warehouse code already exists.')
+      await within(dialog).findByText('Warehouse name already exists.')
     ).toBeVisible();
-    expect(codeField).toHaveAccessibleDescription(
-      'Warehouse code already exists.'
-    );
+    expect(
+      within(dialog).getByRole('textbox', { name: 'Name' })
+    ).toHaveAccessibleDescription('Warehouse name already exists.');
     expect(
       await screen.findByRole('dialog', { name: 'Warehouse creation failed.' })
     ).toBeVisible();

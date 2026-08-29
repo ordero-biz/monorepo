@@ -79,7 +79,7 @@ describe('submitCreateCategory', () => {
     });
   });
 
-  it('sends parent id null when no parent category is selected', async () => {
+  it('omits the parent id when no parent category is selected', async () => {
     const category = {
       id: 3,
       name: 'Sneakers',
@@ -104,7 +104,6 @@ describe('submitCreateCategory', () => {
 
     expect(createCategoryMock).toHaveBeenCalledWith({
       name: 'Sneakers',
-      parentId: null,
       status: 'DRAFT',
     });
   });

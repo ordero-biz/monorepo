@@ -53,7 +53,7 @@ describe('AttributeDetailHeader', () => {
         id: 7,
         name: 'Color',
         sortOrder: 10,
-        status: 'DRAFT',
+        status: 'DRAFT' as const,
         createdAt: '2026-06-24T20:07:32.467Z',
       },
     });
@@ -76,7 +76,7 @@ describe('AttributeDetailHeader', () => {
         id: 7,
         name: 'Color',
         sortOrder: 10,
-        status: 'DRAFT',
+        status: 'DRAFT' as const,
         createdAt: '2026-06-24T20:07:32.467Z',
       },
     });
@@ -147,7 +147,7 @@ describe('AttributeDetailHeader', () => {
         id: 7,
         name: 'Color',
         sortOrder: 10,
-        status: 'DRAFT',
+        status: 'DRAFT' as const,
         createdAt: '2026-06-24T20:07:32.467Z',
       },
     });
@@ -208,6 +208,7 @@ describe('AttributeDetailHeader', () => {
         id: 7,
         name: 'Color',
         sortOrder: 10,
+        status: 'DRAFT' as const,
         createdAt: '2026-06-24T20:07:32.467Z',
       },
     });
@@ -230,6 +231,7 @@ describe('AttributeDetailHeader', () => {
           id: 7,
           name: 'Color',
           sortOrder: 10,
+          status: 'DRAFT' as const,
           createdAt: '2026-06-24T20:07:32.467Z',
         },
       })
@@ -239,6 +241,7 @@ describe('AttributeDetailHeader', () => {
           id: 7,
           name: 'Material',
           sortOrder: 10,
+          status: 'DRAFT' as const,
           createdAt: '2026-06-25T18:13:29.608Z',
         },
       });
@@ -248,6 +251,7 @@ describe('AttributeDetailHeader', () => {
         id: 7,
         name: 'Material',
         sortOrder: 10,
+        status: 'DRAFT' as const,
         createdAt: '2026-06-25T18:13:29.608Z',
       },
     });
@@ -294,6 +298,7 @@ describe('AttributeDetailHeader', () => {
           id: 7,
           name: 'Color',
           sortOrder: 10,
+          status: 'DRAFT' as const,
           createdAt: '2026-06-24T20:07:32.467Z',
         },
       });

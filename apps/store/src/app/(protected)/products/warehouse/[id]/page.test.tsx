@@ -30,7 +30,6 @@ describe('WarehouseDetailPage', () => {
   it('prefetches warehouse details and hydrates the query cache', async () => {
     const warehouse = {
       id: 1,
-      code: 'WH-001',
       name: 'Main Warehouse',
       address: '123 Commerce Ave',
       comment: 'Primary stock location',

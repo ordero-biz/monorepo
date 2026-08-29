@@ -1,14 +1,10 @@
 import { Card, Typography } from '@ordero/ui';
-import type { Warehouse } from '@/lib/domain/warehouses';
+import type { Warehouse } from '@/lib/domain/warehouses/types';
 import type { WarehouseDetailField, WarehouseDetailInfoProps } from './types';
 
 const getWarehouseDetailData = (
   warehouse: Warehouse
 ): WarehouseDetailField[] => [
-  {
-    label: 'Code',
-    value: warehouse.code,
-  },
   {
     label: 'Address',
     value: warehouse.address,

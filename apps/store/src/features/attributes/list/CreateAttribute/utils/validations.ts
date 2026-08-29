@@ -3,6 +3,7 @@ import {
   ATTRIBUTE_STATUS,
   ATTRIBUTE_VALUE_STATUS,
 } from '@/lib/domain/attributes/constants';
+import { getValidationMessage } from '@/lib/utils/form/validation/message';
 import type { ValidationArgs } from '@/lib/utils/form/validation/types';
 
 export const attributeNameSchema = z
@@ -40,23 +41,17 @@ export type AttributeValueFormValue = z.infer<typeof attributeValueSchema>;
 export type CreateAttributeFormValues = z.infer<typeof createAttributeSchema>;
 
 export const validateAttributeName = ({ value }: ValidationArgs<string>) => {
-  const result = attributeNameSchema.safeParse(value);
-
-  return result.success ? undefined : result.error.issues[0]?.message;
+  return getValidationMessage(attributeNameSchema, value);
 };
 
 export const validateAttributeStatus = ({
   value,
 }: ValidationArgs<z.infer<typeof createAttributeSchema>['status']>) => {
-  const result = attributeStatusSchema.safeParse(value);
-
-  return result.success ? undefined : result.error.issues[0]?.message;
+  return getValidationMessage(attributeStatusSchema, value);
 };
 
 export const validateAttributeValueStatus = ({
   value,
 }: ValidationArgs<AttributeValueFormValue['status']>) => {
-  const result = attributeValueStatusSchema.safeParse(value);
-
-  return result.success ? undefined : result.error.issues[0]?.message;
+  return getValidationMessage(attributeValueStatusSchema, value);
 };

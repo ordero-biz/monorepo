@@ -1,17 +1,22 @@
 import { useToastManager } from '@ordero/ui';
 import { useForm } from '@tanstack/react-form';
 import type { Attribute } from '@/lib/domain/attributes/types';
-import { submitUpdateAttribute } from '../utils/submitAction';
+import {
+  getAttributeUpdateChanges,
+  submitUpdateAttribute,
+} from '../utils/submitAction';
 
 type UseUpdateAttributeFormArgs = {
   attributeId: string | number;
   initialName: string;
+  onNoChanges: () => void;
   onUpdated: (attribute: Attribute) => Promise<void> | void;
 };
 
 export const useUpdateAttributeForm = ({
   attributeId,
   initialName,
+  onNoChanges,
   onUpdated,
 }: UseUpdateAttributeFormArgs) => {
   const { add: addToast } = useToastManager();
@@ -20,9 +25,19 @@ export const useUpdateAttributeForm = ({
       name: initialName,
     },
     onSubmit: async ({ formApi, value }) => {
+      const updateChanges = getAttributeUpdateChanges({
+        formValue: value,
+        initialName,
+      });
+
+      if (!updateChanges) {
+        onNoChanges();
+        return;
+      }
+
       const result = await submitUpdateAttribute({
         attributeId,
-        value,
+        submitData: updateChanges,
       });
 
       if (!result.ok) {

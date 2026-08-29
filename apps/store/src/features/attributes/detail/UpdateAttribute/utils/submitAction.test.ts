@@ -1,6 +1,9 @@
 import { updateAttribute } from '@/lib/client/api/attributes';
 import { API_ERROR_CODES } from '@/lib/constants/apiErrorCodes';
-import { submitUpdateAttribute } from './submitAction';
+import {
+  getAttributeUpdateChanges,
+  submitUpdateAttribute,
+} from './submitAction';
 
 vi.mock('@/lib/client/api/attributes', async () => ({
   ...(await vi.importActual<typeof import('@/lib/client/api/attributes')>(
@@ -16,11 +19,30 @@ describe('submitUpdateAttribute', () => {
     updateAttributeMock.mockReset();
   });
 
-  it('normalizes form values before updating the attribute', async () => {
+  it('normalizes form values before creating the update patch', () => {
+    expect(
+      getAttributeUpdateChanges({
+        initialName: ' Color ',
+        formValue: { name: ' Material ' },
+      })
+    ).toEqual({ name: 'Material' });
+  });
+
+  it('returns no patch when normalized form values are unchanged', () => {
+    expect(
+      getAttributeUpdateChanges({
+        initialName: 'Color',
+        formValue: { name: ' Color ' },
+      })
+    ).toBeUndefined();
+  });
+
+  it('transfers prepared attribute update data', async () => {
     const attribute = {
       id: 7,
       name: 'Material',
       sortOrder: 10,
+      status: 'DRAFT' as const,
       createdAt: '2026-06-25T18:13:29.608Z',
     };
     updateAttributeMock.mockResolvedValue({
@@ -31,9 +53,7 @@ describe('submitUpdateAttribute', () => {
     await expect(
       submitUpdateAttribute({
         attributeId: 7,
-        value: {
-          name: '  Material  ',
-        },
+        submitData: { name: 'Material' },
       })
     ).resolves.toEqual({
       ok: true,
@@ -59,9 +79,7 @@ describe('submitUpdateAttribute', () => {
     await expect(
       submitUpdateAttribute({
         attributeId: 7,
-        value: {
-          name: 'Material',
-        },
+        submitData: { name: 'Material' },
       })
     ).resolves.toEqual({
       ok: false,

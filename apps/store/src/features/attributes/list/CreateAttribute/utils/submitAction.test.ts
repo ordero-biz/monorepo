@@ -24,6 +24,7 @@ describe('submitCreateAttribute', () => {
       id: 7,
       name: 'Material',
       sortOrder: 10,
+      status: 'DRAFT' as const,
       createdAt: '2026-05-26T20:55:51.542Z',
     };
     createAttributeMock.mockResolvedValue({
@@ -111,6 +112,7 @@ describe('submitCreateAttribute', () => {
       id: 7,
       name: 'Material',
       sortOrder: 10,
+      status: 'DRAFT' as const,
       createdAt: '2026-05-26T20:55:51.542Z',
     };
     createAttributeMock.mockResolvedValue({

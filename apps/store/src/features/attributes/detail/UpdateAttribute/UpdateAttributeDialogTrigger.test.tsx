@@ -20,6 +20,7 @@ const { setup } = prepareStoreSetup({
       id: 7,
       name: 'Color',
       sortOrder: 10,
+      status: 'DRAFT' as const,
       createdAt: '2026-06-24T20:07:32.467Z',
     },
     onUpdated: vi.fn(),
@@ -70,18 +71,17 @@ describe('UpdateAttributeDialogTrigger', () => {
   });
 
   it('uses the saved values when the dialog is reopened after an update', async () => {
-    updateAttributeMock.mockResolvedValue({
-      ok: true,
-      data: {
-        id: 7,
-        name: 'Material',
-        sortOrder: 10,
-        createdAt: '2026-06-25T18:13:29.608Z',
-      },
-    });
+    const updatedAttribute = {
+      id: 7,
+      name: 'Material',
+      sortOrder: 10,
+      status: 'DRAFT' as const,
+      createdAt: '2026-06-25T18:13:29.608Z',
+    };
+    updateAttributeMock.mockResolvedValue({ ok: true, data: updatedAttribute });
     const user = userEvent.setup();
 
-    setup();
+    const { renderResult } = setup();
 
     await user.click(screen.getByRole('button', { name: 'Edit Color' }));
 
@@ -100,7 +100,9 @@ describe('UpdateAttributeDialogTrigger', () => {
       screen.queryByRole('dialog', { name: 'Edit Attribute' })
     ).not.toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', { name: 'Edit Color' }));
+    renderResult.rerender({ attribute: updatedAttribute });
+
+    await user.click(screen.getByRole('button', { name: 'Edit Material' }));
 
     expect(screen.getByRole('textbox', { name: 'Attribute name' })).toHaveValue(
       'Material'

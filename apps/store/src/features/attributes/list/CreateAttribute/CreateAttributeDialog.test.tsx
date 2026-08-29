@@ -91,7 +91,7 @@ describe('CreateAttributeDialog', () => {
     ).toBeVisible();
     expect(
       within(dialog).getByText(
-        'Fully functional. Can be assigned to products and tracked in analytics. Cannot be edited after publishing'
+        'Fully functional. Can be assigned to products and tracked in analytics. Name cannot be edited after publishing, values remain editable'
       )
     ).toBeVisible();
     expect(
@@ -192,6 +192,7 @@ describe('CreateAttributeDialog', () => {
         id: 1,
         name: 'Material',
         sortOrder: 10,
+        status: 'DRAFT' as const,
         createdAt: '2026-05-26T20:55:51.542Z',
       },
     });
@@ -223,17 +224,17 @@ describe('CreateAttributeDialog', () => {
     expect(createAttributeMock).toHaveBeenCalledWith({
       name: 'Material',
       sortOrder: 0,
-      status: 'DRAFT',
+      status: 'DRAFT' as const,
       attributeValues: [
         {
           name: 'Green',
           sortOrder: 0,
-          status: 'DRAFT',
+          status: 'DRAFT' as const,
         },
         {
           name: 'Blue',
           sortOrder: 0,
-          status: 'DRAFT',
+          status: 'DRAFT' as const,
         },
       ],
     });
@@ -253,6 +254,7 @@ describe('CreateAttributeDialog', () => {
         id: 1,
         name: 'Material',
         sortOrder: 10,
+        status: 'DRAFT' as const,
         createdAt: '2026-05-26T20:55:51.542Z',
       },
     });
@@ -280,12 +282,12 @@ describe('CreateAttributeDialog', () => {
     expect(createAttributeMock).toHaveBeenCalledWith({
       name: 'Material',
       sortOrder: 0,
-      status: 'DRAFT',
+      status: 'DRAFT' as const,
       attributeValues: [
         {
           name: 'Green',
           sortOrder: 0,
-          status: 'DRAFT',
+          status: 'DRAFT' as const,
         },
       ],
     });
@@ -338,6 +340,7 @@ describe('CreateAttributeDialog', () => {
         id: 1,
         name: 'Material',
         sortOrder: 10,
+        status: 'DRAFT' as const,
         createdAt: '2026-05-26T20:55:51.542Z',
       },
     });
@@ -373,7 +376,7 @@ describe('CreateAttributeDialog', () => {
     expect(createAttributeMock).toHaveBeenCalledWith({
       name: 'Material',
       sortOrder: 0,
-      status: 'DRAFT',
+      status: 'DRAFT' as const,
       attributeValues: [],
     });
     expect(

@@ -1,6 +1,7 @@
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getSupplier } from '@/lib/client/api/suppliers';
+import { SUPPLIER_STATUS } from '@/lib/domain/suppliers/constants';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { SupplierDetail } from './SupplierDetail';
 import type { SupplierDetailHeaderProps } from './types';
@@ -36,6 +37,7 @@ const { setup } = prepareStoreSetup({
 const supplier = {
   id: 1,
   name: 'Fresh Farms',
+  status: SUPPLIER_STATUS.DRAFT,
   email: 'orders@fresh.example',
   phone: '+1 555 0100',
   address: '123 Market St',

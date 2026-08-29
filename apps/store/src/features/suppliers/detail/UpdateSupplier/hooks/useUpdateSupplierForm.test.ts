@@ -1,6 +1,8 @@
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { SUPPLIER_STATUS } from '@/lib/domain/suppliers/constants';
 import { prepareFormHookTestSetup } from '@/test/prepareFormHookTestSetup';
+import { getSupplierUpdateChanges } from '../utils/getUpdateChanges';
 import { submitUpdateSupplier } from '../utils/submitAction';
 import { useUpdateSupplierForm } from './useUpdateSupplierForm';
 
@@ -22,11 +24,17 @@ vi.mock('../utils/submitAction', async () => ({
   submitUpdateSupplier: vi.fn(),
 }));
 
+vi.mock('../utils/getUpdateChanges', () => ({
+  getSupplierUpdateChanges: vi.fn(),
+}));
+
+const getSupplierUpdateChangesMock = vi.mocked(getSupplierUpdateChanges);
 const submitUpdateSupplierMock = vi.mocked(submitUpdateSupplier);
 
 const supplier = {
   id: 1,
   name: 'Fresh Farms',
+  status: SUPPLIER_STATUS.DRAFT,
   email: 'orders@fresh.example',
   phone: '+1 555 0100',
   address: '123 Market St',
@@ -35,6 +43,7 @@ const supplier = {
 
 const { setup } = prepareFormHookTestSetup({
   hookProps: {
+    onNoChanges: vi.fn(),
     onUpdated: vi.fn(),
     supplier,
   },
@@ -44,6 +53,7 @@ const { setup } = prepareFormHookTestSetup({
 const setupUpdateSupplierFormHook = () => {
   const user = userEvent.setup();
   const hookProps = {
+    onNoChanges: vi.fn(),
     onUpdated: vi.fn(),
     supplier,
   };
@@ -53,6 +63,7 @@ const setupUpdateSupplierFormHook = () => {
 
   return {
     ...result,
+    onNoChanges: result.hookProps.onNoChanges,
     onUpdated: result.hookProps.onUpdated,
     submitButton: screen.getByRole('button', { name: 'Submit' }),
     user,
@@ -62,52 +73,26 @@ const setupUpdateSupplierFormHook = () => {
 describe('useUpdateSupplierForm', () => {
   beforeEach(() => {
     addToastMock.mockClear();
+    getSupplierUpdateChangesMock.mockReset();
     submitUpdateSupplierMock.mockReset();
   });
 
-  it('submits the supplier id and default form values before reporting success', async () => {
-    submitUpdateSupplierMock.mockResolvedValue({
-      ok: true,
-      data: {
-        id: 1,
-        name: 'Fresh Farms Updated',
-        email: 'orders.updated@fresh.example',
-        phone: '+1 555 0101',
-        address: '124 Market St',
-        comment: 'Updated supplier',
-      },
-    });
-    const { onUpdated, submitButton, user } = setupUpdateSupplierFormHook();
+  it('closes without a request when the normalized values are unchanged', async () => {
+    getSupplierUpdateChangesMock.mockReturnValue(undefined);
+    const { onNoChanges, onUpdated, submitButton, user } =
+      setupUpdateSupplierFormHook();
 
     await user.click(submitButton);
 
-    await waitFor(() =>
-      expect(submitUpdateSupplierMock).toHaveBeenCalledWith({
-        supplierId: 1,
-        value: {
-          name: 'Fresh Farms',
-          email: 'orders@fresh.example',
-          phone: '+1 555 0100',
-          address: '123 Market St',
-          comment: 'Preferred produce supplier',
-        },
-      })
-    );
-    expect(addToastMock).toHaveBeenCalledWith({
-      description: 'Supplier Fresh Farms Updated was updated',
-      type: 'success',
-    });
-    expect(onUpdated).toHaveBeenCalledWith({
-      id: 1,
-      name: 'Fresh Farms Updated',
-      email: 'orders.updated@fresh.example',
-      phone: '+1 555 0101',
-      address: '124 Market St',
-      comment: 'Updated supplier',
-    });
+    await waitFor(() => expect(onNoChanges).toHaveBeenCalled());
+    expect(submitUpdateSupplierMock).not.toHaveBeenCalled();
+    expect(onUpdated).not.toHaveBeenCalled();
   });
 
   it('shows a toast when submit fails with a form-level error', async () => {
+    getSupplierUpdateChangesMock.mockReturnValue({
+      email: 'orders.updated@fresh.example',
+    });
     submitUpdateSupplierMock.mockResolvedValue({
       ok: false,
       error: {
@@ -117,7 +102,8 @@ describe('useUpdateSupplierForm', () => {
         formError: 'Supplier update failed.',
       },
     });
-    const { onUpdated, submitButton, user } = setupUpdateSupplierFormHook();
+    const { onNoChanges, onUpdated, submitButton, user } =
+      setupUpdateSupplierFormHook();
 
     await user.click(submitButton);
 
@@ -127,6 +113,7 @@ describe('useUpdateSupplierForm', () => {
         type: 'error',
       })
     );
+    expect(onNoChanges).not.toHaveBeenCalled();
     expect(onUpdated).not.toHaveBeenCalled();
   });
 });
