@@ -55,12 +55,6 @@ type ProductTemplateField =
 
 type ProductTemplateFieldErrors = Partial<Record<ProductTemplateField, string>>;
 
-const getValidationMessage = (schema: z.ZodString, value: string) => {
-  const result = schema.safeParse(value);
-
-  return result.success ? undefined : result.error.issues[0]?.message;
-};
-
 const hasSelectedAttributeValues = ({
   attributeValues,
   attributes,
