@@ -1,6 +1,6 @@
 'use client';
 
-import { Accordion, Button, ContextualActionBar, Typography } from '@ordero/ui';
+import { Accordion, Button, ContextualActionBar, PageHeader, Typography } from '@ordero/ui';
 import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { useCallback, useState } from 'react';
@@ -68,6 +68,14 @@ export const CreateProduct = () => {
         handleCreateProduct();
       }}
     >
+      <PageHeader.Root>
+        <PageHeader.Left>
+          <Typography variant="h5">Create product</Typography>
+        </PageHeader.Left>
+        <PageHeader.Right>
+        </PageHeader.Right>
+      </PageHeader.Root>
+
       <Accordion.Root
         aria-label="Product template"
         defaultValue={['product-template']}
