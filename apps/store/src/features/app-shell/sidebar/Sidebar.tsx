@@ -9,11 +9,15 @@ import {
   SidebarNavigationSections,
 } from '@ordero/ui';
 import { LogOut, Package } from 'lucide-react';
+import { usePathname } from 'next/navigation';
 import { useLogOut } from '@/lib/hooks/auth/useLogOut';
 import { sidebarSections } from './sidebarSections';
+import { getSidebarSections } from './utils';
 
 export const Sidebar = () => {
   const { isLoggingOut, logOut } = useLogOut();
+  const pathname = usePathname();
+  const sections = getSidebarSections({ pathname, sections: sidebarSections });
 
   return (
     <SidebarNavigation id="store-sidebar">
@@ -28,7 +32,7 @@ export const Sidebar = () => {
         </div>
       </SidebarNavigationHeader>
       <SidebarNavigationContent>
-        <SidebarNavigationSections sections={sidebarSections} />
+        <SidebarNavigationSections sections={sections} />
       </SidebarNavigationContent>
       <SidebarNavigationFooter>
         <SidebarNavigationMenu
