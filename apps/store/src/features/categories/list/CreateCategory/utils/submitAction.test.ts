@@ -1,4 +1,5 @@
 import { createCategory } from '@/lib/client/api/categories';
+import { API_ERROR_CODES } from '@/lib/constants/apiErrorCodes';
 import { submitCreateCategory } from './submitAction';
 
 vi.mock('@/lib/client/api/categories', async () => ({
@@ -75,6 +76,31 @@ describe('submitCreateCategory', () => {
           name: 'Category name already exists.',
         },
         formError: 'Category creation failed.',
+      },
+    });
+  });
+
+  it('maps a duplicate category name error to the shared message', async () => {
+    createCategoryMock.mockResolvedValue({
+      ok: false,
+      error: {
+        status: 409,
+        code: API_ERROR_CODES.CATEGORY_NAME_ALREADY_EXISTS,
+        message: 'Conflict',
+      },
+    });
+
+    await expect(
+      submitCreateCategory({
+        name: 'Sneakers',
+        parentId: '1',
+        status: 'DRAFT',
+      })
+    ).resolves.toEqual({
+      ok: false,
+      error: {
+        fieldErrors: undefined,
+        formError: 'Category name already exists.',
       },
     });
   });

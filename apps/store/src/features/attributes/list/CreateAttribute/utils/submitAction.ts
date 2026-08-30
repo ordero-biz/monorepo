@@ -3,6 +3,7 @@ import {
   ATTRIBUTE_STATUS,
   ATTRIBUTE_VALUE_STATUS,
 } from '@/lib/domain/attributes/constants';
+import { getApiErrorMessage } from '@/lib/utils/apiError';
 import type {
   AttributeValueFormValue,
   CreateAttributeFormValues,
@@ -42,7 +43,7 @@ export const submitCreateAttribute = async (
       ok: false,
       error: {
         fieldErrors: result.error.fieldErrors,
-        formError: result.error.message,
+        formError: getApiErrorMessage(result.error),
       },
     } as const;
   }
