@@ -29,11 +29,6 @@ export const CategoryDetailHeader = ({
           <StoreBreadcrumbs
             items={[
               {
-                href: clientRoutes.products,
-                id: 'product',
-                label: 'Product',
-              },
-              {
                 href: clientRoutes.categories,
                 id: 'categories',
                 label: 'Categories',

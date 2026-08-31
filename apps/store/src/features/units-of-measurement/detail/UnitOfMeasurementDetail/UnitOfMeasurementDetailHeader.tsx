@@ -33,11 +33,6 @@ export const UnitOfMeasurementDetailHeader = ({
           <StoreBreadcrumbs
             items={[
               {
-                href: clientRoutes.products,
-                id: 'product',
-                label: 'Product',
-              },
-              {
                 href: clientRoutes.unitsOfMeasurement,
                 id: 'units-of-measurement',
                 label: 'Units of measurement',

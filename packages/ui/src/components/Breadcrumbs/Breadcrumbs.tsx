@@ -38,7 +38,7 @@ export const Breadcrumbs = ({
   renderLink = defaultLinkRenderer,
 }: BreadcrumbsProps) => (
   <nav aria-label={ariaLabel} ref={ref}>
-    <ol className="flex flex-wrap items-center gap-x-[var(--space-2)] gap-y-[var(--space-0-5)] text-[length:var(--body2-size-desktop)] leading-[var(--body2-line-height-desktop)] font-[var(--body2-weight)]">
+    <ol className="flex flex-wrap items-center gap-x-[var(--space-1)] gap-y-[var(--space-0-5)] text-[length:var(--body2-size-desktop)] leading-[var(--body2-line-height-desktop)] font-[var(--body2-weight)]">
       {items.map((item, index) => {
         const isCurrent = index === items.length - 1;
 

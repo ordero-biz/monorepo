@@ -8,11 +8,6 @@ const { setup } = prepareStoreSetup({
   props: {
     items: [
       {
-        href: clientRoutes.products,
-        id: 'product',
-        label: 'Product',
-      },
-      {
         href: clientRoutes.attributes,
         id: 'attributes',
         label: 'Attributes',
@@ -34,8 +29,8 @@ describe('Store breadcrumbs', () => {
       within(breadcrumbs).queryByRole('link', { name: 'Dashboard' })
     ).not.toBeInTheDocument();
     expect(
-      within(breadcrumbs).getByRole('link', { name: 'Product' })
-    ).toHaveAttribute('href', clientRoutes.products);
+      within(breadcrumbs).queryByRole('link', { name: 'Product' })
+    ).not.toBeInTheDocument();
     expect(
       within(breadcrumbs).getByRole('link', { name: 'Attributes' })
     ).toHaveAttribute('href', clientRoutes.attributes);

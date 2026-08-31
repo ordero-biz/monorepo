@@ -71,11 +71,6 @@ export const AttributeDetailHeader = ({
           <StoreBreadcrumbs
             items={[
               {
-                href: clientRoutes.products,
-                id: 'product',
-                label: 'Product',
-              },
-              {
                 href: clientRoutes.attributes,
                 id: 'attributes',
                 label: 'Attributes',
