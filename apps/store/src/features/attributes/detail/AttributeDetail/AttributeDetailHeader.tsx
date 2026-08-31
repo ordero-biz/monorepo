@@ -3,6 +3,8 @@
 import { Button, Card, Menu, PageHeader, Typography } from '@ordero/ui';
 import { EllipsisVertical, Pencil, Trash2 } from 'lucide-react';
 import { useState } from 'react';
+import { StoreBreadcrumbs } from '@/features/app-shell';
+import { clientRoutes } from '@/lib/client/routes';
 import { ATTRIBUTE_STATUS } from '@/lib/domain/attributes/constants';
 import { useAttributeQuery } from '@/lib/hooks/attributes/useAttributeQuery';
 import { AttributeStatusChip } from '../../shared/AttributeStatusChip';
@@ -61,7 +63,24 @@ export const AttributeDetailHeader = ({
   return (
     <PageHeader.Root>
       <PageHeader.Left>
-        <Typography variant="h5">{attributeQuery.data.name}</Typography>
+        <div className="flex min-w-0 flex-col gap-[var(--space-0-5)]">
+          <Typography variant="h5">{attributeQuery.data.name}</Typography>
+          <StoreBreadcrumbs
+            items={[
+              {
+                href: clientRoutes.products,
+                id: 'product',
+                label: 'Product',
+              },
+              {
+                href: clientRoutes.attributes,
+                id: 'attributes',
+                label: 'Attributes',
+              },
+              { id: 'current-attribute', label: attributeQuery.data.name },
+            ]}
+          />
+        </div>
         <AttributeStatusChip status={attributeQuery.data.status} />
       </PageHeader.Left>
       <PageHeader.Right>

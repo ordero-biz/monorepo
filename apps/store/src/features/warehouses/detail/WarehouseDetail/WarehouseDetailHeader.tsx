@@ -1,6 +1,8 @@
 import { Menu, PageHeader, Typography } from '@ordero/ui';
 import { EllipsisVertical, Pencil } from 'lucide-react';
 import { useState } from 'react';
+import { StoreBreadcrumbs } from '@/features/app-shell';
+import { clientRoutes } from '@/lib/client/routes';
 import { WAREHOUSE_STATUS } from '@/lib/domain/warehouses/constants';
 import { WarehouseStatusChip } from '../../shared/WarehouseStatusChip';
 import { UpdateWarehouseDialog } from '../UpdateWarehouse/UpdateWarehouseDialog';
@@ -17,7 +19,24 @@ export const WarehouseDetailHeader = ({
   return (
     <PageHeader.Root>
       <PageHeader.Left>
-        <Typography variant="h5">{warehouse.name}</Typography>
+        <div className="flex min-w-0 flex-col gap-[var(--space-0-5)]">
+          <Typography variant="h5">{warehouse.name}</Typography>
+          <StoreBreadcrumbs
+            items={[
+              {
+                href: clientRoutes.products,
+                id: 'product',
+                label: 'Product',
+              },
+              {
+                href: clientRoutes.warehouses,
+                id: 'warehouses',
+                label: 'Warehouse',
+              },
+              { id: 'current-warehouse', label: warehouse.name },
+            ]}
+          />
+        </div>
         <WarehouseStatusChip status={warehouse.status} />
       </PageHeader.Left>
       <PageHeader.Right>

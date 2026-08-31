@@ -6,6 +6,13 @@ export type {
 } from './components/Button';
 export { Button } from './components/Button';
 export type {
+  BreadcrumbItem,
+  BreadcrumbsProps,
+  BreadcrumbsRenderLink,
+  BreadcrumbsRenderLinkArgs,
+} from './components/Breadcrumbs';
+export { Breadcrumbs } from './components/Breadcrumbs';
+export type {
   AccordionHeaderProps,
   AccordionItemProps,
   AccordionPanelProps,

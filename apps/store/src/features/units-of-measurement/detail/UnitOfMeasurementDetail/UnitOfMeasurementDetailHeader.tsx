@@ -3,6 +3,8 @@
 import { Menu, PageHeader, Typography } from '@ordero/ui';
 import { EllipsisVertical, Pencil, Trash2 } from 'lucide-react';
 import { useState } from 'react';
+import { StoreBreadcrumbs } from '@/features/app-shell';
+import { clientRoutes } from '@/lib/client/routes';
 import { UNIT_OF_MEASUREMENT_STATUS } from '@/lib/domain/units-of-measurement/constants';
 import { DeleteUnitsOfMeasurementDialog } from '../../shared';
 import { UnitOfMeasurementStatusChip } from '../../shared/UnitOfMeasurementStatusChip';
@@ -23,7 +25,27 @@ export const UnitOfMeasurementDetailHeader = ({
   return (
     <PageHeader.Root>
       <PageHeader.Left>
-        <Typography variant="h5">{unitOfMeasurement.name}</Typography>
+        <div className="flex min-w-0 flex-col gap-[var(--space-0-5)]">
+          <Typography variant="h5">{unitOfMeasurement.name}</Typography>
+          <StoreBreadcrumbs
+            items={[
+              {
+                href: clientRoutes.products,
+                id: 'product',
+                label: 'Product',
+              },
+              {
+                href: clientRoutes.unitsOfMeasurement,
+                id: 'units-of-measurement',
+                label: 'Units of measurement',
+              },
+              {
+                id: 'current-unit-of-measurement',
+                label: unitOfMeasurement.name,
+              },
+            ]}
+          />
+        </div>
         <UnitOfMeasurementStatusChip status={unitOfMeasurement.status} />
       </PageHeader.Left>
       <PageHeader.Right>

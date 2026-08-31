@@ -1,5 +1,7 @@
 import { EllipsisVertical, Pencil } from 'lucide-react';
 import { useState } from 'react';
+import { StoreBreadcrumbs } from '@/features/app-shell';
+import { clientRoutes } from '@/lib/client/routes';
 import { SUPPLIER_STATUS } from '@/lib/domain/suppliers/constants';
 import { Menu, PageHeader, Typography } from '@/ui/index';
 import { SupplierStatusChip } from '../../shared/SupplierStatusChip';
@@ -17,7 +19,24 @@ export const SupplierDetailHeader = ({
   return (
     <PageHeader.Root>
       <PageHeader.Left>
-        <Typography variant="h5">{supplier.name}</Typography>
+        <div className="flex min-w-0 flex-col gap-[var(--space-0-5)]">
+          <Typography variant="h5">{supplier.name}</Typography>
+          <StoreBreadcrumbs
+            items={[
+              {
+                href: clientRoutes.products,
+                id: 'product',
+                label: 'Product',
+              },
+              {
+                href: clientRoutes.suppliers,
+                id: 'suppliers',
+                label: 'Suppliers',
+              },
+              { id: 'current-supplier', label: supplier.name },
+            ]}
+          />
+        </div>
         <SupplierStatusChip status={supplier.status} />
       </PageHeader.Left>
       <PageHeader.Right>
