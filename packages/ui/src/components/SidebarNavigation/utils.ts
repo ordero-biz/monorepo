@@ -76,6 +76,12 @@ export const getExpandedItemIds = (items: SidebarNavigationItem[]) =>
     item.kind === 'collapse' && shouldItemBeExpanded(item) ? [item.id] : []
   );
 
+export const getActiveItemIds = (items: SidebarNavigationItem[]): string[] =>
+  items.flatMap((item) => [
+    ...(item.active ? [item.id] : []),
+    ...(item.kind === 'collapse' ? getActiveItemIds(item.items) : []),
+  ]);
+
 export const shouldSectionBeExpanded = (
   section: SidebarNavigationSectionConfig
 ) => section.defaultExpanded || section.items.some(isItemBranchActive);
