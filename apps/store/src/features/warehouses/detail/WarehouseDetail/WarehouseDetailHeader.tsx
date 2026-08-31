@@ -20,7 +20,10 @@ export const WarehouseDetailHeader = ({
     <PageHeader.Root>
       <PageHeader.Left>
         <div className="flex min-w-0 flex-col gap-[var(--space-0-5)]">
-          <Typography variant="h5">{warehouse.name}</Typography>
+          <div className="flex min-w-0 items-center gap-[var(--space-1)]">
+            <Typography variant="h5">{warehouse.name}</Typography>
+            <WarehouseStatusChip status={warehouse.status} />
+          </div>
           <StoreBreadcrumbs
             items={[
               {
@@ -37,7 +40,6 @@ export const WarehouseDetailHeader = ({
             ]}
           />
         </div>
-        <WarehouseStatusChip status={warehouse.status} />
       </PageHeader.Left>
       <PageHeader.Right>
         {!isWarehouseActive ? (

@@ -64,7 +64,10 @@ export const AttributeDetailHeader = ({
     <PageHeader.Root>
       <PageHeader.Left>
         <div className="flex min-w-0 flex-col gap-[var(--space-0-5)]">
-          <Typography variant="h5">{attributeQuery.data.name}</Typography>
+          <div className="flex min-w-0 items-center gap-[var(--space-1)]">
+            <Typography variant="h5">{attributeQuery.data.name}</Typography>
+            <AttributeStatusChip status={attributeQuery.data.status} />
+          </div>
           <StoreBreadcrumbs
             items={[
               {
@@ -81,7 +84,6 @@ export const AttributeDetailHeader = ({
             ]}
           />
         </div>
-        <AttributeStatusChip status={attributeQuery.data.status} />
       </PageHeader.Left>
       <PageHeader.Right>
         {!isAttributeActive ? (

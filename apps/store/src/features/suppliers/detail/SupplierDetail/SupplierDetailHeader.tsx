@@ -20,7 +20,10 @@ export const SupplierDetailHeader = ({
     <PageHeader.Root>
       <PageHeader.Left>
         <div className="flex min-w-0 flex-col gap-[var(--space-0-5)]">
-          <Typography variant="h5">{supplier.name}</Typography>
+          <div className="flex min-w-0 items-center gap-[var(--space-1)]">
+            <Typography variant="h5">{supplier.name}</Typography>
+            <SupplierStatusChip status={supplier.status} />
+          </div>
           <StoreBreadcrumbs
             items={[
               {
@@ -37,7 +40,6 @@ export const SupplierDetailHeader = ({
             ]}
           />
         </div>
-        <SupplierStatusChip status={supplier.status} />
       </PageHeader.Left>
       <PageHeader.Right>
         {!isSupplierActive ? (

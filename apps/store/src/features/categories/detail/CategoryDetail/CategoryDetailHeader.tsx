@@ -22,7 +22,10 @@ export const CategoryDetailHeader = ({
     <PageHeader.Root>
       <PageHeader.Left>
         <div className="flex min-w-0 flex-col gap-[var(--space-0-5)]">
-          <Typography variant="h5">{category.name}</Typography>
+          <div className="flex min-w-0 items-center gap-[var(--space-1)]">
+            <Typography variant="h5">{category.name}</Typography>
+            <CategoryStatusChip status={category.status} />
+          </div>
           <StoreBreadcrumbs
             items={[
               {
@@ -39,7 +42,6 @@ export const CategoryDetailHeader = ({
             ]}
           />
         </div>
-        <CategoryStatusChip status={category.status} />
       </PageHeader.Left>
 
       {!isCategoryActive ? (
