@@ -6,7 +6,8 @@ import { prepareStoreSetup } from '@/test/prepareSetup';
 import { CategoryDetailHeader } from './CategoryDetailHeader';
 import type { CategoryDetailHeaderProps } from './types';
 
-vi.mock('@/features/categories/detail/UpdateCategory', () => ({
+vi.mock('@/features/categories/detail/UpdateCategory', async () => ({
+  ...(await vi.importActual('@/features/categories/detail/UpdateCategory')),
   UpdateCategoryDialog: ({
     onUpdated,
     open,
