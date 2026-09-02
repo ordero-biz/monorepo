@@ -16,7 +16,8 @@ const menuItems = [
 ] as const;
 
 const meta = {
-  title: 'Components/Menu',
+  id: 'components-menu',
+  title: 'Components/Navigation/Menu',
   component: Menu.Root,
   tags: ['autodocs'],
 } satisfies Meta<typeof Menu.Root>;

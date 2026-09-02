@@ -17,7 +17,8 @@ const colors = [
 const sizes = ['s', 'm'] satisfies readonly CheckboxSize[];
 
 const meta = {
-  title: 'Components/Checkbox',
+  id: 'components-checkbox',
+  title: 'Components/Forms/Selection Controls/Checkbox',
   component: Checkbox,
   tags: ['autodocs'],
   args: {

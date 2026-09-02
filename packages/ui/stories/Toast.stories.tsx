@@ -18,7 +18,8 @@ const layouts = ['stack', 'list'] satisfies readonly ToastLayout[];
 const TOAST_TIMEOUT = 5000;
 
 const meta = {
-  title: 'Components/Toast',
+  id: 'components-toast',
+  title: 'Components/Feedback/Toast',
   component: Toast,
   tags: ['autodocs'],
   args: {

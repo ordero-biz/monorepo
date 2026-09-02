@@ -2,7 +2,8 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { FieldLabel } from '@/ui/components/FieldLabel';
 
 const meta = {
-  title: 'Components/FieldLabel',
+  id: 'components-fieldlabel',
+  title: 'Components/Forms/Field Helpers/FieldLabel',
   component: FieldLabel,
   tags: ['autodocs'],
   args: {

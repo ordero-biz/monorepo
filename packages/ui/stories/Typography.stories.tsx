@@ -15,7 +15,8 @@ const colors = [
 ] satisfies readonly TypographyColor[];
 
 const meta = {
-  title: 'Components/Typography',
+  id: 'components-typography',
+  title: 'Foundations/Typography',
   component: Typography,
   tags: ['autodocs'],
   parameters: {

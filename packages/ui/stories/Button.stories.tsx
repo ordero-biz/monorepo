@@ -20,7 +20,8 @@ const colors = [
 const sizes = ['s', 'm', 'l'] satisfies readonly ButtonSize[];
 
 const meta = {
-  title: 'Components/Button',
+  id: 'components-button',
+  title: 'Components/Actions/Button',
   component: Button,
   tags: ['autodocs'],
   args: {

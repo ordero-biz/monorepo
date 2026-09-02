@@ -5,7 +5,8 @@ import { ContextualActionBar } from '@/ui/components/ContextualActionBar';
 import { Typography } from '@/ui/components/Typography';
 
 const meta = {
-  title: 'Components/ContextualActionBar',
+  id: 'components-contextualactionbar',
+  title: 'Components/Layout/ContextualActionBar',
   component: ContextualActionBar.Root,
   tags: ['autodocs'],
 } satisfies Meta<typeof ContextualActionBar.Root>;

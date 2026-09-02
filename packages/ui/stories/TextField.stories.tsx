@@ -37,7 +37,8 @@ const renderPair = ({
 );
 
 const meta = {
-  title: 'Components/TextField',
+  id: 'components-textfield',
+  title: 'Components/Forms/Text Inputs/TextField',
   component: TextField,
   tags: ['autodocs'],
   args: {

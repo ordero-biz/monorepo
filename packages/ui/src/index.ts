@@ -203,6 +203,14 @@ export {
   SidebarNavigationSections,
 } from './components/SidebarNavigation';
 export type {
+  SplitButtonActionProps,
+  SplitButtonContentProps,
+  SplitButtonItemProps,
+  SplitButtonRootProps,
+  SplitButtonTriggerProps,
+} from './components/SplitButton';
+export { SplitButton } from './components/SplitButton';
+export type {
   TablePaginationProps,
   TablePaginationRangeLabelArgs,
 } from './components/TablePagination';

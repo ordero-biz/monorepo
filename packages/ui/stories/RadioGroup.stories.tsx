@@ -9,7 +9,8 @@ const options = [
 ] as const;
 
 const meta = {
-  title: 'Components/RadioGroup',
+  id: 'components-radiogroup',
+  title: 'Components/Forms/Selection Controls/RadioGroup',
   component: RadioGroup,
   tags: ['autodocs'],
   args: {

@@ -10,7 +10,8 @@ const options = [
 ] as const;
 
 const meta = {
-  title: 'Components/CheckboxGroup',
+  id: 'components-checkboxgroup',
+  title: 'Components/Forms/Selection Controls/CheckboxGroup',
   component: CheckboxGroup,
   tags: ['autodocs'],
   args: {

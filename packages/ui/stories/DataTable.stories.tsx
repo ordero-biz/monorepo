@@ -320,7 +320,8 @@ const PaginatedDataTablePreview = (args: DataTableProps<ProductRow>) => {
 };
 
 const meta = {
-  title: 'Components/DataTable',
+  id: 'components-datatable',
+  title: 'Components/Data Display/DataTable',
   component: DataTable<ProductRow>,
   tags: ['autodocs'],
   args: {

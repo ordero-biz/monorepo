@@ -31,7 +31,8 @@ const sizes = ['l', 'm', 's', 'xs'] satisfies readonly IconButtonSize[];
 const variants = ['text', 'soft'] satisfies readonly IconButtonVariant[];
 
 const meta = {
-  title: 'Components/IconButton',
+  id: 'components-iconbutton',
+  title: 'Components/Actions/IconButton',
   component: IconButton,
   tags: ['autodocs'],
   args: {

@@ -25,7 +25,8 @@ const renderPair = ({
 );
 
 const meta = {
-  title: 'Components/Input',
+  id: 'components-input',
+  title: 'Components/Forms/Text Inputs/Input',
   component: Input,
   tags: ['autodocs'],
   args: {

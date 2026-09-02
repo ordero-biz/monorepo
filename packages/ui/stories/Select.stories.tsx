@@ -60,7 +60,8 @@ const getMultipleSelectArgs = ({
 > => args;
 
 const meta = {
-  title: 'Components/Select',
+  id: 'components-select',
+  title: 'Components/Forms/Selection Controls/Select',
   component: Select,
   tags: ['autodocs'],
   args: {

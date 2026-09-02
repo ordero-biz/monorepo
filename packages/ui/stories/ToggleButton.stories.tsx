@@ -19,7 +19,8 @@ const colors = [
 const sizes = ['l', 'm', 's'] satisfies readonly ToggleButtonSize[];
 
 const meta = {
-  title: 'Components/ToggleButton',
+  id: 'components-togglebutton',
+  title: 'Components/Actions/ToggleButton',
   component: ToggleButton.Group,
   tags: ['autodocs'],
 } satisfies Meta<typeof ToggleButton.Group>;
