@@ -5,6 +5,7 @@ import { StoreBreadcrumbs } from '@/features/app-shell';
 import { clientRoutes } from '@/lib/client/routes';
 import { PRODUCTS_LIST_MODE } from '@/lib/domain/products/constants';
 import { Button, PageHeader, ToggleButton, Typography } from '@/ui/index';
+import { productsRootBreadcrumb } from '../../shared/breadcrumbs';
 import type { ProductsListHeaderProps, ProductsListMode } from './types';
 
 export const ProductsListHeader = ({
@@ -25,7 +26,14 @@ export const ProductsListHeader = ({
       <PageHeader.Left>
         <div className="flex min-w-0 flex-col gap-[var(--space-0-5)]">
           <Typography variant="h5">Products list</Typography>
-          <StoreBreadcrumbs items={[{ id: 'product', label: 'Product' }]} />
+          <StoreBreadcrumbs
+            items={[
+              {
+                id: productsRootBreadcrumb.id,
+                label: productsRootBreadcrumb.label,
+              },
+            ]}
+          />
         </div>
       </PageHeader.Left>
       <PageHeader.Right>

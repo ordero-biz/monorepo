@@ -1,5 +1,6 @@
 import { PageHeader, Typography } from '@ordero/ui';
 import { StoreBreadcrumbs } from '@/features/app-shell';
+import { unitsOfMeasurementRootBreadcrumb } from '../../shared/breadcrumbs';
 import { CreateUnitOfMeasurementDialogTrigger } from '../CreateUnitOfMeasurement';
 
 export const UnitsOfMeasurementListHeader = () => (
@@ -9,7 +10,10 @@ export const UnitsOfMeasurementListHeader = () => (
         <Typography variant="h5">Units of measurement list</Typography>
         <StoreBreadcrumbs
           items={[
-            { id: 'units-of-measurement', label: 'Units of measurement' },
+            {
+              id: unitsOfMeasurementRootBreadcrumb.id,
+              label: unitsOfMeasurementRootBreadcrumb.label,
+            },
           ]}
         />
       </div>

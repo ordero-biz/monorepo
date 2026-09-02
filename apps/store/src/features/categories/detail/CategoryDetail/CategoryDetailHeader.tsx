@@ -5,8 +5,8 @@ import { EllipsisVertical, Pencil } from 'lucide-react';
 import { useState } from 'react';
 import { StoreBreadcrumbs } from '@/features/app-shell';
 import { UpdateCategoryDialog } from '@/features/categories/detail/UpdateCategory';
-import { clientRoutes } from '@/lib/client/routes';
 import { CATEGORY_STATUS } from '@/lib/domain/categories/constants';
+import { categoriesRootBreadcrumb } from '../../shared/breadcrumbs';
 import { CategoryStatusChip } from '../../shared/CategoryStatusChip';
 import { ActivateCategoryDialogTrigger } from './ActivateCategoryDialogTrigger';
 import type { CategoryDetailHeaderProps } from './types';
@@ -28,11 +28,7 @@ export const CategoryDetailHeader = ({
           </div>
           <StoreBreadcrumbs
             items={[
-              {
-                href: clientRoutes.categories,
-                id: 'categories',
-                label: 'Categories',
-              },
+              categoriesRootBreadcrumb,
               { id: 'current-category', label: category.name },
             ]}
           />

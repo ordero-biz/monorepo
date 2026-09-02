@@ -2,8 +2,8 @@ import { Menu, PageHeader, Typography } from '@ordero/ui';
 import { EllipsisVertical, Pencil } from 'lucide-react';
 import { useState } from 'react';
 import { StoreBreadcrumbs } from '@/features/app-shell';
-import { clientRoutes } from '@/lib/client/routes';
 import { WAREHOUSE_STATUS } from '@/lib/domain/warehouses/constants';
+import { warehousesRootBreadcrumb } from '../../shared/breadcrumbs';
 import { WarehouseStatusChip } from '../../shared/WarehouseStatusChip';
 import { UpdateWarehouseDialog } from '../UpdateWarehouse/UpdateWarehouseDialog';
 import { ActivateWarehouseDialogTrigger } from './ActivateWarehouseDialogTrigger';
@@ -26,11 +26,7 @@ export const WarehouseDetailHeader = ({
           </div>
           <StoreBreadcrumbs
             items={[
-              {
-                href: clientRoutes.warehouses,
-                id: 'warehouses',
-                label: 'Warehouse',
-              },
+              warehousesRootBreadcrumb,
               { id: 'current-warehouse', label: warehouse.name },
             ]}
           />

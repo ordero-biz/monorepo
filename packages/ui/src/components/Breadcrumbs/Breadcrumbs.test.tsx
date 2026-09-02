@@ -37,17 +37,13 @@ describe('Breadcrumbs', () => {
   it('supports framework-specific link rendering', () => {
     setup({
       renderLink: ({ children, className, href }) => (
-        <a
-          className={className}
-          data-testid="router-link"
-          href={`/store${href}`}
-        >
+        <a className={className} href={`/store${href}`}>
           {children}
         </a>
       ),
     });
 
-    expect(screen.getAllByTestId('router-link')[0]).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'Dashboard' })).toHaveAttribute(
       'href',
       '/store/dashboard'
     );

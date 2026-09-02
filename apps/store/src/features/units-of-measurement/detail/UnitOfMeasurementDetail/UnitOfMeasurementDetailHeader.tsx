@@ -4,9 +4,9 @@ import { Menu, PageHeader, Typography } from '@ordero/ui';
 import { EllipsisVertical, Pencil, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { StoreBreadcrumbs } from '@/features/app-shell';
-import { clientRoutes } from '@/lib/client/routes';
 import { UNIT_OF_MEASUREMENT_STATUS } from '@/lib/domain/units-of-measurement/constants';
 import { DeleteUnitsOfMeasurementDialog } from '../../shared';
+import { unitsOfMeasurementRootBreadcrumb } from '../../shared/breadcrumbs';
 import { UnitOfMeasurementStatusChip } from '../../shared/UnitOfMeasurementStatusChip';
 import { UpdateUnitOfMeasurementDialog } from '../UpdateUnitOfMeasurement/UpdateUnitOfMeasurementDialog';
 import { ActivateUnitOfMeasurementDialogTrigger } from './ActivateUnitOfMeasurementDialogTrigger';
@@ -32,11 +32,7 @@ export const UnitOfMeasurementDetailHeader = ({
           </div>
           <StoreBreadcrumbs
             items={[
-              {
-                href: clientRoutes.unitsOfMeasurement,
-                id: 'units-of-measurement',
-                label: 'Units of measurement',
-              },
+              unitsOfMeasurementRootBreadcrumb,
               {
                 id: 'current-unit-of-measurement',
                 label: unitOfMeasurement.name,

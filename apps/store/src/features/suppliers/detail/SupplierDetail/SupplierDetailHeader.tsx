@@ -1,9 +1,9 @@
 import { EllipsisVertical, Pencil } from 'lucide-react';
 import { useState } from 'react';
 import { StoreBreadcrumbs } from '@/features/app-shell';
-import { clientRoutes } from '@/lib/client/routes';
 import { SUPPLIER_STATUS } from '@/lib/domain/suppliers/constants';
 import { Menu, PageHeader, Typography } from '@/ui/index';
+import { suppliersRootBreadcrumb } from '../../shared/breadcrumbs';
 import { SupplierStatusChip } from '../../shared/SupplierStatusChip';
 import { UpdateSupplierDialog } from '../UpdateSupplier/UpdateSupplierDialog';
 import { ActivateSupplierDialogTrigger } from './ActivateSupplierDialogTrigger';
@@ -26,11 +26,7 @@ export const SupplierDetailHeader = ({
           </div>
           <StoreBreadcrumbs
             items={[
-              {
-                href: clientRoutes.suppliers,
-                id: 'suppliers',
-                label: 'Suppliers',
-              },
+              suppliersRootBreadcrumb,
               { id: 'current-supplier', label: supplier.name },
             ]}
           />
