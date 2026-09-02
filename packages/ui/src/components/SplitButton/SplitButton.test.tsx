@@ -88,6 +88,21 @@ describe('SplitButton', () => {
     expect(screen.queryByRole('menu')).not.toBeInTheDocument();
   });
 
+  it('closes an open menu when the root becomes disabled', async () => {
+    const { renderResult } = setup({ defaultOpen: true });
+
+    expect(
+      await screen.findByRole('menuitem', { name: 'Create draft pull request' })
+    ).toBeVisible();
+
+    renderResult.rerender({ disabled: true });
+
+    expect(screen.queryByRole('menu')).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Create pull request' })
+    ).toBeDisabled();
+  });
+
   it('keeps alternative actions available when only the main action is disabled', async () => {
     const user = userEvent.setup();
     setup({

@@ -1,6 +1,7 @@
 'use client';
 
 import { cva } from 'class-variance-authority';
+import { useEffect, useState } from 'react';
 import { Menu } from '@/ui/components/Menu';
 import { SplitButtonContext } from './SplitButtonContext';
 import type { SplitButtonRootProps } from './types';
@@ -28,20 +29,47 @@ export const SplitButtonRoot = ({
   open,
   size = 'm',
   variant = 'contained',
-}: SplitButtonRootProps) => (
-  <SplitButtonContext value={{ color, disabled, fullWidth, size, variant }}>
-    <Menu.Root
-      defaultOpen={defaultOpen}
-      disabled={disabled}
-      onOpenChange={onOpenChange}
-      open={open}
-    >
-      <fieldset
-        aria-label={ariaLabel}
-        className={splitButtonVariants({ fullWidth })}
+}: SplitButtonRootProps) => {
+  const isOpenControlled = open !== undefined;
+  const [uncontrolledOpen, setUncontrolledOpen] = useState(
+    defaultOpen ?? false
+  );
+  const requestedOpen = isOpenControlled ? open : uncontrolledOpen;
+
+  useEffect(() => {
+    if (!disabled || !requestedOpen) {
+      return;
+    }
+
+    if (!isOpenControlled) {
+      setUncontrolledOpen(false);
+    }
+
+    onOpenChange?.(false);
+  }, [disabled, isOpenControlled, onOpenChange, requestedOpen]);
+
+  const handleOpenChange = (nextOpen: boolean) => {
+    if (!isOpenControlled) {
+      setUncontrolledOpen(nextOpen);
+    }
+
+    onOpenChange?.(nextOpen);
+  };
+
+  return (
+    <SplitButtonContext value={{ color, disabled, fullWidth, size, variant }}>
+      <Menu.Root
+        disabled={disabled}
+        onOpenChange={handleOpenChange}
+        open={disabled ? false : requestedOpen}
       >
-        {children}
-      </fieldset>
-    </Menu.Root>
-  </SplitButtonContext>
-);
+        <fieldset
+          aria-label={ariaLabel}
+          className={splitButtonVariants({ fullWidth })}
+        >
+          {children}
+        </fieldset>
+      </Menu.Root>
+    </SplitButtonContext>
+  );
+};
