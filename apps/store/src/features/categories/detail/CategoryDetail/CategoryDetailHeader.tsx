@@ -3,7 +3,7 @@
 import { Menu, PageHeader, Typography } from '@ordero/ui';
 import { EllipsisVertical, Pencil } from 'lucide-react';
 import { useState } from 'react';
-import { StoreBreadcrumbs } from '@/features/app-shell';
+import { AppBreadcrumbs } from '@/lib/components/AppBreadcrumbs';
 import { UpdateCategoryDialog } from '@/features/categories/detail/UpdateCategory';
 import { CATEGORY_STATUS } from '@/lib/domain/categories/constants';
 import { categoriesRootBreadcrumb } from '../../shared/breadcrumbs';
@@ -26,7 +26,7 @@ export const CategoryDetailHeader = ({
             <Typography variant="h5">{category.name}</Typography>
             <CategoryStatusChip status={category.status} />
           </div>
-          <StoreBreadcrumbs
+          <AppBreadcrumbs
             items={[
               categoriesRootBreadcrumb,
               { id: 'current-category', label: category.name },

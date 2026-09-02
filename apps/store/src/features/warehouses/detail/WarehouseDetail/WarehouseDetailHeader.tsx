@@ -1,7 +1,7 @@
 import { Menu, PageHeader, Typography } from '@ordero/ui';
 import { EllipsisVertical, Pencil } from 'lucide-react';
 import { useState } from 'react';
-import { StoreBreadcrumbs } from '@/features/app-shell';
+import { AppBreadcrumbs } from '@/lib/components/AppBreadcrumbs';
 import { WAREHOUSE_STATUS } from '@/lib/domain/warehouses/constants';
 import { warehousesRootBreadcrumb } from '../../shared/breadcrumbs';
 import { WarehouseStatusChip } from '../../shared/WarehouseStatusChip';
@@ -24,7 +24,7 @@ export const WarehouseDetailHeader = ({
             <Typography variant="h5">{warehouse.name}</Typography>
             <WarehouseStatusChip status={warehouse.status} />
           </div>
-          <StoreBreadcrumbs
+          <AppBreadcrumbs
             items={[
               warehousesRootBreadcrumb,
               { id: 'current-warehouse', label: warehouse.name },

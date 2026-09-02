@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { StoreBreadcrumbs } from '@/features/app-shell';
+import { AppBreadcrumbs } from '@/lib/components/AppBreadcrumbs';
 import { clientRoutes } from '@/lib/client/routes';
 import { PRODUCTS_LIST_MODE } from '@/lib/domain/products/constants';
 import { Button, PageHeader, ToggleButton, Typography } from '@/ui/index';
@@ -26,7 +26,7 @@ export const ProductsListHeader = ({
       <PageHeader.Left>
         <div className="flex min-w-0 flex-col gap-[var(--space-0-5)]">
           <Typography variant="h5">Products list</Typography>
-          <StoreBreadcrumbs
+          <AppBreadcrumbs
             items={[
               {
                 id: productsRootBreadcrumb.id,

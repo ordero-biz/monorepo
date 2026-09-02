@@ -1,5 +1,5 @@
 import { PageHeader, Typography } from '@ordero/ui';
-import { StoreBreadcrumbs } from '@/features/app-shell';
+import { AppBreadcrumbs } from '@/lib/components/AppBreadcrumbs';
 import { categoriesRootBreadcrumb } from '../../shared/breadcrumbs';
 import { CreateCategoryDialogTrigger } from '../CreateCategory';
 
@@ -8,7 +8,7 @@ export const CategoryListHeader = () => (
     <PageHeader.Left>
       <div className="flex min-w-0 flex-col gap-[var(--space-0-5)]">
         <Typography variant="h5">Category list</Typography>
-        <StoreBreadcrumbs
+        <AppBreadcrumbs
           items={[
             {
               id: categoriesRootBreadcrumb.id,

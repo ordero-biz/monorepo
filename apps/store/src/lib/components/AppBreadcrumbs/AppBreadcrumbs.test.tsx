@@ -1,10 +1,10 @@
 import { screen, within } from '@testing-library/react';
 import { clientRoutes } from '@/lib/client/routes';
 import { prepareStoreSetup } from '@/test/prepareSetup';
-import { StoreBreadcrumbs } from './StoreBreadcrumbs';
+import { AppBreadcrumbs } from './AppBreadcrumbs';
 
 const { setup } = prepareStoreSetup({
-  component: StoreBreadcrumbs,
+  component: AppBreadcrumbs,
   props: {
     items: [
       {
@@ -17,7 +17,7 @@ const { setup } = prepareStoreSetup({
   },
 });
 
-describe('Store breadcrumbs', () => {
+describe('App breadcrumbs', () => {
   it('starts at the owning root menu item', () => {
     setup();
 

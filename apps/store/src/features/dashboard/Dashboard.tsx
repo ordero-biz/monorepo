@@ -1,5 +1,5 @@
 import { Card, PageHeader, Typography } from '@ordero/ui';
-import { StoreBreadcrumbs } from '@/features/app-shell';
+import { AppBreadcrumbs } from '@/lib/components/AppBreadcrumbs';
 
 export const Dashboard = () => (
   <div className="flex flex-col gap-[var(--space-2)]">
@@ -7,7 +7,7 @@ export const Dashboard = () => (
       <PageHeader.Left>
         <div className="flex min-w-0 flex-col gap-[var(--space-0-5)]">
           <Typography variant="h5">Dashboard</Typography>
-          <StoreBreadcrumbs items={[{ id: 'dashboard', label: 'Dashboard' }]} />
+          <AppBreadcrumbs items={[{ id: 'dashboard', label: 'Dashboard' }]} />
         </div>
       </PageHeader.Left>
     </PageHeader.Root>

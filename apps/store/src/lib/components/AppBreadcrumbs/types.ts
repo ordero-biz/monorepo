@@ -1,5 +1,5 @@
 import type { BreadcrumbItem } from '@ordero/ui';
 
-export type StoreBreadcrumbsProps = {
+export type AppBreadcrumbsProps = {
   items: BreadcrumbItem[];
 };

@@ -3,7 +3,7 @@
 import { Button, Card, Menu, PageHeader, Typography } from '@ordero/ui';
 import { EllipsisVertical, Pencil, Trash2 } from 'lucide-react';
 import { useState } from 'react';
-import { StoreBreadcrumbs } from '@/features/app-shell';
+import { AppBreadcrumbs } from '@/lib/components/AppBreadcrumbs';
 import { ATTRIBUTE_STATUS } from '@/lib/domain/attributes/constants';
 import { useAttributeQuery } from '@/lib/hooks/attributes/useAttributeQuery';
 import { AttributeStatusChip } from '../../shared/AttributeStatusChip';
@@ -68,7 +68,7 @@ export const AttributeDetailHeader = ({
             <Typography variant="h5">{attributeQuery.data.name}</Typography>
             <AttributeStatusChip status={attributeQuery.data.status} />
           </div>
-          <StoreBreadcrumbs
+          <AppBreadcrumbs
             items={[
               attributesRootBreadcrumb,
               { id: 'current-attribute', label: attributeQuery.data.name },

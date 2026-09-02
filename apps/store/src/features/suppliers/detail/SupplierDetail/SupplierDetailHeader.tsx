@@ -1,6 +1,6 @@
 import { EllipsisVertical, Pencil } from 'lucide-react';
 import { useState } from 'react';
-import { StoreBreadcrumbs } from '@/features/app-shell';
+import { AppBreadcrumbs } from '@/lib/components/AppBreadcrumbs';
 import { SUPPLIER_STATUS } from '@/lib/domain/suppliers/constants';
 import { Menu, PageHeader, Typography } from '@/ui/index';
 import { suppliersRootBreadcrumb } from '../../shared/breadcrumbs';
@@ -24,7 +24,7 @@ export const SupplierDetailHeader = ({
             <Typography variant="h5">{supplier.name}</Typography>
             <SupplierStatusChip status={supplier.status} />
           </div>
-          <StoreBreadcrumbs
+          <AppBreadcrumbs
             items={[
               suppliersRootBreadcrumb,
               { id: 'current-supplier', label: supplier.name },

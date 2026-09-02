@@ -3,7 +3,7 @@
 import { Menu, PageHeader, Typography } from '@ordero/ui';
 import { EllipsisVertical, Pencil, Trash2 } from 'lucide-react';
 import { useState } from 'react';
-import { StoreBreadcrumbs } from '@/features/app-shell';
+import { AppBreadcrumbs } from '@/lib/components/AppBreadcrumbs';
 import { UNIT_OF_MEASUREMENT_STATUS } from '@/lib/domain/units-of-measurement/constants';
 import { DeleteUnitsOfMeasurementDialog } from '../../shared';
 import { unitsOfMeasurementRootBreadcrumb } from '../../shared/breadcrumbs';
@@ -30,7 +30,7 @@ export const UnitOfMeasurementDetailHeader = ({
             <Typography variant="h5">{unitOfMeasurement.name}</Typography>
             <UnitOfMeasurementStatusChip status={unitOfMeasurement.status} />
           </div>
-          <StoreBreadcrumbs
+          <AppBreadcrumbs
             items={[
               unitsOfMeasurementRootBreadcrumb,
               {

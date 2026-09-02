@@ -1,1 +1,0 @@
-export { StoreBreadcrumbs } from './StoreBreadcrumbs';

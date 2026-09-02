@@ -1,8 +1,8 @@
 import { Breadcrumbs } from '@ordero/ui';
 import Link from 'next/link';
-import type { StoreBreadcrumbsProps } from './types';
+import type { AppBreadcrumbsProps } from './types';
 
-export const StoreBreadcrumbs = ({ items }: StoreBreadcrumbsProps) => (
+export const AppBreadcrumbs = ({ items }: AppBreadcrumbsProps) => (
   <Breadcrumbs
     items={items}
     renderLink={({ children, className, href }) => (
