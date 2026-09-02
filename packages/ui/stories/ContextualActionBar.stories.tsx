@@ -9,6 +9,10 @@ const meta = {
   title: 'Components/Layout/ContextualActionBar',
   component: ContextualActionBar.Root,
   tags: ['autodocs'],
+  args: {
+    ariaLabel: 'Contextual actions',
+    children: null,
+  },
 } satisfies Meta<typeof ContextualActionBar.Root>;
 
 export default meta;

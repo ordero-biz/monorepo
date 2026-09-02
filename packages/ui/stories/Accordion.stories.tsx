@@ -47,6 +47,9 @@ const meta = {
   title: 'Components/Data Display/Accordion',
   component: Accordion.Root,
   tags: ['autodocs'],
+  args: {
+    children: null,
+  },
 } satisfies Meta<typeof Accordion.Root>;
 
 export default meta;
