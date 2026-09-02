@@ -1,2 +1,1 @@
-export { BaseLayout } from './BaseLayout';
-export { BaseLayoutContextualActionBar } from './BaseLayoutContextualActionBar';
+export { BaseLayout, BaseLayoutContextualActionBar } from './base-layout';

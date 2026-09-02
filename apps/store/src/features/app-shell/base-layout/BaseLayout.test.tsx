@@ -2,6 +2,10 @@ import { screen, within } from '@testing-library/react';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { BaseLayout } from './BaseLayout';
 
+vi.mock('next/navigation', () => ({
+  usePathname: () => '/dashboard',
+}));
+
 vi.mock('@/lib/hooks/auth/useLogOut', () => ({
   useLogOut: () => ({
     isLoggingOut: false,
@@ -16,7 +20,7 @@ const { setup } = prepareStoreSetup({
   },
 });
 
-describe('BaseLayout', () => {
+describe('Base layout', () => {
   it('renders the sidebar, page header, and page content', () => {
     setup();
 
