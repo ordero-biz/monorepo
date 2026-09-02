@@ -1,5 +1,5 @@
 import { cn, TopBar, Typography } from '@ordero/ui';
-import { Sidebar } from './Sidebar';
+import { Sidebar } from '../sidebar';
 import type { BaseLayoutProps } from './types';
 
 const baseLayoutContentClassName = cn(
