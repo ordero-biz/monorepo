@@ -53,7 +53,7 @@ describe('Store sidebar', () => {
     await user.click(within(sidebar).getByRole('button', { name: 'Product' }));
 
     expect(
-      within(sidebar).getByRole('link', { name: 'Product' })
+      within(sidebar).getByRole('link', { name: 'Products' })
     ).toHaveAttribute('href', '/products');
     expect(
       within(sidebar).getByRole('link', { name: 'Categories' })
@@ -88,8 +88,25 @@ describe('Store sidebar', () => {
     expect(productBranch).toHaveAttribute('aria-expanded', 'true');
     expect(categoryLink).toHaveAttribute('aria-current', 'page');
     expect(
-      within(sidebar).getByRole('link', { name: 'Product' })
+      within(sidebar).getByRole('link', { name: 'Products' })
     ).not.toHaveAttribute('aria-current');
+  });
+
+  it('highlights the products link for the products route', () => {
+    mocks.pathname = '/products';
+
+    setup();
+
+    const sidebar = screen.getByRole('complementary');
+    const productBranch = within(sidebar).getByRole('button', {
+      name: 'Product',
+    });
+    const productsLink = within(sidebar).getByRole('link', {
+      name: 'Products',
+    });
+
+    expect(productBranch).toHaveAttribute('aria-expanded', 'true');
+    expect(productsLink).toHaveAttribute('aria-current', 'page');
   });
 
   it('lets users collapse the active branch without clearing route activity', async () => {

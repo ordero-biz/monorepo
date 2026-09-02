@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { AttributesListHeader } from './AttributesListHeader';
 
@@ -19,6 +19,11 @@ describe('AttributesListHeader', () => {
     expect(
       screen.getByRole('heading', { name: 'Attributes list' })
     ).toBeVisible();
+    expect(
+      within(screen.getByRole('navigation', { name: 'Breadcrumb' })).getByText(
+        'Attributes'
+      )
+    ).toHaveAttribute('aria-current', 'page');
     expect(screen.getByRole('button', { name: 'Add Attribute' })).toBeVisible();
   });
 });

@@ -1,7 +1,9 @@
 import { EllipsisVertical, Pencil } from 'lucide-react';
 import { useState } from 'react';
+import { AppBreadcrumbs } from '@/lib/components/AppBreadcrumbs';
 import { SUPPLIER_STATUS } from '@/lib/domain/suppliers/constants';
 import { Menu, PageHeader, Typography } from '@/ui/index';
+import { suppliersRootBreadcrumb } from '../../shared/breadcrumbs';
 import { SupplierStatusChip } from '../../shared/SupplierStatusChip';
 import { UpdateSupplierDialog } from '../UpdateSupplier/UpdateSupplierDialog';
 import { ActivateSupplierDialogTrigger } from './ActivateSupplierDialogTrigger';
@@ -17,8 +19,18 @@ export const SupplierDetailHeader = ({
   return (
     <PageHeader.Root>
       <PageHeader.Left>
-        <Typography variant="h5">{supplier.name}</Typography>
-        <SupplierStatusChip status={supplier.status} />
+        <div className="flex min-w-0 flex-col gap-[var(--space-0-5)]">
+          <div className="flex min-w-0 items-center gap-[var(--space-1)]">
+            <Typography variant="h5">{supplier.name}</Typography>
+            <SupplierStatusChip status={supplier.status} />
+          </div>
+          <AppBreadcrumbs
+            items={[
+              suppliersRootBreadcrumb,
+              { id: 'current-supplier', label: supplier.name },
+            ]}
+          />
+        </div>
       </PageHeader.Left>
       <PageHeader.Right>
         {!isSupplierActive ? (

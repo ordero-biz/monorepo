@@ -1,5 +1,6 @@
-import { screen, waitFor } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { clientRoutes } from '@/lib/client/routes';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { SupplierDetailHeader } from './SupplierDetailHeader';
 
@@ -40,6 +41,14 @@ describe('SupplierDetailHeader', () => {
     const { onUpdated } = setup();
 
     expect(screen.getByRole('heading', { name: 'Fresh Farms' })).toBeVisible();
+    const breadcrumbs = screen.getByRole('navigation', { name: 'Breadcrumb' });
+    expect(
+      within(breadcrumbs).getByRole('link', { name: 'Suppliers' })
+    ).toHaveAttribute('href', clientRoutes.suppliers);
+    expect(within(breadcrumbs).getByText('Fresh Farms')).toHaveAttribute(
+      'aria-current',
+      'page'
+    );
 
     await user.click(
       screen.getByRole('button', { name: 'Actions for Fresh Farms' })

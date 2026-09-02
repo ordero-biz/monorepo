@@ -1,6 +1,7 @@
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getAttribute, updateAttribute } from '@/lib/client/api/attributes';
+import { clientRoutes } from '@/lib/client/routes';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { AttributeDetailHeader } from './AttributeDetailHeader';
 
@@ -61,6 +62,14 @@ describe('AttributeDetailHeader', () => {
     setup();
 
     expect(await screen.findByRole('heading', { name: 'Color' })).toBeVisible();
+    const breadcrumbs = screen.getByRole('navigation', { name: 'Breadcrumb' });
+    expect(
+      within(breadcrumbs).getByRole('link', { name: 'Attributes' })
+    ).toHaveAttribute('href', clientRoutes.attributes);
+    expect(within(breadcrumbs).getByText('Color')).toHaveAttribute(
+      'aria-current',
+      'page'
+    );
     expect(screen.getByText('Draft')).toBeVisible();
     expect(screen.getByRole('button', { name: 'Publish' })).toBeVisible();
     expect(screen.getByRole('button', { name: 'Add Value' })).toBeVisible();
