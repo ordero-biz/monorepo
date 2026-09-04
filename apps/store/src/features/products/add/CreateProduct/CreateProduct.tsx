@@ -20,6 +20,7 @@ import type { CreateProductProps, ProductVariantsGeneratedArgs } from './types';
 export const CreateProduct = ({
   creationMode,
   form,
+  onSubmit,
   TemplateFields,
 }: CreateProductProps) => {
   const generationMode =
@@ -40,16 +41,12 @@ export const CreateProduct = ({
     },
     []
   );
-  const handleCreateProduct = () => {
-    void form.handleSubmit();
-  };
-
   return (
     <form
       noValidate
       onSubmit={(event) => {
         event.preventDefault();
-        handleCreateProduct();
+        onSubmit();
       }}
     >
       <PageHeader.Root>
@@ -111,7 +108,7 @@ export const CreateProduct = ({
                           color="primary"
                           disabled={isSubmitting}
                           size="l"
-                          onClick={handleCreateProduct}
+                          onClick={onSubmit}
                           type="button"
                         >
                           {isSubmitting

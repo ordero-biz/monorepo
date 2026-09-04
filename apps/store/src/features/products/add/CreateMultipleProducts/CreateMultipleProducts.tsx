@@ -31,11 +31,13 @@ export const CreateMultipleProducts = () => {
     onCreated,
     validateProduct: validateMultipleProducts,
   });
+  const onSubmit = () => form.handleSubmit();
 
   return (
     <CreateProduct
       creationMode={PRODUCT_CREATION_MODE.multiple}
       form={form}
+      onSubmit={onSubmit}
       TemplateFields={CreateMultipleProductsTemplateFields}
     />
   );

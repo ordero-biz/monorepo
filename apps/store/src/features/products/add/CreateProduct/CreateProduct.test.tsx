@@ -202,7 +202,13 @@ const CreateProductTest = ({
     validateProduct,
   });
 
-  return <CreateProduct {...props} form={form} />;
+  return (
+    <CreateProduct
+      {...props}
+      form={form}
+      onSubmit={() => form.handleSubmit()}
+    />
+  );
 };
 
 const { setup } = prepareStoreSetup({

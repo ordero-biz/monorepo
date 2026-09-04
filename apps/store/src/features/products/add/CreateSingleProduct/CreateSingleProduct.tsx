@@ -32,11 +32,13 @@ export const CreateSingleProduct = () => {
     onCreated,
     validateProduct: validateSingleProduct,
   });
+  const onSubmit = () => form.handleSubmit();
 
   return (
     <CreateProduct
       creationMode={PRODUCT_CREATION_MODE.single}
       form={form}
+      onSubmit={onSubmit}
       TemplateFields={CreateSingleProductTemplateFields}
     />
   );
