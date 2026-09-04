@@ -1,4 +1,5 @@
 import { createSupplier } from '@/lib/client/api/suppliers';
+import { API_ERROR_CODES } from '@/lib/constants/apiErrorCodes';
 import { SUPPLIER_STATUS } from '@/lib/domain/suppliers/constants';
 import { submitCreateSupplier } from './submitAction';
 
@@ -83,6 +84,34 @@ describe('submitCreateSupplier', () => {
           email: 'Supplier email already exists.',
         },
         formError: 'Supplier creation failed.',
+      },
+    });
+  });
+
+  it('maps a duplicate supplier name error to the shared message', async () => {
+    createSupplierMock.mockResolvedValue({
+      ok: false,
+      error: {
+        status: 409,
+        code: API_ERROR_CODES.SUPPLIER_NAME_ALREADY_EXISTS,
+        message: 'Conflict',
+      },
+    });
+
+    await expect(
+      submitCreateSupplier({
+        name: 'Fresh Farms',
+        status: SUPPLIER_STATUS.DRAFT,
+        email: '',
+        phone: '',
+        address: '',
+        comment: '',
+      })
+    ).resolves.toEqual({
+      ok: false,
+      error: {
+        fieldErrors: undefined,
+        formError: 'Supplier name already exists.',
       },
     });
   });
