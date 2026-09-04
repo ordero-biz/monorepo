@@ -28,6 +28,7 @@ export const CreateProductTemplateFields = ({
           <form.Field
             name="productName"
             validators={{
+              onBlur: validateProductName,
               onChange: validateProductName,
               onSubmit: validateProductName,
             }}
@@ -54,6 +55,7 @@ export const CreateProductTemplateFields = ({
           <form.Field
             name="category"
             validators={{
+              onBlur: validateProductCategory,
               onChange: validateProductCategory,
               onSubmit: validateProductCategory,
             }}
@@ -80,6 +82,10 @@ export const CreateProductTemplateFields = ({
           <form.Field
             name="attributes"
             validators={{
+              onBlur: ({ value }) =>
+                isMultipleProducts && value.length === 0
+                  ? 'Select at least one attribute.'
+                  : undefined,
               onChange: ({ value }) =>
                 isMultipleProducts && value.length === 0
                   ? 'Select at least one attribute.'
