@@ -47,9 +47,21 @@ type ProductVariantFieldErrors = Partial<
   Record<ProductVariantFieldPath, string>
 >;
 
-type ProductTemplateField = 'attributes' | 'category' | 'productName';
+type ProductTemplateField =
+  | 'attributes'
+  | 'attributeValues'
+  | 'category'
+  | 'productName';
 
 type ProductTemplateFieldErrors = Partial<Record<ProductTemplateField, string>>;
+
+const hasSelectedAttributeValues = ({
+  attributeValues,
+  attributes,
+}: Pick<CreateProductValues, 'attributeValues' | 'attributes'>) =>
+  attributes.some(
+    (attribute) => (attributeValues[String(attribute.id)] ?? []).length > 0
+  );
 
 const getDuplicateVariantFieldIndexes = ({
   fieldName,
@@ -205,8 +217,12 @@ export const validateProductTemplate = ({
     errors.category = categoryError;
   }
 
-  if (requiresAttributes && value.attributes.length === 0) {
-    errors.attributes = 'Select at least one attribute.';
+  if (requiresAttributes) {
+    if (value.attributes.length === 0) {
+      errors.attributes = 'Select at least one attribute.';
+    } else if (!hasSelectedAttributeValues(value)) {
+      errors.attributeValues = 'Select at least one attribute value.';
+    }
   }
 
   return Object.keys(errors).length > 0

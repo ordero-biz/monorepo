@@ -1,9 +1,12 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import { getAddProductRoute } from '@/lib/client/routes';
 import { AppBreadcrumbs } from '@/lib/components/AppBreadcrumbs';
-import { clientRoutes } from '@/lib/client/routes';
-import { PRODUCTS_LIST_MODE } from '@/lib/domain/products/constants';
+import {
+  PRODUCT_CREATION_MODE,
+  PRODUCTS_LIST_MODE,
+} from '@/lib/domain/products/constants';
 import { Button, PageHeader, ToggleButton, Typography } from '@/ui/index';
 import { productsRootBreadcrumb } from '../../shared/breadcrumbs';
 import type { ProductsListHeaderProps, ProductsListMode } from './types';
@@ -54,10 +57,21 @@ export const ProductsListHeader = ({
         <div aria-hidden="true" className="h-[var(--space-4)] w-px bg-border" />
         <Button
           color="primary"
-          onClick={() => router.push(clientRoutes.addProduct)}
+          onClick={() =>
+            router.push(getAddProductRoute(PRODUCT_CREATION_MODE.single))
+          }
           type="button"
         >
-          Add Product
+          Single product
+        </Button>
+        <Button
+          color="primary"
+          onClick={() =>
+            router.push(getAddProductRoute(PRODUCT_CREATION_MODE.multiple))
+          }
+          type="button"
+        >
+          Multiple products
         </Button>
       </PageHeader.Right>
     </PageHeader.Root>

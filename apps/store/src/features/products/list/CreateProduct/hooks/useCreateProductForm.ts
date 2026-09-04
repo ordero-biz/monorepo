@@ -1,5 +1,5 @@
 import { useToastManager } from '@ordero/ui';
-import { useForm } from '@tanstack/react-form';
+import { revalidateLogic, useForm } from '@tanstack/react-form';
 import { createProductDefaultValues } from '../constants';
 import { submitCreateProduct } from '../utils/submitAction';
 import { validateCreateProduct } from '../utils/validations';
@@ -14,8 +14,12 @@ export const useCreateProductForm = ({
   const { add: addToast } = useToastManager();
   const form = useForm({
     defaultValues: createProductDefaultValues,
+    validationLogic: revalidateLogic(),
     validators: {
-      onSubmit: validateCreateProduct,
+      onDynamic: validateCreateProduct,
+    },
+    onSubmitInvalid: ({ formApi }) => {
+      void formApi.validate('submit');
     },
     onSubmit: async ({ formApi, value }) => {
       const result = await submitCreateProduct(value);

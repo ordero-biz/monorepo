@@ -1,4 +1,5 @@
-export { CreateProduct } from '@/features/products/list/CreateProduct';
+export { CreateMultipleProducts } from '@/features/products/add/CreateMultipleProducts';
+export { CreateSingleProduct } from '@/features/products/add/CreateSingleProduct';
 export {
   ProductsList,
   ProductsListHeader,
