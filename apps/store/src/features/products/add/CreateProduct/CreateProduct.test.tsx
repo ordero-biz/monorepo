@@ -10,6 +10,7 @@ import {
   CreateSingleProductTemplateFields,
 } from './CreateProductTemplateFields';
 import { useCreateProductForm } from './hooks/useCreateProductForm';
+import { useProductGenerationState } from './hooks/useProductGenerationState';
 import type { CreateProductProps } from './types';
 import {
   validateMultipleProducts,
@@ -201,11 +202,13 @@ const CreateProductTest = ({
     onCreated: vi.fn(),
     validateProduct,
   });
+  const generation = useProductGenerationState();
 
   return (
     <CreateProduct
       {...props}
       form={form}
+      generation={generation}
       onSubmit={() => form.handleSubmit()}
     />
   );

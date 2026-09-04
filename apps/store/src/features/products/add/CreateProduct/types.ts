@@ -10,6 +10,7 @@ export type CreateProductForm = ReturnType<typeof useCreateProductForm>['form'];
 export type CreateProductProps = {
   creationMode: ProductCreationMode;
   form: CreateProductForm;
+  generation: ReturnType<typeof import('./hooks/useProductGenerationState').useProductGenerationState>;
   onSubmit: () => void;
   TemplateFields: ComponentType<
     Omit<CreateProductTemplateFieldsProps, 'AttributesField'>

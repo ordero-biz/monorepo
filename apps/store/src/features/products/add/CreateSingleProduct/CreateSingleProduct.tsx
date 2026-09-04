@@ -14,6 +14,7 @@ import {
   useCreateProductForm,
   validateSingleProduct,
 } from '../CreateProduct';
+import { useProductGenerationState } from '../CreateProduct/hooks/useProductGenerationState';
 
 export const CreateSingleProduct = () => {
   const queryClient = useQueryClient();
@@ -33,11 +34,13 @@ export const CreateSingleProduct = () => {
     validateProduct: validateSingleProduct,
   });
   const onSubmit = () => form.handleSubmit();
+  const generation = useProductGenerationState();
 
   return (
     <CreateProduct
       creationMode={PRODUCT_CREATION_MODE.single}
       form={form}
+      generation={generation}
       onSubmit={onSubmit}
       TemplateFields={CreateSingleProductTemplateFields}
     />

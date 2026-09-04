@@ -14,6 +14,7 @@ import {
   useCreateProductForm,
   validateMultipleProducts,
 } from '../CreateProduct';
+import { useProductGenerationState } from '../CreateProduct/hooks/useProductGenerationState';
 
 export const CreateMultipleProducts = () => {
   const queryClient = useQueryClient();
@@ -32,11 +33,13 @@ export const CreateMultipleProducts = () => {
     validateProduct: validateMultipleProducts,
   });
   const onSubmit = () => form.handleSubmit();
+  const generation = useProductGenerationState();
 
   return (
     <CreateProduct
       creationMode={PRODUCT_CREATION_MODE.multiple}
       form={form}
+      generation={generation}
       onSubmit={onSubmit}
       TemplateFields={CreateMultipleProductsTemplateFields}
     />
