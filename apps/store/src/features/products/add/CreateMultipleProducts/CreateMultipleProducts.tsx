@@ -1,3 +1,5 @@
+'use client';
+
 import { PRODUCT_CREATION_MODE } from '@/lib/domain/products/constants';
 import { CreateProduct } from '../../list/CreateProduct';
 import { CreateMultipleProductsTemplateFields } from '../../list/CreateProduct/CreateProductTemplateFields';
