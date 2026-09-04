@@ -3,17 +3,18 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { clientRoutes } from '@/lib/client/routes';
-import { PRODUCT_CREATION_MODE } from '@/lib/domain/products/constants';
 import {
   productGroupsQueryKeys,
   productVariantsQueryKeys,
 } from '@/lib/query/products/productsQueryKeys';
 import {
-  CreateMultipleProductsTemplateFields,
   CreateProduct,
+  PRODUCT_GENERATION_MODE,
   useCreateProductForm,
   validateMultipleProducts,
 } from '../CreateProduct';
+import { useProductGenerationState } from '../CreateProduct/hooks/useProductGenerationState';
+import { CreateMultipleProductsTemplateFields } from './CreateMultipleProductsTemplateFields';
 
 export const CreateMultipleProducts = () => {
   const queryClient = useQueryClient();
@@ -31,11 +32,15 @@ export const CreateMultipleProducts = () => {
     onCreated,
     validateProduct: validateMultipleProducts,
   });
+  const onSubmit = () => form.handleSubmit();
+  const generation = useProductGenerationState();
 
   return (
     <CreateProduct
-      creationMode={PRODUCT_CREATION_MODE.multiple}
+      generationMode={PRODUCT_GENERATION_MODE.many}
       form={form}
+      generation={generation}
+      onSubmit={onSubmit}
       TemplateFields={CreateMultipleProductsTemplateFields}
     />
   );

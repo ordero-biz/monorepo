@@ -3,17 +3,18 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { clientRoutes } from '@/lib/client/routes';
-import { PRODUCT_CREATION_MODE } from '@/lib/domain/products/constants';
 import {
   productGroupsQueryKeys,
   productVariantsQueryKeys,
 } from '@/lib/query/products/productsQueryKeys';
 import {
   CreateProduct,
-  CreateSingleProductTemplateFields,
+  PRODUCT_GENERATION_MODE,
   useCreateProductForm,
   validateSingleProduct,
 } from '../CreateProduct';
+import { useProductGenerationState } from '../CreateProduct/hooks/useProductGenerationState';
+import { CreateSingleProductTemplateFields } from './CreateSingleProductTemplateFields';
 
 export const CreateSingleProduct = () => {
   const queryClient = useQueryClient();
@@ -32,11 +33,15 @@ export const CreateSingleProduct = () => {
     onCreated,
     validateProduct: validateSingleProduct,
   });
+  const onSubmit = () => form.handleSubmit();
+  const generation = useProductGenerationState();
 
   return (
     <CreateProduct
-      creationMode={PRODUCT_CREATION_MODE.single}
+      generationMode={PRODUCT_GENERATION_MODE.one}
       form={form}
+      generation={generation}
+      onSubmit={onSubmit}
       TemplateFields={CreateSingleProductTemplateFields}
     />
   );

@@ -2,14 +2,13 @@ import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createProductGroup } from '@/lib/client/api/products';
 import type { AttributeDropdown } from '@/lib/domain/attributes/types';
-import { PRODUCT_CREATION_MODE } from '@/lib/domain/products/constants';
 import { prepareStoreSetup } from '@/test/prepareSetup';
+import { CreateMultipleProductsTemplateFields } from '../CreateMultipleProducts/CreateMultipleProductsTemplateFields';
+import { CreateSingleProductTemplateFields } from '../CreateSingleProduct/CreateSingleProductTemplateFields';
 import { CreateProduct } from './CreateProduct';
-import {
-  CreateMultipleProductsTemplateFields,
-  CreateSingleProductTemplateFields,
-} from './CreateProductTemplateFields';
+import { PRODUCT_GENERATION_MODE } from './constants';
 import { useCreateProductForm } from './hooks/useCreateProductForm';
+import { useProductGenerationState } from './hooks/useProductGenerationState';
 import type { CreateProductProps } from './types';
 import {
   validateMultipleProducts,
@@ -187,7 +186,10 @@ vi.mock('./AttributesAsyncCombobox', () => ({
 
 const createProductGroupMock = vi.mocked(createProductGroup);
 
-type CreateProductTestProps = Omit<CreateProductProps, 'form'> & {
+type CreateProductTestProps = Omit<
+  CreateProductProps,
+  'form' | 'generation' | 'onSubmit'
+> & {
   validateProduct: Parameters<
     typeof useCreateProductForm
   >[0]['validateProduct'];
@@ -201,14 +203,22 @@ const CreateProductTest = ({
     onCreated: vi.fn(),
     validateProduct,
   });
+  const generation = useProductGenerationState();
 
-  return <CreateProduct {...props} form={form} />;
+  return (
+    <CreateProduct
+      {...props}
+      form={form}
+      generation={generation}
+      onSubmit={() => form.handleSubmit()}
+    />
+  );
 };
 
-const { setup } = prepareStoreSetup({
+const { setup } = prepareStoreSetup<CreateProductTestProps>({
   component: CreateProductTest,
   props: {
-    creationMode: PRODUCT_CREATION_MODE.single,
+    generationMode: PRODUCT_GENERATION_MODE.one,
     TemplateFields: CreateSingleProductTemplateFields,
     validateProduct: validateSingleProduct,
   },
@@ -246,9 +256,9 @@ describe('CreateProduct', () => {
     expect(continueButton).toBeEnabled();
   });
 
-  it('uses the route-selected multiple-product workflow', () => {
+  it('renders the multiple-product generation workflow', () => {
     setup({
-      creationMode: PRODUCT_CREATION_MODE.multiple,
+      generationMode: PRODUCT_GENERATION_MODE.many,
       TemplateFields: CreateMultipleProductsTemplateFields,
       validateProduct: validateMultipleProducts,
     });
@@ -328,7 +338,7 @@ describe('CreateProduct', () => {
     const user = userEvent.setup();
 
     setup({
-      creationMode: PRODUCT_CREATION_MODE.multiple,
+      generationMode: PRODUCT_GENERATION_MODE.many,
       TemplateFields: CreateMultipleProductsTemplateFields,
       validateProduct: validateMultipleProducts,
     });
@@ -445,6 +455,74 @@ describe('CreateProduct', () => {
     expect(within(variantAttributes).getByText('Red')).toBeVisible();
     expect(within(variantAttributes).getByText('Blue')).toBeVisible();
     expect(createProductGroupMock).not.toHaveBeenCalled();
+  });
+
+  it('removes a generated variant attribute with its chip action', async () => {
+    const user = userEvent.setup();
+
+    setup();
+
+    await completeRequiredFields(user);
+    await user.click(screen.getByRole('button', { name: 'Select Attributes' }));
+    await user.click(screen.getByRole('button', { name: 'Blue' }));
+    await user.click(
+      screen.getByRole('button', { name: 'Next: Configure product' })
+    );
+
+    const variantAttributes = screen.getByRole('treegrid', {
+      name: 'Attributes for Running Shoes Blue',
+    });
+
+    await user.click(
+      within(variantAttributes).getByRole('button', { name: 'Remove Blue' })
+    );
+
+    expect(
+      within(variantAttributes).queryByText('Blue')
+    ).not.toBeInTheDocument();
+    expect(
+      within(variantAttributes).getByRole('button', {
+        name: 'Add attributes for Running Shoes Blue',
+      })
+    ).toBeVisible();
+  });
+
+  it('adds attributes to a generated product that has none', async () => {
+    const user = userEvent.setup();
+
+    setup();
+
+    await completeRequiredFields(user);
+    await user.click(screen.getByRole('button', { name: 'Select Attributes' }));
+    await user.click(screen.getByRole('button', { name: 'Blue' }));
+    await user.click(
+      screen.getByRole('button', { name: 'Next: Configure product' })
+    );
+    await user.click(
+      screen.getByRole('button', {
+        name: 'Remove Blue',
+      })
+    );
+    await user.click(
+      screen.getByRole('button', {
+        name: 'Add attributes for Running Shoes Blue',
+      })
+    );
+
+    const dialog = screen.getByRole('dialog', {
+      name: 'Edit variant attributes for Running Shoes Blue',
+    });
+
+    await user.click(within(dialog).getByRole('button', { name: 'Blue' }));
+    await user.click(within(dialog).getByRole('button', { name: 'Update' }));
+
+    expect(
+      within(
+        screen.getByRole('treegrid', {
+          name: 'Attributes for Running Shoes Blue',
+        })
+      ).getByText('Blue')
+    ).toBeVisible();
   });
 
   it('keeps filled variants when generating again without template changes', async () => {
@@ -573,7 +651,7 @@ describe('CreateProduct', () => {
     const user = userEvent.setup();
 
     setup({
-      creationMode: PRODUCT_CREATION_MODE.multiple,
+      generationMode: PRODUCT_GENERATION_MODE.many,
       TemplateFields: CreateMultipleProductsTemplateFields,
       validateProduct: validateMultipleProducts,
     });
@@ -617,7 +695,7 @@ describe('CreateProduct', () => {
     const user = userEvent.setup();
 
     setup({
-      creationMode: PRODUCT_CREATION_MODE.multiple,
+      generationMode: PRODUCT_GENERATION_MODE.many,
       TemplateFields: CreateMultipleProductsTemplateFields,
       validateProduct: validateMultipleProducts,
     });
@@ -640,7 +718,7 @@ describe('CreateProduct', () => {
     const user = userEvent.setup();
 
     setup({
-      creationMode: PRODUCT_CREATION_MODE.multiple,
+      generationMode: PRODUCT_GENERATION_MODE.many,
       TemplateFields: CreateMultipleProductsTemplateFields,
       validateProduct: validateMultipleProducts,
     });
@@ -692,7 +770,7 @@ describe('CreateProduct', () => {
     const user = userEvent.setup();
 
     setup({
-      creationMode: PRODUCT_CREATION_MODE.multiple,
+      generationMode: PRODUCT_GENERATION_MODE.many,
       TemplateFields: CreateMultipleProductsTemplateFields,
       validateProduct: validateMultipleProducts,
     });
@@ -869,5 +947,34 @@ describe('CreateProduct', () => {
 
     expect(screen.getByRole('button', { name: 'Red' })).toBeVisible();
     expect(blueValue).toHaveAttribute('aria-pressed', 'true');
+  });
+
+  it('preserves valid attribute values and clears removed attribute values', async () => {
+    const user = userEvent.setup();
+
+    setup();
+
+    await user.click(screen.getByRole('button', { name: 'Select Attributes' }));
+    await user.click(screen.getByRole('button', { name: 'China' }));
+    await user.click(screen.getByRole('button', { name: 'Blue' }));
+    await user.click(
+      screen.getByRole('button', { name: 'Select Color Attribute' })
+    );
+
+    expect(
+      screen.getByRole('button', { name: 'Blue', pressed: true })
+    ).toBeVisible();
+
+    await user.click(screen.getByRole('button', { name: 'Select Attributes' }));
+
+    expect(
+      screen.getByRole('button', { name: 'China', pressed: false })
+    ).toBeVisible();
+
+    await user.click(screen.getByRole('button', { name: 'Blue' }));
+
+    expect(
+      screen.getByRole('button', { name: 'Blue', pressed: false })
+    ).toBeVisible();
   });
 });

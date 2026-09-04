@@ -25,6 +25,7 @@ const colorAttribute = {
   id: 7,
   name: 'Color',
   sortOrder: 1,
+  status: 'DRAFT',
   createdAt: '2026-07-14T17:54:42.035Z',
   attributeValues: [],
 } satisfies AttributeDropdown;

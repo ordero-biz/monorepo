@@ -7,49 +7,25 @@ import {
   PageHeader,
   Typography,
 } from '@ordero/ui';
-import { useCallback, useState } from 'react';
 import { BaseLayoutContextualActionBar } from '@/features/app-shell';
-import type { AttributeDropdown } from '@/lib/domain/attributes/types';
-import { PRODUCT_CREATION_MODE } from '@/lib/domain/products/constants';
-import { PRODUCT_GENERATION_MODE } from './constants';
 import { GeneratedProductVariants } from './GeneratedProductVariants';
 import { GenerateProductActions } from './GenerateProductActions';
 import { ProductAttributeValuesField } from './ProductAttributeValuesField';
-import type { CreateProductProps, ProductVariantsGeneratedArgs } from './types';
+import type { CreateProductProps } from './types';
 
 export const CreateProduct = ({
-  creationMode,
+  generationMode,
   form,
+  generation,
+  onSubmit,
   TemplateFields,
 }: CreateProductProps) => {
-  const generationMode =
-    creationMode === PRODUCT_CREATION_MODE.multiple
-      ? PRODUCT_GENERATION_MODE.many
-      : PRODUCT_GENERATION_MODE.one;
-  const [generatedAttributes, setGeneratedAttributes] = useState<
-    AttributeDropdown[]
-  >([]);
-  const [generatedTemplateSignature, setGeneratedTemplateSignature] =
-    useState<string>();
-  const [generationVersion, setGenerationVersion] = useState(0);
-  const handleProductVariantsGenerated = useCallback(
-    ({ attributes, generationSignature }: ProductVariantsGeneratedArgs) => {
-      setGeneratedAttributes(attributes);
-      setGeneratedTemplateSignature(generationSignature);
-      setGenerationVersion((currentVersion) => currentVersion + 1);
-    },
-    []
-  );
-  const handleCreateProduct = () => {
-    void form.handleSubmit();
-  };
-
   return (
     <form
       noValidate
       onSubmit={(event) => {
         event.preventDefault();
-        handleCreateProduct();
+        onSubmit();
       }}
     >
       <PageHeader.Root>
@@ -75,9 +51,13 @@ export const CreateProduct = ({
 
               <GenerateProductActions
                 form={form}
-                generatedTemplateSignature={generatedTemplateSignature}
+                generatedTemplateSignature={
+                  generation.generatedTemplateSignature
+                }
                 generationMode={generationMode}
-                onProductVariantsGenerated={handleProductVariantsGenerated}
+                onProductVariantsGenerated={
+                  generation.onProductVariantsGenerated
+                }
               />
             </div>
           </Accordion.Panel>
@@ -86,9 +66,9 @@ export const CreateProduct = ({
 
       <GeneratedProductVariants
         form={form}
-        generatedAttributes={generatedAttributes}
+        generatedAttributes={generation.generatedAttributes}
         generationMode={generationMode}
-        generationVersion={generationVersion}
+        generationVersion={generation.generationVersion}
       />
       <form.Subscribe selector={(state) => state.values.productVariants.length}>
         {(productVariantCount) =>
@@ -111,7 +91,7 @@ export const CreateProduct = ({
                           color="primary"
                           disabled={isSubmitting}
                           size="l"
-                          onClick={handleCreateProduct}
+                          onClick={onSubmit}
                           type="button"
                         >
                           {isSubmitting

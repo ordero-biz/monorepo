@@ -1,23 +1,19 @@
 import { Textarea, TextField } from '@ordero/ui';
 import { CategoriesAsyncCombobox } from '@/features/categories';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
-import { AttributesAsyncCombobox } from './AttributesAsyncCombobox';
-import { ProductImageDropzone } from './ProductImageDropzone';
-import type {
-  CreateProductTemplateFieldsProps,
-  ProductTemplateAttributesFieldProps,
-} from './types';
-import { getAttributeValueSelections } from './utils/productGeneration';
 import {
+  AttributesAsyncCombobox,
+  getAttributeValueSelections,
+  ProductImageDropzone,
+  type ProductTemplateFieldsProps,
   validateProductAttributes,
   validateProductCategory,
   validateProductName,
-} from './utils/validations';
+} from '../CreateProduct';
 
-const ProductTemplateFields = ({
-  AttributesField,
+export const CreateMultipleProductsTemplateFields = ({
   form,
-}: CreateProductTemplateFieldsProps) => {
+}: ProductTemplateFieldsProps) => {
   return (
     <div className="grid gap-[var(--space-3)] lg:grid-cols-[1fr_1fr_0.5fr] lg:items-start">
       <div className="grid gap-[var(--space-3)] lg:col-span-2 lg:grid-cols-2 lg:items-stretch">
@@ -69,6 +65,7 @@ const ProductTemplateFields = ({
                   onBlur={field.handleBlur}
                   onValueChange={field.handleChange}
                   placeholder="Select category"
+                  required
                   size="s"
                   value={field.state.value}
                 />
@@ -76,7 +73,43 @@ const ProductTemplateFields = ({
             }}
           </form.Field>
 
-          <AttributesField form={form} />
+          <form.Field
+            name="attributes"
+            validators={{
+              onBlur: validateProductAttributes,
+              onChange: validateProductAttributes,
+              onSubmit: validateProductAttributes,
+            }}
+          >
+            {(field) => {
+              const errorText = getFieldSubmitChangeErrorText(field.state.meta);
+
+              return (
+                <AttributesAsyncCombobox
+                  errorText={errorText}
+                  helperText="You must select attributes and their values to generate multiple products"
+                  invalid={Boolean(errorText)}
+                  label="Attributes"
+                  multiple
+                  name={field.name}
+                  onBlur={field.handleBlur}
+                  onSelectedAttributesChange={(attributes) => {
+                    field.handleChange(attributes);
+                    form.setFieldValue('attributeValues', (currentValue) =>
+                      getAttributeValueSelections(currentValue, attributes)
+                    );
+                  }}
+                  placeholder="Select attributes"
+                  required
+                  selectedAttributes={field.state.value}
+                  size="s"
+                  value={field.state.value.map((attribute) =>
+                    String(attribute.id)
+                  )}
+                />
+              );
+            }}
+          </form.Field>
         </div>
 
         <div className="flex min-w-0 flex-col gap-[var(--space-2)]">
@@ -110,87 +143,3 @@ const ProductTemplateFields = ({
     </div>
   );
 };
-
-const CreateSingleProductAttributesField = ({
-  form,
-}: ProductTemplateAttributesFieldProps) => (
-  <form.Field name="attributes">
-    {(field) => (
-      <AttributesAsyncCombobox
-        helperText="Optional: Add attributes for a single product"
-        label="Attributes"
-        multiple
-        name={field.name}
-        onBlur={field.handleBlur}
-        onSelectedAttributesChange={(attributes) => {
-          field.handleChange(attributes);
-          form.setFieldValue('attributeValues', (currentValue) =>
-            getAttributeValueSelections(currentValue, attributes)
-          );
-        }}
-        placeholder="Select attributes"
-        selectedAttributes={field.state.value}
-        size="s"
-        value={field.state.value.map((attribute) => String(attribute.id))}
-      />
-    )}
-  </form.Field>
-);
-
-const CreateMultipleProductsAttributesField = ({
-  form,
-}: ProductTemplateAttributesFieldProps) => (
-  <form.Field
-    name="attributes"
-    validators={{
-      onBlur: validateProductAttributes,
-      onChange: validateProductAttributes,
-      onSubmit: validateProductAttributes,
-    }}
-  >
-    {(field) => {
-      const errorText = getFieldSubmitChangeErrorText(field.state.meta);
-
-      return (
-        <AttributesAsyncCombobox
-          errorText={errorText}
-          helperText="You must select attributes and their values to generate multiple products"
-          invalid={Boolean(errorText)}
-          label="Attributes"
-          multiple
-          name={field.name}
-          onBlur={field.handleBlur}
-          onSelectedAttributesChange={(attributes) => {
-            field.handleChange(attributes);
-            form.setFieldValue('attributeValues', (currentValue) =>
-              getAttributeValueSelections(currentValue, attributes)
-            );
-          }}
-          placeholder="Select attributes"
-          required
-          selectedAttributes={field.state.value}
-          size="s"
-          value={field.state.value.map((attribute) => String(attribute.id))}
-        />
-      );
-    }}
-  </form.Field>
-);
-
-export const CreateSingleProductTemplateFields = ({
-  form,
-}: Omit<CreateProductTemplateFieldsProps, 'AttributesField'>) => (
-  <ProductTemplateFields
-    AttributesField={CreateSingleProductAttributesField}
-    form={form}
-  />
-);
-
-export const CreateMultipleProductsTemplateFields = ({
-  form,
-}: Omit<CreateProductTemplateFieldsProps, 'AttributesField'>) => (
-  <ProductTemplateFields
-    AttributesField={CreateMultipleProductsAttributesField}
-    form={form}
-  />
-);

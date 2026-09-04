@@ -1,4 +1,4 @@
-import { act, render, screen } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import { useIncrementalProductVariants } from './useIncrementalProductVariants';
 
 const intersectionObserverCallbacks: IntersectionObserverCallback[] = [];
@@ -71,5 +71,15 @@ describe('useIncrementalProductVariants', () => {
     );
 
     expect(screen.getAllByRole('listitem')).toHaveLength(20);
+  });
+
+  it('shows all variants when IntersectionObserver is unavailable', async () => {
+    vi.stubGlobal('IntersectionObserver', undefined);
+
+    render(<IncrementalProductVariantList productVariantCount={40} />);
+
+    await waitFor(() =>
+      expect(screen.getAllByRole('listitem')).toHaveLength(40)
+    );
   });
 });
