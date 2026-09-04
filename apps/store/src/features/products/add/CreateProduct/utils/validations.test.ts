@@ -3,6 +3,7 @@ import { PRODUCT_GENERATION_MODE } from '../constants';
 import type { CreateProductValues } from '../types';
 import {
   validateCreateProduct,
+  validateProductAttributes,
   validateProductCategory,
   validateProductName,
   validateProductTemplate,
@@ -49,6 +50,20 @@ describe('validateProductCategory', () => {
 
   it('accepts a selected category', () => {
     expect(validateProductCategory({ value: '2' })).toBeUndefined();
+  });
+});
+
+describe('validateProductAttributes', () => {
+  it('requires at least one attribute', () => {
+    expect(validateProductAttributes({ value: [] })).toBe(
+      'Select at least one attribute.'
+    );
+  });
+
+  it('accepts selected attributes', () => {
+    expect(
+      validateProductAttributes({ value: [colorAttribute] })
+    ).toBeUndefined();
   });
 });
 

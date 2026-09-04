@@ -1,15 +1,23 @@
 import { useToastManager } from '@ordero/ui';
 import { revalidateLogic, useForm } from '@tanstack/react-form';
 import { createProductDefaultValues } from '../constants';
+import type { CreateProductValues } from '../types';
 import { submitCreateProduct } from '../utils/submitAction';
-import { validateProductVariants } from '../utils/validations';
+import {
+  type validateCreateProduct,
+  validateProductVariants,
+} from '../utils/validations';
 
 type UseCreateProductFormArgs = {
   onCreated: () => Promise<void> | void;
+  validateProduct: (
+    value: CreateProductValues
+  ) => ReturnType<typeof validateCreateProduct>;
 };
 
 export const useCreateProductForm = ({
   onCreated,
+  validateProduct,
 }: UseCreateProductFormArgs) => {
   const { add: addToast } = useToastManager();
   const form = useForm({
@@ -21,6 +29,7 @@ export const useCreateProductForm = ({
           requireAttributeValueIds: false,
           value,
         }),
+      onSubmit: ({ value }) => validateProduct(value),
     },
     onSubmitInvalid: ({ formApi }) => {
       void formApi.validate('submit');

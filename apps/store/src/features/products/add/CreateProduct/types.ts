@@ -4,18 +4,15 @@ import type { AttributeDropdown } from '@/lib/domain/attributes/types';
 import type { ProductCreationMode } from '@/lib/domain/products/constants';
 import type { PRODUCT_GENERATION_MODE } from './constants';
 import type { useCreateProductForm } from './hooks/useCreateProductForm';
-import type { validateCreateProduct } from './utils/validations';
 
 export type CreateProductForm = ReturnType<typeof useCreateProductForm>['form'];
 
 export type CreateProductProps = {
   creationMode: ProductCreationMode;
+  form: CreateProductForm;
   TemplateFields: ComponentType<
-    Omit<CreateProductTemplateFieldsProps, 'generationMode'>
+    Omit<CreateProductTemplateFieldsProps, 'AttributesField'>
   >;
-  validateProduct: (
-    value: CreateProductValues
-  ) => ReturnType<typeof validateCreateProduct>;
 };
 
 export type AttributesAsyncComboboxProps = Omit<
@@ -35,8 +32,12 @@ export type AttributesAsyncComboboxProps = Omit<
 };
 
 export type CreateProductTemplateFieldsProps = {
+  AttributesField: ComponentType<ProductTemplateAttributesFieldProps>;
   form: CreateProductForm;
-  generationMode: ProductGenerationMode;
+};
+
+export type ProductTemplateAttributesFieldProps = {
+  form: CreateProductForm;
 };
 
 export type ProductAttributeValuesFieldProps = {

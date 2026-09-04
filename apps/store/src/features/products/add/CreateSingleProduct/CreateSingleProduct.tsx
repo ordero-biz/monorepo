@@ -1,14 +1,43 @@
 'use client';
 
+import { useQueryClient } from '@tanstack/react-query';
+import { useRouter } from 'next/navigation';
+import { clientRoutes } from '@/lib/client/routes';
 import { PRODUCT_CREATION_MODE } from '@/lib/domain/products/constants';
-import { CreateProduct } from '../../list/CreateProduct';
-import { CreateSingleProductTemplateFields } from '../../list/CreateProduct/CreateProductTemplateFields';
-import { validateSingleProduct } from '../../list/CreateProduct/utils/validations';
+import {
+  productGroupsQueryKeys,
+  productVariantsQueryKeys,
+} from '@/lib/query/products/productsQueryKeys';
+import {
+  CreateProduct,
+  CreateSingleProductTemplateFields,
+  useCreateProductForm,
+  validateSingleProduct,
+} from '../CreateProduct';
 
-export const CreateSingleProduct = () => (
-  <CreateProduct
-    creationMode={PRODUCT_CREATION_MODE.single}
-    TemplateFields={CreateSingleProductTemplateFields}
-    validateProduct={validateSingleProduct}
-  />
-);
+export const CreateSingleProduct = () => {
+  const queryClient = useQueryClient();
+  const router = useRouter();
+
+  const onCreated = async () => {
+    await Promise.all([
+      queryClient.invalidateQueries({ queryKey: productGroupsQueryKeys.list }),
+      queryClient.invalidateQueries({
+        queryKey: productVariantsQueryKeys.list,
+      }),
+    ]);
+    router.push(clientRoutes.products);
+  };
+  const { form } = useCreateProductForm({
+    onCreated,
+    validateProduct: validateSingleProduct,
+  });
+
+  return (
+    <CreateProduct
+      creationMode={PRODUCT_CREATION_MODE.single}
+      form={form}
+      TemplateFields={CreateSingleProductTemplateFields}
+    />
+  );
+};

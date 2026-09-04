@@ -7,32 +7,21 @@ import {
   PageHeader,
   Typography,
 } from '@ordero/ui';
-import { useQueryClient } from '@tanstack/react-query';
-import { useRouter } from 'next/navigation';
 import { useCallback, useState } from 'react';
 import { BaseLayoutContextualActionBar } from '@/features/app-shell';
-import { clientRoutes } from '@/lib/client/routes';
 import type { AttributeDropdown } from '@/lib/domain/attributes/types';
 import { PRODUCT_CREATION_MODE } from '@/lib/domain/products/constants';
-import {
-  productGroupsQueryKeys,
-  productVariantsQueryKeys,
-} from '@/lib/query/products/productsQueryKeys';
 import { PRODUCT_GENERATION_MODE } from './constants';
 import { GeneratedProductVariants } from './GeneratedProductVariants';
 import { GenerateProductActions } from './GenerateProductActions';
-import { useCreateProductForm } from './hooks/useCreateProductForm';
 import { ProductAttributeValuesField } from './ProductAttributeValuesField';
 import type { CreateProductProps, ProductVariantsGeneratedArgs } from './types';
 
 export const CreateProduct = ({
   creationMode,
+  form,
   TemplateFields,
-  validateProduct,
 }: CreateProductProps) => {
-  const queryClient = useQueryClient();
-  const router = useRouter();
-
   const generationMode =
     creationMode === PRODUCT_CREATION_MODE.multiple
       ? PRODUCT_GENERATION_MODE.many
@@ -43,19 +32,6 @@ export const CreateProduct = ({
   const [generatedTemplateSignature, setGeneratedTemplateSignature] =
     useState<string>();
   const [generationVersion, setGenerationVersion] = useState(0);
-  const { form } = useCreateProductForm({
-    onCreated: async () => {
-      await Promise.all([
-        queryClient.invalidateQueries({
-          queryKey: productGroupsQueryKeys.list,
-        }),
-        queryClient.invalidateQueries({
-          queryKey: productVariantsQueryKeys.list,
-        }),
-      ]);
-      router.push(clientRoutes.products);
-    },
-  });
   const handleProductVariantsGenerated = useCallback(
     ({ attributes, generationSignature }: ProductVariantsGeneratedArgs) => {
       setGeneratedAttributes(attributes);
@@ -65,17 +41,6 @@ export const CreateProduct = ({
     []
   );
   const handleCreateProduct = () => {
-    const validationResult = validateProduct(form.state.values);
-
-    form.setErrorMap({
-      onSubmit: validationResult,
-    });
-
-    if (validationResult) {
-      void form.handleSubmit();
-      return;
-    }
-
     void form.handleSubmit();
   };
 
