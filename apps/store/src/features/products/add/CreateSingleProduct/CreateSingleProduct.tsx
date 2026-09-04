@@ -11,6 +11,7 @@ import {
 import {
   CreateProduct,
   CreateSingleProductTemplateFields,
+  useCreateProductForm,
   validateSingleProduct,
 } from '../CreateProduct';
 
@@ -27,13 +28,16 @@ export const CreateSingleProduct = () => {
     ]);
     router.push(clientRoutes.products);
   };
+  const { form } = useCreateProductForm({
+    onCreated,
+    validateProduct: validateSingleProduct,
+  });
 
   return (
     <CreateProduct
       creationMode={PRODUCT_CREATION_MODE.single}
-      onCreated={onCreated}
+      form={form}
       TemplateFields={CreateSingleProductTemplateFields}
-      validateProduct={validateSingleProduct}
     />
   );
 };

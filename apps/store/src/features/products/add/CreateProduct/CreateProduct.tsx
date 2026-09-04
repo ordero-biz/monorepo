@@ -14,15 +14,13 @@ import { PRODUCT_CREATION_MODE } from '@/lib/domain/products/constants';
 import { PRODUCT_GENERATION_MODE } from './constants';
 import { GeneratedProductVariants } from './GeneratedProductVariants';
 import { GenerateProductActions } from './GenerateProductActions';
-import { useCreateProductForm } from './hooks/useCreateProductForm';
 import { ProductAttributeValuesField } from './ProductAttributeValuesField';
 import type { CreateProductProps, ProductVariantsGeneratedArgs } from './types';
 
 export const CreateProduct = ({
   creationMode,
-  onCreated,
+  form,
   TemplateFields,
-  validateProduct,
 }: CreateProductProps) => {
   const generationMode =
     creationMode === PRODUCT_CREATION_MODE.multiple
@@ -34,10 +32,6 @@ export const CreateProduct = ({
   const [generatedTemplateSignature, setGeneratedTemplateSignature] =
     useState<string>();
   const [generationVersion, setGenerationVersion] = useState(0);
-  const { form } = useCreateProductForm({
-    onCreated,
-    validateProduct,
-  });
   const handleProductVariantsGenerated = useCallback(
     ({ attributes, generationSignature }: ProductVariantsGeneratedArgs) => {
       setGeneratedAttributes(attributes);

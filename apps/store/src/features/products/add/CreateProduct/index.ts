@@ -3,6 +3,7 @@ export {
   CreateMultipleProductsTemplateFields,
   CreateSingleProductTemplateFields,
 } from './CreateProductTemplateFields';
+export { useCreateProductForm } from './hooks/useCreateProductForm';
 export {
   validateMultipleProducts,
   validateSingleProduct,

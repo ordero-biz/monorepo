@@ -11,6 +11,7 @@ import {
 import {
   CreateMultipleProductsTemplateFields,
   CreateProduct,
+  useCreateProductForm,
   validateMultipleProducts,
 } from '../CreateProduct';
 
@@ -26,12 +27,16 @@ export const CreateMultipleProducts = () => {
     ]);
     router.push(clientRoutes.products);
   };
+  const { form } = useCreateProductForm({
+    onCreated,
+    validateProduct: validateMultipleProducts,
+  });
+
   return (
     <CreateProduct
       creationMode={PRODUCT_CREATION_MODE.multiple}
-      onCreated={onCreated}
+      form={form}
       TemplateFields={CreateMultipleProductsTemplateFields}
-      validateProduct={validateMultipleProducts}
     />
   );
 };

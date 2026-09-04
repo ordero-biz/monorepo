@@ -1,19 +1,16 @@
 import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createProductGroup } from '@/lib/client/api/products';
-import { clientRoutes } from '@/lib/client/routes';
 import type { AttributeDropdown } from '@/lib/domain/attributes/types';
 import { PRODUCT_CREATION_MODE } from '@/lib/domain/products/constants';
-import {
-  productGroupsQueryKeys,
-  productVariantsQueryKeys,
-} from '@/lib/query/products/productsQueryKeys';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { CreateProduct } from './CreateProduct';
 import {
   CreateMultipleProductsTemplateFields,
   CreateSingleProductTemplateFields,
 } from './CreateProductTemplateFields';
+import { useCreateProductForm } from './hooks/useCreateProductForm';
+import type { CreateProductProps } from './types';
 import {
   validateMultipleProducts,
   validateSingleProduct,
@@ -190,8 +187,26 @@ vi.mock('./AttributesAsyncCombobox', () => ({
 
 const createProductGroupMock = vi.mocked(createProductGroup);
 
+type CreateProductTestProps = Omit<CreateProductProps, 'form'> & {
+  validateProduct: Parameters<
+    typeof useCreateProductForm
+  >[0]['validateProduct'];
+};
+
+const CreateProductTest = ({
+  validateProduct,
+  ...props
+}: CreateProductTestProps) => {
+  const { form } = useCreateProductForm({
+    onCreated: vi.fn(),
+    validateProduct,
+  });
+
+  return <CreateProduct {...props} form={form} />;
+};
+
 const { setup } = prepareStoreSetup({
-  component: CreateProduct,
+  component: CreateProductTest,
   props: {
     creationMode: PRODUCT_CREATION_MODE.single,
     TemplateFields: CreateSingleProductTemplateFields,
@@ -368,8 +383,7 @@ describe('CreateProduct', () => {
       },
     });
     const user = userEvent.setup();
-    const { queryClient } = setup();
-    const invalidateQueriesSpy = vi.spyOn(queryClient, 'invalidateQueries');
+    setup();
 
     await completeRequiredFields(user);
     await user.click(
@@ -398,15 +412,6 @@ describe('CreateProduct', () => {
         ],
       })
     );
-    await waitFor(() =>
-      expect(invalidateQueriesSpy).toHaveBeenCalledWith({
-        queryKey: productGroupsQueryKeys.list,
-      })
-    );
-    expect(invalidateQueriesSpy).toHaveBeenCalledWith({
-      queryKey: productVariantsQueryKeys.list,
-    });
-    expect(mocks.push).toHaveBeenCalledWith(clientRoutes.products);
   });
 
   it('adds another variant attribute value from the same attribute for a single product', async () => {
