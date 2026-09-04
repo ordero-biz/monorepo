@@ -3,8 +3,10 @@
 import { Menu, PageHeader, Typography } from '@ordero/ui';
 import { EllipsisVertical, Pencil, Trash2 } from 'lucide-react';
 import { useState } from 'react';
+import { AppBreadcrumbs } from '@/lib/components/AppBreadcrumbs';
 import { UNIT_OF_MEASUREMENT_STATUS } from '@/lib/domain/units-of-measurement/constants';
 import { DeleteUnitsOfMeasurementDialog } from '../../shared';
+import { unitsOfMeasurementRootBreadcrumb } from '../../shared/breadcrumbs';
 import { UnitOfMeasurementStatusChip } from '../../shared/UnitOfMeasurementStatusChip';
 import { UpdateUnitOfMeasurementDialog } from '../UpdateUnitOfMeasurement/UpdateUnitOfMeasurementDialog';
 import { ActivateUnitOfMeasurementDialogTrigger } from './ActivateUnitOfMeasurementDialogTrigger';
@@ -23,8 +25,21 @@ export const UnitOfMeasurementDetailHeader = ({
   return (
     <PageHeader.Root>
       <PageHeader.Left>
-        <Typography variant="h5">{unitOfMeasurement.name}</Typography>
-        <UnitOfMeasurementStatusChip status={unitOfMeasurement.status} />
+        <div className="flex min-w-0 flex-col gap-[var(--space-0-5)]">
+          <div className="flex min-w-0 items-center gap-[var(--space-1)]">
+            <Typography variant="h5">{unitOfMeasurement.name}</Typography>
+            <UnitOfMeasurementStatusChip status={unitOfMeasurement.status} />
+          </div>
+          <AppBreadcrumbs
+            items={[
+              unitsOfMeasurementRootBreadcrumb,
+              {
+                id: 'current-unit-of-measurement',
+                label: unitOfMeasurement.name,
+              },
+            ]}
+          />
+        </div>
       </PageHeader.Left>
       <PageHeader.Right>
         {!isUnitOfMeasurementActive ? (

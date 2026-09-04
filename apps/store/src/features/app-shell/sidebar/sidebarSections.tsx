@@ -21,9 +21,9 @@ export const sidebarSections: SidebarNavigationSectionConfig[] = [
         icon: <Package />,
         items: [
           {
-            id: 'product-all',
+            id: 'products',
             kind: 'link',
-            label: 'Product',
+            label: 'Products',
             href: clientRoutes.products,
           },
           {

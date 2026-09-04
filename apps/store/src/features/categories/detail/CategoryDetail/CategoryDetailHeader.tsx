@@ -3,8 +3,10 @@
 import { Menu, PageHeader, Typography } from '@ordero/ui';
 import { EllipsisVertical, Pencil } from 'lucide-react';
 import { useState } from 'react';
+import { AppBreadcrumbs } from '@/lib/components/AppBreadcrumbs';
 import { UpdateCategoryDialog } from '@/features/categories/detail/UpdateCategory';
 import { CATEGORY_STATUS } from '@/lib/domain/categories/constants';
+import { categoriesRootBreadcrumb } from '../../shared/breadcrumbs';
 import { CategoryStatusChip } from '../../shared/CategoryStatusChip';
 import { ActivateCategoryDialogTrigger } from './ActivateCategoryDialogTrigger';
 import type { CategoryDetailHeaderProps } from './types';
@@ -19,8 +21,18 @@ export const CategoryDetailHeader = ({
   return (
     <PageHeader.Root>
       <PageHeader.Left>
-        <Typography variant="h5">{category.name}</Typography>
-        <CategoryStatusChip status={category.status} />
+        <div className="flex min-w-0 flex-col gap-[var(--space-0-5)]">
+          <div className="flex min-w-0 items-center gap-[var(--space-1)]">
+            <Typography variant="h5">{category.name}</Typography>
+            <CategoryStatusChip status={category.status} />
+          </div>
+          <AppBreadcrumbs
+            items={[
+              categoriesRootBreadcrumb,
+              { id: 'current-category', label: category.name },
+            ]}
+          />
+        </div>
       </PageHeader.Left>
 
       {!isCategoryActive ? (

@@ -1,5 +1,6 @@
-import { screen, waitFor } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { clientRoutes } from '@/lib/client/routes';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { UnitOfMeasurementDetailHeader } from './UnitOfMeasurementDetailHeader';
 
@@ -39,6 +40,16 @@ describe('UnitOfMeasurementDetailHeader', () => {
     const { onUpdated } = setup();
 
     expect(screen.getByRole('heading', { name: 'Kilogram' })).toBeVisible();
+    const breadcrumbs = screen.getByRole('navigation', { name: 'Breadcrumb' });
+    expect(
+      within(breadcrumbs).getByRole('link', {
+        name: 'Units of measurement',
+      })
+    ).toHaveAttribute('href', clientRoutes.unitsOfMeasurement);
+    expect(within(breadcrumbs).getByText('Kilogram')).toHaveAttribute(
+      'aria-current',
+      'page'
+    );
 
     await user.click(
       screen.getByRole('button', { name: 'Actions for Kilogram' })

@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { clientRoutes } from '@/lib/client/routes';
 import { PRODUCTS_LIST_MODE } from '@/lib/domain/products/constants';
@@ -39,6 +39,11 @@ describe('ProductsListHeader', () => {
     expect(
       screen.getByRole('heading', { name: 'Products list' })
     ).toBeVisible();
+    expect(
+      within(screen.getByRole('navigation', { name: 'Breadcrumb' })).getByText(
+        'Products'
+      )
+    ).toHaveAttribute('aria-current', 'page');
 
     await user.click(screen.getByRole('button', { name: 'Add Product' }));
 
