@@ -12,5 +12,4 @@ export const createProductDefaultValues: CreateProductValues = {
   description: '',
   productName: '',
   productVariants: [],
-  productVariantsGenerationMode: PRODUCT_GENERATION_MODE.one,
 };

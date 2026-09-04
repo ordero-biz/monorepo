@@ -81,6 +81,7 @@ const GeneratedProductVariantList = ({
 export const GeneratedProductVariants = ({
   form,
   generatedAttributes,
+  generationMode,
   generationVersion,
 }: GeneratedProductVariantsProps) => {
   const [editingVariantIndex, setEditingVariantIndex] = useState<number | null>(
@@ -97,44 +98,31 @@ export const GeneratedProductVariants = ({
     <form.Subscribe selector={(state) => state.values.productVariants.length}>
       {(productVariantCount) =>
         productVariantCount > 0 ? (
-          <form.Subscribe
-            selector={(state) => state.values.productVariantsGenerationMode}
-          >
-            {(productVariantsGenerationMode) => {
-              const allowMultipleValuesPerAttribute =
-                productVariantsGenerationMode === PRODUCT_GENERATION_MODE.one;
-              const requireAttributeValueIds =
-                productVariantsGenerationMode === PRODUCT_GENERATION_MODE.many;
+          <div className="mt-3">
+            <Typography variant="h5">Generated product variants</Typography>
+            <GeneratedProductVariantList
+              attributes={generatedAttributes}
+              form={form}
+              key={generationVersion}
+              onEditAttributes={setEditingVariantIndex}
+              productVariantCount={productVariantCount}
+              requireAttributeValueIds={
+                generationMode === PRODUCT_GENERATION_MODE.many
+              }
+            />
 
-              return (
-                <div className="mt-3">
-                  <Typography variant="h5">
-                    Generated product variants
-                  </Typography>
-                  <GeneratedProductVariantList
-                    attributes={generatedAttributes}
-                    form={form}
-                    key={generationVersion}
-                    onEditAttributes={setEditingVariantIndex}
-                    productVariantCount={productVariantCount}
-                    requireAttributeValueIds={requireAttributeValueIds}
-                  />
-
-                  {editingVariantIndex !== null ? (
-                    <EditGeneratedProductVariantAttributes
-                      allowMultipleValuesPerAttribute={
-                        allowMultipleValuesPerAttribute
-                      }
-                      attributes={generatedAttributes}
-                      form={form}
-                      onOpenChange={handleAttributesDialogOpenChange}
-                      variantIndex={editingVariantIndex}
-                    />
-                  ) : null}
-                </div>
-              );
-            }}
-          </form.Subscribe>
+            {editingVariantIndex !== null ? (
+              <EditGeneratedProductVariantAttributes
+                allowMultipleValuesPerAttribute={
+                  generationMode === PRODUCT_GENERATION_MODE.one
+                }
+                attributes={generatedAttributes}
+                form={form}
+                onOpenChange={handleAttributesDialogOpenChange}
+                variantIndex={editingVariantIndex}
+              />
+            ) : null}
+          </div>
         ) : null
       }
     </form.Subscribe>

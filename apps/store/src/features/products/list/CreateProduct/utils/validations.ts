@@ -2,7 +2,11 @@ import { z } from 'zod';
 import { getValidationMessage } from '@/lib/utils/form/validation/message';
 import type { ValidationArgs } from '@/lib/utils/form/validation/types';
 import { PRODUCT_GENERATION_MODE } from '../constants';
-import type { CreateProductValues, CreateProductVariantValues } from '../types';
+import type {
+  CreateProductValues,
+  CreateProductVariantValues,
+  ProductGenerationMode,
+} from '../types';
 
 export const productNameSchema = z
   .string()
@@ -200,14 +204,26 @@ export const validateProductCategory = ({
   return getValidationMessage(productCategorySchema, value);
 };
 
+type ValidateProductTemplateArgs = ValidationArgs<CreateProductValues> & {
+  generationMode: ProductGenerationMode;
+};
+
+type ValidateProductVariantsArgs = ValidationArgs<CreateProductValues> & {
+  requireAttributeValueIds: boolean;
+};
+
+type ValidateCreateProductArgs = ValidationArgs<CreateProductValues> & {
+  generationMode: ProductGenerationMode;
+};
+
 export const validateProductTemplate = ({
+  generationMode,
   value,
-}: ValidationArgs<CreateProductValues>) => {
+}: ValidateProductTemplateArgs) => {
   const errors: ProductTemplateFieldErrors = {};
   const productNameError = validateProductName({ value: value.productName });
   const categoryError = validateProductCategory({ value: value.category });
-  const requiresAttributes =
-    value.productVariantsGenerationMode === PRODUCT_GENERATION_MODE.many;
+  const requiresAttributes = generationMode === PRODUCT_GENERATION_MODE.many;
 
   if (productNameError) {
     errors.productName = productNameError;
@@ -233,8 +249,9 @@ export const validateProductTemplate = ({
 };
 
 export const validateProductVariants = ({
+  requireAttributeValueIds,
   value,
-}: ValidationArgs<CreateProductValues>) => {
+}: ValidateProductVariantsArgs) => {
   const errors: ProductVariantFieldErrors = {};
   const barcodeDuplicateIndexes = getDuplicateVariantFieldIndexes({
     fieldName: 'barcode',
@@ -247,9 +264,6 @@ export const validateProductVariants = ({
   const attributeValueDuplicateIndexes = getDuplicateAttributeValueIndexes(
     value.productVariants
   );
-  const requireAttributeValueIds =
-    value.productVariantsGenerationMode === PRODUCT_GENERATION_MODE.many;
-
   addProductVariantAttributeValueErrors({
     duplicateIndexes: attributeValueDuplicateIndexes,
     errors,
@@ -287,10 +301,14 @@ export const validateProductVariants = ({
 };
 
 export const validateCreateProduct = ({
+  generationMode,
   value,
-}: ValidationArgs<CreateProductValues>) => {
-  const templateErrors = validateProductTemplate({ value });
-  const variantErrors = validateProductVariants({ value });
+}: ValidateCreateProductArgs) => {
+  const templateErrors = validateProductTemplate({ generationMode, value });
+  const variantErrors = validateProductVariants({
+    requireAttributeValueIds: generationMode === PRODUCT_GENERATION_MODE.many,
+    value,
+  });
   const fields = {
     ...templateErrors?.fields,
     ...variantErrors?.fields,
@@ -302,3 +320,15 @@ export const validateCreateProduct = ({
       }
     : undefined;
 };
+
+export const validateSingleProduct = (value: CreateProductValues) =>
+  validateCreateProduct({
+    generationMode: PRODUCT_GENERATION_MODE.one,
+    value,
+  });
+
+export const validateMultipleProducts = (value: CreateProductValues) =>
+  validateCreateProduct({
+    generationMode: PRODUCT_GENERATION_MODE.many,
+    value,
+  });

@@ -73,6 +73,7 @@ export const GenerateProductActions = ({
                       }
 
                       const templateValidationResult = validateProductTemplate({
+                        generationMode,
                         value: form.state.values,
                       });
 
@@ -83,11 +84,6 @@ export const GenerateProductActions = ({
                       if (templateValidationResult) {
                         return;
                       }
-
-                      form.setFieldValue(
-                        'productVariantsGenerationMode',
-                        generationMode
-                      );
 
                       if (isMultipleProducts) {
                         form.setFieldValue(

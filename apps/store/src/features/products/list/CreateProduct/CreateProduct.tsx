@@ -18,27 +18,25 @@ import {
   productGroupsQueryKeys,
   productVariantsQueryKeys,
 } from '@/lib/query/products/productsQueryKeys';
-import { CreateProductTemplateFields } from './CreateProductTemplateFields';
 import { PRODUCT_GENERATION_MODE } from './constants';
 import { GeneratedProductVariants } from './GeneratedProductVariants';
 import { GenerateProductActions } from './GenerateProductActions';
 import { useCreateProductForm } from './hooks/useCreateProductForm';
 import { ProductAttributeValuesField } from './ProductAttributeValuesField';
-import type {
-  CreateProductProps,
-  ProductGenerationMode,
-  ProductVariantsGeneratedArgs,
-} from './types';
+import type { CreateProductProps, ProductVariantsGeneratedArgs } from './types';
 
-export const CreateProduct = ({ creationMode }: CreateProductProps) => {
+export const CreateProduct = ({
+  creationMode,
+  TemplateFields,
+  validateProduct,
+}: CreateProductProps) => {
   const queryClient = useQueryClient();
   const router = useRouter();
 
-  const [generationMode, setGenerationMode] = useState<ProductGenerationMode>(
+  const generationMode =
     creationMode === PRODUCT_CREATION_MODE.multiple
       ? PRODUCT_GENERATION_MODE.many
-      : PRODUCT_GENERATION_MODE.one
-  );
+      : PRODUCT_GENERATION_MODE.one;
   const [generatedAttributes, setGeneratedAttributes] = useState<
     AttributeDropdown[]
   >([]);
@@ -67,6 +65,17 @@ export const CreateProduct = ({ creationMode }: CreateProductProps) => {
     []
   );
   const handleCreateProduct = () => {
+    const validationResult = validateProduct(form.state.values);
+
+    form.setErrorMap({
+      onSubmit: validationResult,
+    });
+
+    if (validationResult) {
+      void form.handleSubmit();
+      return;
+    }
+
     void form.handleSubmit();
   };
 
@@ -95,11 +104,7 @@ export const CreateProduct = ({ creationMode }: CreateProductProps) => {
           </Accordion.Header>
           <Accordion.Panel>
             <div className="flex flex-col gap-[var(--space-2)]">
-              <CreateProductTemplateFields
-                form={form}
-                generationMode={generationMode}
-                onGenerationModeChange={setGenerationMode}
-              />
+              <TemplateFields form={form} />
 
               <ProductAttributeValuesField form={form} />
 
@@ -117,6 +122,7 @@ export const CreateProduct = ({ creationMode }: CreateProductProps) => {
       <GeneratedProductVariants
         form={form}
         generatedAttributes={generatedAttributes}
+        generationMode={generationMode}
         generationVersion={generationVersion}
       />
       <form.Subscribe selector={(state) => state.values.productVariants.length}>

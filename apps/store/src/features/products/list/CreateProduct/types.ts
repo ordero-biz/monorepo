@@ -1,13 +1,21 @@
+import type { ComponentType } from 'react';
 import type { AsyncComboboxMultipleProps } from '@/lib/components/AsyncCombobox';
 import type { AttributeDropdown } from '@/lib/domain/attributes/types';
 import type { ProductCreationMode } from '@/lib/domain/products/constants';
 import type { PRODUCT_GENERATION_MODE } from './constants';
 import type { useCreateProductForm } from './hooks/useCreateProductForm';
+import type { validateCreateProduct } from './utils/validations';
 
 export type CreateProductForm = ReturnType<typeof useCreateProductForm>['form'];
 
 export type CreateProductProps = {
   creationMode: ProductCreationMode;
+  TemplateFields: ComponentType<
+    Omit<CreateProductTemplateFieldsProps, 'generationMode'>
+  >;
+  validateProduct: (
+    value: CreateProductValues
+  ) => ReturnType<typeof validateCreateProduct>;
 };
 
 export type AttributesAsyncComboboxProps = Omit<
@@ -29,7 +37,6 @@ export type AttributesAsyncComboboxProps = Omit<
 export type CreateProductTemplateFieldsProps = {
   form: CreateProductForm;
   generationMode: ProductGenerationMode;
-  onGenerationModeChange: (generationMode: ProductGenerationMode) => void;
 };
 
 export type ProductAttributeValuesFieldProps = {
@@ -46,6 +53,7 @@ export type GenerateProductActionsProps = {
 export type GeneratedProductVariantsProps = {
   form: CreateProductForm;
   generatedAttributes: AttributeDropdown[];
+  generationMode: ProductGenerationMode;
   generationVersion: number;
 };
 
@@ -92,7 +100,6 @@ export type CreateProductValues = {
   description: string;
   productName: string;
   productVariants: CreateProductVariantValues[];
-  productVariantsGenerationMode: ProductGenerationMode;
 };
 
 export type CreateProductVariantValues = {
