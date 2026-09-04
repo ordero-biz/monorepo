@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { createProductGroup } from '@/lib/client/api/products';
 import { clientRoutes } from '@/lib/client/routes';
 import type { AttributeDropdown } from '@/lib/domain/attributes/types';
+import { PRODUCT_CREATION_MODE } from '@/lib/domain/products/constants';
 import {
   productGroupsQueryKeys,
   productVariantsQueryKeys,
@@ -183,6 +184,9 @@ const createProductGroupMock = vi.mocked(createProductGroup);
 
 const { setup } = prepareStoreSetup({
   component: CreateProduct,
+  props: {
+    creationMode: PRODUCT_CREATION_MODE.single,
+  },
 });
 
 const completeRequiredFields = async (
@@ -215,6 +219,19 @@ describe('CreateProduct', () => {
     });
 
     expect(continueButton).toBeEnabled();
+  });
+
+  it('initializes multiple-product generation from the route mode', () => {
+    setup({
+      creationMode: PRODUCT_CREATION_MODE.multiple,
+    });
+
+    expect(
+      screen.getByRole('button', { name: 'Multiple products' })
+    ).toHaveAttribute('aria-pressed', 'true');
+    expect(
+      screen.getByRole('button', { name: 'Next: Configure products' })
+    ).toBeEnabled();
   });
 
   it('validates the product template before generating a preview', async () => {

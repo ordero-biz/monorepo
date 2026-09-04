@@ -154,7 +154,6 @@ export const CreateProductTemplateFields = ({
           </form.Field>
 
           <ToggleButton.Group
-            defaultValue={[PRODUCT_GENERATION_MODE.one]}
             label="Creation mode"
             onValueChange={(value) => {
               const nextGenerationMode =
@@ -169,6 +168,7 @@ export const CreateProductTemplateFields = ({
             }}
             orientation="horizontal"
             size="s"
+            value={[generationMode]}
           >
             <ToggleButton.Item value={PRODUCT_GENERATION_MODE.one}>
               Single product
