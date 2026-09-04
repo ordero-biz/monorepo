@@ -6,11 +6,19 @@ import {
   productVariantsQueryKeys,
 } from '@/lib/query/products/productsQueryKeys';
 import { prepareStoreSetup } from '@/test/prepareSetup';
+import {
+  PRODUCT_GENERATION_MODE,
+  validateMultipleProducts,
+} from '../CreateProduct';
 import { CreateMultipleProducts } from './CreateMultipleProducts';
+import { CreateMultipleProductsTemplateFields } from './CreateMultipleProductsTemplateFields';
 
 const mocks = vi.hoisted(() => ({
+  generationMode: undefined as undefined | string,
   onCreated: undefined as undefined | (() => Promise<void> | void),
   push: vi.fn(),
+  templateFields: undefined as unknown,
+  validateProduct: undefined as unknown,
 }));
 
 vi.mock('next/navigation', async () => ({
@@ -26,17 +34,33 @@ vi.mock('../CreateProduct', async () => ({
   ...(await vi.importActual<typeof import('../CreateProduct')>(
     '../CreateProduct'
   )),
-  CreateProduct: ({ onSubmit }: { onSubmit: () => void }) => (
-    <button onClick={onSubmit} type="button">
-      Create product
-    </button>
-  ),
+  CreateProduct: ({
+    generationMode,
+    onSubmit,
+    TemplateFields,
+  }: {
+    generationMode: string;
+    onSubmit: () => void;
+    TemplateFields: unknown;
+  }) => {
+    mocks.generationMode = generationMode;
+    mocks.templateFields = TemplateFields;
+
+    return (
+      <button onClick={onSubmit} type="button">
+        Create product
+      </button>
+    );
+  },
   useCreateProductForm: ({
     onCreated,
+    validateProduct,
   }: {
     onCreated: () => Promise<void> | void;
+    validateProduct: unknown;
   }) => {
     mocks.onCreated = onCreated;
+    mocks.validateProduct = validateProduct;
 
     return {
       form: {
@@ -56,8 +80,19 @@ const { setup } = prepareStoreSetup({
 
 describe('CreateMultipleProducts', () => {
   beforeEach(() => {
+    mocks.generationMode = undefined;
     mocks.onCreated = undefined;
     mocks.push.mockReset();
+    mocks.templateFields = undefined;
+    mocks.validateProduct = undefined;
+  });
+
+  it('uses the multiple-product generation configuration', () => {
+    setup();
+
+    expect(mocks.generationMode).toBe(PRODUCT_GENERATION_MODE.many);
+    expect(mocks.templateFields).toBe(CreateMultipleProductsTemplateFields);
+    expect(mocks.validateProduct).toBe(validateMultipleProducts);
   });
 
   it('refreshes product lists and returns to products after creation', async () => {

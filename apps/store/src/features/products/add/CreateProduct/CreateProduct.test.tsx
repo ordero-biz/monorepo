@@ -457,6 +457,74 @@ describe('CreateProduct', () => {
     expect(createProductGroupMock).not.toHaveBeenCalled();
   });
 
+  it('removes a generated variant attribute with its chip action', async () => {
+    const user = userEvent.setup();
+
+    setup();
+
+    await completeRequiredFields(user);
+    await user.click(screen.getByRole('button', { name: 'Select Attributes' }));
+    await user.click(screen.getByRole('button', { name: 'Blue' }));
+    await user.click(
+      screen.getByRole('button', { name: 'Next: Configure product' })
+    );
+
+    const variantAttributes = screen.getByRole('treegrid', {
+      name: 'Attributes for Running Shoes Blue',
+    });
+
+    await user.click(
+      within(variantAttributes).getByRole('button', { name: 'Remove Blue' })
+    );
+
+    expect(
+      within(variantAttributes).queryByText('Blue')
+    ).not.toBeInTheDocument();
+    expect(
+      within(variantAttributes).getByRole('button', {
+        name: 'Add attributes for Running Shoes Blue',
+      })
+    ).toBeVisible();
+  });
+
+  it('adds attributes to a generated product that has none', async () => {
+    const user = userEvent.setup();
+
+    setup();
+
+    await completeRequiredFields(user);
+    await user.click(screen.getByRole('button', { name: 'Select Attributes' }));
+    await user.click(screen.getByRole('button', { name: 'Blue' }));
+    await user.click(
+      screen.getByRole('button', { name: 'Next: Configure product' })
+    );
+    await user.click(
+      screen.getByRole('button', {
+        name: 'Remove Blue',
+      })
+    );
+    await user.click(
+      screen.getByRole('button', {
+        name: 'Add attributes for Running Shoes Blue',
+      })
+    );
+
+    const dialog = screen.getByRole('dialog', {
+      name: 'Edit variant attributes for Running Shoes Blue',
+    });
+
+    await user.click(within(dialog).getByRole('button', { name: 'Blue' }));
+    await user.click(within(dialog).getByRole('button', { name: 'Update' }));
+
+    expect(
+      within(
+        screen.getByRole('treegrid', {
+          name: 'Attributes for Running Shoes Blue',
+        })
+      ).getByText('Blue')
+    ).toBeVisible();
+  });
+
   it('keeps filled variants when generating again without template changes', async () => {
     const user = userEvent.setup();
 
@@ -879,5 +947,34 @@ describe('CreateProduct', () => {
 
     expect(screen.getByRole('button', { name: 'Red' })).toBeVisible();
     expect(blueValue).toHaveAttribute('aria-pressed', 'true');
+  });
+
+  it('preserves valid attribute values and clears removed attribute values', async () => {
+    const user = userEvent.setup();
+
+    setup();
+
+    await user.click(screen.getByRole('button', { name: 'Select Attributes' }));
+    await user.click(screen.getByRole('button', { name: 'China' }));
+    await user.click(screen.getByRole('button', { name: 'Blue' }));
+    await user.click(
+      screen.getByRole('button', { name: 'Select Color Attribute' })
+    );
+
+    expect(
+      screen.getByRole('button', { name: 'Blue', pressed: true })
+    ).toBeVisible();
+
+    await user.click(screen.getByRole('button', { name: 'Select Attributes' }));
+
+    expect(
+      screen.getByRole('button', { name: 'China', pressed: false })
+    ).toBeVisible();
+
+    await user.click(screen.getByRole('button', { name: 'Blue' }));
+
+    expect(
+      screen.getByRole('button', { name: 'Blue', pressed: false })
+    ).toBeVisible();
   });
 });
