@@ -64,6 +64,7 @@ export const CreateSingleProductTemplateFields = ({
                   onBlur={field.handleBlur}
                   onValueChange={field.handleChange}
                   placeholder="Select category"
+                  required
                   size="s"
                   value={field.state.value}
                 />
