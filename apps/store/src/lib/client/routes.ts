@@ -1,3 +1,8 @@
+import {
+  PRODUCT_CREATION_MODE_SEARCH_PARAM,
+  type ProductCreationMode,
+} from '@/lib/domain/products/constants';
+
 export const clientRoutes = {
   home: '/',
   signIn: '/sign-in',
@@ -10,6 +15,9 @@ export const clientRoutes = {
   unitsOfMeasurement: '/products/units-of-measurement',
   warehouses: '/products/warehouse',
 } as const;
+
+export const getAddProductRoute = (creationMode: ProductCreationMode) =>
+  `${clientRoutes.addProduct}?${PRODUCT_CREATION_MODE_SEARCH_PARAM}=${creationMode}`;
 
 export const getAttributeDetailRoute = (attributeId: string | number) =>
   `/products/attributes/${attributeId}`;
