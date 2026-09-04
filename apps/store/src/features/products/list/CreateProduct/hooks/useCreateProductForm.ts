@@ -1,19 +1,27 @@
 import { useToastManager } from '@ordero/ui';
 import { revalidateLogic, useForm } from '@tanstack/react-form';
 import { createProductDefaultValues } from '../constants';
+import type { ProductGenerationMode } from '../types';
 import { submitCreateProduct } from '../utils/submitAction';
 import { validateCreateProduct } from '../utils/validations';
 
 type UseCreateProductFormArgs = {
+  initialGenerationMode?: ProductGenerationMode;
   onCreated: () => Promise<void> | void;
 };
 
 export const useCreateProductForm = ({
+  initialGenerationMode,
   onCreated,
 }: UseCreateProductFormArgs) => {
   const { add: addToast } = useToastManager();
   const form = useForm({
-    defaultValues: createProductDefaultValues,
+    defaultValues: {
+      ...createProductDefaultValues,
+      productVariantsGenerationMode:
+        initialGenerationMode ??
+        createProductDefaultValues.productVariantsGenerationMode,
+    },
     validationLogic: revalidateLogic(),
     validators: {
       onDynamic: validateCreateProduct,

@@ -10,6 +10,7 @@ import {
 } from '@/lib/query/products/productsQueryKeys';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { CreateProduct } from './CreateProduct';
+import type { CreateProductProps } from './types';
 
 const mocks = vi.hoisted(() => ({
   createProductGroup: vi.fn(),
@@ -182,7 +183,7 @@ vi.mock('./AttributesAsyncCombobox', () => ({
 
 const createProductGroupMock = vi.mocked(createProductGroup);
 
-const { setup } = prepareStoreSetup({
+const { setup } = prepareStoreSetup<CreateProductProps>({
   component: CreateProduct,
   props: {
     creationMode: PRODUCT_CREATION_MODE.single,
@@ -227,8 +228,8 @@ describe('CreateProduct', () => {
     });
 
     expect(
-      screen.getByRole('button', { name: 'Multiple products' })
-    ).toHaveAttribute('aria-pressed', 'true');
+      screen.queryByRole('group', { name: 'Creation mode' })
+    ).not.toBeInTheDocument();
     expect(
       screen.getByRole('button', { name: 'Next: Configure products' })
     ).toBeEnabled();
@@ -300,10 +301,9 @@ describe('CreateProduct', () => {
   it('requires a selected attribute value before generating multiple products', async () => {
     const user = userEvent.setup();
 
-    setup();
+    setup({ creationMode: PRODUCT_CREATION_MODE.multiple });
 
     await completeRequiredFields(user);
-    await user.click(screen.getByRole('button', { name: 'Multiple products' }));
     await user.click(
       screen.getByRole('button', { name: 'Select Color Attribute' })
     );
@@ -427,26 +427,6 @@ describe('CreateProduct', () => {
     expect(createProductGroupMock).not.toHaveBeenCalled();
   });
 
-  it('keeps generated product variants when switching generation modes', async () => {
-    const user = userEvent.setup();
-
-    setup();
-
-    await completeRequiredFields(user);
-    await user.click(screen.getByRole('button', { name: 'Select Attributes' }));
-    await user.click(screen.getByRole('button', { name: 'Blue' }));
-    await user.click(
-      screen.getByRole('button', { name: 'Next: Configure product' })
-    );
-
-    expect(screen.getByDisplayValue('Running Shoes Blue')).toBeInTheDocument();
-
-    await user.click(screen.getByRole('button', { name: 'Multiple products' }));
-
-    expect(screen.getByDisplayValue('Running Shoes Blue')).toBeInTheDocument();
-    expect(createProductGroupMock).not.toHaveBeenCalled();
-  });
-
   it('keeps filled variants when generating again without template changes', async () => {
     const user = userEvent.setup();
 
@@ -538,30 +518,6 @@ describe('CreateProduct', () => {
     expect(within(dialog).getByRole('button', { name: 'China' })).toBeVisible();
   });
 
-  it('keeps creation available after switching a generated variant to multiple products', async () => {
-    const user = userEvent.setup();
-
-    setup();
-
-    await completeRequiredFields(user);
-    await user.click(
-      screen.getByRole('button', { name: 'Next: Configure product' })
-    );
-    await user.type(screen.getByRole('textbox', { name: 'SKU' }), 'SHOE');
-    await user.type(
-      screen.getByRole('textbox', { name: 'Barcode' }),
-      'barcode-1'
-    );
-    const createButton = screen.getByRole('button', { name: 'Create product' });
-
-    expect(createButton).toBeEnabled();
-
-    await user.click(screen.getByRole('button', { name: 'Multiple products' }));
-
-    await waitFor(() => expect(createButton).toBeEnabled());
-    expect(createProductGroupMock).not.toHaveBeenCalled();
-  });
-
   it('shows only template-selected attributes in the variant attribute editor', async () => {
     const user = userEvent.setup();
 
@@ -596,10 +552,9 @@ describe('CreateProduct', () => {
   it('generates multiple product previews from selected attribute value combinations', async () => {
     const user = userEvent.setup();
 
-    setup();
+    setup({ creationMode: PRODUCT_CREATION_MODE.multiple });
 
     await completeRequiredFields(user);
-    await user.click(screen.getByRole('button', { name: 'Multiple products' }));
     await user.click(screen.getByRole('button', { name: 'Select Attributes' }));
     await user.click(screen.getByRole('button', { name: 'China' }));
     await user.click(screen.getByRole('button', { name: 'USA' }));
@@ -637,10 +592,9 @@ describe('CreateProduct', () => {
   it('generates multiple-mode previews from any selected attribute values', async () => {
     const user = userEvent.setup();
 
-    setup();
+    setup({ creationMode: PRODUCT_CREATION_MODE.multiple });
 
     await completeRequiredFields(user);
-    await user.click(screen.getByRole('button', { name: 'Multiple products' }));
     await user.click(screen.getByRole('button', { name: 'Select Attributes' }));
     await user.click(screen.getByRole('button', { name: 'Blue' }));
     await user.click(
@@ -657,10 +611,9 @@ describe('CreateProduct', () => {
   it('keeps focus while editing a variant loaded after the first page', async () => {
     const user = userEvent.setup();
 
-    setup();
+    setup({ creationMode: PRODUCT_CREATION_MODE.multiple });
 
     await completeRequiredFields(user);
-    await user.click(screen.getByRole('button', { name: 'Multiple products' }));
     await user.click(screen.getByRole('button', { name: 'Select Attributes' }));
 
     for (const attributeValueName of [
@@ -706,10 +659,9 @@ describe('CreateProduct', () => {
   it('shows submit errors for generated variants loaded after the first page', async () => {
     const user = userEvent.setup();
 
-    setup();
+    setup({ creationMode: PRODUCT_CREATION_MODE.multiple });
 
     await completeRequiredFields(user);
-    await user.click(screen.getByRole('button', { name: 'Multiple products' }));
     await user.click(screen.getByRole('button', { name: 'Select Attributes' }));
 
     for (const attributeValueName of [

@@ -7,7 +7,7 @@ import {
   PRODUCT_CREATION_MODE,
   PRODUCTS_LIST_MODE,
 } from '@/lib/domain/products/constants';
-import { Button, PageHeader, ToggleButton, Typography } from '@/ui/index';
+import { PageHeader, SplitButton, ToggleButton, Typography } from '@/ui/index';
 import { productsRootBreadcrumb } from '../../shared/breadcrumbs';
 import type { ProductsListHeaderProps, ProductsListMode } from './types';
 
@@ -55,24 +55,32 @@ export const ProductsListHeader = ({
           </ToggleButton.Item>
         </ToggleButton.Group>
         <div aria-hidden="true" className="h-[var(--space-4)] w-px bg-border" />
-        <Button
-          color="primary"
-          onClick={() =>
-            router.push(getAddProductRoute(PRODUCT_CREATION_MODE.single))
-          }
-          type="button"
-        >
-          Single product
-        </Button>
-        <Button
-          color="primary"
-          onClick={() =>
-            router.push(getAddProductRoute(PRODUCT_CREATION_MODE.multiple))
-          }
-          type="button"
-        >
-          Multiple products
-        </Button>
+        <SplitButton.Root aria-label="Create product" color="primary">
+          <SplitButton.Action
+            onClick={() =>
+              router.push(getAddProductRoute(PRODUCT_CREATION_MODE.single))
+            }
+          >
+            Add single product
+          </SplitButton.Action>
+          <SplitButton.Trigger aria-label="Choose product creation mode" />
+          <SplitButton.Content>
+            <SplitButton.Item
+              onClick={() =>
+                router.push(getAddProductRoute(PRODUCT_CREATION_MODE.single))
+              }
+            >
+              Add single product
+            </SplitButton.Item>
+            <SplitButton.Item
+              onClick={() =>
+                router.push(getAddProductRoute(PRODUCT_CREATION_MODE.multiple))
+              }
+            >
+              Add multiple products
+            </SplitButton.Item>
+          </SplitButton.Content>
+        </SplitButton.Root>
       </PageHeader.Right>
     </PageHeader.Root>
   );

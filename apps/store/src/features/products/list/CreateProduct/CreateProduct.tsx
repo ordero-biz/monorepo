@@ -24,21 +24,16 @@ import { GeneratedProductVariants } from './GeneratedProductVariants';
 import { GenerateProductActions } from './GenerateProductActions';
 import { useCreateProductForm } from './hooks/useCreateProductForm';
 import { ProductAttributeValuesField } from './ProductAttributeValuesField';
-import type {
-  CreateProductProps,
-  ProductGenerationMode,
-  ProductVariantsGeneratedArgs,
-} from './types';
+import type { CreateProductProps, ProductVariantsGeneratedArgs } from './types';
 
 export const CreateProduct = ({ creationMode }: CreateProductProps) => {
   const queryClient = useQueryClient();
   const router = useRouter();
 
-  const [generationMode, setGenerationMode] = useState<ProductGenerationMode>(
+  const generationMode =
     creationMode === PRODUCT_CREATION_MODE.multiple
       ? PRODUCT_GENERATION_MODE.many
-      : PRODUCT_GENERATION_MODE.one
-  );
+      : PRODUCT_GENERATION_MODE.one;
   const [generatedAttributes, setGeneratedAttributes] = useState<
     AttributeDropdown[]
   >([]);
@@ -46,6 +41,7 @@ export const CreateProduct = ({ creationMode }: CreateProductProps) => {
     useState<string>();
   const [generationVersion, setGenerationVersion] = useState(0);
   const { form } = useCreateProductForm({
+    initialGenerationMode: generationMode,
     onCreated: async () => {
       await Promise.all([
         queryClient.invalidateQueries({
@@ -98,7 +94,6 @@ export const CreateProduct = ({ creationMode }: CreateProductProps) => {
               <CreateProductTemplateFields
                 form={form}
                 generationMode={generationMode}
-                onGenerationModeChange={setGenerationMode}
               />
 
               <ProductAttributeValuesField form={form} />

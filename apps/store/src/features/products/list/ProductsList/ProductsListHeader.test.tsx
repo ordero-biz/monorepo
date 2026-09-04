@@ -48,7 +48,9 @@ describe('ProductsListHeader', () => {
       )
     ).toHaveAttribute('aria-current', 'page');
 
-    await user.click(screen.getByRole('button', { name: 'Single product' }));
+    await user.click(
+      screen.getByRole('button', { name: 'Add single product' })
+    );
 
     expect(routerPushMock).toHaveBeenCalledWith(
       getAddProductRoute(PRODUCT_CREATION_MODE.single)
@@ -60,7 +62,13 @@ describe('ProductsListHeader', () => {
 
     setup();
 
-    await user.click(screen.getByRole('button', { name: 'Multiple products' }));
+    await user.click(
+      screen.getByRole('button', { name: 'Choose product creation mode' })
+    );
+    expect(routerPushMock).not.toHaveBeenCalled();
+    await user.click(
+      await screen.findByRole('menuitem', { name: 'Add multiple products' })
+    );
 
     expect(routerPushMock).toHaveBeenCalledWith(
       getAddProductRoute(PRODUCT_CREATION_MODE.multiple)

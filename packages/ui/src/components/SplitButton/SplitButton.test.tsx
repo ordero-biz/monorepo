@@ -1,7 +1,6 @@
 import { prepareSetup } from '@ordero/test-config/react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { useState } from 'react';
 import { SplitButton } from './index';
 import type { SplitButtonRootProps } from './types';
 
@@ -34,7 +33,7 @@ describe('SplitButton', () => {
     ).toHaveAttribute('aria-haspopup', 'menu');
   });
 
-  it('runs the main action independently from opening and choosing menu items', async () => {
+  it('runs each dropdown action immediately without invoking the main action', async () => {
     const user = userEvent.setup();
     const onAction = vi.fn();
     const onAlternative = vi.fn();
@@ -167,47 +166,6 @@ describe('SplitButton', () => {
     expect(
       await screen.findByRole('menuitem', { name: 'Create draft pull request' })
     ).toBeVisible();
-  });
-
-  it('allows choosing the next main action without executing it', async () => {
-    const user = userEvent.setup();
-    const onAction = vi.fn();
-    const SelectedActionExample = () => {
-      const [action, setAction] = useState('Create pull request');
-
-      return (
-        <SplitButton.Root aria-label="Pull request actions">
-          <SplitButton.Action onClick={() => onAction(action)}>
-            {action}
-          </SplitButton.Action>
-          <SplitButton.Trigger aria-label="Choose pull request action" />
-          <SplitButton.Content>
-            <SplitButton.Item
-              onClick={() => setAction('Create draft pull request')}
-            >
-              Create draft pull request
-            </SplitButton.Item>
-          </SplitButton.Content>
-        </SplitButton.Root>
-      );
-    };
-    const { setup: setupSelectedAction } = prepareSetup({
-      component: SelectedActionExample,
-      props: {},
-    });
-    setupSelectedAction();
-
-    await user.click(
-      screen.getByRole('button', { name: 'Choose pull request action' })
-    );
-    await user.click(
-      await screen.findByRole('menuitem', { name: 'Create draft pull request' })
-    );
-    expect(onAction).not.toHaveBeenCalled();
-    await user.click(
-      screen.getByRole('button', { name: 'Create draft pull request' })
-    );
-    expect(onAction).toHaveBeenCalledWith('Create draft pull request');
   });
 
   it('submits only from the main action when it is a submit button', async () => {

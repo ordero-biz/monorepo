@@ -29,7 +29,6 @@ export type AttributesAsyncComboboxProps = Omit<
 export type CreateProductTemplateFieldsProps = {
   form: CreateProductForm;
   generationMode: ProductGenerationMode;
-  onGenerationModeChange: (generationMode: ProductGenerationMode) => void;
 };
 
 export type ProductAttributeValuesFieldProps = {

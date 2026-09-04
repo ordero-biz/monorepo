@@ -1,13 +1,10 @@
-import { Textarea, TextField, ToggleButton } from '@ordero/ui';
+import { Textarea, TextField } from '@ordero/ui';
 import { CategoriesAsyncCombobox } from '@/features/categories';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
 import { AttributesAsyncCombobox } from './AttributesAsyncCombobox';
 import { PRODUCT_GENERATION_MODE } from './constants';
 import { ProductImageDropzone } from './ProductImageDropzone';
-import type {
-  CreateProductTemplateFieldsProps,
-  ProductGenerationMode,
-} from './types';
+import type { CreateProductTemplateFieldsProps } from './types';
 import { getAttributeValueSelections } from './utils/productGeneration';
 import {
   validateProductCategory,
@@ -17,7 +14,6 @@ import {
 export const CreateProductTemplateFields = ({
   form,
   generationMode,
-  onGenerationModeChange,
 }: CreateProductTemplateFieldsProps) => {
   const isMultipleProducts = generationMode === PRODUCT_GENERATION_MODE.many;
 
@@ -152,31 +148,6 @@ export const CreateProductTemplateFields = ({
               );
             }}
           </form.Field>
-
-          <ToggleButton.Group
-            label="Creation mode"
-            onValueChange={(value) => {
-              const nextGenerationMode =
-                (value[0] as ProductGenerationMode | undefined) ??
-                PRODUCT_GENERATION_MODE.one;
-
-              form.setFieldValue(
-                'productVariantsGenerationMode',
-                nextGenerationMode
-              );
-              onGenerationModeChange(nextGenerationMode);
-            }}
-            orientation="horizontal"
-            size="s"
-            value={[generationMode]}
-          >
-            <ToggleButton.Item value={PRODUCT_GENERATION_MODE.one}>
-              Single product
-            </ToggleButton.Item>
-            <ToggleButton.Item value={PRODUCT_GENERATION_MODE.many}>
-              Multiple products
-            </ToggleButton.Item>
-          </ToggleButton.Group>
         </div>
       </div>
 

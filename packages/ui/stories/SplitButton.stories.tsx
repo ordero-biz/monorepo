@@ -25,22 +25,24 @@ const variants = ['contained', 'outlined', 'soft', 'text'] satisfies readonly Bu
 type PullRequestExampleProps = SplitButtonRootProps & Pick<SplitButtonActionProps, 'startIcon'>;
 
 const PullRequestExample = ({ startIcon, ...args }: PullRequestExampleProps) => {
-  const [selectedAction, setSelectedAction] = useState<string>(actions[0]);
-  const [result, setResult] = useState('Choose an action, then click the main button.');
+  const [result, setResult] = useState('Choose an action.');
 
   return (
     <div className="flex flex-col gap-2">
       <SplitButton.Root {...args}>
         <SplitButton.Action
-          onClick={() => setResult(`${selectedAction} executed.`)}
+          onClick={() => setResult(`${actions[0]} executed.`)}
           startIcon={startIcon}
         >
-          {selectedAction}
+          {actions[0]}
         </SplitButton.Action>
         <SplitButton.Trigger aria-label="Choose pull request action" />
         <SplitButton.Content>
           {actions.map((action) => (
-            <SplitButton.Item key={action} onClick={() => setSelectedAction(action)}>
+            <SplitButton.Item
+              key={action}
+              onClick={() => setResult(`${action} executed.`)}
+            >
               {action}
             </SplitButton.Item>
           ))}
@@ -62,7 +64,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'A main action and a separate menu trigger, composed from Button and Menu. Root shares Button color, size, variant, and disabled state across both halves. Use Action, Trigger, and Content in that order; put Item elements inside Content. Give the group and trigger accessible labels. Keep the selected action in consumer state: Item.onClick can change the selection or run an alternative immediately, while Action.onClick runs the main action. Only Action accepts a submit type; the menu trigger never submits a form.',
+          'A main action and a separate menu trigger, composed from Button and Menu. Root shares Button color, size, variant, and disabled state across both halves. Use Action, Trigger, and Content in that order; put Item elements inside Content. Give the group and trigger accessible labels. Action.onClick runs the default action, while each Item.onClick runs its dropdown action immediately. Only Action accepts a submit type; the menu trigger never submits a form.',
       },
     },
   },
@@ -87,10 +89,10 @@ export const Default: Story = {
 
     await userEvent.click(canvas.getByRole('button', { name: 'Choose pull request action' }));
     await userEvent.click(await page.findByRole('menuitem', { name: actions[1] }));
-
-    await expect(canvas.getByText('Choose an action, then click the main button.')).toBeVisible();
-    await userEvent.click(canvas.getByRole('button', { name: actions[1] }));
     await expect(canvas.getByText(`${actions[1]} executed.`)).toBeVisible();
+
+    await userEvent.click(canvas.getByRole('button', { name: actions[0] }));
+    await expect(canvas.getByText(`${actions[0]} executed.`)).toBeVisible();
   },
 };
 
