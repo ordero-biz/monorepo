@@ -2,13 +2,11 @@ import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createProductGroup } from '@/lib/client/api/products';
 import type { AttributeDropdown } from '@/lib/domain/attributes/types';
-import { PRODUCT_CREATION_MODE } from '@/lib/domain/products/constants';
 import { prepareStoreSetup } from '@/test/prepareSetup';
+import { CreateMultipleProductsTemplateFields } from '../CreateMultipleProducts/CreateMultipleProductsTemplateFields';
+import { CreateSingleProductTemplateFields } from '../CreateSingleProduct/CreateSingleProductTemplateFields';
 import { CreateProduct } from './CreateProduct';
-import {
-  CreateMultipleProductsTemplateFields,
-  CreateSingleProductTemplateFields,
-} from './CreateProductTemplateFields';
+import { PRODUCT_GENERATION_MODE } from './constants';
 import { useCreateProductForm } from './hooks/useCreateProductForm';
 import { useProductGenerationState } from './hooks/useProductGenerationState';
 import type { CreateProductProps } from './types';
@@ -220,7 +218,7 @@ const CreateProductTest = ({
 const { setup } = prepareStoreSetup<CreateProductTestProps>({
   component: CreateProductTest,
   props: {
-    creationMode: PRODUCT_CREATION_MODE.single,
+    generationMode: PRODUCT_GENERATION_MODE.one,
     TemplateFields: CreateSingleProductTemplateFields,
     validateProduct: validateSingleProduct,
   },
@@ -258,9 +256,9 @@ describe('CreateProduct', () => {
     expect(continueButton).toBeEnabled();
   });
 
-  it('uses the route-selected multiple-product workflow', () => {
+  it('renders the multiple-product generation workflow', () => {
     setup({
-      creationMode: PRODUCT_CREATION_MODE.multiple,
+      generationMode: PRODUCT_GENERATION_MODE.many,
       TemplateFields: CreateMultipleProductsTemplateFields,
       validateProduct: validateMultipleProducts,
     });
@@ -340,7 +338,7 @@ describe('CreateProduct', () => {
     const user = userEvent.setup();
 
     setup({
-      creationMode: PRODUCT_CREATION_MODE.multiple,
+      generationMode: PRODUCT_GENERATION_MODE.many,
       TemplateFields: CreateMultipleProductsTemplateFields,
       validateProduct: validateMultipleProducts,
     });
@@ -585,7 +583,7 @@ describe('CreateProduct', () => {
     const user = userEvent.setup();
 
     setup({
-      creationMode: PRODUCT_CREATION_MODE.multiple,
+      generationMode: PRODUCT_GENERATION_MODE.many,
       TemplateFields: CreateMultipleProductsTemplateFields,
       validateProduct: validateMultipleProducts,
     });
@@ -629,7 +627,7 @@ describe('CreateProduct', () => {
     const user = userEvent.setup();
 
     setup({
-      creationMode: PRODUCT_CREATION_MODE.multiple,
+      generationMode: PRODUCT_GENERATION_MODE.many,
       TemplateFields: CreateMultipleProductsTemplateFields,
       validateProduct: validateMultipleProducts,
     });
@@ -652,7 +650,7 @@ describe('CreateProduct', () => {
     const user = userEvent.setup();
 
     setup({
-      creationMode: PRODUCT_CREATION_MODE.multiple,
+      generationMode: PRODUCT_GENERATION_MODE.many,
       TemplateFields: CreateMultipleProductsTemplateFields,
       validateProduct: validateMultipleProducts,
     });
@@ -704,7 +702,7 @@ describe('CreateProduct', () => {
     const user = userEvent.setup();
 
     setup({
-      creationMode: PRODUCT_CREATION_MODE.multiple,
+      generationMode: PRODUCT_GENERATION_MODE.many,
       TemplateFields: CreateMultipleProductsTemplateFields,
       validateProduct: validateMultipleProducts,
     });

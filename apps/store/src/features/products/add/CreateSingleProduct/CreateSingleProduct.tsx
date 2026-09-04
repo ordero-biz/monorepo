@@ -3,13 +3,13 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { clientRoutes } from '@/lib/client/routes';
-import { PRODUCT_CREATION_MODE } from '@/lib/domain/products/constants';
 import {
   productGroupsQueryKeys,
   productVariantsQueryKeys,
 } from '@/lib/query/products/productsQueryKeys';
 import {
   CreateProduct,
+  PRODUCT_GENERATION_MODE,
   useCreateProductForm,
   validateSingleProduct,
 } from '../CreateProduct';
@@ -38,7 +38,7 @@ export const CreateSingleProduct = () => {
 
   return (
     <CreateProduct
-      creationMode={PRODUCT_CREATION_MODE.single}
+      generationMode={PRODUCT_GENERATION_MODE.one}
       form={form}
       generation={generation}
       onSubmit={onSubmit}

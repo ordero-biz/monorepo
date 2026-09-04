@@ -1,20 +1,19 @@
 import type { ComponentType } from 'react';
 import type { AsyncComboboxMultipleProps } from '@/lib/components/AsyncCombobox';
 import type { AttributeDropdown } from '@/lib/domain/attributes/types';
-import type { ProductCreationMode } from '@/lib/domain/products/constants';
 import type { PRODUCT_GENERATION_MODE } from './constants';
 import type { useCreateProductForm } from './hooks/useCreateProductForm';
 
 export type CreateProductForm = ReturnType<typeof useCreateProductForm>['form'];
 
 export type CreateProductProps = {
-  creationMode: ProductCreationMode;
+  generationMode: ProductGenerationMode;
   form: CreateProductForm;
-  generation: ReturnType<typeof import('./hooks/useProductGenerationState').useProductGenerationState>;
-  onSubmit: () => void;
-  TemplateFields: ComponentType<
-    Omit<CreateProductTemplateFieldsProps, 'AttributesField'>
+  generation: ReturnType<
+    typeof import('./hooks/useProductGenerationState').useProductGenerationState
   >;
+  onSubmit: () => void;
+  TemplateFields: ComponentType<ProductTemplateFieldsProps>;
 };
 
 export type AttributesAsyncComboboxProps = Omit<
@@ -33,12 +32,7 @@ export type AttributesAsyncComboboxProps = Omit<
   selectedAttributes?: AttributeDropdown[];
 };
 
-export type CreateProductTemplateFieldsProps = {
-  AttributesField: ComponentType<ProductTemplateAttributesFieldProps>;
-  form: CreateProductForm;
-};
-
-export type ProductTemplateAttributesFieldProps = {
+export type ProductTemplateFieldsProps = {
   form: CreateProductForm;
 };
 

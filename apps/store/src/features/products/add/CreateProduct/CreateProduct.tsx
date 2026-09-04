@@ -8,24 +8,18 @@ import {
   Typography,
 } from '@ordero/ui';
 import { BaseLayoutContextualActionBar } from '@/features/app-shell';
-import { PRODUCT_CREATION_MODE } from '@/lib/domain/products/constants';
-import { PRODUCT_GENERATION_MODE } from './constants';
 import { GeneratedProductVariants } from './GeneratedProductVariants';
 import { GenerateProductActions } from './GenerateProductActions';
 import { ProductAttributeValuesField } from './ProductAttributeValuesField';
 import type { CreateProductProps } from './types';
 
 export const CreateProduct = ({
-  creationMode,
+  generationMode,
   form,
   generation,
   onSubmit,
   TemplateFields,
 }: CreateProductProps) => {
-  const generationMode =
-    creationMode === PRODUCT_CREATION_MODE.multiple
-      ? PRODUCT_GENERATION_MODE.many
-      : PRODUCT_GENERATION_MODE.one;
   return (
     <form
       noValidate
@@ -57,9 +51,13 @@ export const CreateProduct = ({
 
               <GenerateProductActions
                 form={form}
-                generatedTemplateSignature={generation.generatedTemplateSignature}
+                generatedTemplateSignature={
+                  generation.generatedTemplateSignature
+                }
                 generationMode={generationMode}
-                onProductVariantsGenerated={generation.onProductVariantsGenerated}
+                onProductVariantsGenerated={
+                  generation.onProductVariantsGenerated
+                }
               />
             </div>
           </Accordion.Panel>

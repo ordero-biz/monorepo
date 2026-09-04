@@ -3,13 +3,13 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { clientRoutes } from '@/lib/client/routes';
-import { PRODUCT_CREATION_MODE } from '@/lib/domain/products/constants';
 import {
   productGroupsQueryKeys,
   productVariantsQueryKeys,
 } from '@/lib/query/products/productsQueryKeys';
 import {
   CreateProduct,
+  PRODUCT_GENERATION_MODE,
   useCreateProductForm,
   validateMultipleProducts,
 } from '../CreateProduct';
@@ -37,7 +37,7 @@ export const CreateMultipleProducts = () => {
 
   return (
     <CreateProduct
-      creationMode={PRODUCT_CREATION_MODE.multiple}
+      generationMode={PRODUCT_GENERATION_MODE.many}
       form={form}
       generation={generation}
       onSubmit={onSubmit}
