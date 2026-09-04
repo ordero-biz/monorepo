@@ -1,5 +1,11 @@
-import { CreateProduct } from '@/features/products';
-import { getProductCreationMode } from '@/lib/domain/products/constants';
+import {
+  CreateMultipleProducts,
+  CreateSingleProduct,
+} from '@/features/products';
+import {
+  getProductCreationMode,
+  PRODUCT_CREATION_MODE,
+} from '@/lib/domain/products/constants';
 import type { SearchParamsInput } from '@/lib/utils/url';
 
 type AddProductPageProps = {
@@ -16,7 +22,11 @@ export default async function AddProductPage({
 
   return (
     <div className="flex flex-col gap-[var(--space-2)]">
-      <CreateProduct creationMode={creationMode} key={creationMode} />
+      {creationMode === PRODUCT_CREATION_MODE.multiple ? (
+        <CreateMultipleProducts />
+      ) : (
+        <CreateSingleProduct />
+      )}
     </div>
   );
 }
