@@ -22,7 +22,8 @@ const renderPair = ({
 );
 
 const meta = {
-  title: 'Components/Textarea',
+  id: 'components-textarea',
+  title: 'Components/Forms/Text Inputs/Textarea',
   component: Textarea,
   tags: ['autodocs'],
   args: {

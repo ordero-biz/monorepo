@@ -98,7 +98,8 @@ const DialogStory = ({ fullscreen, scrollable, size }: DialogStoryProps) => (
 );
 
 const meta = {
-  title: 'Components/Dialog',
+  id: 'components-dialog',
+  title: 'Components/Feedback/Dialog',
   component: DialogStory,
   tags: ['autodocs'],
   parameters: {

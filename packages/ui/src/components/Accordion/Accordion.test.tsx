@@ -1,7 +1,7 @@
 import { prepareSetup } from '@ordero/test-config/react';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { Accordion } from './index.parts';
+import { Accordion } from './index';
 import type { AccordionRootProps } from './types';
 
 const accordionItems = (
@@ -37,9 +37,9 @@ describe('Accordion', () => {
 
     await user.click(screen.getByRole('button', { name: 'Shipping' }));
 
-    expect(
-      screen.getByRole('region', { name: 'Shipping' })
-    ).toHaveTextContent('Delivery takes 3–5 business days.');
+    expect(screen.getByRole('region', { name: 'Shipping' })).toHaveTextContent(
+      'Delivery takes 3–5 business days.'
+    );
   });
 
   it('only keeps one item open by default', async () => {
@@ -50,9 +50,7 @@ describe('Accordion', () => {
     await user.click(screen.getByRole('button', { name: 'Shipping' }));
     await user.click(screen.getByRole('button', { name: 'Returns' }));
 
-    expect(
-      screen.getByRole('region', { name: 'Returns' })
-    ).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: 'Returns' })).toBeInTheDocument();
     expect(
       screen.queryByRole('region', { name: 'Shipping' })
     ).not.toBeInTheDocument();
@@ -69,9 +67,7 @@ describe('Accordion', () => {
     expect(
       screen.getByRole('region', { name: 'Shipping' })
     ).toBeInTheDocument();
-    expect(
-      screen.getByRole('region', { name: 'Returns' })
-    ).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: 'Returns' })).toBeInTheDocument();
   });
 
   it('does not expand disabled items', async () => {
@@ -92,7 +88,7 @@ describe('Accordion', () => {
 
     await user.click(trigger);
 
-    expect(trigger).toBeDisabled();
+    expect(trigger).toHaveAttribute('aria-disabled', 'true');
     expect(
       screen.queryByRole('region', { name: 'Unavailable section' })
     ).not.toBeInTheDocument();

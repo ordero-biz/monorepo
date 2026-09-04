@@ -12,7 +12,8 @@ import { Card, type CardProps } from '@/ui/components/Card';
 import { IconButton } from '@/ui/components/IconButton';
 
 const meta = {
-  title: 'Components/Card',
+  id: 'components-card',
+  title: 'Components/Data Display/Card',
   component: Card.Root,
   tags: ['autodocs'],
   args: {

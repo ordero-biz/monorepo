@@ -20,7 +20,8 @@ const sizes = ['s', 'm'] satisfies readonly RadioSize[];
 const alignments = ['start', 'center', 'end'] satisfies readonly RadioAlignment[];
 
 const meta = {
-  title: 'Components/Radio',
+  id: 'components-radio',
+  title: 'Components/Forms/Selection Controls/Radio',
   component: Radio,
   tags: ['autodocs'],
   args: {

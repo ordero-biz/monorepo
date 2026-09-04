@@ -43,9 +43,13 @@ const AccordionList = ({ multiple = false }: { multiple?: boolean }) => (
 );
 
 const meta = {
-  title: 'Components/Accordion',
+  id: 'components-accordion',
+  title: 'Components/Data Display/Accordion',
   component: Accordion.Root,
   tags: ['autodocs'],
+  args: {
+    children: null,
+  },
 } satisfies Meta<typeof Accordion.Root>;
 
 export default meta;

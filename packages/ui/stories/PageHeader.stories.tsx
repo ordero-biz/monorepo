@@ -5,7 +5,8 @@ import { PageHeader } from '@/ui/components/PageHeader';
 import { Typography } from '@/ui/components/Typography';
 
 const meta = {
-  title: 'Components/PageHeader',
+  id: 'components-pageheader',
+  title: 'Components/Layout/PageHeader',
   component: PageHeader.Root,
   tags: ['autodocs'],
 } satisfies Meta<typeof PageHeader.Root>;

@@ -2,7 +2,8 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { PasswordField } from '@/ui/components/PasswordField';
 
 const meta = {
-  title: 'Components/PasswordField',
+  id: 'components-passwordfield',
+  title: 'Components/Forms/Text Inputs/PasswordField',
   component: PasswordField,
   tags: ['autodocs'],
   args: {

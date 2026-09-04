@@ -22,7 +22,8 @@ const formatVariantTitle = (variant: ChipVariant) =>
   `${variant[0].toUpperCase()}${variant.slice(1)}`;
 
 const meta = {
-  title: 'Components/Chip',
+  id: 'components-chip',
+  title: 'Components/Data Display/Chip',
   component: Chip,
   tags: ['autodocs'],
   args: {

@@ -60,7 +60,8 @@ const getMultipleComboboxArgs = ({
 > => args;
 
 const meta = {
-  title: 'Components/Combobox',
+  id: 'components-combobox',
+  title: 'Components/Forms/Selection Controls/Combobox',
   component: Combobox,
   tags: ['autodocs'],
   args: {

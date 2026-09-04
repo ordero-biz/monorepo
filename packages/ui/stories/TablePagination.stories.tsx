@@ -43,7 +43,8 @@ const TablePaginationPreview = (args: TablePaginationProps) => {
 };
 
 const meta = {
-  title: 'Components/TablePagination',
+  id: 'components-tablepagination',
+  title: 'Components/Navigation/TablePagination',
   component: TablePagination,
   tags: ['autodocs'],
   args: {

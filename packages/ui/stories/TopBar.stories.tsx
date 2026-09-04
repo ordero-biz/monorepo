@@ -5,7 +5,8 @@ import { IconButton } from '@/ui/components/IconButton';
 import { Typography } from '@/ui/components/Typography';
 
 const meta = {
-  title: 'Components/TopBar',
+  id: 'components-topbar',
+  title: 'Components/Layout/TopBar',
   component: TopBar.Root,
   tags: ['autodocs'],
 } satisfies Meta<typeof TopBar.Root>;

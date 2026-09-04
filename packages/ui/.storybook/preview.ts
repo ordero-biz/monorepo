@@ -59,7 +59,19 @@ const preview: Preview = {
     options: {
       storySort: {
         method: 'alphabetical',
-        order: ['Components'],
+        order: [
+          'Foundations',
+          'Components',
+          [
+            'Actions',
+            'Forms',
+            ['Text Inputs', 'Selection Controls', 'Field Helpers'],
+            'Data Display',
+            'Navigation',
+            'Layout',
+            'Feedback',
+          ],
+        ],
       },
     },
 

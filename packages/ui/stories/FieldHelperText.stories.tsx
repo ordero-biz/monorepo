@@ -3,7 +3,8 @@ import { Info } from 'lucide-react';
 import { FieldHelperText } from '@/ui/components/FieldHelperText';
 
 const meta = {
-  title: 'Components/FieldHelperText',
+  id: 'components-fieldhelpertext',
+  title: 'Components/Forms/Field Helpers/FieldHelperText',
   component: FieldHelperText,
   tags: ['autodocs'],
   args: {

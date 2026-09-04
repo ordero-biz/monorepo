@@ -16,7 +16,8 @@ const colors = [
 const sizes = ['s', 'm'] satisfies readonly CheckboxChipSize[];
 
 const meta = {
-  title: 'Components/CheckboxChip',
+  id: 'components-checkboxchip',
+  title: 'Components/Forms/Selection Controls/CheckboxChip',
   component: CheckboxChip,
   tags: ['autodocs'],
   args: {

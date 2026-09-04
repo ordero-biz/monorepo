@@ -208,7 +208,8 @@ const SidebarNavigationStory = ({
 );
 
 const meta = {
-  title: 'Components/SidebarNavigation',
+  id: 'components-sidebarnavigation',
+  title: 'Components/Navigation/SidebarNavigation',
   component: SidebarNavigationStory,
   subcomponents: {
     SidebarNavigation,
