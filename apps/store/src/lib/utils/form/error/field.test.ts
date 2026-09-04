@@ -50,6 +50,31 @@ describe('getFieldSubmitChangeErrorText', () => {
     ).toBe('Name already exists');
   });
 
+  it('shows dynamic errors before a field has been blurred', () => {
+    expect(
+      getFieldSubmitChangeErrorText({
+        errorMap: {
+          onDynamic: 'Name is required',
+        },
+        isBlurred: false,
+        isDirty: false,
+      })
+    ).toBe('Name is required');
+  });
+
+  it('gives submit errors precedence over dynamic errors', () => {
+    expect(
+      getFieldSubmitChangeErrorText({
+        errorMap: {
+          onDynamic: 'Name is required',
+          onSubmit: 'Name already exists',
+        },
+        isBlurred: true,
+        isDirty: true,
+      })
+    ).toBe('Name already exists');
+  });
+
   it('shows a blur error before the field has changed', () => {
     expect(
       getFieldSubmitChangeErrorText({
