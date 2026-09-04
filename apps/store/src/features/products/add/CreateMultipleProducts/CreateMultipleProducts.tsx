@@ -9,12 +9,12 @@ import {
   productVariantsQueryKeys,
 } from '@/lib/query/products/productsQueryKeys';
 import {
-  CreateMultipleProductsTemplateFields,
   CreateProduct,
   useCreateProductForm,
   validateMultipleProducts,
 } from '../CreateProduct';
 import { useProductGenerationState } from '../CreateProduct/hooks/useProductGenerationState';
+import { CreateMultipleProductsTemplateFields } from './CreateMultipleProductsTemplateFields';
 
 export const CreateMultipleProducts = () => {
   const queryClient = useQueryClient();

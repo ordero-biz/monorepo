@@ -188,7 +188,10 @@ vi.mock('./AttributesAsyncCombobox', () => ({
 
 const createProductGroupMock = vi.mocked(createProductGroup);
 
-type CreateProductTestProps = Omit<CreateProductProps, 'form'> & {
+type CreateProductTestProps = Omit<
+  CreateProductProps,
+  'form' | 'generation' | 'onSubmit'
+> & {
   validateProduct: Parameters<
     typeof useCreateProductForm
   >[0]['validateProduct'];
@@ -214,7 +217,7 @@ const CreateProductTest = ({
   );
 };
 
-const { setup } = prepareStoreSetup({
+const { setup } = prepareStoreSetup<CreateProductTestProps>({
   component: CreateProductTest,
   props: {
     creationMode: PRODUCT_CREATION_MODE.single,

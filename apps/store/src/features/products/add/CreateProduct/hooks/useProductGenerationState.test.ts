@@ -11,6 +11,7 @@ describe('useProductGenerationState', () => {
         id: 7,
         name: 'Color',
         sortOrder: 1,
+        status: 'DRAFT' as const,
       },
     ];
 

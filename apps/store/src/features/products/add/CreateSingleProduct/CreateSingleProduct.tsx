@@ -10,11 +10,11 @@ import {
 } from '@/lib/query/products/productsQueryKeys';
 import {
   CreateProduct,
-  CreateSingleProductTemplateFields,
   useCreateProductForm,
   validateSingleProduct,
 } from '../CreateProduct';
 import { useProductGenerationState } from '../CreateProduct/hooks/useProductGenerationState';
+import { CreateSingleProductTemplateFields } from './CreateSingleProductTemplateFields';
 
 export const CreateSingleProduct = () => {
   const queryClient = useQueryClient();

@@ -23,10 +23,12 @@ vi.mock('../utils/submitAction', async () => ({
 }));
 
 const submitCreateProductMock = vi.mocked(submitCreateProduct);
+const validateProduct = () => undefined;
 
 const { setup } = prepareFormHookTestSetup({
   hookProps: {
     onCreated: vi.fn(),
+    validateProduct,
   },
   useFormHook: useCreateProductForm,
 });
@@ -35,13 +37,14 @@ const setupCreateProductFormHook = () => {
   const user = userEvent.setup();
   const hookProps = {
     onCreated: vi.fn(),
+    validateProduct,
   };
   const result = setup({
     hookProps,
   });
 
   return {
-    onCreated: result.hookProps.onCreated,
+    onCreated: result.hookProps?.onCreated ?? hookProps.onCreated,
     submitButton: screen.getByRole('button', { name: 'Submit' }),
     user,
     ...result,
