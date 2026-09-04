@@ -19,6 +19,10 @@ export const productCategorySchema = z
   .nullable()
   .refine((value) => value !== null, 'Category is required');
 
+export const productAttributesSchema = z
+  .array(z.object({ id: z.number() }))
+  .min(1, 'Select at least one attribute.');
+
 export const productVariantAttributeValueIdsSchema = z
   .array(z.number())
   .min(1, 'Select at least one attribute value');
@@ -203,6 +207,11 @@ export const validateProductCategory = ({
 }: ValidationArgs<string | null>) => {
   return getValidationMessage(productCategorySchema, value);
 };
+
+export const validateProductAttributes = ({
+  value,
+}: ValidationArgs<CreateProductValues['attributes']>) =>
+  getValidationMessage(productAttributesSchema, value);
 
 type ValidateProductTemplateArgs = ValidationArgs<CreateProductValues> & {
   generationMode: ProductGenerationMode;

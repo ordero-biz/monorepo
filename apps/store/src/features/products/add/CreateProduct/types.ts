@@ -10,8 +10,9 @@ export type CreateProductForm = ReturnType<typeof useCreateProductForm>['form'];
 
 export type CreateProductProps = {
   creationMode: ProductCreationMode;
+  onCreated: () => Promise<void> | void;
   TemplateFields: ComponentType<
-    Omit<CreateProductTemplateFieldsProps, 'generationMode'>
+    Omit<CreateProductTemplateFieldsProps, 'AttributesField'>
   >;
   validateProduct: (
     value: CreateProductValues
@@ -35,8 +36,12 @@ export type AttributesAsyncComboboxProps = Omit<
 };
 
 export type CreateProductTemplateFieldsProps = {
+  AttributesField: ComponentType<ProductTemplateAttributesFieldProps>;
   form: CreateProductForm;
-  generationMode: ProductGenerationMode;
+};
+
+export type ProductTemplateAttributesFieldProps = {
+  form: CreateProductForm;
 };
 
 export type ProductAttributeValuesFieldProps = {
