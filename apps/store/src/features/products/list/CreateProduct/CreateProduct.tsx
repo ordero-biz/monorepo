@@ -1,12 +1,19 @@
 'use client';
 
-import { Accordion, Button, ContextualActionBar, PageHeader, Typography } from '@ordero/ui';
+import {
+  Accordion,
+  Button,
+  ContextualActionBar,
+  PageHeader,
+  Typography,
+} from '@ordero/ui';
 import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { useCallback, useState } from 'react';
 import { BaseLayoutContextualActionBar } from '@/features/app-shell';
 import { clientRoutes } from '@/lib/client/routes';
 import type { AttributeDropdown } from '@/lib/domain/attributes/types';
+import { PRODUCT_CREATION_MODE } from '@/lib/domain/products/constants';
 import {
   productGroupsQueryKeys,
   productVariantsQueryKeys,
@@ -18,16 +25,19 @@ import { GenerateProductActions } from './GenerateProductActions';
 import { useCreateProductForm } from './hooks/useCreateProductForm';
 import { ProductAttributeValuesField } from './ProductAttributeValuesField';
 import type {
+  CreateProductProps,
   ProductGenerationMode,
   ProductVariantsGeneratedArgs,
 } from './types';
 
-export const CreateProduct = () => {
+export const CreateProduct = ({ creationMode }: CreateProductProps) => {
   const queryClient = useQueryClient();
   const router = useRouter();
 
   const [generationMode, setGenerationMode] = useState<ProductGenerationMode>(
-    PRODUCT_GENERATION_MODE.one
+    creationMode === PRODUCT_CREATION_MODE.multiple
+      ? PRODUCT_GENERATION_MODE.many
+      : PRODUCT_GENERATION_MODE.one
   );
   const [generatedAttributes, setGeneratedAttributes] = useState<
     AttributeDropdown[]
@@ -72,8 +82,7 @@ export const CreateProduct = () => {
         <PageHeader.Left>
           <Typography variant="h5">Create product</Typography>
         </PageHeader.Left>
-        <PageHeader.Right>
-        </PageHeader.Right>
+        <PageHeader.Right></PageHeader.Right>
       </PageHeader.Root>
 
       <Accordion.Root
