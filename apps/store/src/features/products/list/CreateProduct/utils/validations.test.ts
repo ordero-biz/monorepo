@@ -10,8 +10,7 @@ import {
 } from './validations';
 
 const getProductValues = (
-  productVariants: CreateProductValues['productVariants'],
-  productVariantsGenerationMode: CreateProductValues['productVariantsGenerationMode'] = PRODUCT_GENERATION_MODE.many
+  productVariants: CreateProductValues['productVariants']
 ): CreateProductValues => ({
   attributes: [],
   attributeValues: {},
@@ -19,7 +18,6 @@ const getProductValues = (
   description: '',
   productName: 'Running Shoes',
   productVariants,
-  productVariantsGenerationMode,
 });
 
 const colorAttribute = {
@@ -58,8 +56,9 @@ describe('validateProductTemplate', () => {
   it('requires a name and category before a product preview can be generated', () => {
     expect(
       validateProductTemplate({
+        generationMode: PRODUCT_GENERATION_MODE.one,
         value: {
-          ...getProductValues([], PRODUCT_GENERATION_MODE.one),
+          ...getProductValues([]),
           category: null,
           productName: '   ',
         },
@@ -75,6 +74,7 @@ describe('validateProductTemplate', () => {
   it('requires attributes in multiple-products mode', () => {
     expect(
       validateProductTemplate({
+        generationMode: PRODUCT_GENERATION_MODE.many,
         value: {
           ...getProductValues([]),
           attributes: [],
@@ -90,6 +90,7 @@ describe('validateProductTemplate', () => {
   it('requires an attribute value in multiple-products mode', () => {
     expect(
       validateProductTemplate({
+        generationMode: PRODUCT_GENERATION_MODE.many,
         value: {
           ...getProductValues([]),
           attributes: [colorAttribute],
@@ -107,6 +108,7 @@ describe('validateProductVariants', () => {
   it('requires attribute values, a name, barcode, and SKU for each variant', () => {
     expect(
       validateProductVariants({
+        requireAttributeValueIds: true,
         value: getProductValues([
           {
             attributeValueIds: [],
@@ -131,18 +133,16 @@ describe('validateProductVariants', () => {
   it('allows a single generated product variant without attribute values', () => {
     expect(
       validateProductVariants({
-        value: getProductValues(
-          [
-            {
-              attributeValueIds: [],
-              barcode: 'barcode-1',
-              description: '',
-              name: 'Running Shoes',
-              sku: 'SHOE',
-            },
-          ],
-          PRODUCT_GENERATION_MODE.one
-        ),
+        requireAttributeValueIds: false,
+        value: getProductValues([
+          {
+            attributeValueIds: [],
+            barcode: 'barcode-1',
+            description: '',
+            name: 'Running Shoes',
+            sku: 'SHOE',
+          },
+        ]),
       })
     ).toBeUndefined();
   });
@@ -150,6 +150,7 @@ describe('validateProductVariants', () => {
   it('requires unique barcodes and SKUs across variants', () => {
     expect(
       validateProductVariants({
+        requireAttributeValueIds: true,
         value: getProductValues([
           {
             attributeValueIds: [72],
@@ -180,6 +181,7 @@ describe('validateProductVariants', () => {
   it('marks every variant that shares a barcode or SKU', () => {
     expect(
       validateProductVariants({
+        requireAttributeValueIds: true,
         value: getProductValues([
           {
             attributeValueIds: [70],
@@ -219,6 +221,7 @@ describe('validateProductVariants', () => {
   it('requires unique attribute value sets across variants', () => {
     expect(
       validateProductVariants({
+        requireAttributeValueIds: true,
         value: getProductValues([
           {
             attributeValueIds: [72, 80],
@@ -249,6 +252,7 @@ describe('validateProductVariants', () => {
   it('accepts variants with unique attribute values, barcodes, and SKUs', () => {
     expect(
       validateProductVariants({
+        requireAttributeValueIds: true,
         value: getProductValues([
           {
             attributeValueIds: [72],
@@ -274,19 +278,17 @@ describe('validateCreateProduct', () => {
   it('returns template and variant errors together on submit', () => {
     expect(
       validateCreateProduct({
+        generationMode: PRODUCT_GENERATION_MODE.one,
         value: {
-          ...getProductValues(
-            [
-              {
-                attributeValueIds: [],
-                barcode: '',
-                description: '',
-                name: '',
-                sku: '',
-              },
-            ],
-            PRODUCT_GENERATION_MODE.one
-          ),
+          ...getProductValues([
+            {
+              attributeValueIds: [],
+              barcode: '',
+              description: '',
+              name: '',
+              sku: '',
+            },
+          ]),
           category: null,
           productName: '',
         },
