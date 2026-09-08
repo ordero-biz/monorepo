@@ -1,5 +1,6 @@
 import type { AsyncComboboxMultipleProps } from '@/lib/components/AsyncCombobox';
 import type { AttributeDropdown } from '@/lib/domain/attributes/types';
+import type { ProductStatus } from '@/lib/domain/products/types';
 import type { PRODUCT_GENERATION_MODE } from './constants';
 import type { useCreateProductForm } from './hooks/useCreateProductForm';
 import type { useProductVariantsGenerationForm } from './hooks/useProductVariantsGenerationForm';
@@ -78,6 +79,7 @@ export type GeneratedProductVariantListProps = {
 
 export type GeneratedProductVariantCardProps = {
   attributes: AttributeDropdown[];
+  hasErrors: boolean;
   productVariantsCreationForm: ProductVariantsCreationFormApi;
   onEditAttributes: (variantIndex: number) => void;
   requireAttributeValueIds: boolean;
@@ -92,8 +94,12 @@ export type EditGeneratedProductVariantAttributesProps = {
   variantIndex: number;
 };
 
-export type ProductVariantsGeneratedArgs = ProductVariantsCreationValues & {
+export type ProductVariantsGeneratedArgs = {
   attributes: AttributeDropdown[];
+  category: string | null;
+  description: string;
+  name: string;
+  productVariants: CreateProductVariantValues[];
 };
 
 export type CommonProductFieldsProps = {
@@ -119,11 +125,15 @@ export type ProductCommonValues = {
   category: string | null;
   description: string;
   name: string;
+  status: ProductStatus;
 };
 
-export type ProductGenerationValues = ProductCommonValues & {
+export type ProductGenerationValues = {
   attributes: AttributeDropdown[];
   attributeValues: Record<string, string[]>;
+  category: string | null;
+  description: string;
+  name: string;
 };
 
 export type ProductVariantsCreationValues = ProductCommonValues & {
@@ -136,6 +146,16 @@ export type CreateProductVariantValues = {
   description: string;
   name: string;
   sku: string;
+  status: ProductStatus;
+};
+
+export type ProductStatusSelectorProps = {
+  errorText?: string;
+  invalid?: boolean;
+  label: string;
+  name: string;
+  onValueChange: (status: ProductStatus) => void;
+  value: ProductStatus;
 };
 
 export type ProductGenerationMode =

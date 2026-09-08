@@ -266,12 +266,14 @@ describe('products client helpers', () => {
       createProductGroup({
         name: 'Running Shoes',
         categoryId: 2,
+        status: 'DRAFT',
         productVariants: [
           {
             name: 'Running Shoes Blue',
             sku: 'SHOE-BLUE',
             barcode: 'barcode-1',
             attributeValueIds: [71],
+            status: 'ACTIVE',
           },
         ],
       })
@@ -297,12 +299,14 @@ describe('products client helpers', () => {
         body: JSON.stringify({
           name: 'Running Shoes',
           categoryId: 2,
+          status: 'DRAFT',
           productVariants: [
             {
               name: 'Running Shoes Blue',
               sku: 'SHOE-BLUE',
               barcode: 'barcode-1',
               attributeValueIds: [71],
+              status: 'ACTIVE',
             },
           ],
         }),
@@ -331,6 +335,7 @@ describe('products client helpers', () => {
       createProductGroup({
         name: 'Running Shoes',
         categoryId: 2,
+        status: 'DRAFT',
         productVariants: [],
       })
     ).resolves.toEqual({

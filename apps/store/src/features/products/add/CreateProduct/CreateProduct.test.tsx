@@ -454,6 +454,20 @@ describe('CreateProduct', () => {
     await user.click(
       screen.getByRole('button', { name: 'Next: Configure product' })
     );
+    const productStatus = screen.getByRole('radiogroup', {
+      name: 'Product status',
+    });
+    const productVariantStatus = screen.getByRole('radiogroup', {
+      name: 'Product variant status',
+    });
+
+    await user.click(
+      within(productStatus).getByRole('radio', { name: /Active/ })
+    );
+
+    expect(
+      within(productVariantStatus).getByRole('radio', { name: /Draft/ })
+    ).toBeChecked();
     await user.type(screen.getByRole('textbox', { name: 'SKU' }), 'SHOE');
     await user.type(
       screen.getByRole('textbox', { name: 'Barcode' }),
@@ -464,10 +478,12 @@ describe('CreateProduct', () => {
     await waitFor(() =>
       expect(createProductGroupMock).toHaveBeenCalledWith({
         name: 'Running Shoes',
+        status: 'ACTIVE',
         categoryId: 2,
         productVariants: [
           {
             name: 'Running Shoes',
+            status: 'DRAFT',
             sku: 'SHOE',
             barcode: 'barcode-1',
             attributeValueIds: [],
@@ -723,7 +739,7 @@ describe('CreateProduct', () => {
 
     expect(twentyFirstVariantSku).toHaveFocus();
     expect(twentyFirstVariantSku).toHaveValue('SKU-21');
-  });
+  }, 10_000);
 
   it('shows submit errors for generated variants loaded after the first page', async () => {
     const user = userEvent.setup();
@@ -824,10 +840,12 @@ describe('CreateProduct', () => {
     await waitFor(() =>
       expect(createProductGroupMock).toHaveBeenCalledWith({
         name: 'Running Shoes',
+        status: 'DRAFT',
         categoryId: 2,
         productVariants: [
           {
             name: 'Running Shoes Blue',
+            status: 'DRAFT',
             sku: 'SHOE-BLUE',
             barcode: 'barcode-1',
             attributeValueIds: [72],

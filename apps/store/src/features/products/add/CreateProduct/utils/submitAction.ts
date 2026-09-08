@@ -12,12 +12,14 @@ const normalizeCreateProductFormData = (
 ) => ({
   categoryId: Number(value.category),
   name: value.name.trim(),
+  status: value.status,
   ...getOptionalDescription(value.description),
   productVariants: value.productVariants.map((productVariant) => ({
     attributeValueIds: productVariant.attributeValueIds,
     barcode: productVariant.barcode.trim(),
     name: productVariant.name.trim(),
     sku: productVariant.sku.trim(),
+    status: productVariant.status,
     ...getOptionalDescription(productVariant.description),
   })),
 });

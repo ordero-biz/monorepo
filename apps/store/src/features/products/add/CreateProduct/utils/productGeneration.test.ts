@@ -1,4 +1,5 @@
 import type { AttributeDropdown } from '@/lib/domain/attributes/types';
+import { PRODUCT_STATUS } from '@/lib/domain/products/constants';
 import { PRODUCT_GENERATION_MODE } from '../constants';
 import {
   getAttributeValueSelections,
@@ -132,6 +133,7 @@ describe('product generation', () => {
       description: 'Lightweight',
       name: 'Running Shoes Cotton Blue',
       sku: '',
+      status: PRODUCT_STATUS.DRAFT,
     });
     expect(getProductVariantAttributeValues(attributes, [11, 99])).toEqual([
       { id: 11, name: 'Blue' },
@@ -153,6 +155,7 @@ describe('product generation', () => {
         description: '',
         name: 'Running Shoes Cotton Blue',
         sku: '',
+        status: PRODUCT_STATUS.DRAFT,
       },
       {
         attributeValueIds: [21, 12],
@@ -160,6 +163,7 @@ describe('product generation', () => {
         description: '',
         name: 'Running Shoes Cotton Red',
         sku: '',
+        status: PRODUCT_STATUS.DRAFT,
       },
     ]);
   });

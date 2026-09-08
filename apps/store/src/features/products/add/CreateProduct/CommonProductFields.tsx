@@ -2,10 +2,12 @@ import { Card, Textarea, TextField, Typography } from '@ordero/ui';
 import { CategoriesAsyncCombobox } from '@/features/categories';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
 import { ProductImageDropzone } from './ProductImageDropzone';
+import { ProductStatusSelector } from './ProductStatusSelector';
 import type { CommonProductFieldsProps } from './types';
 import {
   validateProductCategory,
   validateProductName,
+  validateProductStatus,
 } from './utils/validations';
 
 export const CommonProductFields = ({
@@ -71,6 +73,30 @@ export const CommonProductFields = ({
                       placeholder="Select category"
                       required
                       size="s"
+                      value={field.state.value}
+                    />
+                  );
+                }}
+              </productVariantsCreationForm.Field>
+
+              <productVariantsCreationForm.Field
+                name="status"
+                validators={{
+                  onChange: validateProductStatus,
+                }}
+              >
+                {(field) => {
+                  const errorText = getFieldSubmitChangeErrorText(
+                    field.state.meta
+                  );
+
+                  return (
+                    <ProductStatusSelector
+                      errorText={errorText}
+                      invalid={Boolean(errorText)}
+                      label="Product status"
+                      name={field.name}
+                      onValueChange={field.handleChange}
                       value={field.state.value}
                     />
                   );

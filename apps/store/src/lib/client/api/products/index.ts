@@ -1,7 +1,11 @@
 'use client';
 
 import { apiFetch } from '@ordero/api-client';
-import type { ProductGroup, ProductVariant } from '@/lib/domain/products/types';
+import type {
+  ProductGroup,
+  ProductStatus,
+  ProductVariant,
+} from '@/lib/domain/products/types';
 import type { PaginatedResponse } from '@/lib/server/types';
 import {
   getPaginationSearch,
@@ -16,12 +20,14 @@ type CreateProductGroupInput = {
   categoryId: number;
   description?: string;
   name: string;
+  status: ProductStatus;
   productVariants: {
     attributeValueIds: number[];
     barcode: string;
     description?: string;
     name: string;
     sku: string;
+    status: ProductStatus;
   }[];
 };
 

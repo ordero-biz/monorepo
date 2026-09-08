@@ -36,6 +36,7 @@ describe('submitCreateProduct', () => {
         name: ' Running Shoes ',
         description: 'Lightweight daily trainer',
         category: '2',
+        status: 'ACTIVE',
         productVariants: [
           {
             attributeValueIds: [71],
@@ -43,6 +44,7 @@ describe('submitCreateProduct', () => {
             description: 'Blue variant',
             name: ' Running Shoes Blue ',
             sku: ' SHOE-BLUE ',
+            status: 'DRAFT',
           },
         ],
       })
@@ -65,6 +67,7 @@ describe('submitCreateProduct', () => {
       categoryId: 2,
       description: 'Lightweight daily trainer',
       name: 'Running Shoes',
+      status: 'ACTIVE',
       productVariants: [
         {
           attributeValueIds: [71],
@@ -72,6 +75,7 @@ describe('submitCreateProduct', () => {
           description: 'Blue variant',
           name: 'Running Shoes Blue',
           sku: 'SHOE-BLUE',
+          status: 'DRAFT',
         },
       ],
     });
@@ -98,6 +102,7 @@ describe('submitCreateProduct', () => {
         name: 'Running Shoes',
         description: 'Lightweight daily trainer',
         category: '2',
+        status: 'DRAFT',
         productVariants: [],
       })
     ).resolves.toEqual({
@@ -135,6 +140,7 @@ describe('submitCreateProduct', () => {
       name: 'Running Shoes',
       description: '   ',
       category: '2',
+      status: 'DRAFT',
       productVariants: [
         {
           attributeValueIds: [],
@@ -142,6 +148,7 @@ describe('submitCreateProduct', () => {
           description: '',
           name: 'Running Shoes',
           sku: 'SHOE-1',
+          status: 'ACTIVE',
         },
       ],
     });
@@ -149,12 +156,14 @@ describe('submitCreateProduct', () => {
     expect(createProductGroupMock).toHaveBeenCalledWith({
       categoryId: 2,
       name: 'Running Shoes',
+      status: 'DRAFT',
       productVariants: [
         {
           attributeValueIds: [],
           barcode: 'barcode-1',
           name: 'Running Shoes',
           sku: 'SHOE-1',
+          status: 'ACTIVE',
         },
       ],
     });

@@ -10,11 +10,14 @@ import {
 import { Pencil, Plus } from 'lucide-react';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
 import { ProductImageDropzone } from './ProductImageDropzone';
+import { ProductStatusSelector } from './ProductStatusSelector';
 import type { GeneratedProductVariantCardProps } from './types';
 import { getProductVariantAttributeValues } from './utils/productGeneration';
+import { validateProductStatus } from './utils/validations';
 
 export const GeneratedProductVariantCard = ({
   attributes,
+  hasErrors,
   productVariantsCreationForm,
   onEditAttributes,
   requireAttributeValueIds,
@@ -32,7 +35,7 @@ export const GeneratedProductVariantCard = ({
           <Accordion.Header>
             <Accordion.Trigger>{productVariantName}</Accordion.Trigger>
           </Accordion.Header>
-          <Accordion.Panel keepMounted>
+          <Accordion.Panel keepMounted={hasErrors}>
             <div className="flex flex-col gap-[var(--space-3)]">
               <div className="grid gap-[var(--space-2)] lg:grid-cols-[1fr_1fr_0.5fr]">
                 <div className="flex flex-col gap-[var(--space-2)]">
@@ -90,6 +93,29 @@ export const GeneratedProductVariantCard = ({
                           placeholder="SKU"
                           required
                           size="s"
+                          value={field.state.value}
+                        />
+                      );
+                    }}
+                  </productVariantsCreationForm.Field>
+                  <productVariantsCreationForm.Field
+                    name={`productVariants[${variantIndex}].status` as const}
+                    validators={{
+                      onChange: validateProductStatus,
+                    }}
+                  >
+                    {(field) => {
+                      const errorText = getFieldSubmitChangeErrorText(
+                        field.state.meta
+                      );
+
+                      return (
+                        <ProductStatusSelector
+                          errorText={errorText}
+                          invalid={Boolean(errorText)}
+                          label="Product variant status"
+                          name={field.name}
+                          onValueChange={field.handleChange}
                           value={field.state.value}
                         />
                       );

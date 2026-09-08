@@ -1,3 +1,4 @@
+import { PRODUCT_STATUS } from '@/lib/domain/products/constants';
 import type {
   ProductGenerationValues,
   ProductVariantsCreationValues,
@@ -22,4 +23,5 @@ export const createProductVariantsCreationDefaultValues: ProductVariantsCreation
     description: '',
     name: '',
     productVariants: [],
+    status: PRODUCT_STATUS.DRAFT,
   };

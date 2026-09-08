@@ -1,4 +1,5 @@
 import type { AttributeDropdown } from '@/lib/domain/attributes/types';
+import { PRODUCT_STATUS } from '@/lib/domain/products/constants';
 import type {
   CreateProductVariantValues,
   ProductGenerationMode,
@@ -160,6 +161,7 @@ export const getGeneratedSingleProductVariant = ({
   description,
   name: getGeneratedProductName(productName, attributeValues),
   sku: '',
+  status: PRODUCT_STATUS.DRAFT,
 });
 
 export const getGeneratedProductVariants = ({

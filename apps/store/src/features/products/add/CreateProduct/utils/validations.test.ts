@@ -1,4 +1,5 @@
 import type { AttributeDropdown } from '@/lib/domain/attributes/types';
+import { PRODUCT_STATUS } from '@/lib/domain/products/constants';
 import { PRODUCT_GENERATION_MODE } from '../constants';
 import type {
   ProductGenerationValues,
@@ -9,6 +10,7 @@ import {
   validateProductCategory,
   validateProductConfiguration,
   validateProductName,
+  validateProductStatus,
   validateProductTemplate,
   validateProductVariants,
 } from './validations';
@@ -28,6 +30,7 @@ const getProductVariantsCreationValues = (
   description: '',
   name: 'Running Shoes',
   productVariants,
+  status: PRODUCT_STATUS.DRAFT,
 });
 
 const colorAttribute = {
@@ -60,6 +63,23 @@ describe('validateProductCategory', () => {
 
   it('accepts a selected category', () => {
     expect(validateProductCategory({ value: '2' })).toBeUndefined();
+  });
+});
+
+describe('validateProductStatus', () => {
+  it('accepts the supported product statuses', () => {
+    expect(
+      validateProductStatus({ value: PRODUCT_STATUS.DRAFT })
+    ).toBeUndefined();
+    expect(
+      validateProductStatus({ value: PRODUCT_STATUS.ACTIVE })
+    ).toBeUndefined();
+  });
+
+  it('rejects an unsupported product status', () => {
+    expect(validateProductStatus({ value: 'ARCHIVED' as never })).toBe(
+      'Product status must be Draft or Active'
+    );
   });
 });
 
@@ -141,6 +161,7 @@ describe('validateProductVariants', () => {
             description: '',
             name: '',
             sku: '',
+            status: PRODUCT_STATUS.DRAFT,
           },
         ]),
       })
@@ -166,6 +187,7 @@ describe('validateProductVariants', () => {
             description: '',
             name: 'Running Shoes',
             sku: 'SHOE',
+            status: PRODUCT_STATUS.DRAFT,
           },
         ]),
       })
@@ -183,6 +205,7 @@ describe('validateProductVariants', () => {
             description: '',
             name: 'Running Shoes Blue',
             sku: 'SHOE-BLUE',
+            status: PRODUCT_STATUS.DRAFT,
           },
           {
             attributeValueIds: [71],
@@ -190,6 +213,7 @@ describe('validateProductVariants', () => {
             description: '',
             name: 'Running Shoes Red',
             sku: 'SHOE-BLUE',
+            status: PRODUCT_STATUS.DRAFT,
           },
         ]),
       })
@@ -214,6 +238,7 @@ describe('validateProductVariants', () => {
             description: '',
             name: 'Running Shoes Red',
             sku: 'SHOE',
+            status: PRODUCT_STATUS.DRAFT,
           },
           {
             attributeValueIds: [71],
@@ -221,6 +246,7 @@ describe('validateProductVariants', () => {
             description: '',
             name: 'Running Shoes Green',
             sku: 'SHOE',
+            status: PRODUCT_STATUS.DRAFT,
           },
           {
             attributeValueIds: [72],
@@ -228,6 +254,7 @@ describe('validateProductVariants', () => {
             description: '',
             name: 'Running Shoes Blue',
             sku: 'SHOE',
+            status: PRODUCT_STATUS.DRAFT,
           },
         ]),
       })
@@ -254,6 +281,7 @@ describe('validateProductVariants', () => {
             description: '',
             name: 'Running Shoes Blue China',
             sku: 'SHOE-BLUE-CHINA',
+            status: PRODUCT_STATUS.DRAFT,
           },
           {
             attributeValueIds: [80, 72],
@@ -261,6 +289,7 @@ describe('validateProductVariants', () => {
             description: '',
             name: 'Running Shoes China Blue',
             sku: 'SHOE-CHINA-BLUE',
+            status: PRODUCT_STATUS.DRAFT,
           },
         ]),
       })
@@ -285,6 +314,7 @@ describe('validateProductVariants', () => {
             description: '',
             name: 'Running Shoes Blue',
             sku: 'SHOE-BLUE',
+            status: PRODUCT_STATUS.DRAFT,
           },
           {
             attributeValueIds: [71],
@@ -292,6 +322,7 @@ describe('validateProductVariants', () => {
             description: '',
             name: 'Running Shoes Red',
             sku: 'SHOE-RED',
+            status: PRODUCT_STATUS.DRAFT,
           },
         ]),
       })
@@ -311,6 +342,7 @@ describe('validateProductConfiguration', () => {
             description: '',
             name: 'Running Shoes',
             sku: 'SHOE',
+            status: PRODUCT_STATUS.DRAFT,
           },
         ]),
       })
