@@ -3,16 +3,12 @@ import userEvent from '@testing-library/user-event';
 import { createProductGroup } from '@/lib/client/api/products';
 import type { AttributeDropdown } from '@/lib/domain/attributes/types';
 import { prepareStoreSetup } from '@/test/prepareSetup';
-import { CreateMultipleProductsTemplateFields } from '../CreateMultipleProducts/CreateMultipleProductsTemplateFields';
-import { CreateSingleProductTemplateFields } from '../CreateSingleProduct/CreateSingleProductTemplateFields';
 import { CreateProduct } from './CreateProduct';
 import { PRODUCT_GENERATION_MODE } from './constants';
-import { useCreateProductForm } from './hooks/useCreateProductForm';
-import { useProductGenerationState } from './hooks/useProductGenerationState';
 import type { CreateProductProps } from './types';
 import {
-  validateMultipleProducts,
-  validateSingleProduct,
+  validateMultipleProductsConfiguration,
+  validateSingleProductConfiguration,
 } from './utils/validations';
 
 const mocks = vi.hoisted(() => ({
@@ -186,41 +182,12 @@ vi.mock('./AttributesAsyncCombobox', () => ({
 
 const createProductGroupMock = vi.mocked(createProductGroup);
 
-type CreateProductTestProps = Omit<
-  CreateProductProps,
-  'form' | 'generation' | 'onSubmit'
-> & {
-  validateProduct: Parameters<
-    typeof useCreateProductForm
-  >[0]['validateProduct'];
-};
-
-const CreateProductTest = ({
-  validateProduct,
-  ...props
-}: CreateProductTestProps) => {
-  const { form } = useCreateProductForm({
-    onCreated: vi.fn(),
-    validateProduct,
-  });
-  const generation = useProductGenerationState();
-
-  return (
-    <CreateProduct
-      {...props}
-      form={form}
-      generation={generation}
-      onSubmit={() => form.handleSubmit()}
-    />
-  );
-};
-
-const { setup } = prepareStoreSetup<CreateProductTestProps>({
-  component: CreateProductTest,
+const { setup } = prepareStoreSetup<CreateProductProps>({
+  component: CreateProduct,
   props: {
     generationMode: PRODUCT_GENERATION_MODE.one,
-    TemplateFields: CreateSingleProductTemplateFields,
-    validateProduct: validateSingleProduct,
+    onCreated: vi.fn(),
+    validateConfiguration: validateSingleProductConfiguration,
   },
 });
 
@@ -259,8 +226,7 @@ describe('CreateProduct', () => {
   it('renders the multiple-product generation workflow', () => {
     setup({
       generationMode: PRODUCT_GENERATION_MODE.many,
-      TemplateFields: CreateMultipleProductsTemplateFields,
-      validateProduct: validateMultipleProducts,
+      validateConfiguration: validateMultipleProductsConfiguration,
     });
 
     expect(
@@ -288,28 +254,51 @@ describe('CreateProduct', () => {
     expect(createProductGroupMock).not.toHaveBeenCalled();
   });
 
-  it('shows generated variant errors when the product template is invalid', async () => {
+  it('removes the generation form after product variants are generated', async () => {
     const user = userEvent.setup();
 
     setup();
 
+    expect(
+      screen.getByRole('form', { name: 'Product generation' })
+    ).toBeVisible();
+    expect(
+      screen.queryByRole('region', { name: 'Product template' })
+    ).not.toBeInTheDocument();
+
     await completeRequiredFields(user);
+    await user.type(
+      screen.getByRole('textbox', { name: 'Description' }),
+      'Lightweight daily trainer'
+    );
     await user.click(
       screen.getByRole('button', { name: 'Next: Configure product' })
     );
-    await user.clear(
-      screen.getByRole('textbox', { name: 'Base product name' })
-    );
-    await user.click(
-      screen.getByRole('button', { name: 'Regenerate product' })
-    );
 
-    expect(await screen.findByText('Product name is required')).toBeVisible();
+    expect(
+      screen.queryByRole('form', { name: 'Product generation' })
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Next: Configure product' })
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('form', { name: 'Product configuration' })
+    ).toBeVisible();
+    const commonProduct = screen.getByRole('region', {
+      name: 'Common product',
+    });
 
-    await user.click(screen.getByRole('button', { name: 'Create product' }));
-
-    expect(await screen.findByText('Barcode is required')).toBeVisible();
-    expect(await screen.findByText('SKU is required')).toBeVisible();
+    expect(
+      within(commonProduct).getByRole('textbox', {
+        name: 'Base product name',
+      })
+    ).toHaveValue('Running Shoes');
+    expect(
+      within(commonProduct).getByRole('textbox', { name: 'Description' })
+    ).toHaveValue('Lightweight daily trainer');
+    expect(
+      screen.getByRole('heading', { name: 'Generated product variants' })
+    ).toBeVisible();
     expect(createProductGroupMock).not.toHaveBeenCalled();
   });
 
@@ -339,8 +328,7 @@ describe('CreateProduct', () => {
 
     setup({
       generationMode: PRODUCT_GENERATION_MODE.many,
-      TemplateFields: CreateMultipleProductsTemplateFields,
-      validateProduct: validateMultipleProducts,
+      validateConfiguration: validateMultipleProductsConfiguration,
     });
 
     await completeRequiredFields(user);
@@ -373,8 +361,75 @@ describe('CreateProduct', () => {
 
     expect(screen.getByDisplayValue('Running Shoes Blue')).toBeInTheDocument();
     expect(screen.getByText('Attributes')).toBeVisible();
-    expect(screen.getAllByText('Blue')).toHaveLength(2);
+    expect(screen.getAllByText('Blue')).toHaveLength(1);
     expect(createProductGroupMock).not.toHaveBeenCalled();
+  });
+
+  it('collapses and expands a generated product variant', async () => {
+    const user = userEvent.setup();
+
+    setup();
+
+    await completeRequiredFields(user);
+    await user.click(screen.getByRole('button', { name: 'Select Attributes' }));
+    await user.click(screen.getByRole('button', { name: 'Blue' }));
+    await user.click(
+      screen.getByRole('button', { name: 'Next: Configure product' })
+    );
+
+    const productVariantTrigger = screen.getByRole('button', {
+      name: 'Running Shoes Blue',
+    });
+
+    await user.click(productVariantTrigger);
+
+    expect(
+      screen.queryByRole('textbox', { name: 'SKU' })
+    ).not.toBeInTheDocument();
+
+    await user.click(productVariantTrigger);
+
+    expect(screen.getByRole('textbox', { name: 'SKU' })).toBeVisible();
+  });
+
+  it('reopens an invalid variant after submitting the configuration form', async () => {
+    const user = userEvent.setup();
+
+    setup();
+
+    await completeRequiredFields(user);
+    await user.click(screen.getByRole('button', { name: 'Select Attributes' }));
+    await user.click(screen.getByRole('button', { name: 'Blue' }));
+    await user.click(
+      screen.getByRole('button', { name: 'Next: Configure product' })
+    );
+
+    const productVariantTrigger = screen.getByRole('button', {
+      name: 'Running Shoes Blue',
+    });
+
+    await user.click(productVariantTrigger);
+
+    expect(
+      screen.queryByRole('textbox', { name: 'SKU' })
+    ).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Create product' }));
+
+    expect(await screen.findByRole('textbox', { name: 'SKU' })).toHaveAttribute(
+      'aria-invalid',
+      'true'
+    );
+    expect(screen.getByText('SKU is required')).toBeVisible();
+
+    await user.click(productVariantTrigger);
+    await user.click(productVariantTrigger);
+
+    expect(screen.getByRole('textbox', { name: 'SKU' })).toHaveAttribute(
+      'aria-invalid',
+      'true'
+    );
+    expect(screen.getByText('SKU is required')).toBeVisible();
   });
 
   it('submits a single generated product without attribute values', async () => {
@@ -409,12 +464,10 @@ describe('CreateProduct', () => {
     await waitFor(() =>
       expect(createProductGroupMock).toHaveBeenCalledWith({
         name: 'Running Shoes',
-        description: '',
         categoryId: 2,
         productVariants: [
           {
             name: 'Running Shoes',
-            description: '',
             sku: 'SHOE',
             barcode: 'barcode-1',
             attributeValueIds: [],
@@ -525,97 +578,6 @@ describe('CreateProduct', () => {
     ).toBeVisible();
   });
 
-  it('keeps filled variants when generating again without template changes', async () => {
-    const user = userEvent.setup();
-
-    setup();
-
-    await completeRequiredFields(user);
-    await user.click(
-      screen.getByRole('button', { name: 'Next: Configure product' })
-    );
-
-    const sku = screen.getByRole('textbox', { name: 'SKU' });
-    await user.type(sku, 'RUNNING-SHOES');
-    await user.click(
-      screen.getByRole('button', { name: 'Next: Configure product' })
-    );
-
-    expect(sku).toHaveValue('RUNNING-SHOES');
-    expect(createProductGroupMock).not.toHaveBeenCalled();
-  });
-
-  it('keeps generated variants when template attributes change', async () => {
-    const user = userEvent.setup();
-
-    setup();
-
-    await completeRequiredFields(user);
-    await user.click(screen.getByRole('button', { name: 'Select Attributes' }));
-    await user.click(screen.getByRole('button', { name: 'Blue' }));
-    await user.click(
-      screen.getByRole('button', { name: 'Next: Configure product' })
-    );
-
-    expect(screen.getByDisplayValue('Running Shoes Blue')).toBeInTheDocument();
-
-    await user.click(
-      screen.getByRole('button', { name: 'Select Color Attribute' })
-    );
-
-    expect(screen.getByDisplayValue('Running Shoes Blue')).toBeInTheDocument();
-    expect(
-      screen.getByRole('button', { name: 'Create product' })
-    ).toBeVisible();
-    expect(
-      screen.getByText(
-        'Template changes apply when you regenerate. Existing variants will be submitted unchanged.'
-      )
-    ).toBeVisible();
-    expect(
-      screen.getByRole('button', { name: 'Regenerate product' })
-    ).toBeVisible();
-
-    await user.click(
-      screen.getByRole('button', { name: 'Regenerate product' })
-    );
-
-    expect(
-      screen.queryByText(
-        'Template changes apply when you regenerate. Existing variants will be submitted unchanged.'
-      )
-    ).not.toBeInTheDocument();
-  });
-
-  it('keeps the generated attribute definitions after template changes', async () => {
-    const user = userEvent.setup();
-
-    setup();
-
-    await completeRequiredFields(user);
-    await user.click(screen.getByRole('button', { name: 'Select Attributes' }));
-    await user.click(screen.getByRole('button', { name: 'Blue' }));
-    await user.click(
-      screen.getByRole('button', { name: 'Next: Configure product' })
-    );
-
-    await user.click(
-      screen.getByRole('button', { name: 'Select Color Attribute' })
-    );
-    await user.click(
-      screen.getByRole('button', {
-        name: 'Edit attributes for Running Shoes Blue',
-      })
-    );
-
-    const dialog = screen.getByRole('dialog', {
-      name: 'Edit variant attributes for Running Shoes Blue',
-    });
-
-    expect(within(dialog).getByText('Manufacture:')).toBeVisible();
-    expect(within(dialog).getByRole('button', { name: 'China' })).toBeVisible();
-  });
-
   it('shows only template-selected attributes in the variant attribute editor', async () => {
     const user = userEvent.setup();
 
@@ -652,8 +614,7 @@ describe('CreateProduct', () => {
 
     setup({
       generationMode: PRODUCT_GENERATION_MODE.many,
-      TemplateFields: CreateMultipleProductsTemplateFields,
-      validateProduct: validateMultipleProducts,
+      validateConfiguration: validateMultipleProductsConfiguration,
     });
 
     await completeRequiredFields(user);
@@ -696,8 +657,7 @@ describe('CreateProduct', () => {
 
     setup({
       generationMode: PRODUCT_GENERATION_MODE.many,
-      TemplateFields: CreateMultipleProductsTemplateFields,
-      validateProduct: validateMultipleProducts,
+      validateConfiguration: validateMultipleProductsConfiguration,
     });
 
     await completeRequiredFields(user);
@@ -719,8 +679,7 @@ describe('CreateProduct', () => {
 
     setup({
       generationMode: PRODUCT_GENERATION_MODE.many,
-      TemplateFields: CreateMultipleProductsTemplateFields,
-      validateProduct: validateMultipleProducts,
+      validateConfiguration: validateMultipleProductsConfiguration,
     });
 
     await completeRequiredFields(user);
@@ -771,8 +730,7 @@ describe('CreateProduct', () => {
 
     setup({
       generationMode: PRODUCT_GENERATION_MODE.many,
-      TemplateFields: CreateMultipleProductsTemplateFields,
-      validateProduct: validateMultipleProducts,
+      validateConfiguration: validateMultipleProductsConfiguration,
     });
 
     await completeRequiredFields(user);
@@ -866,12 +824,10 @@ describe('CreateProduct', () => {
     await waitFor(() =>
       expect(createProductGroupMock).toHaveBeenCalledWith({
         name: 'Running Shoes',
-        description: '',
         categoryId: 2,
         productVariants: [
           {
             name: 'Running Shoes Blue',
-            description: '',
             sku: 'SHOE-BLUE',
             barcode: 'barcode-1',
             attributeValueIds: [72],
@@ -881,14 +837,14 @@ describe('CreateProduct', () => {
     );
   });
 
-  it('shows backend field errors without leaving the page', async () => {
+  it('shows backend errors without leaving the configuration stage', async () => {
     createProductGroupMock.mockResolvedValue({
       ok: false,
       error: {
         status: 422,
         message: 'Product creation failed.',
         fieldErrors: {
-          name: 'Product name already exists.',
+          'productVariants[0].sku': 'SKU already exists.',
         },
       },
     });
@@ -907,28 +863,24 @@ describe('CreateProduct', () => {
       screen.getByRole('textbox', { name: 'Barcode' }),
       'barcode-1'
     );
-    await user.click(screen.getByRole('button', { name: 'Create product' }));
-
-    const nameField = screen.getByRole('textbox', {
-      name: 'Base product name',
-    });
+    await user.click(
+      screen.getByRole('button', { name: 'Running Shoes Blue' })
+    );
 
     expect(
-      await screen.findByText('Product name already exists.')
-    ).toBeVisible();
-    expect(nameField).toHaveAccessibleDescription(
-      'Product name already exists.'
-    );
+      screen.queryByRole('textbox', { name: 'SKU' })
+    ).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Create product' }));
+
     expect(
       await screen.findByRole('dialog', { name: 'Product creation failed.' })
     ).toBeVisible();
-
-    await user.type(
-      screen.getAllByRole('textbox', { name: 'Description' })[0],
-      'Updated product description'
-    );
-
-    expect(screen.getByText('Product name already exists.')).toBeVisible();
+    expect(
+      screen.queryByRole('form', { name: 'Product generation' })
+    ).not.toBeInTheDocument();
+    expect(await screen.findByRole('textbox', { name: 'SKU' })).toBeVisible();
+    expect(screen.getByText('SKU already exists.')).toBeVisible();
     expect(mocks.push).not.toHaveBeenCalled();
   });
 

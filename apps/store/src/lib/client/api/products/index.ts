@@ -14,12 +14,12 @@ type ProductVariantsListResponse = PaginatedResponse<ProductVariant>;
 
 type CreateProductGroupInput = {
   categoryId: number;
-  description: string;
+  description?: string;
   name: string;
   productVariants: {
     attributeValueIds: number[];
     barcode: string;
-    description: string;
+    description?: string;
     name: string;
     sku: string;
   }[];

@@ -9,6 +9,7 @@ describe('getFieldSubmitChangeErrorText', () => {
         },
         isBlurred: false,
         isDirty: true,
+        isTouched: false,
       })
     ).toBeUndefined();
   });
@@ -21,6 +22,7 @@ describe('getFieldSubmitChangeErrorText', () => {
         },
         isBlurred: true,
         isDirty: true,
+        isTouched: true,
       })
     ).toBe('Name is required');
   });
@@ -33,6 +35,7 @@ describe('getFieldSubmitChangeErrorText', () => {
         },
         isBlurred: false,
         isDirty: false,
+        isTouched: true,
       })
     ).toBe('Name already exists');
   });
@@ -46,6 +49,7 @@ describe('getFieldSubmitChangeErrorText', () => {
         },
         isBlurred: true,
         isDirty: true,
+        isTouched: true,
       })
     ).toBe('Name already exists');
   });
@@ -58,6 +62,7 @@ describe('getFieldSubmitChangeErrorText', () => {
         },
         isBlurred: false,
         isDirty: false,
+        isTouched: true,
       })
     ).toBe('Name is required');
   });
@@ -71,6 +76,7 @@ describe('getFieldSubmitChangeErrorText', () => {
         },
         isBlurred: true,
         isDirty: true,
+        isTouched: true,
       })
     ).toBe('Name already exists');
   });
@@ -83,6 +89,7 @@ describe('getFieldSubmitChangeErrorText', () => {
         },
         isBlurred: true,
         isDirty: false,
+        isTouched: true,
       })
     ).toBe('Name is required');
   });
@@ -96,7 +103,21 @@ describe('getFieldSubmitChangeErrorText', () => {
         },
         isBlurred: true,
         isDirty: true,
+        isTouched: true,
       })
     ).toBeUndefined();
+  });
+
+  it('shows a change error after form submission marks the field as touched', () => {
+    expect(
+      getFieldSubmitChangeErrorText({
+        errorMap: {
+          onChange: 'Name is required',
+        },
+        isBlurred: false,
+        isDirty: false,
+        isTouched: true,
+      })
+    ).toBe('Name is required');
   });
 });

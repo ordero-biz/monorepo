@@ -1,29 +1,32 @@
 import { Textarea, TextField } from '@ordero/ui';
 import { CategoriesAsyncCombobox } from '@/features/categories';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
+import { AttributesAsyncCombobox } from './AttributesAsyncCombobox';
+import { PRODUCT_GENERATION_MODE } from './constants';
+import { ProductImageDropzone } from './ProductImageDropzone';
+import type { ProductTemplateFieldsProps } from './types';
+import { getAttributeValueSelections } from './utils/productGeneration';
 import {
-  AttributesAsyncCombobox,
-  getAttributeValueSelections,
-  ProductImageDropzone,
-  type ProductTemplateFieldsProps,
   validateProductAttributes,
   validateProductCategory,
   validateProductName,
-} from '../CreateProduct';
+} from './utils/validations';
 
-export const CreateMultipleProductsTemplateFields = ({
-  form,
+export const ProductTemplateFields = ({
+  productVariantsGenerationForm,
+  generationMode,
 }: ProductTemplateFieldsProps) => {
+  const requiresAttributes = generationMode === PRODUCT_GENERATION_MODE.many;
+
   return (
     <div className="grid gap-[var(--space-3)] lg:grid-cols-[1fr_1fr_0.5fr] lg:items-start">
       <div className="grid gap-[var(--space-3)] lg:col-span-2 lg:grid-cols-2 lg:items-stretch">
         <div className="flex flex-col gap-[var(--space-2)]">
-          <form.Field
-            name="productName"
+          <productVariantsGenerationForm.Field
+            name="name"
             validators={{
               onBlur: validateProductName,
               onChange: validateProductName,
-              onSubmit: validateProductName,
             }}
           >
             {(field) => {
@@ -43,14 +46,13 @@ export const CreateMultipleProductsTemplateFields = ({
                 />
               );
             }}
-          </form.Field>
+          </productVariantsGenerationForm.Field>
 
-          <form.Field
+          <productVariantsGenerationForm.Field
             name="category"
             validators={{
               onBlur: validateProductCategory,
               onChange: validateProductCategory,
-              onSubmit: validateProductCategory,
             }}
           >
             {(field) => {
@@ -71,15 +73,18 @@ export const CreateMultipleProductsTemplateFields = ({
                 />
               );
             }}
-          </form.Field>
+          </productVariantsGenerationForm.Field>
 
-          <form.Field
+          <productVariantsGenerationForm.Field
             name="attributes"
-            validators={{
-              onBlur: validateProductAttributes,
-              onChange: validateProductAttributes,
-              onSubmit: validateProductAttributes,
-            }}
+            validators={
+              requiresAttributes
+                ? {
+                    onBlur: validateProductAttributes,
+                    onChange: validateProductAttributes,
+                  }
+                : undefined
+            }
           >
             {(field) => {
               const errorText = getFieldSubmitChangeErrorText(field.state.meta);
@@ -87,7 +92,11 @@ export const CreateMultipleProductsTemplateFields = ({
               return (
                 <AttributesAsyncCombobox
                   errorText={errorText}
-                  helperText="You must select attributes and their values to generate multiple products"
+                  helperText={
+                    requiresAttributes
+                      ? 'You must select attributes and their values to generate multiple products'
+                      : 'Optional: Add attributes for a single product'
+                  }
                   invalid={Boolean(errorText)}
                   label="Attributes"
                   multiple
@@ -95,12 +104,14 @@ export const CreateMultipleProductsTemplateFields = ({
                   onBlur={field.handleBlur}
                   onSelectedAttributesChange={(attributes) => {
                     field.handleChange(attributes);
-                    form.setFieldValue('attributeValues', (currentValue) =>
-                      getAttributeValueSelections(currentValue, attributes)
+                    productVariantsGenerationForm.setFieldValue(
+                      'attributeValues',
+                      (currentValue) =>
+                        getAttributeValueSelections(currentValue, attributes)
                     );
                   }}
                   placeholder="Select attributes"
-                  required
+                  required={requiresAttributes}
                   selectedAttributes={field.state.value}
                   size="s"
                   value={field.state.value.map((attribute) =>
@@ -109,11 +120,11 @@ export const CreateMultipleProductsTemplateFields = ({
                 />
               );
             }}
-          </form.Field>
+          </productVariantsGenerationForm.Field>
         </div>
 
         <div className="flex min-w-0 flex-col gap-[var(--space-2)]">
-          <form.Field name="description">
+          <productVariantsGenerationForm.Field name="description">
             {(field) => {
               const errorText = getFieldSubmitChangeErrorText(field.state.meta);
 
@@ -132,7 +143,7 @@ export const CreateMultipleProductsTemplateFields = ({
                 />
               );
             }}
-          </form.Field>
+          </productVariantsGenerationForm.Field>
         </div>
       </div>
 

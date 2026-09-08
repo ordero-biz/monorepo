@@ -1,15 +1,25 @@
-import type { CreateProductValues } from './types';
+import type {
+  ProductGenerationValues,
+  ProductVariantsCreationValues,
+} from './types';
 
 export const PRODUCT_GENERATION_MODE = {
   one: 'one',
   many: 'many',
 } as const;
 
-export const createProductDefaultValues: CreateProductValues = {
+export const createProductGenerationDefaultValues: ProductGenerationValues = {
   attributes: [],
   attributeValues: {},
   category: null,
   description: '',
-  productName: '',
-  productVariants: [],
+  name: '',
 };
+
+export const createProductVariantsCreationDefaultValues: ProductVariantsCreationValues =
+  {
+    category: null,
+    description: '',
+    name: '',
+    productVariants: [],
+  };

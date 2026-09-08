@@ -265,12 +265,10 @@ describe('products client helpers', () => {
     await expect(
       createProductGroup({
         name: 'Running Shoes',
-        description: '',
         categoryId: 2,
         productVariants: [
           {
             name: 'Running Shoes Blue',
-            description: '',
             sku: 'SHOE-BLUE',
             barcode: 'barcode-1',
             attributeValueIds: [71],
@@ -298,12 +296,10 @@ describe('products client helpers', () => {
         method: 'POST',
         body: JSON.stringify({
           name: 'Running Shoes',
-          description: '',
           categoryId: 2,
           productVariants: [
             {
               name: 'Running Shoes Blue',
-              description: '',
               sku: 'SHOE-BLUE',
               barcode: 'barcode-1',
               attributeValueIds: [71],
@@ -334,7 +330,6 @@ describe('products client helpers', () => {
     await expect(
       createProductGroup({
         name: 'Running Shoes',
-        description: '',
         categoryId: 2,
         productVariants: [],
       })

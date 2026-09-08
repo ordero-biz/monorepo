@@ -24,6 +24,13 @@ type GetProductVariantGenerationSignatureArgs = {
   productName: string;
 };
 
+type UpdateAttributeValueSelectionArgs = {
+  attributeId: string;
+  attributeValueId: string;
+  attributeValuesByAttributeId: Record<string, string[]>;
+  pressed: boolean;
+};
+
 export const getProductVariantGenerationSignature = ({
   attributeValuesByAttributeId,
   attributes,
@@ -69,6 +76,26 @@ export const getAttributeValueSelections = (
       ];
     })
   );
+
+export const updateAttributeValueSelection = ({
+  attributeId,
+  attributeValueId,
+  attributeValuesByAttributeId,
+  pressed,
+}: UpdateAttributeValueSelectionArgs) => {
+  const selectedAttributeValueIds =
+    attributeValuesByAttributeId[attributeId] ?? [];
+
+  return {
+    ...attributeValuesByAttributeId,
+    [attributeId]: pressed
+      ? [...selectedAttributeValueIds, attributeValueId]
+      : selectedAttributeValueIds.filter(
+          (selectedAttributeValueId) =>
+            selectedAttributeValueId !== attributeValueId
+        ),
+  };
+};
 
 export const getSelectedAttributeValues = (
   attributes: AttributeDropdown[],

@@ -1,36 +1,52 @@
-import { Typography } from '@ordero/ui';
-import { useState } from 'react';
-import type { AttributeDropdown } from '@/lib/domain/attributes/types';
+import { Accordion, Typography } from '@ordero/ui';
+import { useEffect, useRef, useState } from 'react';
 import { PRODUCT_GENERATION_MODE } from './constants';
 import { EditProductVariantAttributesDialog } from './EditProductVariantAttributesDialog';
 import { GeneratedProductVariantCard } from './GeneratedProductVariantCard';
 import { useIncrementalProductVariants } from './hooks/useIncrementalProductVariants';
 import type {
-  CreateProductForm,
+  EditGeneratedProductVariantAttributesProps,
   GeneratedProductVariantListProps,
   GeneratedProductVariantsProps,
 } from './types';
 
-type EditGeneratedProductVariantAttributesProps = {
-  allowMultipleValuesPerAttribute: boolean;
-  attributes: AttributeDropdown[];
-  form: CreateProductForm;
-  onOpenChange: (open: boolean) => void;
-  variantIndex: number;
+const getInvalidProductVariantIndexes = (fieldMeta: object) => {
+  const invalidVariantIndexes = new Set<number>();
+
+  Object.entries(fieldMeta).forEach(([fieldName, meta]) => {
+    const match = /^productVariants\[(\d+)\]\./.exec(fieldName);
+
+    if (
+      !match ||
+      !meta ||
+      typeof meta !== 'object' ||
+      !('errors' in meta) ||
+      !Array.isArray(meta.errors) ||
+      meta.errors.length === 0
+    ) {
+      return;
+    }
+
+    invalidVariantIndexes.add(Number(match[1]));
+  });
+
+  return Array.from(invalidVariantIndexes);
 };
 
 const EditGeneratedProductVariantAttributes = ({
   allowMultipleValuesPerAttribute,
   attributes,
-  form,
+  productVariantsCreationForm,
   onOpenChange,
   variantIndex,
 }: EditGeneratedProductVariantAttributesProps) => (
-  <form.Field
+  <productVariantsCreationForm.Field
     name={`productVariants[${variantIndex}].attributeValueIds` as const}
   >
     {(attributeValueIdsField) => (
-      <form.Field name={`productVariants[${variantIndex}].name` as const}>
+      <productVariantsCreationForm.Field
+        name={`productVariants[${variantIndex}].name` as const}
+      >
         {(nameField) => (
           <EditProductVariantAttributesDialog
             allowMultipleValuesPerAttribute={allowMultipleValuesPerAttribute}
@@ -42,14 +58,15 @@ const EditGeneratedProductVariantAttributes = ({
             productVariantName={nameField.state.value}
           />
         )}
-      </form.Field>
+      </productVariantsCreationForm.Field>
     )}
-  </form.Field>
+  </productVariantsCreationForm.Field>
 );
 
 const GeneratedProductVariantList = ({
   attributes,
-  form,
+  productVariantsCreationForm,
+  invalidVariantIndexes,
   onEditAttributes,
   productVariantCount,
   requireAttributeValueIds,
@@ -58,13 +75,77 @@ const GeneratedProductVariantList = ({
     useIncrementalProductVariants({
       productVariantCount,
     });
+  const [expandedVariantIds, setExpandedVariantIds] = useState(() =>
+    visibleVariantIndexes.map(String)
+  );
+  const previousVisibleVariantIndexesRef = useRef(
+    new Set(visibleVariantIndexes)
+  );
+
+  useEffect(() => {
+    const previousVisibleVariantIndexes =
+      previousVisibleVariantIndexesRef.current;
+    const newlyVisibleVariantIndexes = visibleVariantIndexes.filter(
+      (variantIndex) => !previousVisibleVariantIndexes.has(variantIndex)
+    );
+
+    previousVisibleVariantIndexesRef.current = new Set(visibleVariantIndexes);
+
+    if (newlyVisibleVariantIndexes.length === 0) {
+      return;
+    }
+
+    setExpandedVariantIds((currentIds) => {
+      const nextIds = new Set(currentIds);
+
+      newlyVisibleVariantIndexes.forEach((variantIndex) => {
+        nextIds.add(String(variantIndex));
+      });
+
+      return nextIds.size === currentIds.length
+        ? currentIds
+        : Array.from(nextIds);
+    });
+  }, [visibleVariantIndexes]);
+
+  useEffect(() => {
+    if (invalidVariantIndexes.length === 0) {
+      return;
+    }
+
+    const visibleVariantIndexesSet = new Set(visibleVariantIndexes);
+    const visibleInvalidVariantIndexes = invalidVariantIndexes.filter(
+      (variantIndex) => visibleVariantIndexesSet.has(variantIndex)
+    );
+
+    if (visibleInvalidVariantIndexes.length === 0) {
+      return;
+    }
+
+    setExpandedVariantIds((currentIds) => {
+      const nextIds = new Set(currentIds);
+
+      visibleInvalidVariantIndexes.forEach((variantIndex) => {
+        nextIds.add(String(variantIndex));
+      });
+
+      return nextIds.size === currentIds.length
+        ? currentIds
+        : Array.from(nextIds);
+    });
+  }, [invalidVariantIndexes, visibleVariantIndexes]);
 
   return (
-    <div className="mt-1 mb-2 flex flex-col gap-[var(--space-1)]">
+    <Accordion.Root
+      aria-label="Generated product variants"
+      multiple
+      onValueChange={setExpandedVariantIds}
+      value={expandedVariantIds}
+    >
       {visibleVariantIndexes.map((variantIndex) => (
         <GeneratedProductVariantCard
           attributes={attributes}
-          form={form}
+          productVariantsCreationForm={productVariantsCreationForm}
           key={variantIndex}
           onEditAttributes={onEditAttributes}
           requireAttributeValueIds={requireAttributeValueIds}
@@ -74,15 +155,14 @@ const GeneratedProductVariantList = ({
       {hasMoreVariants ? (
         <div aria-hidden="true" className="h-px" ref={loadMoreRef} />
       ) : null}
-    </div>
+    </Accordion.Root>
   );
 };
 
 export const GeneratedProductVariants = ({
-  form,
+  productVariantsCreationForm,
   generatedAttributes,
   generationMode,
-  generationVersion,
 }: GeneratedProductVariantsProps) => {
   const [editingVariantIndex, setEditingVariantIndex] = useState<number | null>(
     null
@@ -95,15 +175,27 @@ export const GeneratedProductVariants = ({
   };
 
   return (
-    <form.Subscribe selector={(state) => state.values.productVariants.length}>
-      {(productVariantCount) =>
-        productVariantCount > 0 ? (
+    <productVariantsCreationForm.Subscribe
+      selector={(state) =>
+        [
+          state.isSubmitting,
+          state.submissionAttempts,
+          state.values.productVariants.length,
+        ] as const
+      }
+    >
+      {([, , productVariantCount]) => {
+        const invalidVariantIndexes = getInvalidProductVariantIndexes(
+          productVariantsCreationForm.state.fieldMeta
+        );
+
+        return productVariantCount > 0 ? (
           <div className="mt-3">
             <Typography variant="h5">Generated product variants</Typography>
             <GeneratedProductVariantList
               attributes={generatedAttributes}
-              form={form}
-              key={generationVersion}
+              productVariantsCreationForm={productVariantsCreationForm}
+              invalidVariantIndexes={invalidVariantIndexes}
               onEditAttributes={setEditingVariantIndex}
               productVariantCount={productVariantCount}
               requireAttributeValueIds={
@@ -117,14 +209,14 @@ export const GeneratedProductVariants = ({
                   generationMode === PRODUCT_GENERATION_MODE.one
                 }
                 attributes={generatedAttributes}
-                form={form}
+                productVariantsCreationForm={productVariantsCreationForm}
                 onOpenChange={handleAttributesDialogOpenChange}
                 variantIndex={editingVariantIndex}
               />
             ) : null}
           </div>
-        ) : null
-      }
-    </form.Subscribe>
+        ) : null;
+      }}
+    </productVariantsCreationForm.Subscribe>
   );
 };

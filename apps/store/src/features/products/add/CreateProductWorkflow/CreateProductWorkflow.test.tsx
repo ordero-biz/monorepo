@@ -2,23 +2,20 @@ import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { clientRoutes } from '@/lib/client/routes';
 import {
+  PRODUCT_CREATION_MODE,
+  type ProductCreationMode,
+} from '@/lib/domain/products/constants';
+import {
   productGroupsQueryKeys,
   productVariantsQueryKeys,
 } from '@/lib/query/products/productsQueryKeys';
 import { prepareStoreSetup } from '@/test/prepareSetup';
-import {
-  PRODUCT_GENERATION_MODE,
-  validateMultipleProducts,
-} from '../CreateProduct';
-import { CreateMultipleProducts } from './CreateMultipleProducts';
-import { CreateMultipleProductsTemplateFields } from './CreateMultipleProductsTemplateFields';
+import { PRODUCT_GENERATION_MODE } from '../CreateProduct';
+import { CreateProductWorkflow } from './CreateProductWorkflow';
 
 const mocks = vi.hoisted(() => ({
   generationMode: undefined as undefined | string,
-  onCreated: undefined as undefined | (() => Promise<void> | void),
   push: vi.fn(),
-  templateFields: undefined as unknown,
-  validateProduct: undefined as unknown,
 }));
 
 vi.mock('next/navigation', async () => ({
@@ -36,63 +33,41 @@ vi.mock('../CreateProduct', async () => ({
   )),
   CreateProduct: ({
     generationMode,
-    onSubmit,
-    TemplateFields,
+    onCreated,
   }: {
     generationMode: string;
-    onSubmit: () => void;
-    TemplateFields: unknown;
+    onCreated: () => Promise<void> | void;
   }) => {
     mocks.generationMode = generationMode;
-    mocks.templateFields = TemplateFields;
 
     return (
-      <button onClick={onSubmit} type="button">
+      <button onClick={() => onCreated()} type="button">
         Create product
       </button>
     );
   },
-  useCreateProductForm: ({
-    onCreated,
-    validateProduct,
-  }: {
-    onCreated: () => Promise<void> | void;
-    validateProduct: unknown;
-  }) => {
-    mocks.onCreated = onCreated;
-    mocks.validateProduct = validateProduct;
+}));
 
-    return {
-      form: {
-        handleSubmit: () => mocks.onCreated?.(),
-      },
-    };
+const { setup } = prepareStoreSetup<{ creationMode: ProductCreationMode }>({
+  component: CreateProductWorkflow,
+  props: {
+    creationMode: PRODUCT_CREATION_MODE.single,
   },
-}));
-
-vi.mock('../CreateProduct/hooks/useProductGenerationState', () => ({
-  useProductGenerationState: () => ({}),
-}));
-
-const { setup } = prepareStoreSetup({
-  component: CreateMultipleProducts,
 });
 
-describe('CreateMultipleProducts', () => {
+describe('CreateProductWorkflow', () => {
   beforeEach(() => {
     mocks.generationMode = undefined;
-    mocks.onCreated = undefined;
     mocks.push.mockReset();
-    mocks.templateFields = undefined;
-    mocks.validateProduct = undefined;
   });
 
-  it('uses the multiple-product generation configuration', () => {
-    setup();
+  it.each([
+    [PRODUCT_CREATION_MODE.single, PRODUCT_GENERATION_MODE.one],
+    [PRODUCT_CREATION_MODE.multiple, PRODUCT_GENERATION_MODE.many],
+  ] as const)('uses %s generation mode', (creationMode, generationMode) => {
+    setup({ creationMode });
 
-    expect(mocks.generationMode).toBe(PRODUCT_GENERATION_MODE.many);
-    expect(mocks.templateFields).toBe(CreateMultipleProductsTemplateFields);
-    expect(mocks.validateProduct).toBe(validateMultipleProducts);
+    expect(mocks.generationMode).toBe(generationMode);
   });
 
   it('refreshes product lists and returns to products after creation', async () => {

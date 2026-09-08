@@ -1,12 +1,11 @@
 import {
-  Card,
+  Accordion,
   Chip,
   FieldHelperText,
   FieldLabel,
   IconButton,
   Textarea,
   TextField,
-  Typography,
 } from '@ordero/ui';
 import { Pencil, Plus } from 'lucide-react';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
@@ -16,27 +15,26 @@ import { getProductVariantAttributeValues } from './utils/productGeneration';
 
 export const GeneratedProductVariantCard = ({
   attributes,
-  form,
+  productVariantsCreationForm,
   onEditAttributes,
   requireAttributeValueIds,
   variantIndex,
 }: GeneratedProductVariantCardProps) => (
-  <form.Field name={`productVariants[${variantIndex}].name` as const}>
+  <productVariantsCreationForm.Field
+    name={`productVariants[${variantIndex}].name` as const}
+  >
     {(nameField) => {
       const nameErrorText = getFieldSubmitChangeErrorText(nameField.state.meta);
       const productVariantName = nameField.state.value;
 
       return (
-        <Card.Root variant="outlined">
-          <Card.Content>
-            <div className="flex flex-col mb-2 gap-[var(--space-3)]">
-              <div className="flex items-center justify-between gap-[var(--space-2)]">
-                <Typography variant="subtitle1">
-                  {productVariantName}
-                </Typography>
-              </div>
-
-              <div className="grid gap-[var(--space-2)] lg:grid-cols-[1fr_1fr_0.9fr]">
+        <Accordion.Item value={String(variantIndex)}>
+          <Accordion.Header>
+            <Accordion.Trigger>{productVariantName}</Accordion.Trigger>
+          </Accordion.Header>
+          <Accordion.Panel keepMounted>
+            <div className="flex flex-col gap-[var(--space-3)]">
+              <div className="grid gap-[var(--space-2)] lg:grid-cols-[1fr_1fr_0.5fr]">
                 <div className="flex flex-col gap-[var(--space-2)]">
                   <TextField
                     errorText={nameErrorText}
@@ -49,7 +47,7 @@ export const GeneratedProductVariantCard = ({
                     size="s"
                     value={productVariantName}
                   />
-                  <form.Field
+                  <productVariantsCreationForm.Field
                     name={`productVariants[${variantIndex}].barcode` as const}
                   >
                     {(field) => {
@@ -72,8 +70,8 @@ export const GeneratedProductVariantCard = ({
                         />
                       );
                     }}
-                  </form.Field>
-                  <form.Field
+                  </productVariantsCreationForm.Field>
+                  <productVariantsCreationForm.Field
                     name={`productVariants[${variantIndex}].sku` as const}
                   >
                     {(field) => {
@@ -96,11 +94,11 @@ export const GeneratedProductVariantCard = ({
                         />
                       );
                     }}
-                  </form.Field>
+                  </productVariantsCreationForm.Field>
                 </div>
 
                 <div className="flex flex-col gap-[var(--space-2)]">
-                  <form.Field
+                  <productVariantsCreationForm.Field
                     name={
                       `productVariants[${variantIndex}].description` as const
                     }
@@ -117,7 +115,7 @@ export const GeneratedProductVariantCard = ({
                         value={field.state.value}
                       />
                     )}
-                  </form.Field>
+                  </productVariantsCreationForm.Field>
                 </div>
 
                 <div className="flex flex-col gap-[var(--space-1)]">
@@ -127,7 +125,7 @@ export const GeneratedProductVariantCard = ({
                 </div>
               </div>
 
-              <form.Field
+              <productVariantsCreationForm.Field
                 name={
                   `productVariants[${variantIndex}].attributeValueIds` as const
                 }
@@ -211,11 +209,11 @@ export const GeneratedProductVariantCard = ({
                     </div>
                   ) : null;
                 }}
-              </form.Field>
+              </productVariantsCreationForm.Field>
             </div>
-          </Card.Content>
-        </Card.Root>
+          </Accordion.Panel>
+        </Accordion.Item>
       );
     }}
-  </form.Field>
+  </productVariantsCreationForm.Field>
 );

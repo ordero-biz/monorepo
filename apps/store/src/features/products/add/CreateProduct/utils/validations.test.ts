@@ -1,23 +1,32 @@
 import type { AttributeDropdown } from '@/lib/domain/attributes/types';
 import { PRODUCT_GENERATION_MODE } from '../constants';
-import type { CreateProductValues } from '../types';
+import type {
+  ProductGenerationValues,
+  ProductVariantsCreationValues,
+} from '../types';
 import {
-  validateCreateProduct,
   validateProductAttributes,
   validateProductCategory,
+  validateProductConfiguration,
   validateProductName,
   validateProductTemplate,
   validateProductVariants,
 } from './validations';
 
-const getProductValues = (
-  productVariants: CreateProductValues['productVariants']
-): CreateProductValues => ({
+const getProductGenerationValues = (): ProductGenerationValues => ({
   attributes: [],
   attributeValues: {},
   category: '2',
   description: '',
-  productName: 'Running Shoes',
+  name: 'Running Shoes',
+});
+
+const getProductVariantsCreationValues = (
+  productVariants: ProductVariantsCreationValues['productVariants']
+): ProductVariantsCreationValues => ({
+  category: '2',
+  description: '',
+  name: 'Running Shoes',
   productVariants,
 });
 
@@ -74,15 +83,15 @@ describe('validateProductTemplate', () => {
       validateProductTemplate({
         generationMode: PRODUCT_GENERATION_MODE.one,
         value: {
-          ...getProductValues([]),
+          ...getProductGenerationValues(),
           category: null,
-          productName: '   ',
+          name: '   ',
         },
       })
     ).toEqual({
       fields: {
         category: 'Category is required',
-        productName: 'Product name is required',
+        name: 'Product name is required',
       },
     });
   });
@@ -92,7 +101,7 @@ describe('validateProductTemplate', () => {
       validateProductTemplate({
         generationMode: PRODUCT_GENERATION_MODE.many,
         value: {
-          ...getProductValues([]),
+          ...getProductGenerationValues(),
           attributes: [],
         },
       })
@@ -108,7 +117,7 @@ describe('validateProductTemplate', () => {
       validateProductTemplate({
         generationMode: PRODUCT_GENERATION_MODE.many,
         value: {
-          ...getProductValues([]),
+          ...getProductGenerationValues(),
           attributes: [colorAttribute],
         },
       })
@@ -125,7 +134,7 @@ describe('validateProductVariants', () => {
     expect(
       validateProductVariants({
         requireAttributeValueIds: true,
-        value: getProductValues([
+        value: getProductVariantsCreationValues([
           {
             attributeValueIds: [],
             barcode: '   ',
@@ -150,7 +159,7 @@ describe('validateProductVariants', () => {
     expect(
       validateProductVariants({
         requireAttributeValueIds: false,
-        value: getProductValues([
+        value: getProductVariantsCreationValues([
           {
             attributeValueIds: [],
             barcode: 'barcode-1',
@@ -167,7 +176,7 @@ describe('validateProductVariants', () => {
     expect(
       validateProductVariants({
         requireAttributeValueIds: true,
-        value: getProductValues([
+        value: getProductVariantsCreationValues([
           {
             attributeValueIds: [72],
             barcode: 'barcode-1',
@@ -198,7 +207,7 @@ describe('validateProductVariants', () => {
     expect(
       validateProductVariants({
         requireAttributeValueIds: true,
-        value: getProductValues([
+        value: getProductVariantsCreationValues([
           {
             attributeValueIds: [70],
             barcode: 'barcode-1',
@@ -238,7 +247,7 @@ describe('validateProductVariants', () => {
     expect(
       validateProductVariants({
         requireAttributeValueIds: true,
-        value: getProductValues([
+        value: getProductVariantsCreationValues([
           {
             attributeValueIds: [72, 80],
             barcode: 'barcode-1',
@@ -269,7 +278,7 @@ describe('validateProductVariants', () => {
     expect(
       validateProductVariants({
         requireAttributeValueIds: true,
-        value: getProductValues([
+        value: getProductVariantsCreationValues([
           {
             attributeValueIds: [72],
             barcode: 'barcode-1',
@@ -290,32 +299,25 @@ describe('validateProductVariants', () => {
   });
 });
 
-describe('validateCreateProduct', () => {
-  it('returns template and variant errors together on submit', () => {
+describe('validateProductConfiguration', () => {
+  it('applies multiple-product variant requirements without generation fields', () => {
     expect(
-      validateCreateProduct({
-        generationMode: PRODUCT_GENERATION_MODE.one,
-        value: {
-          ...getProductValues([
-            {
-              attributeValueIds: [],
-              barcode: '',
-              description: '',
-              name: '',
-              sku: '',
-            },
-          ]),
-          category: null,
-          productName: '',
-        },
+      validateProductConfiguration({
+        generationMode: PRODUCT_GENERATION_MODE.many,
+        value: getProductVariantsCreationValues([
+          {
+            attributeValueIds: [],
+            barcode: 'barcode-1',
+            description: '',
+            name: 'Running Shoes',
+            sku: 'SHOE',
+          },
+        ]),
       })
     ).toEqual({
       fields: {
-        'productVariants[0].barcode': 'Barcode is required',
-        'productVariants[0].name': 'Product variant name is required',
-        'productVariants[0].sku': 'SKU is required',
-        category: 'Category is required',
-        productName: 'Product name is required',
+        'productVariants[0].attributeValueIds':
+          'Select at least one attribute value',
       },
     });
   });

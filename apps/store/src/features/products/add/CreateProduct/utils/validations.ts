@@ -3,9 +3,10 @@ import { getValidationMessage } from '@/lib/utils/form/validation/message';
 import type { ValidationArgs } from '@/lib/utils/form/validation/types';
 import { PRODUCT_GENERATION_MODE } from '../constants';
 import type {
-  CreateProductValues,
   CreateProductVariantValues,
   ProductGenerationMode,
+  ProductGenerationValues,
+  ProductVariantsCreationValues,
 } from '../types';
 
 export const productNameSchema = z
@@ -59,14 +60,17 @@ type ProductTemplateField =
   | 'attributes'
   | 'attributeValues'
   | 'category'
-  | 'productName';
+  | 'name';
 
 type ProductTemplateFieldErrors = Partial<Record<ProductTemplateField, string>>;
+
+type ProductConfigurationFieldErrors = ProductVariantFieldErrors &
+  Partial<Record<'category' | 'name', string>>;
 
 const hasSelectedAttributeValues = ({
   attributeValues,
   attributes,
-}: Pick<CreateProductValues, 'attributeValues' | 'attributes'>) =>
+}: Pick<ProductGenerationValues, 'attributeValues' | 'attributes'>) =>
   attributes.some(
     (attribute) => (attributeValues[String(attribute.id)] ?? []).length > 0
   );
@@ -210,32 +214,34 @@ export const validateProductCategory = ({
 
 export const validateProductAttributes = ({
   value,
-}: ValidationArgs<CreateProductValues['attributes']>) =>
+}: ValidationArgs<ProductGenerationValues['attributes']>) =>
   getValidationMessage(productAttributesSchema, value);
 
-type ValidateProductTemplateArgs = ValidationArgs<CreateProductValues> & {
+type ValidateProductTemplateArgs = ValidationArgs<ProductGenerationValues> & {
   generationMode: ProductGenerationMode;
 };
 
-type ValidateProductVariantsArgs = ValidationArgs<CreateProductValues> & {
-  requireAttributeValueIds: boolean;
-};
+type ValidateProductVariantsArgs =
+  ValidationArgs<ProductVariantsCreationValues> & {
+    requireAttributeValueIds: boolean;
+  };
 
-type ValidateCreateProductArgs = ValidationArgs<CreateProductValues> & {
-  generationMode: ProductGenerationMode;
-};
+type ValidateProductConfigurationArgs =
+  ValidationArgs<ProductVariantsCreationValues> & {
+    generationMode: ProductGenerationMode;
+  };
 
 export const validateProductTemplate = ({
   generationMode,
   value,
 }: ValidateProductTemplateArgs) => {
   const errors: ProductTemplateFieldErrors = {};
-  const productNameError = validateProductName({ value: value.productName });
+  const productNameError = validateProductName({ value: value.name });
   const categoryError = validateProductCategory({ value: value.category });
   const requiresAttributes = generationMode === PRODUCT_GENERATION_MODE.many;
 
   if (productNameError) {
-    errors.productName = productNameError;
+    errors.name = productNameError;
   }
 
   if (categoryError) {
@@ -309,35 +315,47 @@ export const validateProductVariants = ({
     : undefined;
 };
 
-export const validateCreateProduct = ({
+export const validateProductConfiguration = ({
   generationMode,
   value,
-}: ValidateCreateProductArgs) => {
-  const templateErrors = validateProductTemplate({ generationMode, value });
+}: ValidateProductConfigurationArgs) => {
+  const errors: ProductConfigurationFieldErrors = {};
+  const productNameError = validateProductName({ value: value.name });
+  const categoryError = validateProductCategory({ value: value.category });
   const variantErrors = validateProductVariants({
     requireAttributeValueIds: generationMode === PRODUCT_GENERATION_MODE.many,
     value,
   });
-  const fields = {
-    ...templateErrors?.fields,
-    ...variantErrors?.fields,
-  };
 
-  return Object.keys(fields).length > 0
+  if (productNameError) {
+    errors.name = productNameError;
+  }
+
+  if (categoryError) {
+    errors.category = categoryError;
+  }
+
+  Object.assign(errors, variantErrors?.fields);
+
+  return Object.keys(errors).length > 0
     ? {
-        fields,
+        fields: errors,
       }
     : undefined;
 };
 
-export const validateSingleProduct = (value: CreateProductValues) =>
-  validateCreateProduct({
+export const validateSingleProductConfiguration = (
+  value: ProductVariantsCreationValues
+) =>
+  validateProductConfiguration({
     generationMode: PRODUCT_GENERATION_MODE.one,
     value,
   });
 
-export const validateMultipleProducts = (value: CreateProductValues) =>
-  validateCreateProduct({
+export const validateMultipleProductsConfiguration = (
+  value: ProductVariantsCreationValues
+) =>
+  validateProductConfiguration({
     generationMode: PRODUCT_GENERATION_MODE.many,
     value,
   });
