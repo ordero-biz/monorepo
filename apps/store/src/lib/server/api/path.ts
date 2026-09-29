@@ -19,6 +19,10 @@ export const BACKEND_PRODUCT_PATHS = {
   productVariants: '/api/v1/products/variants',
 } as const;
 
+export const BACKEND_SUPPLY_PATHS = {
+  supplies: '/api/v1/supplies',
+} as const;
+
 export const BACKEND_SUPPLIER_PATHS = {
   suppliers: '/api/v1/suppliers',
   supplier: '/api/v1/suppliers/{id}',
