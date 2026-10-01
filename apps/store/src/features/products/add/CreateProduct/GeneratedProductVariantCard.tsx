@@ -102,6 +102,7 @@ export const GeneratedProductVariantCard = ({
                     name={`productVariants[${variantIndex}].status` as const}
                     validators={{
                       onChange: validateProductStatus,
+                      onSubmit: validateProductStatus,
                     }}
                   >
                     {(field) => {

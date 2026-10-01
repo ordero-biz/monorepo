@@ -27,6 +27,7 @@ export const CommonProductFields = ({
                 validators={{
                   onBlur: validateProductName,
                   onChange: validateProductName,
+                  onSubmit: validateProductName,
                 }}
               >
                 {(field) => {
@@ -55,6 +56,7 @@ export const CommonProductFields = ({
                 validators={{
                   onBlur: validateProductCategory,
                   onChange: validateProductCategory,
+                  onSubmit: validateProductCategory,
                 }}
               >
                 {(field) => {
@@ -83,6 +85,7 @@ export const CommonProductFields = ({
                 name="status"
                 validators={{
                   onChange: validateProductStatus,
+                  onSubmit: validateProductStatus,
                 }}
               >
                 {(field) => {

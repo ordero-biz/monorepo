@@ -27,6 +27,7 @@ export const ProductTemplateFields = ({
             validators={{
               onBlur: validateProductName,
               onChange: validateProductName,
+              onSubmit: validateProductName,
             }}
           >
             {(field) => {
@@ -53,6 +54,7 @@ export const ProductTemplateFields = ({
             validators={{
               onBlur: validateProductCategory,
               onChange: validateProductCategory,
+              onSubmit: validateProductCategory,
             }}
           >
             {(field) => {
@@ -82,6 +84,7 @@ export const ProductTemplateFields = ({
                 ? {
                     onBlur: validateProductAttributes,
                     onChange: validateProductAttributes,
+                    onSubmit: validateProductAttributes,
                   }
                 : undefined
             }

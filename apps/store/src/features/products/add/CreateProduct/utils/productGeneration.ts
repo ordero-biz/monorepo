@@ -1,8 +1,11 @@
 import type { AttributeDropdown } from '@/lib/domain/attributes/types';
 import { PRODUCT_STATUS } from '@/lib/domain/products/constants';
+import { PRODUCT_GENERATION_MODE } from '../constants';
 import type {
   CreateProductVariantValues,
   ProductGenerationMode,
+  ProductGenerationValues,
+  ProductVariantsGeneratedArgs,
 } from '../types';
 
 export type GeneratedProductAttributeValue = {
@@ -199,6 +202,41 @@ export const getGeneratedProductVariants = ({
       productName,
     })
   );
+};
+
+export const getProductVariantsGeneratedArgs = ({
+  generationMode,
+  value,
+}: {
+  generationMode: ProductGenerationMode;
+  value: ProductGenerationValues;
+}): ProductVariantsGeneratedArgs => {
+  const productVariants =
+    generationMode === PRODUCT_GENERATION_MODE.many
+      ? getGeneratedProductVariants({
+          attributeValuesByAttributeId: value.attributeValues,
+          attributes: value.attributes,
+          description: value.description,
+          productName: value.name,
+        })
+      : [
+          getGeneratedSingleProductVariant({
+            attributeValues: getSelectedAttributeValues(
+              value.attributes,
+              value.attributeValues
+            ),
+            description: value.description,
+            productName: value.name,
+          }),
+        ];
+
+  return {
+    attributes: value.attributes,
+    category: value.category,
+    description: value.description,
+    name: value.name,
+    productVariants,
+  };
 };
 
 export const getProductVariantAttributeValues = (

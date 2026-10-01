@@ -98,38 +98,18 @@ describe('validateProductAttributes', () => {
 });
 
 describe('validateProductTemplate', () => {
-  it('requires a name and category before a product preview can be generated', () => {
-    expect(
-      validateProductTemplate({
-        generationMode: PRODUCT_GENERATION_MODE.one,
-        value: {
-          ...getProductGenerationValues(),
-          category: null,
-          name: '   ',
-        },
-      })
-    ).toEqual({
-      fields: {
-        category: 'Category is required',
-        name: 'Product name is required',
-      },
-    });
-  });
-
-  it('requires attributes in multiple-products mode', () => {
+  it('leaves single-field rules to the field validators', () => {
     expect(
       validateProductTemplate({
         generationMode: PRODUCT_GENERATION_MODE.many,
         value: {
           ...getProductGenerationValues(),
           attributes: [],
+          category: null,
+          name: '   ',
         },
       })
-    ).toEqual({
-      fields: {
-        attributes: 'Select at least one attribute.',
-      },
-    });
+    ).toBeUndefined();
   });
 
   it('requires an attribute value in multiple-products mode', () => {
@@ -331,6 +311,29 @@ describe('validateProductVariants', () => {
 });
 
 describe('validateProductConfiguration', () => {
+  it('leaves single-field rules to the field validators', () => {
+    expect(
+      validateProductConfiguration({
+        generationMode: PRODUCT_GENERATION_MODE.one,
+        value: {
+          ...getProductVariantsCreationValues([
+            {
+              attributeValueIds: [],
+              barcode: 'barcode-1',
+              description: '',
+              name: 'Running Shoes',
+              sku: 'SHOE',
+              status: 'ARCHIVED' as never,
+            },
+          ]),
+          category: null,
+          name: '   ',
+          status: 'ARCHIVED' as never,
+        },
+      })
+    ).toBeUndefined();
+  });
+
   it('applies multiple-product variant requirements without generation fields', () => {
     expect(
       validateProductConfiguration({

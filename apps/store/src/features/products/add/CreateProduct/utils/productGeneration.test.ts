@@ -8,6 +8,7 @@ import {
   getGeneratedSingleProductVariant,
   getProductVariantAttributeValues,
   getProductVariantGenerationSignature,
+  getProductVariantsGeneratedArgs,
   getSelectedAttributeValueGroups,
   getSelectedAttributeValues,
   updateAttributeValueSelection,
@@ -177,5 +178,79 @@ describe('product generation', () => {
         productName: 'Running Shoes',
       })
     ).toEqual([]);
+  });
+
+  it('builds one variant per value combination in multiple-products mode', () => {
+    expect(
+      getProductVariantsGeneratedArgs({
+        generationMode: PRODUCT_GENERATION_MODE.many,
+        value: {
+          attributes,
+          attributeValues: { '1': ['11', '12'], '2': ['21'] },
+          category: '3',
+          description: 'Lightweight',
+          name: 'Running Shoes',
+        },
+      })
+    ).toEqual({
+      attributes,
+      category: '3',
+      description: 'Lightweight',
+      name: 'Running Shoes',
+      productVariants: [
+        {
+          attributeValueIds: [21, 11],
+          barcode: '',
+          description: 'Lightweight',
+          name: 'Running Shoes Cotton Blue',
+          sku: '',
+          status: PRODUCT_STATUS.DRAFT,
+        },
+        {
+          attributeValueIds: [21, 12],
+          barcode: '',
+          description: 'Lightweight',
+          name: 'Running Shoes Cotton Red',
+          sku: '',
+          status: PRODUCT_STATUS.DRAFT,
+        },
+      ],
+    });
+  });
+
+  it('builds a single variant from the selected values in single-product mode', () => {
+    expect(
+      getProductVariantsGeneratedArgs({
+        generationMode: PRODUCT_GENERATION_MODE.one,
+        value: {
+          attributes,
+          attributeValues: { '1': ['11', '12'], '2': ['21'] },
+          category: '3',
+          description: '',
+          name: 'Running Shoes',
+        },
+      }).productVariants
+    ).toHaveLength(1);
+    expect(
+      getProductVariantsGeneratedArgs({
+        generationMode: PRODUCT_GENERATION_MODE.one,
+        value: {
+          attributes: [],
+          attributeValues: {},
+          category: '3',
+          description: '',
+          name: 'Running Shoes',
+        },
+      }).productVariants
+    ).toEqual([
+      {
+        attributeValueIds: [],
+        barcode: '',
+        description: '',
+        name: 'Running Shoes',
+        sku: '',
+        status: PRODUCT_STATUS.DRAFT,
+      },
+    ]);
   });
 });

@@ -1,17 +1,10 @@
 import { revalidateLogic, useForm } from '@tanstack/react-form';
-import {
-  createProductGenerationDefaultValues,
-  PRODUCT_GENERATION_MODE,
-} from '../constants';
+import { createProductGenerationDefaultValues } from '../constants';
 import type {
   ProductGenerationMode,
   ProductVariantsGeneratedArgs,
 } from '../types';
-import {
-  getGeneratedProductVariants,
-  getGeneratedSingleProductVariant,
-  getSelectedAttributeValues,
-} from '../utils/productGeneration';
+import { getProductVariantsGeneratedArgs } from '../utils/productGeneration';
 import { validateProductTemplate } from '../utils/validations';
 
 type UseProductVariantsGenerationFormArgs = {
@@ -31,41 +24,9 @@ export const useProductVariantsGenerationForm = ({
         validateProductTemplate({ generationMode, value }),
     },
     onSubmit: ({ value }) => {
-      if (generationMode === PRODUCT_GENERATION_MODE.many) {
-        onProductVariantsGenerated({
-          attributes: value.attributes,
-          category: value.category,
-          description: value.description,
-          name: value.name,
-          productVariants: getGeneratedProductVariants({
-            attributeValuesByAttributeId: value.attributeValues,
-            attributes: value.attributes,
-            description: value.description,
-            productName: value.name,
-          }),
-        });
-
-        return;
-      }
-
-      const selectedAttributeValues = getSelectedAttributeValues(
-        value.attributes,
-        value.attributeValues
+      onProductVariantsGenerated(
+        getProductVariantsGeneratedArgs({ generationMode, value })
       );
-
-      onProductVariantsGenerated({
-        attributes: value.attributes,
-        category: value.category,
-        description: value.description,
-        name: value.name,
-        productVariants: [
-          getGeneratedSingleProductVariant({
-            attributeValues: selectedAttributeValues,
-            description: value.description,
-            productName: value.name,
-          }),
-        ],
-      });
     },
   });
 

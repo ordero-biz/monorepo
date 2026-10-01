@@ -27,11 +27,9 @@ export const useCreateProductForm = ({
       const result = await submitCreateProduct(value);
 
       if (!result.ok) {
-        const fieldErrors = result.error.fieldErrors ?? {};
-
         formApi.setErrorMap({
           onSubmit: {
-            fields: fieldErrors,
+            fields: result.error.fieldErrors ?? {},
           },
         });
 

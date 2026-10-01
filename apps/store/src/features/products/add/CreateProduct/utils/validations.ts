@@ -52,12 +52,7 @@ export const productStatusSchema = z.enum(
   }
 );
 
-type ProductVariantField =
-  | 'attributeValueIds'
-  | 'barcode'
-  | 'name'
-  | 'sku'
-  | 'status';
+type ProductVariantField = 'attributeValueIds' | 'barcode' | 'name' | 'sku';
 
 type ProductVariantTextField = 'barcode' | 'name' | 'sku';
 
@@ -70,16 +65,7 @@ type ProductVariantFieldErrors = Partial<
   Record<ProductVariantFieldPath, string>
 >;
 
-type ProductTemplateField =
-  | 'attributes'
-  | 'attributeValues'
-  | 'category'
-  | 'name';
-
-type ProductTemplateFieldErrors = Partial<Record<ProductTemplateField, string>>;
-
-type ProductConfigurationFieldErrors = ProductVariantFieldErrors &
-  Partial<Record<'category' | 'name' | 'status', string>>;
+type ProductTemplateFieldErrors = Partial<Record<'attributeValues', string>>;
 
 const hasSelectedAttributeValues = ({
   attributeValues,
@@ -216,24 +202,6 @@ const addProductVariantAttributeValueErrors = ({
   });
 };
 
-const addProductVariantStatusErrors = ({
-  errors,
-  productVariants,
-}: {
-  errors: ProductVariantFieldErrors;
-  productVariants: CreateProductVariantValues[];
-}) => {
-  productVariants.forEach((productVariant, index) => {
-    const validationMessage = validateProductStatus({
-      value: productVariant.status,
-    });
-
-    if (validationMessage) {
-      errors[`productVariants[${index}].status`] = validationMessage;
-    }
-  });
-};
-
 export const validateProductName = ({ value }: ValidationArgs<string>) => {
   return getValidationMessage(productNameSchema, value);
 };
@@ -273,24 +241,14 @@ export const validateProductTemplate = ({
   value,
 }: ValidateProductTemplateArgs) => {
   const errors: ProductTemplateFieldErrors = {};
-  const productNameError = validateProductName({ value: value.name });
-  const categoryError = validateProductCategory({ value: value.category });
   const requiresAttributes = generationMode === PRODUCT_GENERATION_MODE.many;
 
-  if (productNameError) {
-    errors.name = productNameError;
-  }
-
-  if (categoryError) {
-    errors.category = categoryError;
-  }
-
-  if (requiresAttributes) {
-    if (value.attributes.length === 0) {
-      errors.attributes = 'Select at least one attribute.';
-    } else if (!hasSelectedAttributeValues(value)) {
-      errors.attributeValues = 'Select at least one attribute value.';
-    }
+  if (
+    requiresAttributes &&
+    value.attributes.length > 0 &&
+    !hasSelectedAttributeValues(value)
+  ) {
+    errors.attributeValues = 'Select at least one attribute value.';
   }
 
   return Object.keys(errors).length > 0
@@ -344,10 +302,6 @@ export const validateProductVariants = ({
     requiredSchema: productVariantSkuSchema,
     uniqueMessage: 'SKU must be unique across variants',
   });
-  addProductVariantStatusErrors({
-    errors,
-    productVariants: value.productVariants,
-  });
 
   return Object.keys(errors).length > 0
     ? {
@@ -359,36 +313,11 @@ export const validateProductVariants = ({
 export const validateProductConfiguration = ({
   generationMode,
   value,
-}: ValidateProductConfigurationArgs) => {
-  const errors: ProductConfigurationFieldErrors = {};
-  const productNameError = validateProductName({ value: value.name });
-  const categoryError = validateProductCategory({ value: value.category });
-  const statusError = validateProductStatus({ value: value.status });
-  const variantErrors = validateProductVariants({
+}: ValidateProductConfigurationArgs) =>
+  validateProductVariants({
     requireAttributeValueIds: generationMode === PRODUCT_GENERATION_MODE.many,
     value,
   });
-
-  if (productNameError) {
-    errors.name = productNameError;
-  }
-
-  if (categoryError) {
-    errors.category = categoryError;
-  }
-
-  if (statusError) {
-    errors.status = statusError;
-  }
-
-  Object.assign(errors, variantErrors?.fields);
-
-  return Object.keys(errors).length > 0
-    ? {
-        fields: errors,
-      }
-    : undefined;
-};
 
 export const validateSingleProductConfiguration = (
   value: ProductVariantsCreationValues
