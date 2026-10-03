@@ -7,6 +7,7 @@ import type { ProductVariantsGenerationFormProps } from './types';
 export const ProductVariantsGenerationForm = ({
   productVariantsGenerationForm,
   generationMode,
+  maxGeneratedProductVariants,
 }: ProductVariantsGenerationFormProps) => (
   <Card.Root variant="filled">
     <Card.Content>
@@ -31,6 +32,7 @@ export const ProductVariantsGenerationForm = ({
           <GenerateProductActions
             productVariantsGenerationForm={productVariantsGenerationForm}
             generationMode={generationMode}
+            maxGeneratedProductVariants={maxGeneratedProductVariants}
           />
         </div>
       </form>

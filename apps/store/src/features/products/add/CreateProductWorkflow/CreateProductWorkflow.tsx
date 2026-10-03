@@ -11,7 +11,11 @@ import {
   productGroupsQueryKeys,
   productVariantsQueryKeys,
 } from '@/lib/query/products/productsQueryKeys';
-import { CreateProduct, PRODUCT_GENERATION_MODE } from '../CreateProduct';
+import {
+  CreateProduct,
+  DEFAULT_MAX_GENERATED_PRODUCT_VARIANTS,
+  PRODUCT_GENERATION_MODE,
+} from '../CreateProduct';
 import {
   validateMultipleProductsConfiguration,
   validateSingleProductConfiguration,
@@ -57,6 +61,7 @@ export const CreateProductWorkflow = ({
   return (
     <CreateProduct
       generationMode={generationMode}
+      maxGeneratedProductVariants={DEFAULT_MAX_GENERATED_PRODUCT_VARIANTS}
       onCreated={onCreated}
       validateConfiguration={validateConfiguration}
     />

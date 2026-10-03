@@ -20,44 +20,12 @@ type GetGeneratedProductVariantsArgs = {
   productName: string;
 };
 
-type GetProductVariantGenerationSignatureArgs = {
-  attributeValuesByAttributeId: Record<string, string[]>;
-  attributes: AttributeDropdown[];
-  description: string;
-  generationMode: ProductGenerationMode;
-  productName: string;
-};
-
 type UpdateAttributeValueSelectionArgs = {
   attributeId: string;
   attributeValueId: string;
   attributeValuesByAttributeId: Record<string, string[]>;
   pressed: boolean;
 };
-
-export const getProductVariantGenerationSignature = ({
-  attributeValuesByAttributeId,
-  attributes,
-  description,
-  generationMode,
-  productName,
-}: GetProductVariantGenerationSignatureArgs) =>
-  JSON.stringify({
-    attributeValues: attributes
-      .map((attribute) => ({
-        attributeId: attribute.id,
-        valueIds: [
-          ...new Set(attributeValuesByAttributeId[String(attribute.id)] ?? []),
-        ].sort(),
-      }))
-      .sort(
-        (firstAttribute, secondAttribute) =>
-          firstAttribute.attributeId - secondAttribute.attributeId
-      ),
-    description,
-    generationMode,
-    productName: productName.trim(),
-  });
 
 export const getAttributeValueSelections = (
   currentValue: Record<string, string[]>,
@@ -101,25 +69,6 @@ export const updateAttributeValueSelection = ({
   };
 };
 
-export const getSelectedAttributeValues = (
-  attributes: AttributeDropdown[],
-  attributeValuesByAttributeId: Record<string, string[]>
-): GeneratedProductAttributeValue[] =>
-  attributes.flatMap((attribute) => {
-    const selectedValueIds = new Set(
-      attributeValuesByAttributeId[String(attribute.id)] ?? []
-    );
-
-    return attribute.attributeValues
-      .filter((attributeValue) =>
-        selectedValueIds.has(String(attributeValue.id))
-      )
-      .map((attributeValue) => ({
-        id: attributeValue.id,
-        name: attributeValue.name,
-      }));
-  });
-
 export const getSelectedAttributeValueGroups = (
   attributes: AttributeDropdown[],
   attributeValuesByAttributeId: Record<string, string[]>
@@ -138,6 +87,30 @@ export const getSelectedAttributeValueGroups = (
         name: attributeValue.name,
       }));
   });
+
+export const getSelectedAttributeValues = (
+  attributes: AttributeDropdown[],
+  attributeValuesByAttributeId: Record<string, string[]>
+): GeneratedProductAttributeValue[] =>
+  getSelectedAttributeValueGroups(
+    attributes,
+    attributeValuesByAttributeId
+  ).flat();
+
+export const getGeneratedProductsCount = (
+  attributes: AttributeDropdown[],
+  attributeValuesByAttributeId: Record<string, string[]>
+) =>
+  attributes.reduce((count, attribute) => {
+    const selectedValueIds = new Set(
+      attributeValuesByAttributeId[String(attribute.id)]
+    );
+    const selectedCount = attribute.attributeValues.filter((attributeValue) =>
+      selectedValueIds.has(String(attributeValue.id))
+    ).length;
+
+    return selectedCount > 0 ? Math.max(count, 1) * selectedCount : count;
+  }, 0);
 
 export const getGeneratedProductName = (
   productName: string,
@@ -239,20 +212,55 @@ export const getProductVariantsGeneratedArgs = ({
   };
 };
 
+type IndexedAttributeValue = GeneratedProductAttributeValue & {
+  position: number;
+};
+
+const attributeValueIndexByAttributes = new WeakMap<
+  AttributeDropdown[],
+  Map<number, IndexedAttributeValue>
+>();
+
+const getAttributeValueIndex = (attributes: AttributeDropdown[]) => {
+  const cachedIndex = attributeValueIndexByAttributes.get(attributes);
+
+  if (cachedIndex) {
+    return cachedIndex;
+  }
+
+  const index = new Map<number, IndexedAttributeValue>();
+
+  for (const attribute of attributes) {
+    for (const attributeValue of attribute.attributeValues) {
+      index.set(attributeValue.id, {
+        id: attributeValue.id,
+        name: attributeValue.name,
+        position: index.size,
+      });
+    }
+  }
+
+  attributeValueIndexByAttributes.set(attributes, index);
+
+  return index;
+};
+
 export const getProductVariantAttributeValues = (
   attributes: AttributeDropdown[],
   attributeValueIds: number[]
 ): GeneratedProductAttributeValue[] => {
-  const selectedAttributeValueIds = new Set(attributeValueIds);
+  const index = getAttributeValueIndex(attributes);
+  const selectedAttributeValues = new Map<number, IndexedAttributeValue>();
 
-  return attributes.flatMap((attribute) =>
-    attribute.attributeValues
-      .filter((attributeValue) =>
-        selectedAttributeValueIds.has(attributeValue.id)
-      )
-      .map((attributeValue) => ({
-        id: attributeValue.id,
-        name: attributeValue.name,
-      }))
-  );
+  for (const attributeValueId of attributeValueIds) {
+    const attributeValue = index.get(attributeValueId);
+
+    if (attributeValue) {
+      selectedAttributeValues.set(attributeValueId, attributeValue);
+    }
+  }
+
+  return [...selectedAttributeValues.values()]
+    .sort((first, second) => first.position - second.position)
+    .map(({ id, name }) => ({ id, name }));
 };

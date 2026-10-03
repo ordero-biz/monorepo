@@ -10,6 +10,7 @@ import type {
   ProductGenerationValues,
   ProductVariantsCreationValues,
 } from '../types';
+import { getGeneratedProductsCount } from './productGeneration';
 
 export const productNameSchema = z
   .string()
@@ -66,14 +67,6 @@ type ProductVariantFieldErrors = Partial<
 >;
 
 type ProductTemplateFieldErrors = Partial<Record<'attributeValues', string>>;
-
-const hasSelectedAttributeValues = ({
-  attributeValues,
-  attributes,
-}: Pick<ProductGenerationValues, 'attributeValues' | 'attributes'>) =>
-  attributes.some(
-    (attribute) => (attributeValues[String(attribute.id)] ?? []).length > 0
-  );
 
 const getDuplicateVariantFieldIndexes = ({
   fieldName,
@@ -224,6 +217,7 @@ export const validateProductAttributes = ({
 
 type ValidateProductTemplateArgs = ValidationArgs<ProductGenerationValues> & {
   generationMode: ProductGenerationMode;
+  maxGeneratedProductVariants: number;
 };
 
 type ValidateProductVariantsArgs =
@@ -238,17 +232,23 @@ type ValidateProductConfigurationArgs =
 
 export const validateProductTemplate = ({
   generationMode,
+  maxGeneratedProductVariants,
   value,
 }: ValidateProductTemplateArgs) => {
   const errors: ProductTemplateFieldErrors = {};
   const requiresAttributes = generationMode === PRODUCT_GENERATION_MODE.many;
 
-  if (
-    requiresAttributes &&
-    value.attributes.length > 0 &&
-    !hasSelectedAttributeValues(value)
-  ) {
-    errors.attributeValues = 'Select at least one attribute value.';
+  if (requiresAttributes && value.attributes.length > 0) {
+    const generatedProductsCount = getGeneratedProductsCount(
+      value.attributes,
+      value.attributeValues
+    );
+
+    if (generatedProductsCount === 0) {
+      errors.attributeValues = 'Select at least one attribute value.';
+    } else if (generatedProductsCount > maxGeneratedProductVariants) {
+      errors.attributeValues = `Selected values generate ${generatedProductsCount} products. Select fewer values to generate at most ${maxGeneratedProductVariants}.`;
+    }
   }
 
   return Object.keys(errors).length > 0

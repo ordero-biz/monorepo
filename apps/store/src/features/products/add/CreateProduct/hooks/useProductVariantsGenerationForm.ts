@@ -9,11 +9,13 @@ import { validateProductTemplate } from '../utils/validations';
 
 type UseProductVariantsGenerationFormArgs = {
   generationMode: ProductGenerationMode;
+  maxGeneratedProductVariants: number;
   onProductVariantsGenerated: (args: ProductVariantsGeneratedArgs) => void;
 };
 
 export const useProductVariantsGenerationForm = ({
   generationMode,
+  maxGeneratedProductVariants,
   onProductVariantsGenerated,
 }: UseProductVariantsGenerationFormArgs) => {
   const form = useForm({
@@ -21,7 +23,11 @@ export const useProductVariantsGenerationForm = ({
     validationLogic: revalidateLogic(),
     validators: {
       onDynamic: ({ value }) =>
-        validateProductTemplate({ generationMode, value }),
+        validateProductTemplate({
+          generationMode,
+          maxGeneratedProductVariants,
+          value,
+        }),
     },
     onSubmit: ({ value }) => {
       onProductVariantsGenerated(

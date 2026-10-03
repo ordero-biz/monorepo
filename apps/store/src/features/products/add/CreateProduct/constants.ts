@@ -9,6 +9,8 @@ export const PRODUCT_GENERATION_MODE = {
   many: 'many',
 } as const;
 
+export const DEFAULT_MAX_GENERATED_PRODUCT_VARIANTS = 500;
+
 export const createProductGenerationDefaultValues: ProductGenerationValues = {
   attributes: [],
   attributeValues: {},

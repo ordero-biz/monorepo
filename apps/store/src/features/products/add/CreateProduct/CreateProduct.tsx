@@ -10,6 +10,7 @@ import type { CreateProductProps } from './types';
 
 export const CreateProduct = ({
   generationMode,
+  maxGeneratedProductVariants,
   onCreated,
   validateConfiguration,
 }: CreateProductProps) => {
@@ -41,6 +42,7 @@ export const CreateProduct = ({
   const { form: productVariantsGenerationForm } =
     useProductVariantsGenerationForm({
       generationMode,
+      maxGeneratedProductVariants,
       onProductVariantsGenerated: handleProductVariantsGenerated,
     });
 
@@ -57,6 +59,7 @@ export const CreateProduct = ({
         <ProductVariantsGenerationForm
           productVariantsGenerationForm={productVariantsGenerationForm}
           generationMode={generationMode}
+          maxGeneratedProductVariants={maxGeneratedProductVariants}
         />
       ) : (
         <ProductVariantsCreationForm

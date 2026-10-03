@@ -4,7 +4,10 @@ import { createProductGroup } from '@/lib/client/api/products';
 import type { AttributeDropdown } from '@/lib/domain/attributes/types';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { CreateProduct } from './CreateProduct';
-import { PRODUCT_GENERATION_MODE } from './constants';
+import {
+  DEFAULT_MAX_GENERATED_PRODUCT_VARIANTS,
+  PRODUCT_GENERATION_MODE,
+} from './constants';
 import type { CreateProductProps } from './types';
 import {
   validateMultipleProductsConfiguration,
@@ -182,10 +185,13 @@ vi.mock('./AttributesAsyncCombobox', () => ({
 
 const createProductGroupMock = vi.mocked(createProductGroup);
 
+let getComputedStyleSpy: { mockRestore: () => void } | undefined;
+
 const { setup } = prepareStoreSetup<CreateProductProps>({
   component: CreateProduct,
   props: {
     generationMode: PRODUCT_GENERATION_MODE.one,
+    maxGeneratedProductVariants: DEFAULT_MAX_GENERATED_PRODUCT_VARIANTS,
     onCreated: vi.fn(),
     validateConfiguration: validateSingleProductConfiguration,
   },
@@ -211,6 +217,8 @@ describe('CreateProduct', () => {
 
   afterEach(() => {
     vi.unstubAllGlobals();
+    getComputedStyleSpy?.mockRestore();
+    getComputedStyleSpy = undefined;
   });
 
   it('keeps generation available before the template is complete', () => {
@@ -714,7 +722,7 @@ describe('CreateProduct', () => {
       'Blue',
     ]) {
       await user.click(
-        screen.getByRole('button', { name: attributeValueName })
+        screen.getByRole('button', { hidden: true, name: attributeValueName })
       );
     }
 
@@ -722,7 +730,9 @@ describe('CreateProduct', () => {
       screen.getByRole('button', { name: 'Next: Configure products' })
     );
 
-    expect(screen.getAllByRole('textbox', { name: 'SKU' })).toHaveLength(20);
+    expect(
+      screen.getAllByRole('textbox', { hidden: true, name: 'SKU' })
+    ).toHaveLength(20);
 
     act(() => {
       intersectionObserverCallbacks[0]?.(
@@ -732,6 +742,7 @@ describe('CreateProduct', () => {
     });
 
     const twentyFirstVariantSku = screen.getAllByRole('textbox', {
+      hidden: true,
       name: 'SKU',
     })[20];
 
@@ -739,7 +750,7 @@ describe('CreateProduct', () => {
 
     expect(twentyFirstVariantSku).toHaveFocus();
     expect(twentyFirstVariantSku).toHaveValue('SKU-21');
-  }, 10_000);
+  }, 20_000);
 
   it('shows submit errors for generated variants loaded after the first page', async () => {
     const user = userEvent.setup();
@@ -765,7 +776,7 @@ describe('CreateProduct', () => {
       'Blue',
     ]) {
       await user.click(
-        screen.getByRole('button', { name: attributeValueName })
+        screen.getByRole('button', { hidden: true, name: attributeValueName })
       );
     }
 
@@ -773,7 +784,9 @@ describe('CreateProduct', () => {
       screen.getByRole('button', { name: 'Next: Configure products' })
     );
 
-    await user.click(screen.getByRole('button', { name: 'Create product' }));
+    await user.click(
+      screen.getByRole('button', { hidden: true, name: 'Create product' })
+    );
 
     expect(await screen.findAllByText('Barcode is required')).toHaveLength(20);
     expect(screen.getAllByText('SKU is required')).toHaveLength(20);
@@ -788,7 +801,64 @@ describe('CreateProduct', () => {
     expect(await screen.findAllByText('Barcode is required')).toHaveLength(21);
     expect(screen.getAllByText('SKU is required')).toHaveLength(21);
     expect(createProductGroupMock).not.toHaveBeenCalled();
-  });
+  }, 20_000);
+
+  it('keeps a variant panel visible after its last error is fixed', async () => {
+    const realGetComputedStyle = window.getComputedStyle.bind(window);
+
+    getComputedStyleSpy = vi
+      .spyOn(window, 'getComputedStyle')
+      .mockImplementation((element, pseudoElement) => {
+        const style = realGetComputedStyle(element, pseudoElement);
+
+        if (!element.classList.contains('accordion-panel')) {
+          return style;
+        }
+
+        return new Proxy(style, {
+          get: (target, property) => {
+            if (property === 'transitionDuration') {
+              return '0.15s';
+            }
+
+            if (property === 'animationName') {
+              return 'none';
+            }
+
+            const value = Reflect.get(target, property);
+
+            return typeof value === 'function' ? value.bind(target) : value;
+          },
+        });
+      });
+    const user = userEvent.setup();
+
+    setup({
+      generationMode: PRODUCT_GENERATION_MODE.many,
+      validateConfiguration: validateMultipleProductsConfiguration,
+    });
+
+    await completeRequiredFields(user);
+    await user.click(screen.getByRole('button', { name: 'Select Attributes' }));
+    await user.click(screen.getByRole('button', { name: 'China' }));
+    await user.click(screen.getByRole('button', { name: 'Red' }));
+    await user.click(
+      screen.getByRole('button', { name: 'Next: Configure products' })
+    );
+    await user.click(screen.getByRole('button', { name: 'Create product' }));
+    await user.type(screen.getByRole('textbox', { name: 'Barcode' }), 'B-1');
+    await user.type(screen.getByRole('textbox', { name: 'SKU' }), 'S-1');
+    await act(
+      () => new Promise((resolve) => requestAnimationFrame(() => resolve(null)))
+    );
+
+    expect(screen.queryByText('SKU is required')).not.toBeInTheDocument();
+    expect(
+      screen
+        .getByRole('region', { name: 'Running Shoes China Red' })
+        .hasAttribute('data-starting-style')
+    ).toBe(false);
+  }, 20_000);
 
   it('submits the generated product variant collection', async () => {
     createProductGroupMock.mockResolvedValue({

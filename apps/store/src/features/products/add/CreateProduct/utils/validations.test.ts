@@ -1,6 +1,9 @@
 import type { AttributeDropdown } from '@/lib/domain/attributes/types';
 import { PRODUCT_STATUS } from '@/lib/domain/products/constants';
-import { PRODUCT_GENERATION_MODE } from '../constants';
+import {
+  DEFAULT_MAX_GENERATED_PRODUCT_VARIANTS,
+  PRODUCT_GENERATION_MODE,
+} from '../constants';
 import type {
   ProductGenerationValues,
   ProductVariantsCreationValues,
@@ -102,6 +105,7 @@ describe('validateProductTemplate', () => {
     expect(
       validateProductTemplate({
         generationMode: PRODUCT_GENERATION_MODE.many,
+        maxGeneratedProductVariants: DEFAULT_MAX_GENERATED_PRODUCT_VARIANTS,
         value: {
           ...getProductGenerationValues(),
           attributes: [],
@@ -116,6 +120,7 @@ describe('validateProductTemplate', () => {
     expect(
       validateProductTemplate({
         generationMode: PRODUCT_GENERATION_MODE.many,
+        maxGeneratedProductVariants: DEFAULT_MAX_GENERATED_PRODUCT_VARIANTS,
         value: {
           ...getProductGenerationValues(),
           attributes: [colorAttribute],
@@ -126,6 +131,94 @@ describe('validateProductTemplate', () => {
         attributeValues: 'Select at least one attribute value.',
       },
     });
+  });
+});
+
+describe('validateProductTemplate generation limit', () => {
+  const createAttribute = (id: number, valueCount: number) => ({
+    ...colorAttribute,
+    attributeValues: Array.from({ length: valueCount }, (_, index) => ({
+      createdAt: colorAttribute.createdAt,
+      id: id * 1000 + index,
+      name: `Value ${index}`,
+      sortOrder: index,
+      status: 'DRAFT' as const,
+    })),
+    id,
+  });
+
+  it('rejects selections that generate too many products', () => {
+    const attributes = [createAttribute(1, 23), createAttribute(2, 23)];
+
+    expect(
+      validateProductTemplate({
+        generationMode: PRODUCT_GENERATION_MODE.many,
+        maxGeneratedProductVariants: DEFAULT_MAX_GENERATED_PRODUCT_VARIANTS,
+        value: {
+          ...getProductGenerationValues(),
+          attributes,
+          attributeValues: {
+            '1': attributes[0].attributeValues.map(({ id }) => String(id)),
+            '2': attributes[1].attributeValues.map(({ id }) => String(id)),
+          },
+        },
+      })
+    ).toEqual({
+      fields: {
+        attributeValues: `Selected values generate 529 products. Select fewer values to generate at most ${DEFAULT_MAX_GENERATED_PRODUCT_VARIANTS}.`,
+      },
+    });
+  });
+
+  it('uses the provided limit instead of the default', () => {
+    const attributes = [createAttribute(1, 4), createAttribute(2, 3)];
+    const value = {
+      ...getProductGenerationValues(),
+      attributes,
+      attributeValues: {
+        '1': attributes[0].attributeValues.map(({ id }) => String(id)),
+        '2': attributes[1].attributeValues.map(({ id }) => String(id)),
+      },
+    };
+
+    expect(
+      validateProductTemplate({
+        generationMode: PRODUCT_GENERATION_MODE.many,
+        maxGeneratedProductVariants: 10,
+        value,
+      })
+    ).toEqual({
+      fields: {
+        attributeValues:
+          'Selected values generate 12 products. Select fewer values to generate at most 10.',
+      },
+    });
+    expect(
+      validateProductTemplate({
+        generationMode: PRODUCT_GENERATION_MODE.many,
+        maxGeneratedProductVariants: 12,
+        value,
+      })
+    ).toBeUndefined();
+  });
+
+  it('allows selections up to the limit', () => {
+    const attributes = [createAttribute(1, 22), createAttribute(2, 22)];
+
+    expect(
+      validateProductTemplate({
+        generationMode: PRODUCT_GENERATION_MODE.many,
+        maxGeneratedProductVariants: DEFAULT_MAX_GENERATED_PRODUCT_VARIANTS,
+        value: {
+          ...getProductGenerationValues(),
+          attributes,
+          attributeValues: {
+            '1': attributes[0].attributeValues.map(({ id }) => String(id)),
+            '2': attributes[1].attributeValues.map(({ id }) => String(id)),
+          },
+        },
+      })
+    ).toBeUndefined();
   });
 });
 

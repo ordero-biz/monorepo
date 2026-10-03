@@ -15,6 +15,7 @@ export type ProductVariantsGenerationFormApi = ReturnType<
 
 export type CreateProductProps = {
   generationMode: ProductGenerationMode;
+  maxGeneratedProductVariants: number;
   onCreated: () => Promise<void> | void;
   validateConfiguration: Parameters<
     typeof useCreateProductForm
@@ -24,6 +25,7 @@ export type CreateProductProps = {
 export type ProductVariantsGenerationFormProps = {
   productVariantsGenerationForm: ProductVariantsGenerationFormApi;
   generationMode: ProductGenerationMode;
+  maxGeneratedProductVariants: number;
 };
 
 export type ProductVariantsCreationFormProps = {
@@ -60,6 +62,7 @@ export type ProductAttributeValuesFieldProps = {
 export type GenerateProductActionsProps = {
   productVariantsGenerationForm: ProductVariantsGenerationFormApi;
   generationMode: ProductGenerationMode;
+  maxGeneratedProductVariants: number;
 };
 
 export type GeneratedProductVariantsProps = {

@@ -1,11 +1,12 @@
 import { Button, FieldHelperText } from '@ordero/ui';
 import { PRODUCT_GENERATION_MODE } from './constants';
 import type { GenerateProductActionsProps } from './types';
-import { getSelectedAttributeValueGroups } from './utils/productGeneration';
+import { getGeneratedProductsCount } from './utils/productGeneration';
 
 export const GenerateProductActions = ({
   productVariantsGenerationForm,
   generationMode,
+  maxGeneratedProductVariants,
 }: GenerateProductActionsProps) => {
   const isMultipleProducts = generationMode === PRODUCT_GENERATION_MODE.many;
 
@@ -16,28 +17,31 @@ export const GenerateProductActions = ({
       }
     >
       {([attributes, attributeValues]) => {
-        const selectedAttributeValueGroups = getSelectedAttributeValueGroups(
+        const generatedProductsCount = getGeneratedProductsCount(
           attributes,
           attributeValues
-        ).filter((group) => group.length > 0);
-        const hasSelectedAttributeValues =
-          selectedAttributeValueGroups.length > 0;
-        const generatedProductsCount = hasSelectedAttributeValues
-          ? selectedAttributeValueGroups.reduce(
-              (count, group) => count * group.length,
-              1
-            )
-          : 0;
+        );
+        const exceedsLimit =
+          generatedProductsCount > maxGeneratedProductVariants;
+
         return (
           <div className="flex flex-col items-end gap-[var(--space-1)]">
-            <Button color="primary" size="l" type="submit">
+            <Button
+              color="primary"
+              disabled={isMultipleProducts && exceedsLimit}
+              size="l"
+              type="submit"
+            >
               {isMultipleProducts
                 ? 'Next: Configure products'
                 : 'Next: Configure product'}
             </Button>
             {isMultipleProducts ? (
-              <FieldHelperText align="end">
+              <FieldHelperText align="end" invalid={exceedsLimit}>
                 {generatedProductsCount} products will be generated
+                {exceedsLimit
+                  ? ` (maximum ${maxGeneratedProductVariants})`
+                  : ''}
               </FieldHelperText>
             ) : null}
           </div>

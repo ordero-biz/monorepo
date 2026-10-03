@@ -4,10 +4,10 @@ import { PRODUCT_GENERATION_MODE } from '../constants';
 import {
   getAttributeValueSelections,
   getGeneratedProductName,
+  getGeneratedProductsCount,
   getGeneratedProductVariants,
   getGeneratedSingleProductVariant,
   getProductVariantAttributeValues,
-  getProductVariantGenerationSignature,
   getProductVariantsGeneratedArgs,
   getSelectedAttributeValueGroups,
   getSelectedAttributeValues,
@@ -57,23 +57,26 @@ const attributes: AttributeDropdown[] = [
 ];
 
 describe('product generation', () => {
-  it('uses the same signature for equivalent template selections', () => {
-    const firstSignature = getProductVariantGenerationSignature({
-      attributeValuesByAttributeId: { '1': ['12', '11', '11'], '2': ['21'] },
-      attributes,
-      description: 'Lightweight',
-      generationMode: PRODUCT_GENERATION_MODE.many,
-      productName: ' Running Shoes ',
-    });
-    const secondSignature = getProductVariantGenerationSignature({
-      attributeValuesByAttributeId: { '1': ['11', '12'], '2': ['21'] },
-      attributes: [...attributes].reverse(),
-      description: 'Lightweight',
-      generationMode: PRODUCT_GENERATION_MODE.many,
-      productName: 'Running Shoes',
-    });
-
-    expect(firstSignature).toBe(secondSignature);
+  it('counts the products a selection generates without building them', () => {
+    expect(getGeneratedProductsCount(attributes, {})).toBe(0);
+    expect(getGeneratedProductsCount(attributes, { '2': [] })).toBe(0);
+    expect(getGeneratedProductsCount(attributes, { '2': ['21'] })).toBe(1);
+    expect(
+      getGeneratedProductsCount(attributes, { '1': ['11', '12'], '2': ['21'] })
+    ).toBe(2);
+    expect(getGeneratedProductsCount(attributes, { '1': ['11', '99'] })).toBe(
+      1
+    );
+    expect(
+      getGeneratedProductsCount(attributes, { '1': ['11', '12'], '2': ['21'] })
+    ).toBe(
+      getGeneratedProductVariants({
+        attributeValuesByAttributeId: { '1': ['11', '12'], '2': ['21'] },
+        attributes,
+        description: '',
+        productName: 'Running Shoes',
+      }).length
+    );
   });
 
   it('keeps only selections that belong to the current attributes', () => {
@@ -138,6 +141,19 @@ describe('product generation', () => {
     });
     expect(getProductVariantAttributeValues(attributes, [11, 99])).toEqual([
       { id: 11, name: 'Blue' },
+    ]);
+    expect(
+      getProductVariantAttributeValues(attributes, [12, 21, 11, 21])
+    ).toEqual([
+      { id: 21, name: 'Cotton' },
+      { id: 11, name: 'Blue' },
+      { id: 12, name: 'Red' },
+    ]);
+    expect(
+      getProductVariantAttributeValues([...attributes].reverse(), [12, 21])
+    ).toEqual([
+      { id: 12, name: 'Red' },
+      { id: 21, name: 'Cotton' },
     ]);
   });
 

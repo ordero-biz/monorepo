@@ -1,5 +1,5 @@
 import { Accordion } from '@ordero/ui';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { GeneratedProductVariantCard } from './GeneratedProductVariantCard';
 import { useIncrementalProductVariants } from './hooks/useIncrementalProductVariants';
 import type { GeneratedProductVariantListProps } from './types';
@@ -21,6 +21,10 @@ export const GeneratedProductVariantList = ({
   );
   const previousVisibleVariantIndexesRef = useRef(
     new Set(visibleVariantIndexes)
+  );
+  const invalidVariantIndexesSet = useMemo(
+    () => new Set(invalidVariantIndexes),
+    [invalidVariantIndexes]
   );
 
   useEffect(() => {
@@ -86,7 +90,7 @@ export const GeneratedProductVariantList = ({
       {visibleVariantIndexes.map((variantIndex) => (
         <GeneratedProductVariantCard
           attributes={attributes}
-          hasErrors={invalidVariantIndexes.includes(variantIndex)}
+          hasErrors={invalidVariantIndexesSet.has(variantIndex)}
           productVariantsCreationForm={productVariantsCreationForm}
           key={variantIndex}
           onEditAttributes={onEditAttributes}
