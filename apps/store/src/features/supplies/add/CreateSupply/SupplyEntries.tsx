@@ -102,7 +102,7 @@ export const SupplyEntries = ({
 
           return (
             <DataTableCell>
-              <div className="min-w-[220px]">
+              <div className="w-[320px]">
                 <form.Field
                   name={`supplyEntries[${index}].productVariantId` as const}
                 >
@@ -152,7 +152,7 @@ export const SupplyEntries = ({
                           });
                         }}
                         onValueChange={field.handleChange}
-                        placeholder="Select product *"
+                        placeholder="Product *"
                         required
                         size="s"
                         staticOptions={
@@ -178,7 +178,7 @@ export const SupplyEntries = ({
           );
         },
         header: () => header('Product'),
-        meta: { minWidth: 240 },
+        meta: { minWidth: 352 },
       },
       {
         id: 'unit',
@@ -188,7 +188,7 @@ export const SupplyEntries = ({
 
           return (
             <DataTableCell>
-              <div className="min-w-[140px]">
+              <div className="w-[var(--space-16)]">
                 <form.Field
                   name={`supplyEntries[${index}].unitOfMeasurementId` as const}
                 >
@@ -219,7 +219,7 @@ export const SupplyEntries = ({
                           );
                         }}
                         onValueChange={field.handleChange}
-                        placeholder="Select unit *"
+                        placeholder="Unit *"
                         required
                         size="s"
                         staticOptions={
@@ -243,7 +243,7 @@ export const SupplyEntries = ({
           );
         },
         header: () => header('Unit'),
-        meta: { minWidth: 155 },
+        meta: { minWidth: 160 },
       },
       {
         id: 'quantity',

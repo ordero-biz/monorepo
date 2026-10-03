@@ -23,7 +23,7 @@ const { setup } = prepareStoreSetup<UnitsOfMeasurementAsyncComboboxProps>({
   component: UnitsOfMeasurementAsyncCombobox,
   props: {
     'aria-label': 'Unit',
-    placeholder: 'Select unit',
+    placeholder: 'Unit',
   },
 });
 

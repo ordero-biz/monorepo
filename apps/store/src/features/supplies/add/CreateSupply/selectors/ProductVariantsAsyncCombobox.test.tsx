@@ -26,7 +26,7 @@ const { setup } = prepareStoreSetup<ProductVariantsAsyncComboboxProps>({
     'aria-label': 'Product',
     onOptionSelect: mocks.onOptionSelect,
     onValueChange: mocks.onValueChange,
-    placeholder: 'Select product',
+    placeholder: 'Product',
   },
 });
 
