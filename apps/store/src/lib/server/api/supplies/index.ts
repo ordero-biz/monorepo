@@ -4,18 +4,20 @@ import {
   parseBackendResponseData,
 } from '@ordero/next-api/server';
 import { cookies } from 'next/headers';
-import type { Supply } from '@/lib/domain/supplies/types';
+import type { Supply, SupplyDetails } from '@/lib/domain/supplies/types';
 import { BACKEND_SUPPLY_PATHS } from '@/lib/server/api/path';
 import { fetchBackendResponse } from '@/lib/server/fetch';
 import type { PaginatedResponse } from '@/lib/server/types';
+import { tokenizePath } from '@/lib/utils/tokenizePath';
 import {
   getPaginationSearch,
   type PaginationSearchInput,
 } from '@/lib/utils/url';
 
-export const getServerSupplies = async (
-  input?: PaginationSearchInput
-): Promise<ApiResult<PaginatedResponse<Supply>>> => {
+const fetchSupplyResource = async <T>(
+  path: string,
+  search?: string
+): Promise<ApiResult<T>> => {
   const token = (await cookies()).get(AUTH_TOKEN_COOKIE_NAME)?.value;
 
   if (!token) {
@@ -29,8 +31,8 @@ export const getServerSupplies = async (
   }
 
   const result = await fetchBackendResponse({
-    path: BACKEND_SUPPLY_PATHS.supplies,
-    search: getPaginationSearch(input),
+    path,
+    search,
     token,
     init: {
       method: 'GET',
@@ -43,8 +45,17 @@ export const getServerSupplies = async (
 
   return {
     ok: true,
-    data: await parseBackendResponseData<PaginatedResponse<Supply>>(
-      result.data
-    ),
+    data: await parseBackendResponseData<T>(result.data),
   };
 };
+
+export const getServerSupplies = (input?: PaginationSearchInput) =>
+  fetchSupplyResource<PaginatedResponse<Supply>>(
+    BACKEND_SUPPLY_PATHS.supplies,
+    getPaginationSearch(input)
+  );
+
+export const getServerSupply = (supplyId: string | number) =>
+  fetchSupplyResource<SupplyDetails>(
+    tokenizePath(BACKEND_SUPPLY_PATHS.supply, { id: supplyId })
+  );

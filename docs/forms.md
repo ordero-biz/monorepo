@@ -177,13 +177,12 @@ directly inside the form markup. The wrapper should own:
 - the TanStack Query key used for the option cache
 
 Keep the query key under the same resource prefix used for invalidation, then
-add a component-specific segment so option data does not collide with list-page
-data:
+add an `options` segment so option data does not collide with list-page data:
 
 ```ts
-const categoryComboboxQueryKey = [
+const categoryOptionsQueryKey = [
   ...categoriesQueryKeys.list,
-  'category-combobox',
+  'options',
 ] as const;
 ```
 

@@ -1,3 +1,5 @@
+import Link from 'next/link';
+import { getSupplyDetailRoute } from '@/lib/client/routes';
 import type { Supply } from '@/lib/domain/supplies/types';
 import { formatDate } from '@/lib/utils/formatDate';
 import {
@@ -14,7 +16,12 @@ export const columns: DataTableColumnDef<Supply>[] = [
     accessorKey: 'supplyNumber',
     cell: ({ row }) => (
       <DataTableCell>
-        {renderOptionalValue(row.original.supplyNumber)}
+        <Link
+          className="w-full font-600 rounded-[var(--radius-sm)] outline-none transition-colors hover:text-[var(--color-text-body)] hover:underline"
+          href={getSupplyDetailRoute(row.original.id)}
+        >
+          {row.original.supplyNumber || `Supply #${row.original.id}`}
+        </Link>
       </DataTableCell>
     ),
     header: ({ column }) => (

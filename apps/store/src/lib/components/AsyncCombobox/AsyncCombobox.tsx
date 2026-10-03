@@ -51,8 +51,14 @@ export const AsyncCombobox = (props: AsyncComboboxProps) => {
   const options = useMemo(() => {
     const loadedOptions =
       optionsQuery.data?.pages.flatMap((page) => page.options) ?? [];
+    const optionsByValue = new Map(
+      [...staticOptions, ...loadedOptions].map((option) => [
+        option.value,
+        option,
+      ])
+    );
 
-    return [...staticOptions, ...loadedOptions].map((option) => ({
+    return [...optionsByValue.values()].map((option) => ({
       ...option,
       disabled: option.disabled || isOptionDisabled?.(option),
     }));
