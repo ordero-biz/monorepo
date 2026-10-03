@@ -68,6 +68,9 @@ describe('Store sidebar', () => {
       within(sidebar).getByRole('link', { name: 'Suppliers' })
     ).toHaveAttribute('href', '/products/suppliers');
     expect(
+      within(sidebar).getByRole('link', { name: 'Supplies' })
+    ).toHaveAttribute('href', '/products/supplies');
+    expect(
       within(sidebar).getByRole('link', { name: 'Warehouse' })
     ).toHaveAttribute('href', '/products/warehouse');
   });
