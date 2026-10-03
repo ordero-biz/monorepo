@@ -4,6 +4,7 @@ export const warehousesQueryKeys = {
   list: ['warehouses', 'list'] as const,
   listPage: (input?: PaginationSearchInput) =>
     [...warehousesQueryKeys.list, input ?? {}] as const,
+  options: () => [...warehousesQueryKeys.list, 'options'] as const,
   detail: (warehouseId: string | number) =>
     ['warehouses', 'detail', String(warehouseId)] as const,
 };

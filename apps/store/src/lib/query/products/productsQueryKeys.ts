@@ -10,4 +10,5 @@ export const productVariantsQueryKeys = {
   list: ['product-variants', 'list'] as const,
   listPage: (input?: PaginationSearchInput) =>
     [...productVariantsQueryKeys.list, input ?? {}] as const,
+  options: () => [...productVariantsQueryKeys.list, 'options'] as const,
 };

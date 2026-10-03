@@ -12,6 +12,7 @@ export const clientRoutes = {
   categories: '/products/categories',
   attributes: '/products/attributes',
   supplies: '/products/supplies',
+  addSupply: '/products/supplies/add',
   suppliers: '/products/suppliers',
   unitsOfMeasurement: '/products/units-of-measurement',
   warehouses: '/products/warehouse',
@@ -28,6 +29,9 @@ export const getCategoryDetailRoute = (categoryId: string | number) =>
 
 export const getSupplierDetailRoute = (supplierId: string | number) =>
   `/products/suppliers/${supplierId}`;
+
+export const getSupplyDetailRoute = (supplyId: string | number) =>
+  `/products/supplies/${supplyId}`;
 
 export const getWarehouseDetailRoute = (warehouseId: string | number) =>
   `/products/warehouse/${warehouseId}`;
