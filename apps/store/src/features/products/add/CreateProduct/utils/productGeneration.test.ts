@@ -1,14 +1,17 @@
 import type { AttributeDropdown } from '@/lib/domain/attributes/types';
+import { PRODUCT_STATUS } from '@/lib/domain/products/constants';
 import { PRODUCT_GENERATION_MODE } from '../constants';
 import {
   getAttributeValueSelections,
   getGeneratedProductName,
+  getGeneratedProductsCount,
   getGeneratedProductVariants,
   getGeneratedSingleProductVariant,
   getProductVariantAttributeValues,
-  getProductVariantGenerationSignature,
+  getProductVariantsGeneratedArgs,
   getSelectedAttributeValueGroups,
   getSelectedAttributeValues,
+  updateAttributeValueSelection,
 } from './productGeneration';
 
 const attributes: AttributeDropdown[] = [
@@ -54,23 +57,26 @@ const attributes: AttributeDropdown[] = [
 ];
 
 describe('product generation', () => {
-  it('uses the same signature for equivalent template selections', () => {
-    const firstSignature = getProductVariantGenerationSignature({
-      attributeValuesByAttributeId: { '1': ['12', '11', '11'], '2': ['21'] },
-      attributes,
-      description: 'Lightweight',
-      generationMode: PRODUCT_GENERATION_MODE.many,
-      productName: ' Running Shoes ',
-    });
-    const secondSignature = getProductVariantGenerationSignature({
-      attributeValuesByAttributeId: { '1': ['11', '12'], '2': ['21'] },
-      attributes: [...attributes].reverse(),
-      description: 'Lightweight',
-      generationMode: PRODUCT_GENERATION_MODE.many,
-      productName: 'Running Shoes',
-    });
-
-    expect(firstSignature).toBe(secondSignature);
+  it('counts the products a selection generates without building them', () => {
+    expect(getGeneratedProductsCount(attributes, {})).toBe(0);
+    expect(getGeneratedProductsCount(attributes, { '2': [] })).toBe(0);
+    expect(getGeneratedProductsCount(attributes, { '2': ['21'] })).toBe(1);
+    expect(
+      getGeneratedProductsCount(attributes, { '1': ['11', '12'], '2': ['21'] })
+    ).toBe(2);
+    expect(getGeneratedProductsCount(attributes, { '1': ['11', '99'] })).toBe(
+      1
+    );
+    expect(
+      getGeneratedProductsCount(attributes, { '1': ['11', '12'], '2': ['21'] })
+    ).toBe(
+      getGeneratedProductVariants({
+        attributeValuesByAttributeId: { '1': ['11', '12'], '2': ['21'] },
+        attributes,
+        description: '',
+        productName: 'Running Shoes',
+      }).length
+    );
   });
 
   it('keeps only selections that belong to the current attributes', () => {
@@ -80,6 +86,27 @@ describe('product generation', () => {
         [attributes[1]]
       )
     ).toEqual({ '1': ['11'] });
+  });
+
+  it('adds and removes an attribute value selection', () => {
+    const selectedAttributeValues = { '1': ['11'], '2': ['21'] };
+
+    expect(
+      updateAttributeValueSelection({
+        attributeId: '1',
+        attributeValueId: '12',
+        attributeValuesByAttributeId: selectedAttributeValues,
+        pressed: true,
+      })
+    ).toEqual({ '1': ['11', '12'], '2': ['21'] });
+    expect(
+      updateAttributeValueSelection({
+        attributeId: '1',
+        attributeValueId: '11',
+        attributeValuesByAttributeId: selectedAttributeValues,
+        pressed: false,
+      })
+    ).toEqual({ '1': [], '2': ['21'] });
   });
 
   it('maps selected values to their display values and variant payload', () => {
@@ -110,9 +137,23 @@ describe('product generation', () => {
       description: 'Lightweight',
       name: 'Running Shoes Cotton Blue',
       sku: '',
+      status: PRODUCT_STATUS.DRAFT,
     });
     expect(getProductVariantAttributeValues(attributes, [11, 99])).toEqual([
       { id: 11, name: 'Blue' },
+    ]);
+    expect(
+      getProductVariantAttributeValues(attributes, [12, 21, 11, 21])
+    ).toEqual([
+      { id: 21, name: 'Cotton' },
+      { id: 11, name: 'Blue' },
+      { id: 12, name: 'Red' },
+    ]);
+    expect(
+      getProductVariantAttributeValues([...attributes].reverse(), [12, 21])
+    ).toEqual([
+      { id: 12, name: 'Red' },
+      { id: 21, name: 'Cotton' },
     ]);
   });
 
@@ -131,6 +172,7 @@ describe('product generation', () => {
         description: '',
         name: 'Running Shoes Cotton Blue',
         sku: '',
+        status: PRODUCT_STATUS.DRAFT,
       },
       {
         attributeValueIds: [21, 12],
@@ -138,6 +180,7 @@ describe('product generation', () => {
         description: '',
         name: 'Running Shoes Cotton Red',
         sku: '',
+        status: PRODUCT_STATUS.DRAFT,
       },
     ]);
   });
@@ -151,5 +194,79 @@ describe('product generation', () => {
         productName: 'Running Shoes',
       })
     ).toEqual([]);
+  });
+
+  it('builds one variant per value combination in multiple-products mode', () => {
+    expect(
+      getProductVariantsGeneratedArgs({
+        generationMode: PRODUCT_GENERATION_MODE.many,
+        value: {
+          attributes,
+          attributeValues: { '1': ['11', '12'], '2': ['21'] },
+          category: '3',
+          description: 'Lightweight',
+          name: 'Running Shoes',
+        },
+      })
+    ).toEqual({
+      attributes,
+      category: '3',
+      description: 'Lightweight',
+      name: 'Running Shoes',
+      productVariants: [
+        {
+          attributeValueIds: [21, 11],
+          barcode: '',
+          description: 'Lightweight',
+          name: 'Running Shoes Cotton Blue',
+          sku: '',
+          status: PRODUCT_STATUS.DRAFT,
+        },
+        {
+          attributeValueIds: [21, 12],
+          barcode: '',
+          description: 'Lightweight',
+          name: 'Running Shoes Cotton Red',
+          sku: '',
+          status: PRODUCT_STATUS.DRAFT,
+        },
+      ],
+    });
+  });
+
+  it('builds a single variant from the selected values in single-product mode', () => {
+    expect(
+      getProductVariantsGeneratedArgs({
+        generationMode: PRODUCT_GENERATION_MODE.one,
+        value: {
+          attributes,
+          attributeValues: { '1': ['11', '12'], '2': ['21'] },
+          category: '3',
+          description: '',
+          name: 'Running Shoes',
+        },
+      }).productVariants
+    ).toHaveLength(1);
+    expect(
+      getProductVariantsGeneratedArgs({
+        generationMode: PRODUCT_GENERATION_MODE.one,
+        value: {
+          attributes: [],
+          attributeValues: {},
+          category: '3',
+          description: '',
+          name: 'Running Shoes',
+        },
+      }).productVariants
+    ).toEqual([
+      {
+        attributeValueIds: [],
+        barcode: '',
+        description: '',
+        name: 'Running Shoes',
+        sku: '',
+        status: PRODUCT_STATUS.DRAFT,
+      },
+    ]);
   });
 });

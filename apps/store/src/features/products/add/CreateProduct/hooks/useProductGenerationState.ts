@@ -6,22 +6,20 @@ export const useProductGenerationState = () => {
   const [generatedAttributes, setGeneratedAttributes] = useState<
     AttributeDropdown[]
   >([]);
-  const [generatedTemplateSignature, setGeneratedTemplateSignature] =
-    useState<string>();
-  const [generationVersion, setGenerationVersion] = useState(0);
+  const [isProductVariantGenerationStage, setIsProductVariantGenerationStage] =
+    useState(true);
+
   const onProductVariantsGenerated = useCallback(
-    ({ attributes, generationSignature }: ProductVariantsGeneratedArgs) => {
+    ({ attributes }: ProductVariantsGeneratedArgs) => {
       setGeneratedAttributes(attributes);
-      setGeneratedTemplateSignature(generationSignature);
-      setGenerationVersion((version) => version + 1);
+      setIsProductVariantGenerationStage(false);
     },
     []
   );
 
   return {
     generatedAttributes,
-    generatedTemplateSignature,
-    generationVersion,
+    isProductVariantGenerationStage,
     onProductVariantsGenerated,
   };
 };

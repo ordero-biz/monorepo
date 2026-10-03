@@ -1,14 +1,16 @@
 export { AttributesAsyncCombobox } from './AttributesAsyncCombobox';
 export { CreateProduct } from './CreateProduct';
-export { PRODUCT_GENERATION_MODE } from './constants';
+export {
+  DEFAULT_MAX_GENERATED_PRODUCT_VARIANTS,
+  PRODUCT_GENERATION_MODE,
+} from './constants';
 export { useCreateProductForm } from './hooks/useCreateProductForm';
 export { ProductImageDropzone } from './ProductImageDropzone';
-export type { ProductTemplateFieldsProps } from './types';
 export { getAttributeValueSelections } from './utils/productGeneration';
 export {
-  validateMultipleProducts,
+  validateMultipleProductsConfiguration,
   validateProductAttributes,
   validateProductCategory,
   validateProductName,
-  validateSingleProduct,
+  validateSingleProductConfiguration,
 } from './utils/validations';

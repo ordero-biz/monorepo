@@ -1,221 +1,270 @@
 import {
-  Card,
+  Accordion,
   Chip,
   FieldHelperText,
   FieldLabel,
   IconButton,
   Textarea,
   TextField,
-  Typography,
 } from '@ordero/ui';
 import { Pencil, Plus } from 'lucide-react';
+import { memo, useState } from 'react';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
 import { ProductImageDropzone } from './ProductImageDropzone';
+import { ProductStatusSelector } from './ProductStatusSelector';
 import type { GeneratedProductVariantCardProps } from './types';
 import { getProductVariantAttributeValues } from './utils/productGeneration';
+import { validateProductStatus } from './utils/validations';
 
-export const GeneratedProductVariantCard = ({
-  attributes,
-  form,
-  onEditAttributes,
-  requireAttributeValueIds,
-  variantIndex,
-}: GeneratedProductVariantCardProps) => (
-  <form.Field name={`productVariants[${variantIndex}].name` as const}>
-    {(nameField) => {
-      const nameErrorText = getFieldSubmitChangeErrorText(nameField.state.meta);
-      const productVariantName = nameField.state.value;
+export const GeneratedProductVariantCard = memo(
+  ({
+    attributes,
+    hasErrors,
+    productVariantsCreationForm,
+    onEditAttributes,
+    requireAttributeValueIds,
+    variantIndex,
+  }: GeneratedProductVariantCardProps) => {
+    // Base UI re-applies `data-starting-style` (opacity: 0) to an open panel when
+    // `keepMounted` flips from true to false and never removes it, so a card
+    // whose errors were fixed would turn invisible. Only ever turn it on.
+    const [keepPanelMounted, setKeepPanelMounted] = useState(hasErrors);
 
-      return (
-        <Card.Root variant="outlined">
-          <Card.Content>
-            <div className="flex flex-col mb-2 gap-[var(--space-3)]">
-              <div className="flex items-center justify-between gap-[var(--space-2)]">
-                <Typography variant="subtitle1">
-                  {productVariantName}
-                </Typography>
-              </div>
+    if (hasErrors && !keepPanelMounted) {
+      setKeepPanelMounted(true);
+    }
 
-              <div className="grid gap-[var(--space-2)] lg:grid-cols-[1fr_1fr_0.9fr]">
-                <div className="flex flex-col gap-[var(--space-2)]">
-                  <TextField
-                    errorText={nameErrorText}
-                    invalid={Boolean(nameErrorText)}
-                    label="Product variant name"
-                    name={nameField.name}
-                    onBlur={nameField.handleBlur}
-                    onValueChange={nameField.handleChange}
-                    required
-                    size="s"
-                    value={productVariantName}
-                  />
-                  <form.Field
-                    name={`productVariants[${variantIndex}].barcode` as const}
-                  >
-                    {(field) => {
-                      const errorText = getFieldSubmitChangeErrorText(
-                        field.state.meta
-                      );
+    return (
+      <productVariantsCreationForm.Field
+        name={`productVariants[${variantIndex}].name` as const}
+      >
+        {(nameField) => {
+          const nameErrorText = getFieldSubmitChangeErrorText(
+            nameField.state.meta
+          );
+          const productVariantName = nameField.state.value;
 
-                      return (
-                        <TextField
-                          errorText={errorText}
-                          invalid={Boolean(errorText)}
-                          label="Barcode"
-                          name={field.name}
-                          onBlur={field.handleBlur}
-                          onValueChange={field.handleChange}
-                          placeholder="Barcode"
-                          required
-                          size="s"
-                          value={field.state.value}
-                        />
-                      );
-                    }}
-                  </form.Field>
-                  <form.Field
-                    name={`productVariants[${variantIndex}].sku` as const}
-                  >
-                    {(field) => {
-                      const errorText = getFieldSubmitChangeErrorText(
-                        field.state.meta
-                      );
+          return (
+            <Accordion.Item value={String(variantIndex)}>
+              <Accordion.Header>
+                <Accordion.Trigger>{productVariantName}</Accordion.Trigger>
+              </Accordion.Header>
+              <Accordion.Panel keepMounted={keepPanelMounted}>
+                <div className="flex flex-col gap-[var(--space-3)]">
+                  <div className="grid gap-[var(--space-2)] lg:grid-cols-[1fr_1fr_0.5fr]">
+                    <div className="flex flex-col gap-[var(--space-2)]">
+                      <TextField
+                        errorText={nameErrorText}
+                        invalid={Boolean(nameErrorText)}
+                        label="Product variant name"
+                        name={nameField.name}
+                        onBlur={nameField.handleBlur}
+                        onValueChange={nameField.handleChange}
+                        required
+                        size="s"
+                        value={productVariantName}
+                      />
+                      <productVariantsCreationForm.Field
+                        name={
+                          `productVariants[${variantIndex}].barcode` as const
+                        }
+                      >
+                        {(field) => {
+                          const errorText = getFieldSubmitChangeErrorText(
+                            field.state.meta
+                          );
 
-                      return (
-                        <TextField
-                          errorText={errorText}
-                          invalid={Boolean(errorText)}
-                          label="SKU"
-                          name={field.name}
-                          onBlur={field.handleBlur}
-                          onValueChange={field.handleChange}
-                          placeholder="SKU"
-                          required
-                          size="s"
-                          value={field.state.value}
-                        />
-                      );
-                    }}
-                  </form.Field>
-                </div>
+                          return (
+                            <TextField
+                              errorText={errorText}
+                              invalid={Boolean(errorText)}
+                              label="Barcode"
+                              name={field.name}
+                              onBlur={field.handleBlur}
+                              onValueChange={field.handleChange}
+                              placeholder="Barcode"
+                              required
+                              size="s"
+                              value={field.state.value}
+                            />
+                          );
+                        }}
+                      </productVariantsCreationForm.Field>
+                      <productVariantsCreationForm.Field
+                        name={`productVariants[${variantIndex}].sku` as const}
+                      >
+                        {(field) => {
+                          const errorText = getFieldSubmitChangeErrorText(
+                            field.state.meta
+                          );
 
-                <div className="flex flex-col gap-[var(--space-2)]">
-                  <form.Field
+                          return (
+                            <TextField
+                              errorText={errorText}
+                              invalid={Boolean(errorText)}
+                              label="SKU"
+                              name={field.name}
+                              onBlur={field.handleBlur}
+                              onValueChange={field.handleChange}
+                              placeholder="SKU"
+                              required
+                              size="s"
+                              value={field.state.value}
+                            />
+                          );
+                        }}
+                      </productVariantsCreationForm.Field>
+                      <productVariantsCreationForm.Field
+                        name={
+                          `productVariants[${variantIndex}].status` as const
+                        }
+                        validators={{
+                          onChange: validateProductStatus,
+                          onSubmit: validateProductStatus,
+                        }}
+                      >
+                        {(field) => {
+                          const errorText = getFieldSubmitChangeErrorText(
+                            field.state.meta
+                          );
+
+                          return (
+                            <ProductStatusSelector
+                              errorText={errorText}
+                              invalid={Boolean(errorText)}
+                              label="Product variant status"
+                              name={field.name}
+                              onValueChange={field.handleChange}
+                              value={field.state.value}
+                            />
+                          );
+                        }}
+                      </productVariantsCreationForm.Field>
+                    </div>
+
+                    <div className="flex flex-col gap-[var(--space-2)]">
+                      <productVariantsCreationForm.Field
+                        name={
+                          `productVariants[${variantIndex}].description` as const
+                        }
+                      >
+                        {(field) => (
+                          <Textarea
+                            label="Description"
+                            name={field.name}
+                            onBlur={field.handleBlur}
+                            onValueChange={field.handleChange}
+                            placeholder="Description"
+                            resize="none"
+                            rows={3}
+                            value={field.state.value}
+                          />
+                        )}
+                      </productVariantsCreationForm.Field>
+                    </div>
+
+                    <div className="flex flex-col gap-[var(--space-1)]">
+                      <ProductImageDropzone
+                        titleId={`product-variant-${variantIndex}-add-image-title`}
+                      />
+                    </div>
+                  </div>
+
+                  <productVariantsCreationForm.Field
                     name={
-                      `productVariants[${variantIndex}].description` as const
+                      `productVariants[${variantIndex}].attributeValueIds` as const
                     }
                   >
-                    {(field) => (
-                      <Textarea
-                        label="Description"
-                        name={field.name}
-                        onBlur={field.handleBlur}
-                        onValueChange={field.handleChange}
-                        placeholder="Description"
-                        resize="none"
-                        rows={3}
-                        value={field.state.value}
-                      />
-                    )}
-                  </form.Field>
+                    {(attributeValueIdsField) => {
+                      const validationErrorText = getFieldSubmitChangeErrorText(
+                        attributeValueIdsField.state.meta
+                      );
+                      const hasNoAttributeValues =
+                        attributeValueIdsField.state.value.length === 0;
+                      const errorText =
+                        validationErrorText ??
+                        (requireAttributeValueIds && hasNoAttributeValues
+                          ? 'Select at least one attribute value'
+                          : undefined);
+                      const selectedAttributeValues =
+                        getProductVariantAttributeValues(
+                          attributes,
+                          attributeValueIdsField.state.value
+                        );
+
+                      return attributes.length > 0 ? (
+                        <div className="flex flex-col gap-[var(--space-0-5)]">
+                          <FieldLabel
+                            as="span"
+                            invalid={Boolean(errorText)}
+                            required={requireAttributeValueIds}
+                          >
+                            Attributes
+                          </FieldLabel>
+                          <div
+                            aria-label={`Attributes for ${productVariantName}`}
+                            className="flex flex-wrap items-center gap-[var(--space-1)]"
+                            role="treegrid"
+                          >
+                            {selectedAttributeValues.map((attributeValue) => (
+                              <Chip
+                                aria-label={attributeValue.name}
+                                key={attributeValue.id}
+                                onDelete={() => {
+                                  attributeValueIdsField.handleChange(
+                                    attributeValueIdsField.state.value.filter(
+                                      (selectedAttributeValueId) =>
+                                        selectedAttributeValueId !==
+                                        attributeValue.id
+                                    )
+                                  );
+                                }}
+                                size="s"
+                                variant="soft"
+                              >
+                                {attributeValue.name}
+                              </Chip>
+                            ))}
+                            {selectedAttributeValues.length === 0 ? (
+                              <IconButton
+                                aria-label={`Add attributes for ${productVariantName}`}
+                                onClick={() => onEditAttributes(variantIndex)}
+                                size="xs"
+                                title={`Add attributes for ${productVariantName}`}
+                                type="button"
+                              >
+                                <Plus aria-hidden="true" />
+                              </IconButton>
+                            ) : null}
+                            {selectedAttributeValues.length > 0 ? (
+                              <IconButton
+                                aria-label={`Edit attributes for ${productVariantName}`}
+                                onClick={() => onEditAttributes(variantIndex)}
+                                size="xs"
+                                title={`Edit attributes for ${productVariantName}`}
+                                type="button"
+                              >
+                                <Pencil aria-hidden="true" />
+                              </IconButton>
+                            ) : null}
+                          </div>
+                          {errorText ? (
+                            <FieldHelperText invalid>
+                              {errorText}
+                            </FieldHelperText>
+                          ) : null}
+                        </div>
+                      ) : null;
+                    }}
+                  </productVariantsCreationForm.Field>
                 </div>
-
-                <div className="flex flex-col gap-[var(--space-1)]">
-                  <ProductImageDropzone
-                    titleId={`product-variant-${variantIndex}-add-image-title`}
-                  />
-                </div>
-              </div>
-
-              <form.Field
-                name={
-                  `productVariants[${variantIndex}].attributeValueIds` as const
-                }
-              >
-                {(attributeValueIdsField) => {
-                  const validationErrorText = getFieldSubmitChangeErrorText(
-                    attributeValueIdsField.state.meta
-                  );
-                  const hasNoAttributeValues =
-                    attributeValueIdsField.state.value.length === 0;
-                  const errorText =
-                    validationErrorText ??
-                    (requireAttributeValueIds && hasNoAttributeValues
-                      ? 'Select at least one attribute value'
-                      : undefined);
-                  const selectedAttributeValues =
-                    getProductVariantAttributeValues(
-                      attributes,
-                      attributeValueIdsField.state.value
-                    );
-
-                  return attributes.length > 0 ? (
-                    <div className="flex flex-col gap-[var(--space-0-5)]">
-                      <FieldLabel
-                        as="span"
-                        invalid={Boolean(errorText)}
-                        required={requireAttributeValueIds}
-                      >
-                        Attributes
-                      </FieldLabel>
-                      <div
-                        aria-label={`Attributes for ${productVariantName}`}
-                        className="flex flex-wrap items-center gap-[var(--space-1)]"
-                        role="treegrid"
-                      >
-                        {selectedAttributeValues.map((attributeValue) => (
-                          <Chip
-                            aria-label={attributeValue.name}
-                            key={attributeValue.id}
-                            onDelete={() => {
-                              attributeValueIdsField.handleChange(
-                                attributeValueIdsField.state.value.filter(
-                                  (selectedAttributeValueId) =>
-                                    selectedAttributeValueId !==
-                                    attributeValue.id
-                                )
-                              );
-                            }}
-                            size="s"
-                            variant="soft"
-                          >
-                            {attributeValue.name}
-                          </Chip>
-                        ))}
-                        {selectedAttributeValues.length === 0 ? (
-                          <IconButton
-                            aria-label={`Add attributes for ${productVariantName}`}
-                            onClick={() => onEditAttributes(variantIndex)}
-                            size="xs"
-                            title={`Add attributes for ${productVariantName}`}
-                            type="button"
-                          >
-                            <Plus aria-hidden="true" />
-                          </IconButton>
-                        ) : null}
-                        {selectedAttributeValues.length > 0 ? (
-                          <IconButton
-                            aria-label={`Edit attributes for ${productVariantName}`}
-                            onClick={() => onEditAttributes(variantIndex)}
-                            size="xs"
-                            title={`Edit attributes for ${productVariantName}`}
-                            type="button"
-                          >
-                            <Pencil aria-hidden="true" />
-                          </IconButton>
-                        ) : null}
-                      </div>
-                      {errorText ? (
-                        <FieldHelperText invalid>{errorText}</FieldHelperText>
-                      ) : null}
-                    </div>
-                  ) : null;
-                }}
-              </form.Field>
-            </div>
-          </Card.Content>
-        </Card.Root>
-      );
-    }}
-  </form.Field>
+              </Accordion.Panel>
+            </Accordion.Item>
+          );
+        }}
+      </productVariantsCreationForm.Field>
+    );
+  }
 );
+
+GeneratedProductVariantCard.displayName = 'GeneratedProductVariantCard';
