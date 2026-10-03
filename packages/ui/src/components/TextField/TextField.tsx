@@ -41,6 +41,7 @@ export const TextField = ({
   helperIcon,
   helperText,
   id,
+  inputMode,
   invalid = false,
   label,
   name,
@@ -97,6 +98,7 @@ export const TextField = ({
         endIcon={endIcon}
         focused={focusedState}
         id={id}
+        inputMode={inputMode}
         invalid={invalid}
         name={name}
         onBlur={(event) => {
