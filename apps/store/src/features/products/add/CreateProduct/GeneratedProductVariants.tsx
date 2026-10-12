@@ -1,36 +1,28 @@
 import { Typography } from '@ordero/ui';
 import { useState } from 'react';
-import type { AttributeDropdown } from '@/lib/domain/attributes/types';
 import { PRODUCT_GENERATION_MODE } from './constants';
 import { EditProductVariantAttributesDialog } from './EditProductVariantAttributesDialog';
-import { GeneratedProductVariantCard } from './GeneratedProductVariantCard';
-import { useIncrementalProductVariants } from './hooks/useIncrementalProductVariants';
+import { GeneratedProductVariantList } from './GeneratedProductVariantList';
 import type {
-  CreateProductForm,
-  GeneratedProductVariantListProps,
+  EditGeneratedProductVariantAttributesProps,
   GeneratedProductVariantsProps,
 } from './types';
-
-type EditGeneratedProductVariantAttributesProps = {
-  allowMultipleValuesPerAttribute: boolean;
-  attributes: AttributeDropdown[];
-  form: CreateProductForm;
-  onOpenChange: (open: boolean) => void;
-  variantIndex: number;
-};
+import { getInvalidProductVariantIndexes } from './utils/productVariantErrors';
 
 const EditGeneratedProductVariantAttributes = ({
   allowMultipleValuesPerAttribute,
   attributes,
-  form,
+  productVariantsCreationForm,
   onOpenChange,
   variantIndex,
 }: EditGeneratedProductVariantAttributesProps) => (
-  <form.Field
+  <productVariantsCreationForm.Field
     name={`productVariants[${variantIndex}].attributeValueIds` as const}
   >
     {(attributeValueIdsField) => (
-      <form.Field name={`productVariants[${variantIndex}].name` as const}>
+      <productVariantsCreationForm.Field
+        name={`productVariants[${variantIndex}].name` as const}
+      >
         {(nameField) => (
           <EditProductVariantAttributesDialog
             allowMultipleValuesPerAttribute={allowMultipleValuesPerAttribute}
@@ -42,47 +34,15 @@ const EditGeneratedProductVariantAttributes = ({
             productVariantName={nameField.state.value}
           />
         )}
-      </form.Field>
+      </productVariantsCreationForm.Field>
     )}
-  </form.Field>
+  </productVariantsCreationForm.Field>
 );
 
-const GeneratedProductVariantList = ({
-  attributes,
-  form,
-  onEditAttributes,
-  productVariantCount,
-  requireAttributeValueIds,
-}: GeneratedProductVariantListProps) => {
-  const { hasMoreVariants, loadMoreRef, visibleVariantIndexes } =
-    useIncrementalProductVariants({
-      productVariantCount,
-    });
-
-  return (
-    <div className="mt-1 mb-2 flex flex-col gap-[var(--space-1)]">
-      {visibleVariantIndexes.map((variantIndex) => (
-        <GeneratedProductVariantCard
-          attributes={attributes}
-          form={form}
-          key={variantIndex}
-          onEditAttributes={onEditAttributes}
-          requireAttributeValueIds={requireAttributeValueIds}
-          variantIndex={variantIndex}
-        />
-      ))}
-      {hasMoreVariants ? (
-        <div aria-hidden="true" className="h-px" ref={loadMoreRef} />
-      ) : null}
-    </div>
-  );
-};
-
 export const GeneratedProductVariants = ({
-  form,
+  productVariantsCreationForm,
   generatedAttributes,
   generationMode,
-  generationVersion,
 }: GeneratedProductVariantsProps) => {
   const [editingVariantIndex, setEditingVariantIndex] = useState<number | null>(
     null
@@ -95,15 +55,27 @@ export const GeneratedProductVariants = ({
   };
 
   return (
-    <form.Subscribe selector={(state) => state.values.productVariants.length}>
-      {(productVariantCount) =>
-        productVariantCount > 0 ? (
+    <productVariantsCreationForm.Subscribe
+      selector={(state) =>
+        [
+          state.isSubmitting,
+          state.submissionAttempts,
+          state.values.productVariants.length,
+        ] as const
+      }
+    >
+      {([, , productVariantCount]) => {
+        const invalidVariantIndexes = getInvalidProductVariantIndexes(
+          productVariantsCreationForm.state.fieldMeta
+        );
+
+        return productVariantCount > 0 ? (
           <div className="mt-3">
             <Typography variant="h5">Generated product variants</Typography>
             <GeneratedProductVariantList
               attributes={generatedAttributes}
-              form={form}
-              key={generationVersion}
+              productVariantsCreationForm={productVariantsCreationForm}
+              invalidVariantIndexes={invalidVariantIndexes}
               onEditAttributes={setEditingVariantIndex}
               productVariantCount={productVariantCount}
               requireAttributeValueIds={
@@ -117,14 +89,14 @@ export const GeneratedProductVariants = ({
                   generationMode === PRODUCT_GENERATION_MODE.one
                 }
                 attributes={generatedAttributes}
-                form={form}
+                productVariantsCreationForm={productVariantsCreationForm}
                 onOpenChange={handleAttributesDialogOpenChange}
                 variantIndex={editingVariantIndex}
               />
             ) : null}
           </div>
-        ) : null
-      }
-    </form.Subscribe>
+        ) : null;
+      }}
+    </productVariantsCreationForm.Subscribe>
   );
 };

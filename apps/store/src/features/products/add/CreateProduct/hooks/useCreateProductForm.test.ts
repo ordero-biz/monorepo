@@ -23,12 +23,11 @@ vi.mock('../utils/submitAction', async () => ({
 }));
 
 const submitCreateProductMock = vi.mocked(submitCreateProduct);
-const validateProduct = () => undefined;
-
+const validateConfiguration = () => undefined;
 const { setup } = prepareFormHookTestSetup({
   hookProps: {
     onCreated: vi.fn(),
-    validateProduct,
+    validateConfiguration,
   },
   useFormHook: useCreateProductForm,
 });
@@ -37,7 +36,7 @@ const setupCreateProductFormHook = () => {
   const user = userEvent.setup();
   const hookProps = {
     onCreated: vi.fn(),
-    validateProduct,
+    validateConfiguration,
   };
   const result = setup({
     hookProps,
@@ -88,7 +87,7 @@ describe('useCreateProductForm', () => {
       ok: false,
       error: {
         fieldErrors: {
-          productName: 'Product name already exists.',
+          name: 'Product name already exists.',
         },
         formError: 'Product creation failed.',
       },

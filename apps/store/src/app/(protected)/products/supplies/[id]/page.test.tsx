@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { SUPPLY_STATUS } from '@/lib/domain/supplies/constants';
+import type { SupplyDetails } from '@/lib/domain/supplies/types';
 import { suppliesQueryKeys } from '@/lib/query/supplies/suppliesQueryKeys';
 import { getServerSupply } from '@/lib/server/api/supplies';
 import {
@@ -36,7 +37,7 @@ describe('SupplyDetailPage', () => {
       totalPrice: 0,
       supplyEntries: [],
       version: 1,
-    };
+    } satisfies SupplyDetails;
     const queryClient = createTestQueryClient();
     const TestQueryProvider = createTestQueryProvider(queryClient);
     getServerSupplyMock.mockResolvedValue({ ok: true, data: supply });

@@ -164,9 +164,7 @@ describe('ProductsListView', () => {
     await user.click(
       await screen.findByRole('button', { name: 'Product Groups' })
     );
-    await user.click(
-      screen.getByRole('button', { name: 'Product Variants' })
-    );
+    await user.click(screen.getByRole('button', { name: 'Product Variants' }));
 
     expect(mocks.push).toHaveBeenLastCalledWith(
       '/products?page=1&size=25&sort=name%2Casc&listMode=product-variants',

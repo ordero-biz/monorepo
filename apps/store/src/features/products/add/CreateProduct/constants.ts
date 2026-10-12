@@ -1,15 +1,29 @@
-import type { CreateProductValues } from './types';
+import { PRODUCT_STATUS } from '@/lib/domain/products/constants';
+import type {
+  ProductGenerationValues,
+  ProductVariantsCreationValues,
+} from './types';
 
 export const PRODUCT_GENERATION_MODE = {
   one: 'one',
   many: 'many',
 } as const;
 
-export const createProductDefaultValues: CreateProductValues = {
+export const DEFAULT_MAX_GENERATED_PRODUCT_VARIANTS = 500;
+
+export const createProductGenerationDefaultValues: ProductGenerationValues = {
   attributes: [],
   attributeValues: {},
   category: null,
   description: '',
-  productName: '',
-  productVariants: [],
+  name: '',
 };
+
+export const createProductVariantsCreationDefaultValues: ProductVariantsCreationValues =
+  {
+    category: null,
+    description: '',
+    name: '',
+    productVariants: [],
+    status: PRODUCT_STATUS.DRAFT,
+  };

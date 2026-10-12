@@ -1,19 +1,37 @@
-import type { ComponentType } from 'react';
 import type { AsyncComboboxMultipleProps } from '@/lib/components/AsyncCombobox';
 import type { AttributeDropdown } from '@/lib/domain/attributes/types';
+import type { ProductStatus } from '@/lib/domain/products/types';
 import type { PRODUCT_GENERATION_MODE } from './constants';
 import type { useCreateProductForm } from './hooks/useCreateProductForm';
+import type { useProductVariantsGenerationForm } from './hooks/useProductVariantsGenerationForm';
 
-export type CreateProductForm = ReturnType<typeof useCreateProductForm>['form'];
+export type ProductVariantsCreationFormApi = ReturnType<
+  typeof useCreateProductForm
+>['form'];
+
+export type ProductVariantsGenerationFormApi = ReturnType<
+  typeof useProductVariantsGenerationForm
+>['form'];
 
 export type CreateProductProps = {
   generationMode: ProductGenerationMode;
-  form: CreateProductForm;
-  generation: ReturnType<
-    typeof import('./hooks/useProductGenerationState').useProductGenerationState
-  >;
-  onSubmit: () => void;
-  TemplateFields: ComponentType<ProductTemplateFieldsProps>;
+  maxGeneratedProductVariants: number;
+  onCreated: () => Promise<void> | void;
+  validateConfiguration: Parameters<
+    typeof useCreateProductForm
+  >[0]['validateConfiguration'];
+};
+
+export type ProductVariantsGenerationFormProps = {
+  productVariantsGenerationForm: ProductVariantsGenerationFormApi;
+  generationMode: ProductGenerationMode;
+  maxGeneratedProductVariants: number;
+};
+
+export type ProductVariantsCreationFormProps = {
+  productVariantsCreationForm: ProductVariantsCreationFormApi;
+  generatedAttributes: AttributeDropdown[];
+  generationMode: ProductGenerationMode;
 };
 
 export type AttributesAsyncComboboxProps = Omit<
@@ -33,30 +51,30 @@ export type AttributesAsyncComboboxProps = Omit<
 };
 
 export type ProductTemplateFieldsProps = {
-  form: CreateProductForm;
+  productVariantsGenerationForm: ProductVariantsGenerationFormApi;
+  generationMode: ProductGenerationMode;
 };
 
 export type ProductAttributeValuesFieldProps = {
-  form: CreateProductForm;
+  productVariantsGenerationForm: ProductVariantsGenerationFormApi;
 };
 
 export type GenerateProductActionsProps = {
-  form: CreateProductForm;
-  generatedTemplateSignature?: string;
+  productVariantsGenerationForm: ProductVariantsGenerationFormApi;
   generationMode: ProductGenerationMode;
-  onProductVariantsGenerated: (args: ProductVariantsGeneratedArgs) => void;
+  maxGeneratedProductVariants: number;
 };
 
 export type GeneratedProductVariantsProps = {
-  form: CreateProductForm;
+  productVariantsCreationForm: ProductVariantsCreationFormApi;
   generatedAttributes: AttributeDropdown[];
   generationMode: ProductGenerationMode;
-  generationVersion: number;
 };
 
 export type GeneratedProductVariantListProps = {
   attributes: AttributeDropdown[];
-  form: CreateProductForm;
+  productVariantsCreationForm: ProductVariantsCreationFormApi;
+  invalidVariantIndexes: number[];
   onEditAttributes: (variantIndex: number) => void;
   productVariantCount: number;
   requireAttributeValueIds: boolean;
@@ -64,15 +82,31 @@ export type GeneratedProductVariantListProps = {
 
 export type GeneratedProductVariantCardProps = {
   attributes: AttributeDropdown[];
-  form: CreateProductForm;
+  hasErrors: boolean;
+  productVariantsCreationForm: ProductVariantsCreationFormApi;
   onEditAttributes: (variantIndex: number) => void;
   requireAttributeValueIds: boolean;
   variantIndex: number;
 };
 
+export type EditGeneratedProductVariantAttributesProps = {
+  allowMultipleValuesPerAttribute: boolean;
+  attributes: AttributeDropdown[];
+  productVariantsCreationForm: ProductVariantsCreationFormApi;
+  onOpenChange: (open: boolean) => void;
+  variantIndex: number;
+};
+
 export type ProductVariantsGeneratedArgs = {
   attributes: AttributeDropdown[];
-  generationSignature: string;
+  category: string | null;
+  description: string;
+  name: string;
+  productVariants: CreateProductVariantValues[];
+};
+
+export type CommonProductFieldsProps = {
+  productVariantsCreationForm: ProductVariantsCreationFormApi;
 };
 
 export type EditProductVariantAttributesDialogProps = {
@@ -90,12 +124,22 @@ export type ProductImageDropzoneProps = {
   titleId: string;
 };
 
-export type CreateProductValues = {
+export type ProductCommonValues = {
+  category: string | null;
+  description: string;
+  name: string;
+  status: ProductStatus;
+};
+
+export type ProductGenerationValues = {
   attributes: AttributeDropdown[];
   attributeValues: Record<string, string[]>;
   category: string | null;
   description: string;
-  productName: string;
+  name: string;
+};
+
+export type ProductVariantsCreationValues = ProductCommonValues & {
   productVariants: CreateProductVariantValues[];
 };
 
@@ -105,6 +149,16 @@ export type CreateProductVariantValues = {
   description: string;
   name: string;
   sku: string;
+  status: ProductStatus;
+};
+
+export type ProductStatusSelectorProps = {
+  errorText?: string;
+  invalid?: boolean;
+  label: string;
+  name: string;
+  onValueChange: (status: ProductStatus) => void;
+  value: ProductStatus;
 };
 
 export type ProductGenerationMode =

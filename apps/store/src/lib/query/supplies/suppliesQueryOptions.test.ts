@@ -1,4 +1,5 @@
 import { QueryClient } from '@tanstack/react-query';
+import type { SupplyDetails } from '@/lib/domain/supplies/types';
 import {
   suppliesListQueryOptions,
   supplyQueryOptions,
@@ -58,7 +59,7 @@ describe('supply query options', () => {
       totalPrice: 0,
       version: 1,
       supplyEntries: [],
-    };
+    } satisfies SupplyDetails;
     const fetchSupply = vi.fn(async () => ({
       ok: true as const,
       data: supply,

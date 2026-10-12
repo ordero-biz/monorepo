@@ -1,5 +1,5 @@
-import type { CreateCategoryFormValues } from './utils/validations';
 import { CATEGORY_STATUS } from '@/lib/domain/categories/constants';
+import type { CreateCategoryFormValues } from './utils/validations';
 
 export const createCategoryDefaultValues: CreateCategoryFormValues = {
   name: '',

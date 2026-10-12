@@ -93,7 +93,13 @@ export const usePaginationSearchParams = ({
     router.replace(`${pathname}?${nextSearchParams.toString()}`, {
       scroll: false,
     });
-  }, [pathname, requestedPage, router, searchPaginationInput.page, searchParams]);
+  }, [
+    pathname,
+    requestedPage,
+    router,
+    searchPaginationInput.page,
+    searchParams,
+  ]);
 
   const resetPagination: ResetPagination = ({
     updateSearchParams,

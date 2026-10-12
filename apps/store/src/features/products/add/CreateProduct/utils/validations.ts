@@ -1,12 +1,16 @@
 import { z } from 'zod';
+import { PRODUCT_STATUS } from '@/lib/domain/products/constants';
+import type { ProductStatus } from '@/lib/domain/products/types';
 import { getValidationMessage } from '@/lib/utils/form/validation/message';
 import type { ValidationArgs } from '@/lib/utils/form/validation/types';
 import { PRODUCT_GENERATION_MODE } from '../constants';
 import type {
-  CreateProductValues,
   CreateProductVariantValues,
   ProductGenerationMode,
+  ProductGenerationValues,
+  ProductVariantsCreationValues,
 } from '../types';
+import { getGeneratedProductsCount } from './productGeneration';
 
 export const productNameSchema = z
   .string()
@@ -42,6 +46,13 @@ export const productVariantSkuSchema = z
   .trim()
   .min(1, 'SKU is required');
 
+export const productStatusSchema = z.enum(
+  [PRODUCT_STATUS.DRAFT, PRODUCT_STATUS.ACTIVE],
+  {
+    error: 'Product status must be Draft or Active',
+  }
+);
+
 type ProductVariantField = 'attributeValueIds' | 'barcode' | 'name' | 'sku';
 
 type ProductVariantTextField = 'barcode' | 'name' | 'sku';
@@ -55,21 +66,7 @@ type ProductVariantFieldErrors = Partial<
   Record<ProductVariantFieldPath, string>
 >;
 
-type ProductTemplateField =
-  | 'attributes'
-  | 'attributeValues'
-  | 'category'
-  | 'productName';
-
-type ProductTemplateFieldErrors = Partial<Record<ProductTemplateField, string>>;
-
-const hasSelectedAttributeValues = ({
-  attributeValues,
-  attributes,
-}: Pick<CreateProductValues, 'attributeValues' | 'attributes'>) =>
-  attributes.some(
-    (attribute) => (attributeValues[String(attribute.id)] ?? []).length > 0
-  );
+type ProductTemplateFieldErrors = Partial<Record<'attributeValues', string>>;
 
 const getDuplicateVariantFieldIndexes = ({
   fieldName,
@@ -208,45 +205,49 @@ export const validateProductCategory = ({
   return getValidationMessage(productCategorySchema, value);
 };
 
+export const validateProductStatus = ({
+  value,
+}: ValidationArgs<ProductStatus>) =>
+  getValidationMessage(productStatusSchema, value);
+
 export const validateProductAttributes = ({
   value,
-}: ValidationArgs<CreateProductValues['attributes']>) =>
+}: ValidationArgs<ProductGenerationValues['attributes']>) =>
   getValidationMessage(productAttributesSchema, value);
 
-type ValidateProductTemplateArgs = ValidationArgs<CreateProductValues> & {
+type ValidateProductTemplateArgs = ValidationArgs<ProductGenerationValues> & {
   generationMode: ProductGenerationMode;
+  maxGeneratedProductVariants: number;
 };
 
-type ValidateProductVariantsArgs = ValidationArgs<CreateProductValues> & {
-  requireAttributeValueIds: boolean;
-};
+type ValidateProductVariantsArgs =
+  ValidationArgs<ProductVariantsCreationValues> & {
+    requireAttributeValueIds: boolean;
+  };
 
-type ValidateCreateProductArgs = ValidationArgs<CreateProductValues> & {
-  generationMode: ProductGenerationMode;
-};
+type ValidateProductConfigurationArgs =
+  ValidationArgs<ProductVariantsCreationValues> & {
+    generationMode: ProductGenerationMode;
+  };
 
 export const validateProductTemplate = ({
   generationMode,
+  maxGeneratedProductVariants,
   value,
 }: ValidateProductTemplateArgs) => {
   const errors: ProductTemplateFieldErrors = {};
-  const productNameError = validateProductName({ value: value.productName });
-  const categoryError = validateProductCategory({ value: value.category });
   const requiresAttributes = generationMode === PRODUCT_GENERATION_MODE.many;
 
-  if (productNameError) {
-    errors.productName = productNameError;
-  }
+  if (requiresAttributes && value.attributes.length > 0) {
+    const generatedProductsCount = getGeneratedProductsCount(
+      value.attributes,
+      value.attributeValues
+    );
 
-  if (categoryError) {
-    errors.category = categoryError;
-  }
-
-  if (requiresAttributes) {
-    if (value.attributes.length === 0) {
-      errors.attributes = 'Select at least one attribute.';
-    } else if (!hasSelectedAttributeValues(value)) {
+    if (generatedProductsCount === 0) {
       errors.attributeValues = 'Select at least one attribute value.';
+    } else if (generatedProductsCount > maxGeneratedProductVariants) {
+      errors.attributeValues = `Selected values generate ${generatedProductsCount} products. Select fewer values to generate at most ${maxGeneratedProductVariants}.`;
     }
   }
 
@@ -309,35 +310,27 @@ export const validateProductVariants = ({
     : undefined;
 };
 
-export const validateCreateProduct = ({
+export const validateProductConfiguration = ({
   generationMode,
   value,
-}: ValidateCreateProductArgs) => {
-  const templateErrors = validateProductTemplate({ generationMode, value });
-  const variantErrors = validateProductVariants({
+}: ValidateProductConfigurationArgs) =>
+  validateProductVariants({
     requireAttributeValueIds: generationMode === PRODUCT_GENERATION_MODE.many,
     value,
   });
-  const fields = {
-    ...templateErrors?.fields,
-    ...variantErrors?.fields,
-  };
 
-  return Object.keys(fields).length > 0
-    ? {
-        fields,
-      }
-    : undefined;
-};
-
-export const validateSingleProduct = (value: CreateProductValues) =>
-  validateCreateProduct({
+export const validateSingleProductConfiguration = (
+  value: ProductVariantsCreationValues
+) =>
+  validateProductConfiguration({
     generationMode: PRODUCT_GENERATION_MODE.one,
     value,
   });
 
-export const validateMultipleProducts = (value: CreateProductValues) =>
-  validateCreateProduct({
+export const validateMultipleProductsConfiguration = (
+  value: ProductVariantsCreationValues
+) =>
+  validateProductConfiguration({
     generationMode: PRODUCT_GENERATION_MODE.many,
     value,
   });

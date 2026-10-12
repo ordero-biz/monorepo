@@ -1,8 +1,9 @@
-import { screen, waitFor } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getSupplies } from '@/lib/client/api/supplies';
 import { getSupplyDetailRoute } from '@/lib/client/routes';
 import { SUPPLY_STATUS } from '@/lib/domain/supplies/constants';
+import type { Supply } from '@/lib/domain/supplies/types';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { SuppliesList } from './SuppliesList';
 
@@ -40,7 +41,7 @@ const supply = {
   totalQuantity: 12,
   totalPrice: 48.5,
   createdAt: '2026-08-01T10:30:00.000Z',
-};
+} satisfies Supply;
 
 const { setup } = prepareStoreSetup({
   component: SuppliesList,
@@ -110,17 +111,11 @@ describe('SuppliesList', () => {
     expect(screen.getByText('Main warehouse')).toBeVisible();
     expect(screen.getByText('Draft')).toBeVisible();
     expect(screen.getByText('INV-001')).toBeVisible();
-    expect(screen.getByText('12')).toBeVisible();
     expect(screen.getByText('48.5')).toBeVisible();
     expect(screen.getByText('01 Aug 2026')).toBeVisible();
   });
 
   it('requests supplies with pagination input', async () => {
-    const paginationInput = {
-      page: 2,
-      size: 10,
-      sort: ['createdAt,desc'],
-    };
     getSuppliesMock.mockResolvedValue({
       ok: true,
       data: {
@@ -129,11 +124,35 @@ describe('SuppliesList', () => {
       },
     });
 
-    setup({ paginationInput });
+    const { paginationInput } = setup({
+      paginationInput: { page: 2, size: 10, sort: ['createdAt,desc'] },
+    });
 
     await waitFor(() => {
       expect(getSuppliesMock).toHaveBeenCalledWith(paginationInput);
     });
+  });
+
+  it('preserves server row order without offering page-local sorting', async () => {
+    getSuppliesMock.mockResolvedValue({
+      ok: true,
+      data: {
+        content: [
+          { ...supply, id: 2, supplyNumber: 'SUP-002', totalPrice: 100 },
+          supply,
+        ],
+        page: { size: 10, number: 0, totalElements: 20, totalPages: 2 },
+      },
+    });
+
+    setup();
+
+    const table = await screen.findByRole('table', { name: 'Supplies list' });
+    const [header, firstRow, secondRow] = within(table).getAllByRole('row');
+
+    expect(within(header).queryByRole('button')).not.toBeInTheDocument();
+    expect(within(firstRow).getByText('SUP-002')).toBeVisible();
+    expect(within(secondRow).getByText('SUP-001')).toBeVisible();
   });
 
   it('renders an empty state when there are no supplies', async () => {

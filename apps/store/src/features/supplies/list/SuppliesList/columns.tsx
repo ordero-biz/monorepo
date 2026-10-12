@@ -74,22 +74,12 @@ export const columns: DataTableColumnDef<Supply>[] = [
     meta: { width: '14%' },
   },
   {
-    accessorKey: 'totalQuantity',
-    cell: ({ row }) => (
-      <DataTableCell>{row.original.totalQuantity}</DataTableCell>
-    ),
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Quantity" />
-    ),
-    meta: { align: 'right', width: '9%' },
-  },
-  {
     accessorKey: 'totalPrice',
     cell: ({ row }) => <DataTableCell>{row.original.totalPrice}</DataTableCell>,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Total price" />
     ),
-    meta: { align: 'right', width: '10%' },
+    meta: { width: '10%' },
   },
   {
     accessorKey: 'createdAt',

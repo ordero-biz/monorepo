@@ -1,6 +1,7 @@
 import { renderHook, waitFor } from '@testing-library/react';
 import { getSupply } from '@/lib/client/api/supplies';
 import { SUPPLY_STATUS } from '@/lib/domain/supplies/constants';
+import type { SupplyDetails } from '@/lib/domain/supplies/types';
 import { suppliesQueryKeys } from '@/lib/query/supplies/suppliesQueryKeys';
 import {
   createTestQueryClient,
@@ -24,7 +25,7 @@ const supply = {
   totalPrice: 0,
   supplyEntries: [],
   version: 1,
-};
+} satisfies SupplyDetails;
 
 const getSupplyMock = vi.mocked(getSupply);
 

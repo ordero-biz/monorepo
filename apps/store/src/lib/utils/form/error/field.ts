@@ -9,6 +9,7 @@ type FieldSubmitChangeErrorMeta = {
   };
   isBlurred: boolean;
   isDirty: boolean;
+  isTouched: boolean;
 };
 
 export const getFieldSubmitChangeErrorText = (
@@ -22,11 +23,12 @@ export const getFieldSubmitChangeErrorText = (
     ? getErrorMessage(submitError)
     : undefined;
 
-  if (submitErrorText || !meta.isBlurred) {
-    return (
-      submitErrorText ??
-      (dynamicError ? getErrorMessage(dynamicError) : undefined)
-    );
+  if (submitErrorText || dynamicError) {
+    return submitErrorText ?? getErrorMessage(dynamicError);
+  }
+
+  if (!meta.isBlurred && !meta.isTouched) {
+    return undefined;
   }
 
   const clientError =

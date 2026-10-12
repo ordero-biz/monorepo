@@ -1,24 +1,39 @@
 import type { AttributeDropdown } from '@/lib/domain/attributes/types';
-import { PRODUCT_GENERATION_MODE } from '../constants';
-import type { CreateProductValues } from '../types';
+import { PRODUCT_STATUS } from '@/lib/domain/products/constants';
 import {
-  validateCreateProduct,
+  DEFAULT_MAX_GENERATED_PRODUCT_VARIANTS,
+  PRODUCT_GENERATION_MODE,
+} from '../constants';
+import type {
+  ProductGenerationValues,
+  ProductVariantsCreationValues,
+} from '../types';
+import {
   validateProductAttributes,
   validateProductCategory,
+  validateProductConfiguration,
   validateProductName,
+  validateProductStatus,
   validateProductTemplate,
   validateProductVariants,
 } from './validations';
 
-const getProductValues = (
-  productVariants: CreateProductValues['productVariants']
-): CreateProductValues => ({
+const getProductGenerationValues = (): ProductGenerationValues => ({
   attributes: [],
   attributeValues: {},
   category: '2',
   description: '',
-  productName: 'Running Shoes',
+  name: 'Running Shoes',
+});
+
+const getProductVariantsCreationValues = (
+  productVariants: ProductVariantsCreationValues['productVariants']
+): ProductVariantsCreationValues => ({
+  category: '2',
+  description: '',
+  name: 'Running Shoes',
   productVariants,
+  status: PRODUCT_STATUS.DRAFT,
 });
 
 const colorAttribute = {
@@ -54,6 +69,23 @@ describe('validateProductCategory', () => {
   });
 });
 
+describe('validateProductStatus', () => {
+  it('accepts the supported product statuses', () => {
+    expect(
+      validateProductStatus({ value: PRODUCT_STATUS.DRAFT })
+    ).toBeUndefined();
+    expect(
+      validateProductStatus({ value: PRODUCT_STATUS.ACTIVE })
+    ).toBeUndefined();
+  });
+
+  it('rejects an unsupported product status', () => {
+    expect(validateProductStatus({ value: 'ARCHIVED' as never })).toBe(
+      'Product status must be Draft or Active'
+    );
+  });
+});
+
 describe('validateProductAttributes', () => {
   it('requires at least one attribute', () => {
     expect(validateProductAttributes({ value: [] })).toBe(
@@ -69,46 +101,28 @@ describe('validateProductAttributes', () => {
 });
 
 describe('validateProductTemplate', () => {
-  it('requires a name and category before a product preview can be generated', () => {
-    expect(
-      validateProductTemplate({
-        generationMode: PRODUCT_GENERATION_MODE.one,
-        value: {
-          ...getProductValues([]),
-          category: null,
-          productName: '   ',
-        },
-      })
-    ).toEqual({
-      fields: {
-        category: 'Category is required',
-        productName: 'Product name is required',
-      },
-    });
-  });
-
-  it('requires attributes in multiple-products mode', () => {
+  it('leaves single-field rules to the field validators', () => {
     expect(
       validateProductTemplate({
         generationMode: PRODUCT_GENERATION_MODE.many,
+        maxGeneratedProductVariants: DEFAULT_MAX_GENERATED_PRODUCT_VARIANTS,
         value: {
-          ...getProductValues([]),
+          ...getProductGenerationValues(),
           attributes: [],
+          category: null,
+          name: '   ',
         },
       })
-    ).toEqual({
-      fields: {
-        attributes: 'Select at least one attribute.',
-      },
-    });
+    ).toBeUndefined();
   });
 
   it('requires an attribute value in multiple-products mode', () => {
     expect(
       validateProductTemplate({
         generationMode: PRODUCT_GENERATION_MODE.many,
+        maxGeneratedProductVariants: DEFAULT_MAX_GENERATED_PRODUCT_VARIANTS,
         value: {
-          ...getProductValues([]),
+          ...getProductGenerationValues(),
           attributes: [colorAttribute],
         },
       })
@@ -120,18 +134,107 @@ describe('validateProductTemplate', () => {
   });
 });
 
+describe('validateProductTemplate generation limit', () => {
+  const createAttribute = (id: number, valueCount: number) => ({
+    ...colorAttribute,
+    attributeValues: Array.from({ length: valueCount }, (_, index) => ({
+      createdAt: colorAttribute.createdAt,
+      id: id * 1000 + index,
+      name: `Value ${index}`,
+      sortOrder: index,
+      status: 'DRAFT' as const,
+    })),
+    id,
+  });
+
+  it('rejects selections that generate too many products', () => {
+    const attributes = [createAttribute(1, 23), createAttribute(2, 23)];
+
+    expect(
+      validateProductTemplate({
+        generationMode: PRODUCT_GENERATION_MODE.many,
+        maxGeneratedProductVariants: DEFAULT_MAX_GENERATED_PRODUCT_VARIANTS,
+        value: {
+          ...getProductGenerationValues(),
+          attributes,
+          attributeValues: {
+            '1': attributes[0].attributeValues.map(({ id }) => String(id)),
+            '2': attributes[1].attributeValues.map(({ id }) => String(id)),
+          },
+        },
+      })
+    ).toEqual({
+      fields: {
+        attributeValues: `Selected values generate 529 products. Select fewer values to generate at most ${DEFAULT_MAX_GENERATED_PRODUCT_VARIANTS}.`,
+      },
+    });
+  });
+
+  it('uses the provided limit instead of the default', () => {
+    const attributes = [createAttribute(1, 4), createAttribute(2, 3)];
+    const value = {
+      ...getProductGenerationValues(),
+      attributes,
+      attributeValues: {
+        '1': attributes[0].attributeValues.map(({ id }) => String(id)),
+        '2': attributes[1].attributeValues.map(({ id }) => String(id)),
+      },
+    };
+
+    expect(
+      validateProductTemplate({
+        generationMode: PRODUCT_GENERATION_MODE.many,
+        maxGeneratedProductVariants: 10,
+        value,
+      })
+    ).toEqual({
+      fields: {
+        attributeValues:
+          'Selected values generate 12 products. Select fewer values to generate at most 10.',
+      },
+    });
+    expect(
+      validateProductTemplate({
+        generationMode: PRODUCT_GENERATION_MODE.many,
+        maxGeneratedProductVariants: 12,
+        value,
+      })
+    ).toBeUndefined();
+  });
+
+  it('allows selections up to the limit', () => {
+    const attributes = [createAttribute(1, 22), createAttribute(2, 22)];
+
+    expect(
+      validateProductTemplate({
+        generationMode: PRODUCT_GENERATION_MODE.many,
+        maxGeneratedProductVariants: DEFAULT_MAX_GENERATED_PRODUCT_VARIANTS,
+        value: {
+          ...getProductGenerationValues(),
+          attributes,
+          attributeValues: {
+            '1': attributes[0].attributeValues.map(({ id }) => String(id)),
+            '2': attributes[1].attributeValues.map(({ id }) => String(id)),
+          },
+        },
+      })
+    ).toBeUndefined();
+  });
+});
+
 describe('validateProductVariants', () => {
   it('requires attribute values, a name, barcode, and SKU for each variant', () => {
     expect(
       validateProductVariants({
         requireAttributeValueIds: true,
-        value: getProductValues([
+        value: getProductVariantsCreationValues([
           {
             attributeValueIds: [],
             barcode: '   ',
             description: '',
             name: '',
             sku: '',
+            status: PRODUCT_STATUS.DRAFT,
           },
         ]),
       })
@@ -150,13 +253,14 @@ describe('validateProductVariants', () => {
     expect(
       validateProductVariants({
         requireAttributeValueIds: false,
-        value: getProductValues([
+        value: getProductVariantsCreationValues([
           {
             attributeValueIds: [],
             barcode: 'barcode-1',
             description: '',
             name: 'Running Shoes',
             sku: 'SHOE',
+            status: PRODUCT_STATUS.DRAFT,
           },
         ]),
       })
@@ -167,13 +271,14 @@ describe('validateProductVariants', () => {
     expect(
       validateProductVariants({
         requireAttributeValueIds: true,
-        value: getProductValues([
+        value: getProductVariantsCreationValues([
           {
             attributeValueIds: [72],
             barcode: 'barcode-1',
             description: '',
             name: 'Running Shoes Blue',
             sku: 'SHOE-BLUE',
+            status: PRODUCT_STATUS.DRAFT,
           },
           {
             attributeValueIds: [71],
@@ -181,6 +286,7 @@ describe('validateProductVariants', () => {
             description: '',
             name: 'Running Shoes Red',
             sku: 'SHOE-BLUE',
+            status: PRODUCT_STATUS.DRAFT,
           },
         ]),
       })
@@ -198,13 +304,14 @@ describe('validateProductVariants', () => {
     expect(
       validateProductVariants({
         requireAttributeValueIds: true,
-        value: getProductValues([
+        value: getProductVariantsCreationValues([
           {
             attributeValueIds: [70],
             barcode: 'barcode-1',
             description: '',
             name: 'Running Shoes Red',
             sku: 'SHOE',
+            status: PRODUCT_STATUS.DRAFT,
           },
           {
             attributeValueIds: [71],
@@ -212,6 +319,7 @@ describe('validateProductVariants', () => {
             description: '',
             name: 'Running Shoes Green',
             sku: 'SHOE',
+            status: PRODUCT_STATUS.DRAFT,
           },
           {
             attributeValueIds: [72],
@@ -219,6 +327,7 @@ describe('validateProductVariants', () => {
             description: '',
             name: 'Running Shoes Blue',
             sku: 'SHOE',
+            status: PRODUCT_STATUS.DRAFT,
           },
         ]),
       })
@@ -238,13 +347,14 @@ describe('validateProductVariants', () => {
     expect(
       validateProductVariants({
         requireAttributeValueIds: true,
-        value: getProductValues([
+        value: getProductVariantsCreationValues([
           {
             attributeValueIds: [72, 80],
             barcode: 'barcode-1',
             description: '',
             name: 'Running Shoes Blue China',
             sku: 'SHOE-BLUE-CHINA',
+            status: PRODUCT_STATUS.DRAFT,
           },
           {
             attributeValueIds: [80, 72],
@@ -252,6 +362,7 @@ describe('validateProductVariants', () => {
             description: '',
             name: 'Running Shoes China Blue',
             sku: 'SHOE-CHINA-BLUE',
+            status: PRODUCT_STATUS.DRAFT,
           },
         ]),
       })
@@ -269,13 +380,14 @@ describe('validateProductVariants', () => {
     expect(
       validateProductVariants({
         requireAttributeValueIds: true,
-        value: getProductValues([
+        value: getProductVariantsCreationValues([
           {
             attributeValueIds: [72],
             barcode: 'barcode-1',
             description: '',
             name: 'Running Shoes Blue',
             sku: 'SHOE-BLUE',
+            status: PRODUCT_STATUS.DRAFT,
           },
           {
             attributeValueIds: [71],
@@ -283,6 +395,7 @@ describe('validateProductVariants', () => {
             description: '',
             name: 'Running Shoes Red',
             sku: 'SHOE-RED',
+            status: PRODUCT_STATUS.DRAFT,
           },
         ]),
       })
@@ -290,32 +403,49 @@ describe('validateProductVariants', () => {
   });
 });
 
-describe('validateCreateProduct', () => {
-  it('returns template and variant errors together on submit', () => {
+describe('validateProductConfiguration', () => {
+  it('leaves single-field rules to the field validators', () => {
     expect(
-      validateCreateProduct({
+      validateProductConfiguration({
         generationMode: PRODUCT_GENERATION_MODE.one,
         value: {
-          ...getProductValues([
+          ...getProductVariantsCreationValues([
             {
               attributeValueIds: [],
-              barcode: '',
+              barcode: 'barcode-1',
               description: '',
-              name: '',
-              sku: '',
+              name: 'Running Shoes',
+              sku: 'SHOE',
+              status: 'ARCHIVED' as never,
             },
           ]),
           category: null,
-          productName: '',
+          name: '   ',
+          status: 'ARCHIVED' as never,
         },
+      })
+    ).toBeUndefined();
+  });
+
+  it('applies multiple-product variant requirements without generation fields', () => {
+    expect(
+      validateProductConfiguration({
+        generationMode: PRODUCT_GENERATION_MODE.many,
+        value: getProductVariantsCreationValues([
+          {
+            attributeValueIds: [],
+            barcode: 'barcode-1',
+            description: '',
+            name: 'Running Shoes',
+            sku: 'SHOE',
+            status: PRODUCT_STATUS.DRAFT,
+          },
+        ]),
       })
     ).toEqual({
       fields: {
-        'productVariants[0].barcode': 'Barcode is required',
-        'productVariants[0].name': 'Product variant name is required',
-        'productVariants[0].sku': 'SKU is required',
-        category: 'Category is required',
-        productName: 'Product name is required',
+        'productVariants[0].attributeValueIds':
+          'Select at least one attribute value',
       },
     });
   });

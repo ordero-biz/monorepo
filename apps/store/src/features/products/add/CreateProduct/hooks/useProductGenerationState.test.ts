@@ -2,7 +2,7 @@ import { act, renderHook } from '@testing-library/react';
 import { useProductGenerationState } from './useProductGenerationState';
 
 describe('useProductGenerationState', () => {
-  it('stores generated attributes and advances the generation version', () => {
+  it('stores generated attributes and enters the configuration stage', () => {
     const { result } = renderHook(() => useProductGenerationState());
     const attributes = [
       {
@@ -16,20 +16,19 @@ describe('useProductGenerationState', () => {
     ];
 
     expect(result.current.generatedAttributes).toEqual([]);
-    expect(result.current.generatedTemplateSignature).toBeUndefined();
-    expect(result.current.generationVersion).toBe(0);
+    expect(result.current.isProductVariantGenerationStage).toBe(true);
 
     act(() => {
       result.current.onProductVariantsGenerated({
         attributes,
-        generationSignature: 'running-shoes-color',
+        category: '2',
+        description: '',
+        name: 'Running Shoes',
+        productVariants: [],
       });
     });
 
     expect(result.current.generatedAttributes).toEqual(attributes);
-    expect(result.current.generatedTemplateSignature).toBe(
-      'running-shoes-color'
-    );
-    expect(result.current.generationVersion).toBe(1);
+    expect(result.current.isProductVariantGenerationStage).toBe(false);
   });
 });

@@ -33,11 +33,10 @@ describe('submitCreateProduct', () => {
 
     await expect(
       submitCreateProduct({
-        attributes: [],
-        attributeValues: {},
-        productName: ' Running Shoes ',
+        name: ' Running Shoes ',
         description: 'Lightweight daily trainer',
         category: '2',
+        status: 'ACTIVE',
         productVariants: [
           {
             attributeValueIds: [71],
@@ -45,6 +44,7 @@ describe('submitCreateProduct', () => {
             description: 'Blue variant',
             name: ' Running Shoes Blue ',
             sku: ' SHOE-BLUE ',
+            status: 'DRAFT',
           },
         ],
       })
@@ -67,6 +67,7 @@ describe('submitCreateProduct', () => {
       categoryId: 2,
       description: 'Lightweight daily trainer',
       name: 'Running Shoes',
+      status: 'ACTIVE',
       productVariants: [
         {
           attributeValueIds: [71],
@@ -74,22 +75,23 @@ describe('submitCreateProduct', () => {
           description: 'Blue variant',
           name: 'Running Shoes Blue',
           sku: 'SHOE-BLUE',
+          status: 'DRAFT',
         },
       ],
     });
   });
 
-  it('maps backend product field errors to form field names', async () => {
+  it('returns backend product field errors unchanged', async () => {
     createProductGroupMock.mockResolvedValue({
       ok: false,
       error: {
         status: 422,
         message: 'Product creation failed.',
         fieldErrors: {
-          categoryId: 'Category is required.',
+          category: 'Category is required.',
           description: 'Description is too long.',
           name: 'Product name already exists.',
-          'productVariants.0.sku': 'SKU already exists.',
+          'productVariants[0].sku': 'SKU already exists.',
           'productVariants[1].barcode': 'Barcode already exists.',
         },
       },
@@ -97,11 +99,10 @@ describe('submitCreateProduct', () => {
 
     await expect(
       submitCreateProduct({
-        attributes: [],
-        attributeValues: {},
-        productName: 'Running Shoes',
+        name: 'Running Shoes',
         description: 'Lightweight daily trainer',
         category: '2',
+        status: 'DRAFT',
         productVariants: [],
       })
     ).resolves.toEqual({
@@ -110,12 +111,61 @@ describe('submitCreateProduct', () => {
         fieldErrors: {
           category: 'Category is required.',
           description: 'Description is too long.',
-          productName: 'Product name already exists.',
+          name: 'Product name already exists.',
           'productVariants[0].sku': 'SKU already exists.',
           'productVariants[1].barcode': 'Barcode already exists.',
         },
         formError: 'Product creation failed.',
       },
+    });
+  });
+
+  it('omits blank product and variant descriptions', async () => {
+    createProductGroupMock.mockResolvedValue({
+      ok: true,
+      data: {
+        id: 3,
+        name: 'Running Shoes',
+        description: '',
+        createdAt: '2026-07-03T07:20:30.291Z',
+        category: {
+          id: 2,
+          name: 'Footwear',
+          createdAt: '2026-07-01T07:20:30.291Z',
+        },
+      },
+    });
+
+    await submitCreateProduct({
+      name: 'Running Shoes',
+      description: '   ',
+      category: '2',
+      status: 'DRAFT',
+      productVariants: [
+        {
+          attributeValueIds: [],
+          barcode: 'barcode-1',
+          description: '',
+          name: 'Running Shoes',
+          sku: 'SHOE-1',
+          status: 'ACTIVE',
+        },
+      ],
+    });
+
+    expect(createProductGroupMock).toHaveBeenCalledWith({
+      categoryId: 2,
+      name: 'Running Shoes',
+      status: 'DRAFT',
+      productVariants: [
+        {
+          attributeValueIds: [],
+          barcode: 'barcode-1',
+          name: 'Running Shoes',
+          sku: 'SHOE-1',
+          status: 'ACTIVE',
+        },
+      ],
     });
   });
 });

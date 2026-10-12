@@ -1,16 +1,19 @@
 import { FieldHelperText, ToggleButton } from '@ordero/ui';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
 import type { ProductAttributeValuesFieldProps } from './types';
+import { updateAttributeValueSelection } from './utils/productGeneration';
 
 export const ProductAttributeValuesField = ({
-  form,
+  productVariantsGenerationForm,
 }: ProductAttributeValuesFieldProps) => (
-  <form.Field name="attributeValues">
+  <productVariantsGenerationForm.Field name="attributeValues">
     {(field) => {
       const errorText = getFieldSubmitChangeErrorText(field.state.meta);
 
       return (
-        <form.Subscribe selector={(state) => state.values.attributes}>
+        <productVariantsGenerationForm.Subscribe
+          selector={(state) => state.values.attributes}
+        >
           {(attributes) =>
             attributes.length > 0 ? (
               <fieldset
@@ -37,21 +40,15 @@ export const ProductAttributeValuesField = ({
                           <ToggleButton.Item
                             key={attributeValue.id}
                             onPressedChange={(pressed) => {
-                              const nextAttributeValues = {
-                                ...field.state.value,
-                                [attributeId]: pressed
-                                  ? [
-                                      ...selectedAttributeValueIds,
-                                      attributeValueId,
-                                    ]
-                                  : selectedAttributeValueIds.filter(
-                                      (selectedAttributeValueId) =>
-                                        selectedAttributeValueId !==
-                                        attributeValueId
-                                    ),
-                              };
-
-                              field.handleChange(nextAttributeValues);
+                              field.handleChange(
+                                updateAttributeValueSelection({
+                                  attributeId,
+                                  attributeValueId,
+                                  attributeValuesByAttributeId:
+                                    field.state.value,
+                                  pressed,
+                                })
+                              );
                             }}
                             pressed={selectedAttributeValueIds.includes(
                               attributeValueId
@@ -72,8 +69,8 @@ export const ProductAttributeValuesField = ({
               </fieldset>
             ) : null
           }
-        </form.Subscribe>
+        </productVariantsGenerationForm.Subscribe>
       );
     }}
-  </form.Field>
+  </productVariantsGenerationForm.Field>
 );

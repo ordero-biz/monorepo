@@ -38,7 +38,7 @@ const supply = {
   totalPrice: 0,
   supplyEntries: [],
   version: 1,
-};
+} satisfies SupplyDetails;
 
 describe('SupplyDetail', () => {
   beforeEach(() => {

@@ -3,6 +3,11 @@ export const PRODUCTS_LIST_MODE = {
   productGroups: 'product-groups',
 } as const;
 
+export const PRODUCT_STATUS = {
+  DRAFT: 'DRAFT',
+  ACTIVE: 'ACTIVE',
+} as const;
+
 export const PRODUCTS_LIST_MODE_SEARCH_PARAM = 'listMode';
 
 export const PRODUCT_CREATION_MODE = {

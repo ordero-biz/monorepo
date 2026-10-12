@@ -265,15 +265,15 @@ describe('products client helpers', () => {
     await expect(
       createProductGroup({
         name: 'Running Shoes',
-        description: '',
         categoryId: 2,
+        status: 'DRAFT',
         productVariants: [
           {
             name: 'Running Shoes Blue',
-            description: '',
             sku: 'SHOE-BLUE',
             barcode: 'barcode-1',
             attributeValueIds: [71],
+            status: 'ACTIVE',
           },
         ],
       })
@@ -298,15 +298,15 @@ describe('products client helpers', () => {
         method: 'POST',
         body: JSON.stringify({
           name: 'Running Shoes',
-          description: '',
           categoryId: 2,
+          status: 'DRAFT',
           productVariants: [
             {
               name: 'Running Shoes Blue',
-              description: '',
               sku: 'SHOE-BLUE',
               barcode: 'barcode-1',
               attributeValueIds: [71],
+              status: 'ACTIVE',
             },
           ],
         }),
@@ -334,8 +334,8 @@ describe('products client helpers', () => {
     await expect(
       createProductGroup({
         name: 'Running Shoes',
-        description: '',
         categoryId: 2,
+        status: 'DRAFT',
         productVariants: [],
       })
     ).resolves.toEqual({

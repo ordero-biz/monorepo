@@ -1,4 +1,4 @@
-import { getChangedValues, type ChangedValues } from './getChangedValues';
+import { type ChangedValues, getChangedValues } from './getChangedValues';
 
 describe('getChangedValues', () => {
   it('returns undefined when values are unchanged', () => {

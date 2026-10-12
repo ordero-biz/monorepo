@@ -3,8 +3,8 @@
 import { Menu, PageHeader, Typography } from '@ordero/ui';
 import { EllipsisVertical, Pencil } from 'lucide-react';
 import { useState } from 'react';
-import { AppBreadcrumbs } from '@/lib/components/AppBreadcrumbs';
 import { UpdateCategoryDialog } from '@/features/categories/detail/UpdateCategory';
+import { AppBreadcrumbs } from '@/lib/components/AppBreadcrumbs';
 import { CATEGORY_STATUS } from '@/lib/domain/categories/constants';
 import { categoriesRootBreadcrumb } from '../../shared/breadcrumbs';
 import { CategoryStatusChip } from '../../shared/CategoryStatusChip';

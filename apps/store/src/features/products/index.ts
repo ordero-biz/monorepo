@@ -1,5 +1,4 @@
-export { CreateMultipleProducts } from '@/features/products/add/CreateMultipleProducts';
-export { CreateSingleProduct } from '@/features/products/add/CreateSingleProduct';
+export { CreateProductWorkflow } from '@/features/products/add/CreateProductWorkflow';
 export {
   ProductsList,
   ProductsListHeader,

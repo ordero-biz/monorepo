@@ -1,38 +1,27 @@
 import { useToastManager } from '@ordero/ui';
 import { revalidateLogic, useForm } from '@tanstack/react-form';
-import { createProductDefaultValues } from '../constants';
-import type { CreateProductValues } from '../types';
+import { createProductVariantsCreationDefaultValues } from '../constants';
+import type { ProductVariantsCreationValues } from '../types';
 import { submitCreateProduct } from '../utils/submitAction';
-import {
-  type validateCreateProduct,
-  validateProductVariants,
-} from '../utils/validations';
+import type { validateProductConfiguration } from '../utils/validations';
 
 type UseCreateProductFormArgs = {
   onCreated: () => Promise<void> | void;
-  validateProduct: (
-    value: CreateProductValues
-  ) => ReturnType<typeof validateCreateProduct>;
+  validateConfiguration: (
+    value: ProductVariantsCreationValues
+  ) => ReturnType<typeof validateProductConfiguration>;
 };
 
 export const useCreateProductForm = ({
   onCreated,
-  validateProduct,
+  validateConfiguration,
 }: UseCreateProductFormArgs) => {
   const { add: addToast } = useToastManager();
   const form = useForm({
-    defaultValues: createProductDefaultValues,
+    defaultValues: createProductVariantsCreationDefaultValues,
     validationLogic: revalidateLogic(),
     validators: {
-      onDynamic: ({ value }) =>
-        validateProductVariants({
-          requireAttributeValueIds: false,
-          value,
-        }),
-      onSubmit: ({ value }) => validateProduct(value),
-    },
-    onSubmitInvalid: ({ formApi }) => {
-      void formApi.validate('submit');
+      onDynamic: ({ value }) => validateConfiguration(value),
     },
     onSubmit: async ({ formApi, value }) => {
       const result = await submitCreateProduct(value);
@@ -40,7 +29,7 @@ export const useCreateProductForm = ({
       if (!result.ok) {
         formApi.setErrorMap({
           onSubmit: {
-            fields: result.error.fieldErrors,
+            fields: result.error.fieldErrors ?? {},
           },
         });
 
