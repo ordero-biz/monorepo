@@ -1,5 +1,5 @@
 import { CreateSupply } from '@/features/supplies';
 
-const AddSupplyPage = () => <CreateSupply />;
-
-export default AddSupplyPage;
+export default async function AddSupplyPage() {
+  return <CreateSupply />;
+};

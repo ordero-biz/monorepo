@@ -10,7 +10,7 @@ type SupplyDetailPageProps = {
   }>;
 };
 
-const SupplyDetailPage = async ({ params }: SupplyDetailPageProps) => {
+export default async function SupplyDetailPage({ params }: SupplyDetailPageProps) {
   const { id } = await params;
   const queryClient = makeQueryClient();
 
@@ -22,5 +22,3 @@ const SupplyDetailPage = async ({ params }: SupplyDetailPageProps) => {
     </HydrationBoundary>
   );
 };
-
-export default SupplyDetailPage;
