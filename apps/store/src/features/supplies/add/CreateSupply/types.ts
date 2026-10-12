@@ -38,6 +38,20 @@ export type SupplyEntriesProps = {
   entries: SupplyEntryFormValues[];
   form: ReturnType<typeof useSupplyEditorForm>['form'];
   readOnly: boolean;
-  submit: ReturnType<typeof useSupplyEditorForm>['submit'];
-  submitIntent: ReturnType<typeof useSupplyEditorForm>['submitIntent'];
+  pendingIntent: SupplySubmitIntent | null;
+  onSaveDraft: () => void;
+  onFinalize: () => void;
+};
+
+export type SupplySubmitIntent = 'draft' | 'finalize';
+
+export type SupplyActionsProps = {
+  count: number;
+  selectedCount: number;
+  onClearSelection: () => void;
+  onDeleteSelected: () => void;
+  total: number;
+  pendingIntent: SupplySubmitIntent | null;
+  onSaveDraft: () => void;
+  onFinalize: () => void;
 };

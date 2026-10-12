@@ -1,35 +1,26 @@
 'use client';
 
 import {
-  Button,
   Card,
-  ContextualActionBar,
   DataTable,
   DataTableCell,
   type DataTableColumnDef,
-  Dialog,
   Menu,
   TextField,
   Typography,
   useDataTableSelection,
 } from '@ordero/ui';
-import { EllipsisVertical, LockKeyhole, Package, Trash2 } from 'lucide-react';
-import { useCallback, useMemo, useRef, useState } from 'react';
-import { BaseLayoutContextualActionBar } from '@/features/app-shell';
+import { EllipsisVertical, Package, Trash2 } from 'lucide-react';
+import { useCallback, useMemo, useRef } from 'react';
 import type { ProductVariant } from '@/lib/domain/products/types';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
+import { SupplyActions } from './SupplyActions';
 import {
   ProductVariantsAsyncCombobox,
   UnitsOfMeasurementAsyncCombobox,
 } from './selectors';
 import type { SupplyEntriesProps, SupplyEntryFormValues } from './types';
-import { createEmptySupplyEntry, getSupplyTotal } from './utils';
-
-const formatMoney = (value: number) =>
-  new Intl.NumberFormat('en-US', {
-    currency: 'USD',
-    style: 'currency',
-  }).format(value);
+import { createEmptySupplyEntry, formatMoney, getSupplyTotal } from './utils';
 
 const getRowId = (entry: SupplyEntryFormValues) => entry.clientId;
 
@@ -44,11 +35,11 @@ export const SupplyEntries = ({
   entries,
   form,
   readOnly,
-  submit,
-  submitIntent,
+  onSaveDraft,
+  onFinalize,
+  pendingIntent,
 }: SupplyEntriesProps) => {
   const nextClientId = useRef(0);
-  const [finalizeDialogOpen, setFinalizeDialogOpen] = useState(false);
   const data = useMemo(
     () => (readOnly ? entries.slice(0, -1) : entries),
     [entries, readOnly]
@@ -62,7 +53,6 @@ export const SupplyEntries = ({
     getRowId,
     selectAllCheckboxAriaLabel: 'Select all supply entries',
   });
-  const { count, total } = getSupplyTotal(form.state.values);
 
   const deleteRows = useCallback(
     (clientIds: Set<string>) => {
@@ -431,130 +421,18 @@ export const SupplyEntries = ({
       </Card.Root>
 
       {!readOnly ? (
-        <>
-          <div aria-hidden="true" className="h-[var(--space-12)]" />
-          <BaseLayoutContextualActionBar>
-            {selectedRows.length > 0 ? (
-              <ContextualActionBar.Root ariaLabel="Supply entry bulk actions">
-                <ContextualActionBar.Left>
-                  <Typography variant="body2">
-                    {selectedRows.length} selected
-                  </Typography>
-                  <Button
-                    color="inherit"
-                    onClick={clearSelection}
-                    size="s"
-                    type="button"
-                    variant="text"
-                  >
-                    Clear selection
-                  </Button>
-                </ContextualActionBar.Left>
-                <ContextualActionBar.Right>
-                  <Button
-                    color="error"
-                    onClick={() =>
-                      deleteRows(new Set(selectedRows.map(getRowId)))
-                    }
-                    size="s"
-                    startIcon={<Trash2 aria-hidden="true" />}
-                    type="button"
-                    variant="soft"
-                  >
-                    Delete
-                  </Button>
-                </ContextualActionBar.Right>
-              </ContextualActionBar.Root>
-            ) : (
-              <ContextualActionBar.Root ariaLabel="Supply creation actions">
-                <ContextualActionBar.Left>
-                  <Typography variant="body2">
-                    {count} {count === 1 ? 'product' : 'products'} · Total{' '}
-                    {formatMoney(total)}
-                  </Typography>
-                </ContextualActionBar.Left>
-                <div className="flex items-center gap-[var(--space-1)] rounded-[var(--radius)] bg-[var(--color-warning-16)] px-[var(--space-2)] py-[var(--space-1)] text-[var(--warning-dark)]">
-                  <LockKeyhole
-                    aria-hidden="true"
-                    className="size-[var(--space-2)] shrink-0"
-                  />
-                  <p className="text-[length:var(--body2-size-desktop)] leading-[var(--body2-line-height-desktop)]">
-                    After finalization, this supply can no longer be edited.
-                  </p>
-                </div>
-                <ContextualActionBar.Right>
-                  <form.Subscribe selector={(state) => state.isSubmitting}>
-                    {(isSubmitting) => (
-                      <div className="flex items-center gap-[var(--space-1)]">
-                        <Button
-                          color="inherit"
-                          disabled={isSubmitting}
-                          onClick={() => submit('draft')}
-                          type="button"
-                          variant="outlined"
-                        >
-                          {isSubmitting && submitIntent === 'draft'
-                            ? 'Saving...'
-                            : 'Save draft'}
-                        </Button>
-                        <Button
-                          color="primary"
-                          disabled={isSubmitting || count === 0}
-                          onClick={() => setFinalizeDialogOpen(true)}
-                          type="button"
-                        >
-                          Finalize supply
-                        </Button>
-                      </div>
-                    )}
-                  </form.Subscribe>
-                </ContextualActionBar.Right>
-              </ContextualActionBar.Root>
-            )}
-          </BaseLayoutContextualActionBar>
-        </>
+        <SupplyActions
+          {...getSupplyTotal(form.state.values)}
+          onClearSelection={clearSelection}
+          onDeleteSelected={() =>
+            deleteRows(new Set(selectedRows.map(getRowId)))
+          }
+          onFinalize={onFinalize}
+          onSaveDraft={onSaveDraft}
+          pendingIntent={pendingIntent}
+          selectedCount={selectedRows.length}
+        />
       ) : null}
-
-      <Dialog.Root
-        onOpenChange={setFinalizeDialogOpen}
-        open={finalizeDialogOpen}
-      >
-        <Dialog.Portal>
-          <Dialog.Backdrop />
-          <Dialog.Viewport>
-            <Dialog.Popup size="xs">
-              <Dialog.Header>
-                <Dialog.Title>Finalize supply</Dialog.Title>
-              </Dialog.Header>
-              <Dialog.Content>
-                <div className="flex flex-col gap-[var(--space-2)]">
-                  <Typography variant="body1">
-                    Are you sure you want to finalize this supply?
-                  </Typography>
-                  <Typography variant="body1">
-                    <strong>
-                      This action cannot be undone. The supply will no longer be
-                      editable.
-                    </strong>
-                  </Typography>
-                </div>
-              </Dialog.Content>
-              <Dialog.Footer closeButtonLabel="Cancel">
-                <Button
-                  color="primary"
-                  onClick={() => {
-                    setFinalizeDialogOpen(false);
-                    submit('finalize');
-                  }}
-                  type="button"
-                >
-                  Finalize supply
-                </Button>
-              </Dialog.Footer>
-            </Dialog.Popup>
-          </Dialog.Viewport>
-        </Dialog.Portal>
-      </Dialog.Root>
     </>
   );
 };

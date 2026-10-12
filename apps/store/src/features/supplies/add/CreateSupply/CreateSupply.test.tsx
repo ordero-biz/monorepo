@@ -1,8 +1,9 @@
-import { screen, waitFor, within } from '@testing-library/react';
+import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createSupply, updateSupply } from '@/lib/client/api/supplies';
 import { SUPPLY_STATUS } from '@/lib/domain/supplies/constants';
 import type { SupplyDetails } from '@/lib/domain/supplies/types';
+import { suppliesQueryKeys } from '@/lib/query/supplies/suppliesQueryKeys';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { CreateSupply } from './CreateSupply';
 
@@ -245,7 +246,8 @@ describe('CreateSupply', () => {
   it('saves a metadata-only draft without submitting the blank product row', async () => {
     const user = userEvent.setup();
     createSupplyMock.mockResolvedValue({ ok: true, data: savedSupply });
-    setup();
+    const { queryClient } = setup();
+    const invalidateQueriesSpy = vi.spyOn(queryClient, 'invalidateQueries');
     await fillMetadata(user);
 
     await user.click(screen.getByRole('button', { name: 'Save draft' }));
@@ -259,7 +261,15 @@ describe('CreateSupply', () => {
         status: SUPPLY_STATUS.DRAFT,
       });
     });
-    expect(mocks.replace).toHaveBeenCalledWith('/products/supplies/9');
+    await waitFor(() => {
+      expect(mocks.replace).toHaveBeenCalledWith('/products/supplies/9');
+    });
+    expect(queryClient.getQueryData(suppliesQueryKeys.detail(9))).toEqual(
+      savedSupply
+    );
+    expect(invalidateQueriesSpy).toHaveBeenCalledWith({
+      queryKey: suppliesQueryKeys.list,
+    });
   });
 
   it('submits COMPLETED only after confirming finalization', async () => {
@@ -299,11 +309,18 @@ describe('CreateSupply', () => {
 
   it('saves edits to an existing draft with its version and full entry list', async () => {
     const user = userEvent.setup();
+    const updatedSupply = {
+      ...savedSupply,
+      totalQuantity: 25,
+      totalPrice: 700,
+      version: 2,
+    };
     updateSupplyMock.mockResolvedValue({
       ok: true,
-      data: { ...savedSupply, totalQuantity: 25, totalPrice: 700, version: 2 },
+      data: updatedSupply,
     });
-    setup({ initialSupply: savedSupply });
+    const { queryClient } = setup({ initialSupply: savedSupply });
+    const invalidateQueriesSpy = vi.spyOn(queryClient, 'invalidateQueries');
 
     await user.clear(
       screen.getByRole('spinbutton', { name: 'Quantity for row 1' })
@@ -331,7 +348,75 @@ describe('CreateSupply', () => {
     });
     expect(screen.getByText('Draft')).toBeVisible();
     expect(screen.queryByText('Status')).not.toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: 'Save draft' })).toBeEnabled();
+    });
+    expect(queryClient.getQueryData(suppliesQueryKeys.detail(9))).toEqual(
+      updatedSupply
+    );
+    expect(invalidateQueriesSpy).toHaveBeenCalledWith({
+      queryKey: suppliesQueryKeys.list,
+    });
     expect(mocks.replace).not.toHaveBeenCalled();
+  });
+
+  it('keeps caches and navigation unchanged when saving fails', async () => {
+    const user = userEvent.setup();
+    createSupplyMock.mockResolvedValue({
+      ok: false,
+      error: { message: 'Could not save the supply.', status: 500 },
+    });
+    const { queryClient } = setup();
+    const setQueryDataSpy = vi.spyOn(queryClient, 'setQueryData');
+    const invalidateQueriesSpy = vi.spyOn(queryClient, 'invalidateQueries');
+    await fillMetadata(user);
+
+    await user.click(screen.getByRole('button', { name: 'Save draft' }));
+
+    expect(await screen.findByText('Could not save the supply.')).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Save draft' })).toBeEnabled();
+    expect(setQueryDataSpy).not.toHaveBeenCalled();
+    expect(invalidateQueriesSpy).not.toHaveBeenCalled();
+    expect(mocks.replace).not.toHaveBeenCalled();
+  });
+
+  it('keeps save actions pending until the workflow callback finishes', async () => {
+    const user = userEvent.setup();
+    createSupplyMock.mockResolvedValue({ ok: true, data: savedSupply });
+    const { queryClient } = setup();
+    const invalidation = Promise.withResolvers<void>();
+    vi.spyOn(queryClient, 'invalidateQueries').mockReturnValue(
+      invalidation.promise
+    );
+    await fillMetadata(user);
+
+    await user.click(screen.getByRole('button', { name: 'Save draft' }));
+
+    expect(
+      await screen.findByRole('button', { name: 'Saving...' })
+    ).toBeDisabled();
+    expect(
+      screen.getByRole('button', { name: 'Finalize supply' })
+    ).toBeDisabled();
+    expect(mocks.replace).not.toHaveBeenCalled();
+
+    await act(async () => invalidation.resolve());
+
+    expect(
+      await screen.findByRole('button', { name: 'Save draft' })
+    ).toBeEnabled();
+    expect(mocks.replace).toHaveBeenCalledWith('/products/supplies/9');
+  });
+
+  it('restores save actions after validation rejects a submission', async () => {
+    const user = userEvent.setup();
+    setup();
+
+    await user.click(screen.getByRole('button', { name: 'Save draft' }));
+
+    expect(await screen.findByText('Supply number is required')).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Save draft' })).toBeEnabled();
+    expect(createSupplyMock).not.toHaveBeenCalled();
   });
 
   it('keeps a completed supply read-only without save or selection actions', () => {

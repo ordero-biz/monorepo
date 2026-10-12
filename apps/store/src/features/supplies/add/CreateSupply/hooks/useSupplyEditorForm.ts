@@ -2,18 +2,18 @@
 
 import { useToastManager } from '@ordero/ui';
 import { revalidateLogic, useForm } from '@tanstack/react-form';
-import { useQueryClient } from '@tanstack/react-query';
-import { useRouter } from 'next/navigation';
 import { useRef, useState } from 'react';
 import { createSupply, updateSupply } from '@/lib/client/api/supplies';
-import { getSupplyDetailRoute } from '@/lib/client/routes';
 import { SUPPLY_STATUS } from '@/lib/domain/supplies/constants';
 import type { SupplyDetails } from '@/lib/domain/supplies/types';
-import { suppliesQueryKeys } from '@/lib/query/supplies/suppliesQueryKeys';
 import { getCreateSupplyData, getUpdateSupplyData } from '../submitData';
+import type { SupplySubmitIntent } from '../types';
 import { getSupplyFormDefaults, validateSupplyForm } from '../utils';
 
-type SupplySubmitIntent = 'draft' | 'finalize';
+type UseSupplyEditorFormArgs = {
+  initialSupply?: SupplyDetails;
+  onSaved: (supply: SupplyDetails) => Promise<void> | void;
+};
 
 const mapSupplyFieldErrors = (fieldErrors?: Record<string, string>) =>
   fieldErrors
@@ -25,12 +25,15 @@ const mapSupplyFieldErrors = (fieldErrors?: Record<string, string>) =>
       )
     : undefined;
 
-export const useSupplyEditorForm = (initialSupply?: SupplyDetails) => {
-  const router = useRouter();
-  const queryClient = useQueryClient();
+export const useSupplyEditorForm = ({
+  initialSupply,
+  onSaved,
+}: UseSupplyEditorFormArgs) => {
   const { add: addToast } = useToastManager();
   const intentRef = useRef<SupplySubmitIntent>('draft');
-  const [submitIntent, setSubmitIntent] = useState<SupplySubmitIntent>('draft');
+  const [pendingIntent, setPendingIntent] = useState<SupplySubmitIntent | null>(
+    null
+  );
   const form = useForm({
     defaultValues: getSupplyFormDefaults(initialSupply),
     validationLogic: revalidateLogic(),
@@ -38,9 +41,7 @@ export const useSupplyEditorForm = (initialSupply?: SupplyDetails) => {
       onSubmit: ({ value }) =>
         validateSupplyForm(value, intentRef.current === 'finalize'),
     },
-    onSubmitInvalid: ({ formApi }) => {
-      void formApi.validate('submit');
-    },
+    onSubmitInvalid: ({ formApi }) => formApi.validate('submit'),
     onSubmit: async ({ formApi, value }) => {
       const status =
         intentRef.current === 'finalize'
@@ -72,11 +73,6 @@ export const useSupplyEditorForm = (initialSupply?: SupplyDetails) => {
         return;
       }
 
-      queryClient.setQueryData(
-        suppliesQueryKeys.detail(result.data.id),
-        result.data
-      );
-      await queryClient.invalidateQueries({ queryKey: suppliesQueryKeys.list });
       addToast({
         description:
           status === SUPPLY_STATUS.COMPLETED
@@ -87,17 +83,23 @@ export const useSupplyEditorForm = (initialSupply?: SupplyDetails) => {
         type: 'success',
       });
 
-      if (!initialSupply) {
-        router.replace(getSupplyDetailRoute(result.data.id));
-      }
+      await onSaved(result.data);
     },
   });
 
-  const submit = (intent: SupplySubmitIntent) => {
+  const submit = async (intent: SupplySubmitIntent) => {
+    if (form.state.isSubmitting) {
+      return;
+    }
+
     intentRef.current = intent;
-    setSubmitIntent(intent);
-    void form.handleSubmit();
+    setPendingIntent(intent);
+    try {
+      await form.handleSubmit();
+    } finally {
+      setPendingIntent(null);
+    }
   };
 
-  return { form, submit, submitIntent };
+  return { form, submit, pendingIntent };
 };

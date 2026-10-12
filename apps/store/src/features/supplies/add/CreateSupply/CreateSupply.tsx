@@ -1,8 +1,12 @@
 'use client';
 
 import { PageHeader, Typography } from '@ordero/ui';
+import { useQueryClient } from '@tanstack/react-query';
+import { useRouter } from 'next/navigation';
+import { getSupplyDetailRoute } from '@/lib/client/routes';
 import { AppBreadcrumbs } from '@/lib/components/AppBreadcrumbs';
 import { SUPPLY_STATUS } from '@/lib/domain/supplies/constants';
+import { suppliesQueryKeys } from '@/lib/query/supplies/suppliesQueryKeys';
 import { suppliesRootBreadcrumb } from '../../shared/breadcrumbs';
 import { useSupplyEditorForm } from './hooks/useSupplyEditorForm';
 import { SupplyEntries } from './SupplyEntries';
@@ -10,20 +14,23 @@ import { SupplyInformation } from './SupplyInformation';
 import type { CreateSupplyProps } from './types';
 
 export const CreateSupply = ({ initialSupply }: CreateSupplyProps) => {
-  const { form, submit, submitIntent } = useSupplyEditorForm(initialSupply);
+  const router = useRouter();
+  const queryClient = useQueryClient();
+  const { form, submit, pendingIntent } = useSupplyEditorForm({
+    initialSupply,
+    onSaved: async (supply) => {
+      queryClient.setQueryData(suppliesQueryKeys.detail(supply.id), supply);
+      await queryClient.invalidateQueries({ queryKey: suppliesQueryKeys.list });
+
+      if (!initialSupply) {
+        router.replace(getSupplyDetailRoute(supply.id));
+      }
+    },
+  });
   const readOnly = initialSupply?.status === SUPPLY_STATUS.COMPLETED;
 
   return (
-    <form
-      className="flex flex-col gap-[var(--space-3)]"
-      noValidate
-      onSubmit={(event) => {
-        event.preventDefault();
-        if (!readOnly) {
-          submit('draft');
-        }
-      }}
-    >
+    <div className="flex flex-col gap-[var(--space-2)]">
       <PageHeader.Root>
         <PageHeader.Left>
           <div className="flex min-w-0 flex-col gap-[var(--space-0-5)]">
@@ -45,23 +52,35 @@ export const CreateSupply = ({ initialSupply }: CreateSupplyProps) => {
         </PageHeader.Left>
       </PageHeader.Root>
 
-      <SupplyInformation
-        form={form}
-        initialSupply={initialSupply}
-        readOnly={readOnly}
-      />
+      <form
+        className="flex flex-col gap-[var(--space-3)]"
+        noValidate
+        onSubmit={(event) => {
+          event.preventDefault();
+          if (!readOnly) {
+            return submit('draft');
+          }
+        }}
+      >
+        <SupplyInformation
+          form={form}
+          initialSupply={initialSupply}
+          readOnly={readOnly}
+        />
 
-      <form.Subscribe selector={(state) => state.values.supplyEntries}>
-        {(entries) => (
-          <SupplyEntries
-            entries={entries}
-            form={form}
-            readOnly={readOnly}
-            submit={submit}
-            submitIntent={submitIntent}
-          />
-        )}
-      </form.Subscribe>
-    </form>
+        <form.Subscribe selector={(state) => state.values.supplyEntries}>
+          {(entries) => (
+            <SupplyEntries
+              entries={entries}
+              form={form}
+              onFinalize={() => submit('finalize')}
+              onSaveDraft={() => submit('draft')}
+              pendingIntent={pendingIntent}
+              readOnly={readOnly}
+            />
+          )}
+        </form.Subscribe>
+      </form>
+    </div>
   );
 };
