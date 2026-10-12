@@ -1,14 +1,14 @@
 'use client';
 
-import { useCallback, useMemo } from 'react';
 import { Chip } from '@ordero/ui';
-import { CATEGORY_STATUS } from '@/lib/domain/categories/constants';
+import { useCallback, useMemo } from 'react';
 import { getCategories } from '@/lib/client/api/categories';
 import {
   AsyncCombobox,
   type AsyncComboboxLoadOptionsArgs,
   type AsyncComboboxLoadOptionsResult,
 } from '@/lib/components/AsyncCombobox';
+import { CATEGORY_STATUS } from '@/lib/domain/categories/constants';
 import { categoriesQueryKeys } from '@/lib/query/categories/categoriesQueryKeys';
 import type { CategoriesAsyncComboboxProps } from './types';
 
@@ -34,7 +34,9 @@ const loadCategoryOptions = async ({
         <span className="flex min-w-0 items-center gap-[var(--space-1)]">
           <span className="truncate">{category.name}</span>
           {category.status === CATEGORY_STATUS.DRAFT ? (
-            <Chip size="s" variant="soft">Draft</Chip>
+            <Chip size="s" variant="soft">
+              Draft
+            </Chip>
           ) : null}
         </span>
       ),

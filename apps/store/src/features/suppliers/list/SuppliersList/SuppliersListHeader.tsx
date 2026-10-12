@@ -1,5 +1,5 @@
-import { AppBreadcrumbs } from '@/lib/components/AppBreadcrumbs';
 import { CreateSupplierDialogTrigger } from '@/features/suppliers/list/CreateSupplier';
+import { AppBreadcrumbs } from '@/lib/components/AppBreadcrumbs';
 import { PageHeader, Typography } from '@/ui/index';
 import { suppliersRootBreadcrumb } from '../../shared/breadcrumbs';
 
