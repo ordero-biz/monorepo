@@ -51,6 +51,12 @@ export const sidebarSections: SidebarNavigationSectionConfig[] = [
             href: clientRoutes.suppliers,
           },
           {
+            id: 'product-supplies',
+            kind: 'link',
+            label: 'Supplies',
+            href: clientRoutes.supplies,
+          },
+          {
             id: 'product-warehouse',
             kind: 'link',
             label: 'Warehouse',

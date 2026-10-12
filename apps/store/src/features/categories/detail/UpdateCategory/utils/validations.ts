@@ -1,5 +1,8 @@
 import { z } from 'zod';
-import {categoryNameSchema, categoryParentIdSchema} from "@/features/categories/shared/validations";
+import {
+  categoryNameSchema,
+  categoryParentIdSchema,
+} from '@/features/categories/shared/validations';
 
 export const updateCategoryFormSchema = z.object({
   name: categoryNameSchema,

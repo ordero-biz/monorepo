@@ -22,17 +22,20 @@ import type {
   DataTableSortingState,
 } from './types';
 
-const dataTableCellVariants = cva('flex items-center text-card-foreground', {
-  variants: {
-    variant: {
-      actions: 'px-[var(--spacing-2)]',
-      default: 'p-[var(--spacing-2)]',
+const dataTableCellVariants = cva(
+  'inline-flex items-center text-card-foreground',
+  {
+    variants: {
+      variant: {
+        actions: 'px-[var(--spacing-2)]',
+        default: 'p-[var(--spacing-2)]',
+      },
     },
-  },
-  defaultVariants: {
-    variant: 'default',
-  },
-});
+    defaultVariants: {
+      variant: 'default',
+    },
+  }
+);
 
 const tableShellStyle = {
   boxShadow:
@@ -110,10 +113,11 @@ const createSelectionColumn = <TData,>(): DataTableColumnDef<TData> => ({
       return null;
     }
 
-    const checkboxAriaLabel = table.options.meta?.dataTableSelection?.getRowCheckboxAriaLabel?.(
-      row.original,
-      row.index
-    ) ?? `Select row ${row.index + 1}`;
+    const checkboxAriaLabel =
+      table.options.meta?.dataTableSelection?.getRowCheckboxAriaLabel?.(
+        row.original,
+        row.index
+      ) ?? `Select row ${row.index + 1}`;
 
     return (
       <div className="flex items-center justify-center px-[var(--spacing-1)]">
@@ -140,8 +144,8 @@ const createSelectionColumn = <TData,>(): DataTableColumnDef<TData> => ({
       <div className="flex items-center justify-center px-[var(--spacing-1)]">
         <Checkbox
           aria-label={
-            table.options.meta?.dataTableSelection?.selectAllCheckboxAriaLabel ??
-            'Select all rows'
+            table.options.meta?.dataTableSelection
+              ?.selectAllCheckboxAriaLabel ?? 'Select all rows'
           }
           checked={table.getIsAllPageRowsSelected()}
           indeterminate={

@@ -11,6 +11,7 @@ export const clientRoutes = {
   addProduct: '/products/add',
   categories: '/products/categories',
   attributes: '/products/attributes',
+  supplies: '/products/supplies',
   suppliers: '/products/suppliers',
   unitsOfMeasurement: '/products/units-of-measurement',
   warehouses: '/products/warehouse',
