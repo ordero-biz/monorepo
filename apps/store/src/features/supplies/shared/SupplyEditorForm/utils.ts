@@ -2,6 +2,9 @@ import type { SupplyEntryData } from '@/lib/client/api/supplies';
 import type { SupplyDetails } from '@/lib/domain/supplies/types';
 import type { SupplyEntryFormValues, SupplyFormValues } from './types';
 
+export const normalizeOptionalText = (value?: string | null) =>
+  value?.trim() || null;
+
 export const createEmptySupplyEntry = (
   clientId: string
 ): SupplyEntryFormValues => ({

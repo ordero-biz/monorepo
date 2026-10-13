@@ -1,7 +1,20 @@
+import { updateSupply } from '@/lib/client/api/supplies';
 import { SUPPLY_STATUS } from '@/lib/domain/supplies/constants';
 import type { SupplyDetails } from '@/lib/domain/supplies/types';
-import { getCreateSupplyData, getUpdateSupplyData } from './submitData';
+import {
+  getUpdateSupplyData,
+  submitUpdateSupplyAction,
+} from './submitUpdateSupplyAction';
 import { getSupplyFormDefaults } from './utils';
+
+vi.mock('@/lib/client/api/supplies', async () => ({
+  ...(await vi.importActual<typeof import('@/lib/client/api/supplies')>(
+    '@/lib/client/api/supplies'
+  )),
+  updateSupply: vi.fn(),
+}));
+
+const updateSupplyMock = vi.mocked(updateSupply);
 
 const initialSupply: SupplyDetails = {
   id: 9,
@@ -31,64 +44,66 @@ const initialSupply: SupplyDetails = {
   ],
 };
 
-describe('supply submit data', () => {
-  it('omits blank optional metadata and the empty entry row on create', () => {
-    const value = getSupplyFormDefaults();
-    value.supplierId = '3';
-    value.warehouseId = '4';
+describe('submitUpdateSupplyAction', () => {
+  beforeEach(() => {
+    updateSupplyMock.mockReset();
+  });
+
+  it('skips the request when normalized draft values have not changed', async () => {
+    const value = getSupplyFormDefaults(initialSupply);
     value.supplyNumber = ' SUP-001 ';
-    value.supplierInvoiceNumber = '   ';
+
+    const result = await submitUpdateSupplyAction({
+      value,
+      initialSupply,
+      status: SUPPLY_STATUS.DRAFT,
+    });
+
+    expect(result).toBeNull();
+    expect(updateSupplyMock).not.toHaveBeenCalled();
+  });
+
+  it('saves pending edits and finalizes in one versioned request', async () => {
+    const updatedSupply = {
+      ...initialSupply,
+      status: SUPPLY_STATUS.COMPLETED,
+      comment: null,
+      version: 3,
+    };
+    updateSupplyMock.mockResolvedValue({ ok: true, data: updatedSupply });
+    const value = getSupplyFormDefaults(initialSupply);
     value.comment = '   ';
 
-    expect(getCreateSupplyData(value, SUPPLY_STATUS.DRAFT)).toEqual({
-      supplierId: 3,
-      warehouseId: 4,
-      supplyNumber: 'SUP-001',
-      status: SUPPLY_STATUS.DRAFT,
-      supplyEntries: [],
-    });
-  });
-
-  it('keeps filled optional metadata and nested entries on create', () => {
-    const value = getSupplyFormDefaults(initialSupply);
-    value.supplierInvoiceNumber = ' INV-001 ';
-    value.comment = ' First delivery ';
-
-    expect(getCreateSupplyData(value, SUPPLY_STATUS.COMPLETED)).toEqual({
-      supplierId: 3,
-      warehouseId: 4,
-      supplyNumber: 'SUP-001',
-      supplierInvoiceNumber: 'INV-001',
-      comment: 'First delivery',
+    const result = await submitUpdateSupplyAction({
+      value,
+      initialSupply,
       status: SUPPLY_STATUS.COMPLETED,
-      supplyEntries: [
-        {
-          productVariantId: 11,
-          unitOfMeasurementId: 2,
-          quantity: 20,
-          unitPrice: 28,
-          comment: 'New batch',
-        },
-      ],
     });
+
+    expect(updateSupplyMock).toHaveBeenCalledExactlyOnceWith({
+      supplyId: 9,
+      expectedVersion: 2,
+      comment: null,
+      status: SUPPLY_STATUS.COMPLETED,
+    });
+    expect(result).toEqual({ ok: true, data: updatedSupply });
   });
 
-  it('omits a blank nested comment when creating an entry', () => {
-    const value = getSupplyFormDefaults(initialSupply);
-    value.supplyEntries = value.supplyEntries.map((entry, index) =>
-      index === 0 ? { ...entry, comment: '   ' } : entry
-    );
+  it('preserves backend version and field errors on update failure', async () => {
+    const error = {
+      status: 409,
+      message: 'Supply was changed by another user.',
+      fieldErrors: { expectedVersion: 'Version conflict' },
+    };
+    updateSupplyMock.mockResolvedValue({ ok: false, error });
 
-    expect(
-      getCreateSupplyData(value, SUPPLY_STATUS.DRAFT).supplyEntries
-    ).toEqual([
-      {
-        productVariantId: 11,
-        unitOfMeasurementId: 2,
-        quantity: 20,
-        unitPrice: 28,
-      },
-    ]);
+    const result = await submitUpdateSupplyAction({
+      value: getSupplyFormDefaults(initialSupply),
+      initialSupply,
+      status: SUPPLY_STATUS.COMPLETED,
+    });
+
+    expect(result).toEqual({ ok: false, error });
   });
 
   it('returns no PATCH for unchanged normalized values', () => {
@@ -108,7 +123,7 @@ describe('supply submit data', () => {
     );
 
     expect(
-      getUpdateSupplyData(value, initialSupply, SUPPLY_STATUS.DRAFT)
+      getUpdateSupplyData({ value, initialSupply, status: SUPPLY_STATUS.DRAFT })
     ).toBeNull();
   });
 
@@ -119,7 +134,7 @@ describe('supply submit data', () => {
     value.comment = '   ';
 
     expect(
-      getUpdateSupplyData(value, initialSupply, SUPPLY_STATUS.DRAFT)
+      getUpdateSupplyData({ value, initialSupply, status: SUPPLY_STATUS.DRAFT })
     ).toEqual({
       supplyId: 9,
       expectedVersion: 2,
@@ -136,7 +151,7 @@ describe('supply submit data', () => {
     );
 
     expect(
-      getUpdateSupplyData(value, initialSupply, SUPPLY_STATUS.DRAFT)
+      getUpdateSupplyData({ value, initialSupply, status: SUPPLY_STATUS.DRAFT })
     ).toEqual({
       supplyId: 9,
       expectedVersion: 2,
@@ -157,7 +172,7 @@ describe('supply submit data', () => {
     value.supplyEntries = value.supplyEntries.slice(-1);
 
     expect(
-      getUpdateSupplyData(value, initialSupply, SUPPLY_STATUS.DRAFT)
+      getUpdateSupplyData({ value, initialSupply, status: SUPPLY_STATUS.DRAFT })
     ).toEqual({
       supplyId: 9,
       expectedVersion: 2,
@@ -169,7 +184,11 @@ describe('supply submit data', () => {
     const value = getSupplyFormDefaults(initialSupply);
 
     expect(
-      getUpdateSupplyData(value, initialSupply, SUPPLY_STATUS.COMPLETED)
+      getUpdateSupplyData({
+        value,
+        initialSupply,
+        status: SUPPLY_STATUS.COMPLETED,
+      })
     ).toEqual({
       supplyId: 9,
       expectedVersion: 2,

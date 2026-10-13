@@ -3,10 +3,10 @@
 import { useToastManager } from '@ordero/ui';
 import { revalidateLogic, useForm } from '@tanstack/react-form';
 import { useRef, useState } from 'react';
-import { createSupply, updateSupply } from '@/lib/client/api/supplies';
 import { SUPPLY_STATUS } from '@/lib/domain/supplies/constants';
 import type { SupplyDetails } from '@/lib/domain/supplies/types';
-import { getCreateSupplyData, getUpdateSupplyData } from '../submitData';
+import { submitCreateSupplyAction } from '../submitCreateSupplyAction';
+import { submitUpdateSupplyAction } from '../submitUpdateSupplyAction';
 import type { SupplySubmitIntent } from '../types';
 import { getSupplyFormDefaults, validateSupplyForm } from '../utils';
 
@@ -47,18 +47,14 @@ export const useSupplyEditorForm = ({
         intentRef.current === 'finalize'
           ? SUPPLY_STATUS.COMPLETED
           : SUPPLY_STATUS.DRAFT;
-      const updateData = initialSupply
-        ? getUpdateSupplyData(value, initialSupply, status)
-        : null;
+      const result = initialSupply
+        ? await submitUpdateSupplyAction({ value, initialSupply, status })
+        : await submitCreateSupplyAction({ value, status });
 
-      if (initialSupply && !updateData) {
+      if (!result) {
         addToast({ description: 'No changes to save.', type: 'info' });
         return;
       }
-
-      const result = updateData
-        ? await updateSupply(updateData)
-        : await createSupply(getCreateSupplyData(value, status));
 
       if (!result.ok) {
         formApi.setErrorMap({

@@ -1,14 +1,18 @@
-import type {
-  CreateSupplyData,
-  SupplyEntryData,
-  UpdateSupplyData,
-  UpdateSupplyFieldData,
+import {
+  type SupplyEntryData,
+  type UpdateSupplyData,
+  type UpdateSupplyFieldData,
+  updateSupply,
 } from '@/lib/client/api/supplies';
 import type { SupplyDetails, SupplyStatus } from '@/lib/domain/supplies/types';
 import type { SupplyFormValues } from './types';
-import { getSupplyEntriesPayload } from './utils';
+import { getSupplyEntriesPayload, normalizeOptionalText } from './utils';
 
-const normalizeOptionalText = (value?: string | null) => value?.trim() || null;
+type SubmitUpdateSupplyActionArgs = {
+  value: SupplyFormValues;
+  initialSupply: SupplyDetails;
+  status: SupplyStatus;
+};
 
 const getInitialSupplyEntries = (supply: SupplyDetails): SupplyEntryData[] =>
   supply.supplyEntries.map((entry) => ({
@@ -34,35 +38,11 @@ const areSupplyEntriesEqual = (
         normalizeOptionalText(right[index]?.comment)
   );
 
-export const getCreateSupplyData = (
-  value: SupplyFormValues,
-  status: SupplyStatus
-): CreateSupplyData => {
-  const supplierInvoiceNumber = normalizeOptionalText(
-    value.supplierInvoiceNumber
-  );
-  const comment = normalizeOptionalText(value.comment);
-  const supplyEntries = getSupplyEntriesPayload(value).map(
-    ({ comment: entryComment, ...entry }) =>
-      entryComment ? { ...entry, comment: entryComment } : entry
-  );
-
-  return {
-    supplierId: Number(value.supplierId),
-    warehouseId: Number(value.warehouseId),
-    supplyNumber: value.supplyNumber.trim(),
-    status,
-    supplyEntries,
-    ...(supplierInvoiceNumber ? { supplierInvoiceNumber } : {}),
-    ...(comment ? { comment } : {}),
-  };
-};
-
-export const getUpdateSupplyData = (
-  value: SupplyFormValues,
-  initialSupply: SupplyDetails,
-  status: SupplyStatus
-): UpdateSupplyData | null => {
+export const getUpdateSupplyData = ({
+  value,
+  initialSupply,
+  status,
+}: SubmitUpdateSupplyActionArgs): UpdateSupplyData | null => {
   const changes: UpdateSupplyFieldData = {};
   const supplierId = Number(value.supplierId);
   const warehouseId = Number(value.warehouseId);
@@ -112,4 +92,15 @@ export const getUpdateSupplyData = (
     expectedVersion: initialSupply.version,
     ...changes,
   };
+};
+
+export const submitUpdateSupplyAction = async (
+  args: SubmitUpdateSupplyActionArgs
+) => {
+  const data = getUpdateSupplyData(args);
+  if (!data) {
+    return null;
+  }
+
+  return updateSupply(data);
 };
