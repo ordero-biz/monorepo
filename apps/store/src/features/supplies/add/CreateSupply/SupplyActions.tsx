@@ -4,8 +4,8 @@ import { Button, ContextualActionBar, Dialog, Typography } from '@ordero/ui';
 import { LockKeyhole, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { BaseLayoutContextualActionBar } from '@/features/app-shell';
+import { formatMoney } from '../../shared/formatMoney';
 import type { SupplyActionsProps } from './types';
-import { formatMoney } from './utils';
 
 export const SupplyActions = ({
   count,

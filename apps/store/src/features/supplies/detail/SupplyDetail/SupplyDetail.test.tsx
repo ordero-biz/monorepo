@@ -1,8 +1,9 @@
-import { screen } from '@testing-library/react';
+import { act, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getSupply } from '@/lib/client/api/supplies';
 import { SUPPLY_STATUS } from '@/lib/domain/supplies/constants';
 import type { SupplyDetails } from '@/lib/domain/supplies/types';
+import { suppliesQueryKeys } from '@/lib/query/supplies/suppliesQueryKeys';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { SupplyDetail } from './SupplyDetail';
 
@@ -52,6 +53,41 @@ describe('SupplyDetail', () => {
 
     expect(await screen.findByText('Editing supply SUP-009')).toBeVisible();
     expect(getSupplyMock).toHaveBeenCalledWith('9');
+  });
+
+  it('displays completed supplies without opening the editor', async () => {
+    getSupplyMock.mockResolvedValue({
+      ok: true,
+      data: { ...supply, status: SUPPLY_STATUS.COMPLETED },
+    });
+
+    setup();
+
+    expect(await screen.findByText('Completed')).toBeVisible();
+    expect(screen.getByText('Fresh Farms')).toBeVisible();
+    expect(
+      screen.queryByText('Editing supply SUP-009')
+    ).not.toBeInTheDocument();
+    expect(screen.queryByRole('combobox')).not.toBeInTheDocument();
+  });
+
+  it('switches to the read-only view when the cached supply is finalized', async () => {
+    getSupplyMock.mockResolvedValue({ ok: true, data: supply });
+    const { queryClient } = setup();
+    expect(await screen.findByText('Editing supply SUP-009')).toBeVisible();
+
+    await act(async () => {
+      queryClient.setQueryData(suppliesQueryKeys.detail(supply.id), {
+        ...supply,
+        status: SUPPLY_STATUS.COMPLETED,
+        version: 2,
+      });
+    });
+
+    expect(await screen.findByText('Completed')).toBeVisible();
+    expect(
+      screen.queryByText('Editing supply SUP-009')
+    ).not.toBeInTheDocument();
   });
 
   it('retries when the supply cannot be loaded', async () => {

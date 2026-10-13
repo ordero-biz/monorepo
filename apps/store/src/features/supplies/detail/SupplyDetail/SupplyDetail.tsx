@@ -1,8 +1,10 @@
 'use client';
 
+import { SUPPLY_STATUS } from '@/lib/domain/supplies/constants';
 import { useSupplyQuery } from '@/lib/hooks/supplies/useSupplyQuery';
 import { Button, Card, Typography } from '@/ui/index';
 import { CreateSupply } from '../../add/CreateSupply';
+import { SupplyReadOnly } from '../SupplyReadOnly';
 import type { SupplyDetailProps } from './types';
 
 export const SupplyDetail = ({ supplyId }: SupplyDetailProps) => {
@@ -42,6 +44,10 @@ export const SupplyDetail = ({ supplyId }: SupplyDetailProps) => {
         </Card.Content>
       </Card.Root>
     );
+  }
+
+  if (supplyQuery.data.status === SUPPLY_STATUS.COMPLETED) {
+    return <SupplyReadOnly supply={supplyQuery.data} />;
   }
 
   return (

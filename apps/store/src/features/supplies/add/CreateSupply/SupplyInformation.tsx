@@ -1,23 +1,16 @@
 import { Card, Textarea, TextField, Typography } from '@ordero/ui';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
-import { SupplyStatusChip } from '../../shared/SupplyStatusChip';
 import { SuppliersAsyncCombobox, WarehousesAsyncCombobox } from './selectors';
 import type { SupplyInformationProps } from './types';
 
 export const SupplyInformation = ({
   form,
-  initialSupply,
   readOnly,
 }: SupplyInformationProps) => (
   <Card.Root variant="filled">
     <Card.Content>
       <div className="flex flex-col gap-[var(--space-3)]">
-        <div className="flex items-center justify-between">
-          <Typography variant="h6">Supply information</Typography>
-          {initialSupply ? (
-            <SupplyStatusChip status={initialSupply.status} />
-          ) : null}
-        </div>
+        <Typography variant="h6">Supply information</Typography>
         <div className="grid gap-[var(--space-3)] md:grid-cols-2">
           <form.Field name="supplierId">
             {(field) => {

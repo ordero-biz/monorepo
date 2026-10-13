@@ -14,13 +14,14 @@ import { EllipsisVertical, Package, Trash2 } from 'lucide-react';
 import { useCallback, useMemo, useRef } from 'react';
 import type { ProductVariant } from '@/lib/domain/products/types';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
+import { formatMoney } from '../../shared/formatMoney';
 import { SupplyActions } from './SupplyActions';
 import {
   ProductVariantsAsyncCombobox,
   UnitsOfMeasurementAsyncCombobox,
 } from './selectors';
 import type { SupplyEntriesProps, SupplyEntryFormValues } from './types';
-import { createEmptySupplyEntry, formatMoney, getSupplyTotal } from './utils';
+import { createEmptySupplyEntry, getSupplyTotal } from './utils';
 
 const getRowId = (entry: SupplyEntryFormValues) => entry.clientId;
 

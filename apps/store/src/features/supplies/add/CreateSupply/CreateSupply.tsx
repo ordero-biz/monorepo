@@ -8,6 +8,7 @@ import { AppBreadcrumbs } from '@/lib/components/AppBreadcrumbs';
 import { SUPPLY_STATUS } from '@/lib/domain/supplies/constants';
 import { suppliesQueryKeys } from '@/lib/query/supplies/suppliesQueryKeys';
 import { suppliesRootBreadcrumb } from '../../shared/breadcrumbs';
+import { SupplyStatusChip } from '../../shared/SupplyStatusChip';
 import { useSupplyEditorForm } from './hooks/useSupplyEditorForm';
 import { SupplyEntries } from './SupplyEntries';
 import { SupplyInformation } from './SupplyInformation';
@@ -34,11 +35,16 @@ export const CreateSupply = ({ initialSupply }: CreateSupplyProps) => {
       <PageHeader.Root>
         <PageHeader.Left>
           <div className="flex min-w-0 flex-col gap-[var(--space-0-5)]">
-            <Typography variant="h5">
-              {initialSupply
-                ? initialSupply.supplyNumber || 'Supply'
-                : 'Create supply'}
-            </Typography>
+            <div className="flex min-w-0 items-center gap-[var(--space-1)]">
+              <Typography variant="h5">
+                {initialSupply
+                  ? initialSupply.supplyNumber || 'Supply'
+                  : 'Create supply'}
+              </Typography>
+              {initialSupply ? (
+                <SupplyStatusChip status={initialSupply.status} />
+              ) : null}
+            </div>
             <AppBreadcrumbs
               items={[
                 suppliesRootBreadcrumb,
@@ -62,11 +68,7 @@ export const CreateSupply = ({ initialSupply }: CreateSupplyProps) => {
           }
         }}
       >
-        <SupplyInformation
-          form={form}
-          initialSupply={initialSupply}
-          readOnly={readOnly}
-        />
+        <SupplyInformation form={form} readOnly={readOnly} />
 
         <form.Subscribe selector={(state) => state.values.supplyEntries}>
           {(entries) => (

@@ -2,12 +2,6 @@ import type { SupplyEntryData } from '@/lib/client/api/supplies';
 import type { SupplyDetails } from '@/lib/domain/supplies/types';
 import type { SupplyEntryFormValues, SupplyFormValues } from './types';
 
-export const formatMoney = (value: number) =>
-  new Intl.NumberFormat('en-US', {
-    currency: 'USD',
-    style: 'currency',
-  }).format(value);
-
 export const createEmptySupplyEntry = (
   clientId: string
 ): SupplyEntryFormValues => ({

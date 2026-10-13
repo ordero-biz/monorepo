@@ -30,7 +30,6 @@ export type SupplyFormValues = {
 
 export type SupplyInformationProps = {
   form: ReturnType<typeof useSupplyEditorForm>['form'];
-  initialSupply?: SupplyDetails;
   readOnly: boolean;
 };
 
