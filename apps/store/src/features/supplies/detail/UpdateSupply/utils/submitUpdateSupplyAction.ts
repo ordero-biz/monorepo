@@ -5,8 +5,11 @@ import {
   updateSupply,
 } from '@/lib/client/api/supplies';
 import type { SupplyDetails, SupplyStatus } from '@/lib/domain/supplies/types';
-import type { SupplyFormValues } from './types';
-import { getSupplyEntriesPayload, normalizeOptionalText } from './utils';
+import type { SupplyFormValues } from '../../../shared/SupplyEditorForm';
+import {
+  getSupplyEntriesPayload,
+  normalizeOptionalText,
+} from '../../../shared/SupplyEditorForm';
 
 type SubmitUpdateSupplyActionArgs = {
   value: SupplyFormValues;

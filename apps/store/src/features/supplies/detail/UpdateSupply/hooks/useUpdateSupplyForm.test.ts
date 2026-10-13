@@ -3,13 +3,13 @@ import userEvent from '@testing-library/user-event';
 import { SUPPLY_STATUS } from '@/lib/domain/supplies/constants';
 import type { SupplyDetails } from '@/lib/domain/supplies/types';
 import { prepareFormHookTestSetup } from '@/test/prepareFormHookTestSetup';
-import { submitUpdateSupplyAction } from '../submitUpdateSupplyAction';
-import type { SupplySubmitIntent } from '../types';
-import { useSupplyEditorForm } from './useSupplyEditorForm';
+import type { SupplySubmitIntent } from '../../../shared/SupplyEditorForm';
+import { submitUpdateSupplyAction } from '../utils/submitUpdateSupplyAction';
+import { useUpdateSupplyForm } from './useUpdateSupplyForm';
 
-vi.mock('../submitUpdateSupplyAction', async () => ({
-  ...(await vi.importActual<typeof import('../submitUpdateSupplyAction')>(
-    '../submitUpdateSupplyAction'
+vi.mock('../utils/submitUpdateSupplyAction', async () => ({
+  ...(await vi.importActual<typeof import('../utils/submitUpdateSupplyAction')>(
+    '../utils/submitUpdateSupplyAction'
   )),
   submitUpdateSupplyAction: vi.fn(),
 }));
@@ -27,7 +27,7 @@ const supply: SupplyDetails = {
   supplyEntries: [],
 };
 
-type TestHookProps = Parameters<typeof useSupplyEditorForm>[0] & {
+type TestHookProps = Parameters<typeof useUpdateSupplyForm>[0] & {
   intent: SupplySubmitIntent;
   supplyNumber: string;
 };
@@ -37,7 +37,7 @@ const useTestSupplyForm = ({
   supplyNumber,
   ...args
 }: TestHookProps) => {
-  const { form, submit } = useSupplyEditorForm(args);
+  const { form, submit } = useUpdateSupplyForm(args);
   return {
     form: {
       handleSubmit: () => {
@@ -51,14 +51,14 @@ const useTestSupplyForm = ({
 const { setup } = prepareFormHookTestSetup<TestHookProps>({
   useFormHook: useTestSupplyForm,
   hookProps: {
-    initialSupply: supply,
+    supply,
     intent: 'draft',
     supplyNumber: 'SUP-002',
-    onSaved: vi.fn(),
+    onUpdated: vi.fn(),
   },
 });
 
-describe('useSupplyEditorForm', () => {
+describe('useUpdateSupplyForm', () => {
   beforeEach(() => {
     submitUpdateSupplyActionMock.mockReset();
   });
@@ -72,17 +72,17 @@ describe('useSupplyEditorForm', () => {
     const user = userEvent.setup();
     const { hookProps } = setup({
       hookProps: {
-        initialSupply: supply,
+        supply,
         intent: 'draft',
         supplyNumber: 'SUP-002',
-        onSaved: vi.fn(),
+        onUpdated: vi.fn(),
       },
     });
 
     await user.click(screen.getByRole('button', { name: 'Submit' }));
 
     await waitFor(() =>
-      expect(hookProps.onSaved).toHaveBeenCalledWith(savedSupply)
+      expect(hookProps.onUpdated).toHaveBeenCalledWith(savedSupply)
     );
     expect(submitUpdateSupplyActionMock).toHaveBeenCalledWith({
       value: expect.objectContaining({ supplyNumber: 'SUP-002' }),
@@ -95,17 +95,17 @@ describe('useSupplyEditorForm', () => {
     const user = userEvent.setup();
     const { hookProps } = setup({
       hookProps: {
-        initialSupply: supply,
+        supply,
         intent: 'finalize',
         supplyNumber: 'SUP-002',
-        onSaved: vi.fn(),
+        onUpdated: vi.fn(),
       },
     });
 
     await user.click(screen.getByRole('button', { name: 'Submit' }));
 
     expect(submitUpdateSupplyActionMock).not.toHaveBeenCalled();
-    expect(hookProps.onSaved).not.toHaveBeenCalled();
+    expect(hookProps.onUpdated).not.toHaveBeenCalled();
   });
 
   it('does not report a save when the submit utility finds no changes', async () => {
@@ -113,10 +113,10 @@ describe('useSupplyEditorForm', () => {
     const user = userEvent.setup();
     const { hookProps } = setup({
       hookProps: {
-        initialSupply: supply,
+        supply,
         intent: 'draft',
         supplyNumber: 'SUP-001',
-        onSaved: vi.fn(),
+        onUpdated: vi.fn(),
       },
     });
 
@@ -124,7 +124,7 @@ describe('useSupplyEditorForm', () => {
 
     expect(await screen.findByText('No changes to save.')).toBeVisible();
     expect(submitUpdateSupplyActionMock).toHaveBeenCalledOnce();
-    expect(hookProps.onSaved).not.toHaveBeenCalled();
+    expect(hookProps.onUpdated).not.toHaveBeenCalled();
   });
 
   it('shows a submit error without reporting success', async () => {
@@ -135,16 +135,16 @@ describe('useSupplyEditorForm', () => {
     const user = userEvent.setup();
     const { hookProps } = setup({
       hookProps: {
-        initialSupply: supply,
+        supply,
         intent: 'draft',
         supplyNumber: 'SUP-002',
-        onSaved: vi.fn(),
+        onUpdated: vi.fn(),
       },
     });
 
     await user.click(screen.getByRole('button', { name: 'Submit' }));
 
     expect(await screen.findByText('Could not save the supply.')).toBeVisible();
-    expect(hookProps.onSaved).not.toHaveBeenCalled();
+    expect(hookProps.onUpdated).not.toHaveBeenCalled();
   });
 });

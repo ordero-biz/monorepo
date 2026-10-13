@@ -1,11 +1,11 @@
 import { updateSupply } from '@/lib/client/api/supplies';
 import { SUPPLY_STATUS } from '@/lib/domain/supplies/constants';
 import type { SupplyDetails } from '@/lib/domain/supplies/types';
+import { getSupplyFormDefaults } from '../../../shared/SupplyEditorForm';
 import {
   getUpdateSupplyData,
   submitUpdateSupplyAction,
 } from './submitUpdateSupplyAction';
-import { getSupplyFormDefaults } from './utils';
 
 vi.mock('@/lib/client/api/supplies', async () => ({
   ...(await vi.importActual<typeof import('@/lib/client/api/supplies')>(

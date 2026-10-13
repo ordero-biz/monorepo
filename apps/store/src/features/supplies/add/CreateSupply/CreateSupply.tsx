@@ -7,25 +7,18 @@ import { getSupplyDetailRoute } from '@/lib/client/routes';
 import { AppBreadcrumbs } from '@/lib/components/AppBreadcrumbs';
 import { suppliesQueryKeys } from '@/lib/query/supplies/suppliesQueryKeys';
 import { suppliesRootBreadcrumb } from '../../shared/breadcrumbs';
-import {
-  SupplyEditorForm,
-  useSupplyEditorForm,
-} from '../../shared/SupplyEditorForm';
-import { SupplyStatusChip } from '../../shared/SupplyStatusChip';
-import type { CreateSupplyProps } from './types';
+import { SupplyEditorForm } from '../../shared/SupplyEditorForm';
+import { useCreateSupplyForm } from './hooks/useCreateSupplyForm';
 
-export const CreateSupply = ({ initialSupply }: CreateSupplyProps) => {
+export const CreateSupply = () => {
   const router = useRouter();
   const queryClient = useQueryClient();
-  const { form, submit, pendingIntent } = useSupplyEditorForm({
-    initialSupply,
-    onSaved: async (supply) => {
+  const { form, submit, pendingIntent } = useCreateSupplyForm({
+    onCreated: async (supply) => {
       queryClient.setQueryData(suppliesQueryKeys.detail(supply.id), supply);
       await queryClient.invalidateQueries({ queryKey: suppliesQueryKeys.list });
 
-      if (!initialSupply) {
-        router.replace(getSupplyDetailRoute(supply.id));
-      }
+      router.replace(getSupplyDetailRoute(supply.id));
     },
   });
 
@@ -34,22 +27,13 @@ export const CreateSupply = ({ initialSupply }: CreateSupplyProps) => {
       <PageHeader.Root>
         <PageHeader.Left>
           <div className="flex min-w-0 flex-col gap-[var(--space-0-5)]">
-            <div className="flex min-w-0 items-center gap-[var(--space-1)]">
-              <Typography variant="h5">
-                {initialSupply
-                  ? initialSupply.supplyNumber || 'Supply'
-                  : 'Create supply'}
-              </Typography>
-              {initialSupply ? (
-                <SupplyStatusChip status={initialSupply.status} />
-              ) : null}
-            </div>
+            <Typography variant="h5">Create supply</Typography>
             <AppBreadcrumbs
               items={[
                 suppliesRootBreadcrumb,
                 {
                   id: 'current-supply',
-                  label: initialSupply?.supplyNumber || 'New supply',
+                  label: 'New supply',
                 },
               ]}
             />

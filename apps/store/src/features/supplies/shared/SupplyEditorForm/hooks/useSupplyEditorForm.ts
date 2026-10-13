@@ -1,17 +1,21 @@
 'use client';
 
+import type { ApiResult } from '@ordero/api-types';
 import { useToastManager } from '@ordero/ui';
 import { revalidateLogic, useForm } from '@tanstack/react-form';
 import { useRef, useState } from 'react';
 import { SUPPLY_STATUS } from '@/lib/domain/supplies/constants';
-import type { SupplyDetails } from '@/lib/domain/supplies/types';
-import { submitCreateSupplyAction } from '../submitCreateSupplyAction';
-import { submitUpdateSupplyAction } from '../submitUpdateSupplyAction';
-import type { SupplySubmitIntent } from '../types';
-import { getSupplyFormDefaults, validateSupplyForm } from '../utils';
+import type { SupplyDetails, SupplyStatus } from '@/lib/domain/supplies/types';
+import type { SupplyFormValues, SupplySubmitIntent } from '../types';
+import { validateSupplyForm } from '../utils';
 
 type UseSupplyEditorFormArgs = {
-  initialSupply?: SupplyDetails;
+  defaultValues: SupplyFormValues;
+  draftSuccessMessage: string;
+  submitAction: (args: {
+    value: SupplyFormValues;
+    status: SupplyStatus;
+  }) => Promise<ApiResult<SupplyDetails> | null>;
   onSaved: (supply: SupplyDetails) => Promise<void> | void;
 };
 
@@ -26,7 +30,9 @@ const mapSupplyFieldErrors = (fieldErrors?: Record<string, string>) =>
     : undefined;
 
 export const useSupplyEditorForm = ({
-  initialSupply,
+  defaultValues,
+  draftSuccessMessage,
+  submitAction,
   onSaved,
 }: UseSupplyEditorFormArgs) => {
   const { add: addToast } = useToastManager();
@@ -35,7 +41,7 @@ export const useSupplyEditorForm = ({
     null
   );
   const form = useForm({
-    defaultValues: getSupplyFormDefaults(initialSupply),
+    defaultValues,
     validationLogic: revalidateLogic(),
     validators: {
       onSubmit: ({ value }) =>
@@ -47,9 +53,7 @@ export const useSupplyEditorForm = ({
         intentRef.current === 'finalize'
           ? SUPPLY_STATUS.COMPLETED
           : SUPPLY_STATUS.DRAFT;
-      const result = initialSupply
-        ? await submitUpdateSupplyAction({ value, initialSupply, status })
-        : await submitCreateSupplyAction({ value, status });
+      const result = await submitAction({ value, status });
 
       if (!result) {
         addToast({ description: 'No changes to save.', type: 'info' });
@@ -73,9 +77,7 @@ export const useSupplyEditorForm = ({
         description:
           status === SUPPLY_STATUS.COMPLETED
             ? 'Supply finalized. It can no longer be edited.'
-            : initialSupply
-              ? 'Supply draft saved.'
-              : 'Supply draft created.',
+            : draftSuccessMessage,
         type: 'success',
       });
 

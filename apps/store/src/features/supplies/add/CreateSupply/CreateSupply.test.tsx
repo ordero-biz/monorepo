@@ -1,6 +1,6 @@
 import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { createSupply, updateSupply } from '@/lib/client/api/supplies';
+import { createSupply } from '@/lib/client/api/supplies';
 import { SUPPLY_STATUS } from '@/lib/domain/supplies/constants';
 import type { SupplyDetails } from '@/lib/domain/supplies/types';
 import { suppliesQueryKeys } from '@/lib/query/supplies/suppliesQueryKeys';
@@ -9,7 +9,6 @@ import { CreateSupply } from './CreateSupply';
 
 const mocks = vi.hoisted(() => ({
   createSupply: vi.fn(),
-  updateSupply: vi.fn(),
   replace: vi.fn(),
 }));
 
@@ -25,7 +24,6 @@ vi.mock('@/lib/client/api/supplies', async () => ({
     '@/lib/client/api/supplies'
   )),
   createSupply: mocks.createSupply,
-  updateSupply: mocks.updateSupply,
 }));
 
 vi.mock('../../shared/SupplyEditorForm/selectors', async () => {
@@ -113,7 +111,6 @@ vi.mock('../../shared/SupplyEditorForm/selectors', async () => {
 });
 
 const createSupplyMock = vi.mocked(createSupply);
-const updateSupplyMock = vi.mocked(updateSupply);
 
 const savedSupply: SupplyDetails = {
   id: 9,
@@ -179,7 +176,6 @@ const addCompleteEntry = async (user: ReturnType<typeof userEvent.setup>) => {
 describe('CreateSupply', () => {
   beforeEach(() => {
     createSupplyMock.mockReset();
-    updateSupplyMock.mockReset();
     mocks.replace.mockReset();
   });
 
@@ -308,59 +304,6 @@ describe('CreateSupply', () => {
         status: SUPPLY_STATUS.COMPLETED,
       });
     });
-  });
-
-  it('saves edits to an existing draft with its version and full entry list', async () => {
-    const user = userEvent.setup();
-    const updatedSupply = {
-      ...savedSupply,
-      totalQuantity: 25,
-      totalPrice: 700,
-      version: 2,
-    };
-    updateSupplyMock.mockResolvedValue({
-      ok: true,
-      data: updatedSupply,
-    });
-    const { queryClient } = setup({ initialSupply: savedSupply });
-    const invalidateQueriesSpy = vi.spyOn(queryClient, 'invalidateQueries');
-
-    await user.clear(
-      screen.getByRole('spinbutton', { name: 'Quantity for row 1' })
-    );
-    await user.type(
-      screen.getByRole('spinbutton', { name: 'Quantity for row 1' }),
-      '25'
-    );
-    await user.click(screen.getByRole('button', { name: 'Save draft' }));
-
-    await waitFor(() => {
-      expect(updateSupplyMock).toHaveBeenCalledWith({
-        supplyId: 9,
-        expectedVersion: 1,
-        supplyEntries: [
-          {
-            productVariantId: 11,
-            unitOfMeasurementId: 2,
-            quantity: 25,
-            unitPrice: 28,
-            comment: null,
-          },
-        ],
-      });
-    });
-    expect(screen.getByText('Draft')).toBeVisible();
-    expect(screen.queryByText('Status')).not.toBeInTheDocument();
-    await waitFor(() => {
-      expect(screen.getByRole('button', { name: 'Save draft' })).toBeEnabled();
-    });
-    expect(queryClient.getQueryData(suppliesQueryKeys.detail(9))).toEqual(
-      updatedSupply
-    );
-    expect(invalidateQueriesSpy).toHaveBeenCalledWith({
-      queryKey: suppliesQueryKeys.list,
-    });
-    expect(mocks.replace).not.toHaveBeenCalled();
   });
 
   it('keeps caches and navigation unchanged when saving fails', async () => {

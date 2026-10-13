@@ -3,8 +3,8 @@
 import { SUPPLY_STATUS } from '@/lib/domain/supplies/constants';
 import { useSupplyQuery } from '@/lib/hooks/supplies/useSupplyQuery';
 import { Button, Card, Typography } from '@/ui/index';
-import { CreateSupply } from '../../add/CreateSupply';
 import { SupplyReadOnly } from '../SupplyReadOnly';
+import { UpdateSupply } from '../UpdateSupply';
 import type { SupplyDetailProps } from './types';
 
 export const SupplyDetail = ({ supplyId }: SupplyDetailProps) => {
@@ -51,8 +51,8 @@ export const SupplyDetail = ({ supplyId }: SupplyDetailProps) => {
   }
 
   return (
-    <CreateSupply
-      initialSupply={supplyQuery.data}
+    <UpdateSupply
+      supply={supplyQuery.data}
       key={`${supplyQuery.data.id}-${supplyQuery.data.version}`}
     />
   );
