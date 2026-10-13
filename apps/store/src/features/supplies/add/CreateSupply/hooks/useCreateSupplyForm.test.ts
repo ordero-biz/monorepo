@@ -102,7 +102,11 @@ describe('useCreateSupplyForm', () => {
       hookProps: {
         onCreated: vi.fn(),
         intent,
-        values: getSupplyFormDefaults(supply),
+        values: {
+          ...getSupplyFormDefaults(supply),
+          supplyNumber: ' SUP-001 ',
+          comment: '   ',
+        },
       },
     });
 
@@ -112,7 +116,17 @@ describe('useCreateSupplyForm', () => {
       expect(hookProps.onCreated).toHaveBeenCalledWith(savedSupply)
     );
     expect(submitCreateSupplyMock).toHaveBeenCalledWith({
-      value: hookProps.values,
+      supplierId: 3,
+      warehouseId: 4,
+      supplyNumber: 'SUP-001',
+      supplyEntries: [
+        {
+          productVariantId: 11,
+          unitOfMeasurementId: 2,
+          quantity: 1,
+          unitPrice: 28,
+        },
+      ],
       status,
     });
     expect(await screen.findByText(message)).toBeVisible();

@@ -85,9 +85,9 @@ describe('useUpdateSupplyForm', () => {
       expect(hookProps.onUpdated).toHaveBeenCalledWith(savedSupply)
     );
     expect(submitUpdateSupplyMock).toHaveBeenCalledWith({
-      value: expect.objectContaining({ supplyNumber: 'SUP-002' }),
-      initialSupply: supply,
-      status: SUPPLY_STATUS.DRAFT,
+      supplyId: supply.id,
+      expectedVersion: supply.version,
+      submitData: { supplyNumber: 'SUP-002' },
     });
   });
 
@@ -108,14 +108,13 @@ describe('useUpdateSupplyForm', () => {
     expect(hookProps.onUpdated).not.toHaveBeenCalled();
   });
 
-  it('does not report a save when the submit utility finds no changes', async () => {
-    submitUpdateSupplyMock.mockResolvedValue(null);
+  it('skips submission and reports no changes for an unchanged draft', async () => {
     const user = userEvent.setup();
     const { hookProps } = setup({
       hookProps: {
         supply,
         intent: 'draft',
-        supplyNumber: 'SUP-001',
+        supplyNumber: ' SUP-001 ',
         onUpdated: vi.fn(),
       },
     });
@@ -123,7 +122,7 @@ describe('useUpdateSupplyForm', () => {
     await user.click(screen.getByRole('button', { name: 'Submit' }));
 
     expect(await screen.findByText('No changes to save.')).toBeVisible();
-    expect(submitUpdateSupplyMock).toHaveBeenCalledOnce();
+    expect(submitUpdateSupplyMock).not.toHaveBeenCalled();
     expect(hookProps.onUpdated).not.toHaveBeenCalled();
   });
 

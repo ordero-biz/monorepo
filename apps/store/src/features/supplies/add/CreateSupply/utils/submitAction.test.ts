@@ -1,8 +1,7 @@
 import { createSupply } from '@/lib/client/api/supplies';
 import { SUPPLY_STATUS } from '@/lib/domain/supplies/constants';
 import type { SupplyDetails } from '@/lib/domain/supplies/types';
-import { getSupplyFormDefaults } from '../../../shared/SupplyEditorForm';
-import { getCreateSupplyData, submitCreateSupply } from './submitAction';
+import { submitCreateSupply } from './submitAction';
 
 vi.mock('@/lib/client/api/supplies', async () => ({
   ...(await vi.importActual<typeof import('@/lib/client/api/supplies')>(
@@ -46,15 +45,13 @@ describe('submitCreateSupply', () => {
     createSupplyMock.mockReset();
   });
 
-  it('creates a supply with normalized values and returns the saved result', async () => {
+  it('submits prepared create data and returns the saved result', async () => {
     createSupplyMock.mockResolvedValue({ ok: true, data: initialSupply });
-    const value = getSupplyFormDefaults();
-    value.supplierId = '3';
-    value.warehouseId = '4';
-    value.supplyNumber = ' SUP-001 ';
-
     const result = await submitCreateSupply({
-      value,
+      supplierId: 3,
+      warehouseId: 4,
+      supplyNumber: 'SUP-001',
+      supplyEntries: [],
       status: SUPPLY_STATUS.DRAFT,
     });
 
@@ -77,69 +74,12 @@ describe('submitCreateSupply', () => {
     createSupplyMock.mockResolvedValue({ ok: false, error });
 
     const result = await submitCreateSupply({
-      value: getSupplyFormDefaults(initialSupply),
+      supplierId: 3,
+      warehouseId: 4,
+      supplyNumber: 'SUP-001',
       status: SUPPLY_STATUS.DRAFT,
     });
 
     expect(result).toEqual({ ok: false, error });
-  });
-
-  it('omits blank optional metadata and the empty entry row on create', () => {
-    const value = getSupplyFormDefaults();
-    value.supplierId = '3';
-    value.warehouseId = '4';
-    value.supplyNumber = ' SUP-001 ';
-    value.supplierInvoiceNumber = '   ';
-    value.comment = '   ';
-
-    expect(getCreateSupplyData(value, SUPPLY_STATUS.DRAFT)).toEqual({
-      supplierId: 3,
-      warehouseId: 4,
-      supplyNumber: 'SUP-001',
-      status: SUPPLY_STATUS.DRAFT,
-      supplyEntries: [],
-    });
-  });
-
-  it('keeps filled optional metadata and nested entries on create', () => {
-    const value = getSupplyFormDefaults(initialSupply);
-    value.supplierInvoiceNumber = ' INV-001 ';
-    value.comment = ' First delivery ';
-
-    expect(getCreateSupplyData(value, SUPPLY_STATUS.COMPLETED)).toEqual({
-      supplierId: 3,
-      warehouseId: 4,
-      supplyNumber: 'SUP-001',
-      supplierInvoiceNumber: 'INV-001',
-      comment: 'First delivery',
-      status: SUPPLY_STATUS.COMPLETED,
-      supplyEntries: [
-        {
-          productVariantId: 11,
-          unitOfMeasurementId: 2,
-          quantity: 20,
-          unitPrice: 28,
-          comment: 'New batch',
-        },
-      ],
-    });
-  });
-
-  it('omits a blank nested comment when creating an entry', () => {
-    const value = getSupplyFormDefaults(initialSupply);
-    value.supplyEntries = value.supplyEntries.map((entry, index) =>
-      index === 0 ? { ...entry, comment: '   ' } : entry
-    );
-
-    expect(
-      getCreateSupplyData(value, SUPPLY_STATUS.DRAFT).supplyEntries
-    ).toEqual([
-      {
-        productVariantId: 11,
-        unitOfMeasurementId: 2,
-        quantity: 20,
-        unitPrice: 28,
-      },
-    ]);
   });
 });

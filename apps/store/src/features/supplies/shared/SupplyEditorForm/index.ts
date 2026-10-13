@@ -1,4 +1,4 @@
-export { useSupplyEditorForm } from './hooks/useSupplyEditorForm';
+export { useSubmitSupplyForm } from './hooks/useSubmitSupplyForm';
 export { SupplyEditorForm } from './SupplyEditorForm';
 export type { SupplyFormValues, SupplySubmitIntent } from './types';
 export {

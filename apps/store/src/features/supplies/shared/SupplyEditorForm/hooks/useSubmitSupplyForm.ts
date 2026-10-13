@@ -9,7 +9,7 @@ import type { SupplyDetails, SupplyStatus } from '@/lib/domain/supplies/types';
 import type { SupplyFormValues, SupplySubmitIntent } from '../types';
 import { validateSupplyForm } from '../utils';
 
-type UseSupplyEditorFormArgs = {
+type UseSubmitSupplyFormArgs = {
   defaultValues: SupplyFormValues;
   draftSuccessMessage: string;
   submitAction: (args: {
@@ -29,12 +29,12 @@ const mapSupplyFieldErrors = (fieldErrors?: Record<string, string>) =>
       )
     : undefined;
 
-export const useSupplyEditorForm = ({
+export const useSubmitSupplyForm = ({
   defaultValues,
   draftSuccessMessage,
   submitAction,
   onSaved,
-}: UseSupplyEditorFormArgs) => {
+}: UseSubmitSupplyFormArgs) => {
   const { add: addToast } = useToastManager();
   const intentRef = useRef<SupplySubmitIntent>('draft');
   const [pendingIntent, setPendingIntent] = useState<SupplySubmitIntent | null>(

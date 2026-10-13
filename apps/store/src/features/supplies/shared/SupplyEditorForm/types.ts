@@ -1,4 +1,4 @@
-import type { useSupplyEditorForm } from './hooks/useSupplyEditorForm';
+import type { useSubmitSupplyForm } from './hooks/useSubmitSupplyForm';
 
 export type SupplyEntryFormValues = {
   clientId: string;
@@ -24,12 +24,12 @@ export type SupplyFormValues = {
 };
 
 export type SupplyInformationProps = {
-  form: ReturnType<typeof useSupplyEditorForm>['form'];
+  form: ReturnType<typeof useSubmitSupplyForm>['form'];
 };
 
 export type SupplyEntriesProps = {
   entries: SupplyEntryFormValues[];
-  form: ReturnType<typeof useSupplyEditorForm>['form'];
+  form: ReturnType<typeof useSubmitSupplyForm>['form'];
   pendingIntent: SupplySubmitIntent | null;
   onSaveDraft: () => void;
   onFinalize: () => void;
@@ -49,7 +49,7 @@ export type SupplyActionsProps = {
 };
 
 export type SupplyEditorFormProps = {
-  form: ReturnType<typeof useSupplyEditorForm>['form'];
-  submit: ReturnType<typeof useSupplyEditorForm>['submit'];
+  form: ReturnType<typeof useSubmitSupplyForm>['form'];
+  submit: ReturnType<typeof useSubmitSupplyForm>['submit'];
   pendingIntent: SupplySubmitIntent | null;
 };

@@ -1,8 +1,9 @@
 import type { SupplyDetails } from '@/lib/domain/supplies/types';
 import {
   getSupplyFormDefaults,
-  useSupplyEditorForm,
+  useSubmitSupplyForm,
 } from '../../../shared/SupplyEditorForm';
+import { getCreateSupplyData } from '../utils/getCreateData';
 import { submitCreateSupply } from '../utils/submitAction';
 
 type UseCreateSupplyFormArgs = {
@@ -10,9 +11,10 @@ type UseCreateSupplyFormArgs = {
 };
 
 export const useCreateSupplyForm = ({ onCreated }: UseCreateSupplyFormArgs) =>
-  useSupplyEditorForm({
+  useSubmitSupplyForm({
     defaultValues: getSupplyFormDefaults(),
     draftSuccessMessage: 'Supply draft created.',
-    submitAction: submitCreateSupply,
+    submitAction: ({ value, status }) =>
+      submitCreateSupply(getCreateSupplyData(value, status)),
     onSaved: onCreated,
   });
