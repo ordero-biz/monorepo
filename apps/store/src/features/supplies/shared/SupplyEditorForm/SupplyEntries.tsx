@@ -14,7 +14,7 @@ import { EllipsisVertical, Package, Trash2 } from 'lucide-react';
 import { useCallback, useMemo, useRef } from 'react';
 import type { ProductVariant } from '@/lib/domain/products/types';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
-import { formatMoney } from '../../shared/formatMoney';
+import { formatMoney } from '../formatMoney';
 import { SupplyActions } from './SupplyActions';
 import {
   ProductVariantsAsyncCombobox,
@@ -35,21 +35,16 @@ const header = (label: string) => (
 export const SupplyEntries = ({
   entries,
   form,
-  readOnly,
   onSaveDraft,
   onFinalize,
   pendingIntent,
 }: SupplyEntriesProps) => {
   const nextClientId = useRef(0);
-  const data = useMemo(
-    () => (readOnly ? entries.slice(0, -1) : entries),
-    [entries, readOnly]
-  );
   const placeholderId = entries.at(-1)?.clientId;
   const { clearSelection, selectedRows, selection } = useDataTableSelection({
-    data,
+    data: entries,
     getRowCanSelect: (entry: SupplyEntryFormValues) =>
-      !readOnly && entry.clientId !== placeholderId,
+      entry.clientId !== placeholderId,
     getRowCheckboxAriaLabel,
     getRowId,
     selectAllCheckboxAriaLabel: 'Select all supply entries',
@@ -105,7 +100,6 @@ export const SupplyEntries = ({
                     return (
                       <ProductVariantsAsyncCombobox
                         aria-label={`Product for row ${index + 1}`}
-                        disabled={readOnly}
                         errorText={errorText}
                         invalid={Boolean(errorText)}
                         name={field.name}
@@ -191,7 +185,6 @@ export const SupplyEntries = ({
                     return (
                       <UnitsOfMeasurementAsyncCombobox
                         aria-label={`Unit for row ${index + 1}`}
-                        disabled={readOnly}
                         errorText={errorText}
                         invalid={Boolean(errorText)}
                         name={field.name}
@@ -258,7 +251,6 @@ export const SupplyEntries = ({
                       onBlur={field.handleBlur}
                       onValueChange={field.handleChange}
                       placeholder="Quantity *"
-                      readOnly={readOnly}
                       required
                       size="s"
                       type="number"
@@ -295,7 +287,6 @@ export const SupplyEntries = ({
                       onBlur={field.handleBlur}
                       onValueChange={field.handleChange}
                       placeholder="Unit price *"
-                      readOnly={readOnly}
                       required
                       size="s"
                       type="number"
@@ -346,7 +337,6 @@ export const SupplyEntries = ({
                     onBlur={field.handleBlur}
                     onValueChange={field.handleChange}
                     placeholder="Comment"
-                    readOnly={readOnly}
                     size="s"
                     value={field.state.value}
                   />
@@ -358,49 +348,45 @@ export const SupplyEntries = ({
         header: () => header('Comment'),
         meta: { minWidth: 195 },
       },
-      ...(!readOnly
-        ? [
-            {
-              id: 'actions',
-              cell: ({ row }) =>
-                row.original.clientId === placeholderId ? null : (
-                  <DataTableCell variant="actions">
-                    <Menu.Root>
-                      <Menu.Trigger
-                        aria-label={`Actions for ${row.original.productVariantName || 'supply entry'}`}
-                        appearance="iconButton"
-                        size="xs"
+      {
+        id: 'actions',
+        cell: ({ row }) =>
+          row.original.clientId === placeholderId ? null : (
+            <DataTableCell variant="actions">
+              <Menu.Root>
+                <Menu.Trigger
+                  aria-label={`Actions for ${row.original.productVariantName || 'supply entry'}`}
+                  appearance="iconButton"
+                  size="xs"
+                >
+                  <EllipsisVertical aria-hidden="true" />
+                </Menu.Trigger>
+                <Menu.Portal>
+                  <Menu.Positioner align="end">
+                    <Menu.Popup>
+                      <Menu.Item
+                        color="error"
+                        onClick={() =>
+                          deleteRows(new Set([row.original.clientId]))
+                        }
                       >
-                        <EllipsisVertical aria-hidden="true" />
-                      </Menu.Trigger>
-                      <Menu.Portal>
-                        <Menu.Positioner align="end">
-                          <Menu.Popup>
-                            <Menu.Item
-                              color="error"
-                              onClick={() =>
-                                deleteRows(new Set([row.original.clientId]))
-                              }
-                            >
-                              <Trash2
-                                aria-hidden="true"
-                                className="size-[var(--icon-button-xs-icon)]"
-                              />
-                              Delete
-                            </Menu.Item>
-                          </Menu.Popup>
-                        </Menu.Positioner>
-                      </Menu.Portal>
-                    </Menu.Root>
-                  </DataTableCell>
-                ),
-              header: () => null,
-              meta: { align: 'right' as const, width: 48 },
-            } satisfies DataTableColumnDef<SupplyEntryFormValues>,
-          ]
-        : []),
+                        <Trash2
+                          aria-hidden="true"
+                          className="size-[var(--icon-button-xs-icon)]"
+                        />
+                        Delete
+                      </Menu.Item>
+                    </Menu.Popup>
+                  </Menu.Positioner>
+                </Menu.Portal>
+              </Menu.Root>
+            </DataTableCell>
+          ),
+        header: () => null,
+        meta: { align: 'right', width: 48 },
+      },
     ],
-    [deleteRows, form, placeholderId, readOnly]
+    [deleteRows, form, placeholderId]
   );
 
   return (
@@ -412,28 +398,24 @@ export const SupplyEntries = ({
             <DataTable
               ariaLabel="Supply entries"
               columns={columns}
-              data={data}
+              data={entries}
               emptyMessage="No products in this supply."
               getRowId={getRowId}
-              selection={readOnly ? undefined : selection}
+              selection={selection}
             />
           </div>
         </Card.Content>
       </Card.Root>
 
-      {!readOnly ? (
-        <SupplyActions
-          {...getSupplyTotal(form.state.values)}
-          onClearSelection={clearSelection}
-          onDeleteSelected={() =>
-            deleteRows(new Set(selectedRows.map(getRowId)))
-          }
-          onFinalize={onFinalize}
-          onSaveDraft={onSaveDraft}
-          pendingIntent={pendingIntent}
-          selectedCount={selectedRows.length}
-        />
-      ) : null}
+      <SupplyActions
+        {...getSupplyTotal(form.state.values)}
+        onClearSelection={clearSelection}
+        onDeleteSelected={() => deleteRows(new Set(selectedRows.map(getRowId)))}
+        onFinalize={onFinalize}
+        onSaveDraft={onSaveDraft}
+        pendingIntent={pendingIntent}
+        selectedCount={selectedRows.length}
+      />
     </>
   );
 };

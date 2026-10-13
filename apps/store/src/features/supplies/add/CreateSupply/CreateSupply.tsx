@@ -5,13 +5,13 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { getSupplyDetailRoute } from '@/lib/client/routes';
 import { AppBreadcrumbs } from '@/lib/components/AppBreadcrumbs';
-import { SUPPLY_STATUS } from '@/lib/domain/supplies/constants';
 import { suppliesQueryKeys } from '@/lib/query/supplies/suppliesQueryKeys';
 import { suppliesRootBreadcrumb } from '../../shared/breadcrumbs';
+import {
+  SupplyEditorForm,
+  useSupplyEditorForm,
+} from '../../shared/SupplyEditorForm';
 import { SupplyStatusChip } from '../../shared/SupplyStatusChip';
-import { useSupplyEditorForm } from './hooks/useSupplyEditorForm';
-import { SupplyEntries } from './SupplyEntries';
-import { SupplyInformation } from './SupplyInformation';
 import type { CreateSupplyProps } from './types';
 
 export const CreateSupply = ({ initialSupply }: CreateSupplyProps) => {
@@ -28,7 +28,6 @@ export const CreateSupply = ({ initialSupply }: CreateSupplyProps) => {
       }
     },
   });
-  const readOnly = initialSupply?.status === SUPPLY_STATUS.COMPLETED;
 
   return (
     <div className="flex flex-col gap-[var(--space-2)]">
@@ -58,31 +57,11 @@ export const CreateSupply = ({ initialSupply }: CreateSupplyProps) => {
         </PageHeader.Left>
       </PageHeader.Root>
 
-      <form
-        className="flex flex-col gap-[var(--space-3)]"
-        noValidate
-        onSubmit={(event) => {
-          event.preventDefault();
-          if (!readOnly) {
-            return submit('draft');
-          }
-        }}
-      >
-        <SupplyInformation form={form} readOnly={readOnly} />
-
-        <form.Subscribe selector={(state) => state.values.supplyEntries}>
-          {(entries) => (
-            <SupplyEntries
-              entries={entries}
-              form={form}
-              onFinalize={() => submit('finalize')}
-              onSaveDraft={() => submit('draft')}
-              pendingIntent={pendingIntent}
-              readOnly={readOnly}
-            />
-          )}
-        </form.Subscribe>
-      </form>
+      <SupplyEditorForm
+        form={form}
+        pendingIntent={pendingIntent}
+        submit={submit}
+      />
     </div>
   );
 };

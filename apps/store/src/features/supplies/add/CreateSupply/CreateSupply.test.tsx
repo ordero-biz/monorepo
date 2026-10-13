@@ -28,7 +28,7 @@ vi.mock('@/lib/client/api/supplies', async () => ({
   updateSupply: mocks.updateSupply,
 }));
 
-vi.mock('./selectors', () => {
+vi.mock('../../shared/SupplyEditorForm/selectors', async () => {
   type MockOption = {
     data?: unknown;
     displayValue: string;
@@ -90,6 +90,9 @@ vi.mock('./selectors', () => {
     };
 
   return {
+    ...(await vi.importActual<
+      typeof import('../../shared/SupplyEditorForm/selectors')
+    >('../../shared/SupplyEditorForm/selectors')),
     SuppliersAsyncCombobox: makeSelector([
       { displayValue: 'Global Foods', value: '3' },
     ]),
@@ -417,24 +420,5 @@ describe('CreateSupply', () => {
     expect(await screen.findByText('Supply number is required')).toBeVisible();
     expect(screen.getByRole('button', { name: 'Save draft' })).toBeEnabled();
     expect(createSupplyMock).not.toHaveBeenCalled();
-  });
-
-  it('keeps a completed supply read-only without save or selection actions', () => {
-    setup({
-      initialSupply: { ...savedSupply, status: SUPPLY_STATUS.COMPLETED },
-    });
-
-    expect(screen.getByRole('combobox', { name: 'Supplier' })).toBeDisabled();
-    expect(
-      screen.getByRole('combobox', { name: 'Product for row 1' })
-    ).toBeDisabled();
-    expect(
-      screen.getByRole('spinbutton', { name: 'Quantity for row 1' })
-    ).toHaveAttribute('readonly');
-    expect(
-      screen.queryByRole('combobox', { name: 'Product for row 2' })
-    ).not.toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: 'Save draft' })).toBeNull();
-    expect(screen.queryByRole('checkbox')).toBeNull();
   });
 });

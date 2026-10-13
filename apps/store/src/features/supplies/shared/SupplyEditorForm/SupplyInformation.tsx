@@ -3,10 +3,7 @@ import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
 import { SuppliersAsyncCombobox, WarehousesAsyncCombobox } from './selectors';
 import type { SupplyInformationProps } from './types';
 
-export const SupplyInformation = ({
-  form,
-  readOnly,
-}: SupplyInformationProps) => (
+export const SupplyInformation = ({ form }: SupplyInformationProps) => (
   <Card.Root variant="filled">
     <Card.Content>
       <div className="flex flex-col gap-[var(--space-3)]">
@@ -19,7 +16,6 @@ export const SupplyInformation = ({
 
               return (
                 <SuppliersAsyncCombobox
-                  disabled={readOnly}
                   errorText={errorText}
                   invalid={Boolean(errorText)}
                   label="Supplier"
@@ -56,7 +52,6 @@ export const SupplyInformation = ({
 
               return (
                 <WarehousesAsyncCombobox
-                  disabled={readOnly}
                   errorText={errorText}
                   invalid={Boolean(errorText)}
                   label="Warehouse"
@@ -99,7 +94,6 @@ export const SupplyInformation = ({
                   onBlur={field.handleBlur}
                   onValueChange={field.handleChange}
                   placeholder="Enter supply number"
-                  readOnly={readOnly}
                   required
                   value={field.state.value}
                 />
@@ -114,7 +108,6 @@ export const SupplyInformation = ({
                 onBlur={field.handleBlur}
                 onValueChange={field.handleChange}
                 placeholder="Enter invoice number"
-                readOnly={readOnly}
                 value={field.state.value}
               />
             )}
@@ -128,7 +121,6 @@ export const SupplyInformation = ({
                   onBlur={field.handleBlur}
                   onValueChange={field.handleChange}
                   placeholder="Add a comment (optional)"
-                  readOnly={readOnly}
                   resize="vertical"
                   rows={3}
                   value={field.state.value}
