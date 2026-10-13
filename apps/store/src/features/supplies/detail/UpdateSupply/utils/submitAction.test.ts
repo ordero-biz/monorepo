@@ -2,10 +2,7 @@ import { updateSupply } from '@/lib/client/api/supplies';
 import { SUPPLY_STATUS } from '@/lib/domain/supplies/constants';
 import type { SupplyDetails } from '@/lib/domain/supplies/types';
 import { getSupplyFormDefaults } from '../../../shared/SupplyEditorForm';
-import {
-  getUpdateSupplyData,
-  submitUpdateSupplyAction,
-} from './submitUpdateSupplyAction';
+import { getUpdateSupplyData, submitUpdateSupply } from './submitAction';
 
 vi.mock('@/lib/client/api/supplies', async () => ({
   ...(await vi.importActual<typeof import('@/lib/client/api/supplies')>(
@@ -44,7 +41,7 @@ const initialSupply: SupplyDetails = {
   ],
 };
 
-describe('submitUpdateSupplyAction', () => {
+describe('submitUpdateSupply', () => {
   beforeEach(() => {
     updateSupplyMock.mockReset();
   });
@@ -53,7 +50,7 @@ describe('submitUpdateSupplyAction', () => {
     const value = getSupplyFormDefaults(initialSupply);
     value.supplyNumber = ' SUP-001 ';
 
-    const result = await submitUpdateSupplyAction({
+    const result = await submitUpdateSupply({
       value,
       initialSupply,
       status: SUPPLY_STATUS.DRAFT,
@@ -74,7 +71,7 @@ describe('submitUpdateSupplyAction', () => {
     const value = getSupplyFormDefaults(initialSupply);
     value.comment = '   ';
 
-    const result = await submitUpdateSupplyAction({
+    const result = await submitUpdateSupply({
       value,
       initialSupply,
       status: SUPPLY_STATUS.COMPLETED,
@@ -97,7 +94,7 @@ describe('submitUpdateSupplyAction', () => {
     };
     updateSupplyMock.mockResolvedValue({ ok: false, error });
 
-    const result = await submitUpdateSupplyAction({
+    const result = await submitUpdateSupply({
       value: getSupplyFormDefaults(initialSupply),
       initialSupply,
       status: SUPPLY_STATUS.COMPLETED,

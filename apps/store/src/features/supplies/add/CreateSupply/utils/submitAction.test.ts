@@ -2,10 +2,7 @@ import { createSupply } from '@/lib/client/api/supplies';
 import { SUPPLY_STATUS } from '@/lib/domain/supplies/constants';
 import type { SupplyDetails } from '@/lib/domain/supplies/types';
 import { getSupplyFormDefaults } from '../../../shared/SupplyEditorForm';
-import {
-  getCreateSupplyData,
-  submitCreateSupplyAction,
-} from './submitCreateSupplyAction';
+import { getCreateSupplyData, submitCreateSupply } from './submitAction';
 
 vi.mock('@/lib/client/api/supplies', async () => ({
   ...(await vi.importActual<typeof import('@/lib/client/api/supplies')>(
@@ -44,7 +41,7 @@ const initialSupply: SupplyDetails = {
   ],
 };
 
-describe('submitCreateSupplyAction', () => {
+describe('submitCreateSupply', () => {
   beforeEach(() => {
     createSupplyMock.mockReset();
   });
@@ -56,7 +53,7 @@ describe('submitCreateSupplyAction', () => {
     value.warehouseId = '4';
     value.supplyNumber = ' SUP-001 ';
 
-    const result = await submitCreateSupplyAction({
+    const result = await submitCreateSupply({
       value,
       status: SUPPLY_STATUS.DRAFT,
     });
@@ -79,7 +76,7 @@ describe('submitCreateSupplyAction', () => {
     };
     createSupplyMock.mockResolvedValue({ ok: false, error });
 
-    const result = await submitCreateSupplyAction({
+    const result = await submitCreateSupply({
       value: getSupplyFormDefaults(initialSupply),
       status: SUPPLY_STATUS.DRAFT,
     });

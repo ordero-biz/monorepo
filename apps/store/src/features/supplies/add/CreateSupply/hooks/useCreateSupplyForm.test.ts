@@ -8,17 +8,17 @@ import {
   type SupplyFormValues,
   type SupplySubmitIntent,
 } from '../../../shared/SupplyEditorForm';
-import { submitCreateSupplyAction } from '../utils/submitCreateSupplyAction';
+import { submitCreateSupply } from '../utils/submitAction';
 import { useCreateSupplyForm } from './useCreateSupplyForm';
 
-vi.mock('../utils/submitCreateSupplyAction', async () => ({
-  ...(await vi.importActual<typeof import('../utils/submitCreateSupplyAction')>(
-    '../utils/submitCreateSupplyAction'
+vi.mock('../utils/submitAction', async () => ({
+  ...(await vi.importActual<typeof import('../utils/submitAction')>(
+    '../utils/submitAction'
   )),
-  submitCreateSupplyAction: vi.fn(),
+  submitCreateSupply: vi.fn(),
 }));
 
-const submitCreateSupplyActionMock = vi.mocked(submitCreateSupplyAction);
+const submitCreateSupplyMock = vi.mocked(submitCreateSupply);
 const supply: SupplyDetails = {
   id: 9,
   supplier: { id: 3, name: 'Global Foods', status: 'ACTIVE' },
@@ -81,7 +81,7 @@ const { setup } = prepareFormHookTestSetup<TestHookProps>({
 
 describe('useCreateSupplyForm', () => {
   beforeEach(() => {
-    submitCreateSupplyActionMock.mockReset();
+    submitCreateSupplyMock.mockReset();
   });
 
   it.each([
@@ -93,7 +93,7 @@ describe('useCreateSupplyForm', () => {
     ],
   ] as const)('creates a supply with %s intent and reports the result', async (intent, status, message) => {
     const savedSupply = { ...supply, status };
-    submitCreateSupplyActionMock.mockResolvedValue({
+    submitCreateSupplyMock.mockResolvedValue({
       ok: true,
       data: savedSupply,
     });
@@ -111,7 +111,7 @@ describe('useCreateSupplyForm', () => {
     await waitFor(() =>
       expect(hookProps.onCreated).toHaveBeenCalledWith(savedSupply)
     );
-    expect(submitCreateSupplyActionMock).toHaveBeenCalledWith({
+    expect(submitCreateSupplyMock).toHaveBeenCalledWith({
       value: hookProps.values,
       status,
     });
@@ -119,7 +119,7 @@ describe('useCreateSupplyForm', () => {
   });
 
   it('does not report creation when the submit action fails', async () => {
-    submitCreateSupplyActionMock.mockResolvedValue({
+    submitCreateSupplyMock.mockResolvedValue({
       ok: false,
       error: { status: 500, message: 'Could not save the supply.' },
     });

@@ -4,17 +4,17 @@ import { SUPPLY_STATUS } from '@/lib/domain/supplies/constants';
 import type { SupplyDetails } from '@/lib/domain/supplies/types';
 import { prepareFormHookTestSetup } from '@/test/prepareFormHookTestSetup';
 import type { SupplySubmitIntent } from '../../../shared/SupplyEditorForm';
-import { submitUpdateSupplyAction } from '../utils/submitUpdateSupplyAction';
+import { submitUpdateSupply } from '../utils/submitAction';
 import { useUpdateSupplyForm } from './useUpdateSupplyForm';
 
-vi.mock('../utils/submitUpdateSupplyAction', async () => ({
-  ...(await vi.importActual<typeof import('../utils/submitUpdateSupplyAction')>(
-    '../utils/submitUpdateSupplyAction'
+vi.mock('../utils/submitAction', async () => ({
+  ...(await vi.importActual<typeof import('../utils/submitAction')>(
+    '../utils/submitAction'
   )),
-  submitUpdateSupplyAction: vi.fn(),
+  submitUpdateSupply: vi.fn(),
 }));
 
-const submitUpdateSupplyActionMock = vi.mocked(submitUpdateSupplyAction);
+const submitUpdateSupplyMock = vi.mocked(submitUpdateSupply);
 const supply: SupplyDetails = {
   id: 9,
   supplier: { id: 3, name: 'Global Foods', status: 'ACTIVE' },
@@ -60,12 +60,12 @@ const { setup } = prepareFormHookTestSetup<TestHookProps>({
 
 describe('useUpdateSupplyForm', () => {
   beforeEach(() => {
-    submitUpdateSupplyActionMock.mockReset();
+    submitUpdateSupplyMock.mockReset();
   });
 
   it('saves a metadata-only draft and reports the saved supply', async () => {
     const savedSupply = { ...supply, supplyNumber: 'SUP-002', version: 2 };
-    submitUpdateSupplyActionMock.mockResolvedValue({
+    submitUpdateSupplyMock.mockResolvedValue({
       ok: true,
       data: savedSupply,
     });
@@ -84,7 +84,7 @@ describe('useUpdateSupplyForm', () => {
     await waitFor(() =>
       expect(hookProps.onUpdated).toHaveBeenCalledWith(savedSupply)
     );
-    expect(submitUpdateSupplyActionMock).toHaveBeenCalledWith({
+    expect(submitUpdateSupplyMock).toHaveBeenCalledWith({
       value: expect.objectContaining({ supplyNumber: 'SUP-002' }),
       initialSupply: supply,
       status: SUPPLY_STATUS.DRAFT,
@@ -104,12 +104,12 @@ describe('useUpdateSupplyForm', () => {
 
     await user.click(screen.getByRole('button', { name: 'Submit' }));
 
-    expect(submitUpdateSupplyActionMock).not.toHaveBeenCalled();
+    expect(submitUpdateSupplyMock).not.toHaveBeenCalled();
     expect(hookProps.onUpdated).not.toHaveBeenCalled();
   });
 
   it('does not report a save when the submit utility finds no changes', async () => {
-    submitUpdateSupplyActionMock.mockResolvedValue(null);
+    submitUpdateSupplyMock.mockResolvedValue(null);
     const user = userEvent.setup();
     const { hookProps } = setup({
       hookProps: {
@@ -123,12 +123,12 @@ describe('useUpdateSupplyForm', () => {
     await user.click(screen.getByRole('button', { name: 'Submit' }));
 
     expect(await screen.findByText('No changes to save.')).toBeVisible();
-    expect(submitUpdateSupplyActionMock).toHaveBeenCalledOnce();
+    expect(submitUpdateSupplyMock).toHaveBeenCalledOnce();
     expect(hookProps.onUpdated).not.toHaveBeenCalled();
   });
 
   it('shows a submit error without reporting success', async () => {
-    submitUpdateSupplyActionMock.mockResolvedValue({
+    submitUpdateSupplyMock.mockResolvedValue({
       ok: false,
       error: { status: 500, message: 'Could not save the supply.' },
     });

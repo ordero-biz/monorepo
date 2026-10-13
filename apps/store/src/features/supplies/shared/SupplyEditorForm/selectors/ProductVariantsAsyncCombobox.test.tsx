@@ -37,7 +37,13 @@ describe('ProductVariantsAsyncCombobox', () => {
     mocks.onValueChange.mockReset();
   });
 
-  it('lets the user select a product variant and returns its resource data', async () => {
+  it.each([
+    { sku: 'RICE-5KG', displayValue: 'Jasmine Rice 5kg · RICE-5KG' },
+    { sku: '', displayValue: 'Jasmine Rice 5kg' },
+  ])('selects a variant and displays "$displayValue"', async ({
+    sku,
+    displayValue,
+  }) => {
     const variant = {
       barcode: '123456789',
       createdAt: '2026-09-01T00:00:00Z',
@@ -45,7 +51,7 @@ describe('ProductVariantsAsyncCombobox', () => {
       id: 11,
       name: 'Jasmine Rice 5kg',
       productVariantAttributeValues: [],
-      sku: 'RICE-5KG',
+      sku,
     };
     getProductVariantsMock.mockResolvedValue({
       ok: true,
@@ -64,10 +70,11 @@ describe('ProductVariantsAsyncCombobox', () => {
     setup();
 
     await user.click(screen.getByRole('combobox', { name: 'Product' }));
-    await user.click(
-      await screen.findByRole('option', { name: 'Jasmine Rice 5kg · RICE-5KG' })
-    );
+    await user.click(await screen.findByRole('option', { name: displayValue }));
 
+    expect(screen.getByRole('combobox', { name: 'Product' })).toHaveValue(
+      displayValue
+    );
     expect(getProductVariantsMock).toHaveBeenCalledWith({
       page: 1,
       size: 100,

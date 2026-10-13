@@ -6,7 +6,7 @@ import {
   normalizeOptionalText,
 } from '../../../shared/SupplyEditorForm';
 
-type SubmitCreateSupplyActionArgs = {
+type SubmitCreateSupplyArgs = {
   value: SupplyFormValues;
   status: SupplyStatus;
 };
@@ -35,8 +35,5 @@ export const getCreateSupplyData = (
   };
 };
 
-export const submitCreateSupplyAction = ({
-  value,
-  status,
-}: SubmitCreateSupplyActionArgs) =>
+export const submitCreateSupply = ({ value, status }: SubmitCreateSupplyArgs) =>
   createSupply(getCreateSupplyData(value, status));

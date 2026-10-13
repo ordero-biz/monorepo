@@ -3,7 +3,7 @@ import {
   getSupplyFormDefaults,
   useSupplyEditorForm,
 } from '../../../shared/SupplyEditorForm';
-import { submitCreateSupplyAction } from '../utils/submitCreateSupplyAction';
+import { submitCreateSupply } from '../utils/submitAction';
 
 type UseCreateSupplyFormArgs = {
   onCreated: (supply: SupplyDetails) => Promise<void> | void;
@@ -13,6 +13,6 @@ export const useCreateSupplyForm = ({ onCreated }: UseCreateSupplyFormArgs) =>
   useSupplyEditorForm({
     defaultValues: getSupplyFormDefaults(),
     draftSuccessMessage: 'Supply draft created.',
-    submitAction: submitCreateSupplyAction,
+    submitAction: submitCreateSupply,
     onSaved: onCreated,
   });

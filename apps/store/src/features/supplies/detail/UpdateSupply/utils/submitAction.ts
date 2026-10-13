@@ -11,7 +11,7 @@ import {
   normalizeOptionalText,
 } from '../../../shared/SupplyEditorForm';
 
-type SubmitUpdateSupplyActionArgs = {
+type SubmitUpdateSupplyArgs = {
   value: SupplyFormValues;
   initialSupply: SupplyDetails;
   status: SupplyStatus;
@@ -45,7 +45,7 @@ export const getUpdateSupplyData = ({
   value,
   initialSupply,
   status,
-}: SubmitUpdateSupplyActionArgs): UpdateSupplyData | null => {
+}: SubmitUpdateSupplyArgs): UpdateSupplyData | null => {
   const changes: UpdateSupplyFieldData = {};
   const supplierId = Number(value.supplierId);
   const warehouseId = Number(value.warehouseId);
@@ -97,9 +97,7 @@ export const getUpdateSupplyData = ({
   };
 };
 
-export const submitUpdateSupplyAction = async (
-  args: SubmitUpdateSupplyActionArgs
-) => {
+export const submitUpdateSupply = async (args: SubmitUpdateSupplyArgs) => {
   const data = getUpdateSupplyData(args);
   if (!data) {
     return null;

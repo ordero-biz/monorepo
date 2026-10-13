@@ -3,7 +3,7 @@ import {
   getSupplyFormDefaults,
   useSupplyEditorForm,
 } from '../../../shared/SupplyEditorForm';
-import { submitUpdateSupplyAction } from '../utils/submitUpdateSupplyAction';
+import { submitUpdateSupply } from '../utils/submitAction';
 
 type UseUpdateSupplyFormArgs = {
   supply: SupplyDetails;
@@ -18,6 +18,6 @@ export const useUpdateSupplyForm = ({
     defaultValues: getSupplyFormDefaults(supply),
     draftSuccessMessage: 'Supply draft saved.',
     submitAction: ({ value, status }) =>
-      submitUpdateSupplyAction({ value, status, initialSupply: supply }),
+      submitUpdateSupply({ value, status, initialSupply: supply }),
     onSaved: onUpdated,
   });

@@ -45,9 +45,91 @@ const loadSupplierOptions = async ({
   };
 };
 
-export const SuppliersAsyncCombobox = (props: SuppliersAsyncComboboxProps) => (
+export const SuppliersAsyncCombobox = ({
+  'aria-describedby': ariaDescribedBy,
+  'aria-label': ariaLabel,
+  'aria-labelledby': ariaLabelledBy,
+  autoComplete,
+  autoFocus,
+  defaultInputValue,
+  defaultOpen,
+  defaultValue,
+  disabled,
+  endAdornment,
+  endIcon,
+  errorIcon,
+  errorText,
+  helperIcon,
+  helperText,
+  id,
+  inputValue,
+  invalid,
+  isOptionDisabled,
+  label,
+  multiple,
+  name,
+  onBlur,
+  onFocus,
+  onInputValueChange,
+  onKeyDown,
+  onListScroll,
+  onOpenChange,
+  onOptionSelect,
+  onValueChange,
+  open,
+  placeholder,
+  readOnly,
+  ref,
+  required,
+  size,
+  startAdornment,
+  startIcon,
+  staticOptions,
+  value,
+  variant,
+}: SuppliersAsyncComboboxProps) => (
   <AsyncCombobox
-    {...props}
+    aria-describedby={ariaDescribedBy}
+    aria-label={ariaLabel}
+    aria-labelledby={ariaLabelledBy}
+    autoComplete={autoComplete}
+    autoFocus={autoFocus}
+    defaultInputValue={defaultInputValue}
+    defaultOpen={defaultOpen}
+    defaultValue={defaultValue}
+    disabled={disabled}
+    endAdornment={endAdornment}
+    endIcon={endIcon}
+    errorIcon={errorIcon}
+    errorText={errorText}
+    helperIcon={helperIcon}
+    helperText={helperText}
+    id={id}
+    inputValue={inputValue}
+    invalid={invalid}
+    isOptionDisabled={isOptionDisabled}
+    label={label}
+    multiple={multiple}
+    name={name}
+    onBlur={onBlur}
+    onFocus={onFocus}
+    onInputValueChange={onInputValueChange}
+    onKeyDown={onKeyDown}
+    onListScroll={onListScroll}
+    onOpenChange={onOpenChange}
+    onOptionSelect={onOptionSelect}
+    onValueChange={onValueChange}
+    open={open}
+    placeholder={placeholder}
+    readOnly={readOnly}
+    ref={ref}
+    required={required}
+    size={size}
+    startAdornment={startAdornment}
+    startIcon={startIcon}
+    staticOptions={staticOptions}
+    value={value}
+    variant={variant}
     emptyText="No suppliers found"
     loadErrorText="We couldn't load suppliers right now."
     loadOptions={loadSupplierOptions}
