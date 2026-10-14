@@ -10,16 +10,9 @@ import { useCallback, useMemo, useRef } from 'react';
 import { getColumns } from './columns';
 import { SupplyActions } from './SupplyActions';
 import type { SupplyEntriesProps, SupplyEntryFormValues } from './types';
-import {
-  createEmptySupplyEntry,
-  getSupplyTotal,
-  isBlankSupplyEntry,
-} from './utils';
+import { createEmptySupplyEntry, getSupplyTotal } from './utils';
 
 const getRowId = (entry: SupplyEntryFormValues) => entry.clientId;
-
-const getRowCanSelect = (entry: SupplyEntryFormValues) =>
-  !isBlankSupplyEntry(entry);
 
 const getRowCheckboxAriaLabel = (entry: SupplyEntryFormValues) =>
   `Select ${entry.productVariant?.name || 'supply entry'}`;
@@ -35,7 +28,6 @@ export const SupplyEntries = ({
   const lastEntry = entries.at(-1);
   const { clearSelection, selectedRows, selection } = useDataTableSelection({
     data: entries,
-    getRowCanSelect,
     getRowCheckboxAriaLabel,
     getRowId,
     selectAllCheckboxAriaLabel: 'Select all supply entries',

@@ -357,14 +357,46 @@ describe('CreateSupply', () => {
 
     expect(screen.getByRole('table', { name: 'Supply entries' })).toBeVisible();
     expect(
+      screen.getByRole('img', { name: 'Product image unavailable' })
+    ).toBeVisible();
+    expect(
       screen.getByRole('combobox', { name: 'Product for row 1' })
     ).toBeVisible();
     expect(
-      screen.queryByRole('checkbox', { name: 'Select all supply entries' })
-    ).not.toBeInTheDocument();
+      screen.getByRole('checkbox', { name: 'Select all supply entries' })
+    ).toBeVisible();
+    expect(
+      screen.getByRole('checkbox', { name: 'Select supply entry' })
+    ).toBeEnabled();
     expect(
       screen.getByRole('button', { name: 'Finalize supply' })
     ).toBeDisabled();
+  });
+
+  it('selects and deletes the initial empty row', async () => {
+    const user = userEvent.setup();
+    setup();
+
+    await user.click(
+      screen.getByRole('checkbox', { name: 'Select supply entry' })
+    );
+
+    expect(
+      screen.getByRole('checkbox', { name: 'Select all supply entries' })
+    ).toBeChecked();
+    const bulkActions = screen.getByRole('complementary', {
+      name: 'Supply entry bulk actions',
+    });
+    expect(within(bulkActions).getByText('1 selected')).toBeVisible();
+    await user.click(
+      within(bulkActions).getByRole('button', { name: 'Delete' })
+    );
+
+    expect(screen.getByText('No products in this supply.')).toBeVisible();
+    expect(
+      screen.getByRole('button', { name: '+ Add another product' })
+    ).toBeEnabled();
+    expect(screen.getByRole('button', { name: 'Save draft' })).toBeVisible();
   });
 
   it('adds a row only on request and disables adding until the last row has a product', async () => {
@@ -384,6 +416,9 @@ describe('CreateSupply', () => {
       screen.queryByRole('combobox', { name: 'Product for row 2' })
     ).not.toBeInTheDocument();
     expect(addProduct).toBeEnabled();
+    expect(
+      screen.getByRole('img', { name: 'Product image unavailable' })
+    ).toBeVisible();
     expect(
       screen.getByRole('checkbox', { name: 'Select Jasmine Rice 5kg' })
     ).toBeVisible();
@@ -405,6 +440,15 @@ describe('CreateSupply', () => {
     ).toHaveValue('');
     expect(addProduct).toBeDisabled();
     await user.click(addProduct);
+    await user.click(
+      screen.getByRole('checkbox', { name: 'Select all supply entries' })
+    );
+    expect(
+      screen.getByRole('checkbox', { name: 'Select Jasmine Rice 5kg' })
+    ).toBeChecked();
+    expect(
+      screen.getByRole('checkbox', { name: 'Select supply entry' })
+    ).toBeChecked();
     expect(
       screen.queryByRole('combobox', { name: 'Product for row 3' })
     ).not.toBeInTheDocument();
