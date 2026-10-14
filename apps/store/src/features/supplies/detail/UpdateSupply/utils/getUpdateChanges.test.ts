@@ -258,7 +258,7 @@ describe('getSupplyUpdateChanges', () => {
 
   it('sends an empty entry list after deleting the final product', () => {
     const value = getSupplyFormDefaults(initialSupply);
-    value.supplyEntries = value.supplyEntries.slice(-1);
+    value.supplyEntries = getSupplyFormDefaults().supplyEntries;
 
     expect(
       getSupplyUpdateChanges({
@@ -284,11 +284,7 @@ describe('getSupplyUpdateChanges', () => {
       ],
     };
     const value = getSupplyFormDefaults(supply);
-    value.supplyEntries = [
-      value.supplyEntries[1],
-      value.supplyEntries[0],
-      value.supplyEntries[2],
-    ];
+    value.supplyEntries = [value.supplyEntries[1], value.supplyEntries[0]];
 
     expect(
       getSupplyUpdateChanges({

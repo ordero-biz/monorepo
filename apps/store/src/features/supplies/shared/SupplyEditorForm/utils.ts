@@ -23,6 +23,9 @@ export const isBlankSupplyEntry = (entry: SupplyEntryFormValues) =>
   !entry.unitPrice.trim() &&
   !entry.comment.trim();
 
+export const hasOnlyBlankSupplyEntry = (entries: SupplyEntryFormValues[]) =>
+  entries.length === 1 && isBlankSupplyEntry(entries[0]);
+
 const hasPositiveId = (value: string | number | null) =>
   value !== null && Number.isInteger(Number(value)) && Number(value) > 0;
 
@@ -58,26 +61,25 @@ export const getSupplyFormDefaults = (
   supplyNumber: initialSupply?.supplyNumber ?? '',
   supplierInvoiceNumber: initialSupply?.supplierInvoiceNumber ?? '',
   comment: initialSupply?.comment ?? '',
-  supplyEntries: [
-    ...(initialSupply?.supplyEntries.map((entry) => ({
-      clientId: `existing-${entry.id}`,
-      productVariant: {
-        id: entry.productVariant.id,
-        name: entry.productVariant.name,
-        sku: entry.productVariant.sku ?? '',
-      },
-      unitOfMeasurement: {
-        id: entry.unitOfMeasurement.id,
-        name: entry.unitOfMeasurement.name,
-        symbol: entry.unitOfMeasurement.symbol,
-        status: entry.unitOfMeasurement.status,
-      },
-      quantity: String(entry.quantity),
-      unitPrice: String(entry.unitPrice),
-      comment: entry.comment ?? '',
-    })) ?? []),
-    createEmptySupplyEntry('initial-placeholder'),
-  ],
+  supplyEntries: initialSupply?.supplyEntries.length
+    ? initialSupply.supplyEntries.map((entry) => ({
+        clientId: `existing-${entry.id}`,
+        productVariant: {
+          id: entry.productVariant.id,
+          name: entry.productVariant.name,
+          sku: entry.productVariant.sku ?? '',
+        },
+        unitOfMeasurement: {
+          id: entry.unitOfMeasurement.id,
+          name: entry.unitOfMeasurement.name,
+          symbol: entry.unitOfMeasurement.symbol,
+          status: entry.unitOfMeasurement.status,
+        },
+        quantity: String(entry.quantity),
+        unitPrice: String(entry.unitPrice),
+        comment: entry.comment ?? '',
+      }))
+    : [createEmptySupplyEntry('initial-placeholder')],
 });
 
 export const getSupplyEntriesPayload = (

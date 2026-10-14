@@ -373,7 +373,47 @@ describe('CreateSupply', () => {
     ).toBeDisabled();
   });
 
-  it('selects and deletes the initial empty row', async () => {
+  it('disables deletion of the only blank row and enables it once the row has data', async () => {
+    const user = userEvent.setup();
+    setup();
+
+    await user.click(
+      screen.getByRole('button', { name: 'Actions for supply entry' })
+    );
+    expect(
+      await screen.findByRole('menuitem', { name: 'Delete' })
+    ).toHaveAttribute('aria-disabled', 'true');
+    await user.keyboard('{Escape}');
+    await user.type(
+      screen.getByRole('textbox', { name: 'Comment for row 1' }),
+      'Remove this row'
+    );
+    await user.click(
+      screen.getByRole('button', { name: 'Actions for supply entry' })
+    );
+    const deleteAction = await screen.findByRole('menuitem', {
+      name: 'Delete',
+    });
+    expect(deleteAction).not.toHaveAttribute('aria-disabled', 'true');
+    await user.click(deleteAction);
+
+    expect(
+      screen.getByRole('combobox', { name: 'Product for row 1' })
+    ).toHaveValue('');
+    expect(
+      screen.queryByRole('combobox', { name: 'Product for row 2' })
+    ).not.toBeInTheDocument();
+    const addProduct = screen.getByRole('button', {
+      name: '+ Add another product',
+    });
+    expect(
+      screen.getByRole('button', { name: 'Actions for supply entry' })
+    ).toBeVisible();
+    expect(addProduct).toBeDisabled();
+    expect(createSupplyMock).not.toHaveBeenCalled();
+  });
+
+  it('disables bulk deletion of the only blank row', async () => {
     const user = userEvent.setup();
     setup();
 
@@ -388,15 +428,53 @@ describe('CreateSupply', () => {
       name: 'Supply entry bulk actions',
     });
     expect(within(bulkActions).getByText('1 selected')).toBeVisible();
+    expect(
+      within(bulkActions).getByRole('button', { name: 'Delete' })
+    ).toBeDisabled();
     await user.click(
       within(bulkActions).getByRole('button', { name: 'Delete' })
     );
 
-    expect(screen.getByText('No products in this supply.')).toBeVisible();
+    expect(
+      screen.getByRole('combobox', { name: 'Product for row 1' })
+    ).toHaveValue('');
+    expect(
+      screen.queryByRole('combobox', { name: 'Product for row 2' })
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: '+ Add another product' })
+    ).toBeDisabled();
+    await user.click(
+      within(bulkActions).getByRole('button', { name: 'Clear selection' })
+    );
+    expect(screen.getByRole('button', { name: 'Save draft' })).toBeVisible();
+  });
+
+  it('allows deleting an empty row when another product row remains', async () => {
+    const user = userEvent.setup();
+    setup();
+    await addCompleteEntry(user);
+    await user.click(
+      screen.getByRole('button', { name: '+ Add another product' })
+    );
+    await user.click(
+      screen.getByRole('button', { name: 'Actions for supply entry' })
+    );
+    const deleteAction = await screen.findByRole('menuitem', {
+      name: 'Delete',
+    });
+    expect(deleteAction).not.toHaveAttribute('aria-disabled', 'true');
+    await user.click(deleteAction);
+
+    expect(
+      screen.queryByRole('combobox', { name: 'Product for row 2' })
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('combobox', { name: 'Product for row 1' })
+    ).toHaveValue('11');
     expect(
       screen.getByRole('button', { name: '+ Add another product' })
     ).toBeEnabled();
-    expect(screen.getByRole('button', { name: 'Save draft' })).toBeVisible();
   });
 
   it('adds a row only on request and disables adding until the last row has a product', async () => {
@@ -478,13 +556,11 @@ describe('CreateSupply', () => {
       screen.queryByRole('checkbox', { name: 'Select Jasmine Rice 5kg' })
     ).toBeNull();
     expect(
-      screen.queryByRole('combobox', { name: 'Product for row 1' })
+      screen.queryByRole('combobox', { name: 'Product for row 2' })
     ).not.toBeInTheDocument();
     const addProduct = screen.getByRole('button', {
       name: '+ Add another product',
     });
-    expect(addProduct).toBeEnabled();
-    await user.click(addProduct);
     expect(
       screen.getByRole('combobox', { name: 'Product for row 1' })
     ).toHaveValue('');

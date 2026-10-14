@@ -10,7 +10,11 @@ import { useCallback, useMemo, useRef } from 'react';
 import { getColumns } from './columns';
 import { SupplyActions } from './SupplyActions';
 import type { SupplyEntriesProps, SupplyEntryFormValues } from './types';
-import { createEmptySupplyEntry, getSupplyTotal } from './utils';
+import {
+  createEmptySupplyEntry,
+  getSupplyTotal,
+  hasOnlyBlankSupplyEntry,
+} from './utils';
 
 const getRowId = (entry: SupplyEntryFormValues) => entry.clientId;
 
@@ -33,25 +37,31 @@ export const SupplyEntries = ({
     selectAllCheckboxAriaLabel: 'Select all supply entries',
   });
 
-  const deleteRows = useCallback(
-    async (clientIds: Set<string>) => {
-      const indexes = form.state.values.supplyEntries.flatMap((entry, index) =>
-        clientIds.has(entry.clientId) ? [index] : []
-      );
-      for (const index of indexes.reverse()) {
-        await form.removeFieldValue('supplyEntries', index);
-      }
-      clearSelection();
-    },
-    [clearSelection, form]
-  );
-
   const appendEntry = useCallback(() => {
     form.pushFieldValue(
       'supplyEntries',
       createEmptySupplyEntry(`new-${nextClientId.current++}`)
     );
   }, [form]);
+
+  const deleteRows = useCallback(
+    async (clientIds: Set<string>) => {
+      if (hasOnlyBlankSupplyEntry(form.state.values.supplyEntries)) {
+        return;
+      }
+      const indexes = form.state.values.supplyEntries.flatMap((entry, index) =>
+        clientIds.has(entry.clientId) ? [index] : []
+      );
+      for (const index of indexes.reverse()) {
+        await form.removeFieldValue('supplyEntries', index);
+      }
+      if (form.state.values.supplyEntries.length === 0) {
+        appendEntry();
+      }
+      clearSelection();
+    },
+    [appendEntry, clearSelection, form]
+  );
 
   const deleteEntry = useCallback(
     (clientId: string) => deleteRows(new Set([clientId])),
@@ -97,6 +107,7 @@ export const SupplyEntries = ({
 
       <SupplyActions
         {...getSupplyTotal(form.state.values)}
+        deleteDisabled={hasOnlyBlankSupplyEntry(entries)}
         onClearSelection={clearSelection}
         onDeleteSelected={() => deleteRows(new Set(selectedRows.map(getRowId)))}
         onFinalize={onFinalize}

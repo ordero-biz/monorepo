@@ -89,7 +89,53 @@ describe('UpdateSupply', () => {
     getProductVariantsMock.mockReset();
     getUnitsOfMeasurementMock.mockReset();
   });
-  it('does not move a deleted row error onto the next row or the placeholder', async () => {
+  it('restores one clean empty row after deleting the last saved product', async () => {
+    const user = userEvent.setup();
+    updateSupplyMock.mockResolvedValue({ ok: true, data: savedSupply });
+    setup({
+      supply: {
+        ...savedSupply,
+        supplyEntries: [{ ...savedSupply.supplyEntries[0], quantity: 0 }],
+      },
+    });
+    expect(
+      screen.queryByRole('combobox', { name: 'Product for row 2' })
+    ).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Save draft' }));
+    expect(
+      screen.getByRole('spinbutton', { name: 'Quantity for row 1' })
+    ).toHaveAccessibleDescription(
+      'Quantity must be a whole number greater than 0'
+    );
+
+    await user.click(
+      screen.getByRole('button', { name: 'Actions for Jasmine Rice 5kg' })
+    );
+    await user.click(await screen.findByRole('menuitem', { name: 'Delete' }));
+
+    expect(
+      screen.getByRole('combobox', { name: 'Product for row 1' })
+    ).toHaveValue('');
+    expect(
+      screen.queryByRole('combobox', { name: 'Product for row 2' })
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByText('Quantity must be a whole number greater than 0')
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: '+ Add another product' })
+    ).toBeDisabled();
+    await user.click(screen.getByRole('button', { name: 'Save draft' }));
+    await waitFor(() =>
+      expect(updateSupplyMock).toHaveBeenCalledExactlyOnceWith({
+        supplyId: savedSupply.id,
+        expectedVersion: savedSupply.version,
+        supplyEntries: [],
+      })
+    );
+  });
+
+  it('does not move a deleted row error onto the next row', async () => {
     const user = userEvent.setup();
     setup({
       supply: {
@@ -131,8 +177,8 @@ describe('UpdateSupply', () => {
       screen.queryByText('Quantity must be a whole number greater than 0')
     ).not.toBeInTheDocument();
     expect(
-      screen.getByRole('combobox', { name: 'Product for row 2' })
-    ).toHaveValue('');
+      screen.queryByRole('combobox', { name: 'Product for row 2' })
+    ).not.toBeInTheDocument();
     expect(updateSupplyMock).not.toHaveBeenCalled();
   });
 
@@ -173,8 +219,8 @@ describe('UpdateSupply', () => {
       'Quantity must be a whole number greater than 0'
     );
     expect(
-      screen.getByRole('spinbutton', { name: 'Quantity for row 2' })
-    ).not.toHaveAttribute('aria-invalid', 'true');
+      screen.queryByRole('spinbutton', { name: 'Quantity for row 2' })
+    ).not.toBeInTheDocument();
   });
 
   it('deletes nonadjacent selected rows and saves edits to the surviving row', async () => {
@@ -225,8 +271,8 @@ describe('UpdateSupply', () => {
       screen.getByRole('combobox', { name: 'Product for row 1' })
     ).toHaveValue('Brown Rice · BROWN');
     expect(
-      screen.getByRole('combobox', { name: 'Product for row 2' })
-    ).toHaveValue('');
+      screen.queryByRole('combobox', { name: 'Product for row 2' })
+    ).not.toBeInTheDocument();
     expect(
       screen.queryByRole('combobox', { name: 'Product for row 3' })
     ).not.toBeInTheDocument();
@@ -498,6 +544,12 @@ describe('UpdateSupply', () => {
       },
     });
     setup();
+    expect(
+      screen.queryByRole('combobox', { name: 'Product for row 2' })
+    ).not.toBeInTheDocument();
+    await user.click(
+      screen.getByRole('button', { name: '+ Add another product' })
+    );
     await user.click(
       screen.getByRole('combobox', { name: 'Product for row 2' })
     );

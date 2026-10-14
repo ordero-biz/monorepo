@@ -14,7 +14,7 @@ import {
   UnitsOfMeasurementAsyncCombobox,
 } from './selectors';
 import type { SupplyEntriesProps, SupplyEntryFormValues } from './types';
-import { isBlankSupplyEntry } from './utils';
+import { hasOnlyBlankSupplyEntry } from './utils';
 import {
   type SupplyEntryValidatedField,
   validateSupplyEntryField,
@@ -283,36 +283,36 @@ export const getColumns = ({
     },
     {
       id: 'actions',
-      cell: ({ row }) =>
-        isBlankSupplyEntry(row.original) ? null : (
-          <DataTableCell variant="actions">
-            <Menu.Root>
-              <Menu.Trigger
-                aria-label={`Actions for ${row.original.productVariant?.name || 'supply entry'}`}
-                appearance="iconButton"
-                size="xs"
-              >
-                <EllipsisVertical aria-hidden="true" />
-              </Menu.Trigger>
-              <Menu.Portal>
-                <Menu.Positioner align="end">
-                  <Menu.Popup>
-                    <Menu.Item
-                      color="error"
-                      onClick={() => onDeleteEntry(row.original.clientId)}
-                    >
-                      <Trash2
-                        aria-hidden="true"
-                        className="size-[var(--icon-button-xs-icon)]"
-                      />
-                      Delete
-                    </Menu.Item>
-                  </Menu.Popup>
-                </Menu.Positioner>
-              </Menu.Portal>
-            </Menu.Root>
-          </DataTableCell>
-        ),
+      cell: ({ row, table }) => (
+        <DataTableCell variant="actions">
+          <Menu.Root>
+            <Menu.Trigger
+              aria-label={`Actions for ${row.original.productVariant?.name || 'supply entry'}`}
+              appearance="iconButton"
+              size="xs"
+            >
+              <EllipsisVertical aria-hidden="true" />
+            </Menu.Trigger>
+            <Menu.Portal>
+              <Menu.Positioner align="end">
+                <Menu.Popup>
+                  <Menu.Item
+                    color="error"
+                    disabled={hasOnlyBlankSupplyEntry(table.options.data)}
+                    onClick={() => onDeleteEntry(row.original.clientId)}
+                  >
+                    <Trash2
+                      aria-hidden="true"
+                      className="size-[var(--icon-button-xs-icon)]"
+                    />
+                    Delete
+                  </Menu.Item>
+                </Menu.Popup>
+              </Menu.Positioner>
+            </Menu.Portal>
+          </Menu.Root>
+        </DataTableCell>
+      ),
       header: () => null,
       meta: { align: 'right', width: 48 },
     },

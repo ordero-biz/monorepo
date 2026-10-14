@@ -87,17 +87,14 @@ describe('supply form utilities', () => {
     expect(defaults.supplyEntries[0].productVariant).not.toBe(
       initialSupply.supplyEntries[0].productVariant
     );
-    expect(defaults.supplyEntries[1].productVariant).toBeNull();
     expect(defaults.supplyEntries[0].unitOfMeasurement).not.toBe(
       initialSupply.supplyEntries[0].unitOfMeasurement
     );
-    expect(defaults.supplyEntries[1].unitOfMeasurement).toBeNull();
-    expect(defaults.supplyEntries[1]).toEqual(
-      createEmptySupplyEntry('initial-placeholder')
-    );
-    expect(defaults.supplyEntries[0]?.clientId).not.toBe(
-      defaults.supplyEntries[1]?.clientId
-    );
+    expect(defaults.supplyEntries).toHaveLength(1);
+    expect(
+      getSupplyFormDefaults({ ...initialSupply, supplyEntries: [] })
+        .supplyEntries
+    ).toEqual([createEmptySupplyEntry('initial-placeholder')]);
   });
 
   it.each([

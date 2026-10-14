@@ -55,6 +55,7 @@ export type SupplySubmitIntent = 'draft' | 'finalize';
 
 export type SupplyActionsProps = {
   count: number;
+  deleteDisabled?: boolean;
   selectedCount: number;
   onClearSelection: () => void;
   onDeleteSelected: () => void;

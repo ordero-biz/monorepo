@@ -9,6 +9,7 @@ import type { SupplyActionsProps } from './types';
 
 export const SupplyActions = ({
   count,
+  deleteDisabled = false,
   selectedCount,
   onClearSelection,
   onDeleteSelected,
@@ -41,6 +42,7 @@ export const SupplyActions = ({
             <ContextualActionBar.Right>
               <Button
                 color="error"
+                disabled={deleteDisabled}
                 onClick={onDeleteSelected}
                 size="s"
                 startIcon={<Trash2 aria-hidden="true" />}
