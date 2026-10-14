@@ -21,8 +21,8 @@ export const SupplyInformation = ({ form }: SupplyInformationProps) => (
                   name={field.name}
                   onBlur={field.handleBlur}
                   onValueChange={field.handleChange}
-                  placeholder="Select supplier"
                   required
+                  size="s"
                   value={field.state.value}
                 />
               );
@@ -40,8 +40,8 @@ export const SupplyInformation = ({ form }: SupplyInformationProps) => (
                   name={field.name}
                   onBlur={field.handleBlur}
                   onValueChange={field.handleChange}
-                  placeholder="Select warehouse"
                   required
+                  size="s"
                   value={field.state.value}
                 />
               );
@@ -59,8 +59,8 @@ export const SupplyInformation = ({ form }: SupplyInformationProps) => (
                   name={field.name}
                   onBlur={field.handleBlur}
                   onValueChange={field.handleChange}
-                  placeholder="Enter supply number"
                   required
+                  size="s"
                   value={field.state.value}
                 />
               );
@@ -73,7 +73,7 @@ export const SupplyInformation = ({ form }: SupplyInformationProps) => (
                 name={field.name}
                 onBlur={field.handleBlur}
                 onValueChange={field.handleChange}
-                placeholder="Enter invoice number"
+                size="s"
                 value={field.state.value}
               />
             )}
@@ -86,9 +86,8 @@ export const SupplyInformation = ({ form }: SupplyInformationProps) => (
                   name={field.name}
                   onBlur={field.handleBlur}
                   onValueChange={field.handleChange}
-                  placeholder="Add a comment (optional)"
-                  resize="vertical"
-                  rows={3}
+                  resize="none"
+                  rows={2}
                   value={field.state.value}
                 />
               )}
