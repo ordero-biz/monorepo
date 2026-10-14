@@ -12,7 +12,6 @@ import {
 } from '@ordero/ui';
 import { EllipsisVertical, Package, Trash2 } from 'lucide-react';
 import { useCallback, useMemo, useRef } from 'react';
-import type { ProductVariant } from '@/lib/domain/products/types';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
 import { formatMoney } from '../formatMoney';
 import { SupplyActions } from './SupplyActions';
@@ -26,7 +25,7 @@ import { createEmptySupplyEntry, getSupplyTotal } from './utils';
 const getRowId = (entry: SupplyEntryFormValues) => entry.clientId;
 
 const getRowCheckboxAriaLabel = (entry: SupplyEntryFormValues) =>
-  `Select ${entry.productVariantName || 'supply entry'}`;
+  `Select ${entry.productVariant?.name || 'supply entry'}`;
 
 const header = (label: string) => (
   <div className="px-[var(--spacing-2)] py-[var(--spacing-2)]">{label}</div>
@@ -90,7 +89,7 @@ export const SupplyEntries = ({
             <DataTableCell>
               <div className="w-[320px]">
                 <form.Field
-                  name={`supplyEntries[${index}].productVariantId` as const}
+                  name={`supplyEntries[${index}].productVariant` as const}
                 >
                   {(field) => {
                     const errorText = getFieldSubmitChangeErrorText(
@@ -104,55 +103,20 @@ export const SupplyEntries = ({
                         invalid={Boolean(errorText)}
                         name={field.name}
                         onBlur={field.handleBlur}
-                        onOptionSelect={(option) => {
-                          const variant = option?.data as
-                            | ProductVariant
-                            | undefined;
-                          form.setFieldValue('supplyEntries', (current) => {
-                            const updated = current.map((item) =>
-                              item.clientId === entry.clientId
-                                ? {
-                                    ...item,
-                                    productVariantId: option?.value ?? null,
-                                    productVariantName:
-                                      variant?.name ??
-                                      option?.displayValue ??
-                                      '',
-                                    productVariantSku:
-                                      variant?.sku ?? entry.productVariantSku,
-                                  }
-                                : item
+                        onValueChange={(variant) => {
+                          field.handleChange(variant);
+                          if (entry.clientId === placeholderId && variant) {
+                            form.pushFieldValue(
+                              'supplyEntries',
+                              createEmptySupplyEntry(
+                                `new-${nextClientId.current++}`
+                              )
                             );
-
-                            if (entry.clientId === placeholderId && option) {
-                              return [
-                                ...updated,
-                                createEmptySupplyEntry(
-                                  `new-${nextClientId.current++}`
-                                ),
-                              ];
-                            }
-
-                            return updated;
-                          });
+                          }
                         }}
-                        onValueChange={field.handleChange}
                         placeholder="Product *"
                         required
                         size="s"
-                        staticOptions={
-                          entry.productVariantId && entry.productVariantName
-                            ? [
-                                {
-                                  displayValue: entry.productVariantName,
-                                  label: entry.productVariantSku
-                                    ? `${entry.productVariantName} · ${entry.productVariantSku}`
-                                    : entry.productVariantName,
-                                  value: entry.productVariantId,
-                                },
-                              ]
-                            : []
-                        }
                         value={field.state.value}
                       />
                     );
@@ -169,13 +133,12 @@ export const SupplyEntries = ({
         id: 'unit',
         cell: ({ row }) => {
           const index = row.index;
-          const entry = row.original;
 
           return (
             <DataTableCell>
               <div className="w-[var(--space-16)]">
                 <form.Field
-                  name={`supplyEntries[${index}].unitOfMeasurementId` as const}
+                  name={`supplyEntries[${index}].unitOfMeasurement` as const}
                 >
                   {(field) => {
                     const errorText = getFieldSubmitChangeErrorText(
@@ -189,34 +152,10 @@ export const SupplyEntries = ({
                         invalid={Boolean(errorText)}
                         name={field.name}
                         onBlur={field.handleBlur}
-                        onOptionSelect={(option) => {
-                          form.setFieldValue('supplyEntries', (current) =>
-                            current.map((item) =>
-                              item.clientId === entry.clientId
-                                ? {
-                                    ...item,
-                                    unitOfMeasurementName:
-                                      option?.displayValue ?? '',
-                                  }
-                                : item
-                            )
-                          );
-                        }}
                         onValueChange={field.handleChange}
                         placeholder="Unit *"
                         required
                         size="s"
-                        staticOptions={
-                          entry.unitOfMeasurementId &&
-                          entry.unitOfMeasurementName
-                            ? [
-                                {
-                                  displayValue: entry.unitOfMeasurementName,
-                                  value: entry.unitOfMeasurementId,
-                                },
-                              ]
-                            : []
-                        }
                         value={field.state.value}
                       />
                     );
@@ -355,7 +294,7 @@ export const SupplyEntries = ({
             <DataTableCell variant="actions">
               <Menu.Root>
                 <Menu.Trigger
-                  aria-label={`Actions for ${row.original.productVariantName || 'supply entry'}`}
+                  aria-label={`Actions for ${row.original.productVariant?.name || 'supply entry'}`}
                   appearance="iconButton"
                   size="xs"
                 >

@@ -77,6 +77,12 @@ export type {
 } from './components/Combobox';
 export { Combobox } from './components/Combobox';
 export type {
+  Combobox2MultipleProps,
+  Combobox2Props,
+  Combobox2SingleProps,
+} from './components/Combobox2';
+export { Combobox2 } from './components/Combobox2';
+export type {
   DataTableCellProps,
   DataTableCellVariant,
   DataTableColumnAlignment,

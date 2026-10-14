@@ -1,6 +1,10 @@
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { getProductVariants } from '@/lib/client/api/products';
+import { getSuppliers } from '@/lib/client/api/suppliers';
 import { updateSupply } from '@/lib/client/api/supplies';
+import { getUnitsOfMeasurement } from '@/lib/client/api/units-of-measurement';
+import { getWarehouses } from '@/lib/client/api/warehouses';
 import { SUPPLY_STATUS } from '@/lib/domain/supplies/constants';
 import type { SupplyDetails } from '@/lib/domain/supplies/types';
 import { suppliesQueryKeys } from '@/lib/query/supplies/suppliesQueryKeys';
@@ -13,6 +17,38 @@ vi.mock('@/lib/client/api/supplies', async () => ({
   )),
   updateSupply: vi.fn(),
 }));
+
+vi.mock('@/lib/client/api/suppliers', async () => ({
+  ...(await vi.importActual<typeof import('@/lib/client/api/suppliers')>(
+    '@/lib/client/api/suppliers'
+  )),
+  getSuppliers: vi.fn(),
+}));
+const getSuppliersMock = vi.mocked(getSuppliers);
+
+vi.mock('@/lib/client/api/warehouses', async () => ({
+  ...(await vi.importActual<typeof import('@/lib/client/api/warehouses')>(
+    '@/lib/client/api/warehouses'
+  )),
+  getWarehouses: vi.fn(),
+}));
+const getWarehousesMock = vi.mocked(getWarehouses);
+
+vi.mock('@/lib/client/api/products', async () => ({
+  ...(await vi.importActual<typeof import('@/lib/client/api/products')>(
+    '@/lib/client/api/products'
+  )),
+  getProductVariants: vi.fn(),
+}));
+const getProductVariantsMock = vi.mocked(getProductVariants);
+
+vi.mock('@/lib/client/api/units-of-measurement', async () => ({
+  ...(await vi.importActual<
+    typeof import('@/lib/client/api/units-of-measurement')
+  >('@/lib/client/api/units-of-measurement')),
+  getUnitsOfMeasurement: vi.fn(),
+}));
+const getUnitsOfMeasurementMock = vi.mocked(getUnitsOfMeasurement);
 
 const updateSupplyMock = vi.mocked(updateSupply);
 const savedSupply: SupplyDetails = {
@@ -48,7 +84,352 @@ const { setup } = prepareStoreSetup({
 describe('UpdateSupply', () => {
   beforeEach(() => {
     updateSupplyMock.mockReset();
+    getSuppliersMock.mockReset();
+    getWarehousesMock.mockReset();
+    getProductVariantsMock.mockReset();
+    getUnitsOfMeasurementMock.mockReset();
   });
+  it('maps supplierId errors to the object field and submits only its ID after correction', async () => {
+    const user = userEvent.setup();
+    const nextSupplier = {
+      id: 8,
+      name: 'New supplier',
+      status: 'ACTIVE' as const,
+    };
+    getSuppliersMock.mockResolvedValue({
+      ok: true,
+      data: {
+        content: [nextSupplier],
+        page: { number: 0, size: 100, totalElements: 1, totalPages: 1 },
+      },
+    });
+    updateSupplyMock
+      .mockResolvedValueOnce({
+        ok: false,
+        error: {
+          status: 400,
+          message: 'Invalid supplier',
+          fieldErrors: { supplierId: 'Supplier is unavailable' },
+        },
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        data: {
+          ...savedSupply,
+          supplier: nextSupplier,
+          supplyNumber: 'SUP-002',
+          version: 2,
+        },
+      });
+    setup();
+    const supplier = screen.getByRole('combobox', { name: /Supplier/ });
+    expect(supplier).toHaveValue('Global Foods');
+    expect(getSuppliersMock).not.toHaveBeenCalled();
+    const number = screen.getByRole('textbox', { name: /Supply number/ });
+    await user.clear(number);
+    await user.type(number, 'SUP-002');
+    await user.click(screen.getByRole('button', { name: 'Save draft' }));
+    expect(await screen.findByText('Supplier is unavailable')).toBeVisible();
+    expect(supplier).toHaveAccessibleDescription('Supplier is unavailable');
+    await user.click(supplier);
+    await user.clear(supplier);
+    await user.click(
+      await screen.findByRole('option', { name: 'New supplier' })
+    );
+    await user.click(screen.getByRole('button', { name: 'Save draft' }));
+    await waitFor(() =>
+      expect(updateSupplyMock).toHaveBeenLastCalledWith({
+        supplyId: 9,
+        expectedVersion: 1,
+        supplierId: 8,
+        supplyNumber: 'SUP-002',
+      })
+    );
+    await waitFor(() =>
+      expect(
+        screen.queryByText('Supplier is unavailable')
+      ).not.toBeInTheDocument()
+    );
+  });
+
+  it('maps warehouseId errors to the object field and submits only its ID after correction', async () => {
+    const user = userEvent.setup();
+    const nextWarehouse = {
+      id: 8,
+      name: 'New warehouse',
+      status: 'ACTIVE' as const,
+    };
+    getWarehousesMock.mockResolvedValue({
+      ok: true,
+      data: {
+        content: [{ ...nextWarehouse, comment: '' }],
+        page: { number: 0, size: 100, totalElements: 1, totalPages: 1 },
+      },
+    });
+    updateSupplyMock
+      .mockResolvedValueOnce({
+        ok: false,
+        error: {
+          status: 400,
+          message: 'Invalid warehouse',
+          fieldErrors: { warehouseId: 'Warehouse is unavailable' },
+        },
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        data: {
+          ...savedSupply,
+          warehouse: nextWarehouse,
+          supplyNumber: 'SUP-002',
+          version: 2,
+        },
+      });
+    setup();
+    const warehouse = screen.getByRole('combobox', { name: /Warehouse/ });
+    expect(warehouse).toHaveValue('Main Warehouse');
+    expect(getWarehousesMock).not.toHaveBeenCalled();
+    const number = screen.getByRole('textbox', { name: /Supply number/ });
+    await user.clear(number);
+    await user.type(number, 'SUP-002');
+    await user.click(screen.getByRole('button', { name: 'Save draft' }));
+    expect(await screen.findByText('Warehouse is unavailable')).toBeVisible();
+    expect(warehouse).toHaveAccessibleDescription('Warehouse is unavailable');
+    await user.click(warehouse);
+    await user.clear(warehouse);
+    await user.click(
+      await screen.findByRole('option', { name: 'New warehouse' })
+    );
+    await user.click(screen.getByRole('button', { name: 'Save draft' }));
+    await waitFor(() =>
+      expect(updateSupplyMock).toHaveBeenLastCalledWith({
+        supplyId: 9,
+        expectedVersion: 1,
+        warehouseId: 8,
+        supplyNumber: 'SUP-002',
+      })
+    );
+    await waitFor(() =>
+      expect(
+        screen.queryByText('Warehouse is unavailable')
+      ).not.toBeInTheDocument()
+    );
+  });
+
+  it('requires a warehouse after clearing the saved selection', async () => {
+    const user = userEvent.setup();
+    getWarehousesMock.mockResolvedValue({
+      ok: true,
+      data: {
+        content: [],
+        page: { number: 0, size: 100, totalElements: 0, totalPages: 0 },
+      },
+    });
+    setup();
+    await user.clear(screen.getByRole('combobox', { name: /Warehouse/ }));
+    await user.click(screen.getByRole('button', { name: 'Save draft' }));
+    expect(await screen.findByText('Select a warehouse')).toBeVisible();
+    expect(updateSupplyMock).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    'supplyEntries.0.productVariantId',
+    'supplyEntries[0].productVariantId',
+  ])('maps %s errors and serializes a replacement without stale SKU metadata', async (errorPath) => {
+    const user = userEvent.setup();
+    getProductVariantsMock.mockResolvedValue({
+      ok: true,
+      data: {
+        content: [
+          {
+            id: 12,
+            name: 'Other rice',
+            sku: '',
+            description: '',
+            barcode: '',
+            createdAt: '',
+            productVariantAttributeValues: [],
+          },
+        ],
+        page: { number: 0, size: 100, totalElements: 1, totalPages: 1 },
+      },
+    });
+    updateSupplyMock
+      .mockResolvedValueOnce({
+        ok: false,
+        error: {
+          status: 400,
+          message: 'Invalid product',
+          fieldErrors: { [errorPath]: 'Product is unavailable' },
+        },
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        data: { ...savedSupply, version: 2 },
+      });
+    setup();
+    const product = screen.getByRole('combobox', { name: 'Product for row 1' });
+    expect(product).toHaveValue('Jasmine Rice 5kg · RICE-5KG');
+    expect(getProductVariantsMock).not.toHaveBeenCalled();
+    const quantity = screen.getByRole('spinbutton', {
+      name: 'Quantity for row 1',
+    });
+    await user.clear(quantity);
+    await user.type(quantity, '25');
+    await user.click(screen.getByRole('button', { name: 'Save draft' }));
+    expect(await screen.findByText('Product is unavailable')).toBeVisible();
+    expect(product).toHaveAccessibleDescription('Product is unavailable');
+    await user.click(product);
+    await user.clear(product);
+    await user.click(await screen.findByRole('option', { name: 'Other rice' }));
+    expect(
+      screen.getByRole('combobox', { name: 'Product for row 1' })
+    ).toHaveValue('Other rice');
+    expect(
+      screen.getByRole('checkbox', { name: 'Select Other rice' })
+    ).toBeVisible();
+    expect(
+      screen.queryByRole('combobox', { name: 'Product for row 3' })
+    ).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Save draft' }));
+    await waitFor(() =>
+      expect(updateSupplyMock).toHaveBeenLastCalledWith({
+        supplyId: 9,
+        expectedVersion: 1,
+        supplyEntries: [
+          {
+            productVariantId: 12,
+            unitOfMeasurementId: 2,
+            quantity: 25,
+            unitPrice: 28,
+            comment: null,
+          },
+        ],
+      })
+    );
+    await waitFor(() =>
+      expect(
+        screen.queryByText('Product is unavailable')
+      ).not.toBeInTheDocument()
+    );
+  });
+
+  it('adds one blank row after selecting a product in the placeholder', async () => {
+    const user = userEvent.setup();
+    getProductVariantsMock.mockResolvedValue({
+      ok: true,
+      data: {
+        content: [
+          {
+            id: 12,
+            name: 'Other rice',
+            sku: '',
+            description: '',
+            barcode: '',
+            createdAt: '',
+            productVariantAttributeValues: [],
+          },
+        ],
+        page: { number: 0, size: 100, totalElements: 1, totalPages: 1 },
+      },
+    });
+    setup();
+    await user.click(
+      screen.getByRole('combobox', { name: 'Product for row 2' })
+    );
+    await user.click(await screen.findByRole('option', { name: 'Other rice' }));
+    expect(
+      screen.getByRole('combobox', { name: 'Product for row 2' })
+    ).toHaveValue('Other rice');
+    expect(
+      screen.getByRole('combobox', { name: 'Product for row 3' })
+    ).toHaveValue('');
+    expect(
+      screen.queryByRole('combobox', { name: 'Product for row 4' })
+    ).not.toBeInTheDocument();
+    await user.clear(
+      screen.getByRole('combobox', { name: 'Product for row 1' })
+    );
+    await user.click(screen.getByRole('button', { name: 'Save draft' }));
+    expect(await screen.findByText('Select a product')).toBeVisible();
+    expect(updateSupplyMock).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    'supplyEntries.0.unitOfMeasurementId',
+    'supplyEntries[0].unitOfMeasurementId',
+  ])('maps %s errors and serializes a replacement without stale symbol metadata', async (errorPath) => {
+    const user = userEvent.setup();
+    getUnitsOfMeasurementMock.mockResolvedValue({
+      ok: true,
+      data: {
+        content: [{ id: 3, name: 'Piece', symbol: null, status: 'ACTIVE' }],
+        page: { number: 0, size: 100, totalElements: 1, totalPages: 1 },
+      },
+    });
+    updateSupplyMock
+      .mockResolvedValueOnce({
+        ok: false,
+        error: {
+          status: 400,
+          message: 'Invalid unit',
+          fieldErrors: { [errorPath]: 'Unit is unavailable' },
+        },
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        data: { ...savedSupply, version: 2 },
+      });
+    setup();
+    const unit = screen.getByRole('combobox', { name: 'Unit for row 1' });
+    expect(unit).toHaveValue('Bag (bag)');
+    expect(getUnitsOfMeasurementMock).not.toHaveBeenCalled();
+    const quantity = screen.getByRole('spinbutton', {
+      name: 'Quantity for row 1',
+    });
+    await user.clear(quantity);
+    await user.type(quantity, '25');
+    await user.click(screen.getByRole('button', { name: 'Save draft' }));
+    expect(await screen.findByText('Unit is unavailable')).toBeVisible();
+    expect(unit).toHaveAccessibleDescription('Unit is unavailable');
+    await user.click(unit);
+    await user.clear(unit);
+    await user.click(await screen.findByRole('option', { name: 'Piece' }));
+    expect(
+      screen.getByRole('combobox', { name: 'Unit for row 1' })
+    ).toHaveValue('Piece');
+    expect(
+      screen.queryByRole('combobox', { name: 'Unit for row 3' })
+    ).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Save draft' }));
+    await waitFor(() =>
+      expect(updateSupplyMock).toHaveBeenLastCalledWith({
+        supplyId: 9,
+        expectedVersion: 1,
+        supplyEntries: [
+          {
+            productVariantId: 11,
+            unitOfMeasurementId: 3,
+            quantity: 25,
+            unitPrice: 28,
+            comment: null,
+          },
+        ],
+      })
+    );
+    await waitFor(() =>
+      expect(screen.queryByText('Unit is unavailable')).not.toBeInTheDocument()
+    );
+  });
+
+  it('requires a unit after clearing it from a populated entry', async () => {
+    const user = userEvent.setup();
+    setup();
+    await user.clear(screen.getByRole('combobox', { name: 'Unit for row 1' }));
+    await user.click(screen.getByRole('button', { name: 'Save draft' }));
+    expect(await screen.findByText('Select a unit')).toBeVisible();
+    expect(updateSupplyMock).not.toHaveBeenCalled();
+  });
+
   it('saves edits to an existing draft with its version and full entry list', async () => {
     const user = userEvent.setup();
     const updatedSupply = {

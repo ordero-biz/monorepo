@@ -3,18 +3,21 @@
 import { Chip } from '@ordero/ui';
 import { getUnitsOfMeasurement } from '@/lib/client/api/units-of-measurement';
 import {
-  AsyncCombobox,
-  type AsyncComboboxLoadOptionsArgs,
-  type AsyncComboboxLoadOptionsResult,
-} from '@/lib/components/AsyncCombobox';
+  AsyncCombobox2,
+  type AsyncCombobox2LoadOptionsArgs,
+  type AsyncCombobox2LoadOptionsResult,
+} from '@/lib/components/AsyncCombobox2';
 import { UNIT_OF_MEASUREMENT_STATUS } from '@/lib/domain/units-of-measurement/constants';
 import { unitsOfMeasurementQueryKeys } from '@/lib/query/units-of-measurement/unitsOfMeasurementQueryKeys';
+import type { SupplyUnitOfMeasurementSelection } from '../types';
 import type { UnitsOfMeasurementAsyncComboboxProps } from './types';
 
 const loadUnitOfMeasurementOptions = async ({
   page,
   pageSize,
-}: AsyncComboboxLoadOptionsArgs): Promise<AsyncComboboxLoadOptionsResult> => {
+}: AsyncCombobox2LoadOptionsArgs): Promise<
+  AsyncCombobox2LoadOptionsResult<SupplyUnitOfMeasurementSelection>
+> => {
   const result = await getUnitsOfMeasurement({
     page,
     size: pageSize,
@@ -27,25 +30,31 @@ const loadUnitOfMeasurementOptions = async ({
 
   return {
     nextPage: page < result.data.page.totalPages ? page + 1 : undefined,
-    options: result.data.content.map((unit) => ({
-      data: unit,
-      displayValue: unit.symbol ? `${unit.name} (${unit.symbol})` : unit.name,
-      label: (
-        <span className="flex min-w-0 items-center gap-[var(--space-1)]">
-          <span className="truncate">
-            {unit.symbol ? `${unit.name} (${unit.symbol})` : unit.name}
-          </span>
-          {unit.status === UNIT_OF_MEASUREMENT_STATUS.DRAFT ? (
-            <Chip size="s" variant="soft">
-              Draft
-            </Chip>
-          ) : null}
-        </span>
-      ),
-      value: String(unit.id),
+    options: result.data.content.map(({ id, name, symbol, status }) => ({
+      id,
+      name,
+      symbol,
+      status,
     })),
   };
 };
+
+const getUnitOfMeasurementValue = (unit: SupplyUnitOfMeasurementSelection) =>
+  String(unit.id);
+const getUnitOfMeasurementLabel = (unit: SupplyUnitOfMeasurementSelection) =>
+  unit.symbol ? `${unit.name} (${unit.symbol})` : unit.name;
+const renderUnitOfMeasurementOption = (
+  unit: SupplyUnitOfMeasurementSelection
+) => (
+  <span className="flex min-w-0 items-center gap-[var(--space-1)]">
+    <span className="truncate">{getUnitOfMeasurementLabel(unit)}</span>
+    {unit.status === UNIT_OF_MEASUREMENT_STATUS.DRAFT ? (
+      <Chip size="s" variant="soft">
+        Draft
+      </Chip>
+    ) : null}
+  </span>
+);
 
 export const UnitsOfMeasurementAsyncCombobox = ({
   'aria-describedby': ariaDescribedBy,
@@ -76,7 +85,6 @@ export const UnitsOfMeasurementAsyncCombobox = ({
   onKeyDown,
   onListScroll,
   onOpenChange,
-  onOptionSelect,
   onValueChange,
   open,
   placeholder,
@@ -90,7 +98,7 @@ export const UnitsOfMeasurementAsyncCombobox = ({
   value,
   variant,
 }: UnitsOfMeasurementAsyncComboboxProps) => (
-  <AsyncCombobox
+  <AsyncCombobox2
     aria-describedby={ariaDescribedBy}
     aria-label={ariaLabel}
     aria-labelledby={ariaLabelledBy}
@@ -119,7 +127,6 @@ export const UnitsOfMeasurementAsyncCombobox = ({
     onKeyDown={onKeyDown}
     onListScroll={onListScroll}
     onOpenChange={onOpenChange}
-    onOptionSelect={onOptionSelect}
     onValueChange={onValueChange}
     open={open}
     placeholder={placeholder}
@@ -137,6 +144,9 @@ export const UnitsOfMeasurementAsyncCombobox = ({
     loadOptions={loadUnitOfMeasurementOptions}
     loadingText="Loading units of measurement..."
     pageSize={100}
-    queryKey={unitsOfMeasurementQueryKeys.options()}
+    queryKey={[...unitsOfMeasurementQueryKeys.options(), 'combobox2']}
+    getOptionValue={getUnitOfMeasurementValue}
+    getOptionLabel={getUnitOfMeasurementLabel}
+    renderOption={renderUnitOfMeasurementOption}
   />
 );

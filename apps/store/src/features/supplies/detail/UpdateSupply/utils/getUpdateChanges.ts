@@ -18,8 +18,8 @@ const normalizeUpdateSupplyFormData = (
   value: SupplyFormValues,
   status: SupplyStatus
 ) => ({
-  supplierId: Number(value.supplierId),
-  warehouseId: Number(value.warehouseId),
+  supplierId: Number(value.supplier?.id),
+  warehouseId: Number(value.warehouse?.id),
   supplyNumber: value.supplyNumber.trim(),
   supplierInvoiceNumber: normalizeOptionalText(value.supplierInvoiceNumber),
   comment: normalizeOptionalText(value.comment),

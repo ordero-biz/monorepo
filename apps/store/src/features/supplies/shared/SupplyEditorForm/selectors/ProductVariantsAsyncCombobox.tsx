@@ -3,17 +3,20 @@
 import { Chip } from '@ordero/ui';
 import { getProductVariants } from '@/lib/client/api/products';
 import {
-  AsyncCombobox,
-  type AsyncComboboxLoadOptionsArgs,
-  type AsyncComboboxLoadOptionsResult,
-} from '@/lib/components/AsyncCombobox';
+  AsyncCombobox2,
+  type AsyncCombobox2LoadOptionsArgs,
+  type AsyncCombobox2LoadOptionsResult,
+} from '@/lib/components/AsyncCombobox2';
 import { productVariantsQueryKeys } from '@/lib/query/products/productsQueryKeys';
+import type { SupplyProductVariantSelection } from '../types';
 import type { ProductVariantsAsyncComboboxProps } from './types';
 
 const loadProductVariantOptions = async ({
   page,
   pageSize,
-}: AsyncComboboxLoadOptionsArgs): Promise<AsyncComboboxLoadOptionsResult> => {
+}: AsyncCombobox2LoadOptionsArgs): Promise<
+  AsyncCombobox2LoadOptionsResult<SupplyProductVariantSelection>
+> => {
   const result = await getProductVariants({
     page,
     size: pageSize,
@@ -26,27 +29,29 @@ const loadProductVariantOptions = async ({
 
   return {
     nextPage: page < result.data.page.totalPages ? page + 1 : undefined,
-    options: result.data.content.map((variant) => ({
-      data: variant,
-      displayValue: variant.sku
-        ? `${variant.name} · ${variant.sku}`
-        : variant.name,
-      label: (
-        <span className="flex min-w-0 items-center gap-[var(--space-1)]">
-          <span className="truncate">
-            {variant.sku ? `${variant.name} · ${variant.sku}` : variant.name}
-          </span>
-          {variant.status === 'DRAFT' ? (
-            <Chip size="s" variant="soft">
-              Draft
-            </Chip>
-          ) : null}
-        </span>
-      ),
-      value: String(variant.id),
+    options: result.data.content.map(({ id, name, sku, status }) => ({
+      id,
+      name,
+      sku,
+      status,
     })),
   };
 };
+
+const getProductVariantValue = (variant: SupplyProductVariantSelection) =>
+  String(variant.id);
+const getProductVariantLabel = (variant: SupplyProductVariantSelection) =>
+  variant.sku ? `${variant.name} · ${variant.sku}` : variant.name;
+const renderProductVariantOption = (variant: SupplyProductVariantSelection) => (
+  <span className="flex min-w-0 items-center gap-[var(--space-1)]">
+    <span className="truncate">{getProductVariantLabel(variant)}</span>
+    {variant.status === 'DRAFT' ? (
+      <Chip size="s" variant="soft">
+        Draft
+      </Chip>
+    ) : null}
+  </span>
+);
 
 export const ProductVariantsAsyncCombobox = ({
   'aria-describedby': ariaDescribedBy,
@@ -77,7 +82,6 @@ export const ProductVariantsAsyncCombobox = ({
   onKeyDown,
   onListScroll,
   onOpenChange,
-  onOptionSelect,
   onValueChange,
   open,
   placeholder,
@@ -91,7 +95,7 @@ export const ProductVariantsAsyncCombobox = ({
   value,
   variant,
 }: ProductVariantsAsyncComboboxProps) => (
-  <AsyncCombobox
+  <AsyncCombobox2
     aria-describedby={ariaDescribedBy}
     aria-label={ariaLabel}
     aria-labelledby={ariaLabelledBy}
@@ -120,7 +124,6 @@ export const ProductVariantsAsyncCombobox = ({
     onKeyDown={onKeyDown}
     onListScroll={onListScroll}
     onOpenChange={onOpenChange}
-    onOptionSelect={onOptionSelect}
     onValueChange={onValueChange}
     open={open}
     placeholder={placeholder}
@@ -138,6 +141,9 @@ export const ProductVariantsAsyncCombobox = ({
     loadOptions={loadProductVariantOptions}
     loadingText="Loading products..."
     pageSize={100}
-    queryKey={productVariantsQueryKeys.options()}
+    queryKey={[...productVariantsQueryKeys.options(), 'combobox2']}
+    getOptionValue={getProductVariantValue}
+    getOptionLabel={getProductVariantLabel}
+    renderOption={renderProductVariantOption}
   />
 );

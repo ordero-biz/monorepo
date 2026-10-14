@@ -5,6 +5,12 @@ import { SUPPLY_STATUS } from '@/lib/domain/supplies/constants';
 import type { SupplyDetails } from '@/lib/domain/supplies/types';
 import { suppliesQueryKeys } from '@/lib/query/supplies/suppliesQueryKeys';
 import { prepareStoreSetup } from '@/test/prepareSetup';
+import type {
+  SupplyProductVariantSelection,
+  SupplySupplierSelection,
+  SupplyUnitOfMeasurementSelection,
+  SupplyWarehouseSelection,
+} from '../../shared/SupplyEditorForm/types';
 import { CreateSupply } from './CreateSupply';
 
 const mocks = vi.hoisted(() => ({
@@ -27,86 +33,126 @@ vi.mock('@/lib/client/api/supplies', async () => ({
 }));
 
 vi.mock('../../shared/SupplyEditorForm/selectors', async () => {
-  type MockOption = {
-    data?: unknown;
-    displayValue: string;
-    label?: string;
-    value: string;
-  };
-
-  type MockSelectorProps = {
-    'aria-label'?: string;
-    disabled?: boolean;
-    errorText?: string;
-    label?: string;
-    onOptionSelect?: (option: MockOption | null) => void;
-    onValueChange?: (value: string | null) => void;
-    staticOptions?: MockOption[];
-    value?: string | null;
-  };
-
-  const makeSelector =
-    (options: MockOption[]) =>
-    ({
-      'aria-label': ariaLabel,
-      disabled,
-      errorText,
-      label,
-      onOptionSelect,
-      onValueChange,
-      staticOptions = [],
-      value,
-    }: MockSelectorProps) => {
-      const optionsByValue = new Map(
-        [...staticOptions, ...options].map((option) => [option.value, option])
-      );
-
-      return (
-        <>
-          <select
-            aria-label={ariaLabel ?? label}
-            disabled={disabled}
-            onChange={(event) => {
-              const nextValue = event.currentTarget.value || null;
-              onValueChange?.(nextValue);
-              onOptionSelect?.(
-                nextValue ? (optionsByValue.get(nextValue) ?? null) : null
-              );
-            }}
-            value={value ?? ''}
-          >
-            <option value="">Select</option>
-            {[...optionsByValue.values()].map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.displayValue}
-              </option>
-            ))}
-          </select>
-          {errorText ? <span role="alert">{errorText}</span> : null}
-        </>
-      );
-    };
-
   return {
     ...(await vi.importActual<
       typeof import('../../shared/SupplyEditorForm/selectors')
     >('../../shared/SupplyEditorForm/selectors')),
-    SuppliersAsyncCombobox: makeSelector([
-      { displayValue: 'Global Foods', value: '3' },
-    ]),
-    WarehousesAsyncCombobox: makeSelector([
-      { displayValue: 'Main Warehouse', value: '4' },
-    ]),
-    ProductVariantsAsyncCombobox: makeSelector([
-      {
-        data: { id: 11, name: 'Jasmine Rice 5kg', sku: 'RICE-5KG' },
-        displayValue: 'Jasmine Rice 5kg',
-        value: '11',
-      },
-    ]),
-    UnitsOfMeasurementAsyncCombobox: makeSelector([
-      { displayValue: 'Bag (bag)', value: '2' },
-    ]),
+    SuppliersAsyncCombobox: ({
+      value,
+      onValueChange,
+      label,
+      errorText,
+    }: {
+      value: SupplySupplierSelection | null;
+      onValueChange: (value: SupplySupplierSelection | null) => void;
+      label: string;
+      errorText?: string;
+    }) => (
+      <>
+        <select
+          aria-label={label}
+          value={value?.id ?? ''}
+          onChange={(event) =>
+            onValueChange(
+              event.currentTarget.value
+                ? { id: 3, name: 'Global Foods', status: 'ACTIVE' }
+                : null
+            )
+          }
+        >
+          <option value="">Select</option>
+          <option value="3">Global Foods</option>
+        </select>
+        {errorText ? <span role="alert">{errorText}</span> : null}
+      </>
+    ),
+    WarehousesAsyncCombobox: ({
+      value,
+      onValueChange,
+      label,
+      errorText,
+    }: {
+      value: SupplyWarehouseSelection | null;
+      onValueChange: (value: SupplyWarehouseSelection | null) => void;
+      label: string;
+      errorText?: string;
+    }) => (
+      <>
+        <select
+          aria-label={label}
+          value={value?.id ?? ''}
+          onChange={(event) =>
+            onValueChange(
+              event.currentTarget.value
+                ? { id: 4, name: 'Main Warehouse', status: 'ACTIVE' }
+                : null
+            )
+          }
+        >
+          <option value="">Select</option>
+          <option value="4">Main Warehouse</option>
+        </select>
+        {errorText ? <span role="alert">{errorText}</span> : null}
+      </>
+    ),
+    ProductVariantsAsyncCombobox: ({
+      'aria-label': ariaLabel,
+      value,
+      onValueChange,
+      errorText,
+    }: {
+      'aria-label': string;
+      value: SupplyProductVariantSelection | null;
+      onValueChange: (value: SupplyProductVariantSelection | null) => void;
+      errorText?: string;
+    }) => (
+      <>
+        <select
+          aria-label={ariaLabel}
+          value={value?.id ?? ''}
+          onChange={(event) =>
+            onValueChange(
+              event.currentTarget.value
+                ? { id: 11, name: 'Jasmine Rice 5kg', sku: 'RICE-5KG' }
+                : null
+            )
+          }
+        >
+          <option value="">Select</option>
+          <option value="11">Jasmine Rice 5kg</option>
+        </select>
+        {errorText ? <span role="alert">{errorText}</span> : null}
+      </>
+    ),
+    UnitsOfMeasurementAsyncCombobox: ({
+      'aria-label': ariaLabel,
+      value,
+      onValueChange,
+      errorText,
+    }: {
+      'aria-label': string;
+      value: SupplyUnitOfMeasurementSelection | null;
+      onValueChange: (value: SupplyUnitOfMeasurementSelection | null) => void;
+      errorText?: string;
+    }) => (
+      <>
+        <select
+          aria-label={ariaLabel}
+          value={value?.id ?? ''}
+          onChange={(event) =>
+            onValueChange(
+              event.currentTarget.value
+                ? { id: 2, name: 'Bag', symbol: 'bag', status: 'ACTIVE' }
+                : null
+            )
+          }
+        >
+          <option value="">Select</option>
+          <option value="2">Bag (bag)</option>
+        </select>
+        {errorText ? <span role="alert">{errorText}</span> : null}
+      </>
+    ),
   };
 });
 

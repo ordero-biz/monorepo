@@ -23,7 +23,13 @@ const mapSupplyFieldErrors = (fieldErrors?: Record<string, string>) =>
   fieldErrors
     ? Object.fromEntries(
         Object.entries(fieldErrors).map(([name, message]) => [
-          name.replace(/^supplyEntries\.(\d+)\./, 'supplyEntries[$1].'),
+          name
+            .replace(/^(supplier|warehouse)Id$/, '$1')
+            .replace(/^supplyEntries\.(\d+)\./, 'supplyEntries[$1].')
+            .replace(
+              /^(supplyEntries\[\d+\])\.(productVariant|unitOfMeasurement)Id$/,
+              '$1.$2'
+            ),
           message,
         ])
       )

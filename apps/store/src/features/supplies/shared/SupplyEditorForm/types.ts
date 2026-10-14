@@ -1,22 +1,38 @@
+import type { ProductVariant } from '@/lib/domain/products/types';
+import type { Supplier } from '@/lib/domain/suppliers/types';
+import type { UnitOfMeasurement } from '@/lib/domain/units-of-measurement/types';
+import type { Warehouse } from '@/lib/domain/warehouses/types';
 import type { useSubmitSupplyForm } from './hooks/useSubmitSupplyForm';
+
+export type SupplySupplierSelection = Pick<Supplier, 'id' | 'name' | 'status'>;
+
+export type SupplyWarehouseSelection = Pick<
+  Warehouse,
+  'id' | 'name' | 'status'
+>;
+
+export type SupplyProductVariantSelection = Pick<
+  ProductVariant,
+  'id' | 'name' | 'sku' | 'status'
+>;
+
+export type SupplyUnitOfMeasurementSelection = Pick<
+  UnitOfMeasurement,
+  'id' | 'name' | 'symbol' | 'status'
+>;
 
 export type SupplyEntryFormValues = {
   clientId: string;
-  productVariantId: string | null;
-  productVariantName: string;
-  productVariantSku: string;
-  unitOfMeasurementId: string | null;
-  unitOfMeasurementName: string;
+  productVariant: SupplyProductVariantSelection | null;
+  unitOfMeasurement: SupplyUnitOfMeasurementSelection | null;
   quantity: string;
   unitPrice: string;
   comment: string;
 };
 
 export type SupplyFormValues = {
-  supplierId: string | null;
-  supplierName: string;
-  warehouseId: string | null;
-  warehouseName: string;
+  supplier: SupplySupplierSelection | null;
+  warehouse: SupplyWarehouseSelection | null;
   supplyNumber: string;
   supplierInvoiceNumber: string;
   comment: string;

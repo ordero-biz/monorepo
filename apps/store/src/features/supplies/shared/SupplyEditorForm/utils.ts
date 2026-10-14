@@ -9,24 +9,21 @@ export const createEmptySupplyEntry = (
   clientId: string
 ): SupplyEntryFormValues => ({
   clientId,
-  productVariantId: null,
-  productVariantName: '',
-  productVariantSku: '',
-  unitOfMeasurementId: null,
-  unitOfMeasurementName: '',
+  productVariant: null,
+  unitOfMeasurement: null,
   quantity: '',
   unitPrice: '',
   comment: '',
 });
 
 const isBlankSupplyEntry = (entry: SupplyEntryFormValues) =>
-  !entry.productVariantId &&
-  !entry.unitOfMeasurementId &&
+  !entry.productVariant &&
+  !entry.unitOfMeasurement &&
   !entry.quantity.trim() &&
   !entry.unitPrice.trim() &&
   !entry.comment.trim();
 
-const hasPositiveId = (value: string | null) =>
+const hasPositiveId = (value: string | number | null) =>
   value !== null && Number.isInteger(Number(value)) && Number(value) > 0;
 
 const isPositiveNumber = (value: string) =>
@@ -36,31 +33,45 @@ const isNonnegativeNumber = (value: string) =>
   value.trim() !== '' && Number.isFinite(Number(value)) && Number(value) >= 0;
 
 const isCompleteSupplyEntry = (entry: SupplyEntryFormValues) =>
-  hasPositiveId(entry.productVariantId) &&
-  hasPositiveId(entry.unitOfMeasurementId) &&
+  hasPositiveId(entry.productVariant?.id ?? null) &&
+  hasPositiveId(entry.unitOfMeasurement?.id ?? null) &&
   isPositiveNumber(entry.quantity) &&
   isNonnegativeNumber(entry.unitPrice);
 
 export const getSupplyFormDefaults = (
   initialSupply?: SupplyDetails
 ): SupplyFormValues => ({
-  supplierId: initialSupply ? String(initialSupply.supplier.id) : null,
-  supplierName: initialSupply?.supplier.name ?? '',
-  warehouseId: initialSupply ? String(initialSupply.warehouse.id) : null,
-  warehouseName: initialSupply?.warehouse.name ?? '',
+  supplier: initialSupply
+    ? {
+        id: initialSupply.supplier.id,
+        name: initialSupply.supplier.name,
+        status: initialSupply.supplier.status,
+      }
+    : null,
+  warehouse: initialSupply
+    ? {
+        id: initialSupply.warehouse.id,
+        name: initialSupply.warehouse.name,
+        status: initialSupply.warehouse.status,
+      }
+    : null,
   supplyNumber: initialSupply?.supplyNumber ?? '',
   supplierInvoiceNumber: initialSupply?.supplierInvoiceNumber ?? '',
   comment: initialSupply?.comment ?? '',
   supplyEntries: [
     ...(initialSupply?.supplyEntries.map((entry) => ({
       clientId: `existing-${entry.id}`,
-      productVariantId: String(entry.productVariant.id),
-      productVariantName: entry.productVariant.name,
-      productVariantSku: entry.productVariant.sku ?? '',
-      unitOfMeasurementId: String(entry.unitOfMeasurement.id),
-      unitOfMeasurementName: entry.unitOfMeasurement.symbol
-        ? `${entry.unitOfMeasurement.name} (${entry.unitOfMeasurement.symbol})`
-        : entry.unitOfMeasurement.name,
+      productVariant: {
+        id: entry.productVariant.id,
+        name: entry.productVariant.name,
+        sku: entry.productVariant.sku ?? '',
+      },
+      unitOfMeasurement: {
+        id: entry.unitOfMeasurement.id,
+        name: entry.unitOfMeasurement.name,
+        symbol: entry.unitOfMeasurement.symbol,
+        status: entry.unitOfMeasurement.status,
+      },
       quantity: String(entry.quantity),
       unitPrice: String(entry.unitPrice),
       comment: entry.comment ?? '',
@@ -75,12 +86,12 @@ export const validateSupplyForm = (
 ): { fields: Record<string, string> } | undefined => {
   const fields: Record<string, string> = {};
 
-  if (!hasPositiveId(value.supplierId)) {
-    fields.supplierId = 'Select a supplier';
+  if (!hasPositiveId(value.supplier?.id ?? null)) {
+    fields.supplier = 'Select a supplier';
   }
 
-  if (!hasPositiveId(value.warehouseId)) {
-    fields.warehouseId = 'Select a warehouse';
+  if (!hasPositiveId(value.warehouse?.id ?? null)) {
+    fields.warehouse = 'Select a warehouse';
   }
 
   if (!value.supplyNumber.trim()) {
@@ -102,12 +113,12 @@ export const validateSupplyForm = (
 
     const fieldPath = `supplyEntries[${index}]`;
 
-    if (!hasPositiveId(entry.productVariantId)) {
-      fields[`${fieldPath}.productVariantId`] = 'Select a product';
+    if (!hasPositiveId(entry.productVariant?.id ?? null)) {
+      fields[`${fieldPath}.productVariant`] = 'Select a product';
     }
 
-    if (!hasPositiveId(entry.unitOfMeasurementId)) {
-      fields[`${fieldPath}.unitOfMeasurementId`] = 'Select a unit';
+    if (!hasPositiveId(entry.unitOfMeasurement?.id ?? null)) {
+      fields[`${fieldPath}.unitOfMeasurement`] = 'Select a unit';
     }
 
     if (!isPositiveNumber(entry.quantity)) {
@@ -132,8 +143,8 @@ export const getSupplyEntriesPayload = (
   value.supplyEntries
     .filter((entry) => !isBlankSupplyEntry(entry))
     .map((entry) => ({
-      productVariantId: Number(entry.productVariantId),
-      unitOfMeasurementId: Number(entry.unitOfMeasurementId),
+      productVariantId: Number(entry.productVariant?.id),
+      unitOfMeasurementId: Number(entry.unitOfMeasurement?.id),
       quantity: Number(entry.quantity),
       unitPrice: Number(entry.unitPrice),
       comment: entry.comment.trim() || null,

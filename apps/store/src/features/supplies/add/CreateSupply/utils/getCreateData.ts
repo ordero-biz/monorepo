@@ -20,8 +20,8 @@ export const getCreateSupplyData = (
   );
 
   return {
-    supplierId: Number(value.supplierId),
-    warehouseId: Number(value.warehouseId),
+    supplierId: Number(value.supplier?.id),
+    warehouseId: Number(value.warehouse?.id),
     supplyNumber: value.supplyNumber.trim(),
     status,
     supplyEntries,

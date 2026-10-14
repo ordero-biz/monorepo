@@ -32,6 +32,142 @@ const initialSupply: SupplyDetails = {
 };
 
 describe('getSupplyUpdateChanges', () => {
+  it('ignores product name, SKU, and status changes for an unchanged ID', () => {
+    const value = getSupplyFormDefaults(initialSupply);
+    value.supplyEntries[0].productVariant = {
+      id: 11,
+      name: 'Renamed rice',
+      sku: 'NEW-SKU',
+      status: 'ACTIVE',
+    };
+    expect(
+      getSupplyUpdateChanges({
+        supply: initialSupply,
+        formValue: value,
+        status: SUPPLY_STATUS.DRAFT,
+      })
+    ).toBeUndefined();
+  });
+
+  it('serializes a replaced product as an ID in the full entry list', () => {
+    const value = getSupplyFormDefaults(initialSupply);
+    value.supplyEntries[0].productVariant = {
+      id: 12,
+      name: 'Other rice',
+      sku: '',
+      status: 'DRAFT',
+    };
+    expect(
+      getSupplyUpdateChanges({
+        supply: initialSupply,
+        formValue: value,
+        status: SUPPLY_STATUS.DRAFT,
+      })
+    ).toEqual({
+      supplyEntries: [
+        {
+          productVariantId: 12,
+          unitOfMeasurementId: 2,
+          quantity: 20,
+          unitPrice: 28,
+          comment: 'New batch',
+        },
+      ],
+    });
+  });
+
+  it('ignores unit name, symbol, and status changes for an unchanged ID', () => {
+    const value = getSupplyFormDefaults(initialSupply);
+    value.supplyEntries[0].unitOfMeasurement = {
+      id: 2,
+      name: 'Renamed unit',
+      symbol: 'NEW',
+      status: 'DRAFT',
+    };
+    expect(
+      getSupplyUpdateChanges({
+        supply: initialSupply,
+        formValue: value,
+        status: SUPPLY_STATUS.DRAFT,
+      })
+    ).toBeUndefined();
+  });
+
+  it('serializes a replaced unit as an ID in the full entry list', () => {
+    const value = getSupplyFormDefaults(initialSupply);
+    value.supplyEntries[0].unitOfMeasurement = {
+      id: 3,
+      name: 'Piece',
+      symbol: null,
+      status: 'ACTIVE',
+    };
+    expect(
+      getSupplyUpdateChanges({
+        supply: initialSupply,
+        formValue: value,
+        status: SUPPLY_STATUS.DRAFT,
+      })
+    ).toEqual({
+      supplyEntries: [
+        {
+          productVariantId: 11,
+          unitOfMeasurementId: 3,
+          quantity: 20,
+          unitPrice: 28,
+          comment: 'New batch',
+        },
+      ],
+    });
+  });
+
+  it('ignores supplier display changes when the ID is unchanged', () => {
+    const value = getSupplyFormDefaults(initialSupply);
+    value.supplier = { id: 3, name: 'Renamed supplier', status: 'DRAFT' };
+    expect(
+      getSupplyUpdateChanges({
+        supply: initialSupply,
+        formValue: value,
+        status: SUPPLY_STATUS.DRAFT,
+      })
+    ).toBeUndefined();
+  });
+
+  it('submits only the supplier ID when the selection changes', () => {
+    const value = getSupplyFormDefaults(initialSupply);
+    value.supplier = { id: 8, name: 'Another supplier', status: 'ACTIVE' };
+    expect(
+      getSupplyUpdateChanges({
+        supply: initialSupply,
+        formValue: value,
+        status: SUPPLY_STATUS.DRAFT,
+      })
+    ).toEqual({ supplierId: 8 });
+  });
+
+  it('ignores warehouse display changes when the ID is unchanged', () => {
+    const value = getSupplyFormDefaults(initialSupply);
+    value.warehouse = { id: 4, name: 'Renamed warehouse', status: 'DRAFT' };
+    expect(
+      getSupplyUpdateChanges({
+        supply: initialSupply,
+        formValue: value,
+        status: SUPPLY_STATUS.DRAFT,
+      })
+    ).toBeUndefined();
+  });
+
+  it('submits only the warehouse ID when the selection changes', () => {
+    const value = getSupplyFormDefaults(initialSupply);
+    value.warehouse = { id: 8, name: 'Another warehouse', status: 'ACTIVE' };
+    expect(
+      getSupplyUpdateChanges({
+        supply: initialSupply,
+        formValue: value,
+        status: SUPPLY_STATUS.DRAFT,
+      })
+    ).toEqual({ warehouseId: 8 });
+  });
+
   it.each([
     SUPPLY_STATUS.DRAFT,
     SUPPLY_STATUS.COMPLETED,
@@ -78,7 +214,7 @@ describe('getSupplyUpdateChanges', () => {
 
   it('sends only changed metadata and null for cleared optional fields', () => {
     const value = getSupplyFormDefaults(initialSupply);
-    value.warehouseId = '5';
+    value.warehouse = { id: 5, name: 'Another warehouse', status: 'ACTIVE' };
     value.supplierInvoiceNumber = '';
     value.comment = '   ';
 

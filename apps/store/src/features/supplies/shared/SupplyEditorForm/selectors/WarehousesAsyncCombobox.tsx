@@ -3,18 +3,21 @@
 import { Chip } from '@ordero/ui';
 import { getWarehouses } from '@/lib/client/api/warehouses';
 import {
-  AsyncCombobox,
-  type AsyncComboboxLoadOptionsArgs,
-  type AsyncComboboxLoadOptionsResult,
-} from '@/lib/components/AsyncCombobox';
+  AsyncCombobox2,
+  type AsyncCombobox2LoadOptionsArgs,
+  type AsyncCombobox2LoadOptionsResult,
+} from '@/lib/components/AsyncCombobox2';
 import { WAREHOUSE_STATUS } from '@/lib/domain/warehouses/constants';
 import { warehousesQueryKeys } from '@/lib/query/warehouses/warehousesQueryKeys';
+import type { SupplyWarehouseSelection } from '../types';
 import type { WarehousesAsyncComboboxProps } from './types';
 
 const loadWarehouseOptions = async ({
   page,
   pageSize,
-}: AsyncComboboxLoadOptionsArgs): Promise<AsyncComboboxLoadOptionsResult> => {
+}: AsyncCombobox2LoadOptionsArgs): Promise<
+  AsyncCombobox2LoadOptionsResult<SupplyWarehouseSelection>
+> => {
   const result = await getWarehouses({
     page,
     size: pageSize,
@@ -27,23 +30,28 @@ const loadWarehouseOptions = async ({
 
   return {
     nextPage: page < result.data.page.totalPages ? page + 1 : undefined,
-    options: result.data.content.map((warehouse) => ({
-      data: warehouse,
-      displayValue: warehouse.name,
-      label: (
-        <span className="flex min-w-0 items-center gap-[var(--space-1)]">
-          <span className="truncate">{warehouse.name}</span>
-          {warehouse.status === WAREHOUSE_STATUS.DRAFT ? (
-            <Chip size="s" variant="soft">
-              Draft
-            </Chip>
-          ) : null}
-        </span>
-      ),
-      value: String(warehouse.id),
+    options: result.data.content.map(({ id, name, status }) => ({
+      id,
+      name,
+      status,
     })),
   };
 };
+
+const getWarehouseValue = (warehouse: SupplyWarehouseSelection) =>
+  String(warehouse.id);
+const getWarehouseLabel = (warehouse: SupplyWarehouseSelection) =>
+  warehouse.name;
+const renderWarehouseOption = (warehouse: SupplyWarehouseSelection) => (
+  <span className="flex min-w-0 items-center gap-[var(--space-1)]">
+    <span className="truncate">{warehouse.name}</span>
+    {warehouse.status === WAREHOUSE_STATUS.DRAFT ? (
+      <Chip size="s" variant="soft">
+        Draft
+      </Chip>
+    ) : null}
+  </span>
+);
 
 export const WarehousesAsyncCombobox = ({
   'aria-describedby': ariaDescribedBy,
@@ -74,7 +82,6 @@ export const WarehousesAsyncCombobox = ({
   onKeyDown,
   onListScroll,
   onOpenChange,
-  onOptionSelect,
   onValueChange,
   open,
   placeholder,
@@ -88,7 +95,7 @@ export const WarehousesAsyncCombobox = ({
   value,
   variant,
 }: WarehousesAsyncComboboxProps) => (
-  <AsyncCombobox
+  <AsyncCombobox2
     aria-describedby={ariaDescribedBy}
     aria-label={ariaLabel}
     aria-labelledby={ariaLabelledBy}
@@ -117,7 +124,6 @@ export const WarehousesAsyncCombobox = ({
     onKeyDown={onKeyDown}
     onListScroll={onListScroll}
     onOpenChange={onOpenChange}
-    onOptionSelect={onOptionSelect}
     onValueChange={onValueChange}
     open={open}
     placeholder={placeholder}
@@ -135,6 +141,9 @@ export const WarehousesAsyncCombobox = ({
     loadOptions={loadWarehouseOptions}
     loadingText="Loading warehouses..."
     pageSize={100}
-    queryKey={warehousesQueryKeys.options()}
+    queryKey={[...warehousesQueryKeys.options(), 'combobox2']}
+    getOptionValue={getWarehouseValue}
+    getOptionLabel={getWarehouseLabel}
+    renderOption={renderWarehouseOption}
   />
 );

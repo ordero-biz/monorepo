@@ -7,7 +7,6 @@ import type { ProductVariantsAsyncComboboxProps } from './types';
 
 const mocks = vi.hoisted(() => ({
   getProductVariants: vi.fn(),
-  onOptionSelect: vi.fn(),
   onValueChange: vi.fn(),
 }));
 
@@ -24,7 +23,6 @@ const { setup } = prepareStoreSetup<ProductVariantsAsyncComboboxProps>({
   component: ProductVariantsAsyncCombobox,
   props: {
     'aria-label': 'Product',
-    onOptionSelect: mocks.onOptionSelect,
     onValueChange: mocks.onValueChange,
     placeholder: 'Product',
   },
@@ -33,7 +31,6 @@ const { setup } = prepareStoreSetup<ProductVariantsAsyncComboboxProps>({
 describe('ProductVariantsAsyncCombobox', () => {
   beforeEach(() => {
     getProductVariantsMock.mockReset();
-    mocks.onOptionSelect.mockReset();
     mocks.onValueChange.mockReset();
   });
 
@@ -80,10 +77,31 @@ describe('ProductVariantsAsyncCombobox', () => {
       size: 100,
       sort: ['name,asc'],
     });
-    expect(mocks.onValueChange).toHaveBeenCalledWith('11', expect.any(Object));
-    expect(mocks.onOptionSelect).toHaveBeenCalledWith(
-      expect.objectContaining({ data: variant, value: '11' })
+    expect(mocks.onValueChange).toHaveBeenCalledWith(
+      { id: 11, name: variant.name, sku, status: undefined },
+      expect.any(Object)
     );
+  });
+
+  it('keeps the saved name and SKU visible when loading fails', async () => {
+    getProductVariantsMock.mockResolvedValue({
+      ok: false,
+      error: { status: 500, message: 'Unavailable' },
+    });
+    const user = userEvent.setup();
+    const { onValueChange } = setup({
+      value: { id: 11, name: 'Rice', sku: 'RICE' },
+    });
+    const input = screen.getByRole('combobox', { name: 'Product' });
+    expect(input).toHaveValue('Rice · RICE');
+    expect(getProductVariantsMock).not.toHaveBeenCalled();
+    await user.click(input);
+    expect(
+      await screen.findByText("We couldn't load products right now.")
+    ).toBeVisible();
+    await user.keyboard('{Escape}');
+    expect(input).toHaveValue('Rice · RICE');
+    expect(onValueChange).not.toHaveBeenCalled();
   });
 
   it('shows Draft only for draft product variants', async () => {

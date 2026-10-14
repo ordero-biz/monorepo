@@ -197,6 +197,47 @@ When a wrapper intentionally forwards props explicitly instead of using
 accessibility props (`name`, `onBlur`, `aria-label`, `aria-labelledby`,
 `aria-describedby`) and visual props such as `size` and `variant`.
 
+### Experimental object selections
+
+`Combobox2` and the store's `AsyncCombobox2` pilot object-valued selections.
+All supply editor selectors use this API; other features still use `Combobox`
+and `AsyncCombobox`.
+
+- Single selection uses `TOption | null`; multiple selection uses `TOption[]`.
+- `getOptionValue` returns a stable, unique string ID for equality and native
+  form serialization. Object identity and display labels do not define equality.
+- `getOptionLabel` returns plain text. `renderOption` optionally renders rich
+  list and multi-select chip content; keep React elements out of the selected records.
+- Selected records carry enough data to display before options load, and need
+  not appear in the current options page. `staticOptions` remains available for
+  actual fixed choices, not for injecting the current selection.
+- Loaded records take precedence for displayed labels. Refreshing options never
+  emits `onValueChange`. A user selection emits current loaded records, falling
+  back to selected records whose IDs are absent from the loaded list.
+
+Use small serializable form records and normalize them to backend IDs before
+comparing or submitting. The supply form stores `supplier` and `warehouse` as
+`{ id, name, status } | null` (warehouse status can be absent), compares only their
+IDs, and maps backend `supplierId` and `warehouseId` validation errors to the
+corresponding object fields. Thus label/status refreshes do not create PATCH
+fields. Form libraries may still consider a deliberately selected object with
+new metadata dirty; use normalized payload comparison for save/no-op decisions.
+
+Supply entries store `productVariant: { id, name, sku, status? } | null` and
+serialize only `productVariantId`. Saved summaries without a SKU use an empty
+string; status remains absent if the summary does not provide it. Name, SKU,
+and status changes alone do not replace the entry list. Backend entry errors
+for `productVariantId` map to the corresponding `productVariant` field.
+
+Entries also store `unitOfMeasurement: { id, name, symbol?, status } | null`.
+The symbol can be absent or null; the label then uses the name alone. Payloads
+serialize only `unitOfMeasurementId`, and backend errors map to the
+`unitOfMeasurement` field. Unit display metadata does not affect PATCH comparison.
+
+The migrated option caches add a `combobox2` segment under their
+resource keys to keep their record payloads separate from legacy option objects.
+A query key must identify both the requested dataset and the cached option shape.
+
 ## Form Hook Tests
 
 Use the app-local `prepareFormHookTestSetup` helper when a hook test only needs

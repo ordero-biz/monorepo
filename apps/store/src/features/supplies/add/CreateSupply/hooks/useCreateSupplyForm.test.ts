@@ -53,10 +53,8 @@ const useTestCreateSupplyForm = ({
   return {
     form: {
       handleSubmit: () => {
-        form.setFieldValue('supplierId', values.supplierId);
-        form.setFieldValue('supplierName', values.supplierName);
-        form.setFieldValue('warehouseId', values.warehouseId);
-        form.setFieldValue('warehouseName', values.warehouseName);
+        form.setFieldValue('supplier', values.supplier);
+        form.setFieldValue('warehouse', values.warehouse);
         form.setFieldValue('supplyNumber', values.supplyNumber);
         form.setFieldValue(
           'supplierInvoiceNumber',

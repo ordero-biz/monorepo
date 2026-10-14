@@ -9,10 +9,9 @@ export const SupplyInformation = ({ form }: SupplyInformationProps) => (
       <div className="flex flex-col gap-[var(--space-3)]">
         <Typography variant="h6">Supply information</Typography>
         <div className="grid gap-[var(--space-3)] md:grid-cols-2">
-          <form.Field name="supplierId">
+          <form.Field name="supplier">
             {(field) => {
               const errorText = getFieldSubmitChangeErrorText(field.state.meta);
-              const selectedName = form.state.values.supplierName;
 
               return (
                 <SuppliersAsyncCombobox
@@ -21,34 +20,17 @@ export const SupplyInformation = ({ form }: SupplyInformationProps) => (
                   label="Supplier"
                   name={field.name}
                   onBlur={field.handleBlur}
-                  onOptionSelect={(option) => {
-                    form.setFieldValue(
-                      'supplierName',
-                      option?.displayValue ?? ''
-                    );
-                  }}
                   onValueChange={field.handleChange}
                   placeholder="Select supplier"
                   required
-                  staticOptions={
-                    field.state.value && selectedName
-                      ? [
-                          {
-                            displayValue: selectedName,
-                            value: field.state.value,
-                          },
-                        ]
-                      : []
-                  }
                   value={field.state.value}
                 />
               );
             }}
           </form.Field>
-          <form.Field name="warehouseId">
+          <form.Field name="warehouse">
             {(field) => {
               const errorText = getFieldSubmitChangeErrorText(field.state.meta);
-              const selectedName = form.state.values.warehouseName;
 
               return (
                 <WarehousesAsyncCombobox
@@ -57,25 +39,9 @@ export const SupplyInformation = ({ form }: SupplyInformationProps) => (
                   label="Warehouse"
                   name={field.name}
                   onBlur={field.handleBlur}
-                  onOptionSelect={(option) => {
-                    form.setFieldValue(
-                      'warehouseName',
-                      option?.displayValue ?? ''
-                    );
-                  }}
                   onValueChange={field.handleChange}
                   placeholder="Select warehouse"
                   required
-                  staticOptions={
-                    field.state.value && selectedName
-                      ? [
-                          {
-                            displayValue: selectedName,
-                            value: field.state.value,
-                          },
-                        ]
-                      : []
-                  }
                   value={field.state.value}
                 />
               );
