@@ -10,7 +10,7 @@ const getOptionalDescription = (value: string) => {
 const normalizeCreateProductFormData = (
   value: ProductVariantsCreationValues
 ) => ({
-  categoryId: Number(value.category),
+  categoryId: Number(value.category?.id),
   name: value.name.trim(),
   status: value.status,
   ...getOptionalDescription(value.description),

@@ -38,7 +38,14 @@ export const useUpdateCategoryForm = ({
       if (!result.ok) {
         formApi.setErrorMap({
           onSubmit: {
-            fields: result.error.fieldErrors ?? {},
+            fields: Object.fromEntries(
+              Object.entries(result.error.fieldErrors ?? {}).map(
+                ([field, error]) => [
+                  field === 'parentId' ? 'parentCategory' : field,
+                  error,
+                ]
+              )
+            ),
           },
         });
 

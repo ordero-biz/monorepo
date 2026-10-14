@@ -1,21 +1,29 @@
 'use client';
 
-import { useCallback, useMemo, useState } from 'react';
 import { getAttributesDropdown } from '@/lib/client/api/attributes';
 import {
-  AsyncCombobox,
-  type AsyncComboboxLoadOptionsResult,
-} from '@/lib/components/AsyncCombobox';
+  AsyncCombobox2,
+  type AsyncCombobox2LoadOptionsResult,
+} from '@/lib/components/AsyncCombobox2';
 import type { AttributeDropdown } from '@/lib/domain/attributes/types';
 import { attributesQueryKeys } from '@/lib/query/attributes/attributesQueryKeys';
 import type { AttributesAsyncComboboxProps } from './types';
 
-const mergeAttributesById = (
-  attributes: AttributeDropdown[]
-): Record<string, AttributeDropdown> =>
-  Object.fromEntries(
-    attributes.map((attribute) => [String(attribute.id), attribute])
-  );
+const getAttributeValue = (attribute: AttributeDropdown) =>
+  String(attribute.id);
+const getAttributeLabel = (attribute: AttributeDropdown) => attribute.name;
+
+const loadAttributeOptions = async (): Promise<
+  AsyncCombobox2LoadOptionsResult<AttributeDropdown>
+> => {
+  const result = await getAttributesDropdown();
+
+  if (!result.ok) {
+    throw result.error;
+  }
+
+  return { options: result.data };
+};
 
 export const AttributesAsyncCombobox = ({
   'aria-describedby': ariaDescribedBy,
@@ -45,60 +53,20 @@ export const AttributesAsyncCombobox = ({
   onKeyDown,
   onListScroll,
   onOpenChange,
-  onSelectedAttributesChange,
   onValueChange,
   open,
   placeholder,
   readOnly,
   ref,
   required,
-  selectedAttributes = [],
   size,
   startAdornment,
   startIcon,
   value,
   variant,
 }: AttributesAsyncComboboxProps) => {
-  const [loadedAttributesById, setLoadedAttributesById] = useState<
-    Record<string, AttributeDropdown>
-  >({});
-  const selectedAttributesById = useMemo(
-    () => mergeAttributesById(selectedAttributes),
-    [selectedAttributes]
-  );
-  const attributesById = useMemo(
-    () => ({
-      ...selectedAttributesById,
-      ...loadedAttributesById,
-    }),
-    [loadedAttributesById, selectedAttributesById]
-  );
-  const loadAttributeOptions =
-    useCallback(async (): Promise<AsyncComboboxLoadOptionsResult> => {
-      const result = await getAttributesDropdown();
-
-      if (!result.ok) {
-        throw result.error;
-      }
-
-      const nextLoadedAttributesById = {
-        ...loadedAttributesById,
-        ...mergeAttributesById(result.data),
-      };
-
-      setLoadedAttributesById(nextLoadedAttributesById);
-
-      return {
-        options: result.data.map((attribute) => ({
-          displayValue: attribute.name,
-          label: attribute.name,
-          value: String(attribute.id),
-        })),
-      };
-    }, [loadedAttributesById]);
-
   return (
-    <AsyncCombobox
+    <AsyncCombobox2<AttributeDropdown>
       aria-describedby={ariaDescribedBy}
       aria-label={ariaLabel}
       aria-labelledby={ariaLabelledBy}
@@ -113,6 +81,8 @@ export const AttributesAsyncCombobox = ({
       endIcon={endIcon}
       errorIcon={errorIcon}
       errorText={errorText}
+      getOptionLabel={getAttributeLabel}
+      getOptionValue={getAttributeValue}
       helperIcon={helperIcon}
       helperText={helperText}
       id={id}
@@ -130,20 +100,11 @@ export const AttributesAsyncCombobox = ({
       onKeyDown={onKeyDown}
       onListScroll={onListScroll}
       onOpenChange={onOpenChange}
-      onValueChange={(nextValue, details) => {
-        onSelectedAttributesChange?.(
-          nextValue
-            .map((attributeId) => attributesById[attributeId])
-            .filter((attribute): attribute is AttributeDropdown =>
-              Boolean(attribute)
-            )
-        );
-        onValueChange?.(nextValue, details);
-      }}
+      onValueChange={onValueChange}
       open={open}
       pageSize={100}
       placeholder={placeholder}
-      queryKey={attributesQueryKeys.attributeDropdown()}
+      queryKey={[...attributesQueryKeys.attributeDropdown(), 'combobox2']}
       readOnly={readOnly}
       ref={ref}
       required={required}

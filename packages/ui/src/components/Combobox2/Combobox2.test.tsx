@@ -1,5 +1,5 @@
 import { prepareSetup } from '@ordero/test-config/react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Combobox2 } from './Combobox2';
 import type { Combobox2Props } from './types';
@@ -20,6 +20,89 @@ const { setup } = prepareSetup<Combobox2Props<Option>>({
 });
 
 describe('Combobox2', () => {
+  it('preserves required, helper-text, and error-text accessibility', () => {
+    const {
+      renderResult: { rerender },
+    } = setup({ required: true, helperText: 'Search by name' });
+    const input = screen.getByRole('combobox', { name: 'Choice' });
+    expect(input).toBeRequired();
+    expect(input).toHaveAccessibleDescription('Search by name');
+    rerender({ invalid: true, errorText: 'Selection required' });
+    expect(input).toHaveAttribute('aria-invalid', 'true');
+    expect(input).toHaveAccessibleDescription('Selection required');
+    expect(screen.queryByText('Search by name')).not.toBeInTheDocument();
+  });
+
+  it('renders loading, empty, loading-more, and list error states', async () => {
+    const user = userEvent.setup();
+    const {
+      renderResult: { rerender },
+    } = setup({
+      options: [],
+      loading: true,
+      loadingText: 'Fetching records',
+      emptyText: 'No matches',
+    });
+    await user.click(screen.getByRole('combobox', { name: 'Choice' }));
+    expect(await screen.findByText('Fetching records')).toBeVisible();
+    rerender({ loading: false });
+    expect(await screen.findByText('No matches')).toBeVisible();
+    rerender({ options: [first], loadingMore: true });
+    expect(screen.getByRole('option', { name: 'First' })).toBeVisible();
+    expect(screen.getByText('Fetching records')).toBeVisible();
+    rerender({ loadingMore: false, listErrorText: 'Cannot load records' });
+    expect(screen.getByText('Cannot load records')).toBeVisible();
+    expect(screen.queryByRole('option')).not.toBeInTheDocument();
+  });
+
+  it('honors controlled open and input values while reporting user changes', async () => {
+    const user = userEvent.setup();
+    const {
+      onOpenChange,
+      onInputValueChange,
+      renderResult: { rerender },
+    } = setup({
+      open: false,
+      inputValue: '',
+      onOpenChange: vi.fn(),
+      onInputValueChange: vi.fn(),
+    });
+    const input = screen.getByRole('combobox', { name: 'Choice' });
+    await user.click(input);
+    expect(onOpenChange).toHaveBeenCalledWith(true, expect.any(Object));
+    expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
+    rerender({ open: true, inputValue: 'Sec' });
+    expect(input).toHaveValue('Sec');
+    await waitFor(() =>
+      expect(screen.getByRole('option', { name: 'Second' })).toBeVisible()
+    );
+    expect(
+      screen.queryByRole('option', { name: 'First' })
+    ).not.toBeInTheDocument();
+    await user.type(input, 'o');
+    expect(onInputValueChange).toHaveBeenLastCalledWith(
+      'Seco',
+      expect.any(Object)
+    );
+    expect(input).toHaveValue('Sec');
+    await user.keyboard('{Escape}');
+    expect(onOpenChange).toHaveBeenLastCalledWith(false, expect.any(Object));
+  });
+
+  it('forwards focus, blur, and keyboard events to the input', async () => {
+    const user = userEvent.setup();
+    const { onFocus, onBlur, onKeyDown } = setup({
+      onFocus: vi.fn(),
+      onBlur: vi.fn(),
+      onKeyDown: vi.fn(),
+    });
+    await user.tab();
+    expect(onFocus).toHaveBeenCalled();
+    await user.keyboard('{ArrowDown}{Escape}{Tab}');
+    expect(onKeyDown).toHaveBeenCalled();
+    expect(onBlur).toHaveBeenCalled();
+  });
+
   it('displays a selected record before any options exist', () => {
     setup({ value: first, options: [] });
     expect(screen.getByRole('combobox', { name: 'Choice' })).toHaveValue(
@@ -95,7 +178,9 @@ describe('Combobox2', () => {
     onValueChange.mockClear();
     rerender({ options: [{ id: 1, name: 'Renamed' }, { ...second }] });
     expect(input).toHaveValue('Sec');
-    expect(screen.getByRole('option', { name: 'Second' })).toBeVisible();
+    await waitFor(() =>
+      expect(screen.getByRole('option', { name: 'Second' })).toBeVisible()
+    );
     expect(onValueChange).not.toHaveBeenCalled();
   });
 

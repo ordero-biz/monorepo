@@ -188,6 +188,7 @@ export const Combobox2 = <TOption extends object>(
   const supportTextId = useId();
   const [focused, setFocused] = useState(false);
   const [openState, setOpenState] = useState(defaultOpen ?? false);
+  const [hasUserQuery, setHasUserQuery] = useState(false);
   const hasErrorText = Boolean(invalid && errorText);
   const hasHelperText = Boolean(helperText);
   const labelId = label && !ariaLabel ? `${generatedLabelId}-label` : undefined;
@@ -219,7 +220,25 @@ export const Combobox2 = <TOption extends object>(
     details: ComboboxChangeEventDetails
   ) => {
     setOpenState(nextOpen);
+    if (!nextOpen) {
+      setHasUserQuery(false);
+    }
     onOpenChange?.(nextOpen, details);
+  };
+
+  const handleInputValueChange = (
+    nextInputValue: string,
+    details: ComboboxChangeEventDetails
+  ) => {
+    onInputValueChange?.(nextInputValue, details);
+    if (details.isCanceled) {
+      return;
+    }
+    if (details.reason === 'input-change') {
+      setHasUserQuery(nextInputValue.trim() !== '');
+    } else if (details.reason !== 'none') {
+      setHasUserQuery(false);
+    }
   };
 
   const input = (inputPlaceholder?: string) => (
@@ -438,13 +457,21 @@ export const Combobox2 = <TOption extends object>(
       defaultOpen={defaultOpen}
       defaultValue={props.defaultValue}
       disabled={disabled}
+      // A refreshed selected label is display text, not a user search.
+      filter={
+        hasUserQuery ||
+        inputValue !== undefined ||
+        defaultInputValue !== undefined
+          ? undefined
+          : null
+      }
       inputValue={inputValue}
       itemToStringLabel={getSelectedLabel}
       itemToStringValue={getOptionValue}
       isItemEqualToValue={isItemEqualToValue}
       items={uniqueOptions}
       name={name}
-      onInputValueChange={onInputValueChange}
+      onInputValueChange={handleInputValueChange}
       onOpenChange={handleOpenChange}
       onValueChange={(nextValue, details) =>
         props.onValueChange?.(

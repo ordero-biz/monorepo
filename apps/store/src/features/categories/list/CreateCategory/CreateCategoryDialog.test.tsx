@@ -149,6 +149,15 @@ describe('CreateCategoryDialog', () => {
     expect(
       within(dialog).getByRole('button', { name: 'Save draft' })
     ).toBeVisible();
+    await user.click(
+      within(dialog).getByRole('combobox', { name: 'Parent category' })
+    );
+    await user.click(
+      await screen.findByRole('option', { name: 'No parent category' })
+    );
+    expect(
+      within(dialog).getByRole('radio', { name: /^Active\b/ })
+    ).not.toHaveAttribute('aria-disabled', 'true');
   });
 
   it('creates a category with the selected parent category', async () => {
@@ -250,6 +259,7 @@ describe('CreateCategoryDialog', () => {
         message: 'Category creation failed.',
         fieldErrors: {
           name: 'Category name already exists.',
+          parentId: 'Parent category is unavailable.',
         },
       },
     });
@@ -273,6 +283,9 @@ describe('CreateCategoryDialog', () => {
     expect(
       await within(dialog).findByText('Category name already exists.')
     ).toBeVisible();
+    expect(
+      within(dialog).getByRole('combobox', { name: 'Parent category' })
+    ).toHaveAccessibleDescription('Parent category is unavailable.');
     expect(nameField).toHaveAccessibleDescription(
       'Category name already exists.'
     );

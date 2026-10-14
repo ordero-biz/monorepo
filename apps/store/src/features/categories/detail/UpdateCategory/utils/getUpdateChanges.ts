@@ -10,7 +10,7 @@ type GetUpdateChangesArgs = {
 
 const normalizeUpdateCategoryFormData = (data: UpdateCategoryFormValues) => ({
   name: data.name.trim(),
-  parentId: data.parentId ? Number(data.parentId) : null,
+  parentId: data.parentCategory?.id ?? null,
 });
 
 export const getCategoryUpdateChanges = ({

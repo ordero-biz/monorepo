@@ -19,9 +19,111 @@ const { setup } = prepareStoreSetup<AsyncCombobox2Props<Option>>({
   },
 });
 
+const fixedOption: Option = { id: 3, name: 'Fixed option' };
+const sharedProps = {
+  label: 'Supplier',
+  loadOptions,
+  queryKey,
+  staticOptions: [selected, fixedOption],
+  getOptionValue: (option: Option) => String(option.id),
+  getOptionLabel: (option: Option) => option.name,
+  isOptionDisabled: (option: Option) => option.id === 2,
+};
+
 describe('AsyncCombobox2', () => {
   beforeEach(() => {
     loadOptions.mockReset();
+  });
+
+  it.each([
+    false,
+    true,
+  ])('merges static options and respects disabled choices (multiple=%s)', async (multiple) => {
+    loadOptions.mockResolvedValue({
+      options: [
+        { ...selected, name: 'Updated supplier' },
+        { id: 2, name: 'Unavailable' },
+      ],
+    });
+    const user = userEvent.setup();
+    const props: AsyncCombobox2Props<Option> = multiple
+      ? {
+          ...sharedProps,
+          multiple: true,
+          defaultValue: [selected],
+        }
+      : { ...sharedProps, defaultValue: selected };
+    const { onValueChange } = setup({ ...props, onValueChange: vi.fn() });
+    await user.click(screen.getByRole('combobox', { name: 'Supplier' }));
+    expect(
+      await screen.findByRole('option', { name: 'Updated supplier' })
+    ).toBeVisible();
+    await waitFor(() => expect(screen.getAllByRole('option')).toHaveLength(3));
+    const disabledOption = screen.getByRole('option', { name: 'Unavailable' });
+    expect(disabledOption).toHaveAttribute('aria-disabled', 'true');
+    await user.click(disabledOption);
+    expect(onValueChange).not.toHaveBeenCalled();
+    await user.click(screen.getByRole('option', { name: 'Fixed option' }));
+    expect(onValueChange).toHaveBeenLastCalledWith(
+      multiple
+        ? [{ ...selected, name: 'Updated supplier' }, fixedOption]
+        : fixedOption,
+      expect.any(Object)
+    );
+  });
+
+  it('uses cached object options without needing another request', async () => {
+    const user = userEvent.setup();
+    const { queryClient, onValueChange } = setup({ onValueChange: vi.fn() });
+    queryClient.setQueryData([...queryKey, { pageSize: 25 }], {
+      pages: [{ options: [selected] }],
+      pageParams: [1],
+    });
+    await user.click(screen.getByRole('combobox', { name: 'Supplier' }));
+    await user.click(
+      await screen.findByRole('option', { name: 'Saved supplier' })
+    );
+    expect(loadOptions).not.toHaveBeenCalled();
+    expect(onValueChange).toHaveBeenCalledWith(selected, expect.any(Object));
+  });
+
+  it('loads on controlled opening and respects the requested page size', async () => {
+    loadOptions.mockResolvedValue({ options: [selected] });
+    const {
+      renderResult: { rerender },
+    } = setup({ open: false, pageSize: 10 });
+    expect(loadOptions).not.toHaveBeenCalled();
+    rerender({ open: true });
+    await screen.findByRole('option', { name: 'Saved supplier' });
+    expect(loadOptions).toHaveBeenCalledWith({ page: 1, pageSize: 10 });
+    rerender({ open: false });
+    await waitFor(() =>
+      expect(screen.queryByRole('listbox')).not.toBeInTheDocument()
+    );
+  });
+
+  it('shows pagination failures while retaining the selected record and forwarding scroll', async () => {
+    loadOptions
+      .mockResolvedValueOnce({ options: [selected], nextPage: 2 })
+      .mockRejectedValueOnce(new Error('offline'));
+    const user = userEvent.setup();
+    const { onListScroll, onValueChange } = setup({
+      value: selected,
+      onListScroll: vi.fn(),
+      onValueChange: vi.fn(),
+      loadErrorText: 'Next page failed',
+    });
+    await user.click(screen.getByRole('combobox', { name: 'Supplier' }));
+    await screen.findByRole('option', { name: 'Saved supplier' });
+    fireEvent.scroll(screen.getByRole('listbox'));
+    expect(await screen.findByText('Next page failed')).toBeVisible();
+    expect(onListScroll).toHaveBeenCalledTimes(1);
+    expect(loadOptions).toHaveBeenLastCalledWith({ page: 2, pageSize: 25 });
+    await user.keyboard('{Escape}');
+    expect(screen.getByRole('combobox', { name: 'Supplier' })).toHaveValue(
+      'Saved supplier'
+    );
+    expect(onValueChange).not.toHaveBeenCalled();
   });
 
   it('shows the selection immediately and preserves it when loading fails', async () => {

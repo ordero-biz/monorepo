@@ -54,10 +54,13 @@ vi.mock('@/features/categories', () => ({
   }: {
     errorText?: string;
     label: string;
-    onValueChange: (value: string | null) => void;
+    onValueChange: (value: { id: number; name: string } | null) => void;
   }) => (
     <>
-      <button onClick={() => onValueChange('2')} type="button">
+      <button
+        onClick={() => onValueChange({ id: 2, name: 'Footwear' })}
+        type="button"
+      >
         Select {label}
       </button>
       {errorText ? <span>{errorText}</span> : null}
@@ -68,10 +71,10 @@ vi.mock('@/features/categories', () => ({
 vi.mock('./AttributesAsyncCombobox', () => ({
   AttributesAsyncCombobox: ({
     label,
-    onSelectedAttributesChange,
+    onValueChange,
   }: {
     label: string;
-    onSelectedAttributesChange?: (attributes: AttributeDropdown[]) => void;
+    onValueChange?: (attributes: AttributeDropdown[]) => void;
   }) => {
     const manufactureAttribute = {
       id: 8,
@@ -166,16 +169,13 @@ vi.mock('./AttributesAsyncCombobox', () => ({
       <>
         <button
           onClick={() =>
-            onSelectedAttributesChange?.([manufactureAttribute, colorAttribute])
+            onValueChange?.([manufactureAttribute, colorAttribute])
           }
           type="button"
         >
           Select {label}
         </button>
-        <button
-          onClick={() => onSelectedAttributesChange?.([colorAttribute])}
-          type="button"
-        >
+        <button onClick={() => onValueChange?.([colorAttribute])} type="button">
           Select Color Attribute
         </button>
       </>

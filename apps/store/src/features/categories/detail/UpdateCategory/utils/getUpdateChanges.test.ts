@@ -19,7 +19,7 @@ describe('getCategoryUpdateChanges', () => {
         category,
         formValue: {
           name: ' Running shoes ',
-          parentId: null,
+          parentCategory: null,
         },
       })
     ).toEqual({
@@ -34,10 +34,22 @@ describe('getCategoryUpdateChanges', () => {
         category,
         formValue: {
           name: ' Sneakers ',
-          parentId: '1',
+          parentCategory: { id: 1, name: 'Renamed shoes', status: 'ACTIVE' },
         },
       })
     ).toBeUndefined();
+  });
+
+  it('sends only the numeric ID when choosing another parent', () => {
+    expect(
+      getCategoryUpdateChanges({
+        category,
+        formValue: {
+          name: category.name,
+          parentCategory: { id: 3, name: 'Clothing', status: 'DRAFT' },
+        },
+      })
+    ).toEqual({ parentId: 3 });
   });
 
   it('sends null when clearing the parent category', () => {
@@ -46,7 +58,7 @@ describe('getCategoryUpdateChanges', () => {
         category,
         formValue: {
           name: 'Sneakers',
-          parentId: null,
+          parentCategory: null,
         },
       })
     ).toEqual({ parentId: null });

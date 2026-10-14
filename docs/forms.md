@@ -200,8 +200,9 @@ accessibility props (`name`, `onBlur`, `aria-label`, `aria-labelledby`,
 ### Experimental object selections
 
 `Combobox2` and the store's `AsyncCombobox2` pilot object-valued selections.
-All supply editor selectors use this API; other features still use `Combobox`
-and `AsyncCombobox`.
+All supply editor selectors, the category selector, and the product attribute
+multiselect use this API;
+other selectors still use `Combobox` and `AsyncCombobox`.
 
 - Single selection uses `TOption | null`; multiple selection uses `TOption[]`.
 - `getOptionValue` returns a stable, unique string ID for equality and native
@@ -233,6 +234,21 @@ Entries also store `unitOfMeasurement: { id, name, symbol?, status } | null`.
 The symbol can be absent or null; the label then uses the name alone. Payloads
 serialize only `unitOfMeasurementId`, and backend errors map to the
 `unitOfMeasurement` field. Unit display metadata does not affect PATCH comparison.
+
+The product attribute multiselect stores `AttributeDropdown[]`, defaulting to `[]`.
+It retains nested `attributeValues` because variant generation needs their IDs
+and names. Changing selected attributes preserves valid value selections and
+removes selections for deselected attributes or values no longer available.
+Generation produces numeric `attributeValueIds`; the create request contains
+these value IDs, not attribute objects or attribute IDs.
+
+Category selections contain `{ id, name, status? }`. Product forms default to
+`category: null`, retain the selected record through generation, and submit
+only `categoryId`. Category forms store `parentCategory`, initialized from the
+saved parent summary. `allowNoParent` adds the fixed “No parent category” choice
+and maps it to `null`; it never becomes a category record in the form. Create
+omits an absent `parentId`, while update sends `null` when clearing it and
+compares only IDs. Backend `parentId` errors map to `parentCategory`.
 
 The migrated option caches add a `combobox2` segment under their
 resource keys to keep their record payloads separate from legacy option objects.

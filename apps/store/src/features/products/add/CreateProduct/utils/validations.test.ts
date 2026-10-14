@@ -21,7 +21,7 @@ import {
 const getProductGenerationValues = (): ProductGenerationValues => ({
   attributes: [],
   attributeValues: {},
-  category: '2',
+  category: { id: 2, name: 'Footwear' },
   description: '',
   name: 'Running Shoes',
 });
@@ -29,7 +29,7 @@ const getProductGenerationValues = (): ProductGenerationValues => ({
 const getProductVariantsCreationValues = (
   productVariants: ProductVariantsCreationValues['productVariants']
 ): ProductVariantsCreationValues => ({
-  category: '2',
+  category: { id: 2, name: 'Footwear' },
   description: '',
   name: 'Running Shoes',
   productVariants,
@@ -65,7 +65,9 @@ describe('validateProductCategory', () => {
   });
 
   it('accepts a selected category', () => {
-    expect(validateProductCategory({ value: '2' })).toBeUndefined();
+    expect(
+      validateProductCategory({ value: { id: 2, name: 'Footwear' } })
+    ).toBeUndefined();
   });
 });
 

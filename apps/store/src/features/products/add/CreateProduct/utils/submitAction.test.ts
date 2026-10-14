@@ -35,7 +35,7 @@ describe('submitCreateProduct', () => {
       submitCreateProduct({
         name: ' Running Shoes ',
         description: 'Lightweight daily trainer',
-        category: '2',
+        category: { id: 2, name: 'Footwear' },
         status: 'ACTIVE',
         productVariants: [
           {
@@ -101,7 +101,7 @@ describe('submitCreateProduct', () => {
       submitCreateProduct({
         name: 'Running Shoes',
         description: 'Lightweight daily trainer',
-        category: '2',
+        category: { id: 2, name: 'Footwear' },
         status: 'DRAFT',
         productVariants: [],
       })
@@ -139,7 +139,7 @@ describe('submitCreateProduct', () => {
     await submitCreateProduct({
       name: 'Running Shoes',
       description: '   ',
-      category: '2',
+      category: { id: 2, name: 'Footwear' },
       status: 'DRAFT',
       productVariants: [
         {

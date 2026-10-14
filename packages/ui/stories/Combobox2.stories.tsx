@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { useState } from 'react';
 import { expect, userEvent, within } from 'storybook/test';
 import { Combobox2 } from '@/ui/components/Combobox2';
 
@@ -86,4 +87,59 @@ export const RichChips: Story = {
 
 export const ReadOnlyRichChips: Story = {
   args: { ...RichChips.args, readOnly: true },
+};
+
+export const Loading: Story = {
+  args: { options: [], loading: true, loadingText: 'Loading suppliers', defaultOpen: true },
+  play: async () => {
+    await expect(await within(document.body).findByText('Loading suppliers')).toBeVisible();
+  },
+};
+
+export const Empty: Story = {
+  args: { options: [], emptyText: 'No suppliers found', defaultOpen: true },
+  play: async () => {
+    await expect(await within(document.body).findByText('No suppliers found')).toBeVisible();
+  },
+};
+
+export const SearchWithHelperText: Story = {
+  args: { helperText: 'Search suppliers by name', required: true },
+  play: async ({ canvasElement }) => {
+    const input = within(canvasElement).getByRole('combobox', {name: 'Supplier'});
+    await expect(input).toBeRequired();
+    await expect(input).toHaveAccessibleDescription('Search suppliers by name');
+    await userEvent.type(input, 'New');
+    await expect(await within(document.body).findByRole('option', {name: 'New supplier'})).toBeVisible();
+    await expect(within(document.body).queryByRole('option', {name: 'Coffee Import UA'})).not.toBeInTheDocument();
+    await userEvent.keyboard('{ArrowDown}{Enter}');
+    await expect(input).toHaveValue('New supplier');
+  },
+};
+
+export const RefreshedSelection: Story = {
+  render: (args) => {
+    const [loaded, setLoaded] = useState(false);
+    return (
+      <Combobox2<Supplier>
+        label={args.label}
+        getOptionValue={args.getOptionValue}
+        getOptionLabel={args.getOptionLabel}
+        defaultValue={options[0]}
+        options={loaded ? [{...options[0], name: 'Renamed supplier'}, options[1]] : []}
+        onOpenChange={(open) => { if (open) setLoaded(true); }}
+      />
+    );
+  },
+  play: async ({canvasElement}) => {
+    const input = within(canvasElement).getByRole('combobox', {name: 'Supplier'});
+    await userEvent.click(input);
+    await expect(await within(document.body).findByRole('option', {name: 'Renamed supplier'})).toBeVisible();
+    await expect(await within(document.body).findByRole('option', {name: 'New supplier'})).toBeVisible();
+    await userEvent.clear(input);
+    await userEvent.type(input, 'New');
+    await expect(within(document.body).queryByRole('option', {name: 'Renamed supplier'})).not.toBeInTheDocument();
+    await userEvent.keyboard('{ArrowDown}{Enter}');
+    await expect(input).toHaveValue('New supplier');
+  },
 };
