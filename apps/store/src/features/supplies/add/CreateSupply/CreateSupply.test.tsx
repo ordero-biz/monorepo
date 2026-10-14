@@ -301,6 +301,9 @@ describe('CreateSupply', () => {
     setup();
     await fillMetadata(user);
     await addCompleteEntry(user);
+    await user.click(
+      screen.getByRole('button', { name: '+ Add another product' })
+    );
     const comment = screen.getByRole('textbox', { name: 'Comment for row 2' });
     await user.type(comment, 'Incomplete extra row');
     await user.click(screen.getByRole('button', { name: 'Finalize supply' }));
@@ -364,9 +367,13 @@ describe('CreateSupply', () => {
     ).toBeDisabled();
   });
 
-  it('turns a selected product into an editable row and appends a blank row', async () => {
+  it('adds a row only on request and disables adding until the last row has a product', async () => {
     const user = userEvent.setup();
     setup();
+    const addProduct = screen.getByRole('button', {
+      name: '+ Add another product',
+    });
+    expect(addProduct).toBeDisabled();
 
     await user.selectOptions(
       screen.getByRole('combobox', { name: 'Product for row 1' }),
@@ -374,14 +381,34 @@ describe('CreateSupply', () => {
     );
 
     expect(
-      screen.getByRole('combobox', { name: 'Product for row 2' })
-    ).toHaveValue('');
+      screen.queryByRole('combobox', { name: 'Product for row 2' })
+    ).not.toBeInTheDocument();
+    expect(addProduct).toBeEnabled();
     expect(
       screen.getByRole('checkbox', { name: 'Select Jasmine Rice 5kg' })
     ).toBeVisible();
     expect(
       screen.getByRole('spinbutton', { name: 'Quantity for row 1' })
     ).not.toHaveAttribute('readonly');
+    await user.selectOptions(
+      screen.getByRole('combobox', { name: 'Product for row 1' }),
+      ''
+    );
+    expect(addProduct).toBeDisabled();
+    await user.selectOptions(
+      screen.getByRole('combobox', { name: 'Product for row 1' }),
+      '11'
+    );
+    await user.click(addProduct);
+    expect(
+      screen.getByRole('combobox', { name: 'Product for row 2' })
+    ).toHaveValue('');
+    expect(addProduct).toBeDisabled();
+    await user.click(addProduct);
+    expect(
+      screen.queryByRole('combobox', { name: 'Product for row 3' })
+    ).not.toBeInTheDocument();
+    expect(createSupplyMock).not.toHaveBeenCalled();
   });
 
   it('replaces the save actions with a bulk delete action for selected entries', async () => {
@@ -407,8 +434,17 @@ describe('CreateSupply', () => {
       screen.queryByRole('checkbox', { name: 'Select Jasmine Rice 5kg' })
     ).toBeNull();
     expect(
+      screen.queryByRole('combobox', { name: 'Product for row 1' })
+    ).not.toBeInTheDocument();
+    const addProduct = screen.getByRole('button', {
+      name: '+ Add another product',
+    });
+    expect(addProduct).toBeEnabled();
+    await user.click(addProduct);
+    expect(
       screen.getByRole('combobox', { name: 'Product for row 1' })
     ).toHaveValue('');
+    expect(addProduct).toBeDisabled();
     expect(screen.getByRole('button', { name: 'Save draft' })).toBeVisible();
   });
 
@@ -544,6 +580,11 @@ describe('CreateSupply', () => {
       invalidation.promise
     );
     await fillMetadata(user);
+    await addCompleteEntry(user);
+    const addProduct = screen.getByRole('button', {
+      name: '+ Add another product',
+    });
+    expect(addProduct).toBeEnabled();
 
     await user.click(screen.getByRole('button', { name: 'Save draft' }));
 
@@ -554,6 +595,7 @@ describe('CreateSupply', () => {
       screen.getByRole('button', { name: 'Finalize supply' })
     ).toBeDisabled();
     expect(mocks.replace).not.toHaveBeenCalled();
+    expect(addProduct).toBeDisabled();
 
     await act(async () => invalidation.resolve());
 
@@ -561,6 +603,7 @@ describe('CreateSupply', () => {
       await screen.findByRole('button', { name: 'Save draft' })
     ).toBeEnabled();
     expect(mocks.replace).toHaveBeenCalledWith('/products/supplies/9');
+    expect(addProduct).toBeEnabled();
   });
 
   it('restores save actions after validation rejects a submission', async () => {

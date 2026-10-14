@@ -478,7 +478,7 @@ describe('UpdateSupply', () => {
     );
   });
 
-  it('adds one blank row after selecting a product in the placeholder', async () => {
+  it('adds a blank row manually after selecting a product in the last row', async () => {
     const user = userEvent.setup();
     getProductVariantsMock.mockResolvedValue({
       ok: true,
@@ -506,8 +506,17 @@ describe('UpdateSupply', () => {
       screen.getByRole('combobox', { name: 'Product for row 2' })
     ).toHaveValue('Other rice');
     expect(
+      screen.queryByRole('combobox', { name: 'Product for row 3' })
+    ).not.toBeInTheDocument();
+    const addProduct = screen.getByRole('button', {
+      name: '+ Add another product',
+    });
+    expect(addProduct).toBeEnabled();
+    await user.click(addProduct);
+    expect(
       screen.getByRole('combobox', { name: 'Product for row 3' })
     ).toHaveValue('');
+    expect(addProduct).toBeDisabled();
     expect(
       screen.queryByRole('combobox', { name: 'Product for row 4' })
     ).not.toBeInTheDocument();
