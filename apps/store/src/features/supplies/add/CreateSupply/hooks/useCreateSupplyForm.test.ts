@@ -130,6 +130,30 @@ describe('useCreateSupplyForm', () => {
     expect(await screen.findByText(message)).toBeVisible();
   });
 
+  it.each([
+    { supplyEntries: [] },
+    { supplyEntries: getSupplyFormDefaults().supplyEntries },
+  ])('rejects finalization without populated entries (%j)', async ({
+    supplyEntries,
+  }) => {
+    const user = userEvent.setup();
+    const { hookProps } = setup({
+      hookProps: {
+        onCreated: vi.fn(),
+        intent: 'finalize',
+        values: { ...getSupplyFormDefaults(supply), supplyEntries },
+      },
+    });
+
+    await user.click(screen.getByRole('button', { name: 'Submit' }));
+
+    expect(
+      await screen.findByText('Add at least one product before finalizing.')
+    ).toBeVisible();
+    expect(submitCreateSupplyMock).not.toHaveBeenCalled();
+    expect(hookProps.onCreated).not.toHaveBeenCalled();
+  });
+
   it('does not report creation when the submit action fails', async () => {
     submitCreateSupplyMock.mockResolvedValue({
       ok: false,

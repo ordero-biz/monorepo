@@ -89,6 +89,171 @@ describe('UpdateSupply', () => {
     getProductVariantsMock.mockReset();
     getUnitsOfMeasurementMock.mockReset();
   });
+  it('does not move a deleted row error onto the next row or the placeholder', async () => {
+    const user = userEvent.setup();
+    setup({
+      supply: {
+        ...savedSupply,
+        supplyEntries: [
+          { ...savedSupply.supplyEntries[0], quantity: 0 },
+          {
+            ...savedSupply.supplyEntries[0],
+            id: 18,
+            productVariant: { id: 12, name: 'Brown Rice', sku: 'BROWN' },
+            quantity: 3,
+          },
+        ],
+      },
+    });
+    await user.click(screen.getByRole('button', { name: 'Save draft' }));
+    expect(
+      screen.getByRole('spinbutton', { name: 'Quantity for row 1' })
+    ).toHaveAccessibleDescription(
+      'Quantity must be a whole number greater than 0'
+    );
+    await user.click(
+      screen.getByRole('button', { name: 'Actions for Jasmine Rice 5kg' })
+    );
+    await user.click(await screen.findByRole('menuitem', { name: 'Delete' }));
+
+    await waitFor(() =>
+      expect(
+        screen.getByRole('combobox', { name: 'Product for row 1' })
+      ).toHaveValue('Brown Rice · BROWN')
+    );
+    expect(
+      screen.getByRole('spinbutton', { name: 'Quantity for row 1' })
+    ).toHaveValue(3);
+    expect(
+      screen.getByRole('spinbutton', { name: 'Quantity for row 1' })
+    ).not.toHaveAttribute('aria-invalid', 'true');
+    expect(
+      screen.queryByText('Quantity must be a whole number greater than 0')
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('combobox', { name: 'Product for row 2' })
+    ).toHaveValue('');
+    expect(updateSupplyMock).not.toHaveBeenCalled();
+  });
+
+  it('keeps validation on a surviving invalid row after deleting an earlier row', async () => {
+    const user = userEvent.setup();
+    setup({
+      supply: {
+        ...savedSupply,
+        supplyEntries: [
+          savedSupply.supplyEntries[0],
+          {
+            ...savedSupply.supplyEntries[0],
+            id: 18,
+            productVariant: { id: 12, name: 'Brown Rice', sku: 'BROWN' },
+            quantity: 0,
+          },
+        ],
+      },
+    });
+    await user.click(screen.getByRole('button', { name: 'Save draft' }));
+    expect(
+      screen.getByRole('spinbutton', { name: 'Quantity for row 2' })
+    ).toHaveAccessibleDescription(
+      'Quantity must be a whole number greater than 0'
+    );
+    await user.click(
+      screen.getByRole('button', { name: 'Actions for Jasmine Rice 5kg' })
+    );
+    await user.click(await screen.findByRole('menuitem', { name: 'Delete' }));
+    await waitFor(() =>
+      expect(
+        screen.getByRole('combobox', { name: 'Product for row 1' })
+      ).toHaveValue('Brown Rice · BROWN')
+    );
+    expect(
+      screen.getByRole('spinbutton', { name: 'Quantity for row 1' })
+    ).toHaveAccessibleDescription(
+      'Quantity must be a whole number greater than 0'
+    );
+    expect(
+      screen.getByRole('spinbutton', { name: 'Quantity for row 2' })
+    ).not.toHaveAttribute('aria-invalid', 'true');
+  });
+
+  it('deletes nonadjacent selected rows and saves edits to the surviving row', async () => {
+    const user = userEvent.setup();
+    updateSupplyMock.mockResolvedValue({ ok: true, data: savedSupply });
+    setup({
+      supply: {
+        ...savedSupply,
+        supplyEntries: [
+          savedSupply.supplyEntries[0],
+          {
+            ...savedSupply.supplyEntries[0],
+            id: 18,
+            productVariant: { id: 12, name: 'Brown Rice', sku: 'BROWN' },
+            quantity: 3,
+          },
+          {
+            ...savedSupply.supplyEntries[0],
+            id: 19,
+            productVariant: { id: 13, name: 'Basmati Rice', sku: 'BASMATI' },
+            quantity: 5,
+          },
+        ],
+      },
+    });
+    await user.click(
+      screen.getByRole('checkbox', { name: 'Select Jasmine Rice 5kg' })
+    );
+    await user.click(
+      screen.getByRole('checkbox', { name: 'Select Basmati Rice' })
+    );
+    const bulkActions = screen.getByRole('complementary', {
+      name: 'Supply entry bulk actions',
+    });
+    expect(within(bulkActions).getByText('2 selected')).toBeVisible();
+    await user.click(
+      within(bulkActions).getByRole('button', { name: 'Delete' })
+    );
+
+    await waitFor(() =>
+      expect(
+        screen.queryByRole('complementary', {
+          name: 'Supply entry bulk actions',
+        })
+      ).not.toBeInTheDocument()
+    );
+    expect(
+      screen.getByRole('combobox', { name: 'Product for row 1' })
+    ).toHaveValue('Brown Rice · BROWN');
+    expect(
+      screen.getByRole('combobox', { name: 'Product for row 2' })
+    ).toHaveValue('');
+    expect(
+      screen.queryByRole('combobox', { name: 'Product for row 3' })
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('checkbox', { name: 'Select Brown Rice' })
+    ).not.toBeChecked();
+    const quantity = screen.getByRole('spinbutton', {
+      name: 'Quantity for row 1',
+    });
+    await user.clear(quantity);
+    await user.type(quantity, '7');
+    await user.click(screen.getByRole('button', { name: 'Save draft' }));
+    expect(updateSupplyMock).toHaveBeenCalledWith({
+      supplyId: 9,
+      expectedVersion: 1,
+      supplyEntries: [
+        {
+          productVariantId: 12,
+          unitOfMeasurementId: 2,
+          quantity: 7,
+          unitPrice: 28,
+          comment: null,
+        },
+      ],
+    });
+  });
+
   it('maps supplierId errors to the object field and submits only its ID after correction', async () => {
     const user = userEvent.setup();
     const nextSupplier = {

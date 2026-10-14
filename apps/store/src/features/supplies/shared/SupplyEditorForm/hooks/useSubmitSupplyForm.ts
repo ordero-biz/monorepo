@@ -2,12 +2,12 @@
 
 import type { ApiResult } from '@ordero/api-types';
 import { useToastManager } from '@ordero/ui';
-import { revalidateLogic, useForm } from '@tanstack/react-form';
-import { useRef, useState } from 'react';
+import { useForm } from '@tanstack/react-form';
+import { useState } from 'react';
 import { SUPPLY_STATUS } from '@/lib/domain/supplies/constants';
 import type { SupplyDetails, SupplyStatus } from '@/lib/domain/supplies/types';
 import type { SupplyFormValues, SupplySubmitIntent } from '../types';
-import { validateSupplyForm } from '../utils';
+import { isBlankSupplyEntry } from '../utils';
 
 type UseSubmitSupplyFormArgs = {
   defaultValues: SupplyFormValues;
@@ -18,6 +18,8 @@ type UseSubmitSupplyFormArgs = {
   }) => Promise<ApiResult<SupplyDetails> | null>;
   onSaved: (supply: SupplyDetails) => Promise<void> | void;
 };
+
+const defaultSubmitMeta: { intent: SupplySubmitIntent } = { intent: 'draft' };
 
 const mapSupplyFieldErrors = (fieldErrors?: Record<string, string>) =>
   fieldErrors
@@ -42,21 +44,28 @@ export const useSubmitSupplyForm = ({
   onSaved,
 }: UseSubmitSupplyFormArgs) => {
   const { add: addToast } = useToastManager();
-  const intentRef = useRef<SupplySubmitIntent>('draft');
   const [pendingIntent, setPendingIntent] = useState<SupplySubmitIntent | null>(
     null
   );
   const form = useForm({
     defaultValues,
-    validationLogic: revalidateLogic(),
-    validators: {
-      onSubmit: ({ value }) =>
-        validateSupplyForm(value, intentRef.current === 'finalize'),
-    },
-    onSubmitInvalid: ({ formApi }) => formApi.validate('submit'),
-    onSubmit: async ({ formApi, value }) => {
+    // Run all field validators even when change validation has already failed.
+    canSubmitWhenInvalid: true,
+    onSubmitMeta: defaultSubmitMeta,
+    onSubmit: async ({ formApi, value, meta }) => {
+      if (
+        meta.intent === 'finalize' &&
+        value.supplyEntries.every(isBlankSupplyEntry)
+      ) {
+        addToast({
+          description: 'Add at least one product before finalizing.',
+          type: 'error',
+        });
+        return;
+      }
+
       const status =
-        intentRef.current === 'finalize'
+        meta.intent === 'finalize'
           ? SUPPLY_STATUS.COMPLETED
           : SUPPLY_STATUS.DRAFT;
       const result = await submitAction({ value, status });
@@ -69,7 +78,7 @@ export const useSubmitSupplyForm = ({
       if (!result.ok) {
         formApi.setErrorMap({
           onSubmit: {
-            fields: mapSupplyFieldErrors(result.error.fieldErrors),
+            fields: mapSupplyFieldErrors(result.error.fieldErrors) ?? {},
           },
         });
         addToast({
@@ -96,10 +105,9 @@ export const useSubmitSupplyForm = ({
       return;
     }
 
-    intentRef.current = intent;
     setPendingIntent(intent);
     try {
-      await form.handleSubmit();
+      await form.handleSubmit({ intent });
     } finally {
       setPendingIntent(null);
     }

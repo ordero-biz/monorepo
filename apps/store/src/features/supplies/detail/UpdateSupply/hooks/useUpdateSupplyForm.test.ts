@@ -91,9 +91,9 @@ describe('useUpdateSupplyForm', () => {
     });
   });
 
-  it('does not finalize a supply without products', async () => {
+  it('rejects empty finalization and then allows saving the same form as a draft', async () => {
     const user = userEvent.setup();
-    const { hookProps } = setup({
+    const { hookProps, renderResult } = setup({
       hookProps: {
         supply,
         intent: 'finalize',
@@ -104,8 +104,25 @@ describe('useUpdateSupplyForm', () => {
 
     await user.click(screen.getByRole('button', { name: 'Submit' }));
 
+    expect(
+      await screen.findByText('Add at least one product before finalizing.')
+    ).toBeVisible();
     expect(submitUpdateSupplyMock).not.toHaveBeenCalled();
     expect(hookProps.onUpdated).not.toHaveBeenCalled();
+
+    const savedSupply = { ...supply, supplyNumber: 'SUP-002', version: 2 };
+    submitUpdateSupplyMock.mockResolvedValue({ ok: true, data: savedSupply });
+    renderResult.rerender({ hookProps: { ...hookProps, intent: 'draft' } });
+    await user.click(screen.getByRole('button', { name: 'Submit' }));
+
+    await waitFor(() =>
+      expect(hookProps.onUpdated).toHaveBeenCalledWith(savedSupply)
+    );
+    expect(submitUpdateSupplyMock).toHaveBeenCalledExactlyOnceWith({
+      supplyId: supply.id,
+      expectedVersion: supply.version,
+      submitData: { supplyNumber: 'SUP-002' },
+    });
   });
 
   it('skips submission and reports no changes for an unchanged draft', async () => {

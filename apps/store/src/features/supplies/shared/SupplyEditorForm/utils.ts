@@ -16,7 +16,7 @@ export const createEmptySupplyEntry = (
   comment: '',
 });
 
-const isBlankSupplyEntry = (entry: SupplyEntryFormValues) =>
+export const isBlankSupplyEntry = (entry: SupplyEntryFormValues) =>
   !entry.productVariant &&
   !entry.unitOfMeasurement &&
   !entry.quantity.trim() &&
@@ -79,63 +79,6 @@ export const getSupplyFormDefaults = (
     createEmptySupplyEntry('initial-placeholder'),
   ],
 });
-
-export const validateSupplyForm = (
-  value: SupplyFormValues,
-  requireEntries: boolean
-): { fields: Record<string, string> } | undefined => {
-  const fields: Record<string, string> = {};
-
-  if (!hasPositiveId(value.supplier?.id ?? null)) {
-    fields.supplier = 'Select a supplier';
-  }
-
-  if (!hasPositiveId(value.warehouse?.id ?? null)) {
-    fields.warehouse = 'Select a warehouse';
-  }
-
-  if (!value.supplyNumber.trim()) {
-    fields.supplyNumber = 'Supply number is required';
-  }
-
-  const filledEntries = value.supplyEntries.filter(
-    (entry) => !isBlankSupplyEntry(entry)
-  );
-
-  if (requireEntries && filledEntries.length === 0) {
-    fields.supplyEntries = 'Add at least one product';
-  }
-
-  value.supplyEntries.forEach((entry, index) => {
-    if (isBlankSupplyEntry(entry)) {
-      return;
-    }
-
-    const fieldPath = `supplyEntries[${index}]`;
-
-    if (!hasPositiveId(entry.productVariant?.id ?? null)) {
-      fields[`${fieldPath}.productVariant`] = 'Select a product';
-    }
-
-    if (!hasPositiveId(entry.unitOfMeasurement?.id ?? null)) {
-      fields[`${fieldPath}.unitOfMeasurement`] = 'Select a unit';
-    }
-
-    if (!isPositiveNumber(entry.quantity)) {
-      fields[`${fieldPath}.quantity`] = entry.quantity.trim()
-        ? 'Quantity must be a whole number greater than 0'
-        : 'Quantity is required';
-    }
-
-    if (!isNonnegativeNumber(entry.unitPrice)) {
-      fields[`${fieldPath}.unitPrice`] = entry.unitPrice.trim()
-        ? 'Unit price must be 0 or greater'
-        : 'Unit price is required';
-    }
-  });
-
-  return Object.keys(fields).length > 0 ? { fields } : undefined;
-};
 
 export const getSupplyEntriesPayload = (
   value: SupplyFormValues

@@ -21,6 +21,10 @@ import {
 } from './selectors';
 import type { SupplyEntriesProps, SupplyEntryFormValues } from './types';
 import { createEmptySupplyEntry, getSupplyTotal } from './utils';
+import {
+  type SupplyEntryValidatedField,
+  validateSupplyEntryField,
+} from './validations';
 
 const getRowId = (entry: SupplyEntryFormValues) => entry.clientId;
 
@@ -50,13 +54,43 @@ export const SupplyEntries = ({
   });
 
   const deleteRows = useCallback(
-    (clientIds: Set<string>) => {
-      form.setFieldValue('supplyEntries', (current) =>
-        current.filter((entry) => !clientIds.has(entry.clientId))
+    async (clientIds: Set<string>) => {
+      const indexes = form.state.values.supplyEntries.flatMap((entry, index) =>
+        clientIds.has(entry.clientId) ? [index] : []
       );
+      for (const index of indexes.reverse()) {
+        await form.removeFieldValue('supplyEntries', index);
+      }
       clearSelection();
     },
     [clearSelection, form]
+  );
+
+  const getEntryValidators = useCallback(
+    (index: number, field: SupplyEntryValidatedField) => {
+      const validate = () => {
+        const entry = form.getFieldValue(`supplyEntries[${index}]`);
+        return entry
+          ? validateSupplyEntryField({ value: entry, field })
+          : undefined;
+      };
+      const rowFields = [
+        'productVariant',
+        'unitOfMeasurement',
+        'quantity',
+        'unitPrice',
+        'comment',
+      ] as const;
+
+      return {
+        // TanStack also runs change validators on submit.
+        onChange: validate,
+        onChangeListenTo: rowFields
+          .filter((name) => name !== field)
+          .map((name) => `supplyEntries[${index}].${name}` as const),
+      };
+    },
+    [form]
   );
 
   const columns = useMemo<DataTableColumnDef<SupplyEntryFormValues>[]>(
@@ -90,6 +124,7 @@ export const SupplyEntries = ({
               <div className="w-[320px]">
                 <form.Field
                   name={`supplyEntries[${index}].productVariant` as const}
+                  validators={getEntryValidators(index, 'productVariant')}
                 >
                   {(field) => {
                     const errorText = getFieldSubmitChangeErrorText(
@@ -139,6 +174,7 @@ export const SupplyEntries = ({
               <div className="w-[var(--space-16)]">
                 <form.Field
                   name={`supplyEntries[${index}].unitOfMeasurement` as const}
+                  validators={getEntryValidators(index, 'unitOfMeasurement')}
                 >
                   {(field) => {
                     const errorText = getFieldSubmitChangeErrorText(
@@ -175,6 +211,7 @@ export const SupplyEntries = ({
             <div className="w-[105px]">
               <form.Field
                 name={`supplyEntries[${row.index}].quantity` as const}
+                validators={getEntryValidators(row.index, 'quantity')}
               >
                 {(field) => {
                   const errorText = getFieldSubmitChangeErrorText(
@@ -211,6 +248,7 @@ export const SupplyEntries = ({
             <div className="w-[115px]">
               <form.Field
                 name={`supplyEntries[${row.index}].unitPrice` as const}
+                validators={getEntryValidators(row.index, 'unitPrice')}
               >
                 {(field) => {
                   const errorText = getFieldSubmitChangeErrorText(
@@ -325,7 +363,7 @@ export const SupplyEntries = ({
         meta: { align: 'right', width: 48 },
       },
     ],
-    [deleteRows, form, placeholderId]
+    [deleteRows, form, getEntryValidators, placeholderId]
   );
 
   return (

@@ -225,6 +225,130 @@ describe('CreateSupply', () => {
     mocks.replace.mockReset();
   });
 
+  it('validates supply number edits and clears the error when corrected', async () => {
+    const user = userEvent.setup();
+    setup();
+    const number = screen.getByRole('textbox', { name: /Supply number/ });
+
+    expect(
+      screen.queryByText('Supply number is required')
+    ).not.toBeInTheDocument();
+    await user.type(number, ' ');
+    expect(number).toHaveAccessibleDescription('Supply number is required');
+    await user.type(number, 'SUP-001');
+    expect(
+      screen.queryByText('Supply number is required')
+    ).not.toBeInTheDocument();
+    await user.clear(number);
+    expect(number).toHaveAccessibleDescription('Supply number is required');
+    expect(createSupplyMock).not.toHaveBeenCalled();
+  });
+
+  it('updates required field errors after a rejected submission without another submit', async () => {
+    const user = userEvent.setup();
+    setup();
+    await user.click(screen.getByRole('button', { name: 'Save draft' }));
+    expect(screen.getByText('Select a supplier')).toBeVisible();
+    expect(screen.getByText('Select a warehouse')).toBeVisible();
+    expect(screen.getByText('Supply number is required')).toBeVisible();
+
+    await fillMetadata(user);
+    expect(screen.queryByText('Select a supplier')).not.toBeInTheDocument();
+    expect(screen.queryByText('Select a warehouse')).not.toBeInTheDocument();
+    expect(
+      screen.queryByText('Supply number is required')
+    ).not.toBeInTheDocument();
+    expect(createSupplyMock).not.toHaveBeenCalled();
+  });
+
+  it('revalidates partially filled rows live after submit and ignores a cleared blank row', async () => {
+    const user = userEvent.setup();
+    setup();
+    await fillMetadata(user);
+    const comment = screen.getByRole('textbox', { name: 'Comment for row 1' });
+    await user.type(comment, 'Note');
+    await user.click(screen.getByRole('button', { name: 'Save draft' }));
+    expect(screen.getByText('Select a product')).toBeVisible();
+    expect(screen.getByText('Select a unit')).toBeVisible();
+    expect(screen.getByText('Quantity is required')).toBeVisible();
+    expect(screen.getByText('Unit price is required')).toBeVisible();
+
+    const quantity = screen.getByRole('spinbutton', {
+      name: 'Quantity for row 1',
+    });
+    await user.type(quantity, '0');
+    expect(quantity).toHaveAccessibleDescription(
+      'Quantity must be a whole number greater than 0'
+    );
+    await user.clear(quantity);
+    await user.type(quantity, '2');
+    expect(quantity).not.toHaveAttribute('aria-invalid', 'true');
+    expect(screen.getByText('Select a unit')).toBeVisible();
+    await user.clear(quantity);
+    await user.clear(comment);
+    expect(screen.queryByText('Select a product')).not.toBeInTheDocument();
+    expect(screen.queryByText('Select a unit')).not.toBeInTheDocument();
+    expect(screen.queryByText('Quantity is required')).not.toBeInTheDocument();
+    expect(
+      screen.queryByText('Unit price is required')
+    ).not.toBeInTheDocument();
+    expect(createSupplyMock).not.toHaveBeenCalled();
+  });
+
+  it('blocks finalization for an incomplete extra row and allows it after that row is cleared', async () => {
+    const user = userEvent.setup();
+    createSupplyMock.mockResolvedValue({ ok: true, data: savedSupply });
+    setup();
+    await fillMetadata(user);
+    await addCompleteEntry(user);
+    const comment = screen.getByRole('textbox', { name: 'Comment for row 2' });
+    await user.type(comment, 'Incomplete extra row');
+    await user.click(screen.getByRole('button', { name: 'Finalize supply' }));
+    await user.click(
+      within(screen.getByRole('dialog', { name: 'Finalize supply' })).getByRole(
+        'button',
+        { name: 'Finalize supply' }
+      )
+    );
+
+    expect(
+      screen.getByRole('spinbutton', { name: 'Quantity for row 2' })
+    ).toHaveAccessibleDescription('Quantity is required');
+    expect(screen.getByText('Select a product')).toBeVisible();
+    expect(createSupplyMock).not.toHaveBeenCalled();
+
+    await user.clear(comment);
+    expect(screen.queryByText('Quantity is required')).not.toBeInTheDocument();
+    expect(screen.queryByText('Select a product')).not.toBeInTheDocument();
+    await user.type(comment, 'Another note');
+    expect(screen.getByText('Quantity is required')).toBeVisible();
+    await user.clear(comment);
+    await user.click(screen.getByRole('button', { name: 'Finalize supply' }));
+    await user.click(
+      within(screen.getByRole('dialog', { name: 'Finalize supply' })).getByRole(
+        'button',
+        { name: 'Finalize supply' }
+      )
+    );
+
+    await waitFor(() =>
+      expect(createSupplyMock).toHaveBeenCalledExactlyOnceWith({
+        supplierId: 3,
+        warehouseId: 4,
+        supplyNumber: 'SUP-001',
+        supplyEntries: [
+          {
+            productVariantId: 11,
+            unitOfMeasurementId: 2,
+            quantity: 20,
+            unitPrice: 28,
+          },
+        ],
+        status: SUPPLY_STATUS.COMPLETED,
+      })
+    );
+  });
+
   it('starts with one empty product row and cannot finalize it', () => {
     setup();
 
@@ -350,6 +474,45 @@ describe('CreateSupply', () => {
         status: SUPPLY_STATUS.COMPLETED,
       });
     });
+  });
+
+  it('can save an empty draft after a failed finalization and removal of its entry', async () => {
+    const user = userEvent.setup();
+    createSupplyMock.mockResolvedValue({ ok: true, data: savedSupply });
+    setup();
+    await fillMetadata(user);
+    await addCompleteEntry(user);
+    const number = screen.getByRole('textbox', { name: /Supply number/ });
+    await user.clear(number);
+    await user.click(screen.getByRole('button', { name: 'Finalize supply' }));
+    await user.click(
+      within(screen.getByRole('dialog', { name: 'Finalize supply' })).getByRole(
+        'button',
+        { name: 'Finalize supply' }
+      )
+    );
+    expect(number).toHaveAccessibleDescription('Supply number is required');
+    expect(createSupplyMock).not.toHaveBeenCalled();
+
+    await user.type(number, 'SUP-001');
+    await user.click(
+      screen.getByRole('checkbox', { name: 'Select Jasmine Rice 5kg' })
+    );
+    await user.click(
+      within(
+        screen.getByRole('complementary', { name: 'Supply entry bulk actions' })
+      ).getByRole('button', { name: 'Delete' })
+    );
+    await user.click(screen.getByRole('button', { name: 'Save draft' }));
+    await waitFor(() =>
+      expect(createSupplyMock).toHaveBeenCalledExactlyOnceWith({
+        supplierId: 3,
+        warehouseId: 4,
+        supplyNumber: 'SUP-001',
+        supplyEntries: [],
+        status: SUPPLY_STATUS.DRAFT,
+      })
+    );
   });
 
   it('keeps caches and navigation unchanged when saving fails', async () => {

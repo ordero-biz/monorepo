@@ -5,7 +5,6 @@ import {
   getSupplyEntriesPayload,
   getSupplyFormDefaults,
   getSupplyTotal,
-  validateSupplyForm,
 } from './utils';
 
 const completeEntry: SupplyEntryFormValues = {
@@ -101,55 +100,13 @@ describe('supply form utilities', () => {
     );
   });
 
-  it('requires metadata but allows no products in a draft', () => {
-    expect(validateSupplyForm(getSupplyFormDefaults(), false)).toEqual({
-      fields: {
-        supplier: 'Select a supplier',
-        warehouse: 'Select a warehouse',
-        supplyNumber: 'Supply number is required',
-      },
-    });
-    expect(validateSupplyForm(validForm(), false)).toBeUndefined();
-    expect(validateSupplyForm(validForm(), true)).toEqual({
-      fields: { supplyEntries: 'Add at least one product' },
-    });
-  });
-
-  it.each([
-    0,
-    -1,
-    1.5,
-    Number.NaN,
-    Number.POSITIVE_INFINITY,
-  ])('rejects an invalid supplier ID %s', (id) => {
-    const value = validForm();
-    value.supplier = { id, name: 'Invalid', status: 'ACTIVE' };
-    expect(validateSupplyForm(value, false)).toEqual({
-      fields: { supplier: 'Select a supplier' },
-    });
-  });
-
-  it.each([
-    0,
-    -1,
-    1.5,
-    Number.NaN,
-    Number.POSITIVE_INFINITY,
-  ])('rejects an invalid warehouse ID %s', (id) => {
-    const value = validForm();
-    value.warehouse = { id, name: 'Invalid', status: 'ACTIVE' };
-    expect(validateSupplyForm(value, false)).toEqual({
-      fields: { warehouse: 'Select a warehouse' },
-    });
-  });
-
   it.each([
     null,
     0,
     -1,
     1.5,
     Number.NaN,
-  ])('requires a valid product ID in a filled entry (%s)', (id) => {
+  ])('excludes entries with invalid product or unit IDs (%s) from totals', (id) => {
     const value = validForm();
     value.supplyEntries = [
       {
@@ -157,20 +114,7 @@ describe('supply form utilities', () => {
         productVariant: id === null ? null : { id, name: 'Invalid', sku: '' },
       },
     ];
-    expect(validateSupplyForm(value, false)).toEqual({
-      fields: { 'supplyEntries[0].productVariant': 'Select a product' },
-    });
     expect(getSupplyTotal(value)).toEqual({ count: 0, total: 0 });
-  });
-
-  it.each([
-    null,
-    0,
-    -1,
-    1.5,
-    Number.NaN,
-  ])('requires a valid unit ID in a filled entry (%s)', (id) => {
-    const value = validForm();
     value.supplyEntries = [
       {
         ...completeEntry,
@@ -178,37 +122,13 @@ describe('supply form utilities', () => {
           id === null ? null : { id, name: 'Invalid', status: 'ACTIVE' },
       },
     ];
-    expect(validateSupplyForm(value, false)).toEqual({
-      fields: { 'supplyEntries[0].unitOfMeasurement': 'Select a unit' },
-    });
     expect(getSupplyTotal(value)).toEqual({ count: 0, total: 0 });
-  });
-
-  it('validates every partially filled row using TanStack bracket paths', () => {
-    const value = validForm();
-    value.supplyEntries[0] = {
-      ...createEmptySupplyEntry('new-1'),
-      comment: 'Only a note',
-      quantity: '0',
-      unitPrice: '-2',
-    };
-
-    expect(validateSupplyForm(value, false)).toEqual({
-      fields: {
-        'supplyEntries[0].productVariant': 'Select a product',
-        'supplyEntries[0].unitOfMeasurement': 'Select a unit',
-        'supplyEntries[0].quantity':
-          'Quantity must be a whole number greater than 0',
-        'supplyEntries[0].unitPrice': 'Unit price must be 0 or greater',
-      },
-    });
   });
 
   it('omits the blank placeholder from payload and totals complete rows', () => {
     const value = validForm();
     value.supplyEntries.unshift(completeEntry);
 
-    expect(validateSupplyForm(value, true)).toBeUndefined();
     expect(getSupplyEntriesPayload(value)).toEqual([
       {
         productVariantId: 11,
@@ -233,25 +153,15 @@ describe('supply form utilities', () => {
     ];
 
     expect(getSupplyTotal(value)).toEqual({ count: 1, total: 0 });
-    expect(validateSupplyForm(value, true)?.fields).toMatchObject({
-      'supplyEntries[1].unitOfMeasurement': 'Select a unit',
-      'supplyEntries[1].quantity': 'Quantity is required',
-      'supplyEntries[1].unitPrice': 'Unit price is required',
-    });
   });
 
-  it('requires a whole quantity and explicitly clears an empty entry comment', () => {
+  it('explicitly clears an empty entry comment', () => {
     const value = validForm();
     value.supplyEntries.unshift({
       ...completeEntry,
-      quantity: '1.5',
       comment: ' ',
     });
 
-    expect(validateSupplyForm(value, true)?.fields).toMatchObject({
-      'supplyEntries[0].quantity':
-        'Quantity must be a whole number greater than 0',
-    });
     expect(getSupplyEntriesPayload(value)[0]?.comment).toBeNull();
   });
 });
