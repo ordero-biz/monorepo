@@ -34,11 +34,20 @@ export const getColumns = ({
     field: SupplyEntryValidatedField
   ) => {
     const validate = () => {
+      const meta = form.getFieldMeta(`supplyEntries[${index}].${field}`);
+
+      // Sibling changes must not reveal errors on fields that were only blurred.
+      if (!meta?.isDirty && form.state.submissionAttempts === 0) {
+        return undefined;
+      }
+
       const entry = form.getFieldValue(`supplyEntries[${index}]`);
+
       return entry
         ? validateSupplyEntryField({ value: entry, field })
         : undefined;
     };
+
     const rowFields = [
       'productVariant',
       'unitOfMeasurement',

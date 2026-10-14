@@ -98,17 +98,20 @@ vi.mock('../../shared/SupplyEditorForm/selectors', async () => {
     ProductVariantsAsyncCombobox: ({
       'aria-label': ariaLabel,
       value,
+      onBlur,
       onValueChange,
       errorText,
     }: {
       'aria-label': string;
       value: SupplyProductVariantSelection | null;
+      onBlur: () => void;
       onValueChange: (value: SupplyProductVariantSelection | null) => void;
       errorText?: string;
     }) => (
       <>
         <select
           aria-label={ariaLabel}
+          onBlur={onBlur}
           value={value?.id ?? ''}
           onChange={(event) =>
             onValueChange(
@@ -127,17 +130,20 @@ vi.mock('../../shared/SupplyEditorForm/selectors', async () => {
     UnitsOfMeasurementAsyncCombobox: ({
       'aria-label': ariaLabel,
       value,
+      onBlur,
       onValueChange,
       errorText,
     }: {
       'aria-label': string;
       value: SupplyUnitOfMeasurementSelection | null;
+      onBlur: () => void;
       onValueChange: (value: SupplyUnitOfMeasurementSelection | null) => void;
       errorText?: string;
     }) => (
       <>
         <select
           aria-label={ariaLabel}
+          onBlur={onBlur}
           value={value?.id ?? ''}
           onChange={(event) =>
             onValueChange(
@@ -258,6 +264,45 @@ describe('CreateSupply', () => {
     expect(
       screen.queryByText('Supply number is required')
     ).not.toBeInTheDocument();
+    expect(createSupplyMock).not.toHaveBeenCalled();
+  });
+
+  it('does not reveal errors on unchanged row fields when another field changes', async () => {
+    const user = userEvent.setup();
+    setup();
+    await fillMetadata(user);
+    const product = screen.getByRole('combobox', { name: 'Product for row 1' });
+    const unit = screen.getByRole('combobox', { name: 'Unit for row 1' });
+    const quantity = screen.getByRole('spinbutton', {
+      name: 'Quantity for row 1',
+    });
+    const unitPrice = screen.getByRole('spinbutton', {
+      name: 'Unit price for row 1',
+    });
+
+    await user.click(product);
+    await user.click(unit);
+    await user.click(quantity);
+    await user.type(unitPrice, '5');
+
+    expect(screen.queryByText('Select a product')).not.toBeInTheDocument();
+    expect(screen.queryByText('Select a unit')).not.toBeInTheDocument();
+    expect(screen.queryByText('Quantity is required')).not.toBeInTheDocument();
+
+    await user.type(quantity, '0');
+    expect(quantity).toHaveAccessibleDescription(
+      'Quantity must be a whole number greater than 0'
+    );
+    expect(screen.queryByText('Select a product')).not.toBeInTheDocument();
+    expect(screen.queryByText('Select a unit')).not.toBeInTheDocument();
+
+    await user.selectOptions(product, '11');
+    await user.selectOptions(product, '');
+    expect(screen.getByText('Select a product')).toBeVisible();
+    expect(screen.queryByText('Select a unit')).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Save draft' }));
+    expect(screen.getByText('Select a unit')).toBeVisible();
     expect(createSupplyMock).not.toHaveBeenCalled();
   });
 
