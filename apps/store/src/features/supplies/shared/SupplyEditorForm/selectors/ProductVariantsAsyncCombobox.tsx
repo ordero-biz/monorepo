@@ -8,14 +8,16 @@ import {
   type AsyncComboboxLoadOptionsResult,
 } from '@/lib/components/AsyncCombobox';
 import { productVariantsQueryKeys } from '@/lib/query/products/productsQueryKeys';
-import type { SupplyProductVariantSelection } from '../types';
-import type { ProductVariantsAsyncComboboxProps } from './types';
+import type {
+  ProductVariantComboboxOption,
+  ProductVariantsAsyncComboboxProps,
+} from './types';
 
 const loadProductVariantOptions = async ({
   page,
   pageSize,
 }: AsyncComboboxLoadOptionsArgs): Promise<
-  AsyncComboboxLoadOptionsResult<SupplyProductVariantSelection>
+  AsyncComboboxLoadOptionsResult<ProductVariantComboboxOption>
 > => {
   const result = await getProductVariants({
     page,
@@ -38,11 +40,11 @@ const loadProductVariantOptions = async ({
   };
 };
 
-const getProductVariantValue = (variant: SupplyProductVariantSelection) =>
+const getProductVariantValue = (variant: ProductVariantComboboxOption) =>
   String(variant.id);
-const getProductVariantLabel = (variant: SupplyProductVariantSelection) =>
+const getProductVariantLabel = (variant: ProductVariantComboboxOption) =>
   variant.sku ? `${variant.name} · ${variant.sku}` : variant.name;
-const renderProductVariantOption = (variant: SupplyProductVariantSelection) => (
+const renderProductVariantOption = (variant: ProductVariantComboboxOption) => (
   <span className="flex min-w-0 items-center gap-[var(--space-1)]">
     <span className="truncate">{getProductVariantLabel(variant)}</span>
     {variant.status === 'DRAFT' ? (
@@ -95,7 +97,7 @@ export const ProductVariantsAsyncCombobox = ({
   value,
   variant,
 }: ProductVariantsAsyncComboboxProps) => (
-  <AsyncCombobox
+  <AsyncCombobox<ProductVariantComboboxOption>
     aria-describedby={ariaDescribedBy}
     aria-label={ariaLabel}
     aria-labelledby={ariaLabelledBy}
@@ -124,7 +126,12 @@ export const ProductVariantsAsyncCombobox = ({
     onKeyDown={onKeyDown}
     onListScroll={onListScroll}
     onOpenChange={onOpenChange}
-    onValueChange={onValueChange}
+    onValueChange={(option, details) =>
+      onValueChange?.(
+        option ? { id: option.id, name: option.name, sku: option.sku } : null,
+        details
+      )
+    }
     open={open}
     placeholder={placeholder}
     readOnly={readOnly}

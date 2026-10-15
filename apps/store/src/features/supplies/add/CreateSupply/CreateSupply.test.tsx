@@ -6,7 +6,7 @@ import type { SupplyDetails } from '@/lib/domain/supplies/types';
 import { suppliesQueryKeys } from '@/lib/query/supplies/suppliesQueryKeys';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import type {
-  SupplyProductVariantSelection,
+  SupplyProductVariantFormValue,
   SupplySupplierSelection,
   SupplyUnitOfMeasurementSelection,
   SupplyWarehouseSelection,
@@ -103,9 +103,9 @@ vi.mock('../../shared/SupplyEditorForm/selectors', async () => {
       errorText,
     }: {
       'aria-label': string;
-      value: SupplyProductVariantSelection | null;
+      value: SupplyProductVariantFormValue | null;
       onBlur: () => void;
-      onValueChange: (value: SupplyProductVariantSelection | null) => void;
+      onValueChange: (value: SupplyProductVariantFormValue | null) => void;
       errorText?: string;
     }) => (
       <>

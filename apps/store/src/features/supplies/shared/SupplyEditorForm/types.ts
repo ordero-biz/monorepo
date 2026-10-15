@@ -11,7 +11,7 @@ export type SupplyWarehouseSelection = Pick<
   'id' | 'name' | 'status'
 >;
 
-export type SupplyProductVariantSelection = Pick<
+export type SupplyProductVariantFormValue = Pick<
   ProductVariant,
   'id' | 'name' | 'sku'
 >;
@@ -23,7 +23,7 @@ export type SupplyUnitOfMeasurementSelection = Pick<
 
 export type SupplyEntryFormValues = {
   clientId: string;
-  productVariant: SupplyProductVariantSelection | null;
+  productVariant: SupplyProductVariantFormValue | null;
   unitOfMeasurement: SupplyUnitOfMeasurementSelection | null;
   quantity: string;
   unitPrice: string;

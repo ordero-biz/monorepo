@@ -1,10 +1,19 @@
 import type { AsyncComboboxSingleProps } from '@/lib/components/AsyncCombobox';
+import type { ProductVariant } from '@/lib/domain/products/types';
 import type {
-  SupplyProductVariantSelection,
+  SupplyProductVariantFormValue,
   SupplySupplierSelection,
   SupplyUnitOfMeasurementSelection,
   SupplyWarehouseSelection,
 } from '../types';
+
+export type ProductVariantComboboxOption = {
+  id: ProductVariant['id'];
+  name: ProductVariant['name'];
+  sku: ProductVariant['sku'];
+  // The initial selection can be displayed before its option loads.
+  status?: ProductVariant['status'];
+};
 
 type ResourceAsyncComboboxProps<TOption extends object> = Omit<
   AsyncComboboxSingleProps<TOption>,
@@ -23,6 +32,6 @@ export type SuppliersAsyncComboboxProps =
 export type WarehousesAsyncComboboxProps =
   ResourceAsyncComboboxProps<SupplyWarehouseSelection>;
 export type ProductVariantsAsyncComboboxProps =
-  ResourceAsyncComboboxProps<SupplyProductVariantSelection>;
+  ResourceAsyncComboboxProps<SupplyProductVariantFormValue>;
 export type UnitsOfMeasurementAsyncComboboxProps =
   ResourceAsyncComboboxProps<SupplyUnitOfMeasurementSelection>;

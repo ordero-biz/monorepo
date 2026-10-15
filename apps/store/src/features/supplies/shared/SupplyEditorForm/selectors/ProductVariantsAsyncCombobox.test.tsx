@@ -49,6 +49,7 @@ describe('ProductVariantsAsyncCombobox', () => {
       name: 'Jasmine Rice 5kg',
       productVariantAttributeValues: [],
       sku,
+      status: 'ACTIVE',
     };
     getProductVariantsMock.mockResolvedValue({
       ok: true,
@@ -78,7 +79,13 @@ describe('ProductVariantsAsyncCombobox', () => {
       sort: ['name,asc'],
     });
     expect(mocks.onValueChange).toHaveBeenCalledWith(
-      { id: 11, name: variant.name, sku, status: undefined },
+      { id: 11, name: variant.name, sku },
+      expect.any(Object)
+    );
+
+    await user.clear(screen.getByRole('combobox', { name: 'Product' }));
+    expect(mocks.onValueChange).toHaveBeenLastCalledWith(
+      null,
       expect.any(Object)
     );
   });
@@ -104,7 +111,7 @@ describe('ProductVariantsAsyncCombobox', () => {
     expect(onValueChange).not.toHaveBeenCalled();
   });
 
-  it('shows Draft only for draft product variants', async () => {
+  it('shows Draft only for draft options and omits status from the form value', async () => {
     getProductVariantsMock.mockResolvedValue({
       ok: true,
       data: {
@@ -154,5 +161,11 @@ describe('ProductVariantsAsyncCombobox', () => {
     expect(
       within(activeOption).queryByText('Draft', { exact: true })
     ).toBeNull();
+
+    await user.click(draftOption);
+    expect(mocks.onValueChange).toHaveBeenCalledWith(
+      { id: 11, name: 'Draft rice', sku: 'RICE-DRAFT' },
+      expect.any(Object)
+    );
   });
 });

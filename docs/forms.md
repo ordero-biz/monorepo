@@ -152,15 +152,15 @@ Wire form-owned combobox fields through ordinary controlled props:
 ```tsx
 <Combobox
   errorText={errorText}
-  getOptionLabel={(category) => category.name}
-  getOptionValue={(category) => String(category.id)}
+  getOptionLabel={(option) => option.name}
+  getOptionValue={(option) => String(option.id)}
   invalid={Boolean(errorText)}
-  label="Category"
+  label="Related record"
   name={field.name}
   onBlur={field.handleBlur}
   onValueChange={field.handleChange}
-  options={categoryOptions}
-  placeholder="Select category"
+  options={options}
+  placeholder="Select a record"
   size="s"
   value={field.state.value}
 />
@@ -171,7 +171,7 @@ Use `value: TOption | null` for single selection. Use `multiple={true}` with a
 `getOptionValue` identifies them and `getOptionLabel` provides their display text.
 
 For request-backed option lists, create a feature-owned or app-owned resource
-wrapper such as `CategoriesAsyncCombobox` instead of putting request/query logic
+wrapper such as `ResourceAsyncCombobox` instead of putting request/query logic
 directly inside the form markup. The wrapper should own:
 
 - the request helper and option mapping
@@ -183,8 +183,8 @@ Keep the query key under the same resource prefix used for invalidation, then
 add an `options` segment so option data does not collide with list-page data:
 
 ```ts
-const categoryOptionsQueryKey = [
-  ...categoriesQueryKeys.list,
+const resourceOptionsQueryKey = [
+  ...resourceQueryKeys.list,
   'options',
 ] as const;
 ```
@@ -192,8 +192,8 @@ const categoryOptionsQueryKey = [
 Include request parameters that can vary, such as page size, filters, or sort,
 in the key. Fixed wrapper-owned parameters can stay in the wrapper, but the key
 should still be resource-aligned so
-`invalidateQueries({ queryKey: categoriesQueryKeys.list })` refreshes category
-option caches after category writes.
+`invalidateQueries({ queryKey: resourceQueryKeys.list })` refreshes related
+option caches after writes.
 
 When a wrapper intentionally forwards props explicitly instead of using
 `{...props}`, forward every retained `Combobox` prop. This includes form and
@@ -202,7 +202,7 @@ accessibility props (`name`, `onBlur`, `aria-label`, `aria-labelledby`,
 
 ### Selection records and submission
 
-`Combobox` and the store's `AsyncCombobox` use object-valued selections.
+`Combobox` and an app-owned `AsyncCombobox` use object-valued selections.
 `AsyncCombobox` adds paginated option loading and caching to the same selection
 API. Feature wrappers supply the request helper and record accessors.
 
@@ -218,48 +218,59 @@ API. Feature wrappers supply the request helper and record accessors.
   emits `onValueChange`. A user selection emits current loaded records, falling
   back to selected records whose IDs are absent from the loaded list.
 
-Use small serializable form records and normalize them to backend IDs before
-comparing or submitting. The supply form stores `supplier` and `warehouse` as
-`{ id, name, status } | null` (warehouse status can be absent), compares only their
-IDs, and maps backend `supplierId` and `warehouseId` validation errors to the
-corresponding object fields. Thus label/status refreshes do not create PATCH
-fields. Form libraries may still consider a deliberately selected object with
-new metadata dirty; use normalized payload comparison for save/no-op decisions.
+Keep API entities, form values, and combobox options as separate contracts when
+they contain different data. A saved response may provide only a summary,
+while loaded options provide additional display metadata. Build form defaults
+from the data actually available; do not invent missing metadata to satisfy an
+option type. Represent unavailable display metadata explicitly in the combobox
+contract.
 
-Supply entries store `productVariant: { id, name, sku } | null` and
-serialize only `productVariantId`. Saved summaries without a SKU use an empty
-string. Name and SKU changes alone do not replace the entry list. Backend entry errors
-for `productVariantId` map to the corresponding `productVariant` field.
+When options contain fields that the form does not need, map selections at the
+feature wrapper boundary:
 
-Entries also store `unitOfMeasurement: { id, name, symbol?, status } | null`.
-The symbol can be absent or null; the label then uses the name alone. Payloads
-serialize only `unitOfMeasurementId`, and backend errors map to the
-`unitOfMeasurement` field. Unit display metadata does not affect PATCH comparison.
+```ts
+type SelectionFormValue = {
+  id: number;
+  name: string;
+};
 
-The product attribute multiselect stores `AttributeDropdown[]`, defaulting to `[]`.
-It retains nested `attributeValues` because variant generation needs their IDs
-and names. Changing selected attributes preserves valid value selections and
-removes selections for deselected attributes or values no longer available.
-Generation produces numeric `attributeValueIds`; the create request contains
-these value IDs, not attribute objects or attribute IDs.
+type SelectionOption = {
+  id: number;
+  name: string;
+  description?: string;
+};
 
-Category selections contain `{ id, name, status? }`. Product forms default to
-`category: null`, retain the selected record through generation, and submit
-only `categoryId`. Category forms store `parentCategory`, initialized from the
-saved parent summary. `allowNoParent` adds the fixed “No parent category” choice
-and maps it to `null`; it never becomes a category record in the form. Create
-omits an absent `parentId`, while update sends `null` when clearing it and
-compares only IDs. Backend `parentId` errors map to `parentCategory`.
+const toFormValue = (
+  option: SelectionOption | null
+): SelectionFormValue | null =>
+  option ? { id: option.id, name: option.name } : null;
+```
 
-Option caches add a `combobox` segment under their resource keys to keep
-paginated option records separate from other resource query results.
-A query key must identify both the requested dataset and the cached option shape.
+Use small serializable form records and normalize them to the endpoint's
+expected IDs or commands before comparing or submitting. Display metadata
+changes alone must not create PATCH fields. Form libraries may consider an
+object with refreshed metadata dirty; use normalized payload comparison for
+save/no-op decisions. Map backend ID-field errors back to the corresponding
+object-valued form fields.
+
+Default an empty single selection to `null` and an empty multiple selection to
+`[]`. Retain nested data only when the workflow needs it, and reconcile dependent
+selections when their available choices change. Serialize the IDs required by
+the endpoint rather than sending entire option records.
+
+If a fixed option represents clearing a relationship, map it to the form's empty
+value at the wrapper boundary. Keep sentinel options out of request payloads;
+apply the endpoint's omission or `null` rules during payload preparation.
+
+A query key must identify both the requested dataset and the cached option
+shape. Keep option caches under their resource invalidation prefix with a
+distinct segment, such as `options`, to separate them from other query results.
 
 ## Form Hook Tests
 
 Use the app-local `prepareFormHookTestSetup` helper when a hook test only needs
-to submit the form and assert submit-side effects. Both `apps/platform` and
-`apps/store` provide this helper under `src/test/prepareFormHookTestSetup`.
+to submit the form and assert submit-side effects. Keep this helper in the app's
+test utilities, such as `src/test/prepareFormHookTestSetup`.
 
 Use hook tests for behavior such as:
 

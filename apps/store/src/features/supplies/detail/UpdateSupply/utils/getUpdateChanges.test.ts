@@ -32,7 +32,7 @@ const initialSupply: SupplyDetails = {
 };
 
 describe('getSupplyUpdateChanges', () => {
-  it('ignores product name, SKU, and status changes for an unchanged ID', () => {
+  it('ignores product name and SKU changes for an unchanged ID', () => {
     const value = getSupplyFormDefaults(initialSupply);
     value.supplyEntries[0].productVariant = {
       id: 11,
