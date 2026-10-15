@@ -2,9 +2,9 @@
 
 import { getAttributesDropdown } from '@/lib/client/api/attributes';
 import {
-  AsyncCombobox2,
-  type AsyncCombobox2LoadOptionsResult,
-} from '@/lib/components/AsyncCombobox2';
+  AsyncCombobox,
+  type AsyncComboboxLoadOptionsResult,
+} from '@/lib/components/AsyncCombobox';
 import type { AttributeDropdown } from '@/lib/domain/attributes/types';
 import { attributesQueryKeys } from '@/lib/query/attributes/attributesQueryKeys';
 import type { AttributesAsyncComboboxProps } from './types';
@@ -14,7 +14,7 @@ const getAttributeValue = (attribute: AttributeDropdown) =>
 const getAttributeLabel = (attribute: AttributeDropdown) => attribute.name;
 
 const loadAttributeOptions = async (): Promise<
-  AsyncCombobox2LoadOptionsResult<AttributeDropdown>
+  AsyncComboboxLoadOptionsResult<AttributeDropdown>
 > => {
   const result = await getAttributesDropdown();
 
@@ -66,7 +66,7 @@ export const AttributesAsyncCombobox = ({
   variant,
 }: AttributesAsyncComboboxProps) => {
   return (
-    <AsyncCombobox2<AttributeDropdown>
+    <AsyncCombobox<AttributeDropdown>
       aria-describedby={ariaDescribedBy}
       aria-label={ariaLabel}
       aria-labelledby={ariaLabelledBy}
@@ -104,7 +104,7 @@ export const AttributesAsyncCombobox = ({
       open={open}
       pageSize={100}
       placeholder={placeholder}
-      queryKey={[...attributesQueryKeys.attributeDropdown(), 'combobox2']}
+      queryKey={[...attributesQueryKeys.attributeDropdown(), 'combobox']}
       readOnly={readOnly}
       ref={ref}
       required={required}

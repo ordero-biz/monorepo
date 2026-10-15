@@ -152,6 +152,8 @@ Wire form-owned combobox fields through ordinary controlled props:
 ```tsx
 <Combobox
   errorText={errorText}
+  getOptionLabel={(category) => category.name}
+  getOptionValue={(category) => String(category.id)}
   invalid={Boolean(errorText)}
   label="Category"
   name={field.name}
@@ -164,8 +166,9 @@ Wire form-owned combobox fields through ordinary controlled props:
 />
 ```
 
-Use `value: string | null` for single selection. Use `multiple={true}` with a
-`string[]` value for multiple selection.
+Use `value: TOption | null` for single selection. Use `multiple={true}` with a
+`TOption[]` value for multiple selection. Options are serializable records;
+`getOptionValue` identifies them and `getOptionLabel` provides their display text.
 
 For request-backed option lists, create a feature-owned or app-owned resource
 wrapper such as `CategoriesAsyncCombobox` instead of putting request/query logic
@@ -197,12 +200,11 @@ When a wrapper intentionally forwards props explicitly instead of using
 accessibility props (`name`, `onBlur`, `aria-label`, `aria-labelledby`,
 `aria-describedby`) and visual props such as `size` and `variant`.
 
-### Experimental object selections
+### Selection records and submission
 
-`Combobox2` and the store's `AsyncCombobox2` pilot object-valued selections.
-All supply editor selectors, the category selector, and the product attribute
-multiselect use this API;
-other selectors still use `Combobox` and `AsyncCombobox`.
+`Combobox` and the store's `AsyncCombobox` use object-valued selections.
+`AsyncCombobox` adds paginated option loading and caching to the same selection
+API. Feature wrappers supply the request helper and record accessors.
 
 - Single selection uses `TOption | null`; multiple selection uses `TOption[]`.
 - `getOptionValue` returns a stable, unique string ID for equality and native
@@ -224,10 +226,9 @@ corresponding object fields. Thus label/status refreshes do not create PATCH
 fields. Form libraries may still consider a deliberately selected object with
 new metadata dirty; use normalized payload comparison for save/no-op decisions.
 
-Supply entries store `productVariant: { id, name, sku, status? } | null` and
+Supply entries store `productVariant: { id, name, sku } | null` and
 serialize only `productVariantId`. Saved summaries without a SKU use an empty
-string; status remains absent if the summary does not provide it. Name, SKU,
-and status changes alone do not replace the entry list. Backend entry errors
+string. Name and SKU changes alone do not replace the entry list. Backend entry errors
 for `productVariantId` map to the corresponding `productVariant` field.
 
 Entries also store `unitOfMeasurement: { id, name, symbol?, status } | null`.
@@ -250,8 +251,8 @@ and maps it to `null`; it never becomes a category record in the form. Create
 omits an absent `parentId`, while update sends `null` when clearing it and
 compares only IDs. Backend `parentId` errors map to `parentCategory`.
 
-The migrated option caches add a `combobox2` segment under their
-resource keys to keep their record payloads separate from legacy option objects.
+Option caches add a `combobox` segment under their resource keys to keep
+paginated option records separate from other resource query results.
 A query key must identify both the requested dataset and the cached option shape.
 
 ## Form Hook Tests

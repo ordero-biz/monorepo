@@ -4,10 +4,10 @@ import { Chip } from '@ordero/ui';
 import { useCallback, useMemo } from 'react';
 import { getCategories } from '@/lib/client/api/categories';
 import {
-  AsyncCombobox2,
-  type AsyncCombobox2LoadOptionsArgs,
-  type AsyncCombobox2LoadOptionsResult,
-} from '@/lib/components/AsyncCombobox2';
+  AsyncCombobox,
+  type AsyncComboboxLoadOptionsArgs,
+  type AsyncComboboxLoadOptionsResult,
+} from '@/lib/components/AsyncCombobox';
 import { CATEGORY_STATUS } from '@/lib/domain/categories/constants';
 import { categoriesQueryKeys } from '@/lib/query/categories/categoriesQueryKeys';
 import type {
@@ -37,8 +37,8 @@ const renderCategoryOption = (category: CategoryComboboxOption) => (
 const loadCategoryOptions = async ({
   page,
   pageSize,
-}: AsyncCombobox2LoadOptionsArgs): Promise<
-  AsyncCombobox2LoadOptionsResult<CategoryComboboxOption>
+}: AsyncComboboxLoadOptionsArgs): Promise<
+  AsyncComboboxLoadOptionsResult<CategoryComboboxOption>
 > => {
   const result = await getCategories({
     page,
@@ -112,7 +112,7 @@ export const CategoriesAsyncCombobox = ({
   );
 
   return (
-    <AsyncCombobox2<CategoryComboboxOption>
+    <AsyncCombobox<CategoryComboboxOption>
       aria-describedby={ariaDescribedBy}
       aria-label={ariaLabel}
       aria-labelledby={ariaLabelledBy}
@@ -155,7 +155,7 @@ export const CategoriesAsyncCombobox = ({
       open={open}
       pageSize={100}
       placeholder={placeholder}
-      queryKey={[...categoriesQueryKeys.options(), 'combobox2']}
+      queryKey={[...categoriesQueryKeys.options(), 'combobox']}
       readOnly={readOnly}
       ref={ref}
       required={required}

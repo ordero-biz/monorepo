@@ -1,10 +1,11 @@
 export type {
-  ButtonColor,
-  ButtonProps,
-  ButtonSize,
-  ButtonVariant,
-} from './components/Button';
-export { Button } from './components/Button';
+  AccordionHeaderProps,
+  AccordionItemProps,
+  AccordionPanelProps,
+  AccordionRootProps,
+  AccordionTriggerProps,
+} from './components/Accordion';
+export { Accordion } from './components/Accordion';
 export type {
   BreadcrumbItem,
   BreadcrumbsProps,
@@ -13,13 +14,12 @@ export type {
 } from './components/Breadcrumbs';
 export { Breadcrumbs } from './components/Breadcrumbs';
 export type {
-  AccordionHeaderProps,
-  AccordionItemProps,
-  AccordionPanelProps,
-  AccordionRootProps,
-  AccordionTriggerProps,
-} from './components/Accordion';
-export { Accordion } from './components/Accordion';
+  ButtonColor,
+  ButtonProps,
+  ButtonSize,
+  ButtonVariant,
+} from './components/Button';
+export { Button } from './components/Button';
 export type {
   CardContentProps,
   CardDescriptionProps,
@@ -61,15 +61,8 @@ export type {
 } from './components/Chip';
 export { Chip } from './components/Chip';
 export type {
-  ContextualActionBarLeftProps,
-  ContextualActionBarRightProps,
-  ContextualActionBarRootProps,
-} from './components/ContextualActionBar';
-export { ContextualActionBar } from './components/ContextualActionBar';
-export type {
   ComboboxChangeEventDetails,
   ComboboxMultipleProps,
-  ComboboxOption,
   ComboboxProps,
   ComboboxSingleProps,
   ComboboxSize,
@@ -77,11 +70,11 @@ export type {
 } from './components/Combobox';
 export { Combobox } from './components/Combobox';
 export type {
-  Combobox2MultipleProps,
-  Combobox2Props,
-  Combobox2SingleProps,
-} from './components/Combobox2';
-export { Combobox2 } from './components/Combobox2';
+  ContextualActionBarLeftProps,
+  ContextualActionBarRightProps,
+  ContextualActionBarRootProps,
+} from './components/ContextualActionBar';
+export { ContextualActionBar } from './components/ContextualActionBar';
 export type {
   DataTableCellProps,
   DataTableCellVariant,
@@ -94,10 +87,11 @@ export type {
   DataTablePaginationState,
   DataTableProps,
   DataTableRowSelectionState,
-  DataTableSelectionProps,
   DataTableSelectionCellProps,
   DataTableSelectionColumnHeaderProps,
+  DataTableSelectionProps,
   DataTableSortingState,
+  UseDataTableSelectionArgs,
 } from './components/DataTable';
 export {
   DataTable,
@@ -105,9 +99,8 @@ export {
   DataTableColumnHeader,
   DataTableSelectionCell,
   DataTableSelectionColumnHeader,
+  useDataTableSelection,
 } from './components/DataTable';
-export { useDataTableSelection } from './components/DataTable';
-export type { UseDataTableSelectionArgs } from './components/DataTable';
 export type {
   DialogBackdropProps,
   DialogCloseProps,
@@ -142,10 +135,16 @@ export type {
 } from './components/IconButton';
 export { IconButton } from './components/IconButton';
 export type {
+  InputProps,
+  InputSize,
+  InputVariant,
+} from './components/Input/index';
+export { Input } from './components/Input/index';
+export type {
   MenuAlign,
   MenuItemProps,
-  MenuPortalProps,
   MenuPopupProps,
+  MenuPortalProps,
   MenuPositionerProps,
   MenuRootProps,
   MenuSide,
@@ -153,12 +152,6 @@ export type {
   MenuTriggerProps,
 } from './components/Menu';
 export { Menu } from './components/Menu';
-export type {
-  InputProps,
-  InputSize,
-  InputVariant,
-} from './components/Input/index';
-export { Input } from './components/Input/index';
 export type {
   PageHeaderLeftProps,
   PageHeaderProps,

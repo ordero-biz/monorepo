@@ -3,10 +3,10 @@
 import { Chip } from '@ordero/ui';
 import { getWarehouses } from '@/lib/client/api/warehouses';
 import {
-  AsyncCombobox2,
-  type AsyncCombobox2LoadOptionsArgs,
-  type AsyncCombobox2LoadOptionsResult,
-} from '@/lib/components/AsyncCombobox2';
+  AsyncCombobox,
+  type AsyncComboboxLoadOptionsArgs,
+  type AsyncComboboxLoadOptionsResult,
+} from '@/lib/components/AsyncCombobox';
 import { WAREHOUSE_STATUS } from '@/lib/domain/warehouses/constants';
 import { warehousesQueryKeys } from '@/lib/query/warehouses/warehousesQueryKeys';
 import type { SupplyWarehouseSelection } from '../types';
@@ -15,8 +15,8 @@ import type { WarehousesAsyncComboboxProps } from './types';
 const loadWarehouseOptions = async ({
   page,
   pageSize,
-}: AsyncCombobox2LoadOptionsArgs): Promise<
-  AsyncCombobox2LoadOptionsResult<SupplyWarehouseSelection>
+}: AsyncComboboxLoadOptionsArgs): Promise<
+  AsyncComboboxLoadOptionsResult<SupplyWarehouseSelection>
 > => {
   const result = await getWarehouses({
     page,
@@ -95,7 +95,7 @@ export const WarehousesAsyncCombobox = ({
   value,
   variant,
 }: WarehousesAsyncComboboxProps) => (
-  <AsyncCombobox2
+  <AsyncCombobox
     aria-describedby={ariaDescribedBy}
     aria-label={ariaLabel}
     aria-labelledby={ariaLabelledBy}
@@ -141,7 +141,7 @@ export const WarehousesAsyncCombobox = ({
     loadOptions={loadWarehouseOptions}
     loadingText="Loading warehouses..."
     pageSize={100}
-    queryKey={[...warehousesQueryKeys.options(), 'combobox2']}
+    queryKey={[...warehousesQueryKeys.options(), 'combobox']}
     getOptionValue={getWarehouseValue}
     getOptionLabel={getWarehouseLabel}
     renderOption={renderWarehouseOption}

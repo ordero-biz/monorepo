@@ -1,4 +1,4 @@
-import type { AsyncCombobox2SingleProps } from '@/lib/components/AsyncCombobox2';
+import type { AsyncComboboxSingleProps } from '@/lib/components/AsyncCombobox';
 import type {
   SupplyProductVariantSelection,
   SupplySupplierSelection,
@@ -6,8 +6,8 @@ import type {
   SupplyWarehouseSelection,
 } from '../types';
 
-type ResourceAsyncCombobox2Props<TOption extends object> = Omit<
-  AsyncCombobox2SingleProps<TOption>,
+type ResourceAsyncComboboxProps<TOption extends object> = Omit<
+  AsyncComboboxSingleProps<TOption>,
   | 'emptyText'
   | 'loadErrorText'
   | 'loadingText'
@@ -19,10 +19,10 @@ type ResourceAsyncCombobox2Props<TOption extends object> = Omit<
   | 'renderOption'
 >;
 export type SuppliersAsyncComboboxProps =
-  ResourceAsyncCombobox2Props<SupplySupplierSelection>;
+  ResourceAsyncComboboxProps<SupplySupplierSelection>;
 export type WarehousesAsyncComboboxProps =
-  ResourceAsyncCombobox2Props<SupplyWarehouseSelection>;
+  ResourceAsyncComboboxProps<SupplyWarehouseSelection>;
 export type ProductVariantsAsyncComboboxProps =
-  ResourceAsyncCombobox2Props<SupplyProductVariantSelection>;
+  ResourceAsyncComboboxProps<SupplyProductVariantSelection>;
 export type UnitsOfMeasurementAsyncComboboxProps =
-  ResourceAsyncCombobox2Props<SupplyUnitOfMeasurementSelection>;
+  ResourceAsyncComboboxProps<SupplyUnitOfMeasurementSelection>;

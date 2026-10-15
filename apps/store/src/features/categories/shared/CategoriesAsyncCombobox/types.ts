@@ -1,11 +1,11 @@
-import type { AsyncCombobox2SingleProps } from '@/lib/components/AsyncCombobox2';
+import type { AsyncComboboxSingleProps } from '@/lib/components/AsyncCombobox';
 import type {
   Category,
   CategorySelection,
 } from '@/lib/domain/categories/types';
 
 export type CategoriesAsyncComboboxProps = Omit<
-  AsyncCombobox2SingleProps<CategorySelection>,
+  AsyncComboboxSingleProps<CategorySelection>,
   | 'emptyText'
   | 'getOptionLabel'
   | 'getOptionValue'

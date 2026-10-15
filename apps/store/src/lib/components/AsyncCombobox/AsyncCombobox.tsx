@@ -1,11 +1,9 @@
 'use client';
 
-import type { ComboboxChangeEventDetails } from '@ordero/ui';
-import { Combobox } from '@ordero/ui';
+import { Combobox, type ComboboxChangeEventDetails } from '@ordero/ui';
 import type { InfiniteData, QueryKey } from '@tanstack/react-query';
 import { useInfiniteQuery } from '@tanstack/react-query';
-import type { UIEvent } from 'react';
-import { useMemo, useState } from 'react';
+import { type UIEvent, useMemo, useState } from 'react';
 import type {
   AsyncComboboxLoadOptionsResult,
   AsyncComboboxProps,
@@ -14,10 +12,12 @@ import type {
 const DEFAULT_PAGE_SIZE = 25;
 const LOAD_MORE_SCROLL_OFFSET = 24;
 
-export const AsyncCombobox = (props: AsyncComboboxProps) => {
+export const AsyncCombobox = <TOption extends object>(
+  props: AsyncComboboxProps<TOption>
+) => {
   const {
     defaultOpen,
-    isOptionDisabled,
+    getOptionValue,
     invalid = false,
     loadErrorText = "We couldn't load options right now.",
     loadOptions,
@@ -26,15 +26,14 @@ export const AsyncCombobox = (props: AsyncComboboxProps) => {
     open,
     pageSize = DEFAULT_PAGE_SIZE,
     queryKey,
-    staticOptions = [],
-    ...comboboxProps
+    staticOptions,
   } = props;
   const [openState, setOpenState] = useState(defaultOpen ?? false);
   const isOpen = open ?? openState;
   const optionsQuery = useInfiniteQuery<
-    AsyncComboboxLoadOptionsResult,
+    AsyncComboboxLoadOptionsResult<TOption>,
     Error,
-    InfiniteData<AsyncComboboxLoadOptionsResult>,
+    InfiniteData<AsyncComboboxLoadOptionsResult<TOption>>,
     QueryKey,
     number
   >({
@@ -52,21 +51,18 @@ export const AsyncCombobox = (props: AsyncComboboxProps) => {
     const loadedOptions =
       optionsQuery.data?.pages.flatMap((page) => page.options) ?? [];
     const optionsByValue = new Map(
-      [...staticOptions, ...loadedOptions].map((option) => [
-        option.value,
+      [...(staticOptions ?? []), ...loadedOptions].map((option) => [
+        getOptionValue(option),
         option,
       ])
     );
 
-    return [...optionsByValue.values()].map((option) => ({
-      ...option,
-      disabled: option.disabled || isOptionDisabled?.(option),
-    }));
-  }, [isOptionDisabled, optionsQuery.data?.pages, staticOptions]);
+    return [...optionsByValue.values()];
+  }, [getOptionValue, optionsQuery.data?.pages, staticOptions]);
   const isInitialLoading =
     isOpen && optionsQuery.isFetching && !optionsQuery.data;
 
-  const handleListScroll = (event: UIEvent<HTMLDivElement>) => {
+  const handleListScroll = async (event: UIEvent<HTMLDivElement>) => {
     onListScroll?.(event);
 
     const { clientHeight, scrollHeight, scrollTop } = event.currentTarget;
@@ -78,7 +74,7 @@ export const AsyncCombobox = (props: AsyncComboboxProps) => {
       optionsQuery.hasNextPage &&
       !optionsQuery.isFetchingNextPage
     ) {
-      void optionsQuery.fetchNextPage();
+      await optionsQuery.fetchNextPage();
     }
   };
 
@@ -90,18 +86,107 @@ export const AsyncCombobox = (props: AsyncComboboxProps) => {
     onOpenChange?.(nextOpen, details);
   };
 
-  return (
-    <Combobox
-      {...comboboxProps}
+  return props.multiple ? (
+    <Combobox<TOption>
+      aria-describedby={props['aria-describedby']}
+      aria-label={props['aria-label']}
+      aria-labelledby={props['aria-labelledby']}
+      autoComplete={props.autoComplete}
+      autoFocus={props.autoFocus}
+      defaultInputValue={props.defaultInputValue}
+      disabled={props.disabled}
+      emptyText={props.emptyText}
+      endAdornment={props.endAdornment}
+      endIcon={props.endIcon}
+      errorIcon={props.errorIcon}
+      errorText={props.errorText}
+      helperIcon={props.helperIcon}
+      helperText={props.helperText}
+      id={props.id}
+      inputValue={props.inputValue}
+      label={props.label}
+      name={props.name}
+      onBlur={props.onBlur}
+      onFocus={props.onFocus}
+      onInputValueChange={props.onInputValueChange}
+      onKeyDown={props.onKeyDown}
+      placeholder={props.placeholder}
+      readOnly={props.readOnly}
+      ref={props.ref}
+      required={props.required}
+      size={props.size}
+      startAdornment={props.startAdornment}
+      startIcon={props.startIcon}
+      variant={props.variant}
+      getOptionValue={getOptionValue}
+      getOptionLabel={props.getOptionLabel}
+      renderOption={props.renderOption}
+      isOptionDisabled={props.isOptionDisabled}
       defaultOpen={defaultOpen}
       invalid={invalid || optionsQuery.isError}
       listErrorText={optionsQuery.isError ? loadErrorText : undefined}
       loading={isInitialLoading}
       loadingMore={optionsQuery.isFetchingNextPage}
+      loadingText={props.loadingText}
       onListScroll={handleListScroll}
       onOpenChange={handleOpenChange}
       open={isOpen}
       options={options}
+      defaultValue={props.defaultValue}
+      value={props.value}
+      onValueChange={props.onValueChange}
+      multiple
+    />
+  ) : (
+    <Combobox<TOption>
+      aria-describedby={props['aria-describedby']}
+      aria-label={props['aria-label']}
+      aria-labelledby={props['aria-labelledby']}
+      autoComplete={props.autoComplete}
+      autoFocus={props.autoFocus}
+      defaultInputValue={props.defaultInputValue}
+      disabled={props.disabled}
+      emptyText={props.emptyText}
+      endAdornment={props.endAdornment}
+      endIcon={props.endIcon}
+      errorIcon={props.errorIcon}
+      errorText={props.errorText}
+      helperIcon={props.helperIcon}
+      helperText={props.helperText}
+      id={props.id}
+      inputValue={props.inputValue}
+      label={props.label}
+      name={props.name}
+      onBlur={props.onBlur}
+      onFocus={props.onFocus}
+      onInputValueChange={props.onInputValueChange}
+      onKeyDown={props.onKeyDown}
+      placeholder={props.placeholder}
+      readOnly={props.readOnly}
+      ref={props.ref}
+      required={props.required}
+      size={props.size}
+      startAdornment={props.startAdornment}
+      startIcon={props.startIcon}
+      variant={props.variant}
+      getOptionValue={getOptionValue}
+      getOptionLabel={props.getOptionLabel}
+      renderOption={props.renderOption}
+      isOptionDisabled={props.isOptionDisabled}
+      defaultOpen={defaultOpen}
+      invalid={invalid || optionsQuery.isError}
+      listErrorText={optionsQuery.isError ? loadErrorText : undefined}
+      loading={isInitialLoading}
+      loadingMore={optionsQuery.isFetchingNextPage}
+      loadingText={props.loadingText}
+      onListScroll={handleListScroll}
+      onOpenChange={handleOpenChange}
+      open={isOpen}
+      options={options}
+      defaultValue={props.defaultValue}
+      value={props.value}
+      onValueChange={props.onValueChange}
+      multiple={false}
     />
   );
 };

@@ -1,4 +1,4 @@
-import type { AsyncCombobox2MultipleProps } from '@/lib/components/AsyncCombobox2';
+import type { AsyncComboboxMultipleProps } from '@/lib/components/AsyncCombobox';
 import type { AttributeDropdown } from '@/lib/domain/attributes/types';
 import type { CategorySelection } from '@/lib/domain/categories/types';
 import type { ProductStatus } from '@/lib/domain/products/types';
@@ -36,7 +36,7 @@ export type ProductVariantsCreationFormProps = {
 };
 
 export type AttributesAsyncComboboxProps = Omit<
-  AsyncCombobox2MultipleProps<AttributeDropdown>,
+  AsyncComboboxMultipleProps<AttributeDropdown>,
   | 'emptyText'
   | 'isOptionDisabled'
   | 'loadErrorText'

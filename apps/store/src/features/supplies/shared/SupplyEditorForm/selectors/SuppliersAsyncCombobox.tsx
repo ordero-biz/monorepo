@@ -3,10 +3,10 @@
 import { Chip } from '@ordero/ui';
 import { getSuppliers } from '@/lib/client/api/suppliers';
 import {
-  AsyncCombobox2,
-  type AsyncCombobox2LoadOptionsArgs,
-  type AsyncCombobox2LoadOptionsResult,
-} from '@/lib/components/AsyncCombobox2';
+  AsyncCombobox,
+  type AsyncComboboxLoadOptionsArgs,
+  type AsyncComboboxLoadOptionsResult,
+} from '@/lib/components/AsyncCombobox';
 import { SUPPLIER_STATUS } from '@/lib/domain/suppliers/constants';
 import { suppliersQueryKeys } from '@/lib/query/suppliers/suppliersQueryKeys';
 import type { SupplySupplierSelection } from '../types';
@@ -15,8 +15,8 @@ import type { SuppliersAsyncComboboxProps } from './types';
 const loadSupplierOptions = async ({
   page,
   pageSize,
-}: AsyncCombobox2LoadOptionsArgs): Promise<
-  AsyncCombobox2LoadOptionsResult<SupplySupplierSelection>
+}: AsyncComboboxLoadOptionsArgs): Promise<
+  AsyncComboboxLoadOptionsResult<SupplySupplierSelection>
 > => {
   const result = await getSuppliers({
     page,
@@ -94,7 +94,7 @@ export const SuppliersAsyncCombobox = ({
   value,
   variant,
 }: SuppliersAsyncComboboxProps) => (
-  <AsyncCombobox2
+  <AsyncCombobox
     aria-describedby={ariaDescribedBy}
     aria-label={ariaLabel}
     aria-labelledby={ariaLabelledBy}
@@ -140,7 +140,7 @@ export const SuppliersAsyncCombobox = ({
     loadOptions={loadSupplierOptions}
     loadingText="Loading suppliers..."
     pageSize={100}
-    queryKey={[...suppliersQueryKeys.options(), 'combobox2']}
+    queryKey={[...suppliersQueryKeys.options(), 'combobox']}
     getOptionValue={getSupplierValue}
     getOptionLabel={getSupplierLabel}
     renderOption={renderSupplierOption}

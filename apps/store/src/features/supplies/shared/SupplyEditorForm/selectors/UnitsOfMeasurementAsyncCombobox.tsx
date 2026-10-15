@@ -3,10 +3,10 @@
 import { Chip } from '@ordero/ui';
 import { getUnitsOfMeasurement } from '@/lib/client/api/units-of-measurement';
 import {
-  AsyncCombobox2,
-  type AsyncCombobox2LoadOptionsArgs,
-  type AsyncCombobox2LoadOptionsResult,
-} from '@/lib/components/AsyncCombobox2';
+  AsyncCombobox,
+  type AsyncComboboxLoadOptionsArgs,
+  type AsyncComboboxLoadOptionsResult,
+} from '@/lib/components/AsyncCombobox';
 import { UNIT_OF_MEASUREMENT_STATUS } from '@/lib/domain/units-of-measurement/constants';
 import { unitsOfMeasurementQueryKeys } from '@/lib/query/units-of-measurement/unitsOfMeasurementQueryKeys';
 import type { SupplyUnitOfMeasurementSelection } from '../types';
@@ -15,8 +15,8 @@ import type { UnitsOfMeasurementAsyncComboboxProps } from './types';
 const loadUnitOfMeasurementOptions = async ({
   page,
   pageSize,
-}: AsyncCombobox2LoadOptionsArgs): Promise<
-  AsyncCombobox2LoadOptionsResult<SupplyUnitOfMeasurementSelection>
+}: AsyncComboboxLoadOptionsArgs): Promise<
+  AsyncComboboxLoadOptionsResult<SupplyUnitOfMeasurementSelection>
 > => {
   const result = await getUnitsOfMeasurement({
     page,
@@ -98,7 +98,7 @@ export const UnitsOfMeasurementAsyncCombobox = ({
   value,
   variant,
 }: UnitsOfMeasurementAsyncComboboxProps) => (
-  <AsyncCombobox2
+  <AsyncCombobox
     aria-describedby={ariaDescribedBy}
     aria-label={ariaLabel}
     aria-labelledby={ariaLabelledBy}
@@ -144,7 +144,7 @@ export const UnitsOfMeasurementAsyncCombobox = ({
     loadOptions={loadUnitOfMeasurementOptions}
     loadingText="Loading units of measurement..."
     pageSize={100}
-    queryKey={[...unitsOfMeasurementQueryKeys.options(), 'combobox2']}
+    queryKey={[...unitsOfMeasurementQueryKeys.options(), 'combobox']}
     getOptionValue={getUnitOfMeasurementValue}
     getOptionLabel={getUnitOfMeasurementLabel}
     renderOption={renderUnitOfMeasurementOption}

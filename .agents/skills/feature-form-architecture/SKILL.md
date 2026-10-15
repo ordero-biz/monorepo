@@ -126,8 +126,11 @@ For form-owned combobox fields:
 
 - wire fields through ordinary controlled props: `value`, `onValueChange`,
   `name`, `onBlur`, `invalid`, and `errorText`
-- use `value: string | null` for single selection and `value: string[]` with
+- use `value: TOption | null` for single selection and `value: TOption[]` with
   `multiple={true}` for multiple selection
+- supply `getOptionValue` for stable ID equality and `getOptionLabel` for display
+  text; keep selected records serializable and normalize them to backend IDs
+  before comparing or submitting form values
 - keep shared `@ordero/ui` comboboxes presentational and form-library agnostic
 - cover behavior in tests by opening the combobox by role and selecting options
   by role/name; do not assert variant classes or private DOM structure
