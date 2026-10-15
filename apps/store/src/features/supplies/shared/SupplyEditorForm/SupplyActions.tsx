@@ -1,7 +1,7 @@
 'use client';
 
 import { Button, ContextualActionBar, Dialog, Typography } from '@ordero/ui';
-import { LockKeyhole, Trash2 } from 'lucide-react';
+import { Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { BaseLayoutContextualActionBar } from '@/features/app-shell';
 import { formatMoney } from '../formatMoney';
@@ -44,7 +44,7 @@ export const SupplyActions = ({
                 color="error"
                 disabled={deleteDisabled}
                 onClick={onDeleteSelected}
-                size="s"
+                size="m"
                 startIcon={<Trash2 aria-hidden="true" />}
                 type="button"
                 variant="soft"
@@ -61,21 +61,13 @@ export const SupplyActions = ({
                 {formatMoney(total)}
               </Typography>
             </ContextualActionBar.Left>
-            <div className="flex items-center gap-[var(--space-1)] rounded-[var(--radius)] bg-[var(--color-warning-16)] px-[var(--space-2)] py-[var(--space-1)] text-[var(--warning-dark)]">
-              <LockKeyhole
-                aria-hidden="true"
-                className="size-[var(--space-2)] shrink-0"
-              />
-              <p className="text-[length:var(--body2-size-desktop)] leading-[var(--body2-line-height-desktop)]">
-                After finalization, this supply can no longer be edited.
-              </p>
-            </div>
             <ContextualActionBar.Right>
               <div className="flex items-center gap-[var(--space-1)]">
                 <Button
                   color="inherit"
                   disabled={isSubmitting}
                   onClick={onSaveDraft}
+                  size="m"
                   type="button"
                   variant="outlined"
                 >
@@ -85,6 +77,7 @@ export const SupplyActions = ({
                   color="primary"
                   disabled={isSubmitting || count === 0}
                   onClick={() => setFinalizeDialogOpen(true)}
+                  size="m"
                   type="button"
                 >
                   {pendingIntent === 'finalize'
