@@ -1,4 +1,5 @@
 import { createAttribute } from '@/lib/client/api/attributes';
+import { API_ERROR_CODES } from '@/lib/constants/apiErrorCodes';
 import {
   ATTRIBUTE_STATUS,
   ATTRIBUTE_VALUE_STATUS,
@@ -103,6 +104,31 @@ describe('submitCreateAttribute', () => {
           name: 'Attribute name already exists.',
         },
         formError: 'Attribute creation failed.',
+      },
+    });
+  });
+
+  it('maps a duplicate attribute name error to the shared message', async () => {
+    createAttributeMock.mockResolvedValue({
+      ok: false,
+      error: {
+        status: 409,
+        code: API_ERROR_CODES.ATTRIBUTE_NAME_ALREADY_EXISTS,
+        message: 'Conflict',
+      },
+    });
+
+    await expect(
+      submitCreateAttribute({
+        name: 'Material',
+        status: ATTRIBUTE_STATUS.DRAFT,
+        attributeValues: [],
+      })
+    ).resolves.toEqual({
+      ok: false,
+      error: {
+        fieldErrors: undefined,
+        formError: 'Attribute name already exists.',
       },
     });
   });

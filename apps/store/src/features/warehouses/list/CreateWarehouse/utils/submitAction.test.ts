@@ -1,4 +1,5 @@
 import { createWarehouse } from '@/lib/client/api/warehouses';
+import { API_ERROR_CODES } from '@/lib/constants/apiErrorCodes';
 import { WAREHOUSE_STATUS } from '@/lib/domain/warehouses/constants';
 import { submitCreateWarehouse } from './submitAction';
 
@@ -74,6 +75,32 @@ describe('submitCreateWarehouse', () => {
           name: 'Warehouse name already exists.',
         },
         formError: 'Warehouse creation failed.',
+      },
+    });
+  });
+
+  it('maps a duplicate warehouse name error to the shared message', async () => {
+    createWarehouseMock.mockResolvedValue({
+      ok: false,
+      error: {
+        status: 409,
+        code: API_ERROR_CODES.WAREHOUSE_NAME_ALREADY_EXISTS,
+        message: 'Conflict',
+      },
+    });
+
+    await expect(
+      submitCreateWarehouse({
+        name: 'Main Warehouse',
+        address: '',
+        comment: '',
+        status: WAREHOUSE_STATUS.DRAFT,
+      })
+    ).resolves.toEqual({
+      ok: false,
+      error: {
+        fieldErrors: undefined,
+        formError: 'Warehouse name already exists.',
       },
     });
   });
