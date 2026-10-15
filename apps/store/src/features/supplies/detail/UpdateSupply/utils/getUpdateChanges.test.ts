@@ -38,7 +38,6 @@ describe('getSupplyUpdateChanges', () => {
       id: 11,
       name: 'Renamed rice',
       sku: 'NEW-SKU',
-      status: 'ACTIVE',
     };
     expect(
       getSupplyUpdateChanges({
@@ -55,7 +54,6 @@ describe('getSupplyUpdateChanges', () => {
       id: 12,
       name: 'Other rice',
       sku: '',
-      status: 'DRAFT',
     };
     expect(
       getSupplyUpdateChanges({

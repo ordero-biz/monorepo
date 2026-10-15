@@ -13,7 +13,7 @@ export type SupplyWarehouseSelection = Pick<
 
 export type SupplyProductVariantSelection = Pick<
   ProductVariant,
-  'id' | 'name' | 'sku' | 'status'
+  'id' | 'name' | 'sku'
 >;
 
 export type SupplyUnitOfMeasurementSelection = Pick<
