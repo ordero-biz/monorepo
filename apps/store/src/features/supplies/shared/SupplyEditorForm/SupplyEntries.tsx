@@ -6,7 +6,7 @@ import {
   Typography,
   useDataTableSelection,
 } from '@ordero/ui';
-import { useCallback, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { getColumns } from './columns';
 import { SupplyActions } from './SupplyActions';
 import type { SupplyEntriesProps, SupplyEntryFormValues } from './types';
@@ -29,6 +29,8 @@ export const SupplyEntries = ({
   pendingIntent,
 }: SupplyEntriesProps) => {
   const nextClientId = useRef(0);
+  const addProductButtonRef = useRef<HTMLButtonElement>(null);
+  const scrollAfterEntryCount = useRef<number | null>(null);
   const lastEntry = entries.at(-1);
   const { clearSelection, selectedRows, selection } = useDataTableSelection({
     data: entries,
@@ -43,6 +45,22 @@ export const SupplyEntries = ({
       createEmptySupplyEntry(`new-${nextClientId.current++}`)
     );
   }, [form]);
+
+  const scheduleScrollAfterAppend = () => {
+    scrollAfterEntryCount.current = entries.length + 1;
+  };
+
+  useEffect(() => {
+    if (scrollAfterEntryCount.current !== entries.length) {
+      return;
+    }
+
+    scrollAfterEntryCount.current = null;
+    addProductButtonRef.current?.scrollIntoView?.({
+      block: 'center',
+      inline: 'nearest',
+    });
+  }, [entries.length]);
 
   const deleteRows = useCallback(
     async (clientIds: Set<string>) => {
@@ -95,7 +113,11 @@ export const SupplyEntries = ({
               disabled={
                 isSubmitting || Boolean(lastEntry && !lastEntry.productVariant)
               }
-              onClick={appendEntry}
+              onClick={() => {
+                scheduleScrollAfterAppend();
+                appendEntry();
+              }}
+              ref={addProductButtonRef}
               type="button"
               variant="text"
             >
