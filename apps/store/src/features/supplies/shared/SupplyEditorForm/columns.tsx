@@ -255,7 +255,7 @@ export const getColumns = ({
         return (
           <DataTableCell>
             <Typography variant="body2">
-              {valid ? formatMoney(Number(quantity) * Number(unitPrice)) : '—'}
+              {formatMoney(valid ? Number(quantity) * Number(unitPrice) : 0)}
             </Typography>
           </DataTableCell>
         );
