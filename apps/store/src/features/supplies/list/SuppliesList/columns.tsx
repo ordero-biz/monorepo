@@ -14,6 +14,7 @@ const renderOptionalValue = (value?: string | null) => value || '-';
 export const columns: DataTableColumnDef<Supply>[] = [
   {
     accessorKey: 'supplyNumber',
+    enableSorting: false,
     cell: ({ row }) => (
       <DataTableCell>
         <Link
@@ -31,6 +32,7 @@ export const columns: DataTableColumnDef<Supply>[] = [
   },
   {
     accessorKey: 'supplier.name',
+    enableSorting: false,
     cell: ({ row }) => (
       <DataTableCell>{row.original.supplier.name}</DataTableCell>
     ),
@@ -41,6 +43,7 @@ export const columns: DataTableColumnDef<Supply>[] = [
   },
   {
     accessorKey: 'warehouse.name',
+    enableSorting: false,
     cell: ({ row }) => (
       <DataTableCell>{row.original.warehouse.name}</DataTableCell>
     ),
@@ -51,6 +54,7 @@ export const columns: DataTableColumnDef<Supply>[] = [
   },
   {
     accessorKey: 'status',
+    enableSorting: false,
     cell: ({ row }) => (
       <DataTableCell>
         <SupplyStatusChip status={row.original.status} />
@@ -63,6 +67,7 @@ export const columns: DataTableColumnDef<Supply>[] = [
   },
   {
     accessorKey: 'supplierInvoiceNumber',
+    enableSorting: false,
     cell: ({ row }) => (
       <DataTableCell>
         {renderOptionalValue(row.original.supplierInvoiceNumber)}
@@ -75,6 +80,7 @@ export const columns: DataTableColumnDef<Supply>[] = [
   },
   {
     accessorKey: 'totalPrice',
+    enableSorting: false,
     cell: ({ row }) => <DataTableCell>{row.original.totalPrice}</DataTableCell>,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Total price" />
@@ -83,6 +89,7 @@ export const columns: DataTableColumnDef<Supply>[] = [
   },
   {
     accessorKey: 'createdAt',
+    enableSorting: false,
     cell: ({ row }) => (
       <DataTableCell>
         {row.original.createdAt ? formatDate(row.original.createdAt) : '-'}

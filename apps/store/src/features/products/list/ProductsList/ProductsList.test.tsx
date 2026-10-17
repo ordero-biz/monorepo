@@ -38,7 +38,7 @@ const getProductVariantsMock = vi.mocked(getProductVariants);
 const getProductGroupsMock = vi.mocked(getProductGroups);
 const setPaginationMock = vi.fn();
 
-const createPagination = ({ page = 0, size = 10 } = {}) => ({
+const createPagination = ({ page = 1, size = 10 } = {}) => ({
   page,
   setPagination: setPaginationMock,
   size,
@@ -259,11 +259,11 @@ describe('ProductsList', () => {
 
     setup({
       paginationInput: {
-        page: 1,
+        page: 2,
         size: 1,
       },
       pagination: createPagination({
-        page: 1,
+        page: 2,
         size: 1,
       }),
     });
