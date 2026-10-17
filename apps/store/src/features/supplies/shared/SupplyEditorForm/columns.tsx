@@ -14,7 +14,7 @@ import {
   UnitsOfMeasurementAsyncCombobox,
 } from './selectors';
 import type { SupplyEntriesProps, SupplyEntryFormValues } from './types';
-import { hasOnlyBlankSupplyEntry } from './utils';
+import { hasOnlyBlankSupplyEntry, isBlankSupplyEntry } from './utils';
 import {
   type SupplyEntryValidatedField,
   validateSupplyEntryField,
@@ -34,36 +34,45 @@ export const getColumns = ({
     field: SupplyEntryValidatedField
   ) => {
     const validate = () => {
-      const meta = form.getFieldMeta(`supplyEntries[${index}].${field}`);
-
-      // Sibling changes must not reveal errors on fields that were only blurred.
-      if (!meta?.isDirty && form.state.submissionAttempts === 0) {
+      const entry = form.getFieldValue(`supplyEntries[${index}]`);
+      if (!entry) {
         return undefined;
       }
 
-      const entry = form.getFieldValue(`supplyEntries[${index}]`);
-
-      return entry
-        ? validateSupplyEntryField({ value: entry, field })
-        : undefined;
+      return validateSupplyEntryField({ value: entry, field });
     };
-
-    const rowFields = [
-      'productVariant',
-      'unitOfMeasurement',
-      'quantity',
-      'unitPrice',
-      'comment',
-    ] as const;
 
     return {
       // TanStack also runs change validators on submit.
       onChange: validate,
-      onChangeListenTo: rowFields
-        .filter((name) => name !== field)
-        .map((name) => `supplyEntries[${index}].${name}` as const),
     };
   };
+
+  const getEntryListeners = (index: number) => ({
+    onChange: async () => {
+      const entry = form.getFieldValue(`supplyEntries[${index}]`);
+      if (!entry || !isBlankSupplyEntry(entry)) {
+        return;
+      }
+
+      // Clearing the row makes it optional, including fields with existing errors.
+      const fields = [
+        'productVariant',
+        'unitOfMeasurement',
+        'quantity',
+        'unitPrice',
+      ] as const;
+      await Promise.all(
+        fields.map((field) => {
+          const name = `supplyEntries[${index}].${field}` as const;
+          if (form.getFieldMeta(name)?.errors.length) {
+            return form.validateField(name, 'change');
+          }
+          return undefined;
+        })
+      );
+    },
+  });
 
   return [
     {
@@ -93,6 +102,7 @@ export const getColumns = ({
           <DataTableCell>
             <div className="w-[320px]">
               <form.Field
+                listeners={getEntryListeners(index)}
                 name={`supplyEntries[${index}].productVariant` as const}
                 validators={getEntryValidators(index, 'productVariant')}
               >
@@ -134,6 +144,7 @@ export const getColumns = ({
           <DataTableCell>
             <div className="w-[var(--space-16)]">
               <form.Field
+                listeners={getEntryListeners(index)}
                 name={`supplyEntries[${index}].unitOfMeasurement` as const}
                 validators={getEntryValidators(index, 'unitOfMeasurement')}
               >
@@ -172,6 +183,7 @@ export const getColumns = ({
         <DataTableCell>
           <div className="w-[105px]">
             <form.Field
+              listeners={getEntryListeners(row.index)}
               name={`supplyEntries[${row.index}].quantity` as const}
               validators={getEntryValidators(row.index, 'quantity')}
             >
@@ -210,6 +222,7 @@ export const getColumns = ({
         <DataTableCell>
           <div className="w-[115px]">
             <form.Field
+              listeners={getEntryListeners(row.index)}
               name={`supplyEntries[${row.index}].unitPrice` as const}
               validators={getEntryValidators(row.index, 'unitPrice')}
             >
@@ -270,7 +283,10 @@ export const getColumns = ({
       cell: ({ row }) => (
         <DataTableCell>
           <div className="w-[180px]">
-            <form.Field name={`supplyEntries[${row.index}].comment` as const}>
+            <form.Field
+              listeners={getEntryListeners(row.index)}
+              name={`supplyEntries[${row.index}].comment` as const}
+            >
               {(field) => (
                 <TextField
                   aria-label={`Comment for row ${row.index + 1}`}

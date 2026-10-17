@@ -75,7 +75,7 @@ export const SupplyActions = ({
                 </Button>
                 <Button
                   color="primary"
-                  disabled={isSubmitting || count === 0}
+                  disabled={isSubmitting}
                   onClick={() => setFinalizeDialogOpen(true)}
                   size="m"
                   type="button"
@@ -116,7 +116,7 @@ export const SupplyActions = ({
               <Dialog.Footer closeButtonLabel="Cancel">
                 <Button
                   color="primary"
-                  disabled={isSubmitting || count === 0}
+                  disabled={isSubmitting}
                   onClick={() => {
                     setFinalizeDialogOpen(false);
                     onFinalize();

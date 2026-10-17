@@ -369,7 +369,8 @@ describe('CreateSupply', () => {
     expect(screen.queryByText('Quantity is required')).not.toBeInTheDocument();
     expect(screen.queryByText('Select a product')).not.toBeInTheDocument();
     await user.type(comment, 'Another note');
-    expect(screen.getByText('Quantity is required')).toBeVisible();
+    expect(screen.queryByText('Quantity is required')).not.toBeInTheDocument();
+    expect(screen.queryByText('Select a product')).not.toBeInTheDocument();
     await user.clear(comment);
     await user.click(screen.getByRole('button', { name: 'Finalize supply' }));
     await user.click(
@@ -397,7 +398,8 @@ describe('CreateSupply', () => {
     );
   });
 
-  it('starts with one empty product row and cannot finalize it', () => {
+  it('starts with one empty product row and explains why it cannot be finalized', async () => {
+    const user = userEvent.setup();
     setup();
 
     expect(screen.getByRole('table', { name: 'Supply entries' })).toBeVisible();
@@ -415,7 +417,71 @@ describe('CreateSupply', () => {
     ).toBeEnabled();
     expect(
       screen.getByRole('button', { name: 'Finalize supply' })
-    ).toBeDisabled();
+    ).toBeEnabled();
+
+    await fillMetadata(user);
+    await user.click(screen.getByRole('button', { name: 'Finalize supply' }));
+    await user.click(
+      within(screen.getByRole('dialog', { name: 'Finalize supply' })).getByRole(
+        'button',
+        { name: 'Finalize supply' }
+      )
+    );
+
+    expect(
+      await screen.findByText('Add at least one product before finalizing.')
+    ).toBeVisible();
+    expect(createSupplyMock).not.toHaveBeenCalled();
+  });
+
+  it('keeps unchanged row fields free of errors after an empty finalization attempt', async () => {
+    const user = userEvent.setup();
+    setup();
+    await fillMetadata(user);
+    await user.click(screen.getByRole('button', { name: 'Finalize supply' }));
+    await user.click(
+      within(screen.getByRole('dialog', { name: 'Finalize supply' })).getByRole(
+        'button',
+        { name: 'Finalize supply' }
+      )
+    );
+    expect(
+      await screen.findByText('Add at least one product before finalizing.')
+    ).toBeVisible();
+
+    const product = screen.getByRole('combobox', { name: 'Product for row 1' });
+    await user.selectOptions(product, '11');
+    expect(screen.queryByText('Select a unit')).not.toBeInTheDocument();
+    expect(screen.queryByText('Quantity is required')).not.toBeInTheDocument();
+    expect(
+      screen.queryByText('Unit price is required')
+    ).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Finalize supply' }));
+    await user.click(
+      within(screen.getByRole('dialog', { name: 'Finalize supply' })).getByRole(
+        'button',
+        { name: 'Finalize supply' }
+      )
+    );
+    expect(screen.getByText('Select a unit')).toBeVisible();
+    expect(screen.getByText('Quantity is required')).toBeVisible();
+    expect(screen.getByText('Unit price is required')).toBeVisible();
+    expect(createSupplyMock).not.toHaveBeenCalled();
+
+    await user.selectOptions(product, '');
+    expect(screen.queryByText('Select a unit')).not.toBeInTheDocument();
+    expect(screen.queryByText('Quantity is required')).not.toBeInTheDocument();
+    expect(
+      screen.queryByText('Unit price is required')
+    ).not.toBeInTheDocument();
+
+    await user.selectOptions(product, '11');
+    expect(screen.queryByText('Select a unit')).not.toBeInTheDocument();
+    expect(screen.queryByText('Quantity is required')).not.toBeInTheDocument();
+    expect(
+      screen.queryByText('Unit price is required')
+    ).not.toBeInTheDocument();
   });
 
   it('disables deletion of the only blank row and enables it once the row has data', async () => {

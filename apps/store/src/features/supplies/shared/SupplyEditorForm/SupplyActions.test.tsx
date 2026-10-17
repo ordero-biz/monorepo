@@ -87,12 +87,21 @@ describe('SupplyActions', () => {
     expect(screen.getByRole('button', { name: finalizeLabel })).toBeDisabled();
   });
 
-  it('allows an empty draft but disables finalization without complete entries', () => {
-    setup({ count: 0, total: 0 });
+  it('allows finalization attempts without complete entries', async () => {
+    const user = userEvent.setup();
+    const { onFinalize } = setup({ count: 0, total: 0, onFinalize: vi.fn() });
 
     expect(screen.getByRole('button', { name: 'Save draft' })).toBeEnabled();
     expect(
       screen.getByRole('button', { name: 'Finalize supply' })
-    ).toBeDisabled();
+    ).toBeEnabled();
+
+    await user.click(screen.getByRole('button', { name: 'Finalize supply' }));
+    const confirm = within(
+      screen.getByRole('dialog', { name: 'Finalize supply' })
+    ).getByRole('button', { name: 'Finalize supply' });
+    expect(confirm).toBeEnabled();
+    await user.click(confirm);
+    expect(onFinalize).toHaveBeenCalledOnce();
   });
 });
