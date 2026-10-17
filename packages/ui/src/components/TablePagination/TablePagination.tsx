@@ -4,15 +4,14 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useMemo } from 'react';
 import { IconButton } from '@/ui/components/IconButton';
 import { Select } from '@/ui/components/Select';
+import { cn } from '@/ui/lib/utils';
+import { tableFooterRowClassName } from './styles';
 import type {
   TablePaginationProps,
   TablePaginationRangeLabelArgs,
 } from './types';
 
 const defaultRowsPerPageOptions = [5, 10, 25] as const;
-
-const rootClassName =
-  'flex min-h-[56px] w-full items-center justify-end gap-[var(--spacing-2-5)] overflow-hidden bg-card py-[var(--spacing-1-25)] pl-[var(--spacing-2)] pr-[var(--spacing-1)] text-[length:var(--body2-size-desktop)] leading-[var(--body2-line-height-desktop)] font-[var(--body2-weight)] text-card-foreground';
 
 const labelClassName = 'whitespace-nowrap text-card-foreground';
 
@@ -126,7 +125,7 @@ export const TablePagination = ({
   return (
     <nav
       aria-label={ariaLabel}
-      className={rootClassName}
+      className={cn(tableFooterRowClassName, 'overflow-hidden')}
       data-slot="table-pagination"
     >
       <span className={`${labelClassName} ml-auto`}>{rowsPerPageLabel}</span>

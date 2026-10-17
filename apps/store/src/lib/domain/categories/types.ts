@@ -18,3 +18,5 @@ export type Category = {
   createdAt: string;
   parentCategory?: CategoryParent | null;
 };
+
+export type CategorySelection = Pick<Category, 'id' | 'name' | 'status'>;

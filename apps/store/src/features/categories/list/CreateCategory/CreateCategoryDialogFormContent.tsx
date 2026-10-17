@@ -6,30 +6,25 @@ import {
   TextField,
   Typography,
 } from '@ordero/ui';
-import { useState } from 'react';
+import { useStore } from '@tanstack/react-form';
 import { CategoriesAsyncCombobox } from '@/features/categories';
 import { CATEGORY_STATUS } from '@/lib/domain/categories/constants';
-import type { Category, CategoryStatus } from '@/lib/domain/categories/types';
+import type { CategoryStatus } from '@/lib/domain/categories/types';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
 import {
   validateCategoryName,
-  validateCategoryParentId,
+  validateCategoryParent,
   validateCategoryStatus,
 } from '../../shared/validations';
 import type { CreateCategoryDialogFormContentProps } from './types';
 
-const PARENT_CATEGORY_STATIC_OPTIONS = [
-  {
-    displayValue: 'No parent category',
-    label: 'No parent category',
-    value: '',
-  },
-];
-
 export const CreateCategoryDialogFormContent = ({
   form,
 }: CreateCategoryDialogFormContentProps) => {
-  const [parentStatus, setParentStatus] = useState<Category['status']>();
+  const parentStatus = useStore(
+    form.store,
+    (state) => state.values.parentCategory?.status
+  );
   const hasDraftParent = parentStatus?.toLowerCase() === 'draft';
 
   return (
@@ -63,10 +58,10 @@ export const CreateCategoryDialogFormContent = ({
           </form.Field>
 
           <form.Field
-            name="parentId"
+            name="parentCategory"
             validators={{
-              onChange: validateCategoryParentId,
-              onSubmit: validateCategoryParentId,
+              onChange: validateCategoryParent,
+              onSubmit: validateCategoryParent,
             }}
           >
             {(field) => {
@@ -79,10 +74,8 @@ export const CreateCategoryDialogFormContent = ({
                   label="Parent category"
                   name={field.name}
                   onBlur={field.handleBlur}
-                  onOptionSelect={(option) => {
-                    const category = option?.data as Category | undefined;
-
-                    setParentStatus(category?.status);
+                  onValueChange={(category) => {
+                    field.handleChange(category);
 
                     if (
                       category?.status?.toLowerCase() ===
@@ -91,10 +84,9 @@ export const CreateCategoryDialogFormContent = ({
                       form.setFieldValue('status', CATEGORY_STATUS.DRAFT);
                     }
                   }}
-                  onValueChange={field.handleChange}
                   placeholder=""
                   size="s"
-                  staticOptions={PARENT_CATEGORY_STATIC_OPTIONS}
+                  allowNoParent
                   value={field.state.value}
                 />
               );

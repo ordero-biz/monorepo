@@ -31,6 +31,7 @@ describe('useProductVariantsQuery', () => {
           sku: 'TOTE-BLK',
           barcode: '1234567890',
           createdAt: '2026-07-20T18:23:01.675Z',
+          status: 'ACTIVE',
           productVariantAttributeValues: [],
         },
       ],

@@ -9,7 +9,11 @@ import { FieldHelperText } from '@/ui/components/FieldHelperText';
 import { FieldLabel } from '@/ui/components/FieldLabel';
 import { dropdownSurfaceClassName } from '@/ui/components/Select';
 import { cn } from '@/ui/lib/utils';
-import type { ComboboxOption, ComboboxProps } from './types';
+import type {
+  ComboboxChangeEventDetails,
+  ComboboxProps,
+  ComboboxVariant,
+} from './types';
 
 const inputGroupClassNames = {
   outlined:
@@ -87,7 +91,7 @@ const getComboboxStateClassName = ({
   active: boolean;
   disabled: boolean;
   invalid: boolean;
-  variant: NonNullable<ComboboxProps['variant']>;
+  variant: ComboboxVariant;
 }) => {
   if (variant === 'filled') {
     if (invalid) {
@@ -130,15 +134,9 @@ const getTextColorClassName = ({ disabled }: { disabled: boolean }) =>
 const getAdornmentColorClassName = ({ disabled }: { disabled: boolean }) =>
   disabled ? 'text-[var(--text-disabled)]' : 'text-[var(--text-secondary)]';
 
-const getOptionText = (option: ComboboxOption | undefined, value: string) => {
-  if (!option) {
-    return value;
-  }
-
-  return option.displayValue;
-};
-
-export const Combobox = (props: ComboboxProps) => {
+export const Combobox = <TOption extends object>(
+  props: ComboboxProps<TOption>
+) => {
   const {
     'aria-describedby': ariaDescribedBy,
     'aria-label': ariaLabel,
@@ -153,11 +151,14 @@ export const Combobox = (props: ComboboxProps) => {
     endIcon: EndIcon,
     errorIcon,
     errorText,
+    getOptionLabel,
+    getOptionValue,
     helperIcon,
     helperText,
     id,
     inputValue,
     invalid = false,
+    isOptionDisabled,
     label,
     listErrorText,
     loading = false,
@@ -175,6 +176,7 @@ export const Combobox = (props: ComboboxProps) => {
     placeholder,
     readOnly,
     ref,
+    renderOption,
     required,
     size = 'm',
     startAdornment,
@@ -186,6 +188,7 @@ export const Combobox = (props: ComboboxProps) => {
   const supportTextId = useId();
   const [focused, setFocused] = useState(false);
   const [openState, setOpenState] = useState(defaultOpen ?? false);
+  const [hasUserQuery, setHasUserQuery] = useState(false);
   const hasErrorText = Boolean(invalid && errorText);
   const hasHelperText = Boolean(helperText);
   const labelId = label && !ariaLabel ? `${generatedLabelId}-label` : undefined;
@@ -195,12 +198,48 @@ export const Combobox = (props: ComboboxProps) => {
     [ariaDescribedBy, hasErrorText || hasHelperText ? supportTextId : undefined]
       .filter(Boolean)
       .join(' ') || undefined;
-  const optionLabelMap = useMemo(
-    () => new Map(options.map((option) => [option.value, option])),
-    [options]
+  const optionsByValue = useMemo(
+    () => new Map(options.map((option) => [getOptionValue(option), option])),
+    [options, getOptionValue]
   );
+  const uniqueOptions = useMemo(
+    () => [...optionsByValue.values()],
+    [optionsByValue]
+  );
+  const resolveOption = (option: TOption) =>
+    optionsByValue.get(getOptionValue(option)) ?? option;
+  const getSelectedLabel = (option: TOption) =>
+    getOptionLabel(resolveOption(option));
+  const isItemEqualToValue = (item: TOption, value: TOption) =>
+    getOptionValue(item) === getOptionValue(value);
   const isOpen = open ?? openState;
   const isActive = focused || isOpen;
+
+  const handleOpenChange = (
+    nextOpen: boolean,
+    details: ComboboxChangeEventDetails
+  ) => {
+    setOpenState(nextOpen);
+    if (!nextOpen) {
+      setHasUserQuery(false);
+    }
+    onOpenChange?.(nextOpen, details);
+  };
+
+  const handleInputValueChange = (
+    nextInputValue: string,
+    details: ComboboxChangeEventDetails
+  ) => {
+    onInputValueChange?.(nextInputValue, details);
+    if (details.isCanceled) {
+      return;
+    }
+    if (details.reason === 'input-change') {
+      setHasUserQuery(nextInputValue.trim() !== '');
+    } else if (details.reason !== 'none') {
+      setHasUserQuery(false);
+    }
+  };
 
   const input = (inputPlaceholder?: string) => (
     <ComboboxPrimitive.Input
@@ -228,17 +267,31 @@ export const Combobox = (props: ComboboxProps) => {
   const inputGroupContent = multiple ? (
     <ComboboxPrimitive.Chips className={inputContainerClassName}>
       <ComboboxPrimitive.Value>
-        {(selectedValue: string[]) => (
+        {(selectedValue: TOption[]) => (
           <>
             {selectedValue.map((selectedItem) => {
-              const selectedOption = optionLabelMap.get(selectedItem);
-              const selectedLabel = getOptionText(selectedOption, selectedItem);
+              const selectedOption = resolveOption(selectedItem);
+              const selectedLabel = getOptionLabel(selectedOption);
+              const selectedContent =
+                renderOption?.(selectedOption) ?? selectedLabel;
+
+              if (readOnly) {
+                return (
+                  <Chip
+                    key={getOptionValue(selectedItem)}
+                    size="s"
+                    variant="soft"
+                  >
+                    {selectedContent}
+                  </Chip>
+                );
+              }
 
               return (
                 <ComboboxPrimitive.Chip
                   aria-label={selectedLabel}
                   className="contents"
-                  key={selectedItem}
+                  key={getOptionValue(selectedItem)}
                 >
                   <ComboboxPrimitive.ChipRemove
                     aria-label={`Remove ${selectedLabel}`}
@@ -250,7 +303,7 @@ export const Combobox = (props: ComboboxProps) => {
                         size="s"
                         variant="soft"
                       >
-                        {selectedOption?.label ?? selectedItem}
+                        {selectedContent}
                       </Chip>
                     )}
                   />
@@ -276,13 +329,12 @@ export const Combobox = (props: ComboboxProps) => {
         {loading ? loadingText : emptyText}
       </ComboboxPrimitive.Empty>
       <ComboboxPrimitive.List className={listClassName} onScroll={onListScroll}>
-        {(option: ComboboxOption, index: number) => (
+        {(option: TOption) => (
           <ComboboxPrimitive.Item
             className={cn(itemClassName, itemPaddingClassNames[variant])}
-            disabled={option.disabled}
-            index={index}
-            key={option.value}
-            value={option.value}
+            disabled={isOptionDisabled?.(option)}
+            key={getOptionValue(option)}
+            value={option}
           >
             {multiple ? (
               <ComboboxPrimitive.ItemIndicator
@@ -293,7 +345,7 @@ export const Combobox = (props: ComboboxProps) => {
               </ComboboxPrimitive.ItemIndicator>
             ) : null}
             <span className={itemTextClassName}>
-              {option.label ?? option.displayValue}
+              {renderOption?.(option) ?? getOptionLabel(option)}
             </span>
           </ComboboxPrimitive.Item>
         )}
@@ -373,25 +425,24 @@ export const Combobox = (props: ComboboxProps) => {
   );
 
   const root = props.multiple ? (
-    <ComboboxPrimitive.Root<string, true>
+    <ComboboxPrimitive.Root<TOption, true>
       autoComplete={autoComplete}
       defaultInputValue={defaultInputValue}
       defaultOpen={defaultOpen}
       defaultValue={props.defaultValue}
       disabled={disabled}
       inputValue={inputValue}
-      itemToStringLabel={(itemValue) =>
-        getOptionText(optionLabelMap.get(itemValue), itemValue)
-      }
-      items={options}
+      itemToStringLabel={getSelectedLabel}
+      itemToStringValue={getOptionValue}
+      isItemEqualToValue={isItemEqualToValue}
+      items={uniqueOptions}
       multiple={true}
       name={name}
       onInputValueChange={onInputValueChange}
-      onOpenChange={(nextOpen, details) => {
-        setOpenState(nextOpen);
-        onOpenChange?.(nextOpen, details);
-      }}
-      onValueChange={props.onValueChange}
+      onOpenChange={handleOpenChange}
+      onValueChange={(nextValue, details) =>
+        props.onValueChange?.(nextValue.map(resolveOption), details)
+      }
       open={open}
       readOnly={readOnly}
       required={required}
@@ -400,29 +451,34 @@ export const Combobox = (props: ComboboxProps) => {
       {content}
     </ComboboxPrimitive.Root>
   ) : (
-    <ComboboxPrimitive.Root<string, false>
+    <ComboboxPrimitive.Root<TOption, false>
       autoComplete={autoComplete}
       defaultInputValue={defaultInputValue}
       defaultOpen={defaultOpen}
       defaultValue={props.defaultValue}
       disabled={disabled}
-      inputValue={inputValue}
-      itemToStringLabel={(itemValue) =>
-        getOptionText(optionLabelMap.get(itemValue), itemValue)
+      // A refreshed selected label is display text, not a user search.
+      filter={
+        hasUserQuery ||
+        inputValue !== undefined ||
+        defaultInputValue !== undefined
+          ? undefined
+          : null
       }
-      items={options}
+      inputValue={inputValue}
+      itemToStringLabel={getSelectedLabel}
+      itemToStringValue={getOptionValue}
+      isItemEqualToValue={isItemEqualToValue}
+      items={uniqueOptions}
       name={name}
-      onInputValueChange={onInputValueChange}
-      onOpenChange={(nextOpen, details) => {
-        setOpenState(nextOpen);
-        onOpenChange?.(nextOpen, details);
-      }}
-      onValueChange={(nextValue, details) => {
-        props.onValueChange?.(nextValue, details);
-        props.onOptionSelect?.(
-          nextValue ? optionLabelMap.get(nextValue) ?? null : null
-        );
-      }}
+      onInputValueChange={handleInputValueChange}
+      onOpenChange={handleOpenChange}
+      onValueChange={(nextValue, details) =>
+        props.onValueChange?.(
+          nextValue ? resolveOption(nextValue) : null,
+          details
+        )
+      }
       open={open}
       readOnly={readOnly}
       required={required}

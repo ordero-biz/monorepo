@@ -25,50 +25,45 @@ const items = [
   },
 ] as const;
 
-const AccordionList = ({ multiple = false }: { multiple?: boolean }) => (
-  <Accordion.Root
-    aria-label="Accordion examples"
-    defaultValue={['item-1']}
-    multiple={multiple}
-  >
-    {items.map(({ content, title, value }) => (
+const meta = {
+  title: 'Components/Accordion',
+  component: Accordion.Root,
+  tags: ['autodocs'],
+  args: {
+    'aria-label': 'Accordion examples',
+    defaultValue: ['item-1'],
+    children: items.map(({ content, title, value }) => (
       <Accordion.Item key={value} value={value}>
         <Accordion.Header>
           <Accordion.Trigger>{title}</Accordion.Trigger>
         </Accordion.Header>
         <Accordion.Panel>{content}</Accordion.Panel>
       </Accordion.Item>
-    ))}
-  </Accordion.Root>
-);
-
-const meta = {
-  title: 'Components/Accordion',
-  component: Accordion.Root,
-  tags: ['autodocs'],
+    )),
+  },
 } satisfies Meta<typeof Accordion.Root>;
 
 export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-export const Default: Story = {
-  render: () => <AccordionList />,
-};
+export const Default: Story = {};
 
 export const Multiple: Story = {
-  render: () => <AccordionList multiple />,
+  args: { multiple: true },
 };
 
 export const DisabledItem: Story = {
-  render: () => (
-    <Accordion.Root aria-label="Disabled accordion example">
+  args: {
+    'aria-label': 'Disabled accordion example',
+    defaultValue: [],
+    children: (
       <Accordion.Item disabled value="unavailable">
         <Accordion.Header>
           <Accordion.Trigger>Unavailable section</Accordion.Trigger>
         </Accordion.Header>
         <Accordion.Panel>This panel is unavailable.</Accordion.Panel>
       </Accordion.Item>
-    </Accordion.Root>
-  ),
+    ),
+  },
 };

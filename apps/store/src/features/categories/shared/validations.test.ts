@@ -1,7 +1,7 @@
 import { CATEGORY_STATUS } from '@/lib/domain/categories/constants';
 import {
   validateCategoryName,
-  validateCategoryParentId,
+  validateCategoryParent,
   validateCategoryStatus,
 } from './validations';
 
@@ -17,8 +17,10 @@ describe('category validations', () => {
   });
 
   it('accepts a selected or absent parent category', () => {
-    expect(validateCategoryParentId({ value: '1' })).toBeUndefined();
-    expect(validateCategoryParentId({ value: null })).toBeUndefined();
+    expect(
+      validateCategoryParent({ value: { id: 1, name: 'Shoes' } })
+    ).toBeUndefined();
+    expect(validateCategoryParent({ value: null })).toBeUndefined();
   });
 
   it('accepts an active or draft category status', () => {

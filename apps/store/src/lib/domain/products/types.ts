@@ -41,6 +41,7 @@ export type ProductVariant = {
   id: number;
   name: string;
   description: string;
+  status: string;
   sku: string;
   barcode: string;
   createdAt: string;

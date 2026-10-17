@@ -10,12 +10,36 @@ import {
 } from '@/lib/components/AsyncCombobox';
 import { CATEGORY_STATUS } from '@/lib/domain/categories/constants';
 import { categoriesQueryKeys } from '@/lib/query/categories/categoriesQueryKeys';
-import type { CategoriesAsyncComboboxProps } from './types';
+import type {
+  CategoriesAsyncComboboxProps,
+  CategoryComboboxOption,
+} from './types';
+
+const noParentOption: CategoryComboboxOption = {
+  id: null,
+  name: 'No parent category',
+};
+const noParentOptions = [noParentOption];
+const getCategoryValue = (category: CategoryComboboxOption) =>
+  category.id === null ? '' : String(category.id);
+const getCategoryLabel = (category: CategoryComboboxOption) => category.name;
+const renderCategoryOption = (category: CategoryComboboxOption) => (
+  <span className="flex min-w-0 items-center gap-[var(--space-1)]">
+    <span className="truncate">{category.name}</span>
+    {category.status === CATEGORY_STATUS.DRAFT ? (
+      <Chip size="s" variant="soft">
+        Draft
+      </Chip>
+    ) : null}
+  </span>
+);
 
 const loadCategoryOptions = async ({
   page,
   pageSize,
-}: AsyncComboboxLoadOptionsArgs): Promise<AsyncComboboxLoadOptionsResult> => {
+}: AsyncComboboxLoadOptionsArgs): Promise<
+  AsyncComboboxLoadOptionsResult<CategoryComboboxOption>
+> => {
   const result = await getCategories({
     page,
     size: pageSize,
@@ -28,20 +52,10 @@ const loadCategoryOptions = async ({
 
   return {
     nextPage: page < result.data.page.totalPages ? page + 1 : undefined,
-    options: result.data.content.map((category) => ({
-      data: category,
-      label: (
-        <span className="flex min-w-0 items-center gap-[var(--space-1)]">
-          <span className="truncate">{category.name}</span>
-          {category.status === CATEGORY_STATUS.DRAFT ? (
-            <Chip size="s" variant="soft">
-              Draft
-            </Chip>
-          ) : null}
-        </span>
-      ),
-      displayValue: category.name,
-      value: String(category.id),
+    options: result.data.content.map(({ id, name, status }) => ({
+      id,
+      name,
+      status,
     })),
   };
 };
@@ -50,6 +64,7 @@ export const CategoriesAsyncCombobox = ({
   'aria-describedby': ariaDescribedBy,
   'aria-label': ariaLabel,
   'aria-labelledby': ariaLabelledBy,
+  allowNoParent,
   autoComplete,
   autoFocus,
   defaultInputValue,
@@ -74,7 +89,6 @@ export const CategoriesAsyncCombobox = ({
   onKeyDown,
   onListScroll,
   onOpenChange,
-  onOptionSelect,
   onValueChange,
   open,
   placeholder,
@@ -84,7 +98,6 @@ export const CategoriesAsyncCombobox = ({
   size,
   startAdornment,
   startIcon,
-  staticOptions,
   value,
   variant,
 }: CategoriesAsyncComboboxProps) => {
@@ -93,12 +106,13 @@ export const CategoriesAsyncCombobox = ({
     [disabledCategoryIds]
   );
   const isOptionDisabled = useCallback(
-    (option: { value: string }) => disabledCategoryIdSet.has(option.value),
+    (option: CategoryComboboxOption) =>
+      option.id !== null && disabledCategoryIdSet.has(String(option.id)),
     [disabledCategoryIdSet]
   );
 
   return (
-    <AsyncCombobox
+    <AsyncCombobox<CategoryComboboxOption>
       aria-describedby={ariaDescribedBy}
       aria-label={ariaLabel}
       aria-labelledby={ariaLabelledBy}
@@ -106,13 +120,18 @@ export const CategoriesAsyncCombobox = ({
       autoFocus={autoFocus}
       defaultInputValue={defaultInputValue}
       defaultOpen={defaultOpen}
-      defaultValue={defaultValue}
+      defaultValue={
+        defaultValue === null && allowNoParent ? noParentOption : defaultValue
+      }
       disabled={disabled}
       emptyText="No categories found"
       endAdornment={endAdornment}
       endIcon={endIcon}
       errorIcon={errorIcon}
       errorText={errorText}
+      getOptionLabel={getCategoryLabel}
+      getOptionValue={getCategoryValue}
+      renderOption={renderCategoryOption}
       helperIcon={helperIcon}
       helperText={helperText}
       id={id}
@@ -130,20 +149,21 @@ export const CategoriesAsyncCombobox = ({
       onKeyDown={onKeyDown}
       onListScroll={onListScroll}
       onOpenChange={onOpenChange}
-      onOptionSelect={onOptionSelect}
-      onValueChange={onValueChange}
+      onValueChange={(option, details) =>
+        onValueChange?.(option?.id === null ? null : option, details)
+      }
       open={open}
       pageSize={100}
       placeholder={placeholder}
-      queryKey={categoriesQueryKeys.combobox()}
+      queryKey={[...categoriesQueryKeys.options(), 'combobox']}
       readOnly={readOnly}
       ref={ref}
       required={required}
       size={size}
       startAdornment={startAdornment}
       startIcon={startIcon}
-      staticOptions={staticOptions}
-      value={value}
+      staticOptions={allowNoParent ? noParentOptions : undefined}
+      value={value === null && allowNoParent ? noParentOption : value}
       variant={variant}
     />
   );

@@ -35,7 +35,7 @@ describe('submitCreateCategory', () => {
     await expect(
       submitCreateCategory({
         name: '  Sneakers  ',
-        parentId: '1',
+        parentCategory: { id: 1, name: 'Shoes' },
         status: 'ACTIVE',
       })
     ).resolves.toEqual({
@@ -65,7 +65,7 @@ describe('submitCreateCategory', () => {
     await expect(
       submitCreateCategory({
         name: 'Sneakers',
-        parentId: '1',
+        parentCategory: { id: 1, name: 'Shoes' },
         status: 'DRAFT',
       })
     ).resolves.toEqual({
@@ -94,7 +94,7 @@ describe('submitCreateCategory', () => {
     await expect(
       submitCreateCategory({
         name: 'Sneakers',
-        parentId: null,
+        parentCategory: null,
         status: 'DRAFT',
       })
     ).resolves.toEqual({

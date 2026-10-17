@@ -1,6 +1,7 @@
 import {
   getAttributeDetailRoute,
   getSupplierDetailRoute,
+  getSupplyDetailRoute,
   getWarehouseDetailRoute,
 } from './routes';
 
@@ -9,6 +10,13 @@ describe('client detail routes', () => {
     ['attribute', getAttributeDetailRoute, 1, '/products/attributes/1'],
     ['attribute', getAttributeDetailRoute, 'size', '/products/attributes/size'],
     ['supplier', getSupplierDetailRoute, 1, '/products/suppliers/1'],
+    ['supply', getSupplyDetailRoute, 1, '/products/supplies/1'],
+    [
+      'supply',
+      getSupplyDetailRoute,
+      'new-delivery',
+      '/products/supplies/new-delivery',
+    ],
     [
       'supplier',
       getSupplierDetailRoute,

@@ -4,4 +4,6 @@ export const suppliesQueryKeys = {
   list: ['supplies', 'list'] as const,
   listPage: (input?: PaginationSearchInput) =>
     [...suppliesQueryKeys.list, input ?? {}] as const,
+  detail: (supplyId: string | number) =>
+    ['supplies', 'detail', String(supplyId)] as const,
 };

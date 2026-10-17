@@ -1,6 +1,7 @@
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getSupplies } from '@/lib/client/api/supplies';
+import { getSupplyDetailRoute } from '@/lib/client/routes';
 import { SUPPLY_STATUS } from '@/lib/domain/supplies/constants';
 import type { Supply } from '@/lib/domain/supplies/types';
 import { prepareStoreSetup } from '@/test/prepareSetup';
@@ -102,7 +103,10 @@ describe('SuppliesList', () => {
     expect(
       await screen.findByRole('table', { name: 'Supplies list' })
     ).toBeVisible();
-    expect(screen.getByText('SUP-001')).toBeVisible();
+    expect(screen.getByRole('link', { name: 'SUP-001' })).toHaveAttribute(
+      'href',
+      getSupplyDetailRoute(1)
+    );
     expect(screen.getByText('Fresh Farms')).toBeVisible();
     expect(screen.getByText('Main warehouse')).toBeVisible();
     expect(screen.getByText('Draft')).toBeVisible();

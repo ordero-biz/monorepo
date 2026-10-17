@@ -1,5 +1,6 @@
 import type { AsyncComboboxMultipleProps } from '@/lib/components/AsyncCombobox';
 import type { AttributeDropdown } from '@/lib/domain/attributes/types';
+import type { CategorySelection } from '@/lib/domain/categories/types';
 import type { ProductStatus } from '@/lib/domain/products/types';
 import type { PRODUCT_GENERATION_MODE } from './constants';
 import type { useCreateProductForm } from './hooks/useCreateProductForm';
@@ -35,20 +36,19 @@ export type ProductVariantsCreationFormProps = {
 };
 
 export type AttributesAsyncComboboxProps = Omit<
-  AsyncComboboxMultipleProps,
+  AsyncComboboxMultipleProps<AttributeDropdown>,
   | 'emptyText'
   | 'isOptionDisabled'
   | 'loadErrorText'
   | 'loadingText'
   | 'loadOptions'
-  | 'onOptionSelect'
+  | 'getOptionLabel'
+  | 'getOptionValue'
+  | 'renderOption'
   | 'pageSize'
   | 'queryKey'
   | 'staticOptions'
-> & {
-  onSelectedAttributesChange?: (attributes: AttributeDropdown[]) => void;
-  selectedAttributes?: AttributeDropdown[];
-};
+>;
 
 export type ProductTemplateFieldsProps = {
   productVariantsGenerationForm: ProductVariantsGenerationFormApi;
@@ -99,7 +99,7 @@ export type EditGeneratedProductVariantAttributesProps = {
 
 export type ProductVariantsGeneratedArgs = {
   attributes: AttributeDropdown[];
-  category: string | null;
+  category: CategorySelection | null;
   description: string;
   name: string;
   productVariants: CreateProductVariantValues[];
@@ -125,7 +125,7 @@ export type ProductImageDropzoneProps = {
 };
 
 export type ProductCommonValues = {
-  category: string | null;
+  category: CategorySelection | null;
   description: string;
   name: string;
   status: ProductStatus;
@@ -134,7 +134,7 @@ export type ProductCommonValues = {
 export type ProductGenerationValues = {
   attributes: AttributeDropdown[];
   attributeValues: Record<string, string[]>;
-  category: string | null;
+  category: CategorySelection | null;
   description: string;
   name: string;
 };

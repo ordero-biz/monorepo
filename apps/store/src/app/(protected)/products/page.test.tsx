@@ -53,6 +53,7 @@ describe('ProductsPage', () => {
           sku: 'RUN-BLU-42',
           barcode: '1234567890',
           createdAt: '2026-07-20T18:23:01.675Z',
+          status: 'ACTIVE',
           productVariantAttributeValues: [
             {
               id: 1,

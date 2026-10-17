@@ -105,7 +105,7 @@ export const ProductTemplateFields = ({
                   multiple
                   name={field.name}
                   onBlur={field.handleBlur}
-                  onSelectedAttributesChange={(attributes) => {
+                  onValueChange={(attributes) => {
                     field.handleChange(attributes);
                     productVariantsGenerationForm.setFieldValue(
                       'attributeValues',
@@ -115,11 +115,8 @@ export const ProductTemplateFields = ({
                   }}
                   placeholder="Select attributes"
                   required={requiresAttributes}
-                  selectedAttributes={field.state.value}
                   size="s"
-                  value={field.state.value.map((attribute) =>
-                    String(attribute.id)
-                  )}
+                  value={field.state.value}
                 />
               );
             }}

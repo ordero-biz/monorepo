@@ -35,10 +35,77 @@ for that advanced layout case and follow exactly the same selection scope.
   contains only the server-provided page
 - controlled or uncontrolled row selection
 - a built-in selection column through `selection`
+- standalone footer content through `footer` and column-aligned summaries
+  through `footerColumns`
 
 Feature code owns fetching, filters, request parameters, mutation effects,
 dialogs, toasts, and bulk-action bars. Do not put an app resource's query or
 mutation logic into `DataTable`.
+
+## Footers and summaries
+
+Use `footer` for a standalone `ReactNode` below the table. The component owns
+the divider, padding, gap, and minimum height, sharing the bottom-row spacing
+with `TablePagination`. Content is aligned to the end by default and stays
+outside the table's horizontal scroll area. Supply an inner layout element
+when the content needs a different arrangement.
+
+```tsx
+<DataTable
+  ariaLabel="Supply entries"
+  columns={columns}
+  data={supply.supplyEntries}
+  getRowId={getRowId}
+  footer={
+    <Typography variant="subtitle1">
+      Total {formatMoney(supply.totalPrice)}
+    </Typography>
+  }
+/>
+```
+
+Use `footerColumns` for one summary row aligned with the table columns. Its
+keys are resolved leaf column IDs: use the explicit `id` when present, or
+the ID derived from an `accessorKey`. Prefer explicit IDs for accessor
+functions or nested accessors so the footer mapping remains clear.
+
+```tsx
+<DataTable
+  ariaLabel="Supply entries"
+  columns={columns}
+  data={supply.supplyEntries}
+  getRowId={getRowId}
+  footerColumns={{
+    product: <Typography variant="subtitle1">Total</Typography>,
+    total: (
+      <Typography variant="subtitle1">
+        {formatMoney(supply.totalPrice)}
+      </Typography>
+    ),
+  }}
+/>
+```
+
+`DataTable` renders this summary in a native `tfoot` using the visible leaf
+column order, including when headers are grouped. Unspecified columns,
+including the built-in selection column, have empty cells. Unknown IDs are
+ignored. Each cell follows its column's width, alignment, and wrapping and
+includes the standard `DataTableCell` padding; pass content directly without
+another `DataTableCell` wrapper. The summary scrolls horizontally with the
+table and does not participate in sorting, selection, or pagination.
+
+Both props can be used independently or together. The display order is:
+data rows, column summary, standalone footer, pagination. Footers can also
+appear with the empty state. Numeric zero is valid content. A column summary
+is omitted when none of its visible columns has content; null, undefined,
+booleans, and empty strings do not create a summary on their own.
+
+Features own totals and their scope (current page, selected records, or all
+matching records). Pass server-provided aggregates when available rather
+than assuming the loaded rows represent the full dataset. Footer values can
+change without rebuilding the stable `columns` array. Use `footerColumns`
+for column summaries; `DataTable` does not render TanStack's
+`columns[].footer` definitions.
 
 ## Current selection standard
 
@@ -137,6 +204,9 @@ current-page behavior.
 
 For shared DataTable changes, add behavior-focused unit coverage for the
 affected public contract and update Storybook when its documented API changes.
+Footer coverage should include standalone content, column mapping with empty
+cells and selection, zero totals with empty data, and both footers alongside
+pagination. Use Storybook/browser checks to verify spacing and alignment.
 For a selectable feature, cover the meaningful user flow at the nearest useful
 layer:
 

@@ -152,23 +152,26 @@ Wire form-owned combobox fields through ordinary controlled props:
 ```tsx
 <Combobox
   errorText={errorText}
+  getOptionLabel={(option) => option.name}
+  getOptionValue={(option) => String(option.id)}
   invalid={Boolean(errorText)}
-  label="Category"
+  label="Related record"
   name={field.name}
   onBlur={field.handleBlur}
   onValueChange={field.handleChange}
-  options={categoryOptions}
-  placeholder="Select category"
+  options={options}
+  placeholder="Select a record"
   size="s"
   value={field.state.value}
 />
 ```
 
-Use `value: string | null` for single selection. Use `multiple={true}` with a
-`string[]` value for multiple selection.
+Use `value: TOption | null` for single selection. Use `multiple={true}` with a
+`TOption[]` value for multiple selection. Options are serializable records;
+`getOptionValue` identifies them and `getOptionLabel` provides their display text.
 
 For request-backed option lists, create a feature-owned or app-owned resource
-wrapper such as `CategoriesAsyncCombobox` instead of putting request/query logic
+wrapper such as `ResourceAsyncCombobox` instead of putting request/query logic
 directly inside the form markup. The wrapper should own:
 
 - the request helper and option mapping
@@ -177,32 +180,97 @@ directly inside the form markup. The wrapper should own:
 - the TanStack Query key used for the option cache
 
 Keep the query key under the same resource prefix used for invalidation, then
-add a component-specific segment so option data does not collide with list-page
-data:
+add an `options` segment so option data does not collide with list-page data:
 
 ```ts
-const categoryComboboxQueryKey = [
-  ...categoriesQueryKeys.list,
-  'category-combobox',
+const resourceOptionsQueryKey = [
+  ...resourceQueryKeys.list,
+  'options',
 ] as const;
 ```
 
 Include request parameters that can vary, such as page size, filters, or sort,
 in the key. Fixed wrapper-owned parameters can stay in the wrapper, but the key
 should still be resource-aligned so
-`invalidateQueries({ queryKey: categoriesQueryKeys.list })` refreshes category
-option caches after category writes.
+`invalidateQueries({ queryKey: resourceQueryKeys.list })` refreshes related
+option caches after writes.
 
 When a wrapper intentionally forwards props explicitly instead of using
 `{...props}`, forward every retained `Combobox` prop. This includes form and
 accessibility props (`name`, `onBlur`, `aria-label`, `aria-labelledby`,
 `aria-describedby`) and visual props such as `size` and `variant`.
 
+### Selection records and submission
+
+`Combobox` and an app-owned `AsyncCombobox` use object-valued selections.
+`AsyncCombobox` adds paginated option loading and caching to the same selection
+API. Feature wrappers supply the request helper and record accessors.
+
+- Single selection uses `TOption | null`; multiple selection uses `TOption[]`.
+- `getOptionValue` returns a stable, unique string ID for equality and native
+  form serialization. Object identity and display labels do not define equality.
+- `getOptionLabel` returns plain text. `renderOption` optionally renders rich
+  list and multi-select chip content; keep React elements out of the selected records.
+- Selected records carry enough data to display before options load, and need
+  not appear in the current options page. `staticOptions` remains available for
+  actual fixed choices, not for injecting the current selection.
+- Loaded records take precedence for displayed labels. Refreshing options never
+  emits `onValueChange`. A user selection emits current loaded records, falling
+  back to selected records whose IDs are absent from the loaded list.
+
+Keep API entities, form values, and combobox options as separate contracts when
+they contain different data. A saved response may provide only a summary,
+while loaded options provide additional display metadata. Build form defaults
+from the data actually available; do not invent missing metadata to satisfy an
+option type. Represent unavailable display metadata explicitly in the combobox
+contract.
+
+When options contain fields that the form does not need, map selections at the
+feature wrapper boundary:
+
+```ts
+type SelectionFormValue = {
+  id: number;
+  name: string;
+};
+
+type SelectionOption = {
+  id: number;
+  name: string;
+  description?: string;
+};
+
+const toFormValue = (
+  option: SelectionOption | null
+): SelectionFormValue | null =>
+  option ? { id: option.id, name: option.name } : null;
+```
+
+Use small serializable form records and normalize them to the endpoint's
+expected IDs or commands before comparing or submitting. Display metadata
+changes alone must not create PATCH fields. Form libraries may consider an
+object with refreshed metadata dirty; use normalized payload comparison for
+save/no-op decisions. Map backend ID-field errors back to the corresponding
+object-valued form fields.
+
+Default an empty single selection to `null` and an empty multiple selection to
+`[]`. Retain nested data only when the workflow needs it, and reconcile dependent
+selections when their available choices change. Serialize the IDs required by
+the endpoint rather than sending entire option records.
+
+If a fixed option represents clearing a relationship, map it to the form's empty
+value at the wrapper boundary. Keep sentinel options out of request payloads;
+apply the endpoint's omission or `null` rules during payload preparation.
+
+A query key must identify both the requested dataset and the cached option
+shape. Keep option caches under their resource invalidation prefix with a
+distinct segment, such as `options`, to separate them from other query results.
+
 ## Form Hook Tests
 
 Use the app-local `prepareFormHookTestSetup` helper when a hook test only needs
-to submit the form and assert submit-side effects. Both `apps/platform` and
-`apps/store` provide this helper under `src/test/prepareFormHookTestSetup`.
+to submit the form and assert submit-side effects. Keep this helper in the app's
+test utilities, such as `src/test/prepareFormHookTestSetup`.
 
 Use hook tests for behavior such as:
 

@@ -1,257 +1,168 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { CircleAlert, Heart, Info, Search, UserRound } from 'lucide-react';
-import {
-  Combobox,
-  type ComboboxMultipleProps,
-  type ComboboxOption,
-  type ComboboxProps,
-  type ComboboxSingleProps,
-} from '@/ui/components/Combobox';
+import { Info, Search, UserRound } from 'lucide-react';
+import { useState } from 'react';
+import { expect, userEvent, within } from 'storybook/test';
+import { Combobox } from '@/ui/components/Combobox';
 
-const options = [
-  { displayValue: 'JavaScript', label: 'JavaScript', value: 'javascript' },
-  { displayValue: 'TypeScript', label: 'TypeScript', value: 'typescript' },
-  { displayValue: 'Python', label: 'Python', value: 'python' },
-  { displayValue: 'Ruby', label: 'Ruby', value: 'ruby' },
-  { displayValue: 'Go', label: 'Go', value: 'go' },
-  { displayValue: 'Rust', label: 'Rust', value: 'rust' },
-] satisfies readonly ComboboxOption[];
-
-const previewGridClassName = 'grid gap-8 md:grid-cols-2';
-const previewColumnClassName = 'min-w-0';
-
-const renderPair = ({
-  filled,
-  outlined,
-}: {
-  filled: ComboboxSingleProps;
-  outlined: ComboboxSingleProps;
-}) => (
-  <div className={previewGridClassName}>
-    <div className={previewColumnClassName}>
-      <Combobox {...outlined} />
-    </div>
-    <div className={previewColumnClassName}>
-      <Combobox {...filled} />
-    </div>
-  </div>
-);
-
-const getSingleComboboxArgs = ({
-  defaultValue: _defaultValue,
-  multiple: _multiple,
-  onValueChange: _onValueChange,
-  value: _value,
-  ...args
-}: ComboboxProps): Omit<
-  ComboboxSingleProps,
-  'defaultValue' | 'multiple' | 'onValueChange' | 'value'
-> => args;
-
-const getMultipleComboboxArgs = ({
-  defaultValue: _defaultValue,
-  multiple: _multiple,
-  onValueChange: _onValueChange,
-  value: _value,
-  ...args
-}: ComboboxProps): Omit<
-  ComboboxMultipleProps,
-  'defaultValue' | 'multiple' | 'onValueChange' | 'value'
-> => args;
-
+type Supplier = { id: number; name: string; status: 'ACTIVE' | 'DRAFT' };
+const options: Supplier[] = [
+  { id: 1, name: 'Coffee Import UA', status: 'ACTIVE' },
+  { id: 2, name: 'New supplier', status: 'DRAFT' },
+];
 const meta = {
   title: 'Components/Combobox',
-  component: Combobox,
+  component: Combobox<Supplier>,
   tags: ['autodocs'],
   args: {
-    label: 'Language',
+    label: 'Supplier',
     options,
-    placeholder: 'Search language',
+    getOptionValue: (supplier: Supplier) => String(supplier.id),
+    getOptionLabel: (supplier: Supplier) => supplier.name,
+    placeholder: 'Select supplier',
   },
-} satisfies Meta<typeof Combobox>;
-
+} satisfies Meta<typeof Combobox<Supplier>>;
 export default meta;
-
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
-  render: (args) => {
-    const singleArgs = getSingleComboboxArgs(args);
-
-    return renderPair({
-      filled: {
-        ...singleArgs,
-        defaultValue: 'typescript',
-        variant: 'filled',
-      },
-      outlined: {
-        ...singleArgs,
-        defaultValue: 'typescript',
-      },
-    });
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const input = canvas.getByRole('combobox', { name: 'Supplier' });
+    await userEvent.click(input);
+    await within(document.body).findByRole('option', { name: 'Coffee Import UA' });
+    await userEvent.keyboard('{ArrowDown}{Enter}');
+    await expect(input).toHaveValue('Coffee Import UA');
   },
+};
+
+export const BeforeOptionsLoad: Story = {
+  args: { options: [], defaultValue: options[0], helperText: 'The selected record is independent of the loaded list.' },
 };
 
 export const Multiple: Story = {
-  render: (args) => {
-    const multipleArgs = getMultipleComboboxArgs(args);
-
-    return (
-      <div className={previewGridClassName}>
-        <div className={previewColumnClassName}>
-          <Combobox
-            {...multipleArgs}
-            defaultValue={['javascript', 'typescript']}
-            multiple={true}
-          />
-        </div>
-        <div className={previewColumnClassName}>
-          <Combobox
-            {...multipleArgs}
-            defaultValue={['javascript', 'typescript']}
-            multiple={true}
-            variant="filled"
-          />
-        </div>
-      </div>
-    );
+  args: { multiple: true, defaultValue: [options[0]] },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(canvas.getByRole('combobox', { name: 'Supplier' }));
+    await userEvent.click(await within(document.body).findByRole('option', { name: 'New supplier' }));
+    await userEvent.keyboard('{Escape}');
+    await expect(canvas.getByRole('button', { name: 'Remove Coffee Import UA' })).toBeVisible();
+    await expect(canvas.getByRole('button', { name: 'Remove New supplier' })).toBeVisible();
   },
 };
 
-export const Loading: Story = {
-  render: (args) => {
-    const singleArgs = getSingleComboboxArgs(args);
-
-    return renderPair({
-      filled: {
-        ...singleArgs,
-        loading: true,
-        loadingText: 'Loading languages',
-        options: [],
-        variant: 'filled',
-      },
-      outlined: {
-        ...singleArgs,
-        loading: true,
-        loadingText: 'Loading languages',
-        options: [],
-      },
-    });
-  },
-};
-
-export const Empty: Story = {
-  render: (args) => {
-    const singleArgs = getSingleComboboxArgs(args);
-
-    return renderPair({
-      filled: {
-        ...singleArgs,
-        emptyText: 'No languages found',
-        options: [],
-        variant: 'filled',
-      },
-      outlined: {
-        ...singleArgs,
-        emptyText: 'No languages found',
-        options: [],
-      },
-    });
-  },
-};
-
-export const Invalid: Story = {
-  render: (args) => {
-    const singleArgs = getSingleComboboxArgs(args);
-
-    return renderPair({
-      filled: {
-        ...singleArgs,
-        errorIcon: <CircleAlert aria-hidden="true" />,
-        errorText: 'Select at least one language',
-        invalid: true,
-        variant: 'filled',
-      },
-      outlined: {
-        ...singleArgs,
-        errorIcon: <CircleAlert aria-hidden="true" />,
-        errorText: 'Select at least one language',
-        invalid: true,
-      },
-    });
-  },
+export const Disabled: Story = {
+  args: { defaultValue: options[0], disabled: true },
 };
 
 export const DisabledWithStartIconAndHelperText: Story = {
-  render: (args) => {
-    const singleArgs = getSingleComboboxArgs(args);
-
-    return renderPair({
-      filled: {
-        ...singleArgs,
-        defaultValue: 'python',
-        disabled: true,
-        helperIcon: <Info aria-hidden="true" />,
-        helperText: 'Helper text',
-        label: 'Disabled',
-        startIcon: UserRound,
-        variant: 'filled',
-      },
-      outlined: {
-        ...singleArgs,
-        defaultValue: 'python',
-        disabled: true,
-        helperIcon: <Info aria-hidden="true" />,
-        helperText: 'Helper text',
-        label: 'Disabled',
-        startIcon: UserRound,
-      },
-    });
+  args: {
+    defaultValue: options[0],
+    disabled: true,
+    helperIcon: <Info aria-hidden="true" />,
+    helperText: 'Supplier cannot be changed',
+    startIcon: UserRound,
   },
 };
 
 export const WithIconAdornment: Story = {
-  render: (args) => {
-    const singleArgs = getSingleComboboxArgs(args);
-
-    return renderPair({
-      filled: {
-        ...singleArgs,
-        defaultValue: 'rust',
-        helperIcon: <Info aria-hidden="true" />,
-        helperText: 'Start typing to filter options',
-        startIcon: Search,
-        variant: 'filled',
-      },
-      outlined: {
-        ...singleArgs,
-        defaultValue: 'rust',
-        helperIcon: <Info aria-hidden="true" />,
-        helperText: 'Start typing to filter options',
-        startIcon: Search,
-      },
-    });
+  args: {
+    helperIcon: <Info aria-hidden="true" />,
+    helperText: 'Start typing to filter suppliers',
+    startIcon: Search,
   },
 };
 
-export const SmallSizes: Story = {
-  render: (args) => {
-    const singleArgs = getSingleComboboxArgs(args);
+export const SmallOutlined: Story = {
+  args: { size: 's', defaultValue: options[0], startIcon: Search },
+};
 
-    return renderPair({
-      filled: {
-        ...singleArgs,
-        defaultValue: 'go',
-        size: 's',
-        startIcon: Heart,
-        variant: 'filled',
-      },
-      outlined: {
-        ...singleArgs,
-        defaultValue: 'go',
-        size: 's',
-        startIcon: Heart,
-      },
-    });
+export const ReadOnly: Story = {
+  args: { multiple: true, defaultValue: options, readOnly: true },
+};
+
+export const Invalid: Story = {
+  args: { invalid: true, required: true, errorText: 'Select an active supplier' },
+};
+
+export const Filled: Story = {
+  args: { variant: 'filled', size: 's', defaultValue: options[0] },
+};
+
+export const RichOptions: Story = {
+  args: {
+    defaultOpen: true,
+    renderOption: (supplier: Supplier) => (
+      <span>{supplier.name}{supplier.status === 'DRAFT' ? ' (Draft)' : ''}</span>
+    ),
+  },
+};
+
+export const RichChips: Story = {
+  args: {
+    multiple: true,
+    defaultValue: options,
+    renderOption: (supplier: Supplier) => (
+      <span>{supplier.name}{supplier.status === 'DRAFT' ? ' (Draft)' : ''}</span>
+    ),
+  },
+};
+
+export const ReadOnlyRichChips: Story = {
+  args: { ...RichChips.args, readOnly: true },
+};
+
+export const Loading: Story = {
+  args: { options: [], loading: true, loadingText: 'Loading suppliers', defaultOpen: true },
+  play: async () => {
+    await expect(await within(document.body).findByText('Loading suppliers')).toBeVisible();
+  },
+};
+
+export const Empty: Story = {
+  args: { options: [], emptyText: 'No suppliers found', defaultOpen: true },
+  play: async () => {
+    await expect(await within(document.body).findByText('No suppliers found')).toBeVisible();
+  },
+};
+
+export const SearchWithHelperText: Story = {
+  args: { helperText: 'Search suppliers by name', required: true },
+  play: async ({ canvasElement }) => {
+    const input = within(canvasElement).getByRole('combobox', {name: 'Supplier'});
+    await expect(input).toBeRequired();
+    await expect(input).toHaveAccessibleDescription('Search suppliers by name');
+    await userEvent.type(input, 'New');
+    await expect(await within(document.body).findByRole('option', {name: 'New supplier'})).toBeVisible();
+    await expect(within(document.body).queryByRole('option', {name: 'Coffee Import UA'})).not.toBeInTheDocument();
+    await userEvent.keyboard('{ArrowDown}{Enter}');
+    await expect(input).toHaveValue('New supplier');
+  },
+};
+
+export const RefreshedSelection: Story = {
+  render: (args) => {
+    const [loaded, setLoaded] = useState(false);
+    return (
+      <Combobox<Supplier>
+        label={args.label}
+        getOptionValue={args.getOptionValue}
+        getOptionLabel={args.getOptionLabel}
+        defaultValue={options[0]}
+        options={loaded ? [{...options[0], name: 'Renamed supplier'}, options[1]] : []}
+        onOpenChange={(open) => { if (open) setLoaded(true); }}
+      />
+    );
+  },
+  play: async ({canvasElement}) => {
+    const input = within(canvasElement).getByRole('combobox', {name: 'Supplier'});
+    await userEvent.click(input);
+    await expect(await within(document.body).findByRole('option', {name: 'Renamed supplier'})).toBeVisible();
+    await expect(await within(document.body).findByRole('option', {name: 'New supplier'})).toBeVisible();
+    await userEvent.clear(input);
+    await userEvent.type(input, 'New');
+    await expect(within(document.body).queryByRole('option', {name: 'Renamed supplier'})).not.toBeInTheDocument();
+    await userEvent.keyboard('{ArrowDown}{Enter}');
+    await expect(input).toHaveValue('New supplier');
   },
 };

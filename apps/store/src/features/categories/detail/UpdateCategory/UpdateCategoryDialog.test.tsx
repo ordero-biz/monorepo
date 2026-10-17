@@ -46,6 +46,7 @@ describe('UpdateCategoryDialog', () => {
     onOpenChangeMock.mockClear();
     onUpdatedMock.mockClear();
     updateCategoryMock.mockReset();
+    getCategoriesMock.mockReset();
     getCategoriesMock.mockResolvedValue({
       ok: true,
       data: {
@@ -126,6 +127,51 @@ describe('UpdateCategoryDialog', () => {
         { name: 'Name' }
       )
     ).toHaveValue('Sneakers');
+  });
+
+  it('shows the saved parent before loading its options', () => {
+    setup();
+    expect(
+      screen.getByRole('combobox', { name: 'Parent category' })
+    ).toHaveValue('Shoes');
+    expect(getCategoriesMock).not.toHaveBeenCalled();
+  });
+
+  it('submits null when the parent is removed', async () => {
+    const user = userEvent.setup();
+    updateCategoryMock.mockResolvedValue({
+      ok: true,
+      data: { ...category, parentCategory: null },
+    });
+    setup();
+    await user.click(screen.getByRole('combobox', { name: 'Parent category' }));
+    await user.click(
+      await screen.findByRole('option', { name: 'No parent category' })
+    );
+    await user.click(screen.getByRole('button', { name: 'Save' }));
+    expect(updateCategoryMock).toHaveBeenCalledWith({
+      categoryId: 2,
+      parentId: null,
+    });
+  });
+
+  it('maps backend parentId errors to the parent category field', async () => {
+    const user = userEvent.setup();
+    updateCategoryMock.mockResolvedValue({
+      ok: false,
+      error: {
+        status: 422,
+        message: 'Update failed',
+        fieldErrors: { parentId: 'Invalid parent category' },
+      },
+    });
+    setup();
+    await user.type(screen.getByRole('textbox', { name: 'Name' }), ' changed');
+    await user.click(screen.getByRole('button', { name: 'Save' }));
+    expect(await screen.findByText('Invalid parent category')).toBeVisible();
+    expect(
+      screen.getByRole('combobox', { name: 'Parent category' })
+    ).toHaveAccessibleDescription('Invalid parent category');
   });
 
   it('prevents the category itself from being selected as a parent', async () => {
