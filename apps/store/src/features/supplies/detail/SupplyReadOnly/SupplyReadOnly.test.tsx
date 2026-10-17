@@ -60,7 +60,7 @@ describe('SupplyReadOnly', () => {
     );
 
     const table = screen.getByRole('table', { name: 'Supply entries' });
-    expect(within(table).getAllByRole('row')).toHaveLength(3);
+    expect(within(table).getAllByRole('row')).toHaveLength(4);
     const rice = within(table).getByRole('row', { name: /Jasmine Rice 5kg/ });
     expect(within(rice).getByText('RICE-5KG')).toBeVisible();
     expect(within(rice).getByText('Bag (bag)')).toBeVisible();
@@ -73,7 +73,7 @@ describe('SupplyReadOnly', () => {
     expect(within(sample).getAllByText('$0.00')).toHaveLength(2);
     expect(within(sample).getByText('-')).toBeVisible();
     expect(
-      screen.getByText('Total quantity: 22 · Total: $560.00')
+      within(table).getByRole('row', { name: 'Total $560.00' })
     ).toBeVisible();
 
     expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
@@ -102,7 +102,16 @@ describe('SupplyReadOnly', () => {
 
     expect(screen.getByText('No products in this supply.')).toBeVisible();
     expect(screen.getAllByText('-')).toHaveLength(3);
-    expect(screen.getByText('Total quantity: 0 · Total: $0.00')).toBeVisible();
+    expect(screen.getByRole('row', { name: 'Total $0.00' })).toBeVisible();
     expect(screen.queryByRole('combobox')).not.toBeInTheDocument();
+  });
+
+  it('uses the supplied total instead of recalculating it from displayed entries', () => {
+    setup({ supply: { ...supply, totalPrice: 600 } });
+
+    expect(screen.getByRole('row', { name: 'Total $600.00' })).toBeVisible();
+    expect(
+      screen.queryByRole('row', { name: 'Total $560.00' })
+    ).not.toBeInTheDocument();
   });
 });

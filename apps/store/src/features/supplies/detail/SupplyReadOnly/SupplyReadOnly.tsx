@@ -46,9 +46,11 @@ export const SupplyReadOnly = ({ supply }: SupplyReadOnlyProps) => {
 
       <div className="flex flex-col gap-[var(--space-3)]">
         <Card.Root variant="filled">
+          <Card.Header>
+            <Card.Title>Supply information</Card.Title>
+          </Card.Header>
           <Card.Content>
             <div className="flex flex-col gap-[var(--space-3)]">
-              <Typography variant="h6">Supply information</Typography>
               <dl className="grid gap-[var(--space-3)] md:grid-cols-2">
                 {information.map(({ label, value }) => (
                   <div
@@ -70,24 +72,24 @@ export const SupplyReadOnly = ({ supply }: SupplyReadOnlyProps) => {
           </Card.Content>
         </Card.Root>
 
-        <Card.Root variant="filled">
-          <Card.Content>
-            <div className="flex flex-col gap-[var(--space-2)]">
-              <Typography variant="h6">Supply entries</Typography>
-              <DataTable
-                ariaLabel="Supply entries"
-                columns={columns}
-                data={supply.supplyEntries}
-                emptyMessage="No products in this supply."
-                getRowId={getRowId}
-              />
-              <Typography variant="body2">
-                Total quantity: {supply.totalQuantity} · Total:{' '}
-                {formatMoney(supply.totalPrice)}
-              </Typography>
-            </div>
-          </Card.Content>
-        </Card.Root>
+        <div className="flex flex-col gap-[var(--space-2)]">
+          <Typography variant="h6">Supply entries</Typography>
+          <DataTable
+            ariaLabel="Supply entries"
+            columns={columns}
+            data={supply.supplyEntries}
+            emptyMessage="No products in this supply."
+            footerColumns={{
+              product: <Typography variant="subtitle1">Total</Typography>,
+              total: (
+                <Typography variant="subtitle1">
+                  {formatMoney(supply.totalPrice)}
+                </Typography>
+              ),
+            }}
+            getRowId={getRowId}
+          />
+        </div>
       </div>
     </div>
   );

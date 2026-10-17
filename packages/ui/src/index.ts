@@ -83,6 +83,7 @@ export type {
   DataTableColumnHeaderProps,
   DataTableColumnMeta,
   DataTableColumnWrap,
+  DataTableFooterColumns,
   DataTablePaginationProps,
   DataTablePaginationState,
   DataTableProps,

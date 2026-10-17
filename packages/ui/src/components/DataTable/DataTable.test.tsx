@@ -1,5 +1,5 @@
 import { prepareSetup } from '@ordero/test-config/react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useMemo, useState } from 'react';
 import { Checkbox } from '@/ui/components/Checkbox';
@@ -118,6 +118,112 @@ describe('DataTable', () => {
     });
 
     expect(screen.getByText('Nothing to show here.')).toBeInTheDocument();
+  });
+
+  it('renders standalone footer content without pagination', () => {
+    setup({
+      footer: <a href="/invoices/export">Export invoices</a>,
+    });
+
+    expect(
+      screen.getByRole('link', { name: 'Export invoices' })
+    ).toHaveAttribute('href', '/invoices/export');
+    expect(
+      screen.queryByRole('navigation', { name: 'Table pagination' })
+    ).not.toBeInTheDocument();
+  });
+
+  it('matches footer values to leaf columns under grouped headers and selection', () => {
+    const { footerColumns } = setup({
+      columns: [{ header: 'Invoice details', columns }],
+      footerColumns: {
+        amount: <strong>$430.00</strong>,
+        id: 'Total',
+      },
+      selection: {},
+    });
+
+    const summary = screen.getByRole('row', { name: 'Total $430.00' });
+    const cells = within(summary).getAllByRole('cell');
+
+    expect(cells).toHaveLength(4);
+    expect(cells[0]).toHaveTextContent(/^$/);
+    expect(cells[1]).toHaveTextContent(String(footerColumns?.id));
+    expect(cells[2]).toHaveTextContent(/^$/);
+    expect(cells[3]).toHaveTextContent('$430.00');
+    expect(within(summary).queryByRole('checkbox')).not.toBeInTheDocument();
+  });
+
+  it.each([
+    {},
+    { unknown: 'Unmatched summary' },
+    { id: null, amount: false },
+    { id: '' },
+  ])('omits a summary row when no column has footer content: %j', (footerColumns) => {
+    setup({ footerColumns });
+
+    expect(screen.getAllByRole('row')).toHaveLength(data.length + 1);
+    expect(screen.queryByText('Unmatched summary')).not.toBeInTheDocument();
+  });
+
+  it('displays a zero column total alongside the empty state', () => {
+    const { footerColumns } = setup({
+      data: [],
+      footerColumns: { id: 'Total', amount: 0 },
+    });
+
+    expect(screen.getByText('No results.')).toBeInTheDocument();
+    const summary = screen.getByRole('row', { name: 'Total 0' });
+    expect(
+      within(summary).getByRole('cell', { name: String(footerColumns?.amount) })
+    ).toBeInTheDocument();
+  });
+
+  it('displays a numeric zero as standalone footer content', () => {
+    const { footer } = setup({ footer: 0 });
+
+    expect(screen.getByText(String(footer))).toBeInTheDocument();
+  });
+
+  it('supports both footers with pagination and independently updated summaries', async () => {
+    const user = userEvent.setup();
+    const { footer, pagination, renderResult } = setup({
+      footer: 'Totals cover every invoice.',
+      footerColumns: { id: 'Total', amount: '$430.00' },
+      pagination: { onPageChange: vi.fn(), page: 0, rowsPerPage: 1 },
+    });
+
+    expect(screen.getByText(footer)).toBeInTheDocument();
+    expect(
+      screen.getByRole('row', { name: 'Total $430.00' })
+    ).toBeInTheDocument();
+    expect(screen.getByText('INV-001')).toBeInTheDocument();
+    expect(screen.queryByText('INV-002')).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Go to next page' }));
+
+    expect(pagination.onPageChange).toHaveBeenCalledWith(1);
+    renderResult.rerender({ pagination: { ...pagination, page: 1 } });
+
+    expect(screen.getByText('INV-002')).toBeInTheDocument();
+    expect(screen.queryByText('INV-001')).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('row', { name: 'Total $430.00' })
+    ).toBeInTheDocument();
+
+    renderResult.rerender({
+      footer: 'Totals refreshed.',
+      footerColumns: { id: 'Total', amount: '$500.00' },
+    });
+
+    expect(screen.getByText('Totals refreshed.')).toBeInTheDocument();
+    expect(
+      screen.getByRole('row', { name: 'Total $500.00' })
+    ).toBeInTheDocument();
+    expect(screen.queryByText(footer)).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('row', { name: 'Total $430.00' })
+    ).not.toBeInTheDocument();
   });
 
   it('renders pagination controls and pages client-side rows', async () => {
@@ -359,9 +465,7 @@ describe('DataTable', () => {
       selectable: true,
     });
 
-    await user.click(
-      screen.getByRole('checkbox', { name: 'Select INV-001' })
-    );
+    await user.click(screen.getByRole('checkbox', { name: 'Select INV-001' }));
 
     expect(
       screen.getByRole('checkbox', { name: 'Select all invoices' })

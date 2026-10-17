@@ -2,7 +2,6 @@ export { DataTable, DataTableCell } from './DataTable';
 export { DataTableColumnHeader } from './DataTableColumnHeader';
 export { DataTableSelectionCell } from './DataTableSelectionCell';
 export { DataTableSelectionColumnHeader } from './DataTableSelectionColumnHeader';
-export { useDataTableSelection } from './useDataTableSelection';
 export type {
   DataTableCellProps,
   DataTableCellVariant,
@@ -11,13 +10,15 @@ export type {
   DataTableColumnHeaderProps,
   DataTableColumnMeta,
   DataTableColumnWrap,
+  DataTableFooterColumns,
   DataTablePaginationProps,
   DataTablePaginationState,
   DataTableProps,
   DataTableRowSelectionState,
-  DataTableSelectionProps,
   DataTableSelectionCellProps,
   DataTableSelectionColumnHeaderProps,
+  DataTableSelectionProps,
   DataTableSortingState,
   UseDataTableSelectionArgs,
 } from './types';
+export { useDataTableSelection } from './useDataTableSelection';
