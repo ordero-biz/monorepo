@@ -28,6 +28,7 @@ declare module '@tanstack/react-table' {
   interface ColumnMeta<TData extends RowData, TValue>
     extends DataTableColumnMeta {}
 
+  // biome-ignore lint/style/useConsistentTypeDefinitions: TanStack module augmentation requires an interface.
   interface TableMeta<TData extends RowData> {
     dataTableSelection?: DataTableSelectionProps<TData>;
   }
@@ -59,6 +60,7 @@ export type DataTableCellProps = {
 };
 
 export type DataTableRowSelectionState = RowSelectionState;
+export type DataTableRowTone = 'default' | 'warning';
 
 export type DataTableSelectionProps<TData> = {
   getRowCanSelect?: (row: TData, index: number) => boolean;
@@ -84,13 +86,22 @@ export type DataTablePaginationProps = Omit<TablePaginationProps, 'count'> & {
 
 export type DataTableSortingState = SortingState;
 
+/** Summary content keyed by resolved leaf column IDs. */
+export type DataTableFooterColumns = Partial<Record<string, ReactNode>>;
+
 export type DataTableProps<TData> = {
   ariaLabel: string;
   columns: DataTableColumnDef<TData>[];
   data: TData[];
   emptyMessage?: string;
+  /** Content below the scrollable table and above pagination, aligned to the end. */
+  footer?: ReactNode;
+  /** One summary row aligned with the visible columns; cell padding is provided. */
+  footerColumns?: DataTableFooterColumns;
   getRowCanSelect?: (row: TData, index: number) => boolean;
   getRowId?: (originalRow: TData, index: number, parent?: Row<TData>) => string;
+  /** Visual emphasis only; include a visible explanation in the row content. */
+  getRowTone?: (row: TData, index: number) => DataTableRowTone;
   manualPagination?: boolean;
   manualSorting?: boolean;
   onRowSelectionChange?: (rowSelection: DataTableRowSelectionState) => void;

@@ -18,6 +18,7 @@ export const CLIENT_BACKEND_PATHS = {
   productGroups: '/api/backend/api/v1/products',
   productVariants: '/api/backend/api/v1/products/variants',
   supplies: '/api/backend/api/v1/supplies',
+  supply: '/api/backend/api/v1/supplies/{id}',
   suppliers: '/api/backend/api/v1/suppliers',
   supplier: '/api/backend/api/v1/suppliers/{id}',
   unitsOfMeasurement: '/api/backend/api/v1/units-of-measurement',

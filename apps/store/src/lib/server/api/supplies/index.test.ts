@@ -1,7 +1,7 @@
 import { AUTH_TOKEN_COOKIE_NAME } from '@ordero/next-api/server';
 import { cookies } from 'next/headers';
 import { fetchBackendResponse } from '@/lib/server/fetch';
-import { getServerSupplies } from '.';
+import { getServerSupplies, getServerSupply } from '.';
 
 vi.mock('next/headers', () => ({
   cookies: vi.fn(),
@@ -57,6 +57,45 @@ describe('supply server helpers', () => {
     mockAuthCookie();
 
     await expect(getServerSupplies()).resolves.toEqual({
+      ok: false,
+      error: {
+        status: 401,
+        message: 'Authentication required.',
+      },
+    });
+    expect(fetchBackendResponseMock).not.toHaveBeenCalled();
+  });
+
+  it('gets a supply detail using the server auth token', async () => {
+    const response = {
+      id: 7,
+      status: 'DRAFT',
+      supplyNumber: 'SUP-007',
+      supplyEntries: [],
+      version: 1,
+    };
+    mockAuthCookie('server-token');
+    fetchBackendResponseMock.mockResolvedValue({
+      ok: true,
+      data: new Response(JSON.stringify(response)),
+    });
+
+    await expect(getServerSupply('7')).resolves.toEqual({
+      ok: true,
+      data: response,
+    });
+    expect(fetchBackendResponseMock).toHaveBeenCalledWith({
+      path: '/api/v1/supplies/7',
+      search: undefined,
+      token: 'server-token',
+      init: { method: 'GET' },
+    });
+  });
+
+  it('does not fetch supply detail without an auth token', async () => {
+    mockAuthCookie();
+
+    await expect(getServerSupply(7)).resolves.toEqual({
       ok: false,
       error: {
         status: 401,

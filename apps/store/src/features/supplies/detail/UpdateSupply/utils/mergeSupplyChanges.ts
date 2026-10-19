@@ -1,0 +1,149 @@
+import type { SupplyDetails } from '@/lib/domain/supplies/types';
+import { areFormValuesEqual } from '@/lib/utils/form/comparison/areFormValuesEqual';
+import {
+  type FormMergeChoices,
+  type FormMergeFields,
+  type FormMergeValues,
+  mergeFormValues,
+} from '@/lib/utils/form/comparison/mergeFormValues';
+import {
+  getSupplyFormDefaults,
+  type SupplyFormValues,
+} from '../../../shared/SupplyEditorForm';
+import { normalizeSupplyEntry } from './normalizeSupplyEntry';
+
+export type SupplyMergeChoices = FormMergeChoices<keyof SupplyFormValues>;
+
+type MergeSupplyChangesArgs = {
+  baseline: SupplyDetails;
+  current: SupplyFormValues;
+  latest: SupplyDetails;
+  choices?: SupplyMergeChoices;
+};
+
+// Compare product lists without UI ids or option display metadata. Keep blank
+// rows in this comparison so unfinished rows are preserved during refresh.
+const normalizeEntries = (entries: SupplyFormValues['supplyEntries']) =>
+  entries.map(normalizeSupplyEntry);
+
+const describeValue = (value: SupplyFormValues[keyof SupplyFormValues]) => {
+  if (Array.isArray(value)) {
+    return value.length
+      ? value
+          .map(
+            (entry, index) =>
+              `${index + 1}. ${entry.productVariant?.name || 'No product selected'}; ` +
+              `quantity: ${entry.quantity || '(empty)'}; ` +
+              `unit: ${entry.unitOfMeasurement?.name || '(none)'}; ` +
+              `unit price: ${entry.unitPrice || '(empty)'}; ` +
+              `comment: ${entry.comment || '(empty)'}`
+          )
+          .join('\n')
+      : 'No products';
+  }
+
+  if (typeof value === 'string') {
+    return value || '(empty)';
+  }
+
+  return value?.name || '(none)';
+};
+
+export const getAddedSupplyEntries = ({
+  baseline,
+  current,
+}: Pick<
+  FormMergeValues<SupplyFormValues['supplyEntries']>,
+  'baseline' | 'current'
+>) => {
+  // Compare local ids only with the editing baseline: saved ids may change.
+  // The default empty row is a placeholder, not a persisted product.
+  const initialEntries = baseline.filter(
+    (entry) => entry.clientId !== 'initial-placeholder'
+  );
+  const initialIds = new Set(initialEntries.map((entry) => entry.clientId));
+  const existingEntries = current.filter((entry) =>
+    initialIds.has(entry.clientId)
+  );
+  const addedEntries = current.filter(
+    (entry) => !initialIds.has(entry.clientId)
+  );
+  const existingEntriesUnchanged =
+    areFormValuesEqual(
+      existingEntries.map((entry) => entry.clientId),
+      initialEntries.map((entry) => entry.clientId)
+    ) &&
+    areFormValuesEqual(
+      normalizeEntries(existingEntries),
+      normalizeEntries(initialEntries)
+    );
+
+  return existingEntriesUnchanged && !areFormValuesEqual(current, baseline)
+    ? addedEntries
+    : [];
+};
+
+const mergeAddedEntries = ({
+  baseline,
+  current,
+  latest,
+}: FormMergeValues<SupplyFormValues['supplyEntries']>) => {
+  const addedEntries = getAddedSupplyEntries({ baseline, current });
+  if (addedEntries.length > 0) {
+    const savedEntries = latest.filter(
+      (entry) => entry.clientId !== 'initial-placeholder'
+    );
+    return { value: [...savedEntries, ...addedEntries] };
+  }
+  return undefined;
+};
+
+const fields: FormMergeFields<SupplyFormValues> = {
+  supplier: {
+    label: 'Supplier',
+    normalize: (value) => value?.id ?? null,
+    describe: describeValue,
+  },
+  warehouse: {
+    label: 'Warehouse',
+    normalize: (value) => value?.id ?? null,
+    describe: describeValue,
+  },
+  supplyNumber: {
+    label: 'Supply number',
+    normalize: (value) => value.trim(),
+    describe: describeValue,
+  },
+  supplierInvoiceNumber: {
+    label: 'Supplier invoice number',
+    normalize: (value) => value.trim(),
+    describe: describeValue,
+  },
+  comment: {
+    label: 'Comment',
+    normalize: (value) => value.trim(),
+    describe: describeValue,
+  },
+  supplyEntries: {
+    label: 'Supply products',
+    normalize: normalizeEntries,
+    describe: describeValue,
+    merge: mergeAddedEntries,
+    helperText:
+      'Choose one complete product list. Products from the other list will not be included.',
+  },
+};
+
+export const mergeSupplyChanges = ({
+  baseline,
+  current,
+  latest,
+  choices,
+}: MergeSupplyChangesArgs) =>
+  mergeFormValues({
+    baseline: getSupplyFormDefaults(baseline),
+    current,
+    latest: getSupplyFormDefaults(latest),
+    fields,
+    choices,
+  });

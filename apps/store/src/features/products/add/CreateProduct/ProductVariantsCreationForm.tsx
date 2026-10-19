@@ -55,7 +55,7 @@ export const ProductVariantsCreationForm = ({
                           color="primary"
                           disabled={isSubmitting}
                           onClick={handleSubmit}
-                          size="l"
+                          size="m"
                           type="button"
                         >
                           {isSubmitting

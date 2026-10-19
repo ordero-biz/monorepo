@@ -131,7 +131,7 @@ export const UnitsOfMeasurementList = ({
                 onClick={() =>
                   setDeletingUnitsOfMeasurement(selectedUnitsOfMeasurement)
                 }
-                size="s"
+                size="m"
                 startIcon={<Trash2 aria-hidden="true" />}
                 variant="soft"
               >

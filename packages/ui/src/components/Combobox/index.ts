@@ -2,7 +2,6 @@ export { Combobox } from './Combobox';
 export type {
   ComboboxChangeEventDetails,
   ComboboxMultipleProps,
-  ComboboxOption,
   ComboboxProps,
   ComboboxSingleProps,
   ComboboxSize,

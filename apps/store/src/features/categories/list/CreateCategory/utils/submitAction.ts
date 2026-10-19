@@ -2,7 +2,7 @@ import { createCategory } from '@/lib/client/api/categories';
 import type { CreateCategoryFormValues } from './validations';
 
 const normalizeCreateCategoryFormData = (data: CreateCategoryFormValues) => {
-  const parentId = data.parentId ? Number(data.parentId) : undefined;
+  const parentId = data.parentCategory?.id;
 
   return {
     name: data.name.trim(),

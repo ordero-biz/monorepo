@@ -125,7 +125,7 @@ export const AttributeDetailValues = ({
               <Button
                 color="inherit"
                 onClick={clearSelection}
-                size="s"
+                size="m"
                 variant="text"
               >
                 Clear selection

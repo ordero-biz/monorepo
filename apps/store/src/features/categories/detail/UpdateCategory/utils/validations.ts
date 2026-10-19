@@ -1,12 +1,12 @@
 import { z } from 'zod';
 import {
   categoryNameSchema,
-  categoryParentIdSchema,
+  categoryParentSchema,
 } from '@/features/categories/shared/validations';
 
 export const updateCategoryFormSchema = z.object({
   name: categoryNameSchema,
-  parentId: categoryParentIdSchema,
+  parentCategory: categoryParentSchema,
 });
 
 export type UpdateCategoryFormValues = z.infer<typeof updateCategoryFormSchema>;

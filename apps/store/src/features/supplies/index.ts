@@ -1,3 +1,5 @@
+export { CreateSupply } from '@/features/supplies/add/CreateSupply';
+export { SupplyDetail } from '@/features/supplies/detail/SupplyDetail';
 export {
   SuppliesList,
   SuppliesListHeader,

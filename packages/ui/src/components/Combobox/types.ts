@@ -12,17 +12,9 @@ import type {
 export type ComboboxSize = 's' | 'm';
 export type ComboboxVariant = 'outlined' | 'filled';
 
-export type ComboboxOption = {
-  data?: unknown;
-  disabled?: boolean;
-  displayValue: string;
-  label?: ReactNode;
-  value: string;
-};
-
 export type ComboboxChangeEventDetails = ComboboxRoot.ChangeEventDetails;
 
-type ComboboxCommonProps = {
+type ComboboxCommonProps<TOption extends object> = {
   'aria-describedby'?: string;
   'aria-label'?: string;
   'aria-labelledby'?: string;
@@ -57,7 +49,7 @@ type ComboboxCommonProps = {
   onListScroll?: UIEventHandler<HTMLDivElement>;
   onOpenChange?: (open: boolean, details: ComboboxChangeEventDetails) => void;
   open?: boolean;
-  options: ComboboxOption[];
+  options: TOption[];
   placeholder?: string;
   readOnly?: boolean;
   ref?: Ref<HTMLInputElement>;
@@ -66,29 +58,37 @@ type ComboboxCommonProps = {
   startAdornment?: ReactNode;
   startIcon?: ElementType<{ className?: string }>;
   variant?: ComboboxVariant;
+  /** Stable ID used for equality and native form serialization. */
+  getOptionValue: (option: TOption) => string;
+  /** Plain text used for input display, filtering, and accessible names. */
+  getOptionLabel: (option: TOption) => string;
+  /** Rich content shared by list options and selected multi-select chips. */
+  renderOption?: (option: TOption) => ReactNode;
+  isOptionDisabled?: (option: TOption) => boolean;
 };
 
-export type ComboboxSingleProps = ComboboxCommonProps & {
-  defaultValue?: string | null;
-  multiple?: false;
-  onValueChange?: (
-    value: string | null,
-    details: ComboboxChangeEventDetails
-  ) => void;
-  onOptionSelect?: (
-    option: ComboboxOption | null
-  ) => void;
-  value?: string | null;
-};
+export type ComboboxSingleProps<TOption extends object> =
+  ComboboxCommonProps<TOption> & {
+    multiple?: false;
+    value?: TOption | null;
+    defaultValue?: TOption | null;
+    onValueChange?: (
+      value: TOption | null,
+      details: ComboboxChangeEventDetails
+    ) => void;
+  };
 
-export type ComboboxMultipleProps = ComboboxCommonProps & {
-  defaultValue?: string[];
-  multiple: true;
-  onValueChange?: (
-    value: string[],
-    details: ComboboxChangeEventDetails
-  ) => void;
-  value?: string[];
-};
+export type ComboboxMultipleProps<TOption extends object> =
+  ComboboxCommonProps<TOption> & {
+    multiple: true;
+    value?: TOption[];
+    defaultValue?: TOption[];
+    onValueChange?: (
+      value: TOption[],
+      details: ComboboxChangeEventDetails
+    ) => void;
+  };
 
-export type ComboboxProps = ComboboxSingleProps | ComboboxMultipleProps;
+export type ComboboxProps<TOption extends object> =
+  | ComboboxSingleProps<TOption>
+  | ComboboxMultipleProps<TOption>;

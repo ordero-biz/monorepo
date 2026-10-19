@@ -3,17 +3,9 @@ import { CategoriesAsyncCombobox } from '@/features/categories';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
 import {
   validateCategoryName,
-  validateCategoryParentId,
+  validateCategoryParent,
 } from '../../shared/validations';
 import type { UpdateCategoryDialogFormContentProps } from './types';
-
-const PARENT_CATEGORY_STATIC_OPTIONS = [
-  {
-    displayValue: 'No parent category',
-    label: 'No parent category',
-    value: '',
-  },
-];
 
 export const UpdateCategoryDialogFormContent = ({
   disabledCategoryIds,
@@ -50,10 +42,10 @@ export const UpdateCategoryDialogFormContent = ({
           </form.Field>
 
           <form.Field
-            name="parentId"
+            name="parentCategory"
             validators={{
-              onChange: validateCategoryParentId,
-              onSubmit: validateCategoryParentId,
+              onChange: validateCategoryParent,
+              onSubmit: validateCategoryParent,
             }}
           >
             {(field) => {
@@ -70,7 +62,7 @@ export const UpdateCategoryDialogFormContent = ({
                   onValueChange={field.handleChange}
                   placeholder=""
                   size="s"
-                  staticOptions={PARENT_CATEGORY_STATIC_OPTIONS}
+                  allowNoParent
                   value={field.state.value}
                 />
               );

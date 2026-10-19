@@ -38,7 +38,7 @@ const getProductVariantsMock = vi.mocked(getProductVariants);
 const getProductGroupsMock = vi.mocked(getProductGroups);
 const setPaginationMock = vi.fn();
 
-const createPagination = ({ page = 0, size = 10 } = {}) => ({
+const createPagination = ({ page = 1, size = 10 } = {}) => ({
   page,
   setPagination: setPaginationMock,
   size,
@@ -51,6 +51,7 @@ const productVariant = {
   sku: 'RUN-BLU-42',
   barcode: '1234567890',
   createdAt: '2026-07-20T18:23:01.675Z',
+  status: 'ACTIVE',
   productVariantAttributeValues: [
     {
       id: 1,
@@ -258,11 +259,11 @@ describe('ProductsList', () => {
 
     setup({
       paginationInput: {
-        page: 1,
+        page: 2,
         size: 1,
       },
       pagination: createPagination({
-        page: 1,
+        page: 2,
         size: 1,
       }),
     });

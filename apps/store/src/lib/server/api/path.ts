@@ -21,6 +21,7 @@ export const BACKEND_PRODUCT_PATHS = {
 
 export const BACKEND_SUPPLY_PATHS = {
   supplies: '/api/v1/supplies',
+  supply: '/api/v1/supplies/{id}',
 } as const;
 
 export const BACKEND_SUPPLIER_PATHS = {

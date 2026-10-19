@@ -18,8 +18,7 @@ export const productNameSchema = z
   .min(1, 'Product name is required');
 
 export const productCategorySchema = z
-  .string()
-  .min(1, 'Category is required')
+  .object({ id: z.number().int().positive(), name: z.string() })
   .nullable()
   .refine((value) => value !== null, 'Category is required');
 
@@ -201,7 +200,7 @@ export const validateProductName = ({ value }: ValidationArgs<string>) => {
 
 export const validateProductCategory = ({
   value,
-}: ValidationArgs<string | null>) => {
+}: ValidationArgs<ProductGenerationValues['category']>) => {
   return getValidationMessage(productCategorySchema, value);
 };
 

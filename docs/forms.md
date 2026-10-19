@@ -152,23 +152,26 @@ Wire form-owned combobox fields through ordinary controlled props:
 ```tsx
 <Combobox
   errorText={errorText}
+  getOptionLabel={(option) => option.name}
+  getOptionValue={(option) => String(option.id)}
   invalid={Boolean(errorText)}
-  label="Category"
+  label="Related record"
   name={field.name}
   onBlur={field.handleBlur}
   onValueChange={field.handleChange}
-  options={categoryOptions}
-  placeholder="Select category"
+  options={options}
+  placeholder="Select a record"
   size="s"
   value={field.state.value}
 />
 ```
 
-Use `value: string | null` for single selection. Use `multiple={true}` with a
-`string[]` value for multiple selection.
+Use `value: TOption | null` for single selection. Use `multiple={true}` with a
+`TOption[]` value for multiple selection. Options are serializable records;
+`getOptionValue` identifies them and `getOptionLabel` provides their display text.
 
 For request-backed option lists, create a feature-owned or app-owned resource
-wrapper such as `CategoriesAsyncCombobox` instead of putting request/query logic
+wrapper such as `ResourceAsyncCombobox` instead of putting request/query logic
 directly inside the form markup. The wrapper should own:
 
 - the request helper and option mapping
@@ -177,32 +180,194 @@ directly inside the form markup. The wrapper should own:
 - the TanStack Query key used for the option cache
 
 Keep the query key under the same resource prefix used for invalidation, then
-add a component-specific segment so option data does not collide with list-page
-data:
+add an `options` segment so option data does not collide with list-page data:
 
 ```ts
-const categoryComboboxQueryKey = [
-  ...categoriesQueryKeys.list,
-  'category-combobox',
+const resourceOptionsQueryKey = [
+  ...resourceQueryKeys.list,
+  'options',
 ] as const;
 ```
 
 Include request parameters that can vary, such as page size, filters, or sort,
 in the key. Fixed wrapper-owned parameters can stay in the wrapper, but the key
 should still be resource-aligned so
-`invalidateQueries({ queryKey: categoriesQueryKeys.list })` refreshes category
-option caches after category writes.
+`invalidateQueries({ queryKey: resourceQueryKeys.list })` refreshes related
+option caches after writes.
 
 When a wrapper intentionally forwards props explicitly instead of using
 `{...props}`, forward every retained `Combobox` prop. This includes form and
 accessibility props (`name`, `onBlur`, `aria-label`, `aria-labelledby`,
 `aria-describedby`) and visual props such as `size` and `variant`.
 
+### Selection records and submission
+
+`Combobox` and an app-owned `AsyncCombobox` use object-valued selections.
+`AsyncCombobox` adds paginated option loading and caching to the same selection
+API. Feature wrappers supply the request helper and record accessors.
+
+- Single selection uses `TOption | null`; multiple selection uses `TOption[]`.
+- `getOptionValue` returns a stable, unique string ID for equality and native
+  form serialization. Object identity and display labels do not define equality.
+- `getOptionLabel` returns plain text. `renderOption` optionally renders rich
+  list and multi-select chip content; keep React elements out of the selected records.
+- Selected records carry enough data to display before options load, and need
+  not appear in the current options page. `staticOptions` remains available for
+  actual fixed choices, not for injecting the current selection.
+- Loaded records take precedence for displayed labels. Refreshing options never
+  emits `onValueChange`. A user selection emits current loaded records, falling
+  back to selected records whose IDs are absent from the loaded list.
+
+Keep API entities, form values, and combobox options as separate contracts when
+they contain different data. A saved response may provide only a summary,
+while loaded options provide additional display metadata. Build form defaults
+from the data actually available; do not invent missing metadata to satisfy an
+option type. Represent unavailable display metadata explicitly in the combobox
+contract.
+
+When options contain fields that the form does not need, map selections at the
+feature wrapper boundary:
+
+```ts
+type SelectionFormValue = {
+  id: number;
+  name: string;
+};
+
+type SelectionOption = {
+  id: number;
+  name: string;
+  description?: string;
+};
+
+const toFormValue = (
+  option: SelectionOption | null
+): SelectionFormValue | null =>
+  option ? { id: option.id, name: option.name } : null;
+```
+
+Use small serializable form records and normalize them to the endpoint's
+expected IDs or commands before comparing or submitting. Display metadata
+changes alone must not create PATCH fields. Form libraries may consider an
+object with refreshed metadata dirty; use normalized payload comparison for
+save/no-op decisions. Map backend ID-field errors back to the corresponding
+object-valued form fields.
+
+Default an empty single selection to `null` and an empty multiple selection to
+`[]`. Retain nested data only when the workflow needs it, and reconcile dependent
+selections when their available choices change. Serialize the IDs required by
+the endpoint rather than sending entire option records.
+
+If a fixed option represents clearing a relationship, map it to the form's empty
+value at the wrapper boundary. Keep sentinel options out of request payloads;
+apply the endpoint's omission or `null` rules during payload preparation.
+
+A query key must identify both the requested dataset and the cached option
+shape. Keep option caches under their resource invalidation prefix with a
+distinct segment, such as `options`, to separate them from other query results.
+
+## Refreshing Forms With Unsaved Changes
+
+In `apps/store`, use `mergeFormValues` from
+`src/lib/utils/form/comparison/mergeFormValues.ts` to compare the originally
+loaded values, current edits, and latest saved values. It returns merged values,
+conflicts, unresolved-choice status, and fields that differ from the saved defaults.
+It does not depend on React, a form library, or a particular resource.
+
+Define a typed `FormMergeFields<FormValues>` configuration in the feature with
+each field's label, display formatter, and optional normalization function.
+Independent edits merge automatically. Competing edits require a `local` or
+`server` choice. Arrays are compared as complete values by default. A feature
+can provide a field `merge` callback for a safe domain-specific merge; returning
+`undefined` falls back to the standard comparison.
+
+Import `FormConflictResolver` from `src/lib/components/FormConflictResolver`
+and wrap the editor in `FormConflictResolver.Provider`. The provider owns the
+refresh workflow and renders the saved-change notice and conflict choices.
+Its private `useFormRefresh` hook and dialogs live
+in the same module; consumers do not wire them individually.
+
+Pass the accepted `baseline`, `latest` record, `onBaselineChange`, a form adapter,
+and a typed `FormConflictPolicy<Record, FormValues>`. Keep the policy in the
+feature: it supplies a numeric version getter, default-value mapper, merge
+function, and notice copy. An optional `readOnly` configuration supplies its
+predicate and notice copy. A read-only change shows a dismissible notice without
+a refresh action, preserving unsaved edits and the accepted baseline. It also
+replaces any open conflict choices. The shared module has no resource imports.
+
+The form adapter provides reactive pristine/submitting flags, a getter for current
+values, a reset function, and a field setter that restores edits without running
+change listeners or validation. The refresh hook does not import TanStack Form or
+Query. It accepts newer data automatically for pristine idle forms, defers
+refreshes during submission, and preserves dirty edits when applying a refresh.
+Cancelling any dialog retains the edits and submission baseline. Conflict choices
+reset when the saved revision changes.
+
+The conflict dialog uses TanStack Form to control its radio groups and handle
+submission, with Zod validation requiring a local or saved choice for every
+conflict. The same review shows current and proposed values for automatically
+merged fields, supplied by the generic merge result's `updates`. Opening a review
+never changes form values or the accepted baseline, including when there are no
+conflicts. Users must select **Apply changes** to accept the preview; saving the
+form remains a separate action. Its native form disables browser validation so
+errors appear inline through the shared field-error helper. Apply stays enabled
+for validation attempts; only a valid submission passes the choices to the
+resolver. The component owning the form is keyed by saved revision so new data
+clears selections and errors and refreshes the summary.
+
+For structured values, configure `policy.fieldRenderers` by form field. Each
+`FormFieldRenderer<Value>` receives that field's typed values: `renderUpdate`
+gets the baseline, current, latest, and merged values; `renderChoice` gets an
+object with `value`, `otherValue`, and `choice`, and returns a short radio label and separate display
+content. Unconfigured fields retain the text comparison. The resolver owns
+radio controls, required validation, revision resets, and applying choices;
+feature renderers own presentation only. Keep tables and interactive disclosure
+content outside radio labels, and do not parse the merge result's display strings.
+
+The supply renderer displays products, SKUs, quantities, units, and formatted
+unit prices in tables. Safe additions appear after saved rows and are identified
+as retained local rows. Conflicts retain one choice per complete list. Saved row
+IDs may change and duplicate products are valid. Highlighting compares normalized
+whole-row values with occurrence counts, and labels unmatched occurrences
+“Different”. Retained local additions keep their own label and are reserved
+before matching saved rows. The comparison is memoized and linear in row count
+and value size; it does not infer row additions, removals, or cell differences
+by SKU or array position.
+
+Review instructions distinguish automatic updates, conflicting values, and
+reviews containing both. Only reviews with conflicts ask the user to choose.
+When no field values need review, the dialog says **No updates to review** and
+requires **Use latest version** to accept the saved baseline. A note beside the
+actions explains that accepting a review does not save edits; `policy.saveNotice`
+can supply workflow-specific wording, such as not saving or finalizing a supply.
+The primary button references this note as its accessible description.
+
+Place `FormConflictResolver.ReviewButton` beside the form's submit actions. It
+reads context directly and renders only when saved changes are pending. Use
+the **Review updates** action in either the initial notice or footer to enter
+the review directly. The footer does not repeat the initial notification.
+Read-only updates continue to open the informational notice. Use
+`FormConflictResolver.useContext()` to read `isReadOnly`, `hasPendingChanges`, or
+`openReview` in descendants. Guard every submit path with `isReadOnly`, including
+native form submission and confirmation actions. Shared create/edit forms may
+render without a provider: the hook returns `null` and the review button renders
+nothing. Each provider owns independent state.
+
+Keep the accepted baseline in the feature so its submit hook and provider receive
+the same record; pass its setter as `onBaselineChange`. This avoids a circular
+dependency between form creation and the resolver. Keep request/cache side
+effects in the feature's success callback, then reset the form to the saved
+defaults and update the controlled baseline together. The provider clears
+obsolete review state when that baseline's version changes without remounting
+the editor. Mount a separate editor instance for each record identity, not each
+revision, so review state cannot carry over to another record and unsaved edits
+survive background updates.
+
 ## Form Hook Tests
 
 Use the app-local `prepareFormHookTestSetup` helper when a hook test only needs
-to submit the form and assert submit-side effects. Both `apps/platform` and
-`apps/store` provide this helper under `src/test/prepareFormHookTestSetup`.
+to submit the form and assert submit-side effects. Keep this helper in the app's
+test utilities, such as `src/test/prepareFormHookTestSetup`.
 
 Use hook tests for behavior such as:
 

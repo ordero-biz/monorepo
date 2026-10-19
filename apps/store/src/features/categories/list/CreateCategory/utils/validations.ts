@@ -1,13 +1,13 @@
 import { z } from 'zod';
 import {
   categoryNameSchema,
-  categoryParentIdSchema,
+  categoryParentSchema,
   categoryStatusSchema,
 } from '@/features/categories/shared/validations';
 
 export const createCategoryFormSchema = z.object({
   name: categoryNameSchema,
-  parentId: categoryParentIdSchema,
+  parentCategory: categoryParentSchema,
   status: categoryStatusSchema,
 });
 

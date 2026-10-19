@@ -69,6 +69,10 @@ describe('Dialog', () => {
     await user.click(trigger);
 
     expect(
+      screen.getByRole('dialog', { name: 'Notifications' })
+    ).toHaveAccessibleDescription('You are all caught up. Good job!');
+
+    expect(
       screen.getByRole('heading', { name: 'Notifications' })
     ).toBeInTheDocument();
     expect(
@@ -111,6 +115,27 @@ describe('Dialog', () => {
       'max-w-none',
       'rounded-none'
     );
+  });
+
+  it('allows a custom description outside the styled description component', () => {
+    render(
+      <>
+        <p id="custom-description">The saved record changed.</p>
+        <Dialog.Root defaultOpen>
+          <Dialog.Portal>
+            <Dialog.Viewport>
+              <Dialog.Popup aria-describedby="custom-description">
+                <Dialog.Title>Review changes</Dialog.Title>
+                <Dialog.Content>Choose how to continue.</Dialog.Content>
+              </Dialog.Popup>
+            </Dialog.Viewport>
+          </Dialog.Portal>
+        </Dialog.Root>
+      </>
+    );
+    expect(
+      screen.getByRole('dialog', { name: 'Review changes' })
+    ).toHaveAccessibleDescription('The saved record changed.');
   });
 
   it('applies the selected popup size width class', () => {
