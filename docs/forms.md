@@ -315,6 +315,21 @@ for validation attempts; only a valid submission passes the choices to the
 resolver. The component owning the form is keyed by saved revision so new data
 clears selections and errors and refreshes the summary.
 
+For structured values, configure `policy.fieldRenderers` by form field. Each
+`FormFieldRenderer<Value>` receives that field's typed values: `renderUpdate`
+gets the baseline, current, latest, and merged values; `renderChoice` gets the
+local or saved value and returns a short radio label and separate display
+content. Unconfigured fields retain the text comparison. The resolver owns
+radio controls, required validation, revision resets, and applying choices;
+feature renderers own presentation only. Keep tables and interactive disclosure
+content outside radio labels, and do not parse the merge result's display strings.
+
+The supply renderer displays products, SKUs, quantities, units, and formatted
+unit prices in tables. Safe additions appear after saved rows and are identified
+as retained local rows. Conflicts retain one choice per complete list. Saved row
+IDs may change and duplicate products are valid, so this presentation does not
+infer row additions, removals, or cell differences by SKU or array position.
+
 Review instructions distinguish automatic updates, conflicting values, and
 reviews containing both. Only reviews with conflicts ask the user to choose.
 When no field values need review, the dialog says **No updates to review** and

@@ -12,9 +12,13 @@ import type {
 } from './types';
 import { validateConflictChoice } from './validations';
 
+const groupHeadingClassName =
+  'text-[length:var(--overline-size-desktop)] leading-[var(--overline-line-height-desktop)] font-[var(--overline-weight)] tracking-[var(--overline-letter-spacing)] text-muted-foreground uppercase';
+
 const FormConflictForm = <TField extends string>({
   conflicts,
   updates,
+  presentations,
   saveNotice = 'This action does not save your edits.',
   onApply,
 }: FormConflictFormProps<TField>) => {
@@ -67,39 +71,48 @@ const FormConflictForm = <TField extends string>({
         <Dialog.Content scrollable>
           <div className="flex flex-col gap-[var(--space-2)]">
             {updates.length > 0 && (
-              <section aria-label="Updates to apply">
-                <h3 className="font-[var(--subtitle2-weight)]">
-                  Updates to apply
-                </h3>
-                <dl className="mt-[var(--space-1)] flex flex-col gap-[var(--space-2)]">
+              <section
+                aria-label="Updates to apply"
+                className="flex flex-col gap-[var(--space-1)]"
+              >
+                {hasConflicts && (
+                  <h3 className={groupHeadingClassName}>Updates to apply</h3>
+                )}
+                <dl className="flex flex-col gap-[var(--space-3)]">
                   {updates.map((update) => (
                     <div key={update.field}>
-                      <dt className="font-[var(--subtitle2-weight)]">
+                      <dt className="text-[length:var(--subtitle1-size-desktop)] leading-[var(--subtitle1-line-height-desktop)] font-[var(--subtitle1-weight)]">
                         {update.label}
                       </dt>
                       <dd className="mt-[var(--space-1)] grid gap-[var(--space-1)]">
-                        <div>
-                          <p className="text-muted-foreground">Current value</p>
-                          <p className="whitespace-pre-wrap wrap-break-word">
-                            {update.currentValue}
-                          </p>
-                        </div>
-                        <div>
-                          <p className="text-muted-foreground">
-                            After applying
-                          </p>
-                          <p className="whitespace-pre-wrap wrap-break-word">
-                            {update.mergedValue}
-                          </p>
-                        </div>
+                        {presentations?.[update.field]?.update ?? (
+                          <>
+                            <div>
+                              <p className="text-muted-foreground">
+                                Current value
+                              </p>
+                              <p className="whitespace-pre-wrap wrap-break-word">
+                                {update.currentValue}
+                              </p>
+                            </div>
+                            <div>
+                              <p className="text-muted-foreground">
+                                After applying
+                              </p>
+                              <p className="whitespace-pre-wrap wrap-break-word">
+                                {update.mergedValue}
+                              </p>
+                            </div>
+                          </>
+                        )}
                       </dd>
                     </div>
                   ))}
                 </dl>
               </section>
             )}
-            {conflicts.length > 0 && (
-              <h3 className="font-[var(--subtitle2-weight)]">
+            {hasConflicts && hasUpdates && (
+              <h3 className={groupHeadingClassName}>
                 Choose which values to keep
               </h3>
             )}
@@ -116,6 +129,7 @@ const FormConflictForm = <TField extends string>({
                   const errorText = getFieldSubmitChangeErrorText(
                     field.state.meta
                   );
+                  const options = presentations?.[conflict.field]?.options;
 
                   return (
                     <RadioGroup
@@ -132,30 +146,52 @@ const FormConflictForm = <TField extends string>({
                       required
                       value={field.state.value ?? ''}
                     >
-                      <Radio
-                        align="start"
-                        onBlur={field.handleBlur}
-                        value="local"
-                      >
-                        <div className="whitespace-pre-wrap">
-                          Keep my changes:
+                      {options ? (
+                        <div className="grid min-w-0 gap-[var(--space-2)] sm:grid-cols-2">
+                          {(['local', 'server'] as const).map((choice) => (
+                            <div
+                              key={choice}
+                              className="flex min-w-0 flex-col gap-[var(--space-1)]"
+                            >
+                              <Radio
+                                align="start"
+                                onBlur={field.handleBlur}
+                                value={choice}
+                              >
+                                {options[choice].label}
+                              </Radio>
+                              {options[choice].content}
+                            </div>
+                          ))}
                         </div>
-                        <div className="whitespace-pre-wrap">
-                          {conflict.localValue}
-                        </div>
-                      </Radio>
-                      <Radio
-                        align="start"
-                        onBlur={field.handleBlur}
-                        value="server"
-                      >
-                        <div className="whitespace-pre-wrap">
-                          Use saved value:
-                        </div>
-                        <div className="whitespace-pre-wrap">
-                          {conflict.serverValue}
-                        </div>
-                      </Radio>
+                      ) : (
+                        <>
+                          <Radio
+                            align="start"
+                            onBlur={field.handleBlur}
+                            value="local"
+                          >
+                            <div className="whitespace-pre-wrap">
+                              Keep my changes:
+                            </div>
+                            <div className="whitespace-pre-wrap">
+                              {conflict.localValue}
+                            </div>
+                          </Radio>
+                          <Radio
+                            align="start"
+                            onBlur={field.handleBlur}
+                            value="server"
+                          >
+                            <div className="whitespace-pre-wrap">
+                              Use saved value:
+                            </div>
+                            <div className="whitespace-pre-wrap">
+                              {conflict.serverValue}
+                            </div>
+                          </Radio>
+                        </>
+                      )}
                     </RadioGroup>
                   );
                 }}
@@ -192,6 +228,7 @@ export const FormConflictDialog = <TField extends string>({
   conflicts,
   updates,
   saveNotice,
+  presentations,
   onApply,
   onClose,
 }: FormConflictDialogProps<TField>) => (
@@ -205,6 +242,7 @@ export const FormConflictDialog = <TField extends string>({
             conflicts={conflicts}
             updates={updates}
             saveNotice={saveNotice}
+            presentations={presentations}
             key={revision}
             onApply={onApply}
           />

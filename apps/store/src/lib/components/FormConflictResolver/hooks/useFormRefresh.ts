@@ -111,6 +111,15 @@ export const useFormRefresh = <TRecord, TValues extends object>({
       : null;
 
   return {
+    reviewValues:
+      session && preview
+        ? {
+            baseline: getDefaultValues(session.baseline),
+            current: session.current,
+            latest: getDefaultValues(latest),
+            merged: preview.values,
+          }
+        : null,
     hasPendingRefresh,
     latestIsReadOnly,
     openReview,

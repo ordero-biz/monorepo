@@ -671,9 +671,34 @@ test.describe('Supply refresh and conflict resolution', () => {
       page.getByLabel('Product for row 3', { exact: true })
     ).toHaveCount(0);
     await expect(
-      review
-        .getByRole('region', { name: 'Updates to apply' })
-        .getByText(/2\. Oats;[\s\S]*3\. Lentils;/)
+      review.getByRole('table', { name: 'Products after applying' })
+    ).toBeVisible();
+    const products = review.getByRole('table', {
+      name: 'Products after applying',
+    });
+    await expect(
+      review.getByText('Supply products', { exact: true })
+    ).toBeVisible();
+    await expect(review.getByText('After applying · 3 rows')).toBeVisible();
+    await expect(
+      review.getByRole('heading', { name: 'Updates to apply' })
+    ).toHaveCount(0);
+    const rows = products.getByRole('row');
+    await expect(rows).toHaveCount(4);
+    await expect(rows.nth(1)).toContainText('Rice');
+    await expect(rows.nth(2)).toContainText('Oats');
+    await expect(rows.nth(2)).toContainText('Saved version');
+    await expect(rows.nth(3)).toContainText('Lentils');
+    await expect(rows.nth(3)).toContainText('Your added row · kept');
+    await expect(
+      rows.nth(3).getByRole('cell', { name: 'Not entered', exact: true })
+    ).toHaveCount(1);
+    await products.getByText('Comment', { exact: true }).click();
+    await expect(products.getByText('My unfinished new row')).toBeVisible();
+    await expect(
+      review.getByText(
+        'The latest saved products will appear first. Your 1 row will be kept at the end.'
+      )
     ).toBeVisible();
     await capture('Saved and unsaved product rows previewed together');
     await review.getByRole('button', { name: 'Apply changes' }).click();
@@ -693,63 +718,152 @@ test.describe('Supply refresh and conflict resolution', () => {
     await capture('Saved Rice and Oats first — unsaved Lentils appended');
   });
 
-  test('competing edits to existing product rows require a list choice', async ({
-    page,
-    savedSupply,
-    capture,
-  }) => {
-    const saved = await savedSupply.replace({
-      supplyEntries: [
-        draftSupply.supplyEntries[0],
-        {
-          ...draftSupply.supplyEntries[0],
-          id: 18,
-          productVariant: { id: 12, name: 'Oats', sku: 'OATS' },
-        },
-        {
-          ...draftSupply.supplyEntries[0],
-          id: 19,
-          productVariant: { id: 13, name: 'Lentils', sku: 'LENTILS' },
-        },
-      ],
-      totalQuantity: 6,
-      totalPrice: 30,
+  for (const choice of ['local', 'server'] as const) {
+    test(`competing product lists preserve the ${choice} list on ${choice === 'local' ? 'desktop' : 'mobile'}`, async ({
+      page,
+      savedSupply,
+      capture,
+    }) => {
+      if (choice === 'server') {
+        await page.setViewportSize({ width: 390, height: 844 });
+      }
+      const saved = await savedSupply.replace({
+        supplyEntries: [
+          draftSupply.supplyEntries[0],
+          {
+            ...draftSupply.supplyEntries[0],
+            id: 18,
+            productVariant: { id: 12, name: 'Oats', sku: 'OATS' },
+          },
+          {
+            ...draftSupply.supplyEntries[0],
+            id: 19,
+            productVariant: { id: 13, name: 'Lentils', sku: 'LENTILS' },
+          },
+        ],
+        totalQuantity: 6,
+        totalPrice: 30,
+      });
+      await openEditor(page);
+      await page
+        .getByRole('spinbutton', { name: 'Quantity for row 1', exact: true })
+        .fill('7');
+      await savedSupply.replace({
+        supplyEntries: saved.supplyEntries
+          .slice(0, 2)
+          .map((entry, index) =>
+            index === 0 ? { ...entry, quantity: 4 } : entry
+          ),
+        totalQuantity: 8,
+        totalPrice: 40,
+      });
+      await returnToEditor(page);
+      await reviewUpdates(page);
+      const conflict = page.getByRole('dialog', {
+        name: 'Review updates',
+      });
+      await expect(
+        conflict.getByRole('radio', { name: 'Your product list (3 rows)' })
+      ).toBeVisible();
+      await expect(
+        conflict.getByRole('radio', { name: 'Saved product list (2 rows)' })
+      ).toBeVisible();
+      const localTable = conflict.getByRole('table', {
+        name: 'Your product list',
+        exact: true,
+      });
+      const savedTable = conflict.getByRole('table', {
+        name: 'Saved product list',
+        exact: true,
+      });
+      await expect(localTable.getByRole('row')).toHaveCount(4);
+      await expect(savedTable.getByRole('row')).toHaveCount(3);
+      await expect(
+        localTable.getByRole('cell', { name: '7 Bag (bag)', exact: true })
+      ).toBeVisible();
+      await expect(
+        savedTable.getByRole('cell', { name: '4 Bag (bag)', exact: true })
+      ).toBeVisible();
+      await expect(savedTable.getByText('Lentils')).toHaveCount(0);
+      const localBounds = await localTable.boundingBox();
+      const savedBounds = await savedTable.boundingBox();
+      const dialogBounds = await conflict.boundingBox();
+      if (!localBounds || !savedBounds || !dialogBounds) {
+        throw new Error('Product comparison tables must be visible.');
+      }
+      // Every column must fit without clipping prices in either layout.
+      expect(savedBounds.x + savedBounds.width).toBeLessThanOrEqual(
+        dialogBounds.x + dialogBounds.width - 24
+      );
+      if (choice === 'local') {
+        expect(localBounds.x + localBounds.width).toBeLessThanOrEqual(
+          savedBounds.x
+        );
+        expect(localBounds.y).toBe(savedBounds.y);
+      } else {
+        expect(localBounds.x + localBounds.width).toBeLessThanOrEqual(
+          dialogBounds.x + dialogBounds.width - 24
+        );
+        expect(savedBounds.y).toBeGreaterThan(
+          localBounds.y + localBounds.height
+        );
+      }
+      await test.info().attach('Product lists before selection', {
+        body: await conflict.screenshot(),
+        contentType: 'image/png',
+      });
+      await conflict.getByRole('button', { name: 'Apply changes' }).click();
+      await expect(
+        conflict.getByText('Choose which value to keep.')
+      ).toBeVisible();
+      await capture('Existing row was edited in both sessions');
+      if (choice === 'server') {
+        const savedPrice = savedTable
+          .getByRole('cell', { name: '$5.00', exact: true })
+          .last();
+        await savedPrice.scrollIntoViewIfNeeded();
+        await expect(savedPrice).toBeInViewport();
+        await expect(
+          conflict.getByRole('button', { name: 'Apply changes' })
+        ).toBeInViewport();
+      }
+      await conflict
+        .getByRole('radio', {
+          name:
+            choice === 'local'
+              ? 'Your product list (3 rows)'
+              : 'Saved product list (2 rows)',
+        })
+        .check();
+      await test.info().attach('Selected product list', {
+        body: await conflict.screenshot(),
+        contentType: 'image/png',
+      });
+      await conflict.getByRole('button', { name: 'Apply changes' }).click();
+      await expect(
+        page.getByRole('spinbutton', {
+          name: 'Quantity for row 1',
+          exact: true,
+        })
+      ).toHaveValue(choice === 'local' ? '7' : '4');
+      if (choice === 'local') {
+        await expect(
+          page.getByRole('spinbutton', {
+            name: 'Quantity for row 3',
+            exact: true,
+          })
+        ).toHaveValue('2');
+      } else {
+        await expect(
+          page.getByRole('spinbutton', {
+            name: 'Quantity for row 3',
+            exact: true,
+          })
+        ).toHaveCount(0);
+      }
+      await capture(`Explicitly kept ${choice} product list`);
     });
-    await openEditor(page);
-    await page
-      .getByRole('spinbutton', { name: 'Quantity for row 1', exact: true })
-      .fill('7');
-    await savedSupply.replace({
-      supplyEntries: saved.supplyEntries.map((entry, index) =>
-        index === 0 ? { ...entry, quantity: 4 } : entry
-      ),
-      totalQuantity: 8,
-      totalPrice: 40,
-    });
-    await returnToEditor(page);
-    await reviewUpdates(page);
-    const conflict = page.getByRole('dialog', {
-      name: 'Review updates',
-    });
-    await expect(
-      conflict.getByRole('radio', { name: /Keep my changes:.*quantity: 7/ })
-    ).toBeVisible();
-    await expect(
-      conflict.getByRole('radio', { name: /Use saved value:.*quantity: 4/ })
-    ).toBeVisible();
-    await capture('Existing row was edited in both sessions');
-    await conflict
-      .getByRole('radio', { name: /Keep my changes:.*quantity: 7/ })
-      .check();
-    await conflict.getByRole('button', { name: 'Apply changes' }).click();
-    await expect(
-      page.getByRole('spinbutton', { name: 'Quantity for row 1', exact: true })
-    ).toHaveValue('7');
-    await expect(
-      page.getByRole('spinbutton', { name: 'Quantity for row 3', exact: true })
-    ).toHaveValue('2');
-    await capture('Explicitly kept local product values');
-  });
+  }
 
   test('a failed background read keeps edits available and a later refresh recovers', async ({
     page,

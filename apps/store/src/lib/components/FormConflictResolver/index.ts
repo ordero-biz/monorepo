@@ -11,5 +11,6 @@ export const FormConflictResolver = {
 export type {
   FormConflictPolicy,
   FormConflictResolverProviderProps,
+  FormFieldRenderer,
   FormRefreshAdapter,
 } from './types';

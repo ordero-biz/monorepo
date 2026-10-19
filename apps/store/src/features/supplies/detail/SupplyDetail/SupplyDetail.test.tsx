@@ -780,17 +780,17 @@ describe('SupplyDetail', () => {
       name: 'Supply products',
     });
     expect(products).toHaveAccessibleDescription(
-      'Choose the complete product list to keep.'
+      'Choose one complete product list. Products from the other list will not be included.'
     );
     await user.click(screen.getByRole('button', { name: 'Apply changes' }));
     expect(products).toHaveAccessibleDescription('Choose which value to keep.');
     await user.click(
       within(products).getByRole('radio', {
-        name: /Keep my changes:.*quantity: 3/,
+        name: 'Your product list (1 row)',
       })
     );
     expect(products).toHaveAccessibleDescription(
-      'Choose the complete product list to keep.'
+      'Choose one complete product list. Products from the other list will not be included.'
     );
     await user.click(screen.getByRole('button', { name: 'Apply changes' }));
 

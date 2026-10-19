@@ -84,6 +84,78 @@ const { setup: setupWithoutResolver } = prepareStoreSetup({
 describe('FormConflictResolver', () => {
   beforeEach(() => vi.clearAllMocks());
 
+  it('renders typed field previews with the latest saved values before applying', async () => {
+    const user = userEvent.setup();
+    const {
+      form,
+      renderResult: { rerender },
+    } = setup({
+      latest,
+      form: { ...defaultProps.form, getValues: () => initial.values },
+      policy: {
+        ...policy,
+        fieldRenderers: {
+          title: {
+            renderUpdate: ({ baseline, current, latest, merged }) => (
+              <p>{`Original: ${baseline}; on page: ${current}; saved: ${latest}; result: ${merged}`}</p>
+            ),
+          },
+        },
+      } satisfies FormConflictPolicy<SavedRecord, Values>,
+    });
+    await user.click(screen.getByRole('button', { name: 'Review updates' }));
+    expect(
+      screen.getByText(
+        'Original: Original; on page: Original; saved: Saved title; result: Saved title'
+      )
+    ).toBeVisible();
+    expect(screen.queryByText('Current value')).not.toBeInTheDocument();
+    rerender({
+      latest: { ...latest, version: 3, values: { title: 'New saved title' } },
+    });
+    expect(
+      screen.getByText(
+        'Original: Original; on page: Original; saved: New saved title; result: New saved title'
+      )
+    ).toBeVisible();
+    expect(form.reset).not.toHaveBeenCalled();
+    await user.click(screen.getByRole('button', { name: 'Apply changes' }));
+    expect(form.reset).toHaveBeenCalledExactlyOnceWith({
+      title: 'New saved title',
+    });
+  });
+
+  it('validates custom conflict choices and applies the selected typed value', async () => {
+    const user = userEvent.setup();
+    const { form } = setup({
+      latest,
+      policy: {
+        ...policy,
+        fieldRenderers: {
+          title: {
+            renderChoice: (value, choice) => ({
+              label: choice === 'local' ? 'Your title' : 'Saved title',
+              content: <p>{value}</p>,
+            }),
+          },
+        },
+      } satisfies FormConflictPolicy<SavedRecord, Values>,
+    });
+    await user.click(screen.getByRole('button', { name: 'Review updates' }));
+    expect(screen.getByText('My title')).toBeVisible();
+    await user.click(screen.getByRole('button', { name: 'Apply changes' }));
+    expect(
+      screen.getByRole('radiogroup', { name: 'Title' })
+    ).toHaveAccessibleDescription('Choose which value to keep.');
+    expect(form.reset).not.toHaveBeenCalled();
+    await user.click(screen.getByRole('radio', { name: 'Your title' }));
+    await user.click(screen.getByRole('button', { name: 'Apply changes' }));
+    expect(form.setFieldValue).toHaveBeenCalledExactlyOnceWith(
+      'title',
+      'My title'
+    );
+  });
+
   it('allows shared create-form actions without a provider', () => {
     setupWithoutResolver();
 

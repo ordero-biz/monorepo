@@ -5,6 +5,7 @@ import {
   getSupplyFormDefaults,
   type SupplyFormValues,
 } from '../../shared/SupplyEditorForm';
+import { supplyProductsRenderer } from './SupplyProductsComparison';
 import { mergeSupplyChanges } from './utils/mergeSupplyChanges';
 
 export const supplyConflictPolicy: FormConflictPolicy<
@@ -14,6 +15,7 @@ export const supplyConflictPolicy: FormConflictPolicy<
   getVersion: (supply) => supply.version,
   getDefaultValues: getSupplyFormDefaults,
   merge: mergeSupplyChanges,
+  fieldRenderers: { supplyEntries: supplyProductsRenderer },
   saveNotice: 'This action does not save or finalize this supply.',
   notice: {
     title: 'Supply changed',

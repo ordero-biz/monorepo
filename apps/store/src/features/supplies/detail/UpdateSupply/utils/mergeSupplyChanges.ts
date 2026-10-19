@@ -61,11 +61,13 @@ const describeValue = (value: SupplyFormValues[keyof SupplyFormValues]) => {
   return value?.name || '(none)';
 };
 
-const mergeAddedEntries = ({
+export const getAddedSupplyEntries = ({
   baseline,
   current,
-  latest,
-}: FormMergeValues<SupplyFormValues['supplyEntries']>) => {
+}: Pick<
+  FormMergeValues<SupplyFormValues['supplyEntries']>,
+  'baseline' | 'current'
+>) => {
   // Compare local ids only with the editing baseline: saved ids may change.
   // The default empty row is a placeholder, not a persisted product.
   const initialEntries = baseline.filter(
@@ -88,11 +90,18 @@ const mergeAddedEntries = ({
       normalizeEntries(initialEntries)
     );
 
-  if (
-    addedEntries.length > 0 &&
-    existingEntriesUnchanged &&
-    !areFormValuesEqual(current, baseline)
-  ) {
+  return existingEntriesUnchanged && !areFormValuesEqual(current, baseline)
+    ? addedEntries
+    : [];
+};
+
+const mergeAddedEntries = ({
+  baseline,
+  current,
+  latest,
+}: FormMergeValues<SupplyFormValues['supplyEntries']>) => {
+  const addedEntries = getAddedSupplyEntries({ baseline, current });
+  if (addedEntries.length > 0) {
     const savedEntries = latest.filter(
       (entry) => entry.clientId !== 'initial-placeholder'
     );
@@ -132,7 +141,8 @@ const fields: FormMergeFields<SupplyFormValues> = {
     normalize: normalizeEntries,
     describe: describeValue,
     merge: mergeAddedEntries,
-    helperText: 'Choose the complete product list to keep.',
+    helperText:
+      'Choose one complete product list. Products from the other list will not be included.',
   },
 };
 

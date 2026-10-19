@@ -5,6 +5,7 @@ import type {
   FormMergeConflict,
   FormMergeResult,
   FormMergeUpdate,
+  FormMergeValues,
 } from '@/lib/utils/form/comparison/mergeFormValues';
 
 export type FormRefreshAdapter<TValues extends object> = {
@@ -24,6 +25,23 @@ export type SavedChangesNotice = {
   description: string;
 };
 
+export type FormConflictOption = {
+  label: string;
+  content: ReactNode;
+};
+
+export type FormFieldPresentation = {
+  update?: ReactNode;
+  options?: Record<FormMergeChoice, FormConflictOption>;
+};
+
+export type FormFieldRenderer<TValue> = {
+  renderUpdate?: (
+    values: FormMergeValues<TValue> & { merged: TValue }
+  ) => ReactNode;
+  renderChoice?: (value: TValue, choice: FormMergeChoice) => FormConflictOption;
+};
+
 export type FormConflictPolicy<TRecord, TValues extends object> = {
   getVersion: (record: TRecord) => number;
   getDefaultValues: (record: TRecord) => TValues;
@@ -36,6 +54,12 @@ export type FormConflictPolicy<TRecord, TValues extends object> = {
   notice: SavedChangesNotice;
   // Explain what accepting a review does not persist in this workflow.
   saveNotice?: string;
+  // Features render typed values; the resolver keeps selection and validation.
+  fieldRenderers?: {
+    [TField in Extract<keyof TValues, string>]?: FormFieldRenderer<
+      TValues[TField]
+    >;
+  };
   readOnly?: {
     isReadOnly: (record: TRecord) => boolean;
     notice: SavedChangesNotice;
@@ -66,6 +90,7 @@ export type FormConflictDialogProps<TField extends string> = {
   conflicts: readonly FormMergeConflict<TField>[];
   updates: readonly FormMergeUpdate<TField>[];
   saveNotice?: string;
+  presentations?: Partial<Record<TField, FormFieldPresentation>>;
   onApply: (choices: FormMergeChoices<TField>) => void;
   onClose: () => void;
 };
@@ -81,7 +106,7 @@ export type SavedChangesDialogProps = SavedChangesNotice & {
 
 export type FormConflictFormProps<TField extends string> = Pick<
   FormConflictDialogProps<TField>,
-  'conflicts' | 'updates' | 'saveNotice' | 'onApply'
+  'conflicts' | 'updates' | 'saveNotice' | 'presentations' | 'onApply'
 >;
 
 export type FormConflictFormValues = {

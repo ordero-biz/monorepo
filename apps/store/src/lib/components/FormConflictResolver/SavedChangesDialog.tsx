@@ -18,9 +18,7 @@ export const SavedChangesDialog = ({
           <Dialog.Header>
             <Dialog.Title>{title}</Dialog.Title>
           </Dialog.Header>
-          <Dialog.Content>
-            <Dialog.Description>{description}</Dialog.Description>
-          </Dialog.Content>
+          <Dialog.Content>{description}</Dialog.Content>
           <Dialog.Footer
             closeButtonLabel={reviewAction ? 'Keep editing' : 'Close'}
           >

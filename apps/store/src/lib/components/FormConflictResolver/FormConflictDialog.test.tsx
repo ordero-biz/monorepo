@@ -47,6 +47,9 @@ describe('FormConflictDialog', () => {
       'Review the saved updates below. Your unsaved edits will be kept.'
     );
     expect(screen.queryByText(/choose which values/i)).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('heading', { name: 'Updates to apply' })
+    ).not.toBeInTheDocument();
     expect(summary.getByText('Name')).toBeVisible();
     expect(summary.getByText('Current name')).toBeVisible();
     expect(summary.getByText('Updated name')).toBeVisible();
@@ -172,6 +175,12 @@ describe('FormConflictDialog', () => {
       ).getByText(updates[0].mergedValue)
     ).toBeVisible();
     expect(screen.getAllByRole('radiogroup')).toHaveLength(1);
+    expect(
+      screen.getByRole('heading', { name: 'Updates to apply' })
+    ).toBeVisible();
+    expect(
+      screen.getByRole('heading', { name: 'Choose which values to keep' })
+    ).toBeVisible();
     await user.click(screen.getByRole('button', { name: 'Apply changes' }));
     expect(
       screen.getByRole('radiogroup', { name: conflicts[0].label })

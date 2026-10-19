@@ -5,7 +5,10 @@ import { FormConflictResolverContext } from './context';
 import { FormConflictDialog } from './FormConflictDialog';
 import { useFormRefresh } from './hooks/useFormRefresh';
 import { SavedChangesDialog } from './SavedChangesDialog';
-import type { FormConflictResolverProviderProps } from './types';
+import type {
+  FormConflictResolverProviderProps,
+  FormFieldPresentation,
+} from './types';
 
 export const FormConflictResolverProvider = <TRecord, TValues extends object>({
   baseline,
@@ -39,6 +42,37 @@ export const FormConflictResolverProvider = <TRecord, TValues extends object>({
       ? policy.readOnly.notice
       : policy.notice;
 
+  const presentations: Partial<
+    Record<Extract<keyof TValues, string>, FormFieldPresentation>
+  > = {};
+  const { reviewValues, conflictDialogProps } = refresh;
+  if (reviewValues && conflictDialogProps) {
+    for (const { field } of conflictDialogProps.updates) {
+      const renderer = policy.fieldRenderers?.[field];
+      if (renderer?.renderUpdate) {
+        presentations[field] = {
+          update: renderer.renderUpdate({
+            baseline: reviewValues.baseline[field],
+            current: reviewValues.current[field],
+            latest: reviewValues.latest[field],
+            merged: reviewValues.merged[field],
+          }),
+        };
+      }
+    }
+    for (const { field } of conflictDialogProps.conflicts) {
+      const renderer = policy.fieldRenderers?.[field];
+      if (renderer?.renderChoice) {
+        presentations[field] = {
+          options: {
+            local: renderer.renderChoice(reviewValues.current[field], 'local'),
+            server: renderer.renderChoice(reviewValues.latest[field], 'server'),
+          },
+        };
+      }
+    }
+  }
+
   return (
     <FormConflictResolverContext value={value}>
       {children}
@@ -59,6 +93,7 @@ export const FormConflictResolverProvider = <TRecord, TValues extends object>({
         <FormConflictDialog
           {...refresh.conflictDialogProps}
           saveNotice={policy.saveNotice}
+          presentations={presentations}
         />
       )}
     </FormConflictResolverContext>
