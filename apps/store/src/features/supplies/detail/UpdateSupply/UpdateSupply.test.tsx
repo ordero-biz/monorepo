@@ -426,6 +426,91 @@ describe('UpdateSupply', () => {
     );
   });
 
+  it.each([
+    'supplyEntries.0',
+    'supplyEntries[0]',
+  ])('maps %s errors to the submitted product after omitting a blank row', async (errorPath) => {
+    const user = userEvent.setup();
+    const emptyOptions = {
+      ok: true as const,
+      data: {
+        content: [],
+        page: { number: 0, size: 100, totalElements: 0, totalPages: 0 },
+      },
+    };
+    getProductVariantsMock.mockResolvedValue(emptyOptions);
+    getUnitsOfMeasurementMock.mockResolvedValue(emptyOptions);
+    updateSupplyMock.mockResolvedValue({
+      ok: false,
+      error: {
+        status: 400,
+        message: 'Invalid supply entries',
+        fieldErrors: {
+          [`${errorPath}.quantity`]: 'Quantity is unavailable',
+          [`${errorPath}.productVariantId`]: 'Product is unavailable',
+          [`${errorPath}.unitOfMeasurementId`]: 'Unit is unavailable',
+        },
+      },
+    });
+    const { supply } = setup({
+      supply: {
+        ...savedSupply,
+        supplyEntries: [
+          savedSupply.supplyEntries[0],
+          { ...savedSupply.supplyEntries[0], id: 18 },
+        ],
+      },
+    });
+
+    await user.clear(
+      screen.getByRole('combobox', { name: 'Product for row 1' })
+    );
+    await user.clear(screen.getByRole('combobox', { name: 'Unit for row 1' }));
+    await user.clear(
+      screen.getByRole('spinbutton', { name: 'Quantity for row 1' })
+    );
+    await user.clear(
+      screen.getByRole('spinbutton', { name: 'Unit price for row 1' })
+    );
+    await user.click(screen.getByRole('button', { name: 'Save draft' }));
+
+    await waitFor(() =>
+      expect(updateSupplyMock).toHaveBeenCalledExactlyOnceWith({
+        supplyId: supply?.id,
+        expectedVersion: supply?.version,
+        supplyEntries: [
+          {
+            productVariantId: 11,
+            unitOfMeasurementId: 2,
+            quantity: 20,
+            unitPrice: 28,
+            comment: null,
+          },
+        ],
+      })
+    );
+    await waitFor(() =>
+      expect(
+        screen.getByRole('spinbutton', { name: 'Quantity for row 2' })
+      ).toHaveAccessibleDescription('Quantity is unavailable')
+    );
+    expect(
+      screen.getByRole('combobox', { name: 'Product for row 2' })
+    ).toHaveAccessibleDescription('Product is unavailable');
+    expect(
+      screen.getByRole('combobox', { name: 'Unit for row 2' })
+    ).toHaveAccessibleDescription('Unit is unavailable');
+    expect(
+      screen.getByRole('spinbutton', { name: 'Quantity for row 1' })
+    ).toHaveAccessibleDescription('');
+    expect(
+      screen.getByRole('combobox', { name: 'Product for row 1' })
+    ).toHaveAccessibleDescription('');
+    expect(
+      screen.getByRole('combobox', { name: 'Unit for row 1' })
+    ).toHaveAccessibleDescription('');
+  });
+
   it('requires a warehouse after clearing the saved selection', async () => {
     const user = userEvent.setup();
     getWarehousesMock.mockResolvedValue({

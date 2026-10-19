@@ -8,6 +8,7 @@ import { SUPPLY_STATUS } from '@/lib/domain/supplies/constants';
 import type { SupplyDetails, SupplyStatus } from '@/lib/domain/supplies/types';
 import type { SupplyFormValues, SupplySubmitIntent } from '../types';
 import { isBlankSupplyEntry } from '../utils';
+import { mapSupplyFieldErrors } from '../utils/mapSupplyFieldErrors';
 
 type UseSubmitSupplyFormArgs = {
   defaultValues: SupplyFormValues;
@@ -20,22 +21,6 @@ type UseSubmitSupplyFormArgs = {
 };
 
 const defaultSubmitMeta: { intent: SupplySubmitIntent } = { intent: 'draft' };
-
-const mapSupplyFieldErrors = (fieldErrors?: Record<string, string>) =>
-  fieldErrors
-    ? Object.fromEntries(
-        Object.entries(fieldErrors).map(([name, message]) => [
-          name
-            .replace(/^(supplier|warehouse)Id$/, '$1')
-            .replace(/^supplyEntries\.(\d+)\./, 'supplyEntries[$1].')
-            .replace(
-              /^(supplyEntries\[\d+\])\.(productVariant|unitOfMeasurement)Id$/,
-              '$1.$2'
-            ),
-          message,
-        ])
-      )
-    : undefined;
 
 export const useSubmitSupplyForm = ({
   defaultValues,
@@ -68,6 +53,9 @@ export const useSubmitSupplyForm = ({
         meta.intent === 'finalize'
           ? SUPPLY_STATUS.COMPLETED
           : SUPPLY_STATUS.DRAFT;
+      const submittedEntryIds = value.supplyEntries
+        .filter((entry) => !isBlankSupplyEntry(entry))
+        .map((entry) => entry.clientId);
       const result = await submitAction({ value, status });
 
       if (!result) {
@@ -78,7 +66,11 @@ export const useSubmitSupplyForm = ({
       if (!result.ok) {
         formApi.setErrorMap({
           onSubmit: {
-            fields: mapSupplyFieldErrors(result.error.fieldErrors) ?? {},
+            fields: mapSupplyFieldErrors({
+              fieldErrors: result.error.fieldErrors,
+              submittedEntryIds,
+              currentEntries: formApi.state.values.supplyEntries,
+            }),
           },
         });
         addToast({
