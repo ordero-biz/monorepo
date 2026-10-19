@@ -16,6 +16,11 @@ export const columns: DataTableColumnDef<SupplyProductPreviewRow>[] = [
         {entry.source && (
           <p className="font-[var(--subtitle2-weight)]">{entry.source}</p>
         )}
+        {entry.different && (
+          <p className="font-[var(--subtitle2-weight)] text-[var(--text-primary)]">
+            Different
+          </p>
+        )}
         {entry.comment.trim() && (
           <details className="mt-[var(--space-0-5)]">
             <summary className="cursor-pointer text-muted-foreground">

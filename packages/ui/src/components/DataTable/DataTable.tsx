@@ -43,6 +43,18 @@ const tableShellStyle = {
     'var(--card-x1) var(--card-y1) var(--card-blur1) var(--card-spread1) var(--color-grey-20), var(--card-x2) var(--card-y2) var(--card-blur2) var(--card-spread2) var(--color-grey-12)',
 } satisfies CSSProperties;
 
+const dataTableRowVariants = cva('last:[&_td]:border-b-0', {
+  variants: {
+    tone: {
+      default:
+        'bg-card hover:bg-[var(--color-grey-8)] data-[state=selected]:bg-[var(--color-grey-8)]',
+      warning:
+        'bg-[var(--color-warning-8)] hover:bg-[var(--color-warning-16)] data-[state=selected]:bg-[var(--color-warning-16)]',
+    },
+  },
+  defaultVariants: { tone: 'default' },
+});
+
 const contentCellClassName =
   'p-0 align-middle text-[length:var(--body2-size-desktop)] leading-[var(--body2-line-height-desktop)] font-[var(--body2-weight)] [font-family:var(--body2-family)] text-card-foreground';
 
@@ -184,6 +196,7 @@ export const DataTable = <TData,>({
   footerColumns,
   getRowCanSelect,
   getRowId,
+  getRowTone,
   manualPagination = false,
   manualSorting = false,
   onRowSelectionChange,
@@ -330,7 +343,9 @@ export const DataTable = <TData,>({
               table.getRowModel().rows.map((row) => (
                 <tr
                   key={row.id}
-                  className="bg-card hover:bg-[var(--color-grey-8)] last:[&_td]:border-b-0 data-[state=selected]:bg-[var(--color-grey-8)]"
+                  className={dataTableRowVariants({
+                    tone: getRowTone?.(row.original, row.index),
+                  })}
                   data-state={row.getIsSelected() ? 'selected' : undefined}
                 >
                   {row.getVisibleCells().map((cell) => {

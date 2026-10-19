@@ -317,8 +317,8 @@ clears selections and errors and refreshes the summary.
 
 For structured values, configure `policy.fieldRenderers` by form field. Each
 `FormFieldRenderer<Value>` receives that field's typed values: `renderUpdate`
-gets the baseline, current, latest, and merged values; `renderChoice` gets the
-local or saved value and returns a short radio label and separate display
+gets the baseline, current, latest, and merged values; `renderChoice` gets an
+object with `value`, `otherValue`, and `choice`, and returns a short radio label and separate display
 content. Unconfigured fields retain the text comparison. The resolver owns
 radio controls, required validation, revision resets, and applying choices;
 feature renderers own presentation only. Keep tables and interactive disclosure
@@ -327,8 +327,12 @@ content outside radio labels, and do not parse the merge result's display string
 The supply renderer displays products, SKUs, quantities, units, and formatted
 unit prices in tables. Safe additions appear after saved rows and are identified
 as retained local rows. Conflicts retain one choice per complete list. Saved row
-IDs may change and duplicate products are valid, so this presentation does not
-infer row additions, removals, or cell differences by SKU or array position.
+IDs may change and duplicate products are valid. Highlighting compares normalized
+whole-row values with occurrence counts, and labels unmatched occurrences
+“Different”. Retained local additions keep their own label and are reserved
+before matching saved rows. The comparison is memoized and linear in row count
+and value size; it does not infer row additions, removals, or cell differences
+by SKU or array position.
 
 Review instructions distinguish automatic updates, conflicting values, and
 reviews containing both. Only reviews with conflicts ask the user to choose.

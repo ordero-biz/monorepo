@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import type { CellContext, HeaderContext } from '@tanstack/react-table';
 import { format, parseISO } from 'date-fns';
 import { useState } from 'react';
+import { expect, within } from 'storybook/test';
 import { Chip } from '@/ui/components/Chip';
 import {
   DataTable,
@@ -441,6 +442,19 @@ export const Empty: Story = {
   args: {
     data: [],
     emptyMessage: 'No matching products found.',
+  },
+};
+
+export const WarningRows: Story = {
+  args: {
+    getRowTone: (row) => row.publish === 'Draft' ? 'warning' : 'default',
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const warning = canvas.getByRole('row', { name: /Mountain Trekking Boots/ });
+    const normal = canvas.getByRole('row', { name: /Urban Explorer Sneakers/ });
+    await expect(warning).toBeVisible();
+    await expect(getComputedStyle(warning).backgroundColor).not.toBe(getComputedStyle(normal).backgroundColor);
   },
 };
 

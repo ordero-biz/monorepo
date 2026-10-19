@@ -133,9 +133,14 @@ describe('FormConflictResolver', () => {
         ...policy,
         fieldRenderers: {
           title: {
-            renderChoice: (value, choice) => ({
+            renderChoice: ({ value, otherValue, choice }) => ({
               label: choice === 'local' ? 'Your title' : 'Saved title',
-              content: <p>{value}</p>,
+              content: (
+                <>
+                  <p>{value}</p>
+                  <p>Compared with: {otherValue}</p>
+                </>
+              ),
             }),
           },
         },
@@ -143,6 +148,8 @@ describe('FormConflictResolver', () => {
     });
     await user.click(screen.getByRole('button', { name: 'Review updates' }));
     expect(screen.getByText('My title')).toBeVisible();
+    expect(screen.getByText('Compared with: Saved title')).toBeVisible();
+    expect(screen.getByText('Compared with: My title')).toBeVisible();
     await user.click(screen.getByRole('button', { name: 'Apply changes' }));
     expect(
       screen.getByRole('radiogroup', { name: 'Title' })

@@ -15,6 +15,7 @@ export type {
   DataTablePaginationState,
   DataTableProps,
   DataTableRowSelectionState,
+  DataTableRowTone,
   DataTableSelectionCellProps,
   DataTableSelectionColumnHeaderProps,
   DataTableSelectionProps,

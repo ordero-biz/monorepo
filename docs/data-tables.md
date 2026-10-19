@@ -42,6 +42,12 @@ Feature code owns fetching, filters, request parameters, mutation effects,
 dialogs, toasts, and bulk-action bars. Do not put an app resource's query or
 mutation logic into `DataTable`.
 
+Use `getRowTone` to return `warning` for rows that need visual emphasis, or
+`default` for normal rows. The warning tint remains visible on hover and
+selection. Compute domain comparisons in the feature and pass a cheap flag
+lookup here. Include a visible explanation such as “Different” in a cell;
+row color alone must not convey the meaning.
+
 ## Footers and summaries
 
 Use `footer` for a standalone `ReactNode` below the table. The component owns

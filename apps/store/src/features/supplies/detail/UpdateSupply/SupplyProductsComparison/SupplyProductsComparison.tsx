@@ -6,9 +6,14 @@ import { isBlankSupplyEntry } from '../../../shared/SupplyEditorForm/utils';
 import { getAddedSupplyEntries } from '../utils/mergeSupplyChanges';
 import { columns } from './columns';
 import type {
+  SupplyProductPreviewRow,
   SupplyProductsComparisonProps,
   SupplyProductsTableProps,
 } from './types';
+import { getDifferentRows } from './utils/getDifferentRows';
+
+const getRowTone = (row: SupplyProductPreviewRow) =>
+  row.highlighted ? 'warning' : 'default';
 
 const visibleEntries = (entries: SupplyEntryFormValues[]) =>
   entries.filter(
@@ -25,18 +30,35 @@ export const SupplyProductsTable = ({
   label,
   entries,
   addedEntries,
+  comparedEntries,
 }: SupplyProductsTableProps) => {
   const rows = useMemo(() => {
     const addedIds = new Set(addedEntries?.map((entry) => entry.clientId));
-    return visibleEntries(entries).map((entry) => ({
-      ...entry,
-      source: addedEntries
-        ? addedIds.has(entry.clientId)
-          ? ('Your added row · kept' as const)
-          : ('Saved version' as const)
-        : undefined,
-    }));
-  }, [entries, addedEntries]);
+    const visible = visibleEntries(entries);
+    // Retained local additions already have known identity. Reserve their matches
+    // so an identical saved addition is still shown as a difference.
+    const differences = getDifferentRows(
+      visible.filter((entry) => !addedIds.has(entry.clientId)),
+      visibleEntries(comparedEntries ?? entries).filter(
+        (entry) => !addedIds.has(entry.clientId)
+      )
+    );
+    let differenceIndex = 0;
+    return visible.map((entry) => {
+      const added = addedIds.has(entry.clientId);
+      const different = added ? false : differences[differenceIndex++];
+      return {
+        ...entry,
+        different,
+        highlighted: different || added,
+        source: addedEntries
+          ? addedIds.has(entry.clientId)
+            ? ('Your added row · kept' as const)
+            : ('Saved version' as const)
+          : undefined,
+      };
+    });
+  }, [entries, addedEntries, comparedEntries]);
 
   return (
     <DataTable
@@ -44,6 +66,7 @@ export const SupplyProductsTable = ({
       columns={columns}
       data={rows}
       emptyMessage="No products"
+      getRowTone={getRowTone}
     />
   );
 };
@@ -70,6 +93,7 @@ export const SupplyProductsComparison = ({
       </Typography>
       <SupplyProductsTable
         addedEntries={addedEntries}
+        comparedEntries={current}
         entries={merged}
         label="Products after applying"
       />
@@ -79,6 +103,7 @@ export const SupplyProductsComparison = ({
         </summary>
         <div className="mt-[var(--space-1)]">
           <SupplyProductsTable
+            comparedEntries={merged}
             entries={current}
             label="Products currently on your page"
           />
@@ -92,12 +117,18 @@ export const supplyProductsRenderer: FormFieldRenderer<
   SupplyEntryFormValues[]
 > = {
   renderUpdate: (values) => <SupplyProductsComparison {...values} />,
-  renderChoice: (entries, choice) => {
+  renderChoice: ({ value: entries, otherValue, choice }) => {
     const label =
       choice === 'local' ? 'Your product list' : 'Saved product list';
     return {
       label: `${label} (${rowCount(entries)})`,
-      content: <SupplyProductsTable entries={entries} label={label} />,
+      content: (
+        <SupplyProductsTable
+          entries={entries}
+          comparedEntries={otherValue}
+          label={label}
+        />
+      ),
     };
   },
 };

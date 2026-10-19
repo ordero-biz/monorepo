@@ -686,10 +686,19 @@ test.describe('Supply refresh and conflict resolution', () => {
     const rows = products.getByRole('row');
     await expect(rows).toHaveCount(4);
     await expect(rows.nth(1)).toContainText('Rice');
+    await expect(
+      rows.nth(1).getByText('Different', { exact: true })
+    ).toHaveCount(0);
     await expect(rows.nth(2)).toContainText('Oats');
     await expect(rows.nth(2)).toContainText('Saved version');
+    await expect(
+      rows.nth(2).getByText('Different', { exact: true })
+    ).toBeVisible();
     await expect(rows.nth(3)).toContainText('Lentils');
     await expect(rows.nth(3)).toContainText('Your added row · kept');
+    await expect(
+      rows.nth(3).getByText('Different', { exact: true })
+    ).toHaveCount(0);
     await expect(
       rows.nth(3).getByRole('cell', { name: 'Not entered', exact: true })
     ).toHaveCount(1);
@@ -785,6 +794,18 @@ test.describe('Supply refresh and conflict resolution', () => {
         savedTable.getByRole('cell', { name: '4 Bag (bag)', exact: true })
       ).toBeVisible();
       await expect(savedTable.getByText('Lentils')).toHaveCount(0);
+      await expect(
+        localTable.getByText('Different', { exact: true })
+      ).toHaveCount(2);
+      await expect(
+        savedTable.getByText('Different', { exact: true })
+      ).toHaveCount(1);
+      await expect(
+        localTable
+          .getByRole('row')
+          .filter({ hasText: 'Oats' })
+          .getByText('Different', { exact: true })
+      ).toHaveCount(0);
       const localBounds = await localTable.boundingBox();
       const savedBounds = await savedTable.boundingBox();
       const dialogBounds = await conflict.boundingBox();

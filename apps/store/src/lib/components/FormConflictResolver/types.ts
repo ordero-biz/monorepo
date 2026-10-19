@@ -39,7 +39,11 @@ export type FormFieldRenderer<TValue> = {
   renderUpdate?: (
     values: FormMergeValues<TValue> & { merged: TValue }
   ) => ReactNode;
-  renderChoice?: (value: TValue, choice: FormMergeChoice) => FormConflictOption;
+  renderChoice?: (args: {
+    value: TValue;
+    otherValue: TValue;
+    choice: FormMergeChoice;
+  }) => FormConflictOption;
 };
 
 export type FormConflictPolicy<TRecord, TValues extends object> = {

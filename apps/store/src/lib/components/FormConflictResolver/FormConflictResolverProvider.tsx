@@ -65,8 +65,16 @@ export const FormConflictResolverProvider = <TRecord, TValues extends object>({
       if (renderer?.renderChoice) {
         presentations[field] = {
           options: {
-            local: renderer.renderChoice(reviewValues.current[field], 'local'),
-            server: renderer.renderChoice(reviewValues.latest[field], 'server'),
+            local: renderer.renderChoice({
+              value: reviewValues.current[field],
+              otherValue: reviewValues.latest[field],
+              choice: 'local',
+            }),
+            server: renderer.renderChoice({
+              value: reviewValues.latest[field],
+              otherValue: reviewValues.current[field],
+              choice: 'server',
+            }),
           },
         };
       }

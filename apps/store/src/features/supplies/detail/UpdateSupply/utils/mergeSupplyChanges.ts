@@ -10,6 +10,7 @@ import {
   getSupplyFormDefaults,
   type SupplyFormValues,
 } from '../../../shared/SupplyEditorForm';
+import { normalizeSupplyEntry } from './normalizeSupplyEntry';
 
 export type SupplyMergeChoices = FormMergeChoices<keyof SupplyFormValues>;
 
@@ -20,23 +21,10 @@ type MergeSupplyChangesArgs = {
   choices?: SupplyMergeChoices;
 };
 
-const normalizeNumber = (value: string) => {
-  const trimmed = value.trim();
-  return trimmed !== '' && Number.isFinite(Number(trimmed))
-    ? Number(trimmed)
-    : trimmed;
-};
-
 // Compare product lists without UI ids or option display metadata. Keep blank
 // rows in this comparison so unfinished rows are preserved during refresh.
 const normalizeEntries = (entries: SupplyFormValues['supplyEntries']) =>
-  entries.map((entry) => ({
-    productVariantId: entry.productVariant?.id ?? null,
-    unitOfMeasurementId: entry.unitOfMeasurement?.id ?? null,
-    quantity: normalizeNumber(entry.quantity),
-    unitPrice: normalizeNumber(entry.unitPrice),
-    comment: entry.comment.trim(),
-  }));
+  entries.map(normalizeSupplyEntry);
 
 const describeValue = (value: SupplyFormValues[keyof SupplyFormValues]) => {
   if (Array.isArray(value)) {

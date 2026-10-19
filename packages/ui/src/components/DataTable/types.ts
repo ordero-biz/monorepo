@@ -60,6 +60,7 @@ export type DataTableCellProps = {
 };
 
 export type DataTableRowSelectionState = RowSelectionState;
+export type DataTableRowTone = 'default' | 'warning';
 
 export type DataTableSelectionProps<TData> = {
   getRowCanSelect?: (row: TData, index: number) => boolean;
@@ -99,6 +100,8 @@ export type DataTableProps<TData> = {
   footerColumns?: DataTableFooterColumns;
   getRowCanSelect?: (row: TData, index: number) => boolean;
   getRowId?: (originalRow: TData, index: number, parent?: Row<TData>) => string;
+  /** Visual emphasis only; include a visible explanation in the row content. */
+  getRowTone?: (row: TData, index: number) => DataTableRowTone;
   manualPagination?: boolean;
   manualSorting?: boolean;
   onRowSelectionChange?: (rowSelection: DataTableRowSelectionState) => void;

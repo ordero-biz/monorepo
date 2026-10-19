@@ -55,7 +55,9 @@ describe('SupplyProductsComparison', () => {
       within(rows[1]).getByRole('cell', { name: '4 Bag (bag)' })
     ).toBeVisible();
     expect(within(rows[1]).getByText('Saved version')).toBeVisible();
+    expect(within(rows[1]).getByText('Different')).toBeVisible();
     expect(within(rows[2]).getByText('Your added row · kept')).toBeVisible();
+    expect(within(rows[2]).queryByText('Different')).not.toBeInTheDocument();
     expect(
       within(rows[2]).getByRole('cell', { name: 'Not entered' })
     ).toBeVisible();
@@ -77,10 +79,11 @@ describe('SupplyProductsComparison', () => {
 
   it('keeps identical saved and unsaved products as separate rows', () => {
     const duplicate = { ...rice, clientId: 'local-duplicate' };
+    const firstSaved = { ...rice, clientId: 'existing-20' };
     setup({
       current: [rice, duplicate],
-      latest: [saved, { ...rice, clientId: 'existing-21' }],
-      merged: [saved, { ...rice, clientId: 'existing-21' }, duplicate],
+      latest: [firstSaved, { ...rice, clientId: 'existing-21' }],
+      merged: [firstSaved, { ...rice, clientId: 'existing-21' }, duplicate],
     });
     const table = within(
       screen.getByRole('table', { name: 'Products after applying' })
@@ -88,6 +91,10 @@ describe('SupplyProductsComparison', () => {
     expect(table.getAllByText('Rice')).toHaveLength(3);
     expect(table.getAllByText('Saved version')).toHaveLength(2);
     expect(table.getAllByText('Your added row · kept')).toHaveLength(1);
+    const rows = table.getAllByRole('row');
+    expect(within(rows[1]).queryByText('Different')).not.toBeInTheDocument();
+    expect(within(rows[2]).getByText('Different')).toBeVisible();
+    expect(within(rows[3]).queryByText('Different')).not.toBeInTheDocument();
   });
 
   it('keeps zero prices distinct from missing values and exposes product identifiers', () => {
