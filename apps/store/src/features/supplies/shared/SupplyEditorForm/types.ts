@@ -41,9 +41,11 @@ export type SupplyFormValues = {
 
 export type SupplyInformationProps = {
   form: ReturnType<typeof useSubmitSupplyForm>['form'];
+  disabled: boolean;
 };
 
 export type SupplyEntriesProps = {
+  disabled: boolean;
   entries: SupplyEntryFormValues[];
   form: ReturnType<typeof useSubmitSupplyForm>['form'];
   pendingIntent: SupplySubmitIntent | null;

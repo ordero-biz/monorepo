@@ -59,6 +59,12 @@ const radioRingClassName =
 const labelClassName =
   'min-w-0 text-[length:var(--body2-size-desktop)] leading-[var(--body2-line-height-desktop)] font-[var(--body2-weight)]';
 
+// Align the first text line with the circle without shrinking its padded target.
+const startLabelPaddingClassNames: Record<RadioSize, string> = {
+  m: 'pt-[max(0px,calc((var(--radio-md-icon)+var(--radio-p)-var(--body2-line-height-desktop))/2))]',
+  s: 'pt-[max(0px,calc((var(--radio-sm-icon)+var(--radio-p)-var(--body2-line-height-desktop))/2))]',
+};
+
 const indicatorSizeClassNames: Record<RadioSize, string> = {
   m: 'size-[10px]',
   s: 'size-[8px]',
@@ -255,7 +261,11 @@ export const Radio = ({
       />
       {children ? (
         <span
-          className={cn(labelClassName, getLabelColorClassName({ disabled }))}
+          className={cn(
+            labelClassName,
+            align === 'start' && startLabelPaddingClassNames[size],
+            getLabelColorClassName({ disabled })
+          )}
           data-slot="radio-label"
           id={radioLabelId}
         >

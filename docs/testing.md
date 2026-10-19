@@ -250,6 +250,41 @@ tasks in parallel. Current ports:
 - `apps/platform`: `127.0.0.1:3000`
 - `apps/store`: `127.0.0.1:3001`
 
+### Supply Refresh Browser Scenarios
+
+`apps/store/e2e/SupplyRefresh.spec.ts` covers pristine and dirty refreshes,
+external and local finalization, read-only notices, both conflict choices,
+cancellation and reopening, revision changes during review, appended product
+rows, conflicting existing rows, failed reads, delayed saves, and creation
+without a resolver.
+
+The store Playwright config starts a test-only backend on `127.0.0.1:3101`.
+Each test gets a separate session and saved record. Both server prefetch and
+browser requests use that backend through the normal application paths; no real
+account or saved supply is required. The test app uses `.next/playwright` so it
+can run alongside a developer's Next.js server.
+
+Chromium's Playwright focus emulation keeps background tabs visible. The refresh
+fixture dispatches `visibilitychange` to simulate returning to the editor and
+waits for the resulting HTTP request. It does not reload the page or access form
+state or the query cache. This tests the application's response to the event,
+not operating-system tab visibility.
+
+Watch the scenarios sequentially in a visible browser from the repository root:
+
+```sh
+PLAYWRIGHT_SLOW_MO=250 pnpm exec playwright test -c apps/store/playwright.config.ts SupplyRefresh.spec.ts --project=chromium --headed --workers=1
+```
+
+The suite records videos, traces, and named screenshots, including successful
+cases. Open a test in the HTML report to replay its video or inspect each step:
+
+```sh
+pnpm exec playwright show-report apps/store/playwright-report
+```
+
+Run without `--headed` and `PLAYWRIGHT_SLOW_MO` for normal automated checks.
+
 ## Turbo E2E Graph
 
 The root `test:e2e` task is app-aware through Turbo. Each app owns its own

@@ -55,6 +55,9 @@ describe('SupplyActions', () => {
 
     expect(onSaveDraft).toHaveBeenCalledOnce();
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Review updates' })
+    ).not.toBeInTheDocument();
   });
 
   it('only finalizes after confirmation and allows cancellation', async () => {

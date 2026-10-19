@@ -1,4 +1,5 @@
-import { renderHook, waitFor } from '@testing-library/react';
+import { focusManager } from '@tanstack/react-query';
+import { act, renderHook, waitFor } from '@testing-library/react';
 import { getSupply } from '@/lib/client/api/supplies';
 import { SUPPLY_STATUS } from '@/lib/domain/supplies/constants';
 import type { SupplyDetails } from '@/lib/domain/supplies/types';
@@ -58,5 +59,37 @@ describe('supply detail query', () => {
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(result.current.data).toEqual(supply);
     expect(getSupplyMock).not.toHaveBeenCalled();
+  });
+
+  it('refetches on every return to the tab even while the cached supply is fresh', async () => {
+    const queryClient = createTestQueryClient();
+    queryClient.setQueryData(suppliesQueryKeys.detail(7), supply);
+    const TestQueryProvider = createTestQueryProvider(queryClient);
+    const { result, unmount } = renderHook(() => useSupplyQuery('7'), {
+      wrapper: TestQueryProvider,
+    });
+
+    try {
+      expect(result.current.data).toEqual(supply);
+      expect(getSupplyMock).not.toHaveBeenCalled();
+
+      for (const version of [2, 3]) {
+        const latest = { ...supply, version };
+        getSupplyMock.mockResolvedValue({ ok: true, data: latest });
+        expect(result.current.isStale).toBe(false);
+
+        act(() => {
+          focusManager.setFocused(false);
+          focusManager.setFocused(true);
+        });
+
+        await waitFor(() => expect(result.current.data).toEqual(latest));
+        expect(getSupplyMock).toHaveBeenCalledTimes(version - 1);
+        expect(getSupplyMock).toHaveBeenLastCalledWith('7');
+      }
+    } finally {
+      unmount();
+      focusManager.setFocused(undefined);
+    }
   });
 });

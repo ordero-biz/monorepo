@@ -22,6 +22,7 @@ const getRowCheckboxAriaLabel = (entry: SupplyEntryFormValues) =>
   `Select ${entry.productVariant?.name || 'supply entry'}`;
 
 export const SupplyEntries = ({
+  disabled,
   entries,
   form,
   onSaveDraft,
@@ -64,7 +65,10 @@ export const SupplyEntries = ({
 
   const deleteRows = useCallback(
     async (clientIds: Set<string>) => {
-      if (hasOnlyBlankSupplyEntry(form.state.values.supplyEntries)) {
+      if (
+        form.state.isSubmitting ||
+        hasOnlyBlankSupplyEntry(form.state.values.supplyEntries)
+      ) {
         return;
       }
       const indexes = form.state.values.supplyEntries.flatMap((entry, index) =>
@@ -111,7 +115,9 @@ export const SupplyEntries = ({
           {(isSubmitting) => (
             <Button
               disabled={
-                isSubmitting || Boolean(lastEntry && !lastEntry.productVariant)
+                disabled ||
+                isSubmitting ||
+                Boolean(lastEntry && !lastEntry.productVariant)
               }
               onClick={() => {
                 scheduleScrollAfterAppend();
@@ -129,7 +135,7 @@ export const SupplyEntries = ({
 
       <SupplyActions
         {...getSupplyTotal(form.state.values)}
-        deleteDisabled={hasOnlyBlankSupplyEntry(entries)}
+        deleteDisabled={disabled || hasOnlyBlankSupplyEntry(entries)}
         onClearSelection={clearSelection}
         onDeleteSelected={() => deleteRows(new Set(selectedRows.map(getRowId)))}
         onFinalize={onFinalize}

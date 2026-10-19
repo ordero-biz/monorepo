@@ -20,6 +20,7 @@ export type RadioSize = 's' | 'm';
 export type RadioAlignment = 'start' | 'center' | 'end';
 
 export type RadioProps = {
+  /** `start` centers the circle on the first text line, including multiline labels. */
   align?: RadioAlignment;
   'aria-describedby'?: string;
   'aria-label'?: string;

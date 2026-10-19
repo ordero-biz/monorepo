@@ -4,6 +4,7 @@ import { Button, ContextualActionBar, Dialog, Typography } from '@ordero/ui';
 import { Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { BaseLayoutContextualActionBar } from '@/features/app-shell';
+import { FormConflictResolver } from '@/lib/components/FormConflictResolver';
 import { formatMoney } from '../formatMoney';
 import type { SupplyActionsProps } from './types';
 
@@ -18,6 +19,8 @@ export const SupplyActions = ({
   onSaveDraft,
   onFinalize,
 }: SupplyActionsProps) => {
+  const resolver = FormConflictResolver.useContext();
+  const submitDisabled = resolver?.isReadOnly ?? false;
   const [finalizeDialogOpen, setFinalizeDialogOpen] = useState(false);
   const isSubmitting = pendingIntent !== null;
 
@@ -63,9 +66,10 @@ export const SupplyActions = ({
             </ContextualActionBar.Left>
             <ContextualActionBar.Right>
               <div className="flex items-center gap-[var(--space-1)]">
+                <FormConflictResolver.ReviewButton />
                 <Button
                   color="inherit"
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || submitDisabled}
                   onClick={onSaveDraft}
                   size="m"
                   type="button"
@@ -75,7 +79,7 @@ export const SupplyActions = ({
                 </Button>
                 <Button
                   color="primary"
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || submitDisabled}
                   onClick={() => setFinalizeDialogOpen(true)}
                   size="m"
                   type="button"
@@ -116,7 +120,7 @@ export const SupplyActions = ({
               <Dialog.Footer closeButtonLabel="Cancel">
                 <Button
                   color="primary"
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || submitDisabled}
                   onClick={() => {
                     setFinalizeDialogOpen(false);
                     onFinalize();

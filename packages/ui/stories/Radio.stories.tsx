@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { expect, waitFor, within } from 'storybook/test';
 import {
   Radio,
   type RadioAlignment,
@@ -115,4 +116,52 @@ export const LabelAlignments: Story = {
     </RadioGroup>
   ),
   decorators: [],
+};
+
+export const StartAlignedLabels: Story = {
+  render: () => (
+    <div className="flex flex-col gap-6">
+      {sizes.map((size) => (
+        <RadioGroup key={size} defaultValue="multiple" label={`Size ${size}`}>
+          <Radio size={size} value="reference">
+            Centered reference
+          </Radio>
+          <Radio align="start" size={size} value="single">
+            <span className="block">Single line</span>
+          </Radio>
+          <Radio align="start" size={size} value="multiple">
+            <span className="block">Multiple lines</span>
+            <span className="block">Rice, quantity: 2, unit: bag</span>
+            <span className="block">Oats, quantity: 3, unit: bag</span>
+          </Radio>
+        </RadioGroup>
+      ))}
+    </div>
+  ),
+  decorators: [],
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    for (const size of sizes) {
+      const group = within(
+        canvas.getByRole('radiogroup', { name: `Size ${size}` })
+      );
+      const reference = group.getByRole('radio', { name: 'Centered reference' });
+      for (const name of ['Single line', 'Multiple lines']) {
+        const radio = group.getByRole('radio', { name: new RegExp(`^${name}`) });
+        const firstLine = group.getByText(name, { exact: true });
+        await waitFor(async () => {
+          const control = radio.getBoundingClientRect();
+          const line = firstLine.getBoundingClientRect();
+          const centered = reference.getBoundingClientRect();
+          await expect(
+            Math.abs(
+              control.top + control.height / 2 - line.top - line.height / 2
+            )
+          ).toBeLessThan(1);
+          await expect(control.height).toBe(centered.height);
+          await expect(control.width).toBe(centered.width);
+        });
+      }
+    }
+  },
 };

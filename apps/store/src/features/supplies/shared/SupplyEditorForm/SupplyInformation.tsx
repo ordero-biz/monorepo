@@ -8,7 +8,10 @@ import {
   validateSupplyWarehouse,
 } from './validations';
 
-export const SupplyInformation = ({ form }: SupplyInformationProps) => (
+export const SupplyInformation = ({
+  disabled,
+  form,
+}: SupplyInformationProps) => (
   <Card.Root variant="filled">
     <Card.Header>
       <Card.Title>Supply information</Card.Title>
@@ -26,6 +29,7 @@ export const SupplyInformation = ({ form }: SupplyInformationProps) => (
 
             return (
               <SuppliersAsyncCombobox
+                disabled={disabled}
                 errorText={errorText}
                 invalid={Boolean(errorText)}
                 label="Supplier"
@@ -50,6 +54,7 @@ export const SupplyInformation = ({ form }: SupplyInformationProps) => (
 
             return (
               <WarehousesAsyncCombobox
+                disabled={disabled}
                 errorText={errorText}
                 invalid={Boolean(errorText)}
                 label="Warehouse"
@@ -74,6 +79,7 @@ export const SupplyInformation = ({ form }: SupplyInformationProps) => (
 
             return (
               <TextField
+                disabled={disabled}
                 errorText={errorText}
                 invalid={Boolean(errorText)}
                 label="Supply number"
@@ -90,6 +96,7 @@ export const SupplyInformation = ({ form }: SupplyInformationProps) => (
         <form.Field name="supplierInvoiceNumber">
           {(field) => (
             <TextField
+              disabled={disabled}
               label="Supplier invoice number"
               name={field.name}
               onBlur={field.handleBlur}
@@ -103,6 +110,7 @@ export const SupplyInformation = ({ form }: SupplyInformationProps) => (
           <form.Field name="comment">
             {(field) => (
               <Textarea
+                disabled={disabled}
                 label="Comment"
                 name={field.name}
                 onBlur={field.handleBlur}

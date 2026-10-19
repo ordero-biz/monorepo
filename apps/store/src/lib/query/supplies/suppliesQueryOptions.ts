@@ -39,4 +39,5 @@ export const supplyQueryOptions = (
   queryOptions({
     queryKey: suppliesQueryKeys.detail(supplyId),
     queryFn: () => unwrapApiResult(fetchSupply(supplyId)),
+    refetchOnWindowFocus: 'always',
   });

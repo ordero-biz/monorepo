@@ -1,9 +1,7 @@
 'use client';
 
-import { SUPPLY_STATUS } from '@/lib/domain/supplies/constants';
 import { useSupplyQuery } from '@/lib/hooks/supplies/useSupplyQuery';
 import { Button, Card, Typography } from '@/ui/index';
-import { SupplyReadOnly } from '../SupplyReadOnly';
 import { UpdateSupply } from '../UpdateSupply';
 import type { SupplyDetailProps } from './types';
 
@@ -22,7 +20,7 @@ export const SupplyDetail = ({ supplyId }: SupplyDetailProps) => {
     );
   }
 
-  if (supplyQuery.isError) {
+  if (supplyQuery.isError && !supplyQuery.data) {
     return (
       <Card.Root variant="filled">
         <Card.Content>
@@ -46,14 +44,5 @@ export const SupplyDetail = ({ supplyId }: SupplyDetailProps) => {
     );
   }
 
-  if (supplyQuery.data.status === SUPPLY_STATUS.COMPLETED) {
-    return <SupplyReadOnly supply={supplyQuery.data} />;
-  }
-
-  return (
-    <UpdateSupply
-      supply={supplyQuery.data}
-      key={`${supplyQuery.data.id}-${supplyQuery.data.version}`}
-    />
-  );
+  return <UpdateSupply supply={supplyQuery.data} key={supplyQuery.data.id} />;
 };

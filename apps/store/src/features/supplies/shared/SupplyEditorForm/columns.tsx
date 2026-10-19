@@ -112,17 +112,22 @@ export const getColumns = ({
                   );
 
                   return (
-                    <ProductVariantsAsyncCombobox
-                      aria-label={`Product for row ${index + 1}`}
-                      errorText={errorText}
-                      invalid={Boolean(errorText)}
-                      name={field.name}
-                      onBlur={field.handleBlur}
-                      onValueChange={field.handleChange}
-                      required
-                      size="s"
-                      value={field.state.value}
-                    />
+                    <form.Subscribe selector={(state) => state.isSubmitting}>
+                      {(disabled) => (
+                        <ProductVariantsAsyncCombobox
+                          disabled={disabled}
+                          aria-label={`Product for row ${index + 1}`}
+                          errorText={errorText}
+                          invalid={Boolean(errorText)}
+                          name={field.name}
+                          onBlur={field.handleBlur}
+                          onValueChange={field.handleChange}
+                          required
+                          size="s"
+                          value={field.state.value}
+                        />
+                      )}
+                    </form.Subscribe>
                   );
                 }}
               </form.Field>
@@ -154,17 +159,22 @@ export const getColumns = ({
                   );
 
                   return (
-                    <UnitsOfMeasurementAsyncCombobox
-                      aria-label={`Unit for row ${index + 1}`}
-                      errorText={errorText}
-                      invalid={Boolean(errorText)}
-                      name={field.name}
-                      onBlur={field.handleBlur}
-                      onValueChange={field.handleChange}
-                      required
-                      size="s"
-                      value={field.state.value}
-                    />
+                    <form.Subscribe selector={(state) => state.isSubmitting}>
+                      {(disabled) => (
+                        <UnitsOfMeasurementAsyncCombobox
+                          disabled={disabled}
+                          aria-label={`Unit for row ${index + 1}`}
+                          errorText={errorText}
+                          invalid={Boolean(errorText)}
+                          name={field.name}
+                          onBlur={field.handleBlur}
+                          onValueChange={field.handleChange}
+                          required
+                          size="s"
+                          value={field.state.value}
+                        />
+                      )}
+                    </form.Subscribe>
                   );
                 }}
               </form.Field>
@@ -193,18 +203,23 @@ export const getColumns = ({
                 );
 
                 return (
-                  <TextField
-                    aria-label={`Quantity for row ${row.index + 1}`}
-                    errorText={errorText}
-                    invalid={Boolean(errorText)}
-                    name={field.name}
-                    onBlur={field.handleBlur}
-                    onValueChange={field.handleChange}
-                    required
-                    size="s"
-                    type="number"
-                    value={field.state.value}
-                  />
+                  <form.Subscribe selector={(state) => state.isSubmitting}>
+                    {(disabled) => (
+                      <TextField
+                        disabled={disabled}
+                        aria-label={`Quantity for row ${row.index + 1}`}
+                        errorText={errorText}
+                        invalid={Boolean(errorText)}
+                        name={field.name}
+                        onBlur={field.handleBlur}
+                        onValueChange={field.handleChange}
+                        required
+                        size="s"
+                        type="number"
+                        value={field.state.value}
+                      />
+                    )}
+                  </form.Subscribe>
                 );
               }}
             </form.Field>
@@ -232,18 +247,23 @@ export const getColumns = ({
                 );
 
                 return (
-                  <TextField
-                    aria-label={`Unit price for row ${row.index + 1}`}
-                    errorText={errorText}
-                    invalid={Boolean(errorText)}
-                    name={field.name}
-                    onBlur={field.handleBlur}
-                    onValueChange={field.handleChange}
-                    required
-                    size="s"
-                    type="number"
-                    value={field.state.value}
-                  />
+                  <form.Subscribe selector={(state) => state.isSubmitting}>
+                    {(disabled) => (
+                      <TextField
+                        disabled={disabled}
+                        aria-label={`Unit price for row ${row.index + 1}`}
+                        errorText={errorText}
+                        invalid={Boolean(errorText)}
+                        name={field.name}
+                        onBlur={field.handleBlur}
+                        onValueChange={field.handleChange}
+                        required
+                        size="s"
+                        type="number"
+                        value={field.state.value}
+                      />
+                    )}
+                  </form.Subscribe>
                 );
               }}
             </form.Field>
@@ -288,14 +308,19 @@ export const getColumns = ({
               name={`supplyEntries[${row.index}].comment` as const}
             >
               {(field) => (
-                <TextField
-                  aria-label={`Comment for row ${row.index + 1}`}
-                  name={field.name}
-                  onBlur={field.handleBlur}
-                  onValueChange={field.handleChange}
-                  size="s"
-                  value={field.state.value}
-                />
+                <form.Subscribe selector={(state) => state.isSubmitting}>
+                  {(disabled) => (
+                    <TextField
+                      disabled={disabled}
+                      aria-label={`Comment for row ${row.index + 1}`}
+                      name={field.name}
+                      onBlur={field.handleBlur}
+                      onValueChange={field.handleChange}
+                      size="s"
+                      value={field.state.value}
+                    />
+                  )}
+                </form.Subscribe>
               )}
             </form.Field>
           </div>
@@ -310,32 +335,40 @@ export const getColumns = ({
       id: 'actions',
       cell: ({ row, table }) => (
         <DataTableCell variant="actions">
-          <Menu.Root>
-            <Menu.Trigger
-              aria-label={`Actions for ${row.original.productVariant?.name || 'supply entry'}`}
-              appearance="iconButton"
-              size="xs"
-            >
-              <EllipsisVertical aria-hidden="true" />
-            </Menu.Trigger>
-            <Menu.Portal>
-              <Menu.Positioner align="end">
-                <Menu.Popup>
-                  <Menu.Item
-                    color="error"
-                    disabled={hasOnlyBlankSupplyEntry(table.options.data)}
-                    onClick={() => onDeleteEntry(row.original.clientId)}
-                  >
-                    <Trash2
-                      aria-hidden="true"
-                      className="size-[var(--icon-button-xs-icon)]"
-                    />
-                    Delete
-                  </Menu.Item>
-                </Menu.Popup>
-              </Menu.Positioner>
-            </Menu.Portal>
-          </Menu.Root>
+          <form.Subscribe selector={(state) => state.isSubmitting}>
+            {(disabled) => (
+              <Menu.Root>
+                <Menu.Trigger
+                  disabled={disabled}
+                  aria-label={`Actions for ${row.original.productVariant?.name || 'supply entry'}`}
+                  appearance="iconButton"
+                  size="xs"
+                >
+                  <EllipsisVertical aria-hidden="true" />
+                </Menu.Trigger>
+                <Menu.Portal>
+                  <Menu.Positioner align="end">
+                    <Menu.Popup>
+                      <Menu.Item
+                        color="error"
+                        disabled={
+                          disabled ||
+                          hasOnlyBlankSupplyEntry(table.options.data)
+                        }
+                        onClick={() => onDeleteEntry(row.original.clientId)}
+                      >
+                        <Trash2
+                          aria-hidden="true"
+                          className="size-[var(--icon-button-xs-icon)]"
+                        />
+                        Delete
+                      </Menu.Item>
+                    </Menu.Popup>
+                  </Menu.Positioner>
+                </Menu.Portal>
+              </Menu.Root>
+            )}
+          </form.Subscribe>
         </DataTableCell>
       ),
       header: () => null,
