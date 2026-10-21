@@ -1,5 +1,5 @@
 import type { SidebarNavigationSectionConfig } from '@ordero/ui';
-import { LayoutDashboard, Package } from 'lucide-react';
+import { LayoutDashboard, Package, Warehouse } from 'lucide-react';
 import { clientRoutes } from '@/lib/client/routes';
 
 export const sidebarSections: SidebarNavigationSectionConfig[] = [
@@ -44,23 +44,31 @@ export const sidebarSections: SidebarNavigationSectionConfig[] = [
             label: 'Units of measurement',
             href: clientRoutes.unitsOfMeasurement,
           },
+        ],
+      },
+      {
+        id: 'warehouse',
+        kind: 'collapse',
+        label: 'Warehouse',
+        icon: <Warehouse />,
+        items: [
           {
-            id: 'product-suppliers',
+            id: 'warehouses',
             kind: 'link',
-            label: 'Suppliers',
-            href: clientRoutes.suppliers,
+            label: 'Warehouse',
+            href: clientRoutes.warehouses,
           },
           {
-            id: 'product-supplies',
+            id: 'warehouse-supplies',
             kind: 'link',
             label: 'Supplies',
             href: clientRoutes.supplies,
           },
           {
-            id: 'product-warehouse',
+            id: 'warehouse-suppliers',
             kind: 'link',
-            label: 'Warehouse',
-            href: clientRoutes.warehouses,
+            label: 'Suppliers',
+            href: clientRoutes.suppliers,
           },
         ],
       },

@@ -11,6 +11,7 @@ import {
 import { LogOut, Package } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { useLogOut } from '@/lib/hooks/auth/useLogOut';
+import { SidebarLink } from './SidebarLink';
 import { sidebarSections } from './sidebarSections';
 import { getSidebarSections } from './utils';
 
@@ -32,7 +33,10 @@ export const Sidebar = () => {
         </div>
       </SidebarNavigationHeader>
       <SidebarNavigationContent>
-        <SidebarNavigationSections sections={sections} />
+        <SidebarNavigationSections
+          renderLink={SidebarLink}
+          sections={sections}
+        />
       </SidebarNavigationContent>
       <SidebarNavigationFooter>
         <SidebarNavigationMenu
