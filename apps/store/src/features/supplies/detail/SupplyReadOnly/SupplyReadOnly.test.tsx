@@ -56,7 +56,7 @@ describe('SupplyReadOnly', () => {
     expect(screen.getByText('Delivered in full')).toBeVisible();
     expect(screen.getByRole('link', { name: 'Supplies' })).toHaveAttribute(
       'href',
-      '/products/supplies'
+      '/warehouse/supplies'
     );
 
     const table = screen.getByRole('table', { name: 'Supply entries' });

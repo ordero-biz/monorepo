@@ -11,11 +11,11 @@ export const clientRoutes = {
   addProduct: '/products/add',
   categories: '/products/categories',
   attributes: '/products/attributes',
-  supplies: '/products/supplies',
-  addSupply: '/products/supplies/add',
-  suppliers: '/products/suppliers',
+  supplies: '/warehouse/supplies',
+  addSupply: '/warehouse/supplies/add',
+  suppliers: '/warehouse/suppliers',
   unitsOfMeasurement: '/products/units-of-measurement',
-  warehouses: '/products/warehouse',
+  warehouses: '/warehouse',
 } as const;
 
 export const getAddProductRoute = (creationMode: ProductCreationMode) =>
@@ -28,13 +28,13 @@ export const getCategoryDetailRoute = (categoryId: string | number) =>
   `/products/categories/${categoryId}`;
 
 export const getSupplierDetailRoute = (supplierId: string | number) =>
-  `/products/suppliers/${supplierId}`;
+  `/warehouse/suppliers/${supplierId}`;
 
 export const getSupplyDetailRoute = (supplyId: string | number) =>
-  `/products/supplies/${supplyId}`;
+  `/warehouse/supplies/${supplyId}`;
 
 export const getWarehouseDetailRoute = (warehouseId: string | number) =>
-  `/products/warehouse/${warehouseId}`;
+  `/warehouse/${warehouseId}`;
 
 export const getUnitOfMeasurementDetailRoute = (
   unitOfMeasurementId: string | number

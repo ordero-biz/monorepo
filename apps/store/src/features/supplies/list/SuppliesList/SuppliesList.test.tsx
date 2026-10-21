@@ -8,7 +8,7 @@ import { prepareStoreSetup } from '@/test/prepareSetup';
 import { SuppliesList } from './SuppliesList';
 
 const mocks = vi.hoisted(() => ({
-  pathname: '/products/supplies',
+  pathname: '/warehouse/supplies',
   push: vi.fn(),
   searchParams: new URLSearchParams(),
 }));
@@ -191,7 +191,7 @@ describe('SuppliesList', () => {
     );
 
     expect(mocks.push).toHaveBeenCalledWith(
-      '/products/supplies?page=2&size=25&sort=createdAt%2Cdesc',
+      '/warehouse/supplies?page=2&size=25&sort=createdAt%2Cdesc',
       { scroll: false }
     );
   });

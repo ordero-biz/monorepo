@@ -90,13 +90,13 @@ describe('Store sidebar', () => {
 
     expect(
       within(sidebar).getByRole('link', { name: 'Warehouse' })
-    ).toHaveAttribute('href', '/products/warehouse');
+    ).toHaveAttribute('href', '/warehouse');
     expect(
       within(sidebar).getByRole('link', { name: 'Supplies' })
-    ).toHaveAttribute('href', '/products/supplies');
+    ).toHaveAttribute('href', '/warehouse/supplies');
     expect(
       within(sidebar).getByRole('link', { name: 'Suppliers' })
-    ).toHaveAttribute('href', '/products/suppliers');
+    ).toHaveAttribute('href', '/warehouse/suppliers');
 
     for (const linkName of ['Warehouse', 'Supplies', 'Suppliers']) {
       expect(
@@ -143,7 +143,7 @@ describe('Store sidebar', () => {
   });
 
   it('opens the warehouse parent for an active nested route', () => {
-    mocks.pathname = '/products/supplies/42';
+    mocks.pathname = '/warehouse/supplies/42';
 
     setup();
 
