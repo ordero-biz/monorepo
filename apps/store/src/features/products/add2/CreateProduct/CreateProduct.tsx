@@ -2,6 +2,7 @@
 
 import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import { clientRoutes } from '@/lib/client/routes';
 import {
   productGroupsQueryKeys,
@@ -15,11 +16,16 @@ import {
   useCreateProductForm,
   useProductGenerationState,
   useProductVariantsGenerationForm,
+  validateMultipleProductsConfiguration,
   validateSingleProductConfiguration,
 } from '../../add/CreateProduct';
 import { ProductVariantsGenerationForm } from './ProductVariantsGenerationForm';
+import type { ProductGenerationMode } from './types';
 
 export const CreateProduct = () => {
+  const [generationMode, setGenerationMode] = useState<ProductGenerationMode>(
+    PRODUCT_GENERATION_MODE.one
+  );
   const queryClient = useQueryClient();
   const router = useRouter();
   const { form: productVariantsCreationForm } = useCreateProductForm({
@@ -34,7 +40,10 @@ export const CreateProduct = () => {
       ]);
       router.push(clientRoutes.products);
     },
-    validateConfiguration: validateSingleProductConfiguration,
+    validateConfiguration:
+      generationMode === PRODUCT_GENERATION_MODE.one
+        ? validateSingleProductConfiguration
+        : validateMultipleProductsConfiguration,
   });
   const {
     generatedAttributes,
@@ -57,7 +66,7 @@ export const CreateProduct = () => {
 
   const { form: productVariantsGenerationForm } =
     useProductVariantsGenerationForm({
-      generationMode: PRODUCT_GENERATION_MODE.one,
+      generationMode,
       maxGeneratedProductVariants: DEFAULT_MAX_GENERATED_PRODUCT_VARIANTS,
       onProductVariantsGenerated: handleProductVariantsGenerated,
     });
@@ -71,12 +80,14 @@ export const CreateProduct = () => {
       </header>
       {isProductVariantGenerationStage ? (
         <ProductVariantsGenerationForm
+          generationMode={generationMode}
+          onGenerationModeChange={setGenerationMode}
           productVariantsGenerationForm={productVariantsGenerationForm}
         />
       ) : (
         <ProductVariantsCreationForm
           generatedAttributes={generatedAttributes}
-          generationMode={PRODUCT_GENERATION_MODE.one}
+          generationMode={generationMode}
           productVariantsCreationForm={productVariantsCreationForm}
         />
       )}

@@ -39,6 +39,26 @@ vi.mock('@/features/categories', () => ({
 const { setup } = prepareStoreSetup({ component: CreateProduct });
 
 describe('New product creation design', () => {
+  it('lets users choose how variants are generated', async () => {
+    const user = userEvent.setup();
+    setup();
+
+    const singleVariant = screen.getByRole('radio', { name: 'Single variant' });
+    const valueCombinations = screen.getByRole('radio', {
+      name: 'Value combinations',
+    });
+    expect(singleVariant).toBeChecked();
+    expect(valueCombinations).not.toBeChecked();
+
+    await user.click(valueCombinations);
+    expect(valueCombinations).toBeChecked();
+    expect(singleVariant).not.toBeChecked();
+
+    await user.click(screen.getByText('Single variant'));
+    expect(singleVariant).toBeChecked();
+    expect(valueCombinations).not.toBeChecked();
+  });
+
   it('validates required shared details before continuing to variants', async () => {
     const user = userEvent.setup();
     setup();
