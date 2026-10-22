@@ -90,6 +90,10 @@ describe('DeleteAttributesDialog', () => {
     const invalidateQueriesSpy = vi.spyOn(queryClient, 'invalidateQueries');
     const removeQueriesSpy = vi.spyOn(queryClient, 'removeQueries');
 
+    multipleAttributes.forEach((attribute) => {
+      queryClient.setQueryData(attributesQueryKeys.values(attribute.id), []);
+    });
+
     await user.click(screen.getByRole('button', { name: 'Delete' }));
 
     expect(deleteAttributesMock).toHaveBeenCalledWith({
@@ -99,13 +103,12 @@ describe('DeleteAttributesDialog', () => {
       queryKey: attributesQueryKeys.detail(7),
     });
     expect(removeQueriesSpy).toHaveBeenCalledWith({
-      queryKey: attributesQueryKeys.values(7),
-    });
-    expect(removeQueriesSpy).toHaveBeenCalledWith({
       queryKey: attributesQueryKeys.detail(8),
     });
-    expect(removeQueriesSpy).toHaveBeenCalledWith({
-      queryKey: attributesQueryKeys.values(8),
+    multipleAttributes.forEach((attribute) => {
+      expect(
+        queryClient.getQueryState(attributesQueryKeys.values(attribute.id))
+      ).toBeUndefined();
     });
     await waitFor(() =>
       expect(invalidateQueriesSpy).toHaveBeenCalledWith({

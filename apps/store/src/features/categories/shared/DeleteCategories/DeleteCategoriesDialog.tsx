@@ -25,9 +25,6 @@ export const DeleteCategoriesDialog = ({
         queryClient.removeQueries({
           queryKey: categoriesQueryKeys.detail(category.id),
         });
-        queryClient.removeQueries({
-          queryKey: categoriesQueryKeys.children(category.id),
-        });
 
         if (category.parentCategory) {
           parentCategoryIds.add(category.parentCategory.id);

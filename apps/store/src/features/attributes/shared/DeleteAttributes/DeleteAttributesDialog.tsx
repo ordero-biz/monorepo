@@ -23,9 +23,6 @@ export const DeleteAttributesDialog = ({
         queryClient.removeQueries({
           queryKey: attributesQueryKeys.detail(attribute.id),
         });
-        queryClient.removeQueries({
-          queryKey: attributesQueryKeys.values(attribute.id),
-        });
       });
       await queryClient.invalidateQueries({
         queryKey: attributesQueryKeys.list,

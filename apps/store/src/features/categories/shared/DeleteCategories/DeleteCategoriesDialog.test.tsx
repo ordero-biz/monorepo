@@ -100,6 +100,10 @@ describe('DeleteCategoriesDialog', () => {
     const invalidateQueriesSpy = vi.spyOn(queryClient, 'invalidateQueries');
     const removeQueriesSpy = vi.spyOn(queryClient, 'removeQueries');
 
+    multipleCategories.forEach((category) => {
+      queryClient.setQueryData(categoriesQueryKeys.children(category.id), []);
+    });
+
     await user.click(screen.getByRole('button', { name: 'Delete' }));
 
     expect(deleteCategoriesMock).toHaveBeenCalledWith({
@@ -109,13 +113,12 @@ describe('DeleteCategoriesDialog', () => {
       queryKey: categoriesQueryKeys.detail(7),
     });
     expect(removeQueriesSpy).toHaveBeenCalledWith({
-      queryKey: categoriesQueryKeys.children(7),
-    });
-    expect(removeQueriesSpy).toHaveBeenCalledWith({
       queryKey: categoriesQueryKeys.detail(8),
     });
-    expect(removeQueriesSpy).toHaveBeenCalledWith({
-      queryKey: categoriesQueryKeys.children(8),
+    multipleCategories.forEach((category) => {
+      expect(
+        queryClient.getQueryState(categoriesQueryKeys.children(category.id))
+      ).toBeUndefined();
     });
     await waitFor(() => {
       expect(invalidateQueriesSpy).toHaveBeenCalledWith({
