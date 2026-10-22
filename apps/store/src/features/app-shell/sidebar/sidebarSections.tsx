@@ -38,12 +38,6 @@ export const sidebarSections: SidebarNavigationSectionConfig[] = [
             label: 'Attributes',
             href: clientRoutes.attributes,
           },
-          {
-            id: 'product-units-of-measurement',
-            kind: 'link',
-            label: 'Units of measurement',
-            href: clientRoutes.unitsOfMeasurement,
-          },
         ],
       },
       {
@@ -69,6 +63,12 @@ export const sidebarSections: SidebarNavigationSectionConfig[] = [
             kind: 'link',
             label: 'Suppliers',
             href: clientRoutes.suppliers,
+          },
+          {
+            id: 'warehouse-units-of-measurement',
+            kind: 'link',
+            label: 'Units of measurement',
+            href: clientRoutes.unitsOfMeasurement,
           },
         ],
       },

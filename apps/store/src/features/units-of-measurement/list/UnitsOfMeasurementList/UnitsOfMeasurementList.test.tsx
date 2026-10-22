@@ -8,7 +8,7 @@ import { prepareStoreSetup } from '@/test/prepareSetup';
 import { UnitsOfMeasurementList } from './UnitsOfMeasurementList';
 
 const mocks = vi.hoisted(() => ({
-  pathname: '/products/units-of-measurement',
+  pathname: '/warehouse/units-of-measurement',
   push: vi.fn(),
   searchParams: new URLSearchParams(),
 }));
@@ -452,7 +452,7 @@ describe('UnitsOfMeasurementList', () => {
     );
 
     expect(mocks.push).toHaveBeenCalledWith(
-      '/products/units-of-measurement?page=2&size=25&sort=name%2Casc',
+      '/warehouse/units-of-measurement?page=2&size=25&sort=name%2Casc',
       { scroll: false }
     );
   });

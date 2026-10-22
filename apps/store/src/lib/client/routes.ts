@@ -14,7 +14,7 @@ export const clientRoutes = {
   supplies: '/warehouse/supplies',
   addSupply: '/warehouse/supplies/add',
   suppliers: '/warehouse/suppliers',
-  unitsOfMeasurement: '/products/units-of-measurement',
+  unitsOfMeasurement: '/warehouse/units-of-measurement',
   warehouses: '/warehouse',
 } as const;
 
@@ -38,4 +38,4 @@ export const getWarehouseDetailRoute = (warehouseId: string | number) =>
 
 export const getUnitOfMeasurementDetailRoute = (
   unitOfMeasurementId: string | number
-) => `/products/units-of-measurement/${unitOfMeasurementId}`;
+) => `/warehouse/units-of-measurement/${unitOfMeasurementId}`;

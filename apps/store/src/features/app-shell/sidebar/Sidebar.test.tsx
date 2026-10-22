@@ -62,15 +62,10 @@ describe('Store sidebar', () => {
       within(sidebar).getByRole('link', { name: 'Attributes' })
     ).toHaveAttribute('href', '/products/attributes');
     expect(
-      within(sidebar).getByRole('link', { name: 'Units of measurement' })
-    ).toHaveAttribute('href', '/products/units-of-measurement');
+      within(sidebar).queryByRole('link', { name: 'Units of measurement' })
+    ).not.toBeInTheDocument();
 
-    for (const linkName of [
-      'Products',
-      'Categories',
-      'Attributes',
-      'Units of measurement',
-    ]) {
+    for (const linkName of ['Products', 'Categories', 'Attributes']) {
       expect(
         within(sidebar).getByRole('link', { name: linkName })
       ).not.toHaveAttribute('aria-current');
@@ -97,8 +92,16 @@ describe('Store sidebar', () => {
     expect(
       within(sidebar).getByRole('link', { name: 'Suppliers' })
     ).toHaveAttribute('href', '/warehouse/suppliers');
+    expect(
+      within(sidebar).getByRole('link', { name: 'Units of measurement' })
+    ).toHaveAttribute('href', '/warehouse/units-of-measurement');
 
-    for (const linkName of ['Warehouse', 'Supplies', 'Suppliers']) {
+    for (const linkName of [
+      'Warehouse',
+      'Supplies',
+      'Suppliers',
+      'Units of measurement',
+    ]) {
       expect(
         within(sidebar).getByRole('link', { name: linkName })
       ).not.toHaveAttribute('aria-current');
