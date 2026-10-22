@@ -1,4 +1,5 @@
 import { createWarehouse } from '@/lib/client/api/warehouses';
+import { getApiErrorMessage } from '@/lib/utils/apiError';
 import type { CreateWarehouseFormValues } from './validations';
 
 export const submitCreateWarehouse = async (
@@ -18,7 +19,7 @@ export const submitCreateWarehouse = async (
       ok: false,
       error: {
         fieldErrors: result.error.fieldErrors,
-        formError: result.error.message,
+        formError: getApiErrorMessage(result.error),
       },
     } as const;
   }

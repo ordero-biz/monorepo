@@ -1,4 +1,5 @@
 import { createUnitOfMeasurement } from '@/lib/client/api/units-of-measurement';
+import { API_ERROR_CODES } from '@/lib/constants/apiErrorCodes';
 import { UNIT_OF_MEASUREMENT_STATUS } from '@/lib/domain/units-of-measurement/constants';
 import { submitCreateUnitOfMeasurement } from './submitAction';
 
@@ -68,6 +69,30 @@ describe('submitCreateUnitOfMeasurement', () => {
       error: {
         fieldErrors: { status: 'Invalid status.' },
         formError: 'Unit of measurement creation failed.',
+      },
+    });
+  });
+
+  it('maps a duplicate unit name error to the shared message', async () => {
+    createUnitOfMeasurementMock.mockResolvedValue({
+      ok: false,
+      error: {
+        status: 409,
+        code: API_ERROR_CODES.UNIT_OF_MEASUREMENT_NAME_ALREADY_EXISTS,
+        message: 'Conflict',
+      },
+    });
+
+    await expect(
+      submitCreateUnitOfMeasurement({
+        status: 'DRAFT',
+        name: 'Kilogram',
+      })
+    ).resolves.toEqual({
+      ok: false,
+      error: {
+        fieldErrors: undefined,
+        formError: 'Unit name already exists.',
       },
     });
   });

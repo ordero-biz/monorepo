@@ -1,4 +1,5 @@
 import { createSupplier } from '@/lib/client/api/suppliers';
+import { getApiErrorMessage } from '@/lib/utils/apiError';
 import type { CreateSupplierFormValues } from './validations';
 
 const normalizeCreateSupplierFormData = (data: CreateSupplierFormValues) => {
@@ -26,7 +27,7 @@ export const submitCreateSupplier = async (value: CreateSupplierFormValues) => {
       ok: false,
       error: {
         fieldErrors: result.error.fieldErrors,
-        formError: result.error.message,
+        formError: getApiErrorMessage(result.error),
       },
     } as const;
   }
