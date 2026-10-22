@@ -48,7 +48,9 @@ const selectValues = async (
   user: ReturnType<typeof userEvent.setup>,
   { attribute, values }: { attribute: string; values: string[] }
 ) => {
-  await user.click(screen.getByRole('combobox', { name: attribute }));
+  await user.click(
+    screen.getByRole('combobox', { name: `Values for ${attribute}` })
+  );
   for (const name of values) {
     await user.click(await screen.findByRole('option', { name }));
   }
@@ -107,7 +109,14 @@ describe('New product creation design', () => {
     expect(
       screen.queryByRole('combobox', { name: 'Attribute' })
     ).not.toBeInTheDocument();
-    expect(screen.getByRole('combobox', { name: 'Color' })).toBeVisible();
+    const values = screen.getByRole('combobox', { name: 'Values for Color' });
+    expect(values).toBeVisible();
+    expect(values).toHaveFocus();
+    expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Color' })).toBeVisible();
+    expect(screen.getByRole('status')).toHaveTextContent(
+      'Color added. Select its values.'
+    );
     await selectValues(user, { attribute: 'Color', values: ['Blue'] });
     await user.click(screen.getByRole('button', { name: 'Add attribute' }));
     expect(
@@ -119,7 +128,7 @@ describe('New product creation design', () => {
       screen.getByRole('button', { name: 'Remove Color attribute' })
     );
     expect(
-      screen.queryByRole('combobox', { name: 'Color' })
+      screen.queryByRole('combobox', { name: 'Values for Color' })
     ).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Remove Cotton' })).toBeVisible();
 

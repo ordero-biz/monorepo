@@ -19,6 +19,8 @@ export const ProductAttributeValuesField = ({
   productVariantsGenerationForm,
 }: ProductAttributeValuesFieldProps) => {
   const [isAddingAttribute, setIsAddingAttribute] = useState(false);
+  const [focusAttributeId, setFocusAttributeId] = useState<number | null>(null);
+  const [announcement, setAnnouncement] = useState('');
   const requiresAttributes = generationMode === PRODUCT_GENERATION_MODE.many;
 
   return (
@@ -51,60 +53,77 @@ export const ProductAttributeValuesField = ({
                   aria-label="Product attributes"
                   className="m-0 flex min-w-0 flex-col gap-[var(--space-2)] border-0 p-0"
                 >
+                  <output aria-live="polite" className="sr-only">
+                    {announcement}
+                  </output>
                   {attributes.map((attribute) => {
                     const attributeId = String(attribute.id);
                     const selectedIds =
                       valuesField.state.value[attributeId] ?? [];
 
                     return (
-                      <div
-                        className="flex min-w-0 items-end gap-[var(--space-1)]"
+                      <section
+                        aria-labelledby={`attribute-${attributeId}-heading`}
+                        className={`flex min-w-0 flex-col gap-[var(--space-1-5)] rounded-[var(--radius)] border border-border p-[var(--space-2)] transition-colors ${selectedIds.length === 0 ? 'bg-[var(--color-primary-8)]' : 'bg-card'}`}
                         key={attribute.id}
                       >
-                        <div className="min-w-0 flex-1">
-                          <Combobox<AttributeValue>
-                            emptyText="No values found"
-                            getOptionLabel={getValueLabel}
-                            getOptionValue={getValueId}
-                            invalid={Boolean(valuesError)}
-                            label={attribute.name}
-                            multiple
-                            name={`attributeValues[${attributeId}]`}
-                            onBlur={valuesField.handleBlur}
-                            onValueChange={(values) => {
-                              valuesField.handleChange({
-                                ...valuesField.state.value,
-                                [attributeId]: values.map(getValueId),
-                              });
+                        <header className="flex items-center justify-between gap-[var(--space-1)]">
+                          <h4
+                            className="font-semibold"
+                            id={`attribute-${attributeId}-heading`}
+                          >
+                            {attribute.name}
+                          </h4>
+                          <IconButton
+                            aria-label={`Remove ${attribute.name} attribute`}
+                            onClick={() => {
+                              const remainingAttributes = attributes.filter(
+                                (item) => item.id !== attribute.id
+                              );
+                              attributesField.handleChange(remainingAttributes);
+                              valuesField.handleChange(
+                                getAttributeValueSelections(
+                                  valuesField.state.value,
+                                  remainingAttributes
+                                )
+                              );
+                              setAnnouncement(`${attribute.name} removed.`);
                             }}
-                            options={attribute.attributeValues}
-                            placeholder="Select values"
                             size="s"
-                            value={attribute.attributeValues.filter((value) =>
-                              selectedIds.includes(String(value.id))
-                            )}
-                          />
-                        </div>
-                        <IconButton
-                          aria-label={`Remove ${attribute.name} attribute`}
-                          onClick={() => {
-                            const remainingAttributes = attributes.filter(
-                              (item) => item.id !== attribute.id
-                            );
-                            attributesField.handleChange(remainingAttributes);
-                            valuesField.handleChange(
-                              getAttributeValueSelections(
-                                valuesField.state.value,
-                                remainingAttributes
-                              )
-                            );
+                            type="button"
+                          >
+                            <X aria-hidden="true" />
+                          </IconButton>
+                        </header>
+                        <Combobox<AttributeValue>
+                          autoFocus={focusAttributeId === attribute.id}
+                          emptyText="No values found"
+                          getOptionLabel={getValueLabel}
+                          getOptionValue={getValueId}
+                          invalid={Boolean(valuesError)}
+                          helperText={
+                            selectedIds.length === 0
+                              ? 'Choose one or more values.'
+                              : undefined
+                          }
+                          label={`Values for ${attribute.name}`}
+                          multiple
+                          name={`attributeValues[${attributeId}]`}
+                          onBlur={valuesField.handleBlur}
+                          onValueChange={(values) => {
+                            valuesField.handleChange({
+                              ...valuesField.state.value,
+                              [attributeId]: values.map(getValueId),
+                            });
                           }}
-                          size="m"
-                          type="button"
-                        >
-                          <X aria-hidden="true" />
-                        </IconButton>
-                      </div>
+                          options={attribute.attributeValues}
+                          placeholder={`Select ${attribute.name.toLowerCase()} values`}
+                          size="s"
+                          value={attribute.attributeValues.filter((value) =>
+                            selectedIds.includes(String(value.id))
+                          )}
+                        />
+                      </section>
                     );
                   })}
 
@@ -130,6 +149,10 @@ export const ProductAttributeValuesField = ({
                               )
                             );
                             setIsAddingAttribute(false);
+                            setFocusAttributeId(attribute.id);
+                            setAnnouncement(
+                              `${attribute.name} added. Select its values.`
+                            );
                           }}
                           onBlur={attributesField.handleBlur}
                           selectedAttributes={attributes}

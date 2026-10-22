@@ -35,6 +35,7 @@ export const AttributesAsyncCombobox = ({
     emptyText="No attributes found"
     getOptionLabel={getAttributeLabel}
     getOptionValue={getAttributeValue}
+    helperText="Choose an attribute, then select its values."
     invalid={invalid}
     isOptionDisabled={(attribute) =>
       selectedAttributes.some((selected) => selected.id === attribute.id)
