@@ -3,6 +3,7 @@
 import { Button, Card, ContextualActionBar, Typography } from '@ordero/ui';
 import { ArrowRight } from 'lucide-react';
 import { BaseLayoutContextualActionBar } from '@/features/app-shell';
+import { ProductAttributeValuesField } from './ProductAttributeValuesField';
 import { ProductGenerationModeSelector } from './ProductGenerationModeSelector';
 import { ProductTemplateFields } from './ProductTemplateFields';
 import type { ProductVariantsGenerationFormProps } from './types';
@@ -52,10 +53,14 @@ export const ProductVariantsGenerationForm = ({
               </Card.Title>
             </Card.Header>
             <Card.Content>
-              <div className="min-h-[calc(var(--space-20)*3)]">
+              <div className="flex flex-col gap-[var(--space-3)]">
                 <ProductGenerationModeSelector
                   generationMode={generationMode}
                   onGenerationModeChange={onGenerationModeChange}
+                />
+                <ProductAttributeValuesField
+                  generationMode={generationMode}
+                  productVariantsGenerationForm={productVariantsGenerationForm}
                 />
               </div>
             </Card.Content>

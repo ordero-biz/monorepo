@@ -35,7 +35,7 @@ export const ProductGenerationModeSelector = ({
     <div className="grid grid-cols-1 gap-[var(--space-2)] md:grid-cols-2">
       {options.map((option) => (
         <div
-          className={`rounded-[var(--radius)] border p-[var(--space-1-5)] transition-colors [&>label]:w-full [&>label]:max-w-none ${
+          className={`flex items-center rounded-[var(--radius)] border p-[var(--space-1-5)] transition-colors [&>label]:w-full [&>label]:max-w-none ${
             generationMode === option.value
               ? 'border-primary bg-[var(--color-primary-8)]'
               : 'border-border bg-card'
@@ -43,6 +43,7 @@ export const ProductGenerationModeSelector = ({
           key={option.value}
         >
           <Radio
+            align="center"
             aria-describedby={`generation-mode-${option.value}-description`}
             aria-label={option.label}
             color="primary"

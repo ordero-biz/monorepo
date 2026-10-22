@@ -1,3 +1,5 @@
+import type { FocusEventHandler } from 'react';
+import type { AttributeDropdown } from '@/lib/domain/attributes/types';
 import type {
   PRODUCT_GENERATION_MODE,
   ProductVariantsGenerationFormApi,
@@ -17,4 +19,16 @@ export type ProductVariantsGenerationFormProps = {
 
 export type ProductTemplateFieldsProps = {
   productVariantsGenerationForm: ProductVariantsGenerationFormApi;
+};
+
+export type ProductAttributeValuesFieldProps = {
+  generationMode: ProductGenerationMode;
+  productVariantsGenerationForm: ProductVariantsGenerationFormApi;
+};
+
+export type AttributesAsyncComboboxProps = {
+  invalid?: boolean;
+  onAttributeSelected: (attribute: AttributeDropdown) => void;
+  onBlur: FocusEventHandler<HTMLInputElement>;
+  selectedAttributes: AttributeDropdown[];
 };
