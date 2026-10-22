@@ -1,20 +1,23 @@
 'use client';
 
 import { Menu, PageHeader, Typography } from '@ordero/ui';
-import { EllipsisVertical, Pencil } from 'lucide-react';
+import { EllipsisVertical, Pencil, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { UpdateCategoryDialog } from '@/features/categories/detail/UpdateCategory';
 import { AppBreadcrumbs } from '@/lib/components/AppBreadcrumbs';
 import { CATEGORY_STATUS } from '@/lib/domain/categories/constants';
+import { DeleteCategoriesDialog } from '../../shared';
 import { categoriesRootBreadcrumb } from '../../shared/breadcrumbs';
 import { CategoryStatusChip } from '../../shared/CategoryStatusChip';
 import { ActivateCategoryDialogTrigger } from './ActivateCategoryDialogTrigger';
 import type { CategoryDetailHeaderProps } from './types';
 
 export const CategoryDetailHeader = ({
-  onUpdated,
   category,
+  onDeleted,
+  onUpdated,
 }: CategoryDetailHeaderProps) => {
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
   const isCategoryActive = category.status === CATEGORY_STATUS.ACTIVE;
 
@@ -35,25 +38,27 @@ export const CategoryDetailHeader = ({
         </div>
       </PageHeader.Left>
 
-      {!isCategoryActive ? (
-        <PageHeader.Right>
+      <PageHeader.Right>
+        {!isCategoryActive ? (
           <ActivateCategoryDialogTrigger
             category={category}
             onUpdated={onUpdated}
           />
+        ) : null}
 
-          <Menu.Root>
-            <Menu.Trigger
-              aria-label={`Actions for ${category.name}`}
-              appearance="iconButton"
-              size="s"
-              title={`Actions for ${category.name}`}
-            >
-              <EllipsisVertical aria-hidden="true" />
-            </Menu.Trigger>
-            <Menu.Portal>
-              <Menu.Positioner align="end">
-                <Menu.Popup>
+        <Menu.Root>
+          <Menu.Trigger
+            aria-label={`Actions for ${category.name}`}
+            appearance="iconButton"
+            size="s"
+            title={`Actions for ${category.name}`}
+          >
+            <EllipsisVertical aria-hidden="true" />
+          </Menu.Trigger>
+          <Menu.Portal>
+            <Menu.Positioner align="end">
+              <Menu.Popup>
+                {!isCategoryActive ? (
                   <Menu.Item onClick={() => setIsUpdateDialogOpen(true)}>
                     <Pencil
                       aria-hidden="true"
@@ -61,19 +66,35 @@ export const CategoryDetailHeader = ({
                     />
                     Edit category
                   </Menu.Item>
-                </Menu.Popup>
-              </Menu.Positioner>
-            </Menu.Portal>
-          </Menu.Root>
+                ) : null}
+                <Menu.Item
+                  color="error"
+                  onClick={() => setIsDeleteDialogOpen(true)}
+                >
+                  <Trash2
+                    aria-hidden="true"
+                    className="size-[var(--icon-button-xs-icon)]"
+                  />
+                  Delete category
+                </Menu.Item>
+              </Menu.Popup>
+            </Menu.Positioner>
+          </Menu.Portal>
+        </Menu.Root>
 
-          <UpdateCategoryDialog
-            category={category}
-            onOpenChange={setIsUpdateDialogOpen}
-            onUpdated={onUpdated}
-            open={isUpdateDialogOpen}
-          />
-        </PageHeader.Right>
-      ) : null}
+        <DeleteCategoriesDialog
+          categories={[category]}
+          onDeleted={onDeleted}
+          onOpenChange={setIsDeleteDialogOpen}
+          open={isDeleteDialogOpen}
+        />
+        <UpdateCategoryDialog
+          category={category}
+          onOpenChange={setIsUpdateDialogOpen}
+          onUpdated={onUpdated}
+          open={isUpdateDialogOpen}
+        />
+      </PageHeader.Right>
     </PageHeader.Root>
   );
 };

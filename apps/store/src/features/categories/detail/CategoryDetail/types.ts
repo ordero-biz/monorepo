@@ -6,6 +6,7 @@ export type CategoryDetailProps = {
 
 export type CategoryDetailHeaderProps = {
   category: Category;
+  onDeleted: () => Promise<void> | void;
   onUpdated: () => Promise<void> | void;
 };
 

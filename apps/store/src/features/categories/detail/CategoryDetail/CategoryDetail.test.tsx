@@ -1,10 +1,26 @@
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { getCategory, updateCategory } from '@/lib/client/api/categories';
+import {
+  deleteCategories,
+  getCategory,
+  updateCategory,
+} from '@/lib/client/api/categories';
+import { clientRoutes } from '@/lib/client/routes';
 import { CATEGORY_STATUS } from '@/lib/domain/categories/constants';
 import type { Category } from '@/lib/domain/categories/types';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { CategoryDetail } from './CategoryDetail';
+
+const routerPushMock = vi.fn();
+
+vi.mock('next/navigation', async () => ({
+  ...(await vi.importActual<typeof import('next/navigation')>(
+    'next/navigation'
+  )),
+  useRouter: () => ({
+    push: routerPushMock,
+  }),
+}));
 
 vi.mock('./CategoryDetailChildren', () => ({
   CategoryDetailChildren: ({ categoryId }: { categoryId: string }) => (
@@ -16,10 +32,12 @@ vi.mock('@/lib/client/api/categories', async () => ({
   ...(await vi.importActual<typeof import('@/lib/client/api/categories')>(
     '@/lib/client/api/categories'
   )),
+  deleteCategories: vi.fn(),
   getCategory: vi.fn(),
   updateCategory: vi.fn(),
 }));
 
+const deleteCategoriesMock = vi.mocked(deleteCategories);
 const getCategoryMock = vi.mocked(getCategory);
 const updateCategoryMock = vi.mocked(updateCategory);
 
@@ -45,7 +63,9 @@ const { setup } = prepareStoreSetup({
 
 describe('CategoryDetail', () => {
   beforeEach(() => {
+    deleteCategoriesMock.mockReset();
     getCategoryMock.mockReset();
+    routerPushMock.mockReset();
     updateCategoryMock.mockReset();
   });
 
@@ -134,7 +154,38 @@ describe('CategoryDetail', () => {
     ).toBeVisible();
   });
 
-  it('does not render the publish button and actions menu when category status is active', async () => {
+  it('deletes the category and navigates to the category list', async () => {
+    getCategoryMock.mockResolvedValue({ ok: true, data: category });
+    deleteCategoriesMock.mockResolvedValue({
+      ok: true,
+      data: undefined,
+    });
+    const user = userEvent.setup();
+
+    setup();
+
+    await user.click(
+      await screen.findByRole('button', { name: 'Actions for Sneakers' })
+    );
+    await user.click(
+      await screen.findByRole('menuitem', { name: 'Delete category' })
+    );
+    await user.click(
+      within(screen.getByRole('dialog', { name: 'Delete category' })).getByRole(
+        'button',
+        { name: 'Delete' }
+      )
+    );
+
+    expect(deleteCategoriesMock).toHaveBeenCalledWith({
+      categoryIds: [2],
+    });
+    await waitFor(() =>
+      expect(routerPushMock).toHaveBeenCalledWith(clientRoutes.categories)
+    );
+  });
+
+  it('keeps delete available while hiding publish and edit when category status is active', async () => {
     getCategoryMock.mockResolvedValue({
       ok: true,
       data: {
@@ -152,8 +203,18 @@ describe('CategoryDetail', () => {
     expect(
       screen.queryByRole('button', { name: 'Publish' })
     ).not.toBeInTheDocument();
+
+    const user = userEvent.setup();
+
+    await user.click(
+      screen.getByRole('button', { name: 'Actions for Sneakers' })
+    );
+
     expect(
-      screen.queryByRole('button', { name: 'Actions for Sneakers' })
+      screen.queryByRole('menuitem', { name: 'Edit category' })
     ).not.toBeInTheDocument();
+    expect(
+      await screen.findByRole('menuitem', { name: 'Delete category' })
+    ).toBeVisible();
   });
 });

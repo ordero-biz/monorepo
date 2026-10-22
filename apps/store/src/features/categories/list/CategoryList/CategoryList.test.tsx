@@ -1,6 +1,6 @@
-import { screen, within } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { getCategories } from '@/lib/client/api/categories';
+import { deleteCategories, getCategories } from '@/lib/client/api/categories';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { CategoryList } from './CategoryList';
 
@@ -26,6 +26,7 @@ vi.mock('@/lib/client/api/categories', async () => ({
   ...(await vi.importActual<typeof import('@/lib/client/api/categories')>(
     '@/lib/client/api/categories'
   )),
+  deleteCategories: vi.fn(),
   getCategories: mocks.getCategories,
 }));
 
@@ -33,6 +34,7 @@ vi.mock('./CategoryListHeader', () => ({
   CategoryListHeader: () => <div />,
 }));
 
+const deleteCategoriesMock = vi.mocked(deleteCategories);
 const getCategoriesMock = vi.mocked(getCategories);
 
 const { setup } = prepareStoreSetup({
@@ -41,6 +43,7 @@ const { setup } = prepareStoreSetup({
 
 describe('CategoryList', () => {
   beforeEach(() => {
+    deleteCategoriesMock.mockReset();
     getCategoriesMock.mockReset();
     mocks.push.mockReset();
     mocks.searchParams = new URLSearchParams();
@@ -148,11 +151,13 @@ describe('CategoryList', () => {
     expect(
       screen.getAllByRole('columnheader').map((header) => header.textContent)
     ).toEqual([
+      '',
       'Name',
       'Status',
       'Parent category',
       'Parent status',
       'Created at',
+      '',
     ]);
   });
 
@@ -192,12 +197,16 @@ describe('CategoryList', () => {
     expect(screen.getByText('2-2 of 2')).toBeVisible();
     expect(
       within(
-        screen.getByRole('row', { name: 'Accessories Draft None 02 Jul 2026' })
+        screen.getByRole('row', {
+          name: /Accessories Draft None 02 Jul 2026/,
+        })
       ).queryByRole('link', { name: 'None' })
     ).not.toBeInTheDocument();
     expect(
       within(
-        screen.getByRole('row', { name: 'Accessories Draft None 02 Jul 2026' })
+        screen.getByRole('row', {
+          name: /Accessories Draft None 02 Jul 2026/,
+        })
       ).queryByText('Active')
     ).not.toBeInTheDocument();
   });
@@ -243,7 +252,204 @@ describe('CategoryList', () => {
       within(row)
         .getAllByRole('cell')
         .map((cell) => cell.textContent)
-    ).toEqual(['Socks', 'Draft', 'Clothing', '', '03 Jul 2026']);
+    ).toEqual(['', 'Socks', 'Draft', 'Clothing', '', '03 Jul 2026', '']);
+  });
+
+  it('shows bulk delete actions for selected categories', async () => {
+    getCategoriesMock.mockResolvedValue({
+      ok: true,
+      data: {
+        content: [
+          {
+            id: 1,
+            name: 'Shoes',
+            sortOrder: 10,
+            status: 'ACTIVE',
+            createdAt: '2026-07-01T10:54:34.839Z',
+            parentCategory: null,
+          },
+        ],
+        page: {
+          size: 10,
+          number: 0,
+          totalElements: 1,
+          totalPages: 1,
+        },
+      },
+    });
+    const user = userEvent.setup();
+
+    setup();
+
+    await user.click(
+      await screen.findByRole('checkbox', { name: 'Select Shoes' })
+    );
+
+    expect(screen.getByText('1 selected')).toBeVisible();
+    expect(
+      screen.getByRole('button', { name: 'Clear selection' })
+    ).toBeVisible();
+
+    await user.click(screen.getByRole('button', { name: 'Delete' }));
+
+    expect(
+      screen.getByRole('dialog', { name: 'Delete category' })
+    ).toHaveTextContent(
+      'Are you sure you want to delete the "Shoes" category?'
+    );
+  });
+
+  it('preserves other selections when deleting from a category row action', async () => {
+    getCategoriesMock.mockResolvedValue({
+      ok: true,
+      data: {
+        content: [
+          {
+            id: 1,
+            name: 'Shoes',
+            sortOrder: 10,
+            status: 'ACTIVE',
+            createdAt: '2026-07-01T10:54:34.839Z',
+            parentCategory: null,
+          },
+          {
+            id: 2,
+            name: 'Accessories',
+            sortOrder: 20,
+            status: 'DRAFT',
+            createdAt: '2026-07-02T10:54:34.839Z',
+            parentCategory: null,
+          },
+        ],
+        page: {
+          size: 10,
+          number: 0,
+          totalElements: 2,
+          totalPages: 1,
+        },
+      },
+    });
+    deleteCategoriesMock.mockResolvedValue({
+      ok: true,
+      data: undefined,
+    });
+    const user = userEvent.setup();
+
+    setup();
+
+    await user.click(
+      await screen.findByRole('checkbox', { name: 'Select Accessories' })
+    );
+    await user.click(screen.getByRole('button', { name: 'Actions for Shoes' }));
+    await user.click(await screen.findByRole('menuitem', { name: 'Delete' }));
+
+    await user.click(
+      within(screen.getByRole('dialog', { name: 'Delete category' })).getByRole(
+        'button',
+        { name: 'Delete' }
+      )
+    );
+
+    expect(deleteCategoriesMock).toHaveBeenCalledWith({
+      categoryIds: [1],
+    });
+    await waitFor(() => expect(screen.getByText('1 selected')).toBeVisible());
+  });
+
+  it('selects only categories on the current server page', async () => {
+    getCategoriesMock.mockResolvedValue({
+      ok: true,
+      data: {
+        content: [
+          {
+            id: 1,
+            name: 'Shoes',
+            sortOrder: 10,
+            status: 'ACTIVE',
+            createdAt: '2026-07-01T10:54:34.839Z',
+            parentCategory: null,
+          },
+          {
+            id: 2,
+            name: 'Accessories',
+            sortOrder: 20,
+            status: 'DRAFT',
+            createdAt: '2026-07-02T10:54:34.839Z',
+            parentCategory: null,
+          },
+        ],
+        page: {
+          size: 2,
+          number: 0,
+          totalElements: 3,
+          totalPages: 2,
+        },
+      },
+    });
+    const user = userEvent.setup();
+
+    setup({
+      paginationInput: {
+        page: 1,
+        size: 2,
+      },
+    });
+
+    await user.click(
+      await screen.findByRole('checkbox', { name: 'Select all categories' })
+    );
+
+    expect(screen.getByText('2 selected')).toBeVisible();
+    expect(screen.queryByText('3 selected')).not.toBeInTheDocument();
+  });
+
+  it('deletes selected categories and clears the selection after success', async () => {
+    getCategoriesMock.mockResolvedValue({
+      ok: true,
+      data: {
+        content: [
+          {
+            id: 1,
+            name: 'Shoes',
+            sortOrder: 10,
+            status: 'ACTIVE',
+            createdAt: '2026-07-01T10:54:34.839Z',
+            parentCategory: null,
+          },
+        ],
+        page: {
+          size: 10,
+          number: 0,
+          totalElements: 1,
+          totalPages: 1,
+        },
+      },
+    });
+    deleteCategoriesMock.mockResolvedValue({
+      ok: true,
+      data: undefined,
+    });
+    const user = userEvent.setup();
+
+    setup();
+
+    await user.click(
+      await screen.findByRole('checkbox', { name: 'Select Shoes' })
+    );
+    await user.click(screen.getByRole('button', { name: 'Delete' }));
+    await user.click(
+      within(screen.getByRole('dialog', { name: 'Delete category' })).getByRole(
+        'button',
+        { name: 'Delete' }
+      )
+    );
+
+    expect(deleteCategoriesMock).toHaveBeenCalledWith({
+      categoryIds: [1],
+    });
+    await waitFor(() =>
+      expect(screen.queryByText('1 selected')).not.toBeInTheDocument()
+    );
   });
 
   it('renders an empty state when there are no categories', async () => {

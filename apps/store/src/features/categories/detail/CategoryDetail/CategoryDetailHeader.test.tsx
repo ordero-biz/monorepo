@@ -6,6 +6,15 @@ import { prepareStoreSetup } from '@/test/prepareSetup';
 import { CategoryDetailHeader } from './CategoryDetailHeader';
 import type { CategoryDetailHeaderProps } from './types';
 
+vi.mock('next/navigation', async () => ({
+  ...(await vi.importActual<typeof import('next/navigation')>(
+    'next/navigation'
+  )),
+  useRouter: () => ({
+    push: vi.fn(),
+  }),
+}));
+
 vi.mock('@/features/categories/detail/UpdateCategory', async () => ({
   ...(await vi.importActual('@/features/categories/detail/UpdateCategory')),
   UpdateCategoryDialog: ({
@@ -25,6 +34,7 @@ vi.mock('@/features/categories/detail/UpdateCategory', async () => ({
 const { setup } = prepareStoreSetup<CategoryDetailHeaderProps>({
   component: CategoryDetailHeader,
   props: {
+    onDeleted: vi.fn(),
     onUpdated: vi.fn(),
     category: {
       id: 2,
@@ -76,7 +86,26 @@ describe('CategoryDetailHeader', () => {
     ).toBeVisible();
   });
 
-  it('hides publish and edit actions for an active category', () => {
+  it('opens a confirmation dialog from the delete action', async () => {
+    const user = userEvent.setup();
+
+    setup();
+
+    await user.click(
+      screen.getByRole('button', { name: 'Actions for Sneakers' })
+    );
+    await user.click(
+      await screen.findByRole('menuitem', { name: 'Delete category' })
+    );
+
+    expect(
+      screen.getByRole('dialog', { name: 'Delete category' })
+    ).toBeVisible();
+  });
+
+  it('keeps delete available while hiding publish and edit for an active category', async () => {
+    const user = userEvent.setup();
+
     setup({
       category: {
         id: 2,
@@ -92,8 +121,16 @@ describe('CategoryDetailHeader', () => {
     expect(
       screen.queryByRole('button', { name: 'Publish' })
     ).not.toBeInTheDocument();
+
+    await user.click(
+      screen.getByRole('button', { name: 'Actions for Sneakers' })
+    );
+
     expect(
-      screen.queryByRole('button', { name: 'Actions for Sneakers' })
+      screen.queryByRole('menuitem', { name: 'Edit category' })
     ).not.toBeInTheDocument();
+    expect(
+      await screen.findByRole('menuitem', { name: 'Delete category' })
+    ).toBeVisible();
   });
 });
