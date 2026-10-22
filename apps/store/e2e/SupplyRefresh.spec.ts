@@ -1026,7 +1026,7 @@ test.describe('Supply refresh and conflict resolution', () => {
     page,
     capture,
   }) => {
-    await page.goto('/products/supplies/add');
+    await page.goto('/warehouse/supplies/add');
     await expect(page.getByRole('form', { name: 'Supply' })).toBeVisible();
     await expect(
       page.getByRole('button', { name: 'Review updates' })

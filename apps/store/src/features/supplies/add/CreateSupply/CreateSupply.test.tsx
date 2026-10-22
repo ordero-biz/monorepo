@@ -698,7 +698,7 @@ describe('CreateSupply', () => {
       });
     });
     await waitFor(() => {
-      expect(mocks.replace).toHaveBeenCalledWith('/products/supplies/9');
+      expect(mocks.replace).toHaveBeenCalledWith('/warehouse/supplies/9');
     });
     expect(queryClient.getQueryData(suppliesQueryKeys.detail(9))).toEqual(
       savedSupply
@@ -833,7 +833,7 @@ describe('CreateSupply', () => {
     expect(
       await screen.findByRole('button', { name: 'Save draft' })
     ).toBeEnabled();
-    expect(mocks.replace).toHaveBeenCalledWith('/products/supplies/9');
+    expect(mocks.replace).toHaveBeenCalledWith('/warehouse/supplies/9');
     expect(addProduct).toBeEnabled();
   });
 
