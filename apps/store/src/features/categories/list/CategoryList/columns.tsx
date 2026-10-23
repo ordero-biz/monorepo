@@ -2,14 +2,22 @@ import {
   DataTableCell,
   type DataTableColumnDef,
   DataTableColumnHeader,
+  Menu,
 } from '@ordero/ui';
+import { EllipsisVertical, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import { getCategoryDetailRoute } from '@/lib/client/routes';
 import type { Category } from '@/lib/domain/categories/types';
 import { formatDate } from '@/lib/utils/formatDate';
 import { CategoryStatusChip } from '../../shared/CategoryStatusChip';
 
-export const columns: DataTableColumnDef<Category>[] = [
+type GetColumnsArgs = {
+  onDeleteCategory: (category: Category) => void;
+};
+
+export const getColumns = ({
+  onDeleteCategory,
+}: GetColumnsArgs): DataTableColumnDef<Category>[] => [
   {
     accessorKey: 'name',
     cell: ({ row }) => (
@@ -92,6 +100,44 @@ export const columns: DataTableColumnDef<Category>[] = [
     ),
     meta: {
       width: '20%',
+    },
+  },
+  {
+    cell: ({ row }) => (
+      <DataTableCell variant="actions">
+        <Menu.Root>
+          <Menu.Trigger
+            aria-label={`Actions for ${row.original.name}`}
+            appearance="iconButton"
+            size="xs"
+            title={`Actions for ${row.original.name}`}
+          >
+            <EllipsisVertical aria-hidden="true" />
+          </Menu.Trigger>
+          <Menu.Portal>
+            <Menu.Positioner align="end">
+              <Menu.Popup>
+                <Menu.Item
+                  color="error"
+                  onClick={() => onDeleteCategory(row.original)}
+                >
+                  <Trash2
+                    aria-hidden="true"
+                    className="size-[var(--icon-button-xs-icon)]"
+                  />
+                  Delete
+                </Menu.Item>
+              </Menu.Popup>
+            </Menu.Positioner>
+          </Menu.Portal>
+        </Menu.Root>
+      </DataTableCell>
+    ),
+    header: () => null,
+    id: 'actions',
+    meta: {
+      align: 'right',
+      wrap: 'nowrap',
     },
   },
 ];

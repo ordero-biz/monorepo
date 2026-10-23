@@ -1,16 +1,61 @@
 'use client';
 
-import { Button, Card, DataTable, Typography } from '@ordero/ui';
+import {
+  Button,
+  Card,
+  ContextualActionBar,
+  DataTable,
+  Typography,
+  useDataTableSelection,
+} from '@ordero/ui';
+import { Trash2 } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { BaseLayoutContextualActionBar } from '@/features/app-shell';
+import type { Attribute } from '@/lib/domain/attributes/types';
 import { useAttributesQuery } from '@/lib/hooks/attributes/useAttributesQuery';
 import { useTablePagination } from '@/lib/hooks/useTablePagination';
-import { columns } from './columns';
+import { DeleteAttributesDialog } from '../../shared';
+import { getColumns } from './columns';
 import type { AttributesListProps } from './types';
+
+const EMPTY_ATTRIBUTES: Attribute[] = [];
+
+const getAttributeRowId = (attribute: Attribute) => String(attribute.id);
+
+const getAttributeCheckboxAriaLabel = (attribute: Attribute) =>
+  `Select ${attribute.name}`;
 
 export const AttributesList = ({ paginationInput }: AttributesListProps) => {
   const attributesQuery = useAttributesQuery(paginationInput);
+  const attributes = attributesQuery.data?.content ?? EMPTY_ATTRIBUTES;
   const tablePagination = useTablePagination({
     pageMetadata: attributesQuery.data?.page,
     paginationInput,
+  });
+  const [deletingAttributes, setDeletingAttributes] = useState<
+    Attribute[] | null
+  >(null);
+  const [deletingAttribute, setDeletingAttribute] = useState<Attribute | null>(
+    null
+  );
+
+  const columns = useMemo(
+    () =>
+      getColumns({
+        onDeleteAttribute: setDeletingAttribute,
+      }),
+    []
+  );
+
+  const {
+    clearSelection,
+    selectedRows: selectedAttributes,
+    selection,
+  } = useDataTableSelection({
+    data: attributes,
+    getRowCheckboxAriaLabel: getAttributeCheckboxAriaLabel,
+    getRowId: getAttributeRowId,
+    selectAllCheckboxAriaLabel: 'Select all attributes',
   });
 
   if (attributesQuery.isPending) {
@@ -50,14 +95,73 @@ export const AttributesList = ({ paginationInput }: AttributesListProps) => {
   }
 
   return (
-    <DataTable
-      ariaLabel="Attributes list"
-      columns={columns}
-      data={attributesQuery.data.content}
-      emptyMessage="No attributes found."
-      getRowId={(row) => String(row.id)}
-      manualPagination
-      pagination={tablePagination}
-    />
+    <>
+      <DataTable
+        ariaLabel="Attributes list"
+        columns={columns}
+        data={attributes}
+        emptyMessage="No attributes found."
+        getRowId={getAttributeRowId}
+        manualPagination
+        pagination={tablePagination}
+        selection={selection}
+      />
+
+      {selectedAttributes.length > 0 ? (
+        <BaseLayoutContextualActionBar>
+          <ContextualActionBar.Root ariaLabel="Attribute bulk actions">
+            <ContextualActionBar.Left>
+              <Typography variant="body2">
+                {selectedAttributes.length} selected
+              </Typography>
+              <Button
+                color="inherit"
+                onClick={clearSelection}
+                size="s"
+                variant="text"
+              >
+                Clear selection
+              </Button>
+            </ContextualActionBar.Left>
+            <ContextualActionBar.Right>
+              <Button
+                color="error"
+                onClick={() => setDeletingAttributes(selectedAttributes)}
+                size="m"
+                startIcon={<Trash2 aria-hidden="true" />}
+                variant="soft"
+              >
+                Delete
+              </Button>
+            </ContextualActionBar.Right>
+          </ContextualActionBar.Root>
+        </BaseLayoutContextualActionBar>
+      ) : null}
+
+      {deletingAttribute ? (
+        <DeleteAttributesDialog
+          attributes={[deletingAttribute]}
+          onOpenChange={(nextOpen) => {
+            if (!nextOpen) {
+              setDeletingAttribute(null);
+            }
+          }}
+          open={Boolean(deletingAttribute)}
+        />
+      ) : null}
+
+      {deletingAttributes ? (
+        <DeleteAttributesDialog
+          attributes={deletingAttributes}
+          onDeleted={clearSelection}
+          onOpenChange={(nextOpen) => {
+            if (!nextOpen) {
+              setDeletingAttributes(null);
+            }
+          }}
+          open={Boolean(deletingAttributes)}
+        />
+      ) : null}
+    </>
   );
 };

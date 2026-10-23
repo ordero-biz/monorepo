@@ -2,34 +2,32 @@
 
 import { Button, Dialog, Typography } from '@ordero/ui';
 import { useQueryClient } from '@tanstack/react-query';
-import { useRouter } from 'next/navigation';
-import { clientRoutes } from '@/lib/client/routes';
 import { attributesQueryKeys } from '@/lib/query/attributes/attributesQueryKeys';
-import { useDeleteAttribute } from './hooks/useDeleteAttribute';
-import type { DeleteAttributeDialogProps } from './types';
+import { useDeleteAttributes } from './hooks/useDeleteAttributes';
+import type { DeleteAttributesDialogProps } from './types';
 
-export const DeleteAttributeDialog = ({
-  attribute,
+export const DeleteAttributesDialog = ({
+  attributes,
+  onDeleted,
   onOpenChange,
   open,
-}: DeleteAttributeDialogProps) => {
+}: DeleteAttributesDialogProps) => {
   const queryClient = useQueryClient();
-  const router = useRouter();
-  const { handleDelete, isDeleting } = useDeleteAttribute({
-    attributeId: attribute.id,
-    attributeName: attribute.name,
+  const isSingleAttribute = attributes.length === 1;
+
+  const { handleDelete, isDeleting } = useDeleteAttributes({
+    attributeIds: attributes.map((attribute) => attribute.id),
     onDeleted: async () => {
       onOpenChange(false);
-      queryClient.removeQueries({
-        queryKey: attributesQueryKeys.detail(attribute.id),
-      });
-      queryClient.removeQueries({
-        queryKey: attributesQueryKeys.values(attribute.id),
+      attributes.forEach((attribute) => {
+        queryClient.removeQueries({
+          queryKey: attributesQueryKeys.detail(attribute.id),
+        });
       });
       await queryClient.invalidateQueries({
         queryKey: attributesQueryKeys.list,
       });
-      router.push(clientRoutes.attributes);
+      await onDeleted?.();
     },
   });
 
@@ -40,14 +38,25 @@ export const DeleteAttributeDialog = ({
         <Dialog.Viewport>
           <Dialog.Popup size="xs">
             <Dialog.Header>
-              <Dialog.Title>Delete attribute</Dialog.Title>
+              <Dialog.Title>
+                {isSingleAttribute ? 'Delete attribute' : 'Delete attributes'}
+              </Dialog.Title>
             </Dialog.Header>
 
             <Dialog.Content>
               <Typography variant="body1">
-                Are you sure you want to delete the "
-                <strong>{attribute.name}</strong>" attribute and all its
-                associated values?
+                {isSingleAttribute ? (
+                  <>
+                    Are you sure you want to delete the "
+                    <strong>{attributes[0]?.name}</strong>" attribute and all
+                    its associated values?
+                  </>
+                ) : (
+                  <>
+                    Are you sure you want to delete {attributes.length}{' '}
+                    attributes and all their associated values?
+                  </>
+                )}
               </Typography>
             </Dialog.Content>
 

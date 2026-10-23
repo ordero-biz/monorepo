@@ -2,21 +2,24 @@
 
 import { Button, Card, Menu, PageHeader, Typography } from '@ordero/ui';
 import { EllipsisVertical, Pencil, Trash2 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { clientRoutes } from '@/lib/client/routes';
 import { AppBreadcrumbs } from '@/lib/components/AppBreadcrumbs';
 import { ATTRIBUTE_STATUS } from '@/lib/domain/attributes/constants';
 import { useAttributeQuery } from '@/lib/hooks/attributes/useAttributeQuery';
+import { DeleteAttributesDialog } from '../../shared';
 import { AttributeStatusChip } from '../../shared/AttributeStatusChip';
 import { attributesRootBreadcrumb } from '../../shared/breadcrumbs';
 import { ActivateAttributeDialogTrigger } from '../ActivateAttribute';
 import { CreateAttributeValuesDialogTrigger } from '../CreateAttributeValues';
-import { DeleteAttributeDialog } from '../DeleteAttribute';
 import { UpdateAttributeDialog } from '../UpdateAttribute';
 import type { AttributeDetailHeaderProps } from './types';
 
 export const AttributeDetailHeader = ({
   attributeId,
 }: AttributeDetailHeaderProps) => {
+  const router = useRouter();
   const attributeQuery = useAttributeQuery(attributeId);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
@@ -127,8 +130,11 @@ export const AttributeDetailHeader = ({
           </Menu.Portal>
         </Menu.Root>
 
-        <DeleteAttributeDialog
-          attribute={attributeQuery.data}
+        <DeleteAttributesDialog
+          attributes={[attributeQuery.data]}
+          onDeleted={() => {
+            router.push(clientRoutes.attributes);
+          }}
           onOpenChange={setIsDeleteDialogOpen}
           open={isDeleteDialogOpen}
         />
