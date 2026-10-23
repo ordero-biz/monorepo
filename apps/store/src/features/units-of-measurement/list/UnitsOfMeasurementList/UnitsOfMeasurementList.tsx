@@ -8,12 +8,15 @@ import {
   Typography,
   useDataTableSelection,
 } from '@ordero/ui';
+import { useQueryClient } from '@tanstack/react-query';
 import { Trash2 } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { BaseLayoutContextualActionBar } from '@/features/app-shell';
 import type { UnitOfMeasurement } from '@/lib/domain/units-of-measurement/types';
 import { useUnitsOfMeasurementQuery } from '@/lib/hooks/units-of-measurement/useUnitsOfMeasurementQuery';
 import { useTablePagination } from '@/lib/hooks/useTablePagination';
+import { unitsOfMeasurementQueryKeys } from '@/lib/query/units-of-measurement/unitsOfMeasurementQueryKeys';
+import type { PaginatedResponse } from '@/lib/server/types';
 import { DeleteUnitsOfMeasurementDialog } from '../../shared';
 import { getColumns } from './columns';
 import type { UnitsOfMeasurementListProps } from './types';
@@ -28,6 +31,7 @@ const getUnitOfMeasurementCheckboxAriaLabel = (
 export const UnitsOfMeasurementList = ({
   paginationInput,
 }: UnitsOfMeasurementListProps) => {
+  const queryClient = useQueryClient();
   const unitsOfMeasurementQuery = useUnitsOfMeasurementQuery(paginationInput);
 
   const tablePagination = useTablePagination({
@@ -59,6 +63,16 @@ export const UnitsOfMeasurementList = ({
     getRowId: getUnitOfMeasurementRowId,
     selectAllCheckboxAriaLabel: 'Select all units of measurement',
   });
+
+  const handleDeleted = () => {
+    const updatedQuery = queryClient.getQueryState<
+      PaginatedResponse<UnitOfMeasurement>
+    >(unitsOfMeasurementQueryKeys.listPage(paginationInput));
+
+    if (updatedQuery?.status === 'success' && !updatedQuery.isInvalidated) {
+      tablePagination.correctPage(updatedQuery.data?.page);
+    }
+  };
 
   if (unitsOfMeasurementQuery.isPending) {
     return (
@@ -144,6 +158,7 @@ export const UnitsOfMeasurementList = ({
 
       {deletingUnitOfMeasurement ? (
         <DeleteUnitsOfMeasurementDialog
+          onDeleted={handleDeleted}
           onOpenChange={(nextOpen) => {
             if (!nextOpen) {
               setDeletingUnitOfMeasurement(null);
@@ -156,7 +171,10 @@ export const UnitsOfMeasurementList = ({
 
       {deletingUnitsOfMeasurement ? (
         <DeleteUnitsOfMeasurementDialog
-          onDeleted={clearSelection}
+          onDeleted={() => {
+            clearSelection();
+            handleDeleted();
+          }}
           onOpenChange={(nextOpen) => {
             if (!nextOpen) {
               setDeletingUnitsOfMeasurement(null);

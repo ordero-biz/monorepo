@@ -1,5 +1,5 @@
-import { renderHook } from '@testing-library/react';
-import { useTablePagination } from './useTablePagination';
+import { act, renderHook } from '@testing-library/react';
+import { getTablePagination, useTablePagination } from './useTablePagination';
 
 const navigationMocks = vi.hoisted(() => ({
   pathname: '/products/categories',
@@ -7,7 +7,10 @@ const navigationMocks = vi.hoisted(() => ({
   searchParams: new URLSearchParams(),
 }));
 
-vi.mock('next/navigation', () => ({
+vi.mock('next/navigation', async () => ({
+  ...(await vi.importActual<typeof import('next/navigation')>(
+    'next/navigation'
+  )),
   usePathname: () => navigationMocks.pathname,
   useRouter: () => ({
     push: navigationMocks.push,
@@ -16,6 +19,52 @@ vi.mock('next/navigation', () => ({
 }));
 
 describe('useTablePagination', () => {
+  it.each([
+    { page: 2, totalPages: 1, targetPage: 1 },
+    { page: 3, totalPages: 2, targetPage: 2 },
+    { page: 3, totalPages: 0, targetPage: 1 },
+  ])('corrects page $page to $targetPage from the refreshed response', ({
+    page,
+    totalPages,
+    targetPage,
+  }) => {
+    const setPagination = vi.fn();
+    const pagination = getTablePagination({
+      pagination: { page, size: 10, setPagination },
+    });
+
+    expect(setPagination).not.toHaveBeenCalled();
+
+    pagination.correctPage({
+      size: 10,
+      number: page - 1,
+      totalElements: totalPages * 10,
+      totalPages,
+    });
+
+    expect(setPagination).toHaveBeenCalledExactlyOnceWith({
+      navigationType: 'replace',
+      page: targetPage,
+      size: 10,
+    });
+  });
+
+  it.each([
+    { size: 10, number: 2, totalElements: 21, totalPages: 3 },
+    { size: 10, number: 0, totalElements: 10, totalPages: 1 },
+    { size: 25, number: 2, totalElements: 25, totalPages: 1 },
+    undefined,
+  ])('does not navigate for an existing page or mismatched or missing response: %j', (pageMetadata) => {
+    const setPagination = vi.fn();
+    const pagination = getTablePagination({
+      pagination: { page: 3, size: 10, setPagination },
+    });
+
+    pagination.correctPage(pageMetadata);
+
+    expect(setPagination).not.toHaveBeenCalled();
+  });
+
   beforeEach(() => {
     navigationMocks.pathname = '/products/categories';
     navigationMocks.push.mockReset();
@@ -59,7 +108,7 @@ describe('useTablePagination', () => {
       })
     );
 
-    result.current.onPageChange(2);
+    act(() => result.current.onPageChange(2));
 
     expect(navigationMocks.push).toHaveBeenCalledWith(
       '/products/categories?page=3&size=10&sort=name%2Casc&sort=id%2Cdesc&filter=active',
@@ -83,7 +132,7 @@ describe('useTablePagination', () => {
       })
     );
 
-    result.current.onRowsPerPageChange?.(25, {} as never);
+    act(() => result.current.onRowsPerPageChange?.(25, {} as never));
 
     expect(navigationMocks.push).toHaveBeenCalledWith(
       '/products/categories?page=1&size=25&sort=name%2Casc',
