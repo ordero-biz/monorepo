@@ -10,6 +10,7 @@ import { UnitsOfMeasurementList } from './UnitsOfMeasurementList';
 const mocks = vi.hoisted(() => ({
   pathname: '/warehouse/units-of-measurement',
   push: vi.fn(),
+  replace: vi.fn(),
   searchParams: new URLSearchParams(),
 }));
 
@@ -20,6 +21,7 @@ vi.mock('next/navigation', async () => ({
   usePathname: () => mocks.pathname,
   useRouter: () => ({
     push: mocks.push,
+    replace: mocks.replace,
   }),
   useSearchParams: () => mocks.searchParams,
 }));
@@ -40,10 +42,75 @@ const { setup } = prepareStoreSetup({
 });
 
 describe('UnitsOfMeasurementList', () => {
+  it.each([
+    'row',
+    'bulk',
+  ])('corrects page three after %s deletion using a single list refresh', async (mode) => {
+    mocks.searchParams = new URLSearchParams(
+      'page=3&size=10&sort=name%2Casc&filter=active'
+    );
+    getUnitsOfMeasurementMock
+      .mockResolvedValueOnce({
+        ok: true,
+        data: {
+          content: [
+            {
+              id: 21,
+              name: 'Test item',
+              status: 'ACTIVE',
+              symbol: 'kg',
+            },
+          ],
+          page: { size: 10, number: 2, totalElements: 21, totalPages: 3 },
+        },
+      })
+      .mockResolvedValue({
+        ok: true,
+        data: {
+          content: [],
+          page: { size: 10, number: 2, totalElements: 20, totalPages: 2 },
+        },
+      });
+    deleteUnitsOfMeasurementMock.mockResolvedValue({
+      ok: true,
+      data: undefined,
+    });
+    const user = userEvent.setup();
+
+    setup({ paginationInput: { page: 3, size: 10, sort: ['name,asc'] } });
+
+    if (mode === 'row') {
+      await user.click(
+        await screen.findByRole('button', { name: 'Actions for Test item' })
+      );
+      await user.click(await screen.findByRole('menuitem', { name: 'Delete' }));
+    } else {
+      await user.click(
+        await screen.findByRole('checkbox', { name: 'Select Test item' })
+      );
+      await user.click(screen.getByRole('button', { name: 'Delete' }));
+    }
+
+    await user.click(
+      within(
+        screen.getByRole('dialog', { name: 'Delete unit of measurement' })
+      ).getByRole('button', { name: 'Delete' })
+    );
+
+    await waitFor(() =>
+      expect(mocks.replace).toHaveBeenCalledWith(
+        '/warehouse/units-of-measurement?page=2&size=10&sort=name%2Casc&filter=active',
+        { scroll: false }
+      )
+    );
+    expect(getUnitsOfMeasurementMock).toHaveBeenCalledTimes(2);
+    expect(screen.queryByText('1 selected')).not.toBeInTheDocument();
+  });
   beforeEach(() => {
     deleteUnitsOfMeasurementMock.mockReset();
     getUnitsOfMeasurementMock.mockReset();
     mocks.push.mockReset();
+    mocks.replace.mockReset();
     mocks.searchParams = new URLSearchParams();
   });
 

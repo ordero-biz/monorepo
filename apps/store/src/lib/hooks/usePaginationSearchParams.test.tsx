@@ -8,7 +8,10 @@ const navigationMocks = vi.hoisted(() => ({
   searchParams: new URLSearchParams(),
 }));
 
-vi.mock('next/navigation', () => ({
+vi.mock('next/navigation', async () => ({
+  ...(await vi.importActual<typeof import('next/navigation')>(
+    'next/navigation'
+  )),
   usePathname: () => navigationMocks.pathname,
   useRouter: () => ({
     push: navigationMocks.push,
@@ -76,7 +79,7 @@ describe('usePaginationSearchParams', () => {
     );
 
     expect(navigationMocks.push).toHaveBeenCalledWith(
-      '/products?page=1&size=10&listMode=product-groups',
+      '/products?listMode=product-groups&page=1&size=10',
       { scroll: false }
     );
   });

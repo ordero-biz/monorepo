@@ -11,6 +11,7 @@ type UseTablePaginationArgs = {
 };
 
 type SetTablePaginationArgs = {
+  navigationType?: 'push' | 'replace';
   page: number;
   size: number;
 };
@@ -24,7 +25,9 @@ export type TablePaginationController = {
 type UseTablePaginationResult = Pick<
   TablePaginationProps,
   'count' | 'onPageChange' | 'onRowsPerPageChange' | 'page' | 'rowsPerPage'
->;
+> & {
+  correctPage: (pageMetadata?: PageMetadata) => void;
+};
 
 type GetTablePaginationArgs = {
   pageMetadata?: PageMetadata;
@@ -35,6 +38,25 @@ export const getTablePagination = ({
   pageMetadata,
   pagination,
 }: GetTablePaginationArgs): UseTablePaginationResult => ({
+  correctPage: (updatedPageMetadata) => {
+    if (
+      !updatedPageMetadata ||
+      updatedPageMetadata.number !== pagination.page - 1 ||
+      updatedPageMetadata.size !== pagination.size
+    ) {
+      return;
+    }
+
+    const lastPage = Math.max(1, updatedPageMetadata.totalPages);
+
+    if (pagination.page > lastPage) {
+      pagination.setPagination({
+        navigationType: 'replace',
+        page: lastPage,
+        size: pagination.size,
+      });
+    }
+  },
   count: pageMetadata?.totalElements ?? 0,
   onPageChange: (nextPage) => {
     pagination.setPagination({

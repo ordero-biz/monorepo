@@ -9,6 +9,7 @@ import {
 } from '@/lib/utils/url';
 
 type SetPaginationArgs = {
+  navigationType?: 'push' | 'replace';
   page: number;
   size: number;
   updateSearchParams?: SearchParamsUpdater;
@@ -47,12 +48,16 @@ export const usePaginationSearchParams = ({
     pendingPaginationInput ?? searchPaginationInput;
   const page = currentPaginationInput.page ?? DEFAULT_PAGE.page;
   const size = currentPaginationInput.size ?? DEFAULT_PAGE.size;
-  const pushSearchParams = (nextSearchParams: URLSearchParams) => {
-    router.push(`${pathname}?${nextSearchParams.toString()}`, {
+  const pushSearchParams = (
+    nextSearchParams: URLSearchParams,
+    navigationType: 'push' | 'replace' = 'push'
+  ) => {
+    router[navigationType](`${pathname}?${nextSearchParams.toString()}`, {
       scroll: false,
     });
   };
   const setPagination = ({
+    navigationType = 'push',
     page: nextPage,
     size: nextSize,
     updateSearchParams,
@@ -67,7 +72,7 @@ export const usePaginationSearchParams = ({
     });
     nextSearchParams.set('page', String(nextPage));
     nextSearchParams.set('size', String(nextSize));
-    pushSearchParams(nextSearchParams);
+    pushSearchParams(nextSearchParams, navigationType);
   };
 
   useEffect(() => {
