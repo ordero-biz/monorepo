@@ -6,12 +6,13 @@ const options = [
   {
     value: PRODUCT_GENERATION_MODE.one,
     label: 'Single variant',
-    description: 'All selected values describe one item.',
+    description: 'Create one variant containing all selected values',
   },
   {
     value: PRODUCT_GENERATION_MODE.many,
-    label: 'Value combinations',
-    description: 'Each combination becomes a separate variant.',
+    label: 'Multiple variants',
+    description:
+      'Create a separate variant for each combination of selected values',
   },
 ] as const;
 

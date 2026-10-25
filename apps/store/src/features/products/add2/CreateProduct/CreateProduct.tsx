@@ -1,31 +1,26 @@
 'use client';
 
+import { Typography } from '@ordero/ui';
 import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
 import { clientRoutes } from '@/lib/client/routes';
 import {
   productGroupsQueryKeys,
   productVariantsQueryKeys,
 } from '@/lib/query/products/productsQueryKeys';
 import {
-  DEFAULT_MAX_GENERATED_PRODUCT_VARIANTS,
   PRODUCT_GENERATION_MODE,
   ProductVariantsCreationForm,
   type ProductVariantsGeneratedArgs,
   useCreateProductForm,
   useProductGenerationState,
-  useProductVariantsGenerationForm,
   validateMultipleProductsConfiguration,
   validateSingleProductConfiguration,
 } from '../../add/CreateProduct';
+import { useProductVariantsGenerationForm } from './hooks/useProductVariantsGenerationForm';
 import { ProductVariantsGenerationForm } from './ProductVariantsGenerationForm';
-import type { ProductGenerationMode } from './types';
 
 export const CreateProduct = () => {
-  const [generationMode, setGenerationMode] = useState<ProductGenerationMode>(
-    PRODUCT_GENERATION_MODE.one
-  );
   const queryClient = useQueryClient();
   const router = useRouter();
   const { form: productVariantsCreationForm } = useCreateProductForm({
@@ -40,10 +35,11 @@ export const CreateProduct = () => {
       ]);
       router.push(clientRoutes.products);
     },
-    validateConfiguration:
-      generationMode === PRODUCT_GENERATION_MODE.one
-        ? validateSingleProductConfiguration
-        : validateMultipleProductsConfiguration,
+    validateConfiguration: (value) =>
+      productVariantsGenerationForm.getFieldValue('generationMode') ===
+      PRODUCT_GENERATION_MODE.one
+        ? validateSingleProductConfiguration(value)
+        : validateMultipleProductsConfiguration(value),
   });
   const {
     generatedAttributes,
@@ -66,28 +62,31 @@ export const CreateProduct = () => {
 
   const { form: productVariantsGenerationForm } =
     useProductVariantsGenerationForm({
-      generationMode,
-      maxGeneratedProductVariants: DEFAULT_MAX_GENERATED_PRODUCT_VARIANTS,
       onProductVariantsGenerated: handleProductVariantsGenerated,
     });
 
   return (
     <div className="flex flex-col gap-[var(--space-3)]">
-      <header>
-        <h1 className="text-[length:var(--h3-size-desktop)] leading-[var(--h3-line-height-desktop)] font-[var(--h3-weight)] [font-family:var(--h3-family)]">
+      <header className="flex flex-col gap-[var(--space-0-5)]">
+        <h1 className="text-[length:var(--h5-size-mobile)] leading-[var(--h5-line-height-mobile)] font-[var(--h5-weight)] [font-family:var(--h5-family)] tracking-[var(--h5-letter-spacing)] md:text-[length:var(--h5-size-desktop)] md:leading-[var(--h5-line-height-desktop)]">
           Create product
         </h1>
+        <Typography color="text-secondary" variant="body2">
+          {isProductVariantGenerationStage
+            ? 'Step 1 of 2 · Product setup'
+            : 'Step 2 of 2 · Review & create'}
+        </Typography>
       </header>
       {isProductVariantGenerationStage ? (
         <ProductVariantsGenerationForm
-          generationMode={generationMode}
-          onGenerationModeChange={setGenerationMode}
           productVariantsGenerationForm={productVariantsGenerationForm}
         />
       ) : (
         <ProductVariantsCreationForm
           generatedAttributes={generatedAttributes}
-          generationMode={generationMode}
+          generationMode={productVariantsGenerationForm.getFieldValue(
+            'generationMode'
+          )}
           productVariantsCreationForm={productVariantsCreationForm}
         />
       )}

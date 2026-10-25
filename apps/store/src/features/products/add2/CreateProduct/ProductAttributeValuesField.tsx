@@ -1,13 +1,8 @@
-import { Button, Combobox, FieldHelperText, IconButton } from '@ordero/ui';
-import { X } from 'lucide-react';
-import { useState } from 'react';
+import { Button, Combobox, FieldHelperText } from '@ordero/ui';
+import { useId, useState } from 'react';
 import type { AttributeValue } from '@/lib/domain/attributes/types';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
-import {
-  getAttributeValueSelections,
-  PRODUCT_GENERATION_MODE,
-  validateProductAttributes,
-} from '../../add/CreateProduct';
+import { getAttributeValueSelections } from '../../add/CreateProduct';
 import { AttributesAsyncCombobox } from './AttributesAsyncCombobox';
 import type { ProductAttributeValuesFieldProps } from './types';
 
@@ -15,26 +10,15 @@ const getValueId = (value: AttributeValue) => String(value.id);
 const getValueLabel = (value: AttributeValue) => value.name;
 
 export const ProductAttributeValuesField = ({
-  generationMode,
   productVariantsGenerationForm,
 }: ProductAttributeValuesFieldProps) => {
+  const fieldId = useId();
   const [isAddingAttribute, setIsAddingAttribute] = useState(false);
   const [focusAttributeId, setFocusAttributeId] = useState<number | null>(null);
   const [announcement, setAnnouncement] = useState('');
-  const requiresAttributes = generationMode === PRODUCT_GENERATION_MODE.many;
 
   return (
-    <productVariantsGenerationForm.Field
-      name="attributes"
-      validators={
-        requiresAttributes
-          ? {
-              onChange: validateProductAttributes,
-              onSubmit: validateProductAttributes,
-            }
-          : undefined
-      }
-    >
+    <productVariantsGenerationForm.Field name="attributes">
       {(attributesField) => {
         const attributesError = getFieldSubmitChangeErrorText(
           attributesField.state.meta
@@ -64,73 +48,99 @@ export const ProductAttributeValuesField = ({
                     return (
                       <section
                         aria-labelledby={`attribute-${attributeId}-heading`}
-                        className={`flex min-w-0 flex-col gap-[var(--space-1-5)] rounded-[var(--radius)] border border-border p-[var(--space-2)] transition-colors ${selectedIds.length === 0 ? 'bg-[var(--color-primary-8)]' : 'bg-card'}`}
+                        className={`grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-[var(--space-1)] rounded-[var(--radius)] border border-border p-[var(--space-1-5)] transition-colors md:grid-cols-[var(--space-18)_minmax(0,1fr)_auto] ${selectedIds.length === 0 ? 'bg-[var(--color-primary-8)]' : 'bg-card'}`}
                         key={attribute.id}
                       >
-                        <header className="flex items-center justify-between gap-[var(--space-1)]">
-                          <h4
-                            className="font-semibold"
-                            id={`attribute-${attributeId}-heading`}
+                        <h4
+                          className="col-span-2 min-w-0 break-words font-semibold md:col-span-1"
+                          id={`attribute-${attributeId}-heading`}
+                        >
+                          <label
+                            className="cursor-pointer"
+                            htmlFor={`${fieldId}-${attributeId}-values`}
                           >
                             {attribute.name}
-                          </h4>
-                          <IconButton
-                            aria-label={`Remove ${attribute.name} attribute`}
-                            onClick={() => {
-                              const remainingAttributes = attributes.filter(
-                                (item) => item.id !== attribute.id
-                              );
-                              attributesField.handleChange(remainingAttributes);
-                              valuesField.handleChange(
-                                getAttributeValueSelections(
-                                  valuesField.state.value,
-                                  remainingAttributes
-                                )
-                              );
-                              setAnnouncement(`${attribute.name} removed.`);
+                          </label>
+                        </h4>
+                        <div className="min-w-0">
+                          <Combobox<AttributeValue>
+                            id={`${fieldId}-${attributeId}-values`}
+                            aria-label={`${attribute.name} values`}
+                            aria-describedby={
+                              selectedIds.length === 0
+                                ? `${fieldId}-${attributeId}-hint`
+                                : undefined
+                            }
+                            autoFocus={focusAttributeId === attribute.id}
+                            emptyText="No values found"
+                            getOptionLabel={getValueLabel}
+                            getOptionValue={getValueId}
+                            invalid={Boolean(valuesError)}
+                            multiple
+                            name={`attributeValues[${attributeId}]`}
+                            onBlur={valuesField.handleBlur}
+                            onValueChange={(values) => {
+                              valuesField.handleChange({
+                                ...valuesField.state.value,
+                                [attributeId]: values.map(getValueId),
+                              });
                             }}
+                            options={attribute.attributeValues}
                             size="s"
-                            type="button"
-                          >
-                            <X aria-hidden="true" />
-                          </IconButton>
-                        </header>
-                        <Combobox<AttributeValue>
-                          autoFocus={focusAttributeId === attribute.id}
-                          emptyText="No values found"
-                          getOptionLabel={getValueLabel}
-                          getOptionValue={getValueId}
-                          invalid={Boolean(valuesError)}
-                          helperText={
-                            selectedIds.length === 0
-                              ? 'Choose one or more values.'
-                              : undefined
-                          }
-                          label={`Values for ${attribute.name}`}
-                          multiple
-                          name={`attributeValues[${attributeId}]`}
-                          onBlur={valuesField.handleBlur}
-                          onValueChange={(values) => {
-                            valuesField.handleChange({
-                              ...valuesField.state.value,
-                              [attributeId]: values.map(getValueId),
-                            });
+                            value={attribute.attributeValues.filter((value) =>
+                              selectedIds.includes(String(value.id))
+                            )}
+                          />
+                        </div>
+                        <Button
+                          aria-label={`Remove ${attribute.name} attribute`}
+                          color="inherit"
+                          onClick={() => {
+                            const remainingAttributes = attributes.filter(
+                              (item) => item.id !== attribute.id
+                            );
+                            attributesField.handleChange(remainingAttributes);
+                            valuesField.handleChange(
+                              getAttributeValueSelections(
+                                valuesField.state.value,
+                                remainingAttributes
+                              )
+                            );
+                            setAnnouncement(`${attribute.name} removed.`);
                           }}
-                          options={attribute.attributeValues}
-                          placeholder={`Select ${attribute.name.toLowerCase()} values`}
                           size="s"
-                          value={attribute.attributeValues.filter((value) =>
-                            selectedIds.includes(String(value.id))
-                          )}
-                        />
+                          type="button"
+                          variant="text"
+                        >
+                          Remove
+                        </Button>
+                        {selectedIds.length === 0 ? (
+                          <div className="col-span-2 md:col-span-1 md:col-start-2">
+                            <FieldHelperText
+                              as="p"
+                              id={`${fieldId}-${attributeId}-hint`}
+                            >
+                              Choose one or more {attribute.name.toLowerCase()}{' '}
+                              values
+                            </FieldHelperText>
+                          </div>
+                        ) : null}
                       </section>
                     );
                   })}
 
                   {isAddingAttribute ? (
-                    <div className="flex min-w-0 items-end gap-[var(--space-1)]">
-                      <div className="min-w-0 flex-1">
+                    <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-[var(--space-1)]">
+                      <label
+                        className="col-span-2 text-[length:var(--input-label-size-desktop)] leading-[var(--input-label-line-height-desktop)] font-[var(--input-label-weight)] text-muted-foreground"
+                        htmlFor={`${fieldId}-new-attribute`}
+                      >
+                        Attribute
+                      </label>
+                      <div className="min-w-0">
                         <AttributesAsyncCombobox
+                          id={`${fieldId}-new-attribute`}
+                          aria-describedby={`${fieldId}-new-attribute-hint`}
                           invalid={Boolean(attributesError)}
                           onAttributeSelected={(attribute) => {
                             if (
@@ -158,14 +168,24 @@ export const ProductAttributeValuesField = ({
                           selectedAttributes={attributes}
                         />
                       </div>
-                      <IconButton
+                      <Button
                         aria-label="Cancel adding attribute"
+                        color="inherit"
                         onClick={() => setIsAddingAttribute(false)}
-                        size="m"
+                        size="s"
                         type="button"
+                        variant="text"
                       >
-                        <X aria-hidden="true" />
-                      </IconButton>
+                        Cancel
+                      </Button>
+                      <div className="col-span-2">
+                        <FieldHelperText
+                          as="p"
+                          id={`${fieldId}-new-attribute-hint`}
+                        >
+                          Choose an attribute, then select its values
+                        </FieldHelperText>
+                      </div>
                     </div>
                   ) : (
                     <div className="flex flex-col">

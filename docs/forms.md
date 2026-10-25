@@ -59,7 +59,7 @@ groups start competing inside the same component.
 ### Flow Lifecycle
 1. **Initialize**: Define defaults in `constants.ts` and Zod schema in `validations.ts`.
 2. **Setup**: Instantiate TanStack Form inside the feature form or feature hook, passing controlled props to presentational fields from `packages/ui`.
-3. **Validate UX**: Reveal client validation errors on **blur**, then update validation state **live** during correction.
+3. **Validate UX**: Reveal client validation errors on **blur or a submission attempt**, then update validation state **live** during correction.
 4. **Submit**: Collect values via `onSubmit` and call the feature-owned submit action or client request helper.
 5. **Handle Errors**: Map backend field errors to the form state using `setErrorMap`, and show form-level errors through the shared toast surface.
 6. **Finish Workflow**: Keep route navigation, dialog close/reset, and TanStack Query cache invalidation in the workflow layer or the simple route form that owns the workflow.
@@ -100,7 +100,7 @@ by several workflows.
 To ensure a calmer, less intrusive user experience, implement this validation visibility model:
 
 - **Do not show client validation errors on the first keystroke.**
-- **Show client validation errors only after a user blurs the field once** (`blur-first` visibility).
+- **Show client validation errors after a user blurs the field or attempts submission** (`blur-first` visibility before submission).
 - **Once a field is marked invalid, validate live** as the user edits, providing immediate positive reinforcement when corrected.
 - **Always show backend/submit errors immediately**, even if the field was never blurred.
 
@@ -118,8 +118,22 @@ Treat client validation and backend/submit errors as separate concerns:
   submit/change precedence.
   - **Field-level errors** must be mapped back to fields using `setErrorMap`.
   - Use `getFieldSubmitChangeErrorText(...)` when a field needs the standard
-    behavior: submit/backend errors win, while change errors are shown only
-    after blur.
+    behavior: submit/backend errors win, while change errors are shown after
+    blur or a submission attempt. Pass an explicit `hasSubmitted` boolean for
+    fields whose visibility must distinguish input interaction from submission:
+
+    ```tsx
+    const errorText = getFieldSubmitChangeErrorText(
+      field.state.meta,
+      form.state.submissionAttempts > 0
+    );
+    ```
+
+    `hasSubmitted` means at least one submission was attempted, including an
+    attempt blocked by validation. It does not mean submission succeeded.
+    `isTouched` alone is not a reliable submission signal because editing can
+    mark a field as touched. The optional argument preserves the existing
+    touched-state fallback for callers that omit it.
   - Use `getErrorMessage(...)` for single submit-only controls such as
     checkbox agreement fields.
   - **Form-level errors** must use the shared toast surface. Persistent inline form-level error elements are discouraged unless explicitly required by the workflow design.

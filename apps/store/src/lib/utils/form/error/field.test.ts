@@ -1,6 +1,34 @@
 import { getFieldSubmitChangeErrorText } from './field';
 
 describe('getFieldSubmitChangeErrorText', () => {
+  it('hides touched change errors before blur when no submit was attempted', () => {
+    expect(
+      getFieldSubmitChangeErrorText(
+        {
+          errorMap: { onChange: 'Name is required' },
+          isBlurred: false,
+          isDirty: true,
+          isTouched: true,
+        },
+        false
+      )
+    ).toBeUndefined();
+  });
+
+  it('shows change errors after a submit attempt even without blur', () => {
+    expect(
+      getFieldSubmitChangeErrorText(
+        {
+          errorMap: { onChange: 'Name is required' },
+          isBlurred: false,
+          isDirty: true,
+          isTouched: true,
+        },
+        true
+      )
+    ).toBe('Name is required');
+  });
+
   it('hides change errors until the field has been blurred', () => {
     expect(
       getFieldSubmitChangeErrorText({
@@ -12,6 +40,34 @@ describe('getFieldSubmitChangeErrorText', () => {
         isTouched: false,
       })
     ).toBeUndefined();
+  });
+
+  it('shows change errors after submission even when the field is untouched', () => {
+    expect(
+      getFieldSubmitChangeErrorText(
+        {
+          errorMap: { onChange: 'Name is required' },
+          isBlurred: false,
+          isDirty: false,
+          isTouched: false,
+        },
+        true
+      )
+    ).toBe('Name is required');
+  });
+
+  it('shows errors after blur without a submission attempt', () => {
+    expect(
+      getFieldSubmitChangeErrorText(
+        {
+          errorMap: { onBlur: 'Name is required' },
+          isBlurred: true,
+          isDirty: false,
+          isTouched: true,
+        },
+        false
+      )
+    ).toBe('Name is required');
   });
 
   it('shows a change error after the field has been blurred', () => {

@@ -13,7 +13,8 @@ type FieldSubmitChangeErrorMeta = {
 };
 
 export const getFieldSubmitChangeErrorText = (
-  meta: FieldSubmitChangeErrorMeta
+  meta: FieldSubmitChangeErrorMeta,
+  hasSubmitted?: boolean
 ) => {
   const submitError = meta.errorMap.onSubmit;
   const blurError = meta.errorMap.onBlur;
@@ -27,7 +28,7 @@ export const getFieldSubmitChangeErrorText = (
     return submitErrorText ?? getErrorMessage(dynamicError);
   }
 
-  if (!meta.isBlurred && !meta.isTouched) {
+  if (!meta.isBlurred && !(hasSubmitted ?? meta.isTouched)) {
     return undefined;
   }
 

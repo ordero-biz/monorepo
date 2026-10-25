@@ -23,12 +23,15 @@ export const ProductTemplateFields = ({
           }}
         >
           {(field) => {
-            const errorText = getFieldSubmitChangeErrorText(field.state.meta);
+            const errorText = getFieldSubmitChangeErrorText(
+              field.state.meta,
+              productVariantsGenerationForm.state.submissionAttempts > 0
+            );
             return (
               <TextField
+                label="Product name"
                 errorText={errorText}
                 invalid={Boolean(errorText)}
-                label="Product name"
                 name={field.name}
                 onBlur={field.handleBlur}
                 onValueChange={field.handleChange}
@@ -51,15 +54,32 @@ export const ProductTemplateFields = ({
             const errorText = getFieldSubmitChangeErrorText(field.state.meta);
             return (
               <CategoriesAsyncCombobox
+                label="Category"
                 errorText={errorText}
                 invalid={Boolean(errorText)}
-                label="Category"
                 name={field.name}
                 onBlur={field.handleBlur}
                 onValueChange={field.handleChange}
-                placeholder="Select category"
                 required
                 size="s"
+                value={field.state.value}
+              />
+            );
+          }}
+        </productVariantsGenerationForm.Field>
+        <productVariantsGenerationForm.Field name="description">
+          {(field) => {
+            const errorText = getFieldSubmitChangeErrorText(field.state.meta);
+            return (
+              <Textarea
+                label="Description"
+                errorText={errorText}
+                invalid={Boolean(errorText)}
+                name={field.name}
+                onBlur={field.handleBlur}
+                onValueChange={field.handleChange}
+                resize="none"
+                rows={3}
                 value={field.state.value}
               />
             );
@@ -71,23 +91,5 @@ export const ProductTemplateFields = ({
         titleId="product-add2-image-title"
       />
     </div>
-    <productVariantsGenerationForm.Field name="description">
-      {(field) => {
-        const errorText = getFieldSubmitChangeErrorText(field.state.meta);
-        return (
-          <Textarea
-            errorText={errorText}
-            invalid={Boolean(errorText)}
-            label="Description"
-            name={field.name}
-            onBlur={field.handleBlur}
-            onValueChange={field.handleChange}
-            placeholder="Description"
-            rows={3}
-            value={field.state.value}
-          />
-        );
-      }}
-    </productVariantsGenerationForm.Field>
   </div>
 );

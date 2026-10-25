@@ -24,23 +24,26 @@ const loadAttributeOptions = async (): Promise<
 };
 
 export const AttributesAsyncCombobox = ({
+  'aria-describedby': ariaDescribedBy,
+  id,
   invalid,
   onAttributeSelected,
   onBlur,
   selectedAttributes,
 }: AttributesAsyncComboboxProps) => (
   <AsyncCombobox<AttributeDropdown>
+    aria-describedby={ariaDescribedBy}
+    aria-label="Attribute"
+    id={id}
     autoFocus
     defaultOpen
     emptyText="No attributes found"
     getOptionLabel={getAttributeLabel}
     getOptionValue={getAttributeValue}
-    helperText="Choose an attribute, then select its values."
     invalid={invalid}
     isOptionDisabled={(attribute) =>
       selectedAttributes.some((selected) => selected.id === attribute.id)
     }
-    label="Attribute"
     loadErrorText="We couldn't load attributes right now."
     loadingText="Loading attributes..."
     loadOptions={loadAttributeOptions}
@@ -52,7 +55,6 @@ export const AttributesAsyncCombobox = ({
       }
     }}
     pageSize={100}
-    placeholder="Select attribute"
     queryKey={[...attributesQueryKeys.attributeDropdown(), 'combobox']}
     size="s"
     value={null}
