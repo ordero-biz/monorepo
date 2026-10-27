@@ -1,4 +1,5 @@
 import { Textarea, TextField } from '@ordero/ui';
+import { useStore } from '@tanstack/react-form';
 import { CategoriesAsyncCombobox } from '@/features/categories';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
 import { AttributesAsyncCombobox } from './AttributesAsyncCombobox';
@@ -16,6 +17,11 @@ export const ProductTemplateFields = ({
   productVariantsGenerationForm,
   generationMode,
 }: ProductTemplateFieldsProps) => {
+  const submissionAttempts = useStore(
+    productVariantsGenerationForm.store,
+    (state) => state.submissionAttempts
+  );
+
   const requiresAttributes = generationMode === PRODUCT_GENERATION_MODE.many;
 
   return (
@@ -31,7 +37,10 @@ export const ProductTemplateFields = ({
             }}
           >
             {(field) => {
-              const errorText = getFieldSubmitChangeErrorText(field.state.meta);
+              const errorText = getFieldSubmitChangeErrorText(
+                field.state.meta,
+                submissionAttempts
+              );
 
               return (
                 <TextField
@@ -58,7 +67,10 @@ export const ProductTemplateFields = ({
             }}
           >
             {(field) => {
-              const errorText = getFieldSubmitChangeErrorText(field.state.meta);
+              const errorText = getFieldSubmitChangeErrorText(
+                field.state.meta,
+                submissionAttempts
+              );
 
               return (
                 <CategoriesAsyncCombobox
@@ -90,7 +102,10 @@ export const ProductTemplateFields = ({
             }
           >
             {(field) => {
-              const errorText = getFieldSubmitChangeErrorText(field.state.meta);
+              const errorText = getFieldSubmitChangeErrorText(
+                field.state.meta,
+                submissionAttempts
+              );
 
               return (
                 <AttributesAsyncCombobox
@@ -126,7 +141,10 @@ export const ProductTemplateFields = ({
         <div className="flex min-w-0 flex-col gap-[var(--space-2)]">
           <productVariantsGenerationForm.Field name="description">
             {(field) => {
-              const errorText = getFieldSubmitChangeErrorText(field.state.meta);
+              const errorText = getFieldSubmitChangeErrorText(
+                field.state.meta,
+                submissionAttempts
+              );
 
               return (
                 <Textarea

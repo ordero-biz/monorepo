@@ -48,12 +48,7 @@ export const SupplierDetail = ({ supplierId }: SupplierDetailProps) => {
 
   return (
     <div className="flex flex-col gap-[var(--space-2)]">
-      <SupplierDetailHeader
-        onUpdated={async () => {
-          await supplierQuery.refetch();
-        }}
-        supplier={supplierQuery.data}
-      />
+      <SupplierDetailHeader supplier={supplierQuery.data} />
       <SupplierDetailInfo supplier={supplierQuery.data} />
     </div>
   );

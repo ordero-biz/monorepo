@@ -6,7 +6,6 @@ import { prepareStoreSetup } from '@/test/prepareSetup';
 import { UpdateCategoryDialog } from './UpdateCategoryDialog';
 
 const onOpenChangeMock = vi.fn();
-const onUpdatedMock = vi.fn();
 
 vi.mock('@/lib/client/api/categories', async () => ({
   ...(await vi.importActual<typeof import('@/lib/client/api/categories')>(
@@ -36,7 +35,6 @@ const { setup } = prepareStoreSetup({
   props: {
     category,
     onOpenChange: onOpenChangeMock,
-    onUpdated: onUpdatedMock,
     open: true,
   },
 });
@@ -44,7 +42,6 @@ const { setup } = prepareStoreSetup({
 describe('UpdateCategoryDialog', () => {
   beforeEach(() => {
     onOpenChangeMock.mockClear();
-    onUpdatedMock.mockClear();
     updateCategoryMock.mockReset();
     getCategoriesMock.mockReset();
     getCategoriesMock.mockResolvedValue({
@@ -75,7 +72,7 @@ describe('UpdateCategoryDialog', () => {
       data: { ...category, name: 'Running shoes' },
     });
     const user = userEvent.setup();
-    const { onOpenChange, onUpdated, queryClient } = setup();
+    const { onOpenChange, queryClient } = setup();
     const invalidateQueriesSpy = vi.spyOn(queryClient, 'invalidateQueries');
     const dialog = screen.getByRole('dialog', { name: 'Edit category' });
     const nameField = within(dialog).getByRole('textbox', { name: 'Name' });
@@ -100,12 +97,11 @@ describe('UpdateCategoryDialog', () => {
       queryKey: categoriesQueryKeys.children(1),
     });
     expect(onOpenChange).toHaveBeenCalledWith(false);
-    expect(onUpdated).toHaveBeenCalled();
   });
 
   it('does not send normalized values that match the initial category', async () => {
     const user = userEvent.setup();
-    const { onOpenChange, onUpdated, renderResult } = setup();
+    const { onOpenChange, renderResult } = setup();
     const dialog = screen.getByRole('dialog', { name: 'Edit category' });
     const nameField = within(dialog).getByRole('textbox', { name: 'Name' });
 
@@ -115,7 +111,6 @@ describe('UpdateCategoryDialog', () => {
 
     expect(updateCategoryMock).not.toHaveBeenCalled();
     await waitFor(() => expect(onOpenChange).toHaveBeenCalledWith(false));
-    expect(onUpdated).not.toHaveBeenCalled();
     expect(screen.queryByText(/was updated/)).not.toBeInTheDocument();
 
     renderResult.rerender({ open: false });

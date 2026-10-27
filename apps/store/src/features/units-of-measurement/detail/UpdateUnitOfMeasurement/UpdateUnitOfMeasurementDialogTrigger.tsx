@@ -7,7 +7,6 @@ import type { UpdateUnitOfMeasurementDialogTriggerProps } from './types';
 import { UpdateUnitOfMeasurementDialog } from './UpdateUnitOfMeasurementDialog';
 
 export const UpdateUnitOfMeasurementDialogTrigger = ({
-  onUpdated,
   unitOfMeasurement,
 }: UpdateUnitOfMeasurementDialogTriggerProps) => {
   const [open, setOpen] = useState(false);
@@ -25,7 +24,6 @@ export const UpdateUnitOfMeasurementDialogTrigger = ({
 
       <UpdateUnitOfMeasurementDialog
         onOpenChange={setOpen}
-        onUpdated={onUpdated}
         open={open}
         unitOfMeasurement={unitOfMeasurement}
       />

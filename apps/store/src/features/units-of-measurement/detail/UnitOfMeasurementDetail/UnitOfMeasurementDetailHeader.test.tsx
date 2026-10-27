@@ -1,29 +1,13 @@
-import { screen, waitFor, within } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { clientRoutes } from '@/lib/client/routes';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { UnitOfMeasurementDetailHeader } from './UnitOfMeasurementDetailHeader';
 
-vi.mock('../UpdateUnitOfMeasurement/UpdateUnitOfMeasurementDialog', () => ({
-  UpdateUnitOfMeasurementDialog: ({
-    onUpdated,
-    open,
-  }: {
-    onUpdated: () => Promise<void> | void;
-    open: boolean;
-  }) =>
-    open ? (
-      <button onClick={() => void onUpdated()} type="button">
-        Save unit of measurement
-      </button>
-    ) : null,
-}));
-
 const { setup } = prepareStoreSetup({
   component: UnitOfMeasurementDetailHeader,
   props: {
     onDeleted: vi.fn(),
-    onUpdated: vi.fn(),
     unitOfMeasurement: {
       id: 1,
       name: 'Kilogram',
@@ -37,7 +21,8 @@ const { setup } = prepareStoreSetup({
 describe('UnitOfMeasurementDetailHeader', () => {
   it('opens the edit action from the actions menu', async () => {
     const user = userEvent.setup();
-    const { onUpdated } = setup();
+
+    setup();
 
     expect(screen.getByRole('heading', { name: 'Kilogram' })).toBeVisible();
     const breadcrumbs = screen.getByRole('navigation', { name: 'Breadcrumb' });
@@ -59,11 +44,13 @@ describe('UnitOfMeasurementDetailHeader', () => {
         name: 'Edit unit of measurement',
       })
     );
-    await user.click(
-      screen.getByRole('button', { name: 'Save unit of measurement' })
-    );
 
-    await waitFor(() => expect(onUpdated).toHaveBeenCalled());
+    expect(
+      screen.getByRole('dialog', { name: 'Edit unit of measurement' })
+    ).toBeVisible();
+    expect(screen.getByRole('textbox', { name: 'Name' })).toHaveValue(
+      'Kilogram'
+    );
   });
 
   it('opens a confirmation dialog before publishing a draft unit of measurement', async () => {

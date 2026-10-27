@@ -100,7 +100,7 @@ by several workflows.
 To ensure a calmer, less intrusive user experience, implement this validation visibility model:
 
 - **Do not show client validation errors on the first keystroke.**
-- **Show client validation errors only after a user blurs the field once** (`blur-first` visibility).
+- **Show client validation errors after a user blurs the field once or submits the form** (`blur-first` visibility).
 - **Once a field is marked invalid, validate live** as the user edits, providing immediate positive reinforcement when corrected.
 - **Always show backend/submit errors immediately**, even if the field was never blurred.
 
@@ -117,9 +117,13 @@ Treat client validation and backend/submit errors as separate concerns:
   `@/lib/utils/form/error` for common field-message parsing and
   submit/change precedence.
   - **Field-level errors** must be mapped back to fields using `setErrorMap`.
-  - Use `getFieldSubmitChangeErrorText(...)` when a field needs the standard
+  - Use `getFieldSubmitChangeErrorText(meta, submissionAttempts)` when a field needs the standard
     behavior: submit/backend errors win, while change errors are shown only
-    after blur.
+    after blur or a submit attempt. Subscribe to `submissionAttempts` with
+    `form.Subscribe` or `useStore` so keyboard submission updates error visibility
+    even when the focused field's value and metadata do not change. Keep this
+    subscription in the rendered fields or form content, outside the component
+    that initializes the form.
   - Use `getErrorMessage(...)` for single submit-only controls such as
     checkbox agreement fields.
   - **Form-level errors** must use the shared toast surface. Persistent inline form-level error elements are discouraged unless explicitly required by the workflow design.

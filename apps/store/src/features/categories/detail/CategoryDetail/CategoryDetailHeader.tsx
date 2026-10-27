@@ -15,7 +15,6 @@ import type { CategoryDetailHeaderProps } from './types';
 export const CategoryDetailHeader = ({
   category,
   onDeleted,
-  onUpdated,
 }: CategoryDetailHeaderProps) => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
@@ -40,10 +39,7 @@ export const CategoryDetailHeader = ({
 
       <PageHeader.Right>
         {!isCategoryActive ? (
-          <ActivateCategoryDialogTrigger
-            category={category}
-            onUpdated={onUpdated}
-          />
+          <ActivateCategoryDialogTrigger category={category} />
         ) : null}
 
         <Menu.Root>
@@ -91,7 +87,6 @@ export const CategoryDetailHeader = ({
         <UpdateCategoryDialog
           category={category}
           onOpenChange={setIsUpdateDialogOpen}
-          onUpdated={onUpdated}
           open={isUpdateDialogOpen}
         />
       </PageHeader.Right>

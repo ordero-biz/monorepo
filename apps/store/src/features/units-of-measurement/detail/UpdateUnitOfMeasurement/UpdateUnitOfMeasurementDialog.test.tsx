@@ -16,7 +16,6 @@ vi.mock('@/lib/client/api/units-of-measurement', async () => ({
 
 const updateUnitOfMeasurementMock = vi.mocked(updateUnitOfMeasurement);
 const onOpenChangeMock = vi.fn();
-const onUpdatedMock = vi.fn();
 
 const unitOfMeasurement: UnitOfMeasurement = {
   id: 1,
@@ -30,7 +29,6 @@ const { setup } = prepareStoreSetup({
   component: UpdateUnitOfMeasurementDialog,
   props: {
     onOpenChange: onOpenChangeMock,
-    onUpdated: onUpdatedMock,
     open: true,
     unitOfMeasurement,
   },
@@ -40,7 +38,6 @@ describe('UpdateUnitOfMeasurementDialog', () => {
   beforeEach(() => {
     updateUnitOfMeasurementMock.mockReset();
     onOpenChangeMock.mockClear();
-    onUpdatedMock.mockClear();
   });
 
   it('opens with the current unit of measurement values', () => {
@@ -96,7 +93,7 @@ describe('UpdateUnitOfMeasurementDialog', () => {
       },
     });
     const user = userEvent.setup();
-    const { onOpenChange, onUpdated, queryClient } = setup();
+    const { onOpenChange, queryClient } = setup();
     const invalidateQueriesSpy = vi.spyOn(queryClient, 'invalidateQueries');
     const dialog = screen.getByRole('dialog', {
       name: 'Edit unit of measurement',
@@ -132,7 +129,9 @@ describe('UpdateUnitOfMeasurementDialog', () => {
       queryKey: unitsOfMeasurementQueryKeys.detail(1),
     });
     expect(onOpenChange).toHaveBeenCalledWith(false);
-    await waitFor(() => expect(onUpdated).toHaveBeenCalled());
+    expect(
+      await screen.findByText('Unit of measurement Gram was updated')
+    ).toBeVisible();
   });
 
   it('closes without a request when no values changed', async () => {
@@ -282,7 +281,7 @@ describe('UpdateUnitOfMeasurementDialog', () => {
       },
     });
     const user = userEvent.setup();
-    const { onOpenChange, onUpdated } = setup();
+    const { onOpenChange } = setup();
     const dialog = screen.getByRole('dialog', {
       name: 'Edit unit of measurement',
     });
@@ -302,6 +301,5 @@ describe('UpdateUnitOfMeasurementDialog', () => {
       })
     ).toBeVisible();
     expect(onOpenChange).not.toHaveBeenCalledWith(false);
-    expect(onUpdated).not.toHaveBeenCalled();
   });
 });

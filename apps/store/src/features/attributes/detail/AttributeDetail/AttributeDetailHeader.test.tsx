@@ -112,7 +112,7 @@ describe('AttributeDetailHeader', () => {
     ).toBeVisible();
   });
 
-  it('publishes the attribute and refreshes the header as active', async () => {
+  it('refreshes the attribute once after publishing', async () => {
     const draftAttribute = {
       id: 7,
       name: 'Color',
@@ -159,6 +159,8 @@ describe('AttributeDetailHeader', () => {
         screen.queryByRole('button', { name: 'Publish' })
       ).not.toBeInTheDocument()
     );
+    expect(screen.getByText('Active')).toBeVisible();
+    expect(getAttributeMock).toHaveBeenCalledTimes(2);
   });
 
   it('opens the delete dialog from the actions menu', async () => {

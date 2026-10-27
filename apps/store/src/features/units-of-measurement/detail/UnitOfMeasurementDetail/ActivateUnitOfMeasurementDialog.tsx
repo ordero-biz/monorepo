@@ -2,26 +2,16 @@
 
 import { Button, Dialog, Typography } from '@ordero/ui';
 import { useActivateUnitOfMeasurement } from './hooks/useActivateUnitOfMeasurement';
-import type { UnitOfMeasurementDetailHeaderProps } from './types';
-
-type ActivateUnitOfMeasurementDialogProps = Pick<
-  UnitOfMeasurementDetailHeaderProps,
-  'onUpdated' | 'unitOfMeasurement'
-> & {
-  onOpenChange: (open: boolean) => void;
-  open: boolean;
-};
+import type { ActivateUnitOfMeasurementDialogProps } from './types';
 
 export const ActivateUnitOfMeasurementDialog = ({
   onOpenChange,
-  onUpdated,
   open,
   unitOfMeasurement,
 }: ActivateUnitOfMeasurementDialogProps) => {
   const { handleActivate, isActivating } = useActivateUnitOfMeasurement({
-    onActivated: async () => {
+    onActivated: () => {
       onOpenChange(false);
-      await onUpdated();
     },
     unitOfMeasurementId: unitOfMeasurement.id,
     unitOfMeasurementName: unitOfMeasurement.name,

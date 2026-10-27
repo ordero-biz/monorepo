@@ -8,16 +8,14 @@ export const ActivateAttributeValueDialog = ({
   attributeId,
   attributeValue,
   onOpenChange,
-  onUpdated,
   open,
 }: ActivateAttributeValueDialogProps) => {
   const { handleActivate, isActivating } = useActivateAttributeValue({
     attributeId,
     attributeValueId: attributeValue.id,
     attributeValueName: attributeValue.name,
-    onActivated: async () => {
+    onActivated: () => {
       onOpenChange(false);
-      await onUpdated();
     },
   });
 

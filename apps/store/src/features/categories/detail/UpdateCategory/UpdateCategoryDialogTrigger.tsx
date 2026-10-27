@@ -8,7 +8,6 @@ import { UpdateCategoryDialog } from './UpdateCategoryDialog';
 
 export const UpdateCategoryDialogTrigger = ({
   category,
-  onUpdated,
 }: UpdateCategoryDialogTriggerProps) => {
   const [open, setOpen] = useState(false);
 
@@ -25,7 +24,6 @@ export const UpdateCategoryDialogTrigger = ({
       <UpdateCategoryDialog
         category={category}
         onOpenChange={setOpen}
-        onUpdated={onUpdated}
         open={open}
       />
     </>

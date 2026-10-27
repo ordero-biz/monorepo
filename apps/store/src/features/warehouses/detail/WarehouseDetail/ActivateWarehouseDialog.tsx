@@ -6,16 +6,14 @@ import type { ActivateWarehouseDialogProps } from './types';
 
 export const ActivateWarehouseDialog = ({
   onOpenChange,
-  onUpdated,
   open,
   warehouse,
 }: ActivateWarehouseDialogProps) => {
   const { handleActivate, isActivating } = useActivateWarehouse({
     warehouseId: warehouse.id,
     warehouseName: warehouse.name,
-    onActivated: async () => {
+    onActivated: () => {
       onOpenChange(false);
-      await onUpdated();
     },
   });
 

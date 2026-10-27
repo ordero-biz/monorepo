@@ -56,9 +56,6 @@ export const CategoryDetail = ({ categoryId }: CategoryDetailProps) => {
         onDeleted={() => {
           router.push(clientRoutes.categories);
         }}
-        onUpdated={async () => {
-          await categoryQuery.refetch();
-        }}
       />
       <CategoryDetailInfo category={categoryQuery.data} />
       <CategoryDetailChildren categoryId={categoryId} />

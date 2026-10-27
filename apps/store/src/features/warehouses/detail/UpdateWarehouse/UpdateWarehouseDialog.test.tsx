@@ -7,7 +7,6 @@ import { prepareStoreSetup } from '@/test/prepareSetup';
 import { UpdateWarehouseDialog } from './UpdateWarehouseDialog';
 
 const onOpenChangeMock = vi.fn();
-const onUpdatedMock = vi.fn();
 
 vi.mock('@/lib/client/api/warehouses', async () => ({
   ...(await vi.importActual<typeof import('@/lib/client/api/warehouses')>(
@@ -29,7 +28,6 @@ const { setup } = prepareStoreSetup({
   component: UpdateWarehouseDialog,
   props: {
     onOpenChange: onOpenChangeMock,
-    onUpdated: onUpdatedMock,
     open: true,
     warehouse,
   },
@@ -38,7 +36,6 @@ const { setup } = prepareStoreSetup({
 describe('UpdateWarehouseDialog', () => {
   beforeEach(() => {
     onOpenChangeMock.mockClear();
-    onUpdatedMock.mockClear();
     updateWarehouseMock.mockReset();
   });
 
@@ -52,7 +49,7 @@ describe('UpdateWarehouseDialog', () => {
       data: updatedWarehouse,
     });
     const user = userEvent.setup();
-    const { onOpenChange, onUpdated, queryClient, renderResult } = setup();
+    const { onOpenChange, queryClient, renderResult } = setup();
     const invalidateQueriesSpy = vi.spyOn(queryClient, 'invalidateQueries');
     const dialog = screen.getByRole('dialog', { name: 'Edit warehouse' });
     const nameField = within(dialog).getByRole('textbox', { name: 'Name' });
@@ -74,7 +71,6 @@ describe('UpdateWarehouseDialog', () => {
       queryKey: warehousesQueryKeys.detail(1),
     });
     expect(onOpenChange).toHaveBeenCalledWith(false);
-    expect(onUpdated).toHaveBeenCalled();
 
     renderResult.rerender({ open: false });
     renderResult.rerender({ open: true, warehouse: updatedWarehouse });
@@ -86,7 +82,7 @@ describe('UpdateWarehouseDialog', () => {
 
   it('closes without a request when normalized values are unchanged', async () => {
     const user = userEvent.setup();
-    const { onOpenChange, onUpdated } = setup();
+    const { onOpenChange } = setup();
 
     await user.click(
       within(screen.getByRole('dialog', { name: 'Edit warehouse' })).getByRole(
@@ -97,7 +93,6 @@ describe('UpdateWarehouseDialog', () => {
 
     await waitFor(() => expect(onOpenChange).toHaveBeenCalledWith(false));
     expect(updateWarehouseMock).not.toHaveBeenCalled();
-    expect(onUpdated).not.toHaveBeenCalled();
   });
 
   it('clears an existing address when it is removed', async () => {
@@ -215,7 +210,7 @@ describe('UpdateWarehouseDialog', () => {
       },
     });
     const user = userEvent.setup();
-    const { onOpenChange, onUpdated } = setup();
+    const { onOpenChange } = setup();
     const dialog = screen.getByRole('dialog', { name: 'Edit warehouse' });
     const nameField = within(dialog).getByRole('textbox', { name: 'Name' });
 
@@ -233,7 +228,6 @@ describe('UpdateWarehouseDialog', () => {
       await screen.findByRole('dialog', { name: 'Warehouse update failed.' })
     ).toBeVisible();
     expect(onOpenChange).not.toHaveBeenCalledWith(false);
-    expect(onUpdated).not.toHaveBeenCalled();
   });
 
   it('updates an active warehouse address without submitting a name', async () => {

@@ -17,7 +17,6 @@ const updateSupplierMock = vi.mocked(updateSupplier);
 const { setup } = prepareStoreSetup({
   component: UpdateSupplierDialogTrigger,
   props: {
-    onUpdated: vi.fn(),
     supplier: {
       id: 1,
       name: 'Fresh Farms',

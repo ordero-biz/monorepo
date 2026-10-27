@@ -17,7 +17,6 @@ vi.mock('@/lib/client/api/warehouses', async () => ({
 
 const updateWarehouseMock = vi.mocked(updateWarehouse);
 const onOpenChangeMock = vi.fn();
-const onUpdatedMock = vi.fn();
 
 const warehouse: Warehouse = {
   id: 1,
@@ -31,7 +30,6 @@ const { setup } = prepareStoreSetup({
   component: ActivateWarehouseDialog,
   props: {
     onOpenChange: onOpenChangeMock,
-    onUpdated: onUpdatedMock,
     open: true,
     warehouse,
   },
@@ -41,7 +39,6 @@ describe('ActivateWarehouseDialog', () => {
   beforeEach(() => {
     updateWarehouseMock.mockReset();
     onOpenChangeMock.mockClear();
-    onUpdatedMock.mockClear();
   });
 
   it('publishes the warehouse, invalidates caches, and closes on confirm', async () => {
@@ -71,7 +68,6 @@ describe('ActivateWarehouseDialog', () => {
       queryKey: warehousesQueryKeys.detail(1),
     });
     expect(onOpenChangeMock).toHaveBeenCalledWith(false);
-    expect(onUpdatedMock).toHaveBeenCalled();
   });
 
   it('disables publish and cancel while the request is pending', async () => {
@@ -131,6 +127,5 @@ describe('ActivateWarehouseDialog', () => {
       screen.getByRole('dialog', { name: 'Publish warehouse' })
     ).toBeVisible();
     expect(onOpenChangeMock).not.toHaveBeenCalledWith(false);
-    expect(onUpdatedMock).not.toHaveBeenCalled();
   });
 });

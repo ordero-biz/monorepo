@@ -5,7 +5,6 @@ export type WarehouseDetailProps = {
 };
 
 export type WarehouseDetailHeaderProps = {
-  onUpdated: () => Promise<void> | void;
   warehouse: Warehouse;
 };
 
@@ -19,13 +18,11 @@ export type WarehouseDetailField = {
 };
 
 export type ActivateWarehouseDialogTriggerProps = {
-  onUpdated: () => Promise<void> | void;
   warehouse: Warehouse;
 };
 
 export type ActivateWarehouseDialogProps = {
   onOpenChange: (open: boolean) => void;
-  onUpdated: () => Promise<void> | void;
   open: boolean;
   warehouse: Warehouse;
 };

@@ -125,76 +125,83 @@ const FormConflictForm = <TField extends string>({
                   onSubmit: validateConflictChoice,
                 }}
               >
-                {(field) => {
-                  const errorText = getFieldSubmitChangeErrorText(
-                    field.state.meta
-                  );
-                  const options = presentations?.[conflict.field]?.options;
+                {(field) => (
+                  <form.Subscribe
+                    selector={(state) => state.submissionAttempts}
+                  >
+                    {(submissionAttempts) => {
+                      const errorText = getFieldSubmitChangeErrorText(
+                        field.state.meta,
+                        submissionAttempts
+                      );
+                      const options = presentations?.[conflict.field]?.options;
 
-                  return (
-                    <RadioGroup
-                      errorText={errorText}
-                      helperText={conflict.helperText}
-                      invalid={Boolean(errorText)}
-                      label={conflict.label}
-                      name={field.name}
-                      onValueChange={(value) => {
-                        if (value === 'local' || value === 'server') {
-                          field.handleChange(value);
-                        }
-                      }}
-                      required
-                      value={field.state.value ?? ''}
-                    >
-                      {options ? (
-                        <div className="grid min-w-0 gap-[var(--space-2)] sm:grid-cols-2">
-                          {(['local', 'server'] as const).map((choice) => (
-                            <div
-                              key={choice}
-                              className="flex min-w-0 flex-col gap-[var(--space-1)]"
-                            >
+                      return (
+                        <RadioGroup
+                          errorText={errorText}
+                          helperText={conflict.helperText}
+                          invalid={Boolean(errorText)}
+                          label={conflict.label}
+                          name={field.name}
+                          onValueChange={(value) => {
+                            if (value === 'local' || value === 'server') {
+                              field.handleChange(value);
+                            }
+                          }}
+                          required
+                          value={field.state.value ?? ''}
+                        >
+                          {options ? (
+                            <div className="grid min-w-0 gap-[var(--space-2)] sm:grid-cols-2">
+                              {(['local', 'server'] as const).map((choice) => (
+                                <div
+                                  key={choice}
+                                  className="flex min-w-0 flex-col gap-[var(--space-1)]"
+                                >
+                                  <Radio
+                                    align="start"
+                                    onBlur={field.handleBlur}
+                                    value={choice}
+                                  >
+                                    {options[choice].label}
+                                  </Radio>
+                                  {options[choice].content}
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <>
                               <Radio
                                 align="start"
                                 onBlur={field.handleBlur}
-                                value={choice}
+                                value="local"
                               >
-                                {options[choice].label}
+                                <div className="whitespace-pre-wrap">
+                                  Keep my changes:
+                                </div>
+                                <div className="whitespace-pre-wrap">
+                                  {conflict.localValue}
+                                </div>
                               </Radio>
-                              {options[choice].content}
-                            </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <>
-                          <Radio
-                            align="start"
-                            onBlur={field.handleBlur}
-                            value="local"
-                          >
-                            <div className="whitespace-pre-wrap">
-                              Keep my changes:
-                            </div>
-                            <div className="whitespace-pre-wrap">
-                              {conflict.localValue}
-                            </div>
-                          </Radio>
-                          <Radio
-                            align="start"
-                            onBlur={field.handleBlur}
-                            value="server"
-                          >
-                            <div className="whitespace-pre-wrap">
-                              Use saved value:
-                            </div>
-                            <div className="whitespace-pre-wrap">
-                              {conflict.serverValue}
-                            </div>
-                          </Radio>
-                        </>
-                      )}
-                    </RadioGroup>
-                  );
-                }}
+                              <Radio
+                                align="start"
+                                onBlur={field.handleBlur}
+                                value="server"
+                              >
+                                <div className="whitespace-pre-wrap">
+                                  Use saved value:
+                                </div>
+                                <div className="whitespace-pre-wrap">
+                                  {conflict.serverValue}
+                                </div>
+                              </Radio>
+                            </>
+                          )}
+                        </RadioGroup>
+                      );
+                    }}
+                  </form.Subscribe>
+                )}
               </form.Field>
             ))}
           </div>

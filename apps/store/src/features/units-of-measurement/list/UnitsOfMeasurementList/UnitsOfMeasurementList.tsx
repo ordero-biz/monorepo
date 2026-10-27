@@ -30,6 +30,8 @@ export const UnitsOfMeasurementList = ({
 }: UnitsOfMeasurementListProps) => {
   const unitsOfMeasurementQuery = useUnitsOfMeasurementQuery(paginationInput);
 
+  const unitsOfMeasurements = unitsOfMeasurementQuery.data?.content ?? [];
+
   const tablePagination = useTablePagination({
     pageMetadata: unitsOfMeasurementQuery.data?.page,
     paginationInput,
@@ -54,7 +56,7 @@ export const UnitsOfMeasurementList = ({
     selectedRows: selectedUnitsOfMeasurement,
     selection,
   } = useDataTableSelection({
-    data: unitsOfMeasurementQuery.data?.content ?? [],
+    data: unitsOfMeasurements,
     getRowCheckboxAriaLabel: getUnitOfMeasurementCheckboxAriaLabel,
     getRowId: getUnitOfMeasurementRowId,
     selectAllCheckboxAriaLabel: 'Select all units of measurement',
@@ -101,7 +103,7 @@ export const UnitsOfMeasurementList = ({
       <DataTable
         ariaLabel="Units of measurement list"
         columns={columns}
-        data={unitsOfMeasurementQuery.data.content}
+        data={unitsOfMeasurements}
         emptyMessage="No units of measurement found."
         getRowId={getUnitOfMeasurementRowId}
         manualPagination

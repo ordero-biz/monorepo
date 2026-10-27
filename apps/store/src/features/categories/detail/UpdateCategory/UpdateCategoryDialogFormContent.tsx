@@ -1,4 +1,5 @@
 import { Button, Dialog, TextField } from '@ordero/ui';
+import { useStore } from '@tanstack/react-form';
 import { CategoriesAsyncCombobox } from '@/features/categories';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
 import {
@@ -11,6 +12,11 @@ export const UpdateCategoryDialogFormContent = ({
   disabledCategoryIds,
   form,
 }: UpdateCategoryDialogFormContentProps) => {
+  const submissionAttempts = useStore(
+    form.store,
+    (state) => state.submissionAttempts
+  );
+
   return (
     <>
       <Dialog.Content>
@@ -23,7 +29,10 @@ export const UpdateCategoryDialogFormContent = ({
             }}
           >
             {(field) => {
-              const errorText = getFieldSubmitChangeErrorText(field.state.meta);
+              const errorText = getFieldSubmitChangeErrorText(
+                field.state.meta,
+                submissionAttempts
+              );
 
               return (
                 <TextField
@@ -49,7 +58,10 @@ export const UpdateCategoryDialogFormContent = ({
             }}
           >
             {(field) => {
-              const errorText = getFieldSubmitChangeErrorText(field.state.meta);
+              const errorText = getFieldSubmitChangeErrorText(
+                field.state.meta,
+                submissionAttempts
+              );
 
               return (
                 <CategoriesAsyncCombobox

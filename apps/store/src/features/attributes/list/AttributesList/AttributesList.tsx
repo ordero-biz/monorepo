@@ -18,8 +18,6 @@ import { DeleteAttributesDialog } from '../../shared';
 import { getColumns } from './columns';
 import type { AttributesListProps } from './types';
 
-const EMPTY_ATTRIBUTES: Attribute[] = [];
-
 const getAttributeRowId = (attribute: Attribute) => String(attribute.id);
 
 const getAttributeCheckboxAriaLabel = (attribute: Attribute) =>
@@ -27,11 +25,14 @@ const getAttributeCheckboxAriaLabel = (attribute: Attribute) =>
 
 export const AttributesList = ({ paginationInput }: AttributesListProps) => {
   const attributesQuery = useAttributesQuery(paginationInput);
-  const attributes = attributesQuery.data?.content ?? EMPTY_ATTRIBUTES;
+
+  const attributes = attributesQuery.data?.content ?? [];
+
   const tablePagination = useTablePagination({
     pageMetadata: attributesQuery.data?.page,
     paginationInput,
   });
+
   const [deletingAttributes, setDeletingAttributes] = useState<
     Attribute[] | null
   >(null);

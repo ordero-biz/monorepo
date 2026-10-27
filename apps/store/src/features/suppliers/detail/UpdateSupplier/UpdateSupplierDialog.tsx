@@ -11,7 +11,6 @@ import { getSupplierDefaultValues } from './utils/fields';
 
 export const UpdateSupplierDialog = ({
   onOpenChange,
-  onUpdated,
   open,
   supplier,
 }: UpdateSupplierDialogProps) => {
@@ -30,7 +29,6 @@ export const UpdateSupplierDialog = ({
           queryKey: suppliersQueryKeys.detail(supplier.id),
         }),
       ]);
-      await onUpdated(updatedSupplier);
     },
   });
 

@@ -47,12 +47,7 @@ export const WarehouseDetail = ({ warehouseId }: WarehouseDetailProps) => {
 
   return (
     <div className="flex flex-col gap-[var(--space-2)]">
-      <WarehouseDetailHeader
-        onUpdated={async () => {
-          await warehouseQuery.refetch();
-        }}
-        warehouse={warehouseQuery.data}
-      />
+      <WarehouseDetailHeader warehouse={warehouseQuery.data} />
       <WarehouseDetailInfo warehouse={warehouseQuery.data} />
     </div>
   );

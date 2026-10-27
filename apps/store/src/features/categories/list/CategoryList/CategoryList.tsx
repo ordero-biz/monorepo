@@ -19,8 +19,6 @@ import { CategoryListHeader } from './CategoryListHeader';
 import { getColumns } from './columns';
 import type { CategoryListProps } from './types';
 
-const EMPTY_CATEGORIES: Category[] = [];
-
 const getCategoryRowId = (category: Category) => String(category.id);
 
 const getCategoryCheckboxAriaLabel = (category: Category) =>
@@ -28,11 +26,13 @@ const getCategoryCheckboxAriaLabel = (category: Category) =>
 
 export const CategoryList = ({ paginationInput }: CategoryListProps) => {
   const categoriesQuery = useCategoriesQuery(paginationInput);
-  const categories = categoriesQuery.data?.content ?? EMPTY_CATEGORIES;
+  const categories = categoriesQuery.data?.content ?? [];
+
   const tablePagination = useTablePagination({
     pageMetadata: categoriesQuery.data?.page,
     paginationInput,
   });
+
   const [deletingCategories, setDeletingCategories] = useState<
     Category[] | null
   >(null);

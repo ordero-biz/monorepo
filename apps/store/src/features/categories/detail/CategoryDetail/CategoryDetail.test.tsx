@@ -69,6 +69,46 @@ describe('CategoryDetail', () => {
     updateCategoryMock.mockReset();
   });
 
+  it('refreshes the category once after editing', async () => {
+    const updatedCategory = {
+      ...category,
+      name: 'Running shoes',
+    };
+    getCategoryMock
+      .mockResolvedValueOnce({ ok: true, data: category })
+      .mockResolvedValue({ ok: true, data: updatedCategory });
+    updateCategoryMock.mockResolvedValue({ ok: true, data: updatedCategory });
+    const user = userEvent.setup();
+
+    setup();
+
+    await user.click(
+      await screen.findByRole('button', { name: 'Actions for Sneakers' })
+    );
+    await user.click(
+      await screen.findByRole('menuitem', { name: 'Edit category' })
+    );
+
+    const dialog = screen.getByRole('dialog', { name: 'Edit category' });
+    const nameField = within(dialog).getByRole('textbox', { name: 'Name' });
+
+    await user.clear(nameField);
+    await user.type(nameField, 'Running shoes');
+    await user.click(within(dialog).getByRole('button', { name: 'Save' }));
+
+    expect(
+      await screen.findByRole('heading', { name: 'Running shoes' })
+    ).toBeVisible();
+    expect(
+      screen.queryByRole('dialog', { name: 'Edit category' })
+    ).not.toBeInTheDocument();
+    expect(updateCategoryMock).toHaveBeenCalledExactlyOnceWith({
+      categoryId: 2,
+      name: 'Running shoes',
+    });
+    expect(getCategoryMock).toHaveBeenCalledTimes(2);
+  });
+
   it('renders category details and opens its edit dialog from the actions menu', async () => {
     getCategoryMock.mockResolvedValue({ ok: true, data: category });
     setup();
@@ -112,8 +152,13 @@ describe('CategoryDetail', () => {
     await waitFor(() => expect(getCategoryMock).toHaveBeenCalledTimes(2));
   });
 
-  it('opens confirmation dialog and publishes a draft category', async () => {
-    getCategoryMock.mockResolvedValue({ ok: true, data: category });
+  it('refreshes the category once after publishing', async () => {
+    getCategoryMock
+      .mockResolvedValueOnce({ ok: true, data: category })
+      .mockResolvedValue({
+        ok: true,
+        data: { ...category, status: CATEGORY_STATUS.ACTIVE },
+      });
     updateCategoryMock.mockResolvedValue({
       ok: true,
       data: {
@@ -152,6 +197,11 @@ describe('CategoryDetail', () => {
     expect(
       await screen.findByText('Category Sneakers was published')
     ).toBeVisible();
+    expect(await screen.findByText('Active')).toBeVisible();
+    expect(
+      screen.queryByRole('dialog', { name: 'Publish category' })
+    ).not.toBeInTheDocument();
+    expect(getCategoryMock).toHaveBeenCalledTimes(2);
   });
 
   it('deletes the category and navigates to the category list', async () => {

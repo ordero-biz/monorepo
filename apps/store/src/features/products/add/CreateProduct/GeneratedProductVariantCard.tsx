@@ -7,6 +7,7 @@ import {
   Textarea,
   TextField,
 } from '@ordero/ui';
+import { useStore } from '@tanstack/react-form';
 import { Pencil, Plus } from 'lucide-react';
 import { memo, useState } from 'react';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
@@ -25,6 +26,11 @@ export const GeneratedProductVariantCard = memo(
     requireAttributeValueIds,
     variantIndex,
   }: GeneratedProductVariantCardProps) => {
+    const submissionAttempts = useStore(
+      productVariantsCreationForm.store,
+      (state) => state.submissionAttempts
+    );
+
     // Base UI re-applies `data-starting-style` (opacity: 0) to an open panel when
     // `keepMounted` flips from true to false and never removes it, so a card
     // whose errors were fixed would turn invisible. Only ever turn it on.
@@ -40,7 +46,8 @@ export const GeneratedProductVariantCard = memo(
       >
         {(nameField) => {
           const nameErrorText = getFieldSubmitChangeErrorText(
-            nameField.state.meta
+            nameField.state.meta,
+            submissionAttempts
           );
           const productVariantName = nameField.state.value;
 
@@ -71,7 +78,8 @@ export const GeneratedProductVariantCard = memo(
                       >
                         {(field) => {
                           const errorText = getFieldSubmitChangeErrorText(
-                            field.state.meta
+                            field.state.meta,
+                            submissionAttempts
                           );
 
                           return (
@@ -95,7 +103,8 @@ export const GeneratedProductVariantCard = memo(
                       >
                         {(field) => {
                           const errorText = getFieldSubmitChangeErrorText(
-                            field.state.meta
+                            field.state.meta,
+                            submissionAttempts
                           );
 
                           return (
@@ -125,7 +134,8 @@ export const GeneratedProductVariantCard = memo(
                       >
                         {(field) => {
                           const errorText = getFieldSubmitChangeErrorText(
-                            field.state.meta
+                            field.state.meta,
+                            submissionAttempts
                           );
 
                           return (
@@ -177,7 +187,8 @@ export const GeneratedProductVariantCard = memo(
                   >
                     {(attributeValueIdsField) => {
                       const validationErrorText = getFieldSubmitChangeErrorText(
-                        attributeValueIdsField.state.meta
+                        attributeValueIdsField.state.meta,
+                        submissionAttempts
                       );
                       const hasNoAttributeValues =
                         attributeValueIdsField.state.value.length === 0;

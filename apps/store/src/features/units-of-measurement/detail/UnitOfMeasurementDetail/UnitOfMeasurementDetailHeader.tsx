@@ -14,7 +14,6 @@ import type { UnitOfMeasurementDetailHeaderProps } from './types';
 
 export const UnitOfMeasurementDetailHeader = ({
   onDeleted,
-  onUpdated,
   unitOfMeasurement,
 }: UnitOfMeasurementDetailHeaderProps) => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -44,7 +43,6 @@ export const UnitOfMeasurementDetailHeader = ({
       <PageHeader.Right>
         {!isUnitOfMeasurementActive ? (
           <ActivateUnitOfMeasurementDialogTrigger
-            onUpdated={onUpdated}
             unitOfMeasurement={unitOfMeasurement}
           />
         ) : null}
@@ -90,7 +88,6 @@ export const UnitOfMeasurementDetailHeader = ({
         />
         <UpdateUnitOfMeasurementDialog
           onOpenChange={setIsUpdateDialogOpen}
-          onUpdated={onUpdated}
           open={isUpdateDialogOpen}
           unitOfMeasurement={unitOfMeasurement}
         />

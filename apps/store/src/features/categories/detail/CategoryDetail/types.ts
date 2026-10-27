@@ -7,7 +7,6 @@ export type CategoryDetailProps = {
 export type CategoryDetailHeaderProps = {
   category: Category;
   onDeleted: () => Promise<void> | void;
-  onUpdated: () => Promise<void> | void;
 };
 
 export type CategoryDetailInfoProps = {
@@ -25,12 +24,10 @@ export type CategoryDetailField = {
 
 export type ActivateCategoryDialogTriggerProps = {
   category: Category;
-  onUpdated: () => Promise<void> | void;
 };
 
 export type ActivateCategoryDialogProps = {
   category: Category;
   onOpenChange: (open: boolean) => void;
-  onUpdated: () => Promise<void> | void;
   open: boolean;
 };

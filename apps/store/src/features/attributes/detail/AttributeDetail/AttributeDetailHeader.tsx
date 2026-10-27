@@ -81,12 +81,7 @@ export const AttributeDetailHeader = ({
       </PageHeader.Left>
       <PageHeader.Right>
         {!isAttributeActive ? (
-          <ActivateAttributeDialogTrigger
-            attribute={attributeQuery.data}
-            onUpdated={async () => {
-              await attributeQuery.refetch();
-            }}
-          />
+          <ActivateAttributeDialogTrigger attribute={attributeQuery.data} />
         ) : null}
 
         <CreateAttributeValuesDialogTrigger

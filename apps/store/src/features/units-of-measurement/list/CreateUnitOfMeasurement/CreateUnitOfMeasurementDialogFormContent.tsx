@@ -6,6 +6,7 @@ import {
   TextField,
   Typography,
 } from '@ordero/ui';
+import { useStore } from '@tanstack/react-form';
 import { UNIT_OF_MEASUREMENT_STATUS } from '@/lib/domain/units-of-measurement/constants';
 import type { UnitOfMeasurementStatus } from '@/lib/domain/units-of-measurement/types';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
@@ -18,6 +19,11 @@ import type { CreateUnitOfMeasurementDialogFormContentProps } from './types';
 export const CreateUnitOfMeasurementDialogFormContent = ({
   form,
 }: CreateUnitOfMeasurementDialogFormContentProps) => {
+  const submissionAttempts = useStore(
+    form.store,
+    (state) => state.submissionAttempts
+  );
+
   return (
     <>
       <Dialog.Content>
@@ -30,7 +36,10 @@ export const CreateUnitOfMeasurementDialogFormContent = ({
             }}
           >
             {(field) => {
-              const errorText = getFieldSubmitChangeErrorText(field.state.meta);
+              const errorText = getFieldSubmitChangeErrorText(
+                field.state.meta,
+                submissionAttempts
+              );
 
               return (
                 <TextField
@@ -56,7 +65,10 @@ export const CreateUnitOfMeasurementDialogFormContent = ({
             }}
           >
             {(field) => {
-              const errorText = getFieldSubmitChangeErrorText(field.state.meta);
+              const errorText = getFieldSubmitChangeErrorText(
+                field.state.meta,
+                submissionAttempts
+              );
 
               return (
                 <RadioGroup
@@ -100,7 +112,10 @@ export const CreateUnitOfMeasurementDialogFormContent = ({
 
           <form.Field name="symbol">
             {(field) => {
-              const errorText = getFieldSubmitChangeErrorText(field.state.meta);
+              const errorText = getFieldSubmitChangeErrorText(
+                field.state.meta,
+                submissionAttempts
+              );
 
               return (
                 <TextField
@@ -120,7 +135,10 @@ export const CreateUnitOfMeasurementDialogFormContent = ({
 
           <form.Field name="comment">
             {(field) => {
-              const errorText = getFieldSubmitChangeErrorText(field.state.meta);
+              const errorText = getFieldSubmitChangeErrorText(
+                field.state.meta,
+                submissionAttempts
+              );
 
               return (
                 <TextField

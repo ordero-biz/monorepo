@@ -12,7 +12,6 @@ import { getWarehouseDefaultValues } from './utils/fields';
 export const UpdateWarehouseDialog = ({
   warehouse,
   onOpenChange,
-  onUpdated,
   open,
 }: UpdateWarehouseDialogProps) => {
   const queryClient = useQueryClient();
@@ -30,7 +29,6 @@ export const UpdateWarehouseDialog = ({
           queryKey: warehousesQueryKeys.detail(warehouse.id),
         }),
       ]);
-      await onUpdated();
     },
   });
 

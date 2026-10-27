@@ -2,23 +2,16 @@
 
 import { Button, Dialog, Typography } from '@ordero/ui';
 import { useActivateSupplier } from './hooks/useActivateSupplier';
-import type { SupplierDetailHeaderProps } from './types';
-
-type ActivateSupplierDialogProps = SupplierDetailHeaderProps & {
-  onOpenChange: (open: boolean) => void;
-  open: boolean;
-};
+import type { ActivateSupplierDialogProps } from './types';
 
 export const ActivateSupplierDialog = ({
   supplier,
   onOpenChange,
-  onUpdated,
   open,
 }: ActivateSupplierDialogProps) => {
   const { handleActivate, isActivating } = useActivateSupplier({
-    onActivated: async () => {
+    onActivated: () => {
       onOpenChange(false);
-      await onUpdated();
     },
     supplierId: supplier.id,
     supplierName: supplier.name,

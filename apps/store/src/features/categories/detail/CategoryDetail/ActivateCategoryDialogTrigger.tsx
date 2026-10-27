@@ -7,7 +7,6 @@ import type { ActivateCategoryDialogTriggerProps } from './types';
 
 export const ActivateCategoryDialogTrigger = ({
   category,
-  onUpdated,
 }: ActivateCategoryDialogTriggerProps) => {
   const [open, setOpen] = useState(false);
 
@@ -25,7 +24,6 @@ export const ActivateCategoryDialogTrigger = ({
       <ActivateCategoryDialog
         category={category}
         onOpenChange={setOpen}
-        onUpdated={onUpdated}
         open={open}
       />
     </>

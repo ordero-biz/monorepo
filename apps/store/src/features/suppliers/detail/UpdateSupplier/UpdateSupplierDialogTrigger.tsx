@@ -7,7 +7,6 @@ import type { UpdateSupplierDialogTriggerProps } from './types';
 import { UpdateSupplierDialog } from './UpdateSupplierDialog';
 
 export const UpdateSupplierDialogTrigger = ({
-  onUpdated,
   supplier,
 }: UpdateSupplierDialogTriggerProps) => {
   const [open, setOpen] = useState(false);
@@ -25,7 +24,6 @@ export const UpdateSupplierDialogTrigger = ({
 
       <UpdateSupplierDialog
         onOpenChange={setOpen}
-        onUpdated={onUpdated}
         open={open}
         supplier={supplier}
       />

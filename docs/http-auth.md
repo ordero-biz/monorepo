@@ -355,6 +355,32 @@ Backend writes remain uncached. Choose the caller shape based on the UI:
 - Auth mutations such as logout should clear, invalidate, or seed
   `authQueryKeys.session` and any session-dependent query state after success.
 
+### Success Callbacks And Cache Ownership
+
+Keep the form hook's `onUpdated` or mutation hook's `onDeleted`/`onActivated`
+callback when it delegates success handling to the workflow. The workflow uses
+that callback to close/reset the dialog, update caches, or navigate. This does
+not require exposing another callback through the dialog, trigger, header, and
+detail page.
+
+For update and publish flows, give each affected query one owner for refreshing
+its data. When the workflow's awaited `invalidateQueries(...)` already
+refetches the active entity query, do not also pass `onUpdated={() => refetch()}`
+from the parent. Invalidate affected list, detail, and nested collection keys
+at the workflow layer without adding a second refresh for the same query.
+
+Expose a dialog-level success callback only when a consumer has additional
+workflow work, such as clearing table selection, updating a local form
+baseline, or navigating. Remove callback props and forwarding code when their
+only purpose is a duplicate refetch.
+
+For deletion, remove the deleted entity's detail and child-resource caches,
+invalidate affected collections, and navigate away if the current page
+requires that entity. Do not refetch its deleted detail. Keep an `onDeleted`
+callback when it clears parent-owned selection; clear that selection and close
+the confirmation dialog after deletion succeeds, without waiting for the list
+refresh to finish.
+
 ## Auth Page Guard Flow
 
 Auth-page redirects happen in the server page layer, not in `proxy.ts`.

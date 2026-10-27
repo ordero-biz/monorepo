@@ -106,14 +106,18 @@ export const getColumns = ({
                 name={`supplyEntries[${index}].productVariant` as const}
                 validators={getEntryValidators(index, 'productVariant')}
               >
-                {(field) => {
-                  const errorText = getFieldSubmitChangeErrorText(
-                    field.state.meta
-                  );
-
-                  return (
-                    <form.Subscribe selector={(state) => state.isSubmitting}>
-                      {(disabled) => (
+                {(field) => (
+                  <form.Subscribe
+                    selector={(state) =>
+                      [state.isSubmitting, state.submissionAttempts] as const
+                    }
+                  >
+                    {([disabled, submissionAttempts]) => {
+                      const errorText = getFieldSubmitChangeErrorText(
+                        field.state.meta,
+                        submissionAttempts
+                      );
+                      return (
                         <ProductVariantsAsyncCombobox
                           disabled={disabled}
                           aria-label={`Product for row ${index + 1}`}
@@ -126,10 +130,10 @@ export const getColumns = ({
                           size="s"
                           value={field.state.value}
                         />
-                      )}
-                    </form.Subscribe>
-                  );
-                }}
+                      );
+                    }}
+                  </form.Subscribe>
+                )}
               </form.Field>
             </div>
           </DataTableCell>
@@ -153,14 +157,18 @@ export const getColumns = ({
                 name={`supplyEntries[${index}].unitOfMeasurement` as const}
                 validators={getEntryValidators(index, 'unitOfMeasurement')}
               >
-                {(field) => {
-                  const errorText = getFieldSubmitChangeErrorText(
-                    field.state.meta
-                  );
-
-                  return (
-                    <form.Subscribe selector={(state) => state.isSubmitting}>
-                      {(disabled) => (
+                {(field) => (
+                  <form.Subscribe
+                    selector={(state) =>
+                      [state.isSubmitting, state.submissionAttempts] as const
+                    }
+                  >
+                    {([disabled, submissionAttempts]) => {
+                      const errorText = getFieldSubmitChangeErrorText(
+                        field.state.meta,
+                        submissionAttempts
+                      );
+                      return (
                         <UnitsOfMeasurementAsyncCombobox
                           disabled={disabled}
                           aria-label={`Unit for row ${index + 1}`}
@@ -173,10 +181,10 @@ export const getColumns = ({
                           size="s"
                           value={field.state.value}
                         />
-                      )}
-                    </form.Subscribe>
-                  );
-                }}
+                      );
+                    }}
+                  </form.Subscribe>
+                )}
               </form.Field>
             </div>
           </DataTableCell>
@@ -197,14 +205,18 @@ export const getColumns = ({
               name={`supplyEntries[${row.index}].quantity` as const}
               validators={getEntryValidators(row.index, 'quantity')}
             >
-              {(field) => {
-                const errorText = getFieldSubmitChangeErrorText(
-                  field.state.meta
-                );
-
-                return (
-                  <form.Subscribe selector={(state) => state.isSubmitting}>
-                    {(disabled) => (
+              {(field) => (
+                <form.Subscribe
+                  selector={(state) =>
+                    [state.isSubmitting, state.submissionAttempts] as const
+                  }
+                >
+                  {([disabled, submissionAttempts]) => {
+                    const errorText = getFieldSubmitChangeErrorText(
+                      field.state.meta,
+                      submissionAttempts
+                    );
+                    return (
                       <TextField
                         disabled={disabled}
                         aria-label={`Quantity for row ${row.index + 1}`}
@@ -218,10 +230,10 @@ export const getColumns = ({
                         type="number"
                         value={field.state.value}
                       />
-                    )}
-                  </form.Subscribe>
-                );
-              }}
+                    );
+                  }}
+                </form.Subscribe>
+              )}
             </form.Field>
           </div>
         </DataTableCell>
@@ -241,14 +253,18 @@ export const getColumns = ({
               name={`supplyEntries[${row.index}].unitPrice` as const}
               validators={getEntryValidators(row.index, 'unitPrice')}
             >
-              {(field) => {
-                const errorText = getFieldSubmitChangeErrorText(
-                  field.state.meta
-                );
-
-                return (
-                  <form.Subscribe selector={(state) => state.isSubmitting}>
-                    {(disabled) => (
+              {(field) => (
+                <form.Subscribe
+                  selector={(state) =>
+                    [state.isSubmitting, state.submissionAttempts] as const
+                  }
+                >
+                  {([disabled, submissionAttempts]) => {
+                    const errorText = getFieldSubmitChangeErrorText(
+                      field.state.meta,
+                      submissionAttempts
+                    );
+                    return (
                       <TextField
                         disabled={disabled}
                         aria-label={`Unit price for row ${row.index + 1}`}
@@ -262,10 +278,10 @@ export const getColumns = ({
                         type="number"
                         value={field.state.value}
                       />
-                    )}
-                  </form.Subscribe>
-                );
-              }}
+                    );
+                  }}
+                </form.Subscribe>
+              )}
             </form.Field>
           </div>
         </DataTableCell>

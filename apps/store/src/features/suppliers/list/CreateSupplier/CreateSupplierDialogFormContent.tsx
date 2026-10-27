@@ -1,3 +1,4 @@
+import { useStore } from '@tanstack/react-form';
 import { SUPPLIER_STATUS } from '@/lib/domain/suppliers/constants';
 import type { SupplierStatus } from '@/lib/domain/suppliers/types';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
@@ -19,6 +20,11 @@ import type { CreateSupplierDialogFormContentProps } from './types';
 export const CreateSupplierDialogFormContent = ({
   form,
 }: CreateSupplierDialogFormContentProps) => {
+  const submissionAttempts = useStore(
+    form.store,
+    (state) => state.submissionAttempts
+  );
+
   return (
     <>
       <Dialog.Content>
@@ -31,7 +37,10 @@ export const CreateSupplierDialogFormContent = ({
             }}
           >
             {(field) => {
-              const errorText = getFieldSubmitChangeErrorText(field.state.meta);
+              const errorText = getFieldSubmitChangeErrorText(
+                field.state.meta,
+                submissionAttempts
+              );
 
               return (
                 <TextField
@@ -57,7 +66,10 @@ export const CreateSupplierDialogFormContent = ({
             }}
           >
             {(field) => {
-              const errorText = getFieldSubmitChangeErrorText(field.state.meta);
+              const errorText = getFieldSubmitChangeErrorText(
+                field.state.meta,
+                submissionAttempts
+              );
 
               return (
                 <RadioGroup
@@ -104,7 +116,10 @@ export const CreateSupplierDialogFormContent = ({
             }}
           >
             {(field) => {
-              const errorText = getFieldSubmitChangeErrorText(field.state.meta);
+              const errorText = getFieldSubmitChangeErrorText(
+                field.state.meta,
+                submissionAttempts
+              );
 
               return (
                 <TextField
@@ -123,7 +138,10 @@ export const CreateSupplierDialogFormContent = ({
 
           <form.Field name="phone">
             {(field) => {
-              const errorText = getFieldSubmitChangeErrorText(field.state.meta);
+              const errorText = getFieldSubmitChangeErrorText(
+                field.state.meta,
+                submissionAttempts
+              );
 
               return (
                 <TextField
@@ -142,7 +160,10 @@ export const CreateSupplierDialogFormContent = ({
 
           <form.Field name="address">
             {(field) => {
-              const errorText = getFieldSubmitChangeErrorText(field.state.meta);
+              const errorText = getFieldSubmitChangeErrorText(
+                field.state.meta,
+                submissionAttempts
+              );
 
               return (
                 <TextField
@@ -161,7 +182,10 @@ export const CreateSupplierDialogFormContent = ({
 
           <form.Field name="comment">
             {(field) => {
-              const errorText = getFieldSubmitChangeErrorText(field.state.meta);
+              const errorText = getFieldSubmitChangeErrorText(
+                field.state.meta,
+                submissionAttempts
+              );
 
               return (
                 <TextField
