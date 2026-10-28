@@ -231,7 +231,7 @@ describe('CreateSupply', () => {
     mocks.replace.mockReset();
   });
 
-  it('validates supply number edits and clears the error when corrected', async () => {
+  it('validates supply number after blur and clears the error when corrected', async () => {
     const user = userEvent.setup();
     setup();
     const number = screen.getByRole('textbox', { name: /Supply number/ });
@@ -240,6 +240,10 @@ describe('CreateSupply', () => {
       screen.queryByText('Supply number is required')
     ).not.toBeInTheDocument();
     await user.type(number, ' ');
+    expect(
+      screen.queryByText('Supply number is required')
+    ).not.toBeInTheDocument();
+    await user.tab();
     expect(number).toHaveAccessibleDescription('Supply number is required');
     await user.type(number, 'SUP-001');
     expect(

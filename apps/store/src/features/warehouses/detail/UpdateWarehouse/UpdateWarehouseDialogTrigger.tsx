@@ -7,7 +7,6 @@ import type { UpdateWarehouseDialogTriggerProps } from './types';
 import { UpdateWarehouseDialog } from './UpdateWarehouseDialog';
 
 export const UpdateWarehouseDialogTrigger = ({
-  onUpdated,
   warehouse,
 }: UpdateWarehouseDialogTriggerProps) => {
   const [open, setOpen] = useState(false);
@@ -24,7 +23,6 @@ export const UpdateWarehouseDialogTrigger = ({
       </IconButton>
       <UpdateWarehouseDialog
         onOpenChange={setOpen}
-        onUpdated={onUpdated}
         open={open}
         warehouse={warehouse}
       />

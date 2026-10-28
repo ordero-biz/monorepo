@@ -7,7 +7,6 @@ import { ActivateWarehouseDialogTrigger } from './ActivateWarehouseDialogTrigger
 const { setup } = prepareStoreSetup({
   component: ActivateWarehouseDialogTrigger,
   props: {
-    onUpdated: vi.fn(),
     warehouse: {
       id: 1,
       name: 'Main Warehouse',

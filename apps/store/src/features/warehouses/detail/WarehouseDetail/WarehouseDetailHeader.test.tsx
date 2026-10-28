@@ -7,7 +7,6 @@ import { WarehouseDetailHeader } from './WarehouseDetailHeader';
 const { setup } = prepareStoreSetup({
   component: WarehouseDetailHeader,
   props: {
-    onUpdated: vi.fn(),
     warehouse: {
       id: 1,
       name: 'Main Warehouse',

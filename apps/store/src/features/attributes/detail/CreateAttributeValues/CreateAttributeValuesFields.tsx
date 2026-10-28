@@ -1,4 +1,5 @@
 import { Button, IconButton, Select, TextField, Typography } from '@ordero/ui';
+import { useStore } from '@tanstack/react-form';
 import { CircleAlert, Minus } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { ATTRIBUTE_STATUS } from '@/lib/domain/attributes/constants';
@@ -23,6 +24,11 @@ export const CreateAttributeValuesFields = ({
   form,
   open,
 }: CreateAttributeValuesFieldsProps) => {
+  const submissionAttempts = useStore(
+    form.store,
+    (state) => state.submissionAttempts
+  );
+
   const nextAttributeValueFieldIndex = useRef(
     INITIAL_ATTRIBUTE_VALUE_FIELD_INDEX + 1
   );
@@ -88,7 +94,8 @@ export const CreateAttributeValuesFields = ({
                         >
                           {(subField) => {
                             const fieldError = getFieldSubmitChangeErrorText(
-                              subField.state.meta
+                              subField.state.meta,
+                              submissionAttempts
                             );
                             const value = subField.state.value ?? '';
 
@@ -129,7 +136,8 @@ export const CreateAttributeValuesFields = ({
                                   {(statusField) => {
                                     const errorText =
                                       getFieldSubmitChangeErrorText(
-                                        statusField.state.meta
+                                        statusField.state.meta,
+                                        submissionAttempts
                                       );
 
                                     return (

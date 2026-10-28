@@ -6,7 +6,16 @@ export type UnitOfMeasurementDetailProps = {
 
 export type UnitOfMeasurementDetailHeaderProps = {
   onDeleted: () => Promise<void> | void;
-  onUpdated: () => Promise<void> | void;
+  unitOfMeasurement: UnitOfMeasurement;
+};
+
+export type ActivateUnitOfMeasurementDialogProps = {
+  onOpenChange: (open: boolean) => void;
+  open: boolean;
+  unitOfMeasurement: UnitOfMeasurement;
+};
+
+export type ActivateUnitOfMeasurementDialogTriggerProps = {
   unitOfMeasurement: UnitOfMeasurement;
 };
 

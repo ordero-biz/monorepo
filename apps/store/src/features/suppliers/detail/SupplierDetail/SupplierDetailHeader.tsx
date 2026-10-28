@@ -10,7 +10,6 @@ import { ActivateSupplierDialogTrigger } from './ActivateSupplierDialogTrigger';
 import type { SupplierDetailHeaderProps } from './types';
 
 export const SupplierDetailHeader = ({
-  onUpdated,
   supplier,
 }: SupplierDetailHeaderProps) => {
   const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
@@ -34,10 +33,7 @@ export const SupplierDetailHeader = ({
       </PageHeader.Left>
       <PageHeader.Right>
         {!isSupplierActive ? (
-          <ActivateSupplierDialogTrigger
-            onUpdated={onUpdated}
-            supplier={supplier}
-          />
+          <ActivateSupplierDialogTrigger supplier={supplier} />
         ) : null}
         <Menu.Root>
           <Menu.Trigger
@@ -65,7 +61,6 @@ export const SupplierDetailHeader = ({
 
         <UpdateSupplierDialog
           onOpenChange={setIsUpdateDialogOpen}
-          onUpdated={onUpdated}
           open={isUpdateDialogOpen}
           supplier={supplier}
         />

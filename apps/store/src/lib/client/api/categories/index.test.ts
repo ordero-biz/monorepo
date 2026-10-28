@@ -1,5 +1,6 @@
 import {
   createCategory,
+  deleteCategories,
   getCategories,
   getCategoriesPath,
   getCategory,
@@ -350,6 +351,32 @@ describe('category client helpers', () => {
         method: 'PATCH',
         body: JSON.stringify({
           status: 'ACTIVE',
+        }),
+        cache: 'no-store',
+      })
+    );
+  });
+
+  it('deletes categories through the backend proxy', async () => {
+    const fetchMock = vi.mocked(fetch);
+
+    fetchMock.mockResolvedValue(new Response(null, { status: 204 }));
+
+    await expect(
+      deleteCategories({
+        categoryIds: [3],
+      })
+    ).resolves.toEqual({
+      ok: true,
+      data: undefined,
+    });
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/backend/api/v1/categories',
+      expect.objectContaining({
+        method: 'DELETE',
+        body: JSON.stringify({
+          categoryIds: [3],
         }),
         cache: 'no-store',
       })

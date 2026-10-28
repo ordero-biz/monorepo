@@ -7,7 +7,6 @@ import type { ActivateAttributeDialogTriggerProps } from './types';
 
 export const ActivateAttributeDialogTrigger = ({
   attribute,
-  onUpdated,
 }: ActivateAttributeDialogTriggerProps) => {
   const [open, setOpen] = useState(false);
 
@@ -20,7 +19,6 @@ export const ActivateAttributeDialogTrigger = ({
       <ActivateAttributeDialog
         attribute={attribute}
         onOpenChange={setOpen}
-        onUpdated={onUpdated}
         open={open}
       />
     </>

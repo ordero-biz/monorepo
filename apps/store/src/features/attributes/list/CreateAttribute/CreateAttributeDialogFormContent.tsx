@@ -6,6 +6,7 @@ import {
   TextField,
   Typography,
 } from '@ordero/ui';
+import { useStore } from '@tanstack/react-form';
 import {
   ATTRIBUTE_STATUS,
   ATTRIBUTE_VALUE_STATUS,
@@ -23,6 +24,11 @@ export const CreateAttributeDialogFormContent = ({
   form,
   open,
 }: CreateAttributeDialogFormContentProps) => {
+  const submissionAttempts = useStore(
+    form.store,
+    (state) => state.submissionAttempts
+  );
+
   const setAttributeValueStatusesToDraft = () => {
     form.setFieldValue(
       'attributeValues',
@@ -45,7 +51,10 @@ export const CreateAttributeDialogFormContent = ({
             }}
           >
             {(field) => {
-              const errorText = getFieldSubmitChangeErrorText(field.state.meta);
+              const errorText = getFieldSubmitChangeErrorText(
+                field.state.meta,
+                submissionAttempts
+              );
 
               return (
                 <TextField
@@ -71,7 +80,10 @@ export const CreateAttributeDialogFormContent = ({
             }}
           >
             {(field) => {
-              const errorText = getFieldSubmitChangeErrorText(field.state.meta);
+              const errorText = getFieldSubmitChangeErrorText(
+                field.state.meta,
+                submissionAttempts
+              );
 
               return (
                 <RadioGroup

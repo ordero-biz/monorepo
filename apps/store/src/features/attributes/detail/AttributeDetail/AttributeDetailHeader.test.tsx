@@ -1,16 +1,24 @@
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { getAttribute, updateAttribute } from '@/lib/client/api/attributes';
+import {
+  deleteAttributes,
+  getAttribute,
+  updateAttribute,
+} from '@/lib/client/api/attributes';
 import { clientRoutes } from '@/lib/client/routes';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { AttributeDetailHeader } from './AttributeDetailHeader';
+
+const mocks = vi.hoisted(() => ({
+  push: vi.fn(),
+}));
 
 vi.mock('next/navigation', async () => ({
   ...(await vi.importActual<typeof import('next/navigation')>(
     'next/navigation'
   )),
   useRouter: () => ({
-    push: vi.fn(),
+    push: mocks.push,
   }),
 }));
 
@@ -18,10 +26,12 @@ vi.mock('@/lib/client/api/attributes', async () => ({
   ...(await vi.importActual<typeof import('@/lib/client/api/attributes')>(
     '@/lib/client/api/attributes'
   )),
+  deleteAttributes: vi.fn(),
   getAttribute: vi.fn(),
   updateAttribute: vi.fn(),
 }));
 
+const deleteAttributesMock = vi.mocked(deleteAttributes);
 const getAttributeMock = vi.mocked(getAttribute);
 const updateAttributeMock = vi.mocked(updateAttribute);
 
@@ -34,7 +44,9 @@ const { setup } = prepareStoreSetup({
 
 describe('AttributeDetailHeader', () => {
   beforeEach(() => {
+    deleteAttributesMock.mockReset();
     getAttributeMock.mockReset();
+    mocks.push.mockReset();
     updateAttributeMock.mockReset();
   });
 
@@ -100,7 +112,7 @@ describe('AttributeDetailHeader', () => {
     ).toBeVisible();
   });
 
-  it('publishes the attribute and refreshes the header as active', async () => {
+  it('refreshes the attribute once after publishing', async () => {
     const draftAttribute = {
       id: 7,
       name: 'Color',
@@ -147,6 +159,8 @@ describe('AttributeDetailHeader', () => {
         screen.queryByRole('button', { name: 'Publish' })
       ).not.toBeInTheDocument()
     );
+    expect(screen.getByText('Active')).toBeVisible();
+    expect(getAttributeMock).toHaveBeenCalledTimes(2);
   });
 
   it('opens the delete dialog from the actions menu', async () => {
@@ -177,6 +191,45 @@ describe('AttributeDetailHeader', () => {
     expect(
       screen.getByRole('dialog', { name: 'Delete attribute' })
     ).toBeVisible();
+  });
+
+  it('deletes the attribute and returns to the attributes list', async () => {
+    getAttributeMock.mockResolvedValue({
+      ok: true,
+      data: {
+        id: 7,
+        name: 'Color',
+        sortOrder: 10,
+        status: 'DRAFT' as const,
+        createdAt: '2026-06-24T20:07:32.467Z',
+      },
+    });
+    deleteAttributesMock.mockResolvedValue({
+      ok: true,
+      data: undefined,
+    });
+    const user = userEvent.setup();
+
+    setup();
+
+    await user.click(
+      await screen.findByRole('button', { name: 'Actions for Color' })
+    );
+    await user.click(
+      await screen.findByRole('menuitem', { name: 'Delete attribute' })
+    );
+    await user.click(
+      within(
+        screen.getByRole('dialog', { name: 'Delete attribute' })
+      ).getByRole('button', { name: 'Delete' })
+    );
+
+    expect(deleteAttributesMock).toHaveBeenCalledWith({
+      attributeIds: [7],
+    });
+    await waitFor(() =>
+      expect(mocks.push).toHaveBeenCalledWith(clientRoutes.attributes)
+    );
   });
 
   it('hides the edit action for active attributes', async () => {

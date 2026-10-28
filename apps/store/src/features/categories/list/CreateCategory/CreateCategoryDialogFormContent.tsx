@@ -21,6 +21,11 @@ import type { CreateCategoryDialogFormContentProps } from './types';
 export const CreateCategoryDialogFormContent = ({
   form,
 }: CreateCategoryDialogFormContentProps) => {
+  const submissionAttempts = useStore(
+    form.store,
+    (state) => state.submissionAttempts
+  );
+
   const parentStatus = useStore(
     form.store,
     (state) => state.values.parentCategory?.status
@@ -39,7 +44,10 @@ export const CreateCategoryDialogFormContent = ({
             }}
           >
             {(field) => {
-              const errorText = getFieldSubmitChangeErrorText(field.state.meta);
+              const errorText = getFieldSubmitChangeErrorText(
+                field.state.meta,
+                submissionAttempts
+              );
 
               return (
                 <TextField
@@ -65,7 +73,10 @@ export const CreateCategoryDialogFormContent = ({
             }}
           >
             {(field) => {
-              const errorText = getFieldSubmitChangeErrorText(field.state.meta);
+              const errorText = getFieldSubmitChangeErrorText(
+                field.state.meta,
+                submissionAttempts
+              );
 
               return (
                 <CategoriesAsyncCombobox
@@ -101,7 +112,10 @@ export const CreateCategoryDialogFormContent = ({
             }}
           >
             {(field) => {
-              const errorText = getFieldSubmitChangeErrorText(field.state.meta);
+              const errorText = getFieldSubmitChangeErrorText(
+                field.state.meta,
+                submissionAttempts
+              );
 
               return (
                 <RadioGroup

@@ -4,7 +4,7 @@ import {
   createTestQueryClient,
   createTestQueryProvider,
 } from '@/test/prepareSetup';
-import { useDeleteAttribute } from './useDeleteAttribute';
+import { useDeleteAttributes } from './useDeleteAttributes';
 
 const { addToastMock } = vi.hoisted(() => ({
   addToastMock: vi.fn(),
@@ -26,14 +26,13 @@ vi.mock('@/lib/client/api/attributes', async () => ({
 
 const deleteAttributesMock = vi.mocked(deleteAttributes);
 
-const setupDeleteAttributeHook = () => {
+const setupDeleteAttributesHook = () => {
   const onDeleted = vi.fn();
   const TestQueryProvider = createTestQueryProvider(createTestQueryClient());
   const { result } = renderHook(
     () =>
-      useDeleteAttribute({
-        attributeId: 7,
-        attributeName: 'Color',
+      useDeleteAttributes({
+        attributeIds: [7, 8],
         onDeleted,
       }),
     {
@@ -47,18 +46,18 @@ const setupDeleteAttributeHook = () => {
   };
 };
 
-describe('useDeleteAttribute', () => {
+describe('useDeleteAttributes', () => {
   beforeEach(() => {
     addToastMock.mockClear();
     deleteAttributesMock.mockReset();
   });
 
-  it('deletes the attribute and runs success cleanup', async () => {
+  it('deletes the attributes and runs success cleanup', async () => {
     deleteAttributesMock.mockResolvedValue({
       ok: true,
       data: undefined,
     });
-    const { onDeleted, result } = setupDeleteAttributeHook();
+    const { onDeleted, result } = setupDeleteAttributesHook();
 
     expect(result.current.isDeleting).toBe(false);
 
@@ -68,18 +67,18 @@ describe('useDeleteAttribute', () => {
 
     await waitFor(() =>
       expect(deleteAttributesMock).toHaveBeenCalledWith({
-        attributeIds: [7],
+        attributeIds: [7, 8],
       })
     );
     await waitFor(() => expect(onDeleted).toHaveBeenCalled());
     expect(addToastMock).toHaveBeenCalledWith({
-      description: 'Attribute Color was deleted.',
+      description: '2 attributes were deleted.',
       type: 'success',
     });
     expect(result.current.isDeleting).toBe(false);
   });
 
-  it('shows a toast and skips success cleanup when delete fails', async () => {
+  it('shows a toast and skips success cleanup when deletion fails', async () => {
     deleteAttributesMock.mockResolvedValue({
       ok: false,
       error: {
@@ -87,7 +86,7 @@ describe('useDeleteAttribute', () => {
         message: 'Attribute delete failed',
       },
     });
-    const { onDeleted, result } = setupDeleteAttributeHook();
+    const { onDeleted, result } = setupDeleteAttributesHook();
 
     act(() => {
       result.current.handleDelete();

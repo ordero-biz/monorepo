@@ -10,7 +10,6 @@ import { ActivateWarehouseDialogTrigger } from './ActivateWarehouseDialogTrigger
 import type { WarehouseDetailHeaderProps } from './types';
 
 export const WarehouseDetailHeader = ({
-  onUpdated,
   warehouse,
 }: WarehouseDetailHeaderProps) => {
   const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
@@ -34,10 +33,7 @@ export const WarehouseDetailHeader = ({
       </PageHeader.Left>
       <PageHeader.Right>
         {!isWarehouseActive ? (
-          <ActivateWarehouseDialogTrigger
-            onUpdated={onUpdated}
-            warehouse={warehouse}
-          />
+          <ActivateWarehouseDialogTrigger warehouse={warehouse} />
         ) : null}
         <Menu.Root>
           <Menu.Trigger
@@ -65,7 +61,6 @@ export const WarehouseDetailHeader = ({
 
         <UpdateWarehouseDialog
           onOpenChange={setIsUpdateDialogOpen}
-          onUpdated={onUpdated}
           open={isUpdateDialogOpen}
           warehouse={warehouse}
         />

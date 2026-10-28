@@ -76,6 +76,23 @@ describe('SignInForm', () => {
     expect(passwordField).toHaveValue('');
   });
 
+  it('shows validation when submitting an edited field without blurring it', async () => {
+    const { emailField, user } = setupSignInForm();
+
+    await user.type(emailField, 'invalid');
+
+    expect(
+      screen.queryByText('Enter a valid email address.')
+    ).not.toBeInTheDocument();
+
+    await user.keyboard('{Enter}');
+
+    expect(emailField).toHaveFocus();
+    expect(
+      await screen.findByText('Enter a valid email address.')
+    ).toBeVisible();
+  });
+
   it('shows validation after blur and clears it as the email is corrected', async () => {
     const { emailField, user } = setupSignInForm();
 

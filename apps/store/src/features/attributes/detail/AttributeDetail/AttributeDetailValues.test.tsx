@@ -1,6 +1,10 @@
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { getAttribute, getAttributeValues } from '@/lib/client/api/attributes';
+import {
+  getAttribute,
+  getAttributeValues,
+  updateAttributeValue,
+} from '@/lib/client/api/attributes';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { AttributeDetailValues } from './AttributeDetailValues';
 
@@ -10,10 +14,12 @@ vi.mock('@/lib/client/api/attributes', async () => ({
   )),
   getAttribute: vi.fn(),
   getAttributeValues: vi.fn(),
+  updateAttributeValue: vi.fn(),
 }));
 
 const getAttributeMock = vi.mocked(getAttribute);
 const getAttributeValuesMock = vi.mocked(getAttributeValues);
+const updateAttributeValueMock = vi.mocked(updateAttributeValue);
 
 const { setup } = prepareStoreSetup({
   component: AttributeDetailValues,
@@ -26,6 +32,7 @@ describe('AttributeDetailValues', () => {
   beforeEach(() => {
     getAttributeMock.mockReset();
     getAttributeValuesMock.mockReset();
+    updateAttributeValueMock.mockReset();
     getAttributeMock.mockResolvedValue({
       ok: true,
       data: {
@@ -121,18 +128,21 @@ describe('AttributeDetailValues', () => {
     ).toHaveValue('Blue');
   });
 
-  it('opens the publish dialog for a draft attribute value', async () => {
-    getAttributeValuesMock.mockResolvedValue({
+  it('refreshes the attribute values once after publishing', async () => {
+    const draftValue = {
+      id: 3,
+      name: 'Blue',
+      sortOrder: 0,
+      status: 'DRAFT' as const,
+      createdAt: '2026-06-24T20:07:32.467Z',
+    };
+    const activeValue = { ...draftValue, status: 'ACTIVE' as const };
+    getAttributeValuesMock
+      .mockResolvedValueOnce({ ok: true, data: [draftValue] })
+      .mockResolvedValue({ ok: true, data: [activeValue] });
+    updateAttributeValueMock.mockResolvedValue({
       ok: true,
-      data: [
-        {
-          id: 3,
-          name: 'Blue',
-          sortOrder: 0,
-          status: 'DRAFT',
-          createdAt: '2026-06-24T20:07:32.467Z',
-        },
-      ],
+      data: activeValue,
     });
     const user = userEvent.setup();
 
@@ -146,6 +156,22 @@ describe('AttributeDetailValues', () => {
     expect(
       screen.getByRole('dialog', { name: 'Publish attribute value' })
     ).toBeVisible();
+
+    await user.click(
+      within(
+        screen.getByRole('dialog', { name: 'Publish attribute value' })
+      ).getByRole('button', { name: 'Publish' })
+    );
+
+    expect(await screen.findByText('Active')).toBeVisible();
+    expect(
+      screen.queryByRole('dialog', { name: 'Publish attribute value' })
+    ).not.toBeInTheDocument();
+    expect(updateAttributeValueMock).toHaveBeenCalledExactlyOnceWith({
+      attributeValueId: 3,
+      status: 'ACTIVE',
+    });
+    expect(getAttributeValuesMock).toHaveBeenCalledTimes(2);
   });
 
   it('hides the edit action for active attribute values', async () => {

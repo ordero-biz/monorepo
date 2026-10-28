@@ -144,6 +144,20 @@ For writes, keep tests aligned with the caller shape:
   blank values, update-time `null` for a cleared persisted value, and no request
   for unchanged normalized update data
 
+For update and publish flows that refresh an active detail or nested collection
+query, cover the complete workflow with a real QueryClient, query hook, and
+dialog. Mock the request helpers and assert both the updated visible data and
+exactly one refresh after the successful write. For a fresh mount with one
+initial read, that means two reads in total. A spy on `invalidateQueries` alone
+cannot catch an extra parent `onUpdated` callback calling `refetch()`.
+
+For deletion flows, verify that deleted detail/child caches are removed,
+affected collections refresh, and any required navigation or selection cleanup
+happens. When deletion clears table selection, keep the list refresh pending
+and verify that selection is cleared and the confirmation dialog closes before
+the refresh resolves. Retain coverage that failed writes do not run success
+callbacks or perform success-only navigation and selection cleanup.
+
 ## Commands
 
 Run all unit tests through Turbo:

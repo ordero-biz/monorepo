@@ -17,7 +17,6 @@ vi.mock('@/lib/client/api/units-of-measurement', async () => ({
 
 const updateUnitOfMeasurementMock = vi.mocked(updateUnitOfMeasurement);
 const onOpenChangeMock = vi.fn();
-const onUpdatedMock = vi.fn();
 
 const unitOfMeasurement: UnitOfMeasurement = {
   id: 1,
@@ -31,7 +30,6 @@ const { setup } = prepareStoreSetup({
   component: ActivateUnitOfMeasurementDialog,
   props: {
     onOpenChange: onOpenChangeMock,
-    onUpdated: onUpdatedMock,
     open: true,
     unitOfMeasurement,
   },
@@ -41,7 +39,6 @@ describe('ActivateUnitOfMeasurementDialog', () => {
   beforeEach(() => {
     updateUnitOfMeasurementMock.mockReset();
     onOpenChangeMock.mockClear();
-    onUpdatedMock.mockClear();
   });
 
   it('publishes the unit, invalidates caches, and closes on confirm', async () => {
@@ -71,7 +68,6 @@ describe('ActivateUnitOfMeasurementDialog', () => {
       queryKey: unitsOfMeasurementQueryKeys.detail(1),
     });
     expect(onOpenChangeMock).toHaveBeenCalledWith(false);
-    expect(onUpdatedMock).toHaveBeenCalled();
   });
 
   it('disables publish and cancel while the request is pending', async () => {
@@ -131,6 +127,5 @@ describe('ActivateUnitOfMeasurementDialog', () => {
       screen.getByRole('dialog', { name: 'Publish unit of measurement' })
     ).toBeVisible();
     expect(onOpenChangeMock).not.toHaveBeenCalledWith(false);
-    expect(onUpdatedMock).not.toHaveBeenCalled();
   });
 });

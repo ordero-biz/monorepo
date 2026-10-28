@@ -7,7 +7,6 @@ import { ActivateCategoryDialogTrigger } from './ActivateCategoryDialogTrigger';
 const { setup } = prepareStoreSetup({
   component: ActivateCategoryDialogTrigger,
   props: {
-    onUpdated: vi.fn(),
     category: {
       id: 2,
       name: 'Sneakers',

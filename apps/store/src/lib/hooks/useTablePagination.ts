@@ -1,6 +1,7 @@
 'use client';
 
 import type { TablePaginationProps } from '@ordero/ui';
+import { useEffect } from 'react';
 import type { PageMetadata } from '@/lib/server/types';
 import type { PaginationSearchInput } from '@/lib/utils/url';
 import { usePaginationSearchParams } from './usePaginationSearchParams';
@@ -59,6 +60,23 @@ export const useTablePagination = ({
   const { page, setPagination, size } = usePaginationSearchParams({
     paginationInput,
   });
+
+  useEffect(() => {
+    // A navigation can update the URL before the matching response arrives.
+    if (
+      !pageMetadata ||
+      pageMetadata.number !== page - 1 ||
+      pageMetadata.size !== size
+    ) {
+      return;
+    }
+
+    const lastPage = Math.max(1, pageMetadata.totalPages);
+
+    if (page > lastPage) {
+      setPagination({ page: lastPage, replace: true, size });
+    }
+  }, [page, pageMetadata, setPagination, size]);
 
   return getTablePagination({
     pageMetadata,

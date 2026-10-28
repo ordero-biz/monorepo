@@ -1,26 +1,32 @@
+'use client';
+
 import type { ApiError } from '@ordero/api-types';
 import { useToastManager } from '@ordero/ui';
 import { useMutation } from '@tanstack/react-query';
 import { deleteAttributes } from '@/lib/client/api/attributes';
 
-type UseDeleteAttributeArgs = {
-  attributeId: number;
-  attributeName: string;
+type UseDeleteAttributesArgs = {
+  attributeIds: number[];
   onDeleted: () => Promise<void> | void;
 };
 
-export const useDeleteAttribute = ({
-  attributeId,
-  attributeName,
+const getSuccessDescription = (attributeIds: number[]) => {
+  if (attributeIds.length === 1) {
+    return 'Attribute was deleted.';
+  }
+
+  return `${attributeIds.length} attributes were deleted.`;
+};
+
+export const useDeleteAttributes = ({
+  attributeIds,
   onDeleted,
-}: UseDeleteAttributeArgs) => {
+}: UseDeleteAttributesArgs) => {
   const { add: addToast } = useToastManager();
 
-  const deleteAttributeMutation = useMutation<void, ApiError>({
+  const deleteAttributesMutation = useMutation<void, ApiError>({
     mutationFn: async () => {
-      const result = await deleteAttributes({
-        attributeIds: [attributeId],
-      });
+      const result = await deleteAttributes({ attributeIds });
 
       if (!result.ok) {
         throw result.error;
@@ -34,7 +40,7 @@ export const useDeleteAttribute = ({
     },
     onSuccess: async () => {
       addToast({
-        description: `Attribute ${attributeName} was deleted.`,
+        description: getSuccessDescription(attributeIds),
         type: 'success',
       });
       await onDeleted();
@@ -42,7 +48,7 @@ export const useDeleteAttribute = ({
   });
 
   return {
-    handleDelete: () => deleteAttributeMutation.mutate(),
-    isDeleting: deleteAttributeMutation.isPending,
+    handleDelete: () => deleteAttributesMutation.mutate(),
+    isDeleting: deleteAttributesMutation.isPending,
   };
 };

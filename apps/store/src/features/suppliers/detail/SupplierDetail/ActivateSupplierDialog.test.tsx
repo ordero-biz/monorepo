@@ -17,7 +17,6 @@ vi.mock('@/lib/client/api/suppliers', async () => ({
 
 const updateSupplierMock = vi.mocked(updateSupplier);
 const onOpenChangeMock = vi.fn();
-const onUpdatedMock = vi.fn();
 
 const supplier: Supplier = {
   id: 1,
@@ -33,7 +32,6 @@ const { setup } = prepareStoreSetup({
   component: ActivateSupplierDialog,
   props: {
     onOpenChange: onOpenChangeMock,
-    onUpdated: onUpdatedMock,
     open: true,
     supplier,
   },
@@ -43,7 +41,6 @@ describe('ActivateSupplierDialog', () => {
   beforeEach(() => {
     updateSupplierMock.mockReset();
     onOpenChangeMock.mockClear();
-    onUpdatedMock.mockClear();
   });
 
   it('publishes the supplier, invalidates caches, and closes on confirm', async () => {
@@ -73,7 +70,6 @@ describe('ActivateSupplierDialog', () => {
       queryKey: suppliersQueryKeys.detail(1),
     });
     expect(onOpenChangeMock).toHaveBeenCalledWith(false);
-    expect(onUpdatedMock).toHaveBeenCalled();
   });
 
   it('disables publish and cancel while the request is pending', async () => {
@@ -133,6 +129,5 @@ describe('ActivateSupplierDialog', () => {
       screen.getByRole('dialog', { name: 'Publish supplier' })
     ).toBeVisible();
     expect(onOpenChangeMock).not.toHaveBeenCalledWith(false);
-    expect(onUpdatedMock).not.toHaveBeenCalled();
   });
 });
