@@ -59,7 +59,7 @@ groups start competing inside the same component.
 ### Flow Lifecycle
 1. **Initialize**: Define defaults in `constants.ts` and Zod schema in `validations.ts`.
 2. **Setup**: Instantiate TanStack Form inside the feature form or feature hook, passing controlled props to presentational fields from `packages/ui`.
-3. **Validate UX**: Reveal client validation errors on **blur**, then update validation state **live** during correction.
+3. **Validate UX**: Reveal client validation errors on **blur or a submission attempt**, then update validation state **live** during correction.
 4. **Submit**: Collect values via `onSubmit` and call the feature-owned submit action or client request helper.
 5. **Handle Errors**: Map backend field errors to the form state using `setErrorMap`, and show form-level errors through the shared toast surface.
 6. **Finish Workflow**: Keep route navigation, dialog close/reset, and TanStack Query cache invalidation in the workflow layer or the simple route form that owns the workflow.
@@ -100,7 +100,7 @@ by several workflows.
 To ensure a calmer, less intrusive user experience, implement this validation visibility model:
 
 - **Do not show client validation errors on the first keystroke.**
-- **Show client validation errors after a user blurs the field once or submits the form** (`blur-first` visibility).
+- **Show client validation errors after a user blurs the field once or attempts submission** (`blur-first` visibility).
 - **Once a field is marked invalid, validate live** as the user edits, providing immediate positive reinforcement when corrected.
 - **Always show backend/submit errors immediately**, even if the field was never blurred.
 
@@ -123,7 +123,8 @@ Treat client validation and backend/submit errors as separate concerns:
     `form.Subscribe` or `useStore` so keyboard submission updates error visibility
     even when the focused field's value and metadata do not change. Keep this
     subscription in the rendered fields or form content, outside the component
-    that initializes the form.
+    that initializes the form. A submission attempt includes one blocked by
+    validation; it does not mean submission succeeded.
   - Use `getErrorMessage(...)` for single submit-only controls such as
     checkbox agreement fields.
   - **Form-level errors** must use the shared toast surface. Persistent inline form-level error elements are discouraged unless explicitly required by the workflow design.
