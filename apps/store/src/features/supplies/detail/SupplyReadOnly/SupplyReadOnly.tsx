@@ -3,8 +3,8 @@
 import { Card, DataTable, PageHeader, Typography } from '@ordero/ui';
 import { AppBreadcrumbs } from '@/lib/components/AppBreadcrumbs';
 import type { SupplyEntry } from '@/lib/domain/supplies/types';
+import { formatMoney } from '@/lib/utils/formatMoney';
 import { suppliesRootBreadcrumb } from '../../shared/breadcrumbs';
-import { formatMoney } from '../../shared/formatMoney';
 import { SupplyStatusChip } from '../../shared/SupplyStatusChip';
 import { columns } from './columns';
 import type { SupplyReadOnlyProps } from './types';

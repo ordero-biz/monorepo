@@ -4,6 +4,7 @@ import { format, parseISO } from 'date-fns';
 import { useState } from 'react';
 import { expect, within } from 'storybook/test';
 import { Chip } from '@/ui/components/Chip';
+import { Button } from '@/ui/components/Button';
 import {
   DataTable,
   DataTableCell,
@@ -338,6 +339,33 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {};
+
+export const WithHeader: Story = {
+  args: {
+    header: (
+      <>
+        <div className="flex items-center gap-[var(--spacing-1)]">
+          <h2>Products</h2>
+          <Chip size="s" variant="soft">{rows.length}</Chip>
+        </div>
+        <Button color="inherit" size="s">Export products</Button>
+      </>
+    ),
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('heading', { name: 'Products' })).toBeVisible();
+    await expect(canvas.getByRole('button', { name: 'Export products' })).toBeVisible();
+    await expect(canvas.getByRole('table', { name: 'Products table' })).toBeVisible();
+  },
+};
+
+export const EmptyWithHeader: Story = {
+  args: {
+    data: [],
+    header: <h2>Products (0)</h2>,
+  },
+};
 
 const summaryColumns: DataTableColumnDef<ProductRow>[] = [
   {

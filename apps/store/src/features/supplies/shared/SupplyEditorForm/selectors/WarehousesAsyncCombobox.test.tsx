@@ -60,12 +60,20 @@ describe('WarehousesAsyncCombobox', () => {
       data: {
         content: [
           {
+            address: null,
+            phone: null,
+            totalItemQuantity: 0,
+            totalPrice: 0,
             id: 1,
             name: 'Draft warehouse',
             comment: '',
             status: WAREHOUSE_STATUS.DRAFT,
           },
           {
+            address: null,
+            phone: null,
+            totalItemQuantity: 0,
+            totalPrice: 0,
             id: 2,
             name: 'Active warehouse',
             comment: '',

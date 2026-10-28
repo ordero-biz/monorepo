@@ -32,17 +32,33 @@ const { setup } = prepareStoreSetup({
 });
 
 const supply = {
+  comment: null,
+  completedAt: null,
+  completedBy: null,
+  supplierInvoiceNumber: null,
+  createdAt: '2026-10-28T10:00:00Z',
+  createdBy: 'owner@example.test',
+  updatedAt: '2026-10-28T10:00:00Z',
+  updatedBy: 'owner@example.test',
+
   id: 9,
   supplier: { id: 1, name: 'Fresh Farms', status: 'ACTIVE' },
   warehouse: { id: 2, name: 'Main Warehouse', status: 'ACTIVE' },
   status: SUPPLY_STATUS.DRAFT,
   supplyNumber: 'SUP-009',
-  totalQuantity: 2,
+
   totalPrice: 10,
   supplyEntries: [
     {
+      comment: null,
+
       id: 17,
-      productVariant: { id: 11, name: 'Rice' },
+      productVariant: {
+        sku: '',
+        barcode: '',
+        id: 11,
+        name: 'Rice',
+      },
       unitOfMeasurement: { id: 3, name: 'Bag', status: 'ACTIVE' },
       quantity: 2,
       unitPrice: 5,
@@ -935,7 +951,12 @@ describe('SupplyDetail', () => {
         {
           ...supply.supplyEntries[0],
           id: 21,
-          productVariant: { id: 12, name: 'Beans' },
+          productVariant: {
+            sku: '',
+            barcode: '',
+            id: 12,
+            name: 'Beans',
+          },
           quantity: 6,
         },
       ],

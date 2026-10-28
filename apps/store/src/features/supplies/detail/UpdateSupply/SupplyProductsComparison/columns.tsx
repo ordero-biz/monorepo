@@ -1,5 +1,5 @@
 import type { DataTableColumnDef } from '@ordero/ui';
-import { formatMoney } from '../../../shared/formatMoney';
+import { formatMoney } from '@/lib/utils/formatMoney';
 import type { SupplyProductPreviewRow } from './types';
 
 export const columns: DataTableColumnDef<SupplyProductPreviewRow>[] = [

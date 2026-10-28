@@ -18,11 +18,21 @@ vi.mock('@/lib/client/api/supplies', async () => ({
 }));
 
 const supply = {
+  comment: null,
+  completedAt: null,
+  completedBy: null,
+  supplyNumber: 'SUP-001',
+  supplierInvoiceNumber: null,
+  createdAt: '2026-10-28T10:00:00Z',
+  createdBy: 'owner@example.test',
+  updatedAt: '2026-10-28T10:00:00Z',
+  updatedBy: 'owner@example.test',
+
   id: 7,
   supplier: { id: 2, name: 'Fresh Farms', status: 'ACTIVE' },
   warehouse: { id: 3, name: 'Main warehouse', status: 'ACTIVE' },
   status: SUPPLY_STATUS.DRAFT,
-  totalQuantity: 0,
+
   totalPrice: 0,
   supplyEntries: [],
   version: 1,

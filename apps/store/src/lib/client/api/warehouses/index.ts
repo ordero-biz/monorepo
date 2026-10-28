@@ -1,7 +1,12 @@
 'use client';
 
 import { apiFetch } from '@ordero/api-client';
-import type { Warehouse, WarehouseStatus } from '@/lib/domain/warehouses/types';
+import type {
+  Warehouse,
+  WarehouseStatus,
+  WarehouseStockItem,
+  WarehouseSupply,
+} from '@/lib/domain/warehouses/types';
 import type { PaginatedResponse } from '@/lib/server/types';
 import { tokenizePath } from '@/lib/utils/tokenizePath';
 import {
@@ -41,11 +46,41 @@ export const getWarehouse = (warehouseId: string | number) =>
     }
   );
 
+export const getWarehouseStockPath = (
+  warehouseId: string | number,
+  input?: PaginationSearchInput
+) =>
+  `${tokenizePath(CLIENT_BACKEND_PATHS.warehouseStock, { id: warehouseId })}?${getPaginationSearch(input)}`;
+
+export const getWarehouseStock = (
+  warehouseId: string | number,
+  input?: PaginationSearchInput
+) =>
+  apiFetch<PaginatedResponse<WarehouseStockItem>>(
+    getWarehouseStockPath(warehouseId, input),
+    { method: 'GET' }
+  );
+
 export const createWarehouse = (input: CreateWarehouseData) =>
   apiFetch<Warehouse>(CLIENT_BACKEND_PATHS.warehouses, {
     method: 'POST',
     body: input,
   });
+
+export const getWarehouseSuppliesPath = (
+  warehouseId: string | number,
+  input?: PaginationSearchInput
+) =>
+  `${tokenizePath(CLIENT_BACKEND_PATHS.warehouseSupplies, { id: warehouseId })}?${getPaginationSearch(input)}`;
+
+export const getWarehouseSupplies = (
+  warehouseId: string | number,
+  input?: PaginationSearchInput
+) =>
+  apiFetch<PaginatedResponse<WarehouseSupply>>(
+    getWarehouseSuppliesPath(warehouseId, input),
+    { method: 'GET' }
+  );
 
 export const updateWarehouse = ({
   warehouseId,

@@ -1,5 +1,6 @@
 import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { WAREHOUSE_STATUS } from '@/lib/domain/warehouses/constants';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { UpdateWarehouseDialogTrigger } from './UpdateWarehouseDialogTrigger';
 
@@ -7,6 +8,10 @@ const { setup } = prepareStoreSetup({
   component: UpdateWarehouseDialogTrigger,
   props: {
     warehouse: {
+      phone: null,
+      status: WAREHOUSE_STATUS.DRAFT,
+      totalItemQuantity: 0,
+      totalPrice: 0,
       id: 1,
       name: 'Main Warehouse',
       address: '123 Commerce Ave',

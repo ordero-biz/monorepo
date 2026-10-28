@@ -22,21 +22,20 @@ export type Supply = {
   supplier: SupplySupplierData;
   warehouse: SupplyWarehouseData;
   status: SupplyStatus;
-  comment?: string | null;
-  completedAt?: string | null;
-  completedBy?: string | null;
-  supplyNumber?: string | null;
-  supplierInvoiceNumber?: string | null;
-  totalQuantity: number;
+  comment: string | null;
+  completedAt: string | null;
+  completedBy: string | null;
+  supplyNumber: string;
+  supplierInvoiceNumber: string | null;
   totalPrice: number;
-  createdAt?: string | null;
+  createdAt: string;
 };
 
 export type SupplyProductVariantSummary = {
   id: number;
   name: string;
-  sku?: string | null;
-  barcode?: string | null;
+  sku: string;
+  barcode: string;
 };
 
 export type SupplyEntry = {
@@ -45,10 +44,13 @@ export type SupplyEntry = {
   unitOfMeasurement: UnitOfMeasurement;
   quantity: number;
   unitPrice: number;
-  comment?: string | null;
+  comment: string | null;
 };
 
 export type SupplyDetails = Supply & {
+  createdBy: string;
+  updatedAt: string;
+  updatedBy: string;
   supplyEntries: SupplyEntry[];
   version: number;
 };

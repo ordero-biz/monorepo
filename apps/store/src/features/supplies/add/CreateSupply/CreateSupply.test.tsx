@@ -4,6 +4,7 @@ import { createSupply } from '@/lib/client/api/supplies';
 import { SUPPLY_STATUS } from '@/lib/domain/supplies/constants';
 import type { SupplyDetails } from '@/lib/domain/supplies/types';
 import { suppliesQueryKeys } from '@/lib/query/supplies/suppliesQueryKeys';
+import { warehousesQueryKeys } from '@/lib/query/warehouses/warehousesQueryKeys';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import type {
   SupplyProductVariantFormValue,
@@ -165,18 +166,34 @@ vi.mock('../../shared/SupplyEditorForm/selectors', async () => {
 const createSupplyMock = vi.mocked(createSupply);
 
 const savedSupply: SupplyDetails = {
+  comment: null,
+  completedAt: null,
+  completedBy: null,
+  supplierInvoiceNumber: null,
+  createdAt: '2026-10-28T10:00:00Z',
+  createdBy: 'owner@example.test',
+  updatedAt: '2026-10-28T10:00:00Z',
+  updatedBy: 'owner@example.test',
+
   id: 9,
   supplier: { id: 3, name: 'Global Foods', status: 'ACTIVE' },
   warehouse: { id: 4, name: 'Main Warehouse', status: 'ACTIVE' },
   status: SUPPLY_STATUS.DRAFT,
   supplyNumber: 'SUP-001',
-  totalQuantity: 20,
+
   totalPrice: 560,
   version: 1,
   supplyEntries: [
     {
+      comment: null,
+
       id: 17,
-      productVariant: { id: 11, name: 'Jasmine Rice 5kg', sku: 'RICE-5KG' },
+      productVariant: {
+        barcode: '',
+        id: 11,
+        name: 'Jasmine Rice 5kg',
+        sku: 'RICE-5KG',
+      },
       unitOfMeasurement: {
         id: 2,
         name: 'Bag',
@@ -710,12 +727,41 @@ describe('CreateSupply', () => {
     expect(invalidateQueriesSpy).toHaveBeenCalledWith({
       queryKey: suppliesQueryKeys.list,
     });
+    expect(invalidateQueriesSpy).not.toHaveBeenCalledWith({
+      queryKey: warehousesQueryKeys.stock(savedSupply.warehouse.id),
+    });
+    expect(invalidateQueriesSpy).not.toHaveBeenCalledWith({
+      queryKey: warehousesQueryKeys.detail(savedSupply.warehouse.id),
+    });
   });
 
   it('submits COMPLETED only after confirming finalization', async () => {
     const user = userEvent.setup();
-    createSupplyMock.mockResolvedValue({ ok: true, data: savedSupply });
-    setup();
+    createSupplyMock.mockResolvedValue({
+      ok: true,
+      data: { ...savedSupply, status: SUPPLY_STATUS.COMPLETED },
+    });
+    const { queryClient } = setup();
+    const stockPageKeys = [1, 2].map((page) =>
+      warehousesQueryKeys.stockPage(savedSupply.warehouse.id, {
+        page,
+        size: 10,
+      })
+    );
+    const warehouseDetailKey = warehousesQueryKeys.detail(
+      savedSupply.warehouse.id
+    );
+    const otherWarehouseDetailKey = warehousesQueryKeys.detail(99);
+    for (const queryKey of [warehouseDetailKey, otherWarehouseDetailKey]) {
+      queryClient.setQueryData(queryKey, { totalPrice: 0 });
+    }
+    const otherWarehouseKey = warehousesQueryKeys.stockPage(99);
+    for (const queryKey of [...stockPageKeys, otherWarehouseKey]) {
+      queryClient.setQueryData(queryKey, {
+        content: [],
+        page: { number: 0, size: 10, totalElements: 0, totalPages: 0 },
+      });
+    }
     await fillMetadata(user);
     await addCompleteEntry(user);
 
@@ -745,6 +791,21 @@ describe('CreateSupply', () => {
         status: SUPPLY_STATUS.COMPLETED,
       });
     });
+    await waitFor(() => {
+      expect(mocks.replace).toHaveBeenCalledWith('/warehouse/supplies/9');
+    });
+    expect(queryClient.getQueryState(warehouseDetailKey)?.isInvalidated).toBe(
+      true
+    );
+    expect(
+      queryClient.getQueryState(otherWarehouseDetailKey)?.isInvalidated
+    ).toBe(false);
+    for (const queryKey of stockPageKeys) {
+      expect(queryClient.getQueryState(queryKey)?.isInvalidated).toBe(true);
+    }
+    expect(queryClient.getQueryState(otherWarehouseKey)?.isInvalidated).toBe(
+      false
+    );
   });
 
   it('can save an empty draft after a failed finalization and removal of its entry', async () => {

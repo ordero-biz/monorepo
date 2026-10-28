@@ -63,6 +63,9 @@ describe('useActivateWarehouse', () => {
     updateWarehouseMock.mockResolvedValue({
       ok: true,
       data: {
+        phone: null,
+        totalItemQuantity: 0,
+        totalPrice: 0,
         id: 1,
         name: 'Main Warehouse',
         status: WAREHOUSE_STATUS.ACTIVE,

@@ -5,6 +5,13 @@ import { prepareStoreSetup } from '@/test/prepareSetup';
 import { SupplyReadOnly } from './SupplyReadOnly';
 
 const supply: SupplyDetails = {
+  completedAt: null,
+  completedBy: null,
+  createdAt: '2026-10-28T10:00:00Z',
+  createdBy: 'owner@example.test',
+  updatedAt: '2026-10-28T10:00:00Z',
+  updatedBy: 'owner@example.test',
+
   id: 9,
   supplier: { id: 3, name: 'Global Foods', status: 'ACTIVE' },
   warehouse: { id: 4, name: 'Main Warehouse', status: 'ACTIVE' },
@@ -12,13 +19,18 @@ const supply: SupplyDetails = {
   supplyNumber: 'SUP-009',
   supplierInvoiceNumber: 'INV-004',
   comment: 'Delivered in full',
-  totalQuantity: 22,
+
   totalPrice: 560,
   version: 2,
   supplyEntries: [
     {
       id: 17,
-      productVariant: { id: 11, name: 'Jasmine Rice 5kg', sku: 'RICE-5KG' },
+      productVariant: {
+        barcode: '',
+        id: 11,
+        name: 'Jasmine Rice 5kg',
+        sku: 'RICE-5KG',
+      },
       unitOfMeasurement: {
         id: 2,
         name: 'Bag',
@@ -31,7 +43,12 @@ const supply: SupplyDetails = {
     },
     {
       id: 18,
-      productVariant: { id: 12, name: 'Rice sample', sku: null },
+      productVariant: {
+        barcode: '',
+        id: 12,
+        name: 'Rice sample',
+        sku: '',
+      },
       unitOfMeasurement: { id: 3, name: 'Box', symbol: null, status: 'ACTIVE' },
       quantity: 2,
       unitPrice: 0,
@@ -87,21 +104,20 @@ describe('SupplyReadOnly', () => {
     ).not.toBeInTheDocument();
   });
 
-  it('displays empty entries and missing optional values without adding a placeholder row', () => {
+  it('displays empty entries and nullable values without adding a placeholder row', () => {
     setup({
       supply: {
         ...supply,
-        supplyNumber: null,
         supplierInvoiceNumber: null,
         comment: null,
         supplyEntries: [],
-        totalQuantity: 0,
+
         totalPrice: 0,
       },
     });
 
     expect(screen.getByText('No products in this supply.')).toBeVisible();
-    expect(screen.getAllByText('-')).toHaveLength(3);
+    expect(screen.getAllByText('-')).toHaveLength(2);
     expect(screen.getByRole('row', { name: 'Total $0.00' })).toBeVisible();
     expect(screen.queryByRole('combobox')).not.toBeInTheDocument();
   });

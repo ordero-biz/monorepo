@@ -133,6 +133,36 @@ describe('DataTable', () => {
     ).not.toBeInTheDocument();
   });
 
+  it('renders header content and lets users operate its controls alongside pagination', async () => {
+    const onExport = vi.fn();
+    const user = userEvent.setup();
+    const { pagination } = setup({
+      header: (
+        <>
+          <h2>Invoices</h2>
+          <button onClick={onExport} type="button">
+            Export invoices
+          </button>
+        </>
+      ),
+      pagination: { onPageChange: vi.fn(), page: 0, rowsPerPage: 1 },
+    });
+
+    expect(screen.getByRole('heading', { name: 'Invoices' })).toBeVisible();
+    await user.click(screen.getByRole('button', { name: 'Export invoices' }));
+    expect(onExport).toHaveBeenCalledOnce();
+    await user.click(screen.getByRole('button', { name: 'Go to next page' }));
+    expect(pagination?.onPageChange).toHaveBeenCalledWith(1);
+    expect(screen.getByRole('table', { name: 'Invoice table' })).toBeVisible();
+  });
+
+  it('keeps the header visible when the table is empty', () => {
+    setup({ data: [], header: <h2>Invoices (0)</h2> });
+
+    expect(screen.getByRole('heading', { name: 'Invoices (0)' })).toBeVisible();
+    expect(screen.getByText('No results.')).toBeVisible();
+  });
+
   it('matches footer values to leaf columns under grouped headers and selection', () => {
     const { footerColumns } = setup({
       columns: [{ header: 'Invoice details', columns }],
