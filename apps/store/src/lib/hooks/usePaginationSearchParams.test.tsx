@@ -8,7 +8,10 @@ const navigationMocks = vi.hoisted(() => ({
   searchParams: new URLSearchParams(),
 }));
 
-vi.mock('next/navigation', () => ({
+vi.mock('next/navigation', async () => ({
+  ...(await vi.importActual<typeof import('next/navigation')>(
+    'next/navigation'
+  )),
   usePathname: () => navigationMocks.pathname,
   useRouter: () => ({
     push: navigationMocks.push,
@@ -51,6 +54,28 @@ describe('usePaginationSearchParams', () => {
     expect(navigationMocks.push).not.toHaveBeenCalled();
   });
 
+  it('replaces the URL when correcting pagination', () => {
+    navigationMocks.searchParams = new URLSearchParams(
+      'page=2&size=10&sort=name%2Casc&filter=active'
+    );
+    const { result } = renderHook(() => usePaginationSearchParams({}));
+
+    act(() =>
+      result.current.setPagination({ page: 1, size: 10, replace: true })
+    );
+
+    expect(result.current.paginationInput).toEqual({
+      page: 1,
+      size: 10,
+      sort: ['name,asc'],
+    });
+    expect(navigationMocks.replace).toHaveBeenCalledExactlyOnceWith(
+      '/products?page=1&size=10&sort=name%2Casc&filter=active',
+      { scroll: false }
+    );
+    expect(navigationMocks.push).not.toHaveBeenCalled();
+  });
+
   it('replaces legacy zero-based page URLs with the first page', () => {
     navigationMocks.searchParams = new URLSearchParams(
       'page=0&size=25&sort=name%2Casc&filter=active'
@@ -75,9 +100,15 @@ describe('usePaginationSearchParams', () => {
       })
     );
 
-    expect(navigationMocks.push).toHaveBeenCalledWith(
-      '/products?page=1&size=10&listMode=product-groups',
-      { scroll: false }
-    );
+    const [url, options] = navigationMocks.push.mock.calls[0];
+
+    expect(
+      Object.fromEntries(new URL(url, 'http://localhost').searchParams)
+    ).toEqual({
+      page: '1',
+      size: '10',
+      listMode: 'product-groups',
+    });
+    expect(options).toEqual({ scroll: false });
   });
 });

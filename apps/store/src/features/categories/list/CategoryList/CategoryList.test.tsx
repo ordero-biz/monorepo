@@ -8,6 +8,7 @@ const mocks = vi.hoisted(() => ({
   getCategories: vi.fn(),
   pathname: '/products/categories',
   push: vi.fn(),
+  replace: vi.fn(),
   searchParams: new URLSearchParams(),
 }));
 
@@ -18,6 +19,7 @@ vi.mock('next/navigation', async () => ({
   usePathname: () => mocks.pathname,
   useRouter: () => ({
     push: mocks.push,
+    replace: mocks.replace,
   }),
   useSearchParams: () => mocks.searchParams,
 }));
@@ -46,6 +48,7 @@ describe('CategoryList', () => {
     deleteCategoriesMock.mockReset();
     getCategoriesMock.mockReset();
     mocks.push.mockReset();
+    mocks.replace.mockReset();
     mocks.searchParams = new URLSearchParams();
   });
 
@@ -541,6 +544,95 @@ describe('CategoryList', () => {
       screen.getByRole('checkbox', { name: 'Select Shoes', hidden: true })
     ).toBeChecked();
     expect(getCategoriesMock).toHaveBeenCalledTimes(1);
+  });
+
+  it.each([
+    'row',
+    'bulk',
+  ] as const)('returns to the remaining records after deleting the last page through the %s action', async (action) => {
+    mocks.searchParams = new URLSearchParams('page=2&size=10');
+    const lastCategory = {
+      id: 11,
+      name: 'Shoes',
+      sortOrder: 10,
+      status: 'ACTIVE' as const,
+      createdAt: '2026-07-01T10:54:34.839Z',
+      parentCategory: null,
+    };
+    getCategoriesMock
+      .mockResolvedValueOnce({
+        ok: true,
+        data: {
+          content: [lastCategory],
+          page: { size: 10, number: 1, totalElements: 11, totalPages: 2 },
+        },
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        data: {
+          content: [],
+          page: { size: 10, number: 1, totalElements: 10, totalPages: 1 },
+        },
+      })
+      .mockResolvedValue({
+        ok: true,
+        data: {
+          content: Array.from({ length: 10 }, (_, index) => ({
+            ...lastCategory,
+            id: index + 1,
+            name: `Remaining category ${index + 1}`,
+          })),
+          page: { size: 10, number: 0, totalElements: 10, totalPages: 1 },
+        },
+      });
+    deleteCategoriesMock.mockResolvedValue({ ok: true, data: undefined });
+    const user = userEvent.setup();
+    const { renderResult } = setup({
+      paginationInput: { page: 2, size: 10 },
+    });
+
+    if (action === 'row') {
+      await user.click(
+        await screen.findByRole('button', { name: 'Actions for Shoes' })
+      );
+      await user.click(await screen.findByRole('menuitem', { name: 'Delete' }));
+    } else {
+      await user.click(
+        await screen.findByRole('checkbox', { name: 'Select Shoes' })
+      );
+      await user.click(screen.getByRole('button', { name: 'Delete' }));
+    }
+
+    await user.click(
+      within(screen.getByRole('dialog', { name: 'Delete category' })).getByRole(
+        'button',
+        { name: 'Delete' }
+      )
+    );
+
+    await waitFor(() =>
+      expect(mocks.replace).toHaveBeenCalledExactlyOnceWith(
+        '/products/categories?page=1&size=10',
+        { scroll: false }
+      )
+    );
+    expect(deleteCategoriesMock).toHaveBeenCalledExactlyOnceWith({
+      categoryIds: [11],
+    });
+
+    mocks.searchParams = new URLSearchParams('page=1&size=10');
+    renderResult.rerender({ paginationInput: { page: 1, size: 10 } });
+
+    expect(
+      await screen.findByRole('link', {
+        name: 'Remaining category 1',
+      })
+    ).toBeVisible();
+    expect(getCategoriesMock).toHaveBeenLastCalledWith({ page: 1, size: 10 });
+    expect(screen.queryByText('No categories found.')).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('navigation', { name: 'Table pagination' })
+    ).toHaveTextContent('1-10 of 10');
   });
 
   it('renders an empty state when there are no categories', async () => {

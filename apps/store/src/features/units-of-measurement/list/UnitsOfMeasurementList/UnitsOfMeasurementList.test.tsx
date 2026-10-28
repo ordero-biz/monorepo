@@ -10,6 +10,7 @@ import { UnitsOfMeasurementList } from './UnitsOfMeasurementList';
 const mocks = vi.hoisted(() => ({
   pathname: '/warehouse/units-of-measurement',
   push: vi.fn(),
+  replace: vi.fn(),
   searchParams: new URLSearchParams(),
 }));
 
@@ -20,6 +21,7 @@ vi.mock('next/navigation', async () => ({
   usePathname: () => mocks.pathname,
   useRouter: () => ({
     push: mocks.push,
+    replace: mocks.replace,
   }),
   useSearchParams: () => mocks.searchParams,
 }));
@@ -44,6 +46,7 @@ describe('UnitsOfMeasurementList', () => {
     deleteUnitsOfMeasurementMock.mockReset();
     getUnitsOfMeasurementMock.mockReset();
     mocks.push.mockReset();
+    mocks.replace.mockReset();
     mocks.searchParams = new URLSearchParams();
   });
 
@@ -501,6 +504,101 @@ describe('UnitsOfMeasurementList', () => {
     expect(
       screen.getByRole('navigation', { name: 'Table pagination' })
     ).toHaveTextContent('1-1 of 2');
+  });
+
+  it.each([
+    'row',
+    'bulk',
+  ] as const)('returns to the remaining records after deleting the last page through the %s action', async (action) => {
+    mocks.searchParams = new URLSearchParams('page=2&size=10');
+    const lastUnit = {
+      id: 11,
+      name: 'Kilogram',
+      status: 'ACTIVE' as const,
+      symbol: 'kg',
+      comment: 'Weight unit',
+    };
+    getUnitsOfMeasurementMock
+      .mockResolvedValueOnce({
+        ok: true,
+        data: {
+          content: [lastUnit],
+          page: { size: 10, number: 1, totalElements: 11, totalPages: 2 },
+        },
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        data: {
+          content: [],
+          page: { size: 10, number: 1, totalElements: 10, totalPages: 1 },
+        },
+      })
+      .mockResolvedValue({
+        ok: true,
+        data: {
+          content: Array.from({ length: 10 }, (_, index) => ({
+            ...lastUnit,
+            id: index + 1,
+            name: `Remaining unit of measurement ${index + 1}`,
+          })),
+          page: { size: 10, number: 0, totalElements: 10, totalPages: 1 },
+        },
+      });
+    deleteUnitsOfMeasurementMock.mockResolvedValue({
+      ok: true,
+      data: undefined,
+    });
+    const user = userEvent.setup();
+    const { renderResult } = setup({
+      paginationInput: { page: 2, size: 10 },
+    });
+
+    if (action === 'row') {
+      await user.click(
+        await screen.findByRole('button', { name: 'Actions for Kilogram' })
+      );
+      await user.click(await screen.findByRole('menuitem', { name: 'Delete' }));
+    } else {
+      await user.click(
+        await screen.findByRole('checkbox', { name: 'Select Kilogram' })
+      );
+      await user.click(screen.getByRole('button', { name: 'Delete' }));
+    }
+
+    await user.click(
+      within(
+        screen.getByRole('dialog', { name: 'Delete unit of measurement' })
+      ).getByRole('button', { name: 'Delete' })
+    );
+
+    await waitFor(() =>
+      expect(mocks.replace).toHaveBeenCalledExactlyOnceWith(
+        '/warehouse/units-of-measurement?page=1&size=10',
+        { scroll: false }
+      )
+    );
+    expect(deleteUnitsOfMeasurementMock).toHaveBeenCalledExactlyOnceWith({
+      unitOfMeasurementIds: [11],
+    });
+
+    mocks.searchParams = new URLSearchParams('page=1&size=10');
+    renderResult.rerender({ paginationInput: { page: 1, size: 10 } });
+
+    expect(
+      await screen.findByRole('link', {
+        name: 'Remaining unit of measurement 1',
+      })
+    ).toBeVisible();
+    expect(getUnitsOfMeasurementMock).toHaveBeenLastCalledWith({
+      page: 1,
+      size: 10,
+    });
+    expect(
+      screen.queryByText('No units of measurement found.')
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('navigation', { name: 'Table pagination' })
+    ).toHaveTextContent('1-10 of 10');
   });
 
   it('renders an empty state when there are no units of measurement', async () => {
