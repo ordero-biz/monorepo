@@ -1,0 +1,16 @@
+.tabs-indicator {
+  /* Base UI overrides these defaults with measured inline values. */
+  --active-tab-left: 0px;
+  --active-tab-width: 0px;
+
+  transform: translateX(var(--active-tab-left));
+  transition:
+    transform 200ms ease,
+    width 200ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tabs-indicator {
+    transition: none;
+  }
+}
