@@ -5,8 +5,12 @@ import { useWarehouseQuery } from '@/lib/hooks/warehouses/useWarehouseQuery';
 import type { WarehouseDetailProps } from './types';
 import { WarehouseDetailHeader } from './WarehouseDetailHeader';
 import { WarehouseDetailInfo } from './WarehouseDetailInfo';
+import { WarehouseDetailProducts } from './WarehouseDetailProducts';
 
-export const WarehouseDetail = ({ warehouseId }: WarehouseDetailProps) => {
+export const WarehouseDetail = ({
+  warehouseId,
+  paginationInput,
+}: WarehouseDetailProps) => {
   const warehouseQuery = useWarehouseQuery(warehouseId);
 
   if (warehouseQuery.isPending) {
@@ -49,6 +53,10 @@ export const WarehouseDetail = ({ warehouseId }: WarehouseDetailProps) => {
     <div className="flex flex-col gap-[var(--space-2)]">
       <WarehouseDetailHeader warehouse={warehouseQuery.data} />
       <WarehouseDetailInfo warehouse={warehouseQuery.data} />
+      <WarehouseDetailProducts
+        warehouseId={warehouseId}
+        paginationInput={paginationInput}
+      />
     </div>
   );
 };

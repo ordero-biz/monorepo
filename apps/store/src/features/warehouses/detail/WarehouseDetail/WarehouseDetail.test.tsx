@@ -1,15 +1,26 @@
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { getWarehouse, updateWarehouse } from '@/lib/client/api/warehouses';
+import {
+  getWarehouse,
+  getWarehouseStock,
+  updateWarehouse,
+} from '@/lib/client/api/warehouses';
 import { WAREHOUSE_STATUS } from '@/lib/domain/warehouses/constants';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { WarehouseDetail } from './WarehouseDetail';
+
+vi.mock('next/navigation', () => ({
+  usePathname: () => '/warehouse/1',
+  useSearchParams: () => new URLSearchParams(),
+  useRouter: () => ({ push: vi.fn(), replace: vi.fn() }),
+}));
 
 vi.mock('@/lib/client/api/warehouses', async () => ({
   ...(await vi.importActual<typeof import('@/lib/client/api/warehouses')>(
     '@/lib/client/api/warehouses'
   )),
   getWarehouse: vi.fn(),
+  getWarehouseStock: vi.fn(),
   updateWarehouse: vi.fn(),
 }));
 
@@ -34,6 +45,13 @@ const warehouse = {
 describe('WarehouseDetail', () => {
   beforeEach(() => {
     getWarehouseMock.mockReset();
+    vi.mocked(getWarehouseStock).mockResolvedValue({
+      ok: true,
+      data: {
+        content: [],
+        page: { number: 0, size: 10, totalElements: 0, totalPages: 0 },
+      },
+    });
     updateWarehouseMock.mockReset();
   });
 
@@ -126,6 +144,9 @@ describe('WarehouseDetail', () => {
       await screen.findByRole('heading', { name: 'Main Warehouse' })
     ).toBeVisible();
     expect(screen.getByText('Warehouse details')).toBeVisible();
+    expect(
+      await screen.findByRole('table', { name: 'Warehouse products' })
+    ).toBeVisible();
     expect(screen.getByText('Draft')).toBeVisible();
     expect(screen.getByRole('button', { name: 'Publish' })).toBeVisible();
     expect(screen.getByText('123 Commerce Ave')).toBeVisible();

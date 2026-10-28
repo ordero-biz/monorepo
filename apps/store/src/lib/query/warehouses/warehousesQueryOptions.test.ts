@@ -1,6 +1,7 @@
 import { QueryClient } from '@tanstack/react-query';
 import {
   warehouseQueryOptions,
+  warehouseStockQueryOptions,
   warehousesListQueryOptions,
 } from './warehousesQueryOptions';
 
@@ -75,5 +76,67 @@ describe('warehousesListQueryOptions', () => {
       warehouse
     );
     expect(fetchWarehouse).toHaveBeenCalledWith('1');
+  });
+});
+
+describe('warehouseStockQueryOptions', () => {
+  it('isolates cached stock by warehouse and page and reuses matching keys', async () => {
+    const client = createQueryClient();
+    const fetchWarehouseStock = vi.fn(async () => ({
+      ok: true as const,
+      data: {
+        content: [],
+        page: { number: 0, size: 10, totalElements: 0, totalPages: 0 },
+      },
+    }));
+    const options = warehouseStockQueryOptions({
+      warehouseId: 1,
+      fetchWarehouseStock,
+      input: { page: 1, size: 10 },
+    });
+    await client.fetchQuery(options);
+    const sameOptions = warehouseStockQueryOptions({
+      warehouseId: '1',
+      fetchWarehouseStock,
+      input: { page: 1, size: 10 },
+    });
+    expect(client.getQueryData(sameOptions.queryKey)).toEqual({
+      content: [],
+      page: { number: 0, size: 10, totalElements: 0, totalPages: 0 },
+    });
+    expect(
+      client.getQueryData(
+        warehouseStockQueryOptions({
+          warehouseId: 2,
+          fetchWarehouseStock,
+          input: { page: 1, size: 10 },
+        }).queryKey
+      )
+    ).toBeUndefined();
+    expect(
+      client.getQueryData(
+        warehouseStockQueryOptions({
+          warehouseId: 1,
+          fetchWarehouseStock,
+          input: { page: 2, size: 10 },
+        }).queryKey
+      )
+    ).toBeUndefined();
+    expect(fetchWarehouseStock).toHaveBeenCalledExactlyOnceWith(1, {
+      page: 1,
+      size: 10,
+    });
+  });
+
+  it('throws the normalized stock error', async () => {
+    const error = { status: 503, message: 'Stock unavailable.' };
+    await expect(
+      createQueryClient().fetchQuery(
+        warehouseStockQueryOptions({
+          warehouseId: 1,
+          fetchWarehouseStock: async () => ({ ok: false, error }),
+        })
+      )
+    ).rejects.toEqual(error);
   });
 });

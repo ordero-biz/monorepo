@@ -9,6 +9,7 @@ import { FormConflictResolver } from '@/lib/components/FormConflictResolver';
 import { SUPPLY_STATUS } from '@/lib/domain/supplies/constants';
 import type { SupplyDetails } from '@/lib/domain/supplies/types';
 import { suppliesQueryKeys } from '@/lib/query/supplies/suppliesQueryKeys';
+import { warehousesQueryKeys } from '@/lib/query/warehouses/warehousesQueryKeys';
 import { suppliesRootBreadcrumb } from '../../shared/breadcrumbs';
 import {
   getSupplyFormDefaults,
@@ -35,7 +36,14 @@ export const UpdateSupply = ({ supply }: UpdateSupplyProps) => {
             ? cachedSupply
             : updatedSupply
       );
-      await queryClient.invalidateQueries({ queryKey: suppliesQueryKeys.list });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: suppliesQueryKeys.list }),
+        updatedSupply.status === SUPPLY_STATUS.COMPLETED
+          ? queryClient.invalidateQueries({
+              queryKey: warehousesQueryKeys.stock(updatedSupply.warehouse.id),
+            })
+          : undefined,
+      ]);
       form.reset(getSupplyFormDefaults(updatedSupply));
       setBaseline(updatedSupply);
     },

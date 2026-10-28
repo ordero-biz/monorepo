@@ -5,7 +5,9 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { getSupplyDetailRoute } from '@/lib/client/routes';
 import { AppBreadcrumbs } from '@/lib/components/AppBreadcrumbs';
+import { SUPPLY_STATUS } from '@/lib/domain/supplies/constants';
 import { suppliesQueryKeys } from '@/lib/query/supplies/suppliesQueryKeys';
+import { warehousesQueryKeys } from '@/lib/query/warehouses/warehousesQueryKeys';
 import { suppliesRootBreadcrumb } from '../../shared/breadcrumbs';
 import { SupplyEditorForm } from '../../shared/SupplyEditorForm';
 import { useCreateSupplyForm } from './hooks/useCreateSupplyForm';
@@ -16,7 +18,14 @@ export const CreateSupply = () => {
   const { form, submit, pendingIntent } = useCreateSupplyForm({
     onCreated: async (supply) => {
       queryClient.setQueryData(suppliesQueryKeys.detail(supply.id), supply);
-      await queryClient.invalidateQueries({ queryKey: suppliesQueryKeys.list });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: suppliesQueryKeys.list }),
+        supply.status === SUPPLY_STATUS.COMPLETED
+          ? queryClient.invalidateQueries({
+              queryKey: warehousesQueryKeys.stock(supply.warehouse.id),
+            })
+          : undefined,
+      ]);
 
       router.replace(getSupplyDetailRoute(supply.id));
     },

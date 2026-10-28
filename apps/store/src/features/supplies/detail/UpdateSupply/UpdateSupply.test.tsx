@@ -8,6 +8,7 @@ import { getWarehouses } from '@/lib/client/api/warehouses';
 import { SUPPLY_STATUS } from '@/lib/domain/supplies/constants';
 import type { SupplyDetails } from '@/lib/domain/supplies/types';
 import { suppliesQueryKeys } from '@/lib/query/supplies/suppliesQueryKeys';
+import { warehousesQueryKeys } from '@/lib/query/warehouses/warehousesQueryKeys';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { UpdateSupply } from './UpdateSupply';
 
@@ -797,6 +798,9 @@ describe('UpdateSupply', () => {
     expect(invalidateQueriesSpy).toHaveBeenCalledWith({
       queryKey: suppliesQueryKeys.list,
     });
+    expect(invalidateQueriesSpy).not.toHaveBeenCalledWith({
+      queryKey: warehousesQueryKeys.stock(savedSupply.warehouse.id),
+    });
   });
 
   it('finalizes the current draft after confirmation and updates its cache', async () => {
@@ -809,6 +813,20 @@ describe('UpdateSupply', () => {
     const user = userEvent.setup();
     const { queryClient } = setup();
     const invalidateQueriesSpy = vi.spyOn(queryClient, 'invalidateQueries');
+
+    const stockPageKeys = [1, 2].map((page) =>
+      warehousesQueryKeys.stockPage(completedSupply.warehouse.id, {
+        page,
+        size: 10,
+      })
+    );
+    const otherWarehouseKey = warehousesQueryKeys.stockPage(99);
+    for (const queryKey of [...stockPageKeys, otherWarehouseKey]) {
+      queryClient.setQueryData(queryKey, {
+        content: [],
+        page: { number: 0, size: 10, totalElements: 0, totalPages: 0 },
+      });
+    }
 
     await user.click(screen.getByRole('button', { name: 'Finalize supply' }));
     expect(updateSupplyMock).not.toHaveBeenCalled();
@@ -832,6 +850,15 @@ describe('UpdateSupply', () => {
     expect(invalidateQueriesSpy).toHaveBeenCalledWith({
       queryKey: suppliesQueryKeys.list,
     });
+    expect(invalidateQueriesSpy).toHaveBeenCalledWith({
+      queryKey: warehousesQueryKeys.stock(completedSupply.warehouse.id),
+    });
+    for (const queryKey of stockPageKeys) {
+      expect(queryClient.getQueryState(queryKey)?.isInvalidated).toBe(true);
+    }
+    expect(queryClient.getQueryState(otherWarehouseKey)?.isInvalidated).toBe(
+      false
+    );
   });
 
   it('keeps the persisted cache unchanged when an update fails', async () => {

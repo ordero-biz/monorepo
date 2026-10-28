@@ -4,6 +4,7 @@ import { createSupply } from '@/lib/client/api/supplies';
 import { SUPPLY_STATUS } from '@/lib/domain/supplies/constants';
 import type { SupplyDetails } from '@/lib/domain/supplies/types';
 import { suppliesQueryKeys } from '@/lib/query/supplies/suppliesQueryKeys';
+import { warehousesQueryKeys } from '@/lib/query/warehouses/warehousesQueryKeys';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import type {
   SupplyProductVariantFormValue,
@@ -710,12 +711,31 @@ describe('CreateSupply', () => {
     expect(invalidateQueriesSpy).toHaveBeenCalledWith({
       queryKey: suppliesQueryKeys.list,
     });
+    expect(invalidateQueriesSpy).not.toHaveBeenCalledWith({
+      queryKey: warehousesQueryKeys.stock(savedSupply.warehouse.id),
+    });
   });
 
   it('submits COMPLETED only after confirming finalization', async () => {
     const user = userEvent.setup();
-    createSupplyMock.mockResolvedValue({ ok: true, data: savedSupply });
-    setup();
+    createSupplyMock.mockResolvedValue({
+      ok: true,
+      data: { ...savedSupply, status: SUPPLY_STATUS.COMPLETED },
+    });
+    const { queryClient } = setup();
+    const stockPageKeys = [1, 2].map((page) =>
+      warehousesQueryKeys.stockPage(savedSupply.warehouse.id, {
+        page,
+        size: 10,
+      })
+    );
+    const otherWarehouseKey = warehousesQueryKeys.stockPage(99);
+    for (const queryKey of [...stockPageKeys, otherWarehouseKey]) {
+      queryClient.setQueryData(queryKey, {
+        content: [],
+        page: { number: 0, size: 10, totalElements: 0, totalPages: 0 },
+      });
+    }
     await fillMetadata(user);
     await addCompleteEntry(user);
 
@@ -745,6 +765,15 @@ describe('CreateSupply', () => {
         status: SUPPLY_STATUS.COMPLETED,
       });
     });
+    await waitFor(() => {
+      expect(mocks.replace).toHaveBeenCalledWith('/warehouse/supplies/9');
+    });
+    for (const queryKey of stockPageKeys) {
+      expect(queryClient.getQueryState(queryKey)?.isInvalidated).toBe(true);
+    }
+    expect(queryClient.getQueryState(otherWarehouseKey)?.isInvalidated).toBe(
+      false
+    );
   });
 
   it('can save an empty draft after a failed finalization and removal of its entry', async () => {
