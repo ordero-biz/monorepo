@@ -1,7 +1,12 @@
 import { AUTH_TOKEN_COOKIE_NAME } from '@ordero/next-api/server';
 import { cookies } from 'next/headers';
+import { WAREHOUSE_STATUS } from '@/lib/domain/warehouses/constants';
 import { fetchBackendResponse } from '@/lib/server/fetch';
-import { getServerWarehouse, getServerWarehouses } from '.';
+import {
+  getServerWarehouse,
+  getServerWarehouseStock,
+  getServerWarehouses,
+} from '.';
 
 vi.mock('next/headers', () => ({
   cookies: vi.fn(),
@@ -32,10 +37,54 @@ describe('warehouse server helpers', () => {
     fetchBackendResponseMock.mockReset();
   });
 
+  it('gets a stock page with the server auth token', async () => {
+    const data = {
+      content: [],
+      page: { number: 1, size: 25, totalElements: 0, totalPages: 0 },
+    };
+    mockAuthCookie('server-token');
+    fetchBackendResponseMock.mockResolvedValue({
+      ok: true,
+      data: new Response(JSON.stringify(data)),
+    });
+    await expect(
+      getServerWarehouseStock(7, { page: 2, size: 25, sort: ['quantity,desc'] })
+    ).resolves.toEqual({ ok: true, data });
+    expect(fetchBackendResponseMock).toHaveBeenCalledWith({
+      path: '/api/v1/warehouses/7/stock',
+      search: 'page=1&size=25&sort=quantity%2Cdesc',
+      token: 'server-token',
+      init: { method: 'GET' },
+    });
+  });
+
+  it('does not request stock without authentication', async () => {
+    mockAuthCookie();
+    await expect(getServerWarehouseStock(7)).resolves.toEqual({
+      ok: false,
+      error: { status: 401, message: 'Authentication required.' },
+    });
+    expect(fetchBackendResponseMock).not.toHaveBeenCalled();
+  });
+
+  it('preserves normalized stock backend errors', async () => {
+    const result = {
+      ok: false as const,
+      error: { status: 503, message: 'Stock unavailable.' },
+    };
+    mockAuthCookie('server-token');
+    fetchBackendResponseMock.mockResolvedValue(result);
+    await expect(getServerWarehouseStock(7)).resolves.toEqual(result);
+  });
+
   it('gets warehouses with the server auth token', async () => {
     const response = {
       content: [
         {
+          phone: null,
+          status: WAREHOUSE_STATUS.DRAFT,
+          totalItemQuantity: 0,
+          totalPrice: 0,
           id: 1,
           code: 'WH-001',
           name: 'Main Warehouse',
@@ -107,11 +156,15 @@ describe('warehouse server helpers', () => {
 
   it('gets a warehouse with the server auth token', async () => {
     const warehouse = {
+      phone: null,
+      status: WAREHOUSE_STATUS.DRAFT,
+      totalItemQuantity: 0,
       id: 1,
       code: 'WH-001',
       name: 'Main Warehouse',
       address: '123 Commerce Ave',
       comment: 'Primary stock location',
+      totalPrice: 4285,
     };
 
     mockAuthCookie('server-token');

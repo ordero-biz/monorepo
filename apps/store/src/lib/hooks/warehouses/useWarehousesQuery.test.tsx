@@ -1,5 +1,6 @@
 import { renderHook, waitFor } from '@testing-library/react';
 import { getWarehouses } from '@/lib/client/api/warehouses';
+import { WAREHOUSE_STATUS } from '@/lib/domain/warehouses/constants';
 import {
   createTestQueryClient,
   createTestQueryProvider,
@@ -25,6 +26,10 @@ describe('useWarehousesQuery', () => {
     const warehouses = {
       content: [
         {
+          phone: null,
+          status: WAREHOUSE_STATUS.DRAFT,
+          totalItemQuantity: 0,
+          totalPrice: 0,
           id: 1,
           code: 'WH-001',
           name: 'Main Warehouse',

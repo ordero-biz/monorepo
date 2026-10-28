@@ -1,5 +1,6 @@
 import { renderHook, waitFor } from '@testing-library/react';
 import { getWarehouse } from '@/lib/client/api/warehouses';
+import { WAREHOUSE_STATUS } from '@/lib/domain/warehouses/constants';
 import { warehousesQueryKeys } from '@/lib/query/warehouses/warehousesQueryKeys';
 import {
   createTestQueryClient,
@@ -21,11 +22,15 @@ vi.mock('@/lib/client/api/warehouses', async () => {
 const getWarehouseMock = vi.mocked(getWarehouse);
 
 const warehouse = {
+  phone: null,
+  status: WAREHOUSE_STATUS.DRAFT,
+  totalItemQuantity: 0,
   id: 1,
   code: 'WH-001',
   name: 'Main Warehouse',
   address: '123 Commerce Ave',
   comment: 'Primary stock location',
+  totalPrice: 4285,
 };
 
 describe('warehouse query', () => {

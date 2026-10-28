@@ -1,6 +1,8 @@
 import { QueryClient } from '@tanstack/react-query';
+import { WAREHOUSE_STATUS } from '@/lib/domain/warehouses/constants';
 import {
   warehouseQueryOptions,
+  warehouseStockQueryOptions,
   warehousesListQueryOptions,
 } from './warehousesQueryOptions';
 
@@ -17,6 +19,10 @@ describe('warehousesListQueryOptions', () => {
     const warehouses = {
       content: [
         {
+          phone: null,
+          status: WAREHOUSE_STATUS.DRAFT,
+          totalItemQuantity: 0,
+          totalPrice: 0,
           id: 1,
           code: 'WH-001',
           name: 'Main Warehouse',
@@ -58,11 +64,15 @@ describe('warehousesListQueryOptions', () => {
 
   it('uses a stable detail key and unwraps a fetched warehouse', async () => {
     const warehouse = {
+      phone: null,
+      status: WAREHOUSE_STATUS.DRAFT,
+      totalItemQuantity: 0,
       id: 1,
       code: 'WH-001',
       name: 'Main Warehouse',
       address: '123 Commerce Ave',
       comment: 'Primary stock location',
+      totalPrice: 4285,
     };
     const fetchWarehouse = vi.fn(async () => ({
       ok: true as const,
@@ -75,5 +85,67 @@ describe('warehousesListQueryOptions', () => {
       warehouse
     );
     expect(fetchWarehouse).toHaveBeenCalledWith('1');
+  });
+});
+
+describe('warehouseStockQueryOptions', () => {
+  it('isolates cached stock by warehouse and page and reuses matching keys', async () => {
+    const client = createQueryClient();
+    const fetchWarehouseStock = vi.fn(async () => ({
+      ok: true as const,
+      data: {
+        content: [],
+        page: { number: 0, size: 10, totalElements: 0, totalPages: 0 },
+      },
+    }));
+    const options = warehouseStockQueryOptions({
+      warehouseId: 1,
+      fetchWarehouseStock,
+      input: { page: 1, size: 10 },
+    });
+    await client.fetchQuery(options);
+    const sameOptions = warehouseStockQueryOptions({
+      warehouseId: '1',
+      fetchWarehouseStock,
+      input: { page: 1, size: 10 },
+    });
+    expect(client.getQueryData(sameOptions.queryKey)).toEqual({
+      content: [],
+      page: { number: 0, size: 10, totalElements: 0, totalPages: 0 },
+    });
+    expect(
+      client.getQueryData(
+        warehouseStockQueryOptions({
+          warehouseId: 2,
+          fetchWarehouseStock,
+          input: { page: 1, size: 10 },
+        }).queryKey
+      )
+    ).toBeUndefined();
+    expect(
+      client.getQueryData(
+        warehouseStockQueryOptions({
+          warehouseId: 1,
+          fetchWarehouseStock,
+          input: { page: 2, size: 10 },
+        }).queryKey
+      )
+    ).toBeUndefined();
+    expect(fetchWarehouseStock).toHaveBeenCalledExactlyOnceWith(1, {
+      page: 1,
+      size: 10,
+    });
+  });
+
+  it('throws the normalized stock error', async () => {
+    const error = { status: 503, message: 'Stock unavailable.' };
+    await expect(
+      createQueryClient().fetchQuery(
+        warehouseStockQueryOptions({
+          warehouseId: 1,
+          fetchWarehouseStock: async () => ({ ok: false, error }),
+        })
+      )
+    ).rejects.toEqual(error);
   });
 });

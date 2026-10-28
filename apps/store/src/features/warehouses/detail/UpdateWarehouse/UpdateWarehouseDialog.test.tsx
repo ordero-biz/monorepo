@@ -4,6 +4,7 @@ import { updateWarehouse } from '@/lib/client/api/warehouses';
 import { WAREHOUSE_STATUS } from '@/lib/domain/warehouses/constants';
 import { warehousesQueryKeys } from '@/lib/query/warehouses/warehousesQueryKeys';
 import { prepareStoreSetup } from '@/test/prepareSetup';
+import type { UpdateWarehouseDialogProps } from './types';
 import { UpdateWarehouseDialog } from './UpdateWarehouseDialog';
 
 const onOpenChangeMock = vi.fn();
@@ -18,13 +19,17 @@ vi.mock('@/lib/client/api/warehouses', async () => ({
 const updateWarehouseMock = vi.mocked(updateWarehouse);
 
 const warehouse = {
+  phone: null,
+  status: WAREHOUSE_STATUS.DRAFT,
+  totalItemQuantity: 0,
+  totalPrice: 0,
   id: 1,
   name: 'Main Warehouse',
   address: '123 Commerce Ave',
   comment: 'Primary stock location',
 };
 
-const { setup } = prepareStoreSetup({
+const { setup } = prepareStoreSetup<UpdateWarehouseDialogProps>({
   component: UpdateWarehouseDialog,
   props: {
     onOpenChange: onOpenChangeMock,

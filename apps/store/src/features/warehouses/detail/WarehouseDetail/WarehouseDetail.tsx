@@ -5,8 +5,13 @@ import { useWarehouseQuery } from '@/lib/hooks/warehouses/useWarehouseQuery';
 import type { WarehouseDetailProps } from './types';
 import { WarehouseDetailHeader } from './WarehouseDetailHeader';
 import { WarehouseDetailInfo } from './WarehouseDetailInfo';
+import { WarehouseDetailInventoryValue } from './WarehouseDetailInventoryValue';
+import { WarehouseDetailProducts } from './WarehouseDetailProducts';
 
-export const WarehouseDetail = ({ warehouseId }: WarehouseDetailProps) => {
+export const WarehouseDetail = ({
+  warehouseId,
+  paginationInput,
+}: WarehouseDetailProps) => {
   const warehouseQuery = useWarehouseQuery(warehouseId);
 
   if (warehouseQuery.isPending) {
@@ -46,9 +51,20 @@ export const WarehouseDetail = ({ warehouseId }: WarehouseDetailProps) => {
   }
 
   return (
-    <div className="flex flex-col gap-[var(--space-2)]">
+    <div className="flex min-w-0 flex-col gap-[var(--space-3)]">
       <WarehouseDetailHeader warehouse={warehouseQuery.data} />
-      <WarehouseDetailInfo warehouse={warehouseQuery.data} />
+      <div className="grid gap-[var(--space-2)] lg:grid-cols-3">
+        <WarehouseDetailInventoryValue
+          totalPrice={warehouseQuery.data.totalPrice}
+        />
+        <div className="grid min-w-0 lg:col-span-2">
+          <WarehouseDetailInfo warehouse={warehouseQuery.data} />
+        </div>
+      </div>
+      <WarehouseDetailProducts
+        warehouseId={warehouseId}
+        paginationInput={paginationInput}
+      />
     </div>
   );
 };

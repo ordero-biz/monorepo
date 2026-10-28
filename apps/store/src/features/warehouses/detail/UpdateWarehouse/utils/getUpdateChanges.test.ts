@@ -1,7 +1,12 @@
+import { WAREHOUSE_STATUS } from '@/lib/domain/warehouses/constants';
 import type { Warehouse } from '@/lib/domain/warehouses/types';
 import { getWarehouseUpdateChanges } from './getUpdateChanges';
 
 const warehouse: Warehouse = {
+  phone: null,
+  status: WAREHOUSE_STATUS.DRAFT,
+  totalItemQuantity: 0,
+  totalPrice: 0,
   id: 1,
   name: 'Main Warehouse',
   address: '123 Commerce Ave',

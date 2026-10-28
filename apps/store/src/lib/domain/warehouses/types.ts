@@ -1,3 +1,4 @@
+import type { UnitOfMeasurement } from '@/lib/domain/units-of-measurement/types';
 import type { WAREHOUSE_STATUS } from './constants';
 
 export type WarehouseStatus =
@@ -6,7 +7,22 @@ export type WarehouseStatus =
 export type Warehouse = {
   id: number;
   name: string;
-  address?: string | null;
+  address: string | null;
   comment: string;
-  status?: WarehouseStatus;
+  phone: string | null;
+  status: WarehouseStatus;
+  totalItemQuantity: number;
+  totalPrice: number;
+};
+
+export type WarehouseStockItem = {
+  productVariant: {
+    id: number;
+    name: string;
+    sku: string;
+    barcode: string;
+  };
+  unitOfMeasurement: UnitOfMeasurement;
+  quantity: number;
+  totalPrice: number;
 };

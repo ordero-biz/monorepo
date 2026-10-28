@@ -6,7 +6,7 @@ import {
 } from '@ordero/ui';
 import { Package } from 'lucide-react';
 import type { SupplyEntry } from '@/lib/domain/supplies/types';
-import { formatMoney } from '../../shared/formatMoney';
+import { formatMoney } from '@/lib/utils/formatMoney';
 
 export const columns: DataTableColumnDef<SupplyEntry>[] = [
   {

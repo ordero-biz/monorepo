@@ -1,5 +1,6 @@
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { WAREHOUSE_STATUS } from '@/lib/domain/warehouses/constants';
 import { prepareFormHookTestSetup } from '@/test/prepareFormHookTestSetup';
 import { getWarehouseUpdateChanges } from '../utils/getUpdateChanges';
 import { submitUpdateWarehouse } from '../utils/submitAction';
@@ -31,6 +32,10 @@ const getWarehouseUpdateChangesMock = vi.mocked(getWarehouseUpdateChanges);
 const submitUpdateWarehouseMock = vi.mocked(submitUpdateWarehouse);
 
 const warehouse = {
+  phone: null,
+  status: WAREHOUSE_STATUS.DRAFT,
+  totalItemQuantity: 0,
+  totalPrice: 0,
   id: 1,
   name: 'Main Warehouse',
   address: '123 Commerce Ave',

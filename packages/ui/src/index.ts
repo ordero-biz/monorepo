@@ -21,6 +21,7 @@ export type {
 } from './components/Button';
 export { Button } from './components/Button';
 export type {
+  CardColor,
   CardContentProps,
   CardDescriptionProps,
   CardDividerProps,

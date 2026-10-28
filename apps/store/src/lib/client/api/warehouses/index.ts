@@ -1,7 +1,11 @@
 'use client';
 
 import { apiFetch } from '@ordero/api-client';
-import type { Warehouse, WarehouseStatus } from '@/lib/domain/warehouses/types';
+import type {
+  Warehouse,
+  WarehouseStatus,
+  WarehouseStockItem,
+} from '@/lib/domain/warehouses/types';
 import type { PaginatedResponse } from '@/lib/server/types';
 import { tokenizePath } from '@/lib/utils/tokenizePath';
 import {
@@ -39,6 +43,21 @@ export const getWarehouse = (warehouseId: string | number) =>
     {
       method: 'GET',
     }
+  );
+
+export const getWarehouseStockPath = (
+  warehouseId: string | number,
+  input?: PaginationSearchInput
+) =>
+  `${tokenizePath(CLIENT_BACKEND_PATHS.warehouseStock, { id: warehouseId })}?${getPaginationSearch(input)}`;
+
+export const getWarehouseStock = (
+  warehouseId: string | number,
+  input?: PaginationSearchInput
+) =>
+  apiFetch<PaginatedResponse<WarehouseStockItem>>(
+    getWarehouseStockPath(warehouseId, input),
+    { method: 'GET' }
   );
 
 export const createWarehouse = (input: CreateWarehouseData) =>
