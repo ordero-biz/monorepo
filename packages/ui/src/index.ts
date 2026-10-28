@@ -217,6 +217,14 @@ export type {
 } from './components/TablePagination';
 export { TablePagination } from './components/TablePagination';
 export type {
+  TabsListProps,
+  TabsPanelProps,
+  TabsRootProps,
+  TabsTabProps,
+  TabsValue,
+} from './components/Tabs';
+export { Tabs } from './components/Tabs';
+export type {
   TextareaChangeEventDetails,
   TextareaProps,
   TextareaResize,
