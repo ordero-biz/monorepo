@@ -3,15 +3,9 @@
 import { Button } from '@ordero/ui';
 import { useState } from 'react';
 import { ActivateUnitOfMeasurementDialog } from './ActivateUnitOfMeasurementDialog';
-import type { UnitOfMeasurementDetailHeaderProps } from './types';
-
-type ActivateUnitOfMeasurementDialogTriggerProps = Pick<
-  UnitOfMeasurementDetailHeaderProps,
-  'onUpdated' | 'unitOfMeasurement'
->;
+import type { ActivateUnitOfMeasurementDialogTriggerProps } from './types';
 
 export const ActivateUnitOfMeasurementDialogTrigger = ({
-  onUpdated,
   unitOfMeasurement,
 }: ActivateUnitOfMeasurementDialogTriggerProps) => {
   const [open, setOpen] = useState(false);
@@ -28,7 +22,6 @@ export const ActivateUnitOfMeasurementDialogTrigger = ({
       </Button>
       <ActivateUnitOfMeasurementDialog
         onOpenChange={setOpen}
-        onUpdated={onUpdated}
         open={open}
         unitOfMeasurement={unitOfMeasurement}
       />

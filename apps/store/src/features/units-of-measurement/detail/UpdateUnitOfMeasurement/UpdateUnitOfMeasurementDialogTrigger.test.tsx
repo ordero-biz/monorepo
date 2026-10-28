@@ -16,7 +16,6 @@ const updateUnitOfMeasurementMock = vi.mocked(updateUnitOfMeasurement);
 const { setup } = prepareStoreSetup({
   component: UpdateUnitOfMeasurementDialogTrigger,
   props: {
-    onUpdated: vi.fn(),
     unitOfMeasurement: {
       id: 1,
       status: 'DRAFT',

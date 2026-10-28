@@ -4,7 +4,7 @@ import type { ProductVariant } from '../../src/lib/domain/products/types';
 import type { SupplyDetails } from '../../src/lib/domain/supplies/types';
 
 const backendURL = 'http://127.0.0.1:3101';
-export const supplyPath = '/products/supplies/9';
+export const supplyPath = '/warehouse/supplies/9';
 export const supplyApiPath = '/api/backend/api/v1/supplies/9';
 
 export const products: ProductVariant[] = [

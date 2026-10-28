@@ -17,7 +17,6 @@ vi.mock('@/lib/client/api/categories', async () => ({
 
 const updateCategoryMock = vi.mocked(updateCategory);
 const onOpenChangeMock = vi.fn();
-const onUpdatedMock = vi.fn();
 
 const category: Category = {
   id: 2,
@@ -37,7 +36,6 @@ const { setup } = prepareStoreSetup({
   props: {
     category,
     onOpenChange: onOpenChangeMock,
-    onUpdated: onUpdatedMock,
     open: true,
   },
 });
@@ -46,7 +44,6 @@ describe('ActivateCategoryDialog', () => {
   beforeEach(() => {
     updateCategoryMock.mockReset();
     onOpenChangeMock.mockClear();
-    onUpdatedMock.mockClear();
   });
 
   it('renders confirmation dialog content and cancel button', () => {
@@ -98,7 +95,6 @@ describe('ActivateCategoryDialog', () => {
       queryKey: categoriesQueryKeys.detail(2),
     });
     expect(onOpenChangeMock).toHaveBeenCalledWith(false);
-    expect(onUpdatedMock).toHaveBeenCalled();
   });
 
   it('prevents publishing while the request is in flight', async () => {
@@ -159,6 +155,5 @@ describe('ActivateCategoryDialog', () => {
       screen.getByRole('dialog', { name: 'Publish category' })
     ).toBeVisible();
     expect(onOpenChangeMock).not.toHaveBeenCalledWith(false);
-    expect(onUpdatedMock).not.toHaveBeenCalled();
   });
 });

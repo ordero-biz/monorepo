@@ -8,7 +8,6 @@ import { prepareStoreSetup } from '@/test/prepareSetup';
 import { UpdateSupplierDialog } from './UpdateSupplierDialog';
 
 const onOpenChangeMock = vi.fn();
-const onUpdatedMock = vi.fn();
 
 vi.mock('@/lib/client/api/suppliers', async () => ({
   ...(await vi.importActual<typeof import('@/lib/client/api/suppliers')>(
@@ -33,7 +32,6 @@ const { setup } = prepareStoreSetup({
   component: UpdateSupplierDialog,
   props: {
     onOpenChange: onOpenChangeMock,
-    onUpdated: onUpdatedMock,
     open: true,
     supplier,
   },
@@ -42,7 +40,6 @@ const { setup } = prepareStoreSetup({
 describe('UpdateSupplierDialog', () => {
   beforeEach(() => {
     onOpenChangeMock.mockClear();
-    onUpdatedMock.mockClear();
     updateSupplierMock.mockReset();
   });
 
@@ -126,7 +123,7 @@ describe('UpdateSupplierDialog', () => {
       },
     });
     const user = userEvent.setup();
-    const { onOpenChange, onUpdated, queryClient } = setup();
+    const { onOpenChange, queryClient } = setup();
     const invalidateQueriesSpy = vi.spyOn(queryClient, 'invalidateQueries');
     const dialog = screen.getByRole('dialog', { name: 'Edit supplier' });
     const nameField = within(dialog).getByRole('textbox', { name: 'Name' });
@@ -152,7 +149,6 @@ describe('UpdateSupplierDialog', () => {
         name: 'Supplier Fresh Farms Updated was updated',
       })
     ).toBeVisible();
-    await waitFor(() => expect(onUpdated).toHaveBeenCalled());
     expect(onOpenChange).toHaveBeenCalledWith(false);
   });
 
@@ -168,7 +164,7 @@ describe('UpdateSupplierDialog', () => {
       },
     });
     const user = userEvent.setup();
-    const { onOpenChange, onUpdated } = setup();
+    const { onOpenChange } = setup();
 
     const dialog = screen.getByRole('dialog', { name: 'Edit supplier' });
     const nameField = within(dialog).getByRole('textbox', { name: 'Name' });
@@ -189,7 +185,6 @@ describe('UpdateSupplierDialog', () => {
     ).toBeVisible();
     expect(screen.getByRole('dialog', { name: 'Edit supplier' })).toBeVisible();
     expect(onOpenChange).not.toHaveBeenCalledWith(false);
-    expect(onUpdated).not.toHaveBeenCalled();
   });
 
   it('updates active supplier contact details without submitting a name', async () => {

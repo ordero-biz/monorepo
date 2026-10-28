@@ -174,6 +174,20 @@ Use callback names that describe the feature result:
 - `onUpdated` for update forms
 - `onSuccess` only when the result is intentionally generic
 
+Keep a form hook's `onUpdated` callback when it delegates close/reset, cache
+updates, or navigation to the workflow. A dialog does not need a public
+`onUpdated` prop merely because its form hook has one.
+
+When the workflow's awaited query invalidation already refreshes the active
+entity, do not forward an `onUpdated` callback through triggers, headers, or
+detail pages just to call `refetch()` again. Keep public success callbacks only
+for additional consumer-owned work, such as clearing selection, updating a
+local form baseline, or navigating. For deletion, preserve `onDeleted` when it
+clears parent-owned selection before the list refresh finishes.
+
+Follow `docs/http-auth.md` for cache ownership and deletion cleanup, and
+`docs/testing.md` for workflow coverage that catches duplicate refreshes.
+
 Return only what consumers need. Prefer `return { form }` until another returned value has a clear feature-owned reason.
 
 ## Splitting Workflow

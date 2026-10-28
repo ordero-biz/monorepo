@@ -1,4 +1,5 @@
 import { Button, Combobox, FieldHelperText } from '@ordero/ui';
+import { useStore } from '@tanstack/react-form';
 import { useId, useState } from 'react';
 import type { AttributeValue } from '@/lib/domain/attributes/types';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
@@ -12,6 +13,10 @@ const getValueLabel = (value: AttributeValue) => value.name;
 export const ProductAttributeValuesField = ({
   productVariantsGenerationForm,
 }: ProductAttributeValuesFieldProps) => {
+  const submissionAttempts = useStore(
+    productVariantsGenerationForm.store,
+    (state) => state.submissionAttempts
+  );
   const fieldId = useId();
   const [isAddingAttribute, setIsAddingAttribute] = useState(false);
   const [focusAttributeId, setFocusAttributeId] = useState<number | null>(null);
@@ -21,7 +26,8 @@ export const ProductAttributeValuesField = ({
     <productVariantsGenerationForm.Field name="attributes">
       {(attributesField) => {
         const attributesError = getFieldSubmitChangeErrorText(
-          attributesField.state.meta
+          attributesField.state.meta,
+          submissionAttempts
         );
         const attributes = attributesField.state.value;
 
@@ -29,7 +35,8 @@ export const ProductAttributeValuesField = ({
           <productVariantsGenerationForm.Field name="attributeValues">
             {(valuesField) => {
               const valuesError = getFieldSubmitChangeErrorText(
-                valuesField.state.meta
+                valuesField.state.meta,
+                submissionAttempts
               );
 
               return (

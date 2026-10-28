@@ -72,26 +72,33 @@ export const UpdateAttributeValueDialog = ({
                     onSubmit: validateUpdateAttributeValueName,
                   }}
                 >
-                  {(field) => {
-                    const errorText = getFieldSubmitChangeErrorText(
-                      field.state.meta
-                    );
+                  {(field) => (
+                    <form.Subscribe
+                      selector={(state) => state.submissionAttempts}
+                    >
+                      {(submissionAttempts) => {
+                        const errorText = getFieldSubmitChangeErrorText(
+                          field.state.meta,
+                          submissionAttempts
+                        );
 
-                    return (
-                      <TextField
-                        aria-label="Attribute value name"
-                        errorText={errorText}
-                        invalid={Boolean(errorText)}
-                        label="Name"
-                        name={field.name}
-                        onBlur={field.handleBlur}
-                        onValueChange={field.handleChange}
-                        required
-                        value={field.state.value}
-                        size="s"
-                      />
-                    );
-                  }}
+                        return (
+                          <TextField
+                            aria-label="Attribute value name"
+                            errorText={errorText}
+                            invalid={Boolean(errorText)}
+                            label="Name"
+                            name={field.name}
+                            onBlur={field.handleBlur}
+                            onValueChange={field.handleChange}
+                            required
+                            value={field.state.value}
+                            size="s"
+                          />
+                        );
+                      }}
+                    </form.Subscribe>
+                  )}
                 </form.Field>
               </Dialog.Content>
 

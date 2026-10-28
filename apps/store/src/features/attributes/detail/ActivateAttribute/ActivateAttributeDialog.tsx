@@ -7,15 +7,13 @@ import type { ActivateAttributeDialogProps } from './types';
 export const ActivateAttributeDialog = ({
   attribute,
   onOpenChange,
-  onUpdated,
   open,
 }: ActivateAttributeDialogProps) => {
   const { handleActivate, isActivating } = useActivateAttribute({
     attributeId: attribute.id,
     attributeName: attribute.name,
-    onActivated: async () => {
+    onActivated: () => {
       onOpenChange(false);
-      await onUpdated();
     },
   });
 

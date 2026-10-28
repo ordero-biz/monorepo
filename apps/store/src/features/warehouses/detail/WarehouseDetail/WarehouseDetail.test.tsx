@@ -1,6 +1,6 @@
-import { screen, waitFor } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { getWarehouse } from '@/lib/client/api/warehouses';
+import { getWarehouse, updateWarehouse } from '@/lib/client/api/warehouses';
 import { WAREHOUSE_STATUS } from '@/lib/domain/warehouses/constants';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { WarehouseDetail } from './WarehouseDetail';
@@ -10,9 +10,11 @@ vi.mock('@/lib/client/api/warehouses', async () => ({
     '@/lib/client/api/warehouses'
   )),
   getWarehouse: vi.fn(),
+  updateWarehouse: vi.fn(),
 }));
 
 const getWarehouseMock = vi.mocked(getWarehouse);
+const updateWarehouseMock = vi.mocked(updateWarehouse);
 
 const { setup } = prepareStoreSetup({
   component: WarehouseDetail,
@@ -32,6 +34,87 @@ const warehouse = {
 describe('WarehouseDetail', () => {
   beforeEach(() => {
     getWarehouseMock.mockReset();
+    updateWarehouseMock.mockReset();
+  });
+
+  it('refreshes the warehouse once after editing', async () => {
+    const updatedWarehouse = {
+      ...warehouse,
+      name: 'Central Warehouse',
+      address: '456 Commerce Ave',
+    };
+    getWarehouseMock
+      .mockResolvedValueOnce({ ok: true, data: warehouse })
+      .mockResolvedValue({ ok: true, data: updatedWarehouse });
+    updateWarehouseMock.mockResolvedValue({ ok: true, data: updatedWarehouse });
+    const user = userEvent.setup();
+
+    setup();
+
+    await user.click(
+      await screen.findByRole('button', { name: 'Actions for Main Warehouse' })
+    );
+    await user.click(
+      await screen.findByRole('menuitem', { name: 'Edit warehouse' })
+    );
+
+    const dialog = screen.getByRole('dialog', { name: 'Edit warehouse' });
+    const nameField = within(dialog).getByRole('textbox', { name: 'Name' });
+
+    await user.clear(nameField);
+    await user.type(nameField, 'Central Warehouse');
+    const addressField = within(dialog).getByRole('textbox', {
+      name: 'Address',
+    });
+
+    await user.clear(addressField);
+    await user.type(addressField, '456 Commerce Ave');
+    await user.click(within(dialog).getByRole('button', { name: 'Save' }));
+
+    expect(
+      await screen.findByRole('heading', { name: 'Central Warehouse' })
+    ).toBeVisible();
+    expect(screen.getByText('456 Commerce Ave')).toBeVisible();
+    expect(
+      screen.queryByRole('dialog', { name: 'Edit warehouse' })
+    ).not.toBeInTheDocument();
+    expect(updateWarehouseMock).toHaveBeenCalledExactlyOnceWith({
+      warehouseId: 1,
+      name: 'Central Warehouse',
+      address: '456 Commerce Ave',
+    });
+    expect(getWarehouseMock).toHaveBeenCalledTimes(2);
+  });
+
+  it('refreshes the warehouse once after publishing', async () => {
+    const activeWarehouse = { ...warehouse, status: WAREHOUSE_STATUS.ACTIVE };
+    getWarehouseMock
+      .mockResolvedValueOnce({ ok: true, data: warehouse })
+      .mockResolvedValue({ ok: true, data: activeWarehouse });
+    updateWarehouseMock.mockResolvedValue({ ok: true, data: activeWarehouse });
+    const user = userEvent.setup();
+
+    setup();
+
+    await user.click(await screen.findByRole('button', { name: 'Publish' }));
+    await user.click(
+      within(
+        screen.getByRole('dialog', { name: 'Publish warehouse' })
+      ).getByRole('button', { name: 'Publish' })
+    );
+
+    expect(await screen.findByText('Active')).toBeVisible();
+    expect(
+      screen.queryByRole('button', { name: 'Publish' })
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('dialog', { name: 'Publish warehouse' })
+    ).not.toBeInTheDocument();
+    expect(updateWarehouseMock).toHaveBeenCalledExactlyOnceWith({
+      warehouseId: 1,
+      status: WAREHOUSE_STATUS.ACTIVE,
+    });
+    expect(getWarehouseMock).toHaveBeenCalledTimes(2);
   });
 
   it('renders warehouse details', async () => {

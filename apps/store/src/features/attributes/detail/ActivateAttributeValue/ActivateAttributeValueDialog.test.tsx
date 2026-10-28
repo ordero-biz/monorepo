@@ -17,7 +17,6 @@ vi.mock('@/lib/client/api/attributes', async () => ({
 
 const updateAttributeValueMock = vi.mocked(updateAttributeValue);
 const onOpenChangeMock = vi.fn();
-const onUpdatedMock = vi.fn();
 
 const attributeValue: AttributeValue = {
   id: 3,
@@ -33,7 +32,6 @@ const { setup } = prepareStoreSetup({
     attributeId: 7,
     attributeValue,
     onOpenChange: onOpenChangeMock,
-    onUpdated: onUpdatedMock,
     open: true,
   },
 });
@@ -42,7 +40,6 @@ describe('ActivateAttributeValueDialog', () => {
   beforeEach(() => {
     updateAttributeValueMock.mockReset();
     onOpenChangeMock.mockClear();
-    onUpdatedMock.mockClear();
   });
 
   it('renders confirmation content and a cancel button', () => {
@@ -91,7 +88,6 @@ describe('ActivateAttributeValueDialog', () => {
       })
     );
     expect(onOpenChangeMock).toHaveBeenCalledWith(false);
-    expect(onUpdatedMock).toHaveBeenCalled();
   });
 
   it('prevents another publish while the request is in flight', async () => {
@@ -152,6 +148,5 @@ describe('ActivateAttributeValueDialog', () => {
       screen.getByRole('dialog', { name: 'Publish attribute value' })
     ).toBeVisible();
     expect(onOpenChangeMock).not.toHaveBeenCalledWith(false);
-    expect(onUpdatedMock).not.toHaveBeenCalled();
   });
 });

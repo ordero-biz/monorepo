@@ -170,9 +170,6 @@ export const AttributeDetailValues = ({
               setActivatingAttributeValue(null);
             }
           }}
-          onUpdated={async () => {
-            await attributeValuesQuery.refetch();
-          }}
           open={Boolean(activatingAttributeValue)}
         />
       )}

@@ -1,31 +1,20 @@
-import { screen, waitFor } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { getSupplier } from '@/lib/client/api/suppliers';
+import { getSupplier, updateSupplier } from '@/lib/client/api/suppliers';
 import { SUPPLIER_STATUS } from '@/lib/domain/suppliers/constants';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { SupplierDetail } from './SupplierDetail';
-import type { SupplierDetailHeaderProps } from './types';
 
 vi.mock('@/lib/client/api/suppliers', async () => ({
   ...(await vi.importActual<typeof import('@/lib/client/api/suppliers')>(
     '@/lib/client/api/suppliers'
   )),
   getSupplier: vi.fn(),
-}));
-
-vi.mock('./SupplierDetailHeader', () => ({
-  SupplierDetailHeader: ({ onUpdated }: SupplierDetailHeaderProps) => (
-    <button onClick={() => void onUpdated()} type="button">
-      Refresh supplier
-    </button>
-  ),
-}));
-
-vi.mock('./SupplierDetailInfo', () => ({
-  SupplierDetailInfo: () => <div>Supplier detail information</div>,
+  updateSupplier: vi.fn(),
 }));
 
 const getSupplierMock = vi.mocked(getSupplier);
+const updateSupplierMock = vi.mocked(updateSupplier);
 
 const { setup } = prepareStoreSetup({
   component: SupplierDetail,
@@ -47,6 +36,7 @@ const supplier = {
 describe('SupplierDetail', () => {
   beforeEach(() => {
     getSupplierMock.mockReset();
+    updateSupplierMock.mockReset();
   });
 
   it('requests the supplier while loading', async () => {
@@ -58,23 +48,96 @@ describe('SupplierDetail', () => {
     await waitFor(() => expect(getSupplierMock).toHaveBeenCalledWith('1'));
   });
 
-  it('composes supplier details and refreshes them after an update', async () => {
-    getSupplierMock.mockResolvedValue({
-      ok: true,
-      data: supplier,
-    });
+  it('refreshes the supplier once after editing', async () => {
+    const updatedSupplier = {
+      ...supplier,
+      name: 'Green Farms',
+      email: 'orders@green.example',
+    };
+    getSupplierMock
+      .mockResolvedValueOnce({ ok: true, data: supplier })
+      .mockResolvedValue({ ok: true, data: updatedSupplier });
+    updateSupplierMock.mockResolvedValue({ ok: true, data: updatedSupplier });
     const user = userEvent.setup();
 
     setup();
 
+    await user.click(
+      await screen.findByRole('button', { name: 'Actions for Fresh Farms' })
+    );
+    await user.click(
+      await screen.findByRole('menuitem', { name: 'Edit supplier' })
+    );
+
+    const dialog = screen.getByRole('dialog', { name: 'Edit supplier' });
+    const nameField = within(dialog).getByRole('textbox', { name: 'Name' });
+
+    await user.clear(nameField);
+    await user.type(nameField, 'Green Farms');
+    const emailField = within(dialog).getByRole('textbox', { name: 'Email' });
+
+    await user.clear(emailField);
+    await user.type(emailField, 'orders@green.example');
+    await user.click(within(dialog).getByRole('button', { name: 'Save' }));
+
     expect(
-      await screen.findByRole('button', { name: 'Refresh supplier' })
+      await screen.findByRole('heading', { name: 'Green Farms' })
     ).toBeVisible();
-    expect(screen.getByText('Supplier detail information')).toBeVisible();
+    expect(screen.getByText('orders@green.example')).toBeVisible();
+    expect(
+      screen.queryByRole('dialog', { name: 'Edit supplier' })
+    ).not.toBeInTheDocument();
+    expect(updateSupplierMock).toHaveBeenCalledExactlyOnceWith({
+      supplierId: 1,
+      name: 'Green Farms',
+      email: 'orders@green.example',
+    });
+    expect(getSupplierMock).toHaveBeenCalledTimes(2);
+  });
 
-    await user.click(screen.getByRole('button', { name: 'Refresh supplier' }));
+  it('refreshes the supplier once after publishing', async () => {
+    const activeSupplier = { ...supplier, status: SUPPLIER_STATUS.ACTIVE };
+    getSupplierMock
+      .mockResolvedValueOnce({ ok: true, data: supplier })
+      .mockResolvedValue({ ok: true, data: activeSupplier });
+    updateSupplierMock.mockResolvedValue({ ok: true, data: activeSupplier });
+    const user = userEvent.setup();
 
-    await waitFor(() => expect(getSupplierMock).toHaveBeenCalledTimes(2));
+    setup();
+
+    await user.click(await screen.findByRole('button', { name: 'Publish' }));
+    await user.click(
+      within(
+        screen.getByRole('dialog', { name: 'Publish supplier' })
+      ).getByRole('button', { name: 'Publish' })
+    );
+
+    expect(await screen.findByText('Active')).toBeVisible();
+    expect(
+      screen.queryByRole('button', { name: 'Publish' })
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('dialog', { name: 'Publish supplier' })
+    ).not.toBeInTheDocument();
+    expect(updateSupplierMock).toHaveBeenCalledExactlyOnceWith({
+      supplierId: 1,
+      status: SUPPLIER_STATUS.ACTIVE,
+    });
+    expect(getSupplierMock).toHaveBeenCalledTimes(2);
+  });
+
+  it('renders supplier details', async () => {
+    getSupplierMock.mockResolvedValue({
+      ok: true,
+      data: supplier,
+    });
+    setup();
+
+    expect(
+      await screen.findByRole('heading', { name: 'Fresh Farms' })
+    ).toBeVisible();
+    expect(screen.getByText('Supplier details')).toBeVisible();
+    expect(screen.getByText('orders@fresh.example')).toBeVisible();
   });
 
   it('renders an error state and retries loading the supplier', async () => {
@@ -101,7 +164,7 @@ describe('SupplierDetail', () => {
     await user.click(screen.getByRole('button', { name: 'Retry' }));
 
     expect(
-      await screen.findByRole('button', { name: 'Refresh supplier' })
+      await screen.findByRole('heading', { name: 'Fresh Farms' })
     ).toBeVisible();
     expect(getSupplierMock).toHaveBeenCalledTimes(2);
   });

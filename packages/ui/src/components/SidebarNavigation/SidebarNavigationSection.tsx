@@ -70,7 +70,7 @@ export const SidebarNavigationSection = ({
               className={cn(sectionLabelClassName, 'cursor-pointer')}
             >
               <span className="min-w-0 flex-1 truncate">{label}</span>
-              <span className="flex size-[var(--space-2)] shrink-0 items-center justify-center transition-transform group-data-[open]/section:rotate-180">
+              <span className="flex size-[var(--space-2)] shrink-0 items-center justify-center transition-transform duration-150 motion-reduce:transition-none group-data-[open]/section:rotate-180">
                 <ChevronDown />
               </span>
             </Accordion.Trigger>

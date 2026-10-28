@@ -110,7 +110,7 @@ const SidebarNavigationItemContent = ({
       {item.kind === 'collapse' ? (
         <span
           className={cn(
-            'ml-[var(--space-1)] flex size-[var(--space-2)] shrink-0 items-center justify-center transition-transform',
+            'ml-[var(--space-1)] flex size-[var(--space-2)] shrink-0 items-center justify-center transition-transform duration-150 motion-reduce:transition-none',
             isOpen && 'rotate-180'
           )}
         >

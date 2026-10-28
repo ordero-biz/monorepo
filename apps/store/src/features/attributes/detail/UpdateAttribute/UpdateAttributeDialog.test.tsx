@@ -15,7 +15,6 @@ vi.mock('@/lib/client/api/attributes', async () => ({
 
 const updateAttributeMock = vi.mocked(updateAttribute);
 const onOpenChangeMock = vi.fn();
-const onUpdatedMock = vi.fn();
 
 const { setup } = prepareStoreSetup({
   component: UpdateAttributeDialog,
@@ -28,7 +27,6 @@ const { setup } = prepareStoreSetup({
       createdAt: '2026-06-24T20:07:32.467Z',
     },
     onOpenChange: onOpenChangeMock,
-    onUpdated: onUpdatedMock,
     open: true,
   },
 });
@@ -37,7 +35,6 @@ describe('UpdateAttributeDialog', () => {
   beforeEach(() => {
     updateAttributeMock.mockReset();
     onOpenChangeMock.mockClear();
-    onUpdatedMock.mockClear();
   });
 
   it('opens with the current attribute name', () => {
@@ -69,7 +66,7 @@ describe('UpdateAttributeDialog', () => {
       },
     });
     const user = userEvent.setup();
-    const { onOpenChange, onUpdated, queryClient } = setup();
+    const { onOpenChange, queryClient } = setup();
     const invalidateQueriesSpy = vi.spyOn(queryClient, 'invalidateQueries');
     const dialog = screen.getByRole('dialog', { name: 'Edit Attribute' });
     const nameField = within(dialog).getByRole('textbox', {
@@ -93,12 +90,11 @@ describe('UpdateAttributeDialog', () => {
       queryKey: attributesQueryKeys.detail(7),
     });
     expect(onOpenChange).toHaveBeenCalledWith(false);
-    await waitFor(() => expect(onUpdated).toHaveBeenCalled());
   });
 
   it('closes without sending a normalized name that matches the attribute', async () => {
     const user = userEvent.setup();
-    const { onOpenChange, onUpdated } = setup();
+    const { onOpenChange } = setup();
     const dialog = screen.getByRole('dialog', { name: 'Edit Attribute' });
     const nameField = within(dialog).getByRole('textbox', {
       name: 'Attribute name',
@@ -110,7 +106,6 @@ describe('UpdateAttributeDialog', () => {
 
     expect(updateAttributeMock).not.toHaveBeenCalled();
     await waitFor(() => expect(onOpenChange).toHaveBeenCalledWith(false));
-    expect(onUpdated).not.toHaveBeenCalled();
     expect(screen.queryByText(/was updated/)).not.toBeInTheDocument();
   });
 
@@ -189,7 +184,7 @@ describe('UpdateAttributeDialog', () => {
       },
     });
     const user = userEvent.setup();
-    const { onOpenChange, onUpdated } = setup();
+    const { onOpenChange } = setup();
     const dialog = screen.getByRole('dialog', { name: 'Edit Attribute' });
     const nameField = within(dialog).getByRole('textbox', {
       name: 'Attribute name',
@@ -205,6 +200,5 @@ describe('UpdateAttributeDialog', () => {
       })
     ).toBeVisible();
     expect(onOpenChange).not.toHaveBeenCalledWith(false);
-    expect(onUpdated).not.toHaveBeenCalled();
   });
 });

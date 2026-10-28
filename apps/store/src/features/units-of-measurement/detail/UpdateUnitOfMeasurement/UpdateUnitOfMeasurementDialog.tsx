@@ -11,7 +11,6 @@ import { getUnitOfMeasurementDefaultValues } from './utils/fields';
 
 export const UpdateUnitOfMeasurementDialog = ({
   onOpenChange,
-  onUpdated,
   open,
   unitOfMeasurement,
 }: UpdateUnitOfMeasurementDialogProps) => {
@@ -29,7 +28,6 @@ export const UpdateUnitOfMeasurementDialog = ({
           queryKey: unitsOfMeasurementQueryKeys.detail(unitOfMeasurement.id),
         }),
       ]);
-      await onUpdated(updatedUnitOfMeasurement);
     },
     unitOfMeasurement,
   });

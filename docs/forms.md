@@ -100,7 +100,7 @@ by several workflows.
 To ensure a calmer, less intrusive user experience, implement this validation visibility model:
 
 - **Do not show client validation errors on the first keystroke.**
-- **Show client validation errors after a user blurs the field or attempts submission** (`blur-first` visibility before submission).
+- **Show client validation errors after a user blurs the field once or attempts submission** (`blur-first` visibility).
 - **Once a field is marked invalid, validate live** as the user edits, providing immediate positive reinforcement when corrected.
 - **Always show backend/submit errors immediately**, even if the field was never blurred.
 
@@ -117,23 +117,14 @@ Treat client validation and backend/submit errors as separate concerns:
   `@/lib/utils/form/error` for common field-message parsing and
   submit/change precedence.
   - **Field-level errors** must be mapped back to fields using `setErrorMap`.
-  - Use `getFieldSubmitChangeErrorText(...)` when a field needs the standard
-    behavior: submit/backend errors win, while change errors are shown after
-    blur or a submission attempt. Pass an explicit `hasSubmitted` boolean for
-    fields whose visibility must distinguish input interaction from submission:
-
-    ```tsx
-    const errorText = getFieldSubmitChangeErrorText(
-      field.state.meta,
-      form.state.submissionAttempts > 0
-    );
-    ```
-
-    `hasSubmitted` means at least one submission was attempted, including an
-    attempt blocked by validation. It does not mean submission succeeded.
-    `isTouched` alone is not a reliable submission signal because editing can
-    mark a field as touched. The optional argument preserves the existing
-    touched-state fallback for callers that omit it.
+  - Use `getFieldSubmitChangeErrorText(meta, submissionAttempts)` when a field needs the standard
+    behavior: submit/backend errors win, while change errors are shown only
+    after blur or a submit attempt. Subscribe to `submissionAttempts` with
+    `form.Subscribe` or `useStore` so keyboard submission updates error visibility
+    even when the focused field's value and metadata do not change. Keep this
+    subscription in the rendered fields or form content, outside the component
+    that initializes the form. A submission attempt includes one blocked by
+    validation; it does not mean submission succeeded.
   - Use `getErrorMessage(...)` for single submit-only controls such as
     checkbox agreement fields.
   - **Form-level errors** must use the shared toast surface. Persistent inline form-level error elements are discouraged unless explicitly required by the workflow design.

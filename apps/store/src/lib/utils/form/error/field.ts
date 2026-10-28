@@ -14,7 +14,7 @@ type FieldSubmitChangeErrorMeta = {
 
 export const getFieldSubmitChangeErrorText = (
   meta: FieldSubmitChangeErrorMeta,
-  hasSubmitted?: boolean
+  submissionAttempts: number
 ) => {
   const submitError = meta.errorMap.onSubmit;
   const blurError = meta.errorMap.onBlur;
@@ -28,7 +28,8 @@ export const getFieldSubmitChangeErrorText = (
     return submitErrorText ?? getErrorMessage(dynamicError);
   }
 
-  if (!meta.isBlurred && !(hasSubmitted ?? meta.isTouched)) {
+  // Editing also marks a field as touched, so it cannot indicate submission.
+  if (!meta.isBlurred && submissionAttempts === 0) {
     return undefined;
   }
 

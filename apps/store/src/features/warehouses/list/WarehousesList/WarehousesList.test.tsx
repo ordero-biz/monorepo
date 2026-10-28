@@ -6,7 +6,7 @@ import { prepareStoreSetup } from '@/test/prepareSetup';
 import { WarehousesList } from './WarehousesList';
 
 const mocks = vi.hoisted(() => ({
-  pathname: '/products/warehouse',
+  pathname: '/warehouse',
   push: vi.fn(),
   searchParams: new URLSearchParams(),
 }));
@@ -122,7 +122,7 @@ describe('WarehousesList', () => {
     ).toBeVisible();
     expect(
       screen.getByRole('link', { name: 'Main Warehouse' })
-    ).toHaveAttribute('href', '/products/warehouse/1');
+    ).toHaveAttribute('href', '/warehouse/1');
     expect(screen.getByText('Draft')).toBeVisible();
     expect(screen.getByText('123 Commerce Ave')).toBeVisible();
     expect(screen.getByText('Primary stock location')).toBeVisible();
@@ -237,7 +237,7 @@ describe('WarehousesList', () => {
     );
 
     expect(mocks.push).toHaveBeenCalledWith(
-      '/products/warehouse?page=2&size=25&sort=name%2Casc',
+      '/warehouse?page=2&size=25&sort=name%2Casc',
       { scroll: false }
     );
   });

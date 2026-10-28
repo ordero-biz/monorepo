@@ -1,28 +1,12 @@
-import { screen, waitFor, within } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { clientRoutes } from '@/lib/client/routes';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { SupplierDetailHeader } from './SupplierDetailHeader';
 
-vi.mock('../UpdateSupplier/UpdateSupplierDialog', () => ({
-  UpdateSupplierDialog: ({
-    open,
-    onUpdated,
-  }: {
-    open: boolean;
-    onUpdated: () => Promise<void> | void;
-  }) =>
-    open ? (
-      <button onClick={() => void onUpdated()} type="button">
-        Save supplier
-      </button>
-    ) : null,
-}));
-
 const { setup } = prepareStoreSetup({
   component: SupplierDetailHeader,
   props: {
-    onUpdated: vi.fn(),
     supplier: {
       id: 1,
       name: 'Fresh Farms',
@@ -38,7 +22,8 @@ const { setup } = prepareStoreSetup({
 describe('SupplierDetailHeader', () => {
   it('opens the edit action from the actions menu', async () => {
     const user = userEvent.setup();
-    const { onUpdated } = setup();
+
+    setup();
 
     expect(screen.getByRole('heading', { name: 'Fresh Farms' })).toBeVisible();
     const breadcrumbs = screen.getByRole('navigation', { name: 'Breadcrumb' });
@@ -56,9 +41,11 @@ describe('SupplierDetailHeader', () => {
     await user.click(
       await screen.findByRole('menuitem', { name: 'Edit supplier' })
     );
-    await user.click(screen.getByRole('button', { name: 'Save supplier' }));
 
-    await waitFor(() => expect(onUpdated).toHaveBeenCalled());
+    expect(screen.getByRole('dialog', { name: 'Edit supplier' })).toBeVisible();
+    expect(screen.getByRole('textbox', { name: 'Name' })).toHaveValue(
+      'Fresh Farms'
+    );
   });
 
   it('opens a confirmation dialog before publishing a draft supplier', async () => {

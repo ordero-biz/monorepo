@@ -56,9 +56,6 @@ export const UnitOfMeasurementDetail = ({
         onDeleted={() => {
           router.push(clientRoutes.unitsOfMeasurement);
         }}
-        onUpdated={async () => {
-          await unitOfMeasurementQuery.refetch();
-        }}
         unitOfMeasurement={unitOfMeasurementQuery.data}
       />
       <UnitOfMeasurementDetailInfo

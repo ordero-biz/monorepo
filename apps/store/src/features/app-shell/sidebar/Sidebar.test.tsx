@@ -33,7 +33,7 @@ describe('Store sidebar', () => {
     });
   });
 
-  it('renders the store navigation links', async () => {
+  it('opens product navigation without selecting a child', async () => {
     const user = userEvent.setup();
 
     setup();
@@ -62,17 +62,50 @@ describe('Store sidebar', () => {
       within(sidebar).getByRole('link', { name: 'Attributes' })
     ).toHaveAttribute('href', '/products/attributes');
     expect(
-      within(sidebar).getByRole('link', { name: 'Units of measurement' })
-    ).toHaveAttribute('href', '/products/units-of-measurement');
-    expect(
-      within(sidebar).getByRole('link', { name: 'Suppliers' })
-    ).toHaveAttribute('href', '/products/suppliers');
-    expect(
-      within(sidebar).getByRole('link', { name: 'Supplies' })
-    ).toHaveAttribute('href', '/products/supplies');
+      within(sidebar).queryByRole('link', { name: 'Units of measurement' })
+    ).not.toBeInTheDocument();
+
+    for (const linkName of ['Products', 'Categories', 'Attributes']) {
+      expect(
+        within(sidebar).getByRole('link', { name: linkName })
+      ).not.toHaveAttribute('aria-current');
+    }
+  });
+
+  it('opens warehouse navigation without selecting a child', async () => {
+    const user = userEvent.setup();
+
+    setup();
+
+    const sidebar = screen.getByRole('complementary');
+
+    await user.click(
+      within(sidebar).getByRole('button', { name: 'Warehouse' })
+    );
+
     expect(
       within(sidebar).getByRole('link', { name: 'Warehouse' })
-    ).toHaveAttribute('href', '/products/warehouse');
+    ).toHaveAttribute('href', '/warehouse');
+    expect(
+      within(sidebar).getByRole('link', { name: 'Supplies' })
+    ).toHaveAttribute('href', '/warehouse/supplies');
+    expect(
+      within(sidebar).getByRole('link', { name: 'Suppliers' })
+    ).toHaveAttribute('href', '/warehouse/suppliers');
+    expect(
+      within(sidebar).getByRole('link', { name: 'Units of measurement' })
+    ).toHaveAttribute('href', '/warehouse/units-of-measurement');
+
+    for (const linkName of [
+      'Warehouse',
+      'Supplies',
+      'Suppliers',
+      'Units of measurement',
+    ]) {
+      expect(
+        within(sidebar).getByRole('link', { name: linkName })
+      ).not.toHaveAttribute('aria-current');
+    }
   });
 
   it('opens and highlights the parent branch for the most specific active route', () => {
@@ -110,6 +143,27 @@ describe('Store sidebar', () => {
 
     expect(productBranch).toHaveAttribute('aria-expanded', 'true');
     expect(productsLink).toHaveAttribute('aria-current', 'page');
+  });
+
+  it('opens the warehouse parent for an active nested route', () => {
+    mocks.pathname = '/warehouse/supplies/42';
+
+    setup();
+
+    const sidebar = screen.getByRole('complementary');
+    const productBranch = within(sidebar).getByRole('button', {
+      name: 'Product',
+    });
+    const warehouseBranch = within(sidebar).getByRole('button', {
+      name: 'Warehouse',
+    });
+    const suppliesLink = within(sidebar).getByRole('link', {
+      name: 'Supplies',
+    });
+
+    expect(productBranch).toHaveAttribute('aria-expanded', 'false');
+    expect(warehouseBranch).toHaveAttribute('aria-expanded', 'true');
+    expect(suppliesLink).toHaveAttribute('aria-current', 'page');
   });
 
   it('lets users collapse the active branch without clearing route activity', async () => {

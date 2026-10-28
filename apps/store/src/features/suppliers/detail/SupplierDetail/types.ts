@@ -5,7 +5,16 @@ export type SupplierDetailProps = {
 };
 
 export type SupplierDetailHeaderProps = {
-  onUpdated: () => Promise<void> | void;
+  supplier: Supplier;
+};
+
+export type ActivateSupplierDialogProps = {
+  onOpenChange: (open: boolean) => void;
+  open: boolean;
+  supplier: Supplier;
+};
+
+export type ActivateSupplierDialogTriggerProps = {
   supplier: Supplier;
 };
 

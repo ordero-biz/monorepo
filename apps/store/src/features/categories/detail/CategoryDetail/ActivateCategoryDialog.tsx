@@ -7,15 +7,13 @@ import type { ActivateCategoryDialogProps } from './types';
 export const ActivateCategoryDialog = ({
   category,
   onOpenChange,
-  onUpdated,
   open,
 }: ActivateCategoryDialogProps) => {
   const { handleActivate, isActivating } = useActivateCategory({
     categoryId: category.id,
     categoryName: category.name,
-    onActivated: async () => {
+    onActivated: () => {
       onOpenChange(false);
-      await onUpdated();
     },
   });
 

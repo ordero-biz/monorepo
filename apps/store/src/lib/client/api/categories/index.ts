@@ -62,3 +62,13 @@ export const updateCategory = ({ categoryId, ...input }: UpdateCategoryData) =>
       body: input,
     }
   );
+
+type DeleteCategoriesInput = {
+  categoryIds: number[];
+};
+
+export const deleteCategories = (input: DeleteCategoriesInput) =>
+  apiFetch<void>(CLIENT_BACKEND_PATHS.categories, {
+    method: 'DELETE',
+    body: input,
+  });

@@ -1,4 +1,5 @@
 import { Button, Dialog, TextField } from '@ordero/ui';
+import { useStore } from '@tanstack/react-form';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
 import { validateUnitOfMeasurementName } from '../../shared/validations';
 import type { UpdateUnitOfMeasurementDialogFormContentProps } from './types';
@@ -7,6 +8,11 @@ export const UpdateUnitOfMeasurementDialogFormContent = ({
   form,
   isUnitOfMeasurementActive,
 }: UpdateUnitOfMeasurementDialogFormContentProps) => {
+  const submissionAttempts = useStore(
+    form.store,
+    (state) => state.submissionAttempts
+  );
+
   return (
     <>
       <Dialog.Content>
@@ -21,7 +27,8 @@ export const UpdateUnitOfMeasurementDialogFormContent = ({
             >
               {(field) => {
                 const errorText = getFieldSubmitChangeErrorText(
-                  field.state.meta
+                  field.state.meta,
+                  submissionAttempts
                 );
 
                 return (
@@ -43,7 +50,10 @@ export const UpdateUnitOfMeasurementDialogFormContent = ({
 
           <form.Field name="symbol">
             {(field) => {
-              const errorText = getFieldSubmitChangeErrorText(field.state.meta);
+              const errorText = getFieldSubmitChangeErrorText(
+                field.state.meta,
+                submissionAttempts
+              );
 
               return (
                 <TextField
@@ -63,7 +73,10 @@ export const UpdateUnitOfMeasurementDialogFormContent = ({
 
           <form.Field name="comment">
             {(field) => {
-              const errorText = getFieldSubmitChangeErrorText(field.state.meta);
+              const errorText = getFieldSubmitChangeErrorText(
+                field.state.meta,
+                submissionAttempts
+              );
 
               return (
                 <TextField

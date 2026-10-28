@@ -1,6 +1,9 @@
-import { screen, waitFor } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { getUnitOfMeasurement } from '@/lib/client/api/units-of-measurement';
+import {
+  getUnitOfMeasurement,
+  updateUnitOfMeasurement,
+} from '@/lib/client/api/units-of-measurement';
 import { UNIT_OF_MEASUREMENT_STATUS } from '@/lib/domain/units-of-measurement/constants';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { UnitOfMeasurementDetail } from './UnitOfMeasurementDetail';
@@ -19,9 +22,11 @@ vi.mock('@/lib/client/api/units-of-measurement', async () => ({
     typeof import('@/lib/client/api/units-of-measurement')
   >('@/lib/client/api/units-of-measurement')),
   getUnitOfMeasurement: vi.fn(),
+  updateUnitOfMeasurement: vi.fn(),
 }));
 
 const getUnitOfMeasurementMock = vi.mocked(getUnitOfMeasurement);
+const updateUnitOfMeasurementMock = vi.mocked(updateUnitOfMeasurement);
 
 const { setup } = prepareStoreSetup({
   component: UnitOfMeasurementDetail,
@@ -41,6 +46,7 @@ const unitOfMeasurement = {
 describe('UnitOfMeasurementDetail', () => {
   beforeEach(() => {
     getUnitOfMeasurementMock.mockReset();
+    updateUnitOfMeasurementMock.mockReset();
   });
 
   it('renders unit of measurement details', async () => {
@@ -158,6 +164,102 @@ describe('UnitOfMeasurementDetail', () => {
     expect(
       screen.getByRole('dialog', { name: 'Publish unit of measurement' })
     ).toBeVisible();
+  });
+
+  it('refreshes the header and details once after editing a unit of measurement', async () => {
+    const draftUnitOfMeasurement = {
+      ...unitOfMeasurement,
+      status: UNIT_OF_MEASUREMENT_STATUS.DRAFT,
+    };
+    const updatedUnitOfMeasurement = {
+      ...draftUnitOfMeasurement,
+      name: 'Gram',
+      symbol: 'g',
+    };
+    getUnitOfMeasurementMock
+      .mockResolvedValueOnce({ ok: true, data: draftUnitOfMeasurement })
+      .mockResolvedValue({ ok: true, data: updatedUnitOfMeasurement });
+    updateUnitOfMeasurementMock.mockResolvedValue({
+      ok: true,
+      data: updatedUnitOfMeasurement,
+    });
+    const user = userEvent.setup();
+
+    setup();
+
+    await user.click(
+      await screen.findByRole('button', { name: 'Actions for Kilogram' })
+    );
+    await user.click(
+      await screen.findByRole('menuitem', {
+        name: 'Edit unit of measurement',
+      })
+    );
+
+    const dialog = screen.getByRole('dialog', {
+      name: 'Edit unit of measurement',
+    });
+    const nameField = within(dialog).getByRole('textbox', { name: 'Name' });
+    const symbolField = within(dialog).getByRole('textbox', { name: 'Symbol' });
+
+    await user.clear(nameField);
+    await user.type(nameField, 'Gram');
+    await user.clear(symbolField);
+    await user.type(symbolField, 'g');
+    await user.click(within(dialog).getByRole('button', { name: 'Save' }));
+
+    expect(await screen.findByRole('heading', { name: 'Gram' })).toBeVisible();
+    expect(screen.getByText('g')).toBeVisible();
+    expect(screen.getByText('Weight unit')).toBeVisible();
+    expect(
+      screen.queryByRole('dialog', { name: 'Edit unit of measurement' })
+    ).not.toBeInTheDocument();
+    expect(updateUnitOfMeasurementMock).toHaveBeenCalledExactlyOnceWith({
+      unitOfMeasurementId: 1,
+      name: 'Gram',
+      symbol: 'g',
+    });
+    expect(getUnitOfMeasurementMock).toHaveBeenCalledTimes(2);
+  });
+
+  it('refreshes the status once after publishing a unit of measurement', async () => {
+    getUnitOfMeasurementMock
+      .mockResolvedValueOnce({
+        ok: true,
+        data: {
+          ...unitOfMeasurement,
+          status: UNIT_OF_MEASUREMENT_STATUS.DRAFT,
+        },
+      })
+      .mockResolvedValue({ ok: true, data: unitOfMeasurement });
+    updateUnitOfMeasurementMock.mockResolvedValue({
+      ok: true,
+      data: unitOfMeasurement,
+    });
+    const user = userEvent.setup();
+
+    setup();
+
+    await user.click(await screen.findByRole('button', { name: 'Publish' }));
+
+    const dialog = screen.getByRole('dialog', {
+      name: 'Publish unit of measurement',
+    });
+
+    await user.click(within(dialog).getByRole('button', { name: 'Publish' }));
+
+    expect(await screen.findByText('Active')).toBeVisible();
+    expect(
+      screen.queryByRole('button', { name: 'Publish' })
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('dialog', { name: 'Publish unit of measurement' })
+    ).not.toBeInTheDocument();
+    expect(updateUnitOfMeasurementMock).toHaveBeenCalledExactlyOnceWith({
+      unitOfMeasurementId: 1,
+      status: UNIT_OF_MEASUREMENT_STATUS.ACTIVE,
+    });
+    expect(getUnitOfMeasurementMock).toHaveBeenCalledTimes(2);
   });
 
   it('renders an error state and retries loading the unit of measurement', async () => {

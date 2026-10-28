@@ -4,12 +4,14 @@ import {
   type ServerResponse,
 } from 'node:http';
 import type { CreateSupplyData } from '../../src/lib/client/api/supplies/index';
+import type { Category } from '../../src/lib/domain/categories/types';
 import type { ProductVariant } from '../../src/lib/domain/products/types';
 import type { SupplyDetails } from '../../src/lib/domain/supplies/types';
 
 // Test-only backend. Each browser context has its own token and saved record,
 // including SSR requests, so tests can run independently and in parallel.
 type Session = {
+  categories?: Category[];
   saved: SupplyDetails;
   products: ProductVariant[];
   unit: SupplyDetails['supplyEntries'][number]['unitOfMeasurement'];
@@ -41,7 +43,8 @@ const paginate = (content: unknown[]) => ({
 
 const server = createServer(async (request, response) => {
   try {
-    const path = new URL(request.url ?? '/', 'http://127.0.0.1').pathname;
+    const url = new URL(request.url ?? '/', 'http://127.0.0.1');
+    const path = url.pathname;
     if (path === '/health') {
       respond({ response, body: { ready: true } });
       return;
@@ -77,6 +80,36 @@ const server = createServer(async (request, response) => {
         },
       });
       return;
+    }
+    if (path === '/api/v1/categories' && session.categories) {
+      if (request.method === 'GET') {
+        const page = Number(url.searchParams.get('page') ?? 0);
+        const size = Number(url.searchParams.get('size') ?? 10);
+        respond({
+          response,
+          body: {
+            content: session.categories.slice(page * size, (page + 1) * size),
+            page: {
+              number: page,
+              size,
+              totalElements: session.categories.length,
+              totalPages: Math.ceil(session.categories.length / size),
+            },
+          },
+        });
+        return;
+      }
+      if (request.method === 'DELETE') {
+        const { categoryIds } = await readJson<{ categoryIds: number[] }>(
+          request
+        );
+        session.categories = session.categories.filter(
+          (category) => !categoryIds.includes(category.id)
+        );
+        response.writeHead(204);
+        response.end();
+        return;
+      }
     }
     const saved = session.saved;
     const isDetail = path === `/api/v1/supplies/${saved.id}`;

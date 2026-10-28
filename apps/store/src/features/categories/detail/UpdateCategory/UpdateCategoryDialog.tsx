@@ -11,7 +11,6 @@ import { getCategoryDefaultValues } from './utils/fields';
 export const UpdateCategoryDialog = ({
   category,
   onOpenChange,
-  onUpdated,
   open,
 }: UpdateCategoryDialogProps) => {
   const queryClient = useQueryClient();
@@ -41,7 +40,6 @@ export const UpdateCategoryDialog = ({
           })
         ),
       ]);
-      await onUpdated();
     },
   });
 
