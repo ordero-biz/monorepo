@@ -8,15 +8,36 @@ import {
   User,
   Users,
 } from 'lucide-react';
-import { Card, type CardProps } from '@/ui/components/Card';
+import {
+  Card,
+  type CardColor,
+  type CardProps,
+  type CardVariant,
+} from '@/ui/components/Card';
 import { IconButton } from '@/ui/components/IconButton';
+
+const cardColors = [
+  'inherit',
+  'primary',
+  'secondary',
+  'info',
+  'success',
+  'warning',
+  'error',
+] satisfies readonly CardColor[];
+const cardVariants = ['filled', 'outlined'] satisfies readonly CardVariant[];
 
 const meta = {
   title: 'Components/Card',
   component: Card.Root,
   tags: ['autodocs'],
   args: {
+    color: 'inherit',
     variant: 'filled',
+  },
+  argTypes: {
+    color: { control: 'select', options: cardColors },
+    variant: { control: 'select', options: cardVariants },
   },
 } satisfies Meta<typeof Card.Root>;
 
@@ -97,6 +118,46 @@ export const Outlined: Story = {
     variant: 'outlined',
   },
   render: (args) => <CardBalanceTemplate {...args} />,
+};
+
+const CardColorsTemplate = (args: CardProps) => (
+  <div className="grid gap-[var(--spacing-3)] md:grid-cols-2 xl:grid-cols-3">
+    {cardColors.map((color) => (
+      <section aria-label={`${color} card`} className="grid" key={color}>
+        <Card.Root {...args} color={color}>
+          <Card.Header>
+            <div>
+              <Card.Title>{color}</Card.Title>
+              <Card.Description>Inventory overview</Card.Description>
+            </div>
+          </Card.Header>
+          <Card.Content>
+            <p>At cost · $4,285.00 USD</p>
+          </Card.Content>
+        </Card.Root>
+      </section>
+    ))}
+  </div>
+);
+
+export const FilledColors: Story = {
+  render: (args) => <CardColorsTemplate {...args} />,
+};
+
+export const OutlinedColors: Story = {
+  args: { variant: 'outlined' },
+  render: (args) => <CardColorsTemplate {...args} />,
+};
+
+export const FilledColorsDark: Story = {
+  globals: { theme: 'dark' },
+  render: (args) => <CardColorsTemplate {...args} />,
+};
+
+export const OutlinedColorsDark: Story = {
+  args: { variant: 'outlined' },
+  globals: { theme: 'dark' },
+  render: (args) => <CardColorsTemplate {...args} />,
 };
 
 export const JobCardFigmaReplica: Story = {

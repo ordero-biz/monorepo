@@ -55,6 +55,7 @@ provide a currency field. Currency selection or conversion is not implemented.
 | Use **Inventory value** for the summary and **Stock value** for table amounts. | Distinguish stock valuation from an item's selling price or an order total. |
 | Keep **At cost** and the currency visible. | Users need both to interpret the amount without opening another control. |
 | Place a green summary card beside warehouse details, above the table. | Users can see the total before inspecting its contributing stock records. |
+| Use the shared Card with its primary color and filled variant. | Keep the summary's tint, shadow, radius, and padding consistent with the design system. |
 | Do not add a tooltip to the summary card. | The essential explanation is already visible in its label and supporting text. |
 | Show the warehouse total only in the summary card. | Repeating the same total in the table footer adds no information. |
 | Do not show a combined quantity total. | Quantities with different units, such as grams and boxes, cannot be meaningfully added together. |
