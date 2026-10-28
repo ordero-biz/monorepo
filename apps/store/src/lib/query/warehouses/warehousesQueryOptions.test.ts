@@ -1,4 +1,5 @@
 import { QueryClient } from '@tanstack/react-query';
+import { WAREHOUSE_STATUS } from '@/lib/domain/warehouses/constants';
 import {
   warehouseQueryOptions,
   warehouseStockQueryOptions,
@@ -18,6 +19,10 @@ describe('warehousesListQueryOptions', () => {
     const warehouses = {
       content: [
         {
+          phone: null,
+          status: WAREHOUSE_STATUS.DRAFT,
+          totalItemQuantity: 0,
+          totalPrice: 0,
           id: 1,
           code: 'WH-001',
           name: 'Main Warehouse',
@@ -59,11 +64,15 @@ describe('warehousesListQueryOptions', () => {
 
   it('uses a stable detail key and unwraps a fetched warehouse', async () => {
     const warehouse = {
+      phone: null,
+      status: WAREHOUSE_STATUS.DRAFT,
+      totalItemQuantity: 0,
       id: 1,
       code: 'WH-001',
       name: 'Main Warehouse',
       address: '123 Commerce Ave',
       comment: 'Primary stock location',
+      totalPrice: 4285,
     };
     const fetchWarehouse = vi.fn(async () => ({
       ok: true as const,

@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react';
+import { WAREHOUSE_STATUS } from '@/lib/domain/warehouses/constants';
 import { warehousesQueryKeys } from '@/lib/query/warehouses/warehousesQueryKeys';
 import {
   getServerWarehouse,
@@ -41,10 +42,14 @@ describe('WarehouseDetailPage', () => {
 
   it('prefetches warehouse details and hydrates the query cache', async () => {
     const warehouse = {
+      phone: null,
+      status: WAREHOUSE_STATUS.DRAFT,
+      totalItemQuantity: 0,
       id: 1,
       name: 'Main Warehouse',
       address: '123 Commerce Ave',
       comment: 'Primary stock location',
+      totalPrice: 4285,
     };
     const queryClient = createTestQueryClient();
     const TestQueryProvider = createTestQueryProvider(queryClient);

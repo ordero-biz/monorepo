@@ -1,4 +1,5 @@
 import { updateWarehouse } from '@/lib/client/api/warehouses';
+import { WAREHOUSE_STATUS } from '@/lib/domain/warehouses/constants';
 import { submitUpdateWarehouse } from './submitAction';
 
 vi.mock('@/lib/client/api/warehouses', async () => ({
@@ -11,6 +12,10 @@ vi.mock('@/lib/client/api/warehouses', async () => ({
 const updateWarehouseMock = vi.mocked(updateWarehouse);
 
 const warehouse = {
+  phone: null,
+  status: WAREHOUSE_STATUS.DRAFT,
+  totalItemQuantity: 0,
+  totalPrice: 0,
   id: 1,
   name: 'Main Warehouse',
   address: '123 Commerce Ave',

@@ -1,5 +1,6 @@
 import { AUTH_TOKEN_COOKIE_NAME } from '@ordero/next-api/server';
 import { cookies } from 'next/headers';
+import { WAREHOUSE_STATUS } from '@/lib/domain/warehouses/constants';
 import { fetchBackendResponse } from '@/lib/server/fetch';
 import {
   getServerWarehouse,
@@ -80,6 +81,10 @@ describe('warehouse server helpers', () => {
     const response = {
       content: [
         {
+          phone: null,
+          status: WAREHOUSE_STATUS.DRAFT,
+          totalItemQuantity: 0,
+          totalPrice: 0,
           id: 1,
           code: 'WH-001',
           name: 'Main Warehouse',
@@ -151,11 +156,15 @@ describe('warehouse server helpers', () => {
 
   it('gets a warehouse with the server auth token', async () => {
     const warehouse = {
+      phone: null,
+      status: WAREHOUSE_STATUS.DRAFT,
+      totalItemQuantity: 0,
       id: 1,
       code: 'WH-001',
       name: 'Main Warehouse',
       address: '123 Commerce Ave',
       comment: 'Primary stock location',
+      totalPrice: 4285,
     };
 
     mockAuthCookie('server-token');

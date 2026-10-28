@@ -8,7 +8,7 @@ test('paginates warehouse stock through the URL, reload, and browser history', a
   page,
   request,
   baseURL,
-}) => {
+}, testInfo) => {
   const token = `warehouse-stock-${randomUUID()}`;
   const endpoint = `http://127.0.0.1:3101/__test/sessions/${token}`;
   const warehouseStock: WarehouseStockItem[] = Array.from(
@@ -18,6 +18,7 @@ test('paginates warehouse stock through the URL, reload, and browser history', a
         id: index + 1,
         name: `Stock product ${index + 1}`,
         sku: `SKU-${index + 1}`,
+        barcode: `BARCODE-${index + 1}`,
       },
       unitOfMeasurement: draftSupply.supplyEntries[0].unitOfMeasurement,
       quantity: index + 1,
@@ -49,6 +50,11 @@ test('paginates warehouse stock through the URL, reload, and browser history', a
       page.getByRole('heading', { name: 'Main Warehouse' })
     ).toBeVisible();
     const table = page.getByRole('table', { name: 'Warehouse products' });
+    const inventoryValue = page.getByRole('region', {
+      name: 'Inventory value',
+    });
+    await expect(inventoryValue.getByText('$877.50')).toBeVisible();
+    await expect(inventoryValue.getByText('USD')).toBeVisible();
     await expect(
       table.getByText('Stock product 11', { exact: true })
     ).toBeVisible();
@@ -63,6 +69,7 @@ test('paginates warehouse stock through the URL, reload, and browser history', a
       table.getByText('Stock product 21', { exact: true })
     ).toBeVisible();
     await expect(page.getByText('21-26 of 26')).toBeVisible();
+    await expect(inventoryValue.getByText('$877.50')).toBeVisible();
     await expect(
       page.getByRole('button', { name: 'Go to next page' })
     ).toBeDisabled();
@@ -105,6 +112,10 @@ test('paginates warehouse stock through the URL, reload, and browser history', a
     await expect(
       table.getByText('Stock product 21', { exact: true })
     ).toBeVisible();
+    await page.screenshot({
+      path: testInfo.outputPath('warehouse-desktop.png'),
+      fullPage: true,
+    });
   } finally {
     await request.delete(endpoint);
   }

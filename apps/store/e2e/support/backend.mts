@@ -7,7 +7,10 @@ import type { CreateSupplyData } from '../../src/lib/client/api/supplies/index';
 import type { Category } from '../../src/lib/domain/categories/types';
 import type { ProductVariant } from '../../src/lib/domain/products/types';
 import type { SupplyDetails } from '../../src/lib/domain/supplies/types';
-import type { WarehouseStockItem } from '../../src/lib/domain/warehouses/types';
+import type {
+  Warehouse,
+  WarehouseStockItem,
+} from '../../src/lib/domain/warehouses/types';
 
 // Test-only backend. Each browser context has its own token and saved record,
 // including SSR requests, so tests can run independently and in parallel.
@@ -114,11 +117,28 @@ const server = createServer(async (request, response) => {
       }
     }
     const saved = session.saved;
+    const warehouse: Warehouse = {
+      ...saved.warehouse,
+      address: null,
+      comment: '',
+      phone: null,
+      totalItemQuantity: (session.warehouseStock ?? []).reduce(
+        (total, item) => total + item.quantity,
+        0
+      ),
+      totalPrice: (session.warehouseStock ?? []).reduce(
+        (total, item) => total + item.totalPrice,
+        0
+      ),
+    };
     if (
       request.method === 'GET' &&
       path === `/api/v1/warehouses/${saved.warehouse.id}`
     ) {
-      respond({ response, body: { ...saved.warehouse, comment: '' } });
+      respond({
+        response,
+        body: warehouse,
+      });
       return;
     }
     if (
@@ -217,7 +237,7 @@ const server = createServer(async (request, response) => {
     const lists: Record<string, unknown[]> = {
       '/api/v1/supplies': [saved],
       '/api/v1/suppliers': [saved.supplier],
-      '/api/v1/warehouses': [saved.warehouse],
+      '/api/v1/warehouses': [warehouse],
       '/api/v1/products/variants': session.products,
       '/api/v1/units-of-measurement': [session.unit],
     };

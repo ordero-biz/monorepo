@@ -80,13 +80,18 @@ describe('WarehouseDetailProducts', () => {
       expect(within(table).getByText(value)).toBeVisible();
     }
     expect(screen.getByText('1-10 of 21')).toBeVisible();
+    expect(screen.getByRole('heading', { name: 'Products' })).toBeVisible();
+    expect(screen.getByText('21', { exact: true })).toBeVisible();
+    expect(
+      within(table).getByRole('columnheader', { name: 'Stock value' })
+    ).toBeVisible();
     expect(getWarehouseStockMock).toHaveBeenCalledWith('1', {
       page: 1,
       size: 10,
     });
   });
 
-  it('renders zero stock and missing optional product and unit fields', async () => {
+  it('renders zero stock, empty product identifiers, and a missing unit symbol', async () => {
     getWarehouseStockMock.mockResolvedValue({
       ok: true,
       data: {
@@ -97,8 +102,8 @@ describe('WarehouseDetailProducts', () => {
             productVariant: {
               id: 7,
               name: 'Blue shirt',
-              sku: null,
-              barcode: null,
+              sku: '',
+              barcode: '',
             },
             unitOfMeasurement: { id: 2, name: 'Piece', status: 'ACTIVE' },
             quantity: 0,

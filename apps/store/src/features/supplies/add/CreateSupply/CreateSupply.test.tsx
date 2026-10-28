@@ -714,6 +714,9 @@ describe('CreateSupply', () => {
     expect(invalidateQueriesSpy).not.toHaveBeenCalledWith({
       queryKey: warehousesQueryKeys.stock(savedSupply.warehouse.id),
     });
+    expect(invalidateQueriesSpy).not.toHaveBeenCalledWith({
+      queryKey: warehousesQueryKeys.detail(savedSupply.warehouse.id),
+    });
   });
 
   it('submits COMPLETED only after confirming finalization', async () => {
@@ -729,6 +732,13 @@ describe('CreateSupply', () => {
         size: 10,
       })
     );
+    const warehouseDetailKey = warehousesQueryKeys.detail(
+      savedSupply.warehouse.id
+    );
+    const otherWarehouseDetailKey = warehousesQueryKeys.detail(99);
+    for (const queryKey of [warehouseDetailKey, otherWarehouseDetailKey]) {
+      queryClient.setQueryData(queryKey, { totalPrice: 0 });
+    }
     const otherWarehouseKey = warehousesQueryKeys.stockPage(99);
     for (const queryKey of [...stockPageKeys, otherWarehouseKey]) {
       queryClient.setQueryData(queryKey, {
@@ -768,6 +778,12 @@ describe('CreateSupply', () => {
     await waitFor(() => {
       expect(mocks.replace).toHaveBeenCalledWith('/warehouse/supplies/9');
     });
+    expect(queryClient.getQueryState(warehouseDetailKey)?.isInvalidated).toBe(
+      true
+    );
+    expect(
+      queryClient.getQueryState(otherWarehouseDetailKey)?.isInvalidated
+    ).toBe(false);
     for (const queryKey of stockPageKeys) {
       expect(queryClient.getQueryState(queryKey)?.isInvalidated).toBe(true);
     }

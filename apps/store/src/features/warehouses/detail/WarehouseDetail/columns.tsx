@@ -55,18 +55,28 @@ export const columns: DataTableColumnDef<WarehouseStockItem>[] = [
   },
   {
     id: 'quantity',
+    meta: { align: 'right', wrap: 'nowrap' },
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Quantity" />
     ),
-    cell: ({ row }) => <DataTableCell>{row.original.quantity}</DataTableCell>,
+    cell: ({ row }) => (
+      <DataTableCell>
+        <span className="tabular-nums">{row.original.quantity}</span>
+      </DataTableCell>
+    ),
   },
   {
     id: 'total',
+    meta: { align: 'right', wrap: 'nowrap' },
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Total price" />
+      <DataTableColumnHeader column={column} title="Stock value" />
     ),
     cell: ({ row }) => (
-      <DataTableCell>{formatMoney(row.original.totalPrice)}</DataTableCell>
+      <DataTableCell>
+        <span className="tabular-nums">
+          {formatMoney(row.original.totalPrice)}
+        </span>
+      </DataTableCell>
     ),
   },
 ];

@@ -374,7 +374,16 @@ describe('UpdateSupply', () => {
     getWarehousesMock.mockResolvedValue({
       ok: true,
       data: {
-        content: [{ ...nextWarehouse, comment: '' }],
+        content: [
+          {
+            ...nextWarehouse,
+            address: null,
+            comment: '',
+            phone: null,
+            totalItemQuantity: 0,
+            totalPrice: 0,
+          },
+        ],
         page: { number: 0, size: 100, totalElements: 1, totalPages: 1 },
       },
     });
@@ -801,6 +810,9 @@ describe('UpdateSupply', () => {
     expect(invalidateQueriesSpy).not.toHaveBeenCalledWith({
       queryKey: warehousesQueryKeys.stock(savedSupply.warehouse.id),
     });
+    expect(invalidateQueriesSpy).not.toHaveBeenCalledWith({
+      queryKey: warehousesQueryKeys.detail(savedSupply.warehouse.id),
+    });
   });
 
   it('finalizes the current draft after confirmation and updates its cache', async () => {
@@ -820,6 +832,13 @@ describe('UpdateSupply', () => {
         size: 10,
       })
     );
+    const warehouseDetailKey = warehousesQueryKeys.detail(
+      completedSupply.warehouse.id
+    );
+    const otherWarehouseDetailKey = warehousesQueryKeys.detail(99);
+    for (const queryKey of [warehouseDetailKey, otherWarehouseDetailKey]) {
+      queryClient.setQueryData(queryKey, { totalPrice: 0 });
+    }
     const otherWarehouseKey = warehousesQueryKeys.stockPage(99);
     for (const queryKey of [...stockPageKeys, otherWarehouseKey]) {
       queryClient.setQueryData(queryKey, {
@@ -853,6 +872,12 @@ describe('UpdateSupply', () => {
     expect(invalidateQueriesSpy).toHaveBeenCalledWith({
       queryKey: warehousesQueryKeys.stock(completedSupply.warehouse.id),
     });
+    expect(queryClient.getQueryState(warehouseDetailKey)?.isInvalidated).toBe(
+      true
+    );
+    expect(
+      queryClient.getQueryState(otherWarehouseDetailKey)?.isInvalidated
+    ).toBe(false);
     for (const queryKey of stockPageKeys) {
       expect(queryClient.getQueryState(queryKey)?.isInvalidated).toBe(true);
     }

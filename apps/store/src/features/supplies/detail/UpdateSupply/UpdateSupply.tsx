@@ -39,9 +39,16 @@ export const UpdateSupply = ({ supply }: UpdateSupplyProps) => {
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: suppliesQueryKeys.list }),
         updatedSupply.status === SUPPLY_STATUS.COMPLETED
-          ? queryClient.invalidateQueries({
-              queryKey: warehousesQueryKeys.stock(updatedSupply.warehouse.id),
-            })
+          ? Promise.all([
+              queryClient.invalidateQueries({
+                queryKey: warehousesQueryKeys.stock(updatedSupply.warehouse.id),
+              }),
+              queryClient.invalidateQueries({
+                queryKey: warehousesQueryKeys.detail(
+                  updatedSupply.warehouse.id
+                ),
+              }),
+            ])
           : undefined,
       ]);
       form.reset(getSupplyFormDefaults(updatedSupply));

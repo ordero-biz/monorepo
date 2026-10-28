@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, Card, DataTable, Typography } from '@ordero/ui';
+import { Button, Card, Chip, DataTable, Typography } from '@ordero/ui';
 import type { WarehouseStockItem } from '@/lib/domain/warehouses/types';
 import { useTablePagination } from '@/lib/hooks/useTablePagination';
 import { useWarehouseStockQuery } from '@/lib/hooks/warehouses/useWarehouseStockQuery';
@@ -66,6 +66,16 @@ export const WarehouseDetailProducts = ({
       data={warehouseStockQuery.data.content}
       emptyMessage="No products found in this warehouse."
       getRowId={getStockRowId}
+      header={
+        <div className="flex items-center gap-[var(--space-1)]">
+          <h2 className="text-[length:var(--subtitle1-size-desktop)] leading-[var(--subtitle1-line-height-desktop)] font-[var(--subtitle1-weight)] [font-family:var(--subtitle1-family)]">
+            Products
+          </h2>
+          <Chip size="s" variant="soft">
+            {warehouseStockQuery.data.page.totalElements}
+          </Chip>
+        </div>
+      }
       manualPagination
       pagination={tablePagination}
     />

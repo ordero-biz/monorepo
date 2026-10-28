@@ -21,9 +21,14 @@ export const CreateSupply = () => {
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: suppliesQueryKeys.list }),
         supply.status === SUPPLY_STATUS.COMPLETED
-          ? queryClient.invalidateQueries({
-              queryKey: warehousesQueryKeys.stock(supply.warehouse.id),
-            })
+          ? Promise.all([
+              queryClient.invalidateQueries({
+                queryKey: warehousesQueryKeys.stock(supply.warehouse.id),
+              }),
+              queryClient.invalidateQueries({
+                queryKey: warehousesQueryKeys.detail(supply.warehouse.id),
+              }),
+            ])
           : undefined,
       ]);
 

@@ -102,6 +102,8 @@ export type DataTableProps<TData> = {
   getRowId?: (originalRow: TData, index: number, parent?: Row<TData>) => string;
   /** Visual emphasis only; include a visible explanation in the row content. */
   getRowTone?: (row: TData, index: number) => DataTableRowTone;
+  /** Content above the column headers, outside horizontal scrolling; padding is provided. */
+  header?: ReactNode;
   manualPagination?: boolean;
   manualSorting?: boolean;
   onRowSelectionChange?: (rowSelection: DataTableRowSelectionState) => void;

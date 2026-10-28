@@ -7,17 +7,20 @@ export type WarehouseStatus =
 export type Warehouse = {
   id: number;
   name: string;
-  address?: string | null;
+  address: string | null;
   comment: string;
-  status?: WarehouseStatus;
+  phone: string | null;
+  status: WarehouseStatus;
+  totalItemQuantity: number;
+  totalPrice: number;
 };
 
 export type WarehouseStockItem = {
   productVariant: {
     id: number;
     name: string;
-    sku?: string | null;
-    barcode?: string | null;
+    sku: string;
+    barcode: string;
   };
   unitOfMeasurement: UnitOfMeasurement;
   quantity: number;

@@ -35,6 +35,7 @@ for that advanced layout case and follow exactly the same selection scope.
   contains only the server-provided page
 - controlled or uncontrolled row selection
 - a built-in selection column through `selection`
+- standalone title, count, or controls above the column headers through `header`
 - standalone footer content through `footer` and column-aligned summaries
   through `footerColumns`
 
@@ -47,6 +48,28 @@ Use `getRowTone` to return `warning` for rows that need visual emphasis, or
 selection. Compute domain comparisons in the feature and pass a cheap flag
 lookup here. Include a visible explanation such as “Different” in a cell;
 row color alone must not convey the meaning.
+
+## Header content
+
+Use `header` for a title, count, or feature-owned controls above the column
+headers. The component provides padding, a bottom divider, and a wrapping flex
+layout with space between its children. Group related content in an inner
+element. The header stays outside horizontal scrolling and remains visible
+when the table is empty. Omit it on tables that do not need a header.
+
+```tsx
+<DataTable
+  ariaLabel="Warehouse products"
+  columns={columns}
+  data={stock.content}
+  header={<h2>Products</h2>}
+/>
+```
+
+Features own any controls and their behavior. Adding search here requires
+filtering the full dataset or querying the server, not just filtering the
+current page. Continue supplying `ariaLabel` to name the table independently
+of the visual header.
 
 ## Footers and summaries
 

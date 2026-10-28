@@ -82,6 +82,10 @@ describe('warehouse client helpers', () => {
   it('gets warehouses from the backend proxy on success', async () => {
     const fetchMock = vi.mocked(fetch);
     const warehouse = {
+      phone: null,
+      status: WAREHOUSE_STATUS.DRAFT,
+      totalItemQuantity: 0,
+      totalPrice: 0,
       id: 1,
       name: 'Main Warehouse',
       address: '123 Commerce Ave',
@@ -109,10 +113,14 @@ describe('warehouse client helpers', () => {
   it('gets a warehouse from the backend proxy', async () => {
     const fetchMock = vi.mocked(fetch);
     const warehouse = {
+      phone: null,
+      status: WAREHOUSE_STATUS.DRAFT,
+      totalItemQuantity: 0,
       id: 1,
       name: 'Main Warehouse',
       address: '123 Commerce Ave',
       comment: 'Primary stock location',
+      totalPrice: 4285,
     };
     fetchMock.mockResolvedValue(new Response(JSON.stringify(warehouse)));
 
@@ -129,6 +137,10 @@ describe('warehouse client helpers', () => {
   it('posts a new warehouse through the backend proxy', async () => {
     const fetchMock = vi.mocked(fetch);
     const warehouse = {
+      phone: null,
+      status: WAREHOUSE_STATUS.DRAFT,
+      totalItemQuantity: 0,
+      totalPrice: 0,
       id: 1,
       name: 'Main Warehouse',
       address: '123 Commerce Ave',
@@ -161,6 +173,10 @@ describe('warehouse client helpers', () => {
   it('patches a warehouse through the backend proxy', async () => {
     const fetchMock = vi.mocked(fetch);
     const warehouse = {
+      phone: null,
+      status: WAREHOUSE_STATUS.DRAFT,
+      totalItemQuantity: 0,
+      totalPrice: 0,
       id: 1,
       name: 'Updated Warehouse',
       address: '124 Commerce Ave',
@@ -192,6 +208,10 @@ describe('warehouse client helpers', () => {
   it('sends null when clearing a warehouse address', async () => {
     const fetchMock = vi.mocked(fetch);
     const warehouse = {
+      phone: null,
+      status: WAREHOUSE_STATUS.DRAFT,
+      totalItemQuantity: 0,
+      totalPrice: 0,
       id: 1,
       name: 'Main Warehouse',
       address: null,

@@ -19,6 +19,10 @@ export type WarehouseDetailInfoProps = {
   warehouse: Warehouse;
 };
 
+export type WarehouseDetailInventoryValueProps = {
+  totalPrice: number;
+};
+
 export type WarehouseDetailField = {
   label: string;
   value: Warehouse[keyof Warehouse];
