@@ -7,8 +7,9 @@ export const warehousesQueryKeys = {
   options: () => [...warehousesQueryKeys.list, 'options'] as const,
   detail: (warehouseId: string | number) =>
     ['warehouses', 'detail', String(warehouseId)] as const,
+  allStock: ['warehouses', 'stock'] as const,
   stock: (warehouseId: string | number) =>
-    ['warehouses', 'stock', String(warehouseId)] as const,
+    [...warehousesQueryKeys.allStock, String(warehouseId)] as const,
   stockPage: (warehouseId: string | number, input?: PaginationSearchInput) =>
     [...warehousesQueryKeys.stock(warehouseId), input ?? {}] as const,
 };

@@ -1,7 +1,10 @@
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { UpdateUnitOfMeasurementDialogTrigger } from '@/features/units-of-measurement/detail/UpdateUnitOfMeasurement';
+import { updateUnitOfMeasurement } from '@/lib/client/api/units-of-measurement';
 import { getWarehouseStock } from '@/lib/client/api/warehouses';
 import type { WarehouseStockItem } from '@/lib/domain/warehouses/types';
+import { warehousesQueryKeys } from '@/lib/query/warehouses/warehousesQueryKeys';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import type { WarehouseDetailProductsProps } from './types';
 import { WarehouseDetailProducts } from './WarehouseDetailProducts';
@@ -28,7 +31,15 @@ vi.mock('@/lib/client/api/warehouses', async () => ({
   getWarehouseStock: vi.fn(),
 }));
 
+vi.mock('@/lib/client/api/units-of-measurement', async () => ({
+  ...(await vi.importActual<
+    typeof import('@/lib/client/api/units-of-measurement')
+  >('@/lib/client/api/units-of-measurement')),
+  updateUnitOfMeasurement: vi.fn(),
+}));
+
 const getWarehouseStockMock = vi.mocked(getWarehouseStock);
+const updateUnitOfMeasurementMock = vi.mocked(updateUnitOfMeasurement);
 const stockItem: WarehouseStockItem = {
   productVariant: {
     id: 7,
@@ -49,13 +60,113 @@ const { setup } = prepareStoreSetup<WarehouseDetailProductsProps>({
   props: { warehouseId: '1', paginationInput: { page: 1, size: 10 } },
 });
 
+const WarehouseStockUnitEditor = () => (
+  <>
+    <WarehouseDetailProducts warehouseId="1" />
+    <UpdateUnitOfMeasurementDialogTrigger
+      unitOfMeasurement={stockItem.unitOfMeasurement}
+    />
+  </>
+);
+
+const { setup: setupUnitEditor } = prepareStoreSetup({
+  component: WarehouseStockUnitEditor,
+});
+
 describe('WarehouseDetailProducts', () => {
   beforeEach(() => {
     getWarehouseStockMock.mockReset();
+    updateUnitOfMeasurementMock.mockReset();
     mocks.push.mockReset();
     mocks.replace.mockReset();
     mocks.searchParams = new URLSearchParams();
     getWarehouseStockMock.mockResolvedValue({ ok: true, data: stock });
+  });
+
+  it('refreshes stock once after editing a unit and invalidates cached pages across warehouses', async () => {
+    const updatedUnit = { ...stockItem.unitOfMeasurement, symbol: 'piece' };
+    updateUnitOfMeasurementMock.mockResolvedValue({
+      ok: true,
+      data: updatedUnit,
+    });
+    const user = userEvent.setup();
+    const { queryClient } = setupUnitEditor();
+    const cachedStockKeys = [
+      warehousesQueryKeys.stockPage(1, { page: 2, size: 10 }),
+      warehousesQueryKeys.stockPage(2, { page: 1, size: 25 }),
+    ];
+    for (const queryKey of cachedStockKeys) {
+      queryClient.setQueryData(queryKey, stock);
+    }
+    const warehouseDetailKey = warehousesQueryKeys.detail(1);
+    queryClient.setQueryData(warehouseDetailKey, { id: 1 });
+
+    const table = await screen.findByRole('table', {
+      name: 'Warehouse products',
+    });
+    expect(within(table).getByText('Piece (pc)')).toBeVisible();
+    getWarehouseStockMock.mockResolvedValue({
+      ok: true,
+      data: {
+        ...stock,
+        content: [{ ...stockItem, unitOfMeasurement: updatedUnit }],
+      },
+    });
+
+    await user.click(screen.getByRole('button', { name: 'Edit Piece' }));
+    const symbol = screen.getByRole('textbox', { name: 'Symbol' });
+    await user.clear(symbol);
+    await user.type(symbol, 'piece');
+    await user.click(screen.getByRole('button', { name: 'Save' }));
+
+    expect(await within(table).findByText('Piece (piece)')).toBeVisible();
+    expect(getWarehouseStockMock).toHaveBeenCalledTimes(2);
+    expect(updateUnitOfMeasurementMock).toHaveBeenCalledExactlyOnceWith({
+      unitOfMeasurementId: stockItem.unitOfMeasurement.id,
+      symbol: 'piece',
+    });
+    for (const queryKey of cachedStockKeys) {
+      expect(queryClient.getQueryState(queryKey)?.isInvalidated).toBe(true);
+    }
+    expect(queryClient.getQueryState(warehouseDetailKey)?.isInvalidated).toBe(
+      false
+    );
+  });
+
+  it('keeps stock unchanged when a unit edit fails', async () => {
+    updateUnitOfMeasurementMock.mockResolvedValue({
+      ok: false,
+      error: {
+        status: 422,
+        message: 'Invalid symbol.',
+        fieldErrors: { symbol: 'Invalid symbol.' },
+      },
+    });
+    const user = userEvent.setup();
+    const { queryClient } = setupUnitEditor();
+    const cachedStockKey = warehousesQueryKeys.stockPage(2, {
+      page: 1,
+      size: 10,
+    });
+    queryClient.setQueryData(cachedStockKey, stock);
+    const table = await screen.findByRole('table', {
+      name: 'Warehouse products',
+    });
+
+    await user.click(screen.getByRole('button', { name: 'Edit Piece' }));
+    const symbol = screen.getByRole('textbox', { name: 'Symbol' });
+    await user.clear(symbol);
+    await user.type(symbol, 'invalid');
+    await user.click(screen.getByRole('button', { name: 'Save' }));
+
+    await waitFor(() =>
+      expect(symbol).toHaveAccessibleDescription('Invalid symbol.')
+    );
+    expect(within(table).getByText('Piece (pc)')).toBeVisible();
+    expect(getWarehouseStockMock).toHaveBeenCalledTimes(1);
+    expect(queryClient.getQueryState(cachedStockKey)?.isInvalidated).toBe(
+      false
+    );
   });
 
   it('shows loading while stock is pending', () => {

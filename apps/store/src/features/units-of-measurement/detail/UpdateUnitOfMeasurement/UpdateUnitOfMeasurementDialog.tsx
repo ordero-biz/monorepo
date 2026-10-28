@@ -4,6 +4,7 @@ import { Dialog } from '@ordero/ui';
 import { useQueryClient } from '@tanstack/react-query';
 import { UNIT_OF_MEASUREMENT_STATUS } from '@/lib/domain/units-of-measurement/constants';
 import { unitsOfMeasurementQueryKeys } from '@/lib/query/units-of-measurement/unitsOfMeasurementQueryKeys';
+import { warehousesQueryKeys } from '@/lib/query/warehouses/warehousesQueryKeys';
 import { useUpdateUnitOfMeasurementForm } from './hooks/useUpdateUnitOfMeasurementForm';
 import type { UpdateUnitOfMeasurementDialogProps } from './types';
 import { UpdateUnitOfMeasurementDialogFormContent } from './UpdateUnitOfMeasurementDialogFormContent';
@@ -26,6 +27,10 @@ export const UpdateUnitOfMeasurementDialog = ({
         }),
         queryClient.invalidateQueries({
           queryKey: unitsOfMeasurementQueryKeys.detail(unitOfMeasurement.id),
+        }),
+        // A unit can appear in any warehouse, including unloaded stock pages.
+        queryClient.invalidateQueries({
+          queryKey: warehousesQueryKeys.allStock,
         }),
       ]);
     },
