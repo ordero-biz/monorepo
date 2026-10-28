@@ -1,4 +1,4 @@
-import { screen, waitFor, within } from '@testing-library/react';
+import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {
   deleteUnitsOfMeasurement,
@@ -287,8 +287,13 @@ describe('UnitsOfMeasurementList', () => {
     expect(screen.queryByText('3 selected')).not.toBeInTheDocument();
   });
 
-  it('deletes selected units and clears the selection after success', async () => {
-    getUnitsOfMeasurementMock.mockResolvedValue({
+  it('clears selection and closes the dialog before the list refresh finishes', async () => {
+    const refresh =
+      Promise.withResolvers<
+        Awaited<ReturnType<typeof getUnitsOfMeasurement>>
+      >();
+
+    getUnitsOfMeasurementMock.mockResolvedValueOnce({
       ok: true,
       data: {
         content: [
@@ -308,6 +313,7 @@ describe('UnitsOfMeasurementList', () => {
         },
       },
     });
+    getUnitsOfMeasurementMock.mockReturnValue(refresh.promise);
     deleteUnitsOfMeasurementMock.mockResolvedValue({
       ok: true,
       data: undefined,
@@ -334,8 +340,103 @@ describe('UnitsOfMeasurementList', () => {
       queryKey: ['units-of-measurement', 'detail', '1'],
     });
     await waitFor(() =>
+      expect(getUnitsOfMeasurementMock).toHaveBeenCalledTimes(2)
+    );
+    await waitFor(() =>
       expect(screen.queryByText('1 selected')).not.toBeInTheDocument()
     );
+    expect(
+      screen.queryByRole('dialog', { name: 'Delete unit of measurement' })
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('checkbox', { name: 'Select Kilogram' })
+    ).not.toBeChecked();
+
+    await act(async () => {
+      refresh.resolve({
+        ok: true,
+        data: {
+          content: [],
+          page: { size: 10, number: 0, totalElements: 0, totalPages: 0 },
+        },
+      });
+    });
+
+    expect(
+      await screen.findByText('No units of measurement found.')
+    ).toBeVisible();
+  });
+
+  it('preserves selection and the dialog while deletion is pending and after failure', async () => {
+    const deletion =
+      Promise.withResolvers<
+        Awaited<ReturnType<typeof deleteUnitsOfMeasurement>>
+      >();
+
+    getUnitsOfMeasurementMock.mockResolvedValue({
+      ok: true,
+      data: {
+        content: [
+          {
+            id: 1,
+            status: 'ACTIVE',
+            name: 'Kilogram',
+            symbol: 'kg',
+            comment: 'Weight unit',
+          },
+        ],
+        page: {
+          size: 10,
+          number: 0,
+          totalElements: 1,
+          totalPages: 1,
+        },
+      },
+    });
+    deleteUnitsOfMeasurementMock.mockReturnValue(deletion.promise);
+    const user = userEvent.setup();
+
+    const { queryClient } = setup();
+    const removeQueriesSpy = vi.spyOn(queryClient, 'removeQueries');
+
+    await user.click(
+      await screen.findByRole('checkbox', { name: 'Select Kilogram' })
+    );
+    await user.click(screen.getByRole('button', { name: 'Delete' }));
+    await user.click(
+      within(
+        screen.getByRole('dialog', { name: 'Delete unit of measurement' })
+      ).getByRole('button', { name: 'Delete' })
+    );
+
+    expect(deleteUnitsOfMeasurementMock).toHaveBeenCalledWith({
+      unitOfMeasurementIds: [1],
+    });
+    expect(screen.getByText('1 selected')).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Deleting...' })).toBeDisabled();
+
+    await act(async () => {
+      deletion.resolve({
+        ok: false,
+        error: { status: 500, message: 'Deletion failed' },
+      });
+    });
+
+    expect(await screen.findByText('Deletion failed')).toBeVisible();
+    const dialog = screen.getByRole('dialog', {
+      name: 'Delete unit of measurement',
+    });
+
+    expect(dialog).toBeVisible();
+    expect(
+      within(dialog).getByRole('button', { name: 'Delete' })
+    ).toBeEnabled();
+    expect(screen.getByText('1 selected')).toBeVisible();
+    expect(
+      screen.getByRole('checkbox', { name: 'Select Kilogram', hidden: true })
+    ).toBeChecked();
+    expect(getUnitsOfMeasurementMock).toHaveBeenCalledTimes(1);
+    expect(removeQueriesSpy).not.toHaveBeenCalled();
   });
 
   it('requests units of measurement with pagination input', async () => {

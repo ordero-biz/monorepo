@@ -1,4 +1,4 @@
-import { screen, waitFor, within } from '@testing-library/react';
+import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { deleteCategories, getCategories } from '@/lib/client/api/categories';
 import { prepareStoreSetup } from '@/test/prepareSetup';
@@ -403,8 +403,11 @@ describe('CategoryList', () => {
     expect(screen.queryByText('3 selected')).not.toBeInTheDocument();
   });
 
-  it('deletes selected categories and clears the selection after success', async () => {
-    getCategoriesMock.mockResolvedValue({
+  it('clears selection and closes the dialog before the list refresh finishes', async () => {
+    const refresh =
+      Promise.withResolvers<Awaited<ReturnType<typeof getCategories>>>();
+
+    getCategoriesMock.mockResolvedValueOnce({
       ok: true,
       data: {
         content: [
@@ -425,6 +428,7 @@ describe('CategoryList', () => {
         },
       },
     });
+    getCategoriesMock.mockReturnValue(refresh.promise);
     deleteCategoriesMock.mockResolvedValue({
       ok: true,
       data: undefined,
@@ -447,9 +451,96 @@ describe('CategoryList', () => {
     expect(deleteCategoriesMock).toHaveBeenCalledWith({
       categoryIds: [1],
     });
+    await waitFor(() => expect(getCategoriesMock).toHaveBeenCalledTimes(2));
     await waitFor(() =>
       expect(screen.queryByText('1 selected')).not.toBeInTheDocument()
     );
+    expect(
+      screen.queryByRole('dialog', { name: 'Delete category' })
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('checkbox', { name: 'Select Shoes' })
+    ).not.toBeChecked();
+
+    await act(async () => {
+      refresh.resolve({
+        ok: true,
+        data: {
+          content: [],
+          page: { size: 10, number: 0, totalElements: 0, totalPages: 0 },
+        },
+      });
+    });
+
+    expect(await screen.findByText('No categories found.')).toBeVisible();
+  });
+
+  it('preserves selection and the dialog while deletion is pending and after failure', async () => {
+    const deletion =
+      Promise.withResolvers<Awaited<ReturnType<typeof deleteCategories>>>();
+
+    getCategoriesMock.mockResolvedValue({
+      ok: true,
+      data: {
+        content: [
+          {
+            id: 1,
+            name: 'Shoes',
+            sortOrder: 10,
+            status: 'ACTIVE',
+            createdAt: '2026-07-01T10:54:34.839Z',
+            parentCategory: null,
+          },
+        ],
+        page: {
+          size: 10,
+          number: 0,
+          totalElements: 1,
+          totalPages: 1,
+        },
+      },
+    });
+    deleteCategoriesMock.mockReturnValue(deletion.promise);
+    const user = userEvent.setup();
+
+    setup();
+
+    await user.click(
+      await screen.findByRole('checkbox', { name: 'Select Shoes' })
+    );
+    await user.click(screen.getByRole('button', { name: 'Delete' }));
+    await user.click(
+      within(screen.getByRole('dialog', { name: 'Delete category' })).getByRole(
+        'button',
+        { name: 'Delete' }
+      )
+    );
+
+    expect(deleteCategoriesMock).toHaveBeenCalledWith({
+      categoryIds: [1],
+    });
+    expect(screen.getByText('1 selected')).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Deleting...' })).toBeDisabled();
+
+    await act(async () => {
+      deletion.resolve({
+        ok: false,
+        error: { status: 500, message: 'Deletion failed' },
+      });
+    });
+
+    expect(await screen.findByText('Deletion failed')).toBeVisible();
+    const dialog = screen.getByRole('dialog', { name: 'Delete category' });
+
+    expect(dialog).toBeVisible();
+    expect(
+      within(dialog).getByRole('button', { name: 'Delete' })
+    ).toBeEnabled();
+    expect(screen.getByText('1 selected')).toBeVisible();
+    expect(
+      screen.getByRole('checkbox', { name: 'Select Shoes', hidden: true })
+    ).toBeChecked();
+    expect(getCategoriesMock).toHaveBeenCalledTimes(1);
   });
 
   it('renders an empty state when there are no categories', async () => {

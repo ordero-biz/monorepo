@@ -24,10 +24,12 @@ export const DeleteAttributesDialog = ({
           queryKey: attributesQueryKeys.detail(attribute.id),
         });
       });
-      await queryClient.invalidateQueries({
-        queryKey: attributesQueryKeys.list,
-      });
-      await onDeleted?.();
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: attributesQueryKeys.list,
+        }),
+        onDeleted?.(),
+      ]);
     },
   });
 

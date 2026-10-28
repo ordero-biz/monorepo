@@ -1,4 +1,4 @@
-import { screen, waitFor, within } from '@testing-library/react';
+import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { deleteAttributes, getAttributes } from '@/lib/client/api/attributes';
 import { getAttributeDetailRoute } from '@/lib/client/routes';
@@ -321,8 +321,11 @@ describe('AttributesList', () => {
     expect(screen.queryByText('3 selected')).not.toBeInTheDocument();
   });
 
-  it('deletes selected attributes and clears the selection after success', async () => {
-    getAttributesMock.mockResolvedValue({
+  it('clears selection and closes the dialog before the list refresh finishes', async () => {
+    const refresh =
+      Promise.withResolvers<Awaited<ReturnType<typeof getAttributes>>>();
+
+    getAttributesMock.mockResolvedValueOnce({
       ok: true,
       data: {
         content: [
@@ -343,6 +346,7 @@ describe('AttributesList', () => {
         },
       },
     });
+    getAttributesMock.mockReturnValue(refresh.promise);
     deleteAttributesMock.mockResolvedValue({
       ok: true,
       data: undefined,
@@ -364,9 +368,95 @@ describe('AttributesList', () => {
     expect(deleteAttributesMock).toHaveBeenCalledWith({
       attributeIds: [1],
     });
+    await waitFor(() => expect(getAttributesMock).toHaveBeenCalledTimes(2));
     await waitFor(() =>
       expect(screen.queryByText('1 selected')).not.toBeInTheDocument()
     );
+    expect(
+      screen.queryByRole('dialog', { name: 'Delete attribute' })
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('checkbox', { name: 'Select Size' })
+    ).not.toBeChecked();
+
+    await act(async () => {
+      refresh.resolve({
+        ok: true,
+        data: {
+          content: [],
+          page: { size: 10, number: 0, totalElements: 0, totalPages: 0 },
+        },
+      });
+    });
+
+    expect(await screen.findByText('No attributes found.')).toBeVisible();
+  });
+
+  it('preserves selection and the dialog while deletion is pending and after failure', async () => {
+    const deletion =
+      Promise.withResolvers<Awaited<ReturnType<typeof deleteAttributes>>>();
+
+    getAttributesMock.mockResolvedValue({
+      ok: true,
+      data: {
+        content: [
+          {
+            id: 1,
+            name: 'Size',
+            sortOrder: 10,
+            status: 'ACTIVE',
+            values: ['S', 'M', 'L'],
+            createdAt: '2026-05-26T20:55:51.542Z',
+          },
+        ],
+        page: {
+          size: 10,
+          number: 0,
+          totalElements: 1,
+          totalPages: 1,
+        },
+      },
+    });
+    deleteAttributesMock.mockReturnValue(deletion.promise);
+    const user = userEvent.setup();
+
+    setup();
+
+    await user.click(
+      await screen.findByRole('checkbox', { name: 'Select Size' })
+    );
+    await user.click(screen.getByRole('button', { name: 'Delete' }));
+    await user.click(
+      within(
+        screen.getByRole('dialog', { name: 'Delete attribute' })
+      ).getByRole('button', { name: 'Delete' })
+    );
+
+    expect(deleteAttributesMock).toHaveBeenCalledWith({
+      attributeIds: [1],
+    });
+    expect(screen.getByText('1 selected')).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Deleting...' })).toBeDisabled();
+
+    await act(async () => {
+      deletion.resolve({
+        ok: false,
+        error: { status: 500, message: 'Deletion failed' },
+      });
+    });
+
+    expect(await screen.findByText('Deletion failed')).toBeVisible();
+    const dialog = screen.getByRole('dialog', { name: 'Delete attribute' });
+
+    expect(dialog).toBeVisible();
+    expect(
+      within(dialog).getByRole('button', { name: 'Delete' })
+    ).toBeEnabled();
+    expect(screen.getByText('1 selected')).toBeVisible();
+    expect(
+      screen.getByRole('checkbox', { name: 'Select Size', hidden: true })
+    ).toBeChecked();
+    expect(getAttributesMock).toHaveBeenCalledTimes(1);
   });
 
   it('renders an empty state when no attributes are available', async () => {

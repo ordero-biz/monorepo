@@ -40,8 +40,8 @@ export const DeleteCategoriesDialog = ({
             queryKey: categoriesQueryKeys.children(parentCategoryId),
           })
         ),
+        onDeleted?.(),
       ]);
-      await onDeleted?.();
     },
   });
 
