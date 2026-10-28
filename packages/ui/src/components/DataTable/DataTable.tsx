@@ -300,7 +300,7 @@ export const DataTable = <TData,>({
       style={tableShellStyle}
     >
       {hasContent(header) ? (
-        <div className="flex flex-wrap items-center justify-between gap-[var(--spacing-2)] border-b border-[var(--color-divider)] p-[var(--card-content-p)]">
+        <div className="flex flex-wrap items-center justify-between gap-[var(--spacing-2)] p-[var(--card-content-p)]">
           {header}
         </div>
       ) : null}
