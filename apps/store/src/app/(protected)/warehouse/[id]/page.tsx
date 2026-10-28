@@ -1,13 +1,20 @@
 import { dehydrate, HydrationBoundary } from '@tanstack/react-query';
 import { WarehouseDetail } from '@/features/warehouses';
+import {
+  getWarehouseListMode,
+  WAREHOUSE_LIST_MODE,
+  WAREHOUSE_LIST_MODE_SEARCH_PARAM,
+} from '@/lib/domain/warehouses/constants';
 import { makeQueryClient } from '@/lib/query/queryClient';
 import {
   warehouseQueryOptions,
   warehouseStockQueryOptions,
+  warehouseSuppliesQueryOptions,
 } from '@/lib/query/warehouses/warehousesQueryOptions';
 import {
   getServerWarehouse,
   getServerWarehouseStock,
+  getServerWarehouseSupplies,
 } from '@/lib/server/api/warehouses';
 import {
   getPaginationSearchInput,
@@ -26,18 +33,30 @@ export default async function WarehouseDetailPage({
   searchParams,
 }: WarehouseDetailPageProps) {
   const { id } = await params;
-  const paginationInput = getPaginationSearchInput(await searchParams);
+  const resolvedSearchParams = await searchParams;
+  const paginationInput = getPaginationSearchInput(resolvedSearchParams);
+  const listMode = getWarehouseListMode(
+    resolvedSearchParams?.[WAREHOUSE_LIST_MODE_SEARCH_PARAM]
+  );
   const queryClient = makeQueryClient();
 
   await Promise.all([
     queryClient.prefetchQuery(warehouseQueryOptions(id, getServerWarehouse)),
-    queryClient.prefetchQuery(
-      warehouseStockQueryOptions({
-        warehouseId: id,
-        fetchWarehouseStock: getServerWarehouseStock,
-        input: paginationInput,
-      })
-    ),
+    listMode === WAREHOUSE_LIST_MODE.supplies
+      ? queryClient.prefetchQuery(
+          warehouseSuppliesQueryOptions({
+            warehouseId: id,
+            fetchWarehouseSupplies: getServerWarehouseSupplies,
+            input: paginationInput,
+          })
+        )
+      : queryClient.prefetchQuery(
+          warehouseStockQueryOptions({
+            warehouseId: id,
+            fetchWarehouseStock: getServerWarehouseStock,
+            input: paginationInput,
+          })
+        ),
   ]);
 
   return (

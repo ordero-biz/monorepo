@@ -1,3 +1,4 @@
+import type { Supply } from '@/lib/domain/supplies/types';
 import type { UnitOfMeasurement } from '@/lib/domain/units-of-measurement/types';
 import type { WAREHOUSE_STATUS } from './constants';
 
@@ -26,3 +27,15 @@ export type WarehouseStockItem = {
   quantity: number;
   totalPrice: number;
 };
+
+// The warehouse supplies endpoint omits warehouse and quantity totals.
+export type WarehouseSupply = Pick<
+  Supply,
+  | 'id'
+  | 'supplier'
+  | 'status'
+  | 'supplyNumber'
+  | 'supplierInvoiceNumber'
+  | 'totalPrice'
+  | 'createdAt'
+>;

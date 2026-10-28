@@ -8,19 +8,32 @@ import {
 } from '.';
 
 const supplyDetails = {
+  comment: null,
+  completedAt: null,
+  completedBy: null,
+  createdAt: '2026-10-28T10:00:00Z',
+  createdBy: 'owner@example.test',
+  updatedAt: '2026-10-28T10:00:00Z',
+  updatedBy: 'owner@example.test',
+
   id: 7,
   supplier: { id: 2, name: 'Fresh Farms', status: 'ACTIVE' },
   warehouse: { id: 3, name: 'Main warehouse', status: 'ACTIVE' },
   status: SUPPLY_STATUS.DRAFT,
   supplyNumber: 'SUP-007',
   supplierInvoiceNumber: 'INV-007',
-  totalQuantity: 12,
+
   totalPrice: 48.5,
   version: 1,
   supplyEntries: [
     {
       id: 11,
-      productVariant: { id: 21, name: 'Rice', sku: 'RICE-1' },
+      productVariant: {
+        barcode: '',
+        id: 21,
+        name: 'Rice',
+        sku: 'RICE-1',
+      },
       unitOfMeasurement: { id: 4, name: 'Bag', status: 'ACTIVE' },
       quantity: 12,
       unitPrice: 4,
@@ -52,13 +65,18 @@ describe('supply client helpers', () => {
     const response = {
       content: [
         {
+          comment: null,
+          completedAt: null,
+          completedBy: null,
+          createdAt: '2026-10-28T10:00:00Z',
+
           id: 1,
           supplier: { id: 2, name: 'Fresh Farms', status: 'ACTIVE' },
           warehouse: { id: 3, name: 'Main warehouse', status: 'ACTIVE' },
           status: SUPPLY_STATUS.DRAFT,
           supplyNumber: 'SUP-001',
           supplierInvoiceNumber: 'INV-001',
-          totalQuantity: 12,
+
           totalPrice: 48.5,
         },
       ],

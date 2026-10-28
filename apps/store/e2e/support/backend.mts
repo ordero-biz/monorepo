@@ -10,6 +10,7 @@ import type { SupplyDetails } from '../../src/lib/domain/supplies/types';
 import type {
   Warehouse,
   WarehouseStockItem,
+  WarehouseSupply,
 } from '../../src/lib/domain/warehouses/types';
 
 // Test-only backend. Each browser context has its own token and saved record,
@@ -17,6 +18,7 @@ import type {
 type Session = {
   categories?: Category[];
   warehouseStock?: WarehouseStockItem[];
+  warehouseSupplies?: WarehouseSupply[];
   saved: SupplyDetails;
   products: ProductVariant[];
   unit: SupplyDetails['supplyEntries'][number]['unitOfMeasurement'];
@@ -162,6 +164,27 @@ const server = createServer(async (request, response) => {
       });
       return;
     }
+    if (
+      request.method === 'GET' &&
+      path === `/api/v1/warehouses/${saved.warehouse.id}/supplies`
+    ) {
+      const supplies = session.warehouseSupplies ?? [];
+      const page = Number(url.searchParams.get('page') ?? 0);
+      const size = Number(url.searchParams.get('size') ?? 10);
+      respond({
+        response,
+        body: {
+          content: supplies.slice(page * size, (page + 1) * size),
+          page: {
+            number: page,
+            size,
+            totalElements: supplies.length,
+            totalPages: Math.ceil(supplies.length / size),
+          },
+        },
+      });
+      return;
+    }
     const isDetail = path === `/api/v1/supplies/${saved.id}`;
     if (isDetail && request.method === 'GET') {
       respond({
@@ -210,11 +233,12 @@ const server = createServer(async (request, response) => {
               id: product.id,
               name: product.name,
               sku: product.sku,
+              barcode: product.barcode,
             },
             unitOfMeasurement: session.unit,
             quantity: entry.quantity,
             unitPrice: entry.unitPrice,
-            comment: entry.comment,
+            comment: entry.comment ?? null,
           };
         }) ?? (request.method === 'POST' ? [] : saved.supplyEntries);
       session.saved = {
@@ -224,7 +248,7 @@ const server = createServer(async (request, response) => {
           : {}),
         ...fields,
         supplyEntries: entries,
-        totalQuantity: entries.reduce((sum, entry) => sum + entry.quantity, 0),
+
         totalPrice: entries.reduce(
           (sum, entry) => sum + entry.quantity * entry.unitPrice,
           0

@@ -51,11 +51,21 @@ describe('supply query options', () => {
 
   it('uses the supply id for detail queries', async () => {
     const supply = {
+      comment: null,
+      completedAt: null,
+      completedBy: null,
+      supplyNumber: 'SUP-001',
+      supplierInvoiceNumber: null,
+      createdAt: '2026-10-28T10:00:00Z',
+      createdBy: 'owner@example.test',
+      updatedAt: '2026-10-28T10:00:00Z',
+      updatedBy: 'owner@example.test',
+
       id: 7,
       status: 'DRAFT' as const,
       supplier: { id: 2, name: 'Fresh Farms', status: 'ACTIVE' },
       warehouse: { id: 3, name: 'Main warehouse', status: 'ACTIVE' },
-      totalQuantity: 0,
+
       totalPrice: 0,
       version: 1,
       supplyEntries: [],

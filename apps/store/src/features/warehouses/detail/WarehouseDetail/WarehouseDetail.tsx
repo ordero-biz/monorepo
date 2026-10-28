@@ -6,7 +6,7 @@ import type { WarehouseDetailProps } from './types';
 import { WarehouseDetailHeader } from './WarehouseDetailHeader';
 import { WarehouseDetailInfo } from './WarehouseDetailInfo';
 import { WarehouseDetailInventoryValue } from './WarehouseDetailInventoryValue';
-import { WarehouseDetailProducts } from './WarehouseDetailProducts';
+import { WarehouseDetailLists } from './WarehouseDetailLists';
 
 export const WarehouseDetail = ({
   warehouseId,
@@ -61,7 +61,7 @@ export const WarehouseDetail = ({
           <WarehouseDetailInfo warehouse={warehouseQuery.data} />
         </div>
       </div>
-      <WarehouseDetailProducts
+      <WarehouseDetailLists
         warehouseId={warehouseId}
         paginationInput={paginationInput}
       />

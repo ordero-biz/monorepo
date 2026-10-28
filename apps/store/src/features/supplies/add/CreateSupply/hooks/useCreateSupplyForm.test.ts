@@ -20,18 +20,34 @@ vi.mock('../utils/submitAction', async () => ({
 
 const submitCreateSupplyMock = vi.mocked(submitCreateSupply);
 const supply: SupplyDetails = {
+  comment: null,
+  completedAt: null,
+  completedBy: null,
+  supplierInvoiceNumber: null,
+  createdAt: '2026-10-28T10:00:00Z',
+  createdBy: 'owner@example.test',
+  updatedAt: '2026-10-28T10:00:00Z',
+  updatedBy: 'owner@example.test',
+
   id: 9,
   supplier: { id: 3, name: 'Global Foods', status: 'ACTIVE' },
   warehouse: { id: 4, name: 'Main Warehouse', status: 'ACTIVE' },
   status: SUPPLY_STATUS.DRAFT,
   supplyNumber: 'SUP-001',
-  totalQuantity: 1,
+
   totalPrice: 28,
   version: 1,
   supplyEntries: [
     {
+      comment: null,
+
       id: 17,
-      productVariant: { id: 11, name: 'Rice' },
+      productVariant: {
+        sku: '',
+        barcode: '',
+        id: 11,
+        name: 'Rice',
+      },
       unitOfMeasurement: { id: 2, name: 'Bag', status: 'ACTIVE' },
       quantity: 1,
       unitPrice: 28,

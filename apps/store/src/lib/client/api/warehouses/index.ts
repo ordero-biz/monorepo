@@ -5,6 +5,7 @@ import type {
   Warehouse,
   WarehouseStatus,
   WarehouseStockItem,
+  WarehouseSupply,
 } from '@/lib/domain/warehouses/types';
 import type { PaginatedResponse } from '@/lib/server/types';
 import { tokenizePath } from '@/lib/utils/tokenizePath';
@@ -65,6 +66,21 @@ export const createWarehouse = (input: CreateWarehouseData) =>
     method: 'POST',
     body: input,
   });
+
+export const getWarehouseSuppliesPath = (
+  warehouseId: string | number,
+  input?: PaginationSearchInput
+) =>
+  `${tokenizePath(CLIENT_BACKEND_PATHS.warehouseSupplies, { id: warehouseId })}?${getPaginationSearch(input)}`;
+
+export const getWarehouseSupplies = (
+  warehouseId: string | number,
+  input?: PaginationSearchInput
+) =>
+  apiFetch<PaginatedResponse<WarehouseSupply>>(
+    getWarehouseSuppliesPath(warehouseId, input),
+    { method: 'GET' }
+  );
 
 export const updateWarehouse = ({
   warehouseId,

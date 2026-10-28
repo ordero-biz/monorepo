@@ -5,6 +5,7 @@ import { fetchBackendResponse } from '@/lib/server/fetch';
 import {
   getServerWarehouse,
   getServerWarehouseStock,
+  getServerWarehouseSupplies,
   getServerWarehouses,
 } from '.';
 
@@ -75,6 +76,50 @@ describe('warehouse server helpers', () => {
     mockAuthCookie('server-token');
     fetchBackendResponseMock.mockResolvedValue(result);
     await expect(getServerWarehouseStock(7)).resolves.toEqual(result);
+  });
+
+  it('gets a supplies page with the server auth token', async () => {
+    const data = {
+      content: [],
+      page: { number: 1, size: 25, totalElements: 0, totalPages: 0 },
+    };
+    mockAuthCookie('server-token');
+    fetchBackendResponseMock.mockResolvedValue({
+      ok: true,
+      data: new Response(JSON.stringify(data)),
+    });
+    await expect(
+      getServerWarehouseSupplies(7, {
+        page: 2,
+        size: 25,
+        sort: ['createdAt,desc'],
+      })
+    ).resolves.toEqual({ ok: true, data });
+    expect(fetchBackendResponseMock).toHaveBeenCalledWith({
+      path: '/api/v1/warehouses/7/supplies',
+      search: 'page=1&size=25&sort=createdAt%2Cdesc',
+      token: 'server-token',
+      init: { method: 'GET' },
+    });
+  });
+
+  it('does not request supplies without authentication', async () => {
+    mockAuthCookie();
+    await expect(getServerWarehouseSupplies(7)).resolves.toEqual({
+      ok: false,
+      error: { status: 401, message: 'Authentication required.' },
+    });
+    expect(fetchBackendResponseMock).not.toHaveBeenCalled();
+  });
+
+  it('preserves normalized supplies backend errors', async () => {
+    const result = {
+      ok: false as const,
+      error: { status: 503, message: 'Supplies unavailable.' },
+    };
+    mockAuthCookie('server-token');
+    fetchBackendResponseMock.mockResolvedValue(result);
+    await expect(getServerWarehouseSupplies(7)).resolves.toEqual(result);
   });
 
   it('gets warehouses with the server auth token', async () => {

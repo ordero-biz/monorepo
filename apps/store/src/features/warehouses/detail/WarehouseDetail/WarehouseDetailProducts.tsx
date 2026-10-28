@@ -1,11 +1,12 @@
 'use client';
 
-import { Button, Card, Chip, DataTable, Typography } from '@ordero/ui';
+import { Button, Card, DataTable, Typography } from '@ordero/ui';
 import type { WarehouseStockItem } from '@/lib/domain/warehouses/types';
 import { useTablePagination } from '@/lib/hooks/useTablePagination';
 import { useWarehouseStockQuery } from '@/lib/hooks/warehouses/useWarehouseStockQuery';
 import { columns } from './columns';
 import type { WarehouseDetailProductsProps } from './types';
+import { WarehouseDetailListHeader } from './WarehouseDetailListHeader';
 
 const getStockRowId = (item: WarehouseStockItem) =>
   `${item.productVariant.id}-${item.unitOfMeasurement.id}`;
@@ -13,6 +14,7 @@ const getStockRowId = (item: WarehouseStockItem) =>
 export const WarehouseDetailProducts = ({
   warehouseId,
   paginationInput,
+  headerActions,
 }: WarehouseDetailProductsProps) => {
   const warehouseStockQuery = useWarehouseStockQuery(
     warehouseId,
@@ -23,9 +25,18 @@ export const WarehouseDetailProducts = ({
     paginationInput,
   });
 
+  const header = (
+    <WarehouseDetailListHeader
+      title="Products"
+      total={warehouseStockQuery.data?.page.totalElements}
+      actions={headerActions}
+    />
+  );
+
   if (warehouseStockQuery.isPending) {
     return (
       <Card.Root variant="filled">
+        <Card.Content>{header}</Card.Content>
         <Card.Content>
           <Typography color="text-secondary" variant="body2">
             Loading warehouse products...
@@ -38,6 +49,7 @@ export const WarehouseDetailProducts = ({
   if (warehouseStockQuery.isError) {
     return (
       <Card.Root variant="filled">
+        <Card.Content>{header}</Card.Content>
         <Card.Content>
           <div className="flex flex-col gap-[var(--space-2)]">
             <Typography variant="body2">
@@ -66,16 +78,7 @@ export const WarehouseDetailProducts = ({
       data={warehouseStockQuery.data.content}
       emptyMessage="No products found in this warehouse."
       getRowId={getStockRowId}
-      header={
-        <div className="flex items-center gap-[var(--space-1)]">
-          <h2 className="text-[length:var(--subtitle1-size-desktop)] leading-[var(--subtitle1-line-height-desktop)] font-[var(--subtitle1-weight)] [font-family:var(--subtitle1-family)]">
-            Products
-          </h2>
-          <Chip size="s" variant="soft">
-            {warehouseStockQuery.data.page.totalElements}
-          </Chip>
-        </div>
-      }
+      header={header}
       manualPagination
       pagination={tablePagination}
     />

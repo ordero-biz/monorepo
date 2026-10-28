@@ -38,4 +38,5 @@ export const BACKEND_WAREHOUSE_PATHS = {
   warehouses: '/api/v1/warehouses',
   warehouse: '/api/v1/warehouses/{id}',
   warehouseStock: '/api/v1/warehouses/{id}/stock',
+  warehouseSupplies: '/api/v1/warehouses/{id}/supplies',
 } as const;

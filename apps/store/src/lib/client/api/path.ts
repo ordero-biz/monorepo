@@ -26,4 +26,5 @@ export const CLIENT_BACKEND_PATHS = {
   warehouses: '/api/backend/api/v1/warehouses',
   warehouse: '/api/backend/api/v1/warehouses/{id}',
   warehouseStock: '/api/backend/api/v1/warehouses/{id}/stock',
+  warehouseSupplies: '/api/backend/api/v1/warehouses/{id}/supplies',
 } as const;

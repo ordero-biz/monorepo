@@ -7,6 +7,7 @@ import { cookies } from 'next/headers';
 import type {
   Warehouse,
   WarehouseStockItem,
+  WarehouseSupply,
 } from '@/lib/domain/warehouses/types';
 import { BACKEND_WAREHOUSE_PATHS } from '@/lib/server/api/path';
 import { fetchBackendResponse } from '@/lib/server/fetch';
@@ -72,5 +73,16 @@ export const getServerWarehouseStock = (
 ) =>
   fetchWarehouseResource<PaginatedResponse<WarehouseStockItem>>(
     tokenizePath(BACKEND_WAREHOUSE_PATHS.warehouseStock, { id: warehouseId }),
+    getPaginationSearch(input)
+  );
+
+export const getServerWarehouseSupplies = (
+  warehouseId: string | number,
+  input?: PaginationSearchInput
+) =>
+  fetchWarehouseResource<PaginatedResponse<WarehouseSupply>>(
+    tokenizePath(BACKEND_WAREHOUSE_PATHS.warehouseSupplies, {
+      id: warehouseId,
+    }),
     getPaginationSearch(input)
   );

@@ -53,18 +53,34 @@ const getUnitsOfMeasurementMock = vi.mocked(getUnitsOfMeasurement);
 
 const updateSupplyMock = vi.mocked(updateSupply);
 const savedSupply: SupplyDetails = {
+  comment: null,
+  completedAt: null,
+  completedBy: null,
+  supplierInvoiceNumber: null,
+  createdAt: '2026-10-28T10:00:00Z',
+  createdBy: 'owner@example.test',
+  updatedAt: '2026-10-28T10:00:00Z',
+  updatedBy: 'owner@example.test',
+
   id: 9,
   supplier: { id: 3, name: 'Global Foods', status: 'ACTIVE' },
   warehouse: { id: 4, name: 'Main Warehouse', status: 'ACTIVE' },
   status: SUPPLY_STATUS.DRAFT,
   supplyNumber: 'SUP-001',
-  totalQuantity: 20,
+
   totalPrice: 560,
   version: 1,
   supplyEntries: [
     {
+      comment: null,
+
       id: 17,
-      productVariant: { id: 11, name: 'Jasmine Rice 5kg', sku: 'RICE-5KG' },
+      productVariant: {
+        barcode: '',
+        id: 11,
+        name: 'Jasmine Rice 5kg',
+        sku: 'RICE-5KG',
+      },
       unitOfMeasurement: {
         id: 2,
         name: 'Bag',
@@ -146,7 +162,12 @@ describe('UpdateSupply', () => {
           {
             ...savedSupply.supplyEntries[0],
             id: 18,
-            productVariant: { id: 12, name: 'Brown Rice', sku: 'BROWN' },
+            productVariant: {
+              barcode: '',
+              id: 12,
+              name: 'Brown Rice',
+              sku: 'BROWN',
+            },
             quantity: 3,
           },
         ],
@@ -193,7 +214,12 @@ describe('UpdateSupply', () => {
           {
             ...savedSupply.supplyEntries[0],
             id: 18,
-            productVariant: { id: 12, name: 'Brown Rice', sku: 'BROWN' },
+            productVariant: {
+              barcode: '',
+              id: 12,
+              name: 'Brown Rice',
+              sku: 'BROWN',
+            },
             quantity: 0,
           },
         ],
@@ -235,13 +261,23 @@ describe('UpdateSupply', () => {
           {
             ...savedSupply.supplyEntries[0],
             id: 18,
-            productVariant: { id: 12, name: 'Brown Rice', sku: 'BROWN' },
+            productVariant: {
+              barcode: '',
+              id: 12,
+              name: 'Brown Rice',
+              sku: 'BROWN',
+            },
             quantity: 3,
           },
           {
             ...savedSupply.supplyEntries[0],
             id: 19,
-            productVariant: { id: 13, name: 'Basmati Rice', sku: 'BASMATI' },
+            productVariant: {
+              barcode: '',
+              id: 13,
+              name: 'Basmati Rice',
+              sku: 'BASMATI',
+            },
             quantity: 5,
           },
         ],
@@ -757,7 +793,7 @@ describe('UpdateSupply', () => {
     const user = userEvent.setup();
     const updatedSupply = {
       ...savedSupply,
-      totalQuantity: 25,
+
       totalPrice: 700,
       version: 2,
       supplyEntries: savedSupply.supplyEntries.map((entry) => ({

@@ -32,13 +32,17 @@ vi.mock('@/lib/client/api/supplies', async () => ({
 const getSuppliesMock = vi.mocked(getSupplies);
 
 const supply = {
+  comment: null,
+  completedAt: null,
+  completedBy: null,
+
   id: 1,
   supplier: { id: 2, name: 'Fresh Farms', status: 'ACTIVE' },
   warehouse: { id: 3, name: 'Main warehouse', status: 'ACTIVE' },
   status: SUPPLY_STATUS.DRAFT,
   supplyNumber: 'SUP-001',
   supplierInvoiceNumber: 'INV-001',
-  totalQuantity: 12,
+
   totalPrice: 48.5,
   createdAt: '2026-08-01T10:30:00.000Z',
 } satisfies Supply;
@@ -111,7 +115,18 @@ describe('SuppliesList', () => {
     expect(screen.getByText('Main warehouse')).toBeVisible();
     expect(screen.getByText('Draft')).toBeVisible();
     expect(screen.getByText('INV-001')).toBeVisible();
-    expect(screen.getByText('48.5')).toBeVisible();
+    expect(screen.getByText('$48.50')).toBeVisible();
+    expect(
+      screen.getAllByRole('columnheader').map((header) => header.textContent)
+    ).toEqual([
+      'Supply number',
+      'Supplier',
+      'Warehouse',
+      'Status',
+      'Invoice number',
+      'Supply value',
+      'Created at',
+    ]);
     expect(screen.getByText('01 Aug 2026')).toBeVisible();
   });
 

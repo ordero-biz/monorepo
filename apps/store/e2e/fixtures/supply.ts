@@ -21,6 +21,13 @@ export const products: ProductVariant[] = [
 }));
 
 export const draftSupply: SupplyDetails = {
+  completedAt: null,
+  completedBy: null,
+  createdAt: '2026-10-28T10:00:00Z',
+  createdBy: 'owner@example.test',
+  updatedAt: '2026-10-28T10:00:00Z',
+  updatedBy: 'owner@example.test',
+
   id: 9,
   version: 1,
   status: 'DRAFT',
@@ -29,12 +36,19 @@ export const draftSupply: SupplyDetails = {
   comment: 'Original saved comment',
   supplier: { id: 1, name: 'Fresh Farms', status: 'ACTIVE' },
   warehouse: { id: 2, name: 'Main Warehouse', status: 'ACTIVE' },
-  totalQuantity: 2,
+
   totalPrice: 10,
   supplyEntries: [
     {
+      comment: null,
+
       id: 17,
-      productVariant: { id: 11, name: 'Rice', sku: 'RICE' },
+      productVariant: {
+        barcode: '',
+        id: 11,
+        name: 'Rice',
+        sku: 'RICE',
+      },
       unitOfMeasurement: {
         id: 3,
         name: 'Bag',

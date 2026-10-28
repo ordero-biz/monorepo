@@ -5,7 +5,7 @@ Status: accepted for the current implementation. Updated: 2026-10-28.
 The warehouse detail page helps store operators see the value of stock held in
 one warehouse and inspect the products contributing to that value. It shows
 warehouse identity and status, an inventory value summary, warehouse details,
-and a paginated product table.
+and a switchable, paginated Products / Supplies list.
 
 ## Inventory value
 
@@ -35,12 +35,13 @@ product pages. Changing the table page or page size must not change its scope.
 | Inventory value | `GET /api/v1/warehouses/{id}` → `totalPrice` | Use the warehouse aggregate directly. Never sum the loaded table page. |
 | Stock value for a row | `GET /api/v1/warehouses/{id}/stock` → `content[].totalPrice` | Display the backend's value for that stock record. |
 | Quantity and unit | `content[].quantity` and `content[].unitOfMeasurement` | Keep the quantity associated with its unit. |
-| Products count | Stock response → `page.totalElements` | Show the total number of stock records across pages, not the number currently loaded or a sum of quantities. |
+| List totals | Selected response → `page.totalElements` | Pagination shows the total number of matching records across pages. |
+| Supply value for a row | `GET /api/v1/warehouses/{id}/supplies` → `content[].totalPrice` | Show the supply document value, labelled **Supply value**. This is not current stock value. |
 | Currency | Existing app money formatter | Display dollar-formatted amounts and an explicit `USD` code in the summary. |
 
 Stock rows are identified by product variant and unit of measurement together.
-The Products count therefore counts stock records; it is not guaranteed to be
-a count of distinct product variants.
+The product pagination total therefore counts stock records; it is not
+guaranteed to be a count of distinct product variants.
 
 The API fields retain their `totalPrice` names. User-facing labels express
 their meaning without requiring a backend field rename.
@@ -59,13 +60,44 @@ provide a currency field. Currency selection or conversion is not implemented.
 | Do not add a tooltip to the summary card. | The essential explanation is already visible in its label and supporting text. |
 | Show the warehouse total only in the summary card. | Repeating the same total in the table footer adds no information. |
 | Do not show a combined quantity total. | Quantities with different units, such as grams and boxes, cannot be meaningfully added together. |
-| Right-align quantities and monetary values; use tabular numerals. | Consistent alignment makes rows easier to compare. |
-| Put the Products heading and count in the DataTable header slot. | Keep collection context with the table and outside its horizontal scroll area. |
+| Right-align product quantities and stock values; left-align Supply value in both supply lists. Use tabular numerals. | Keep alignment consistent within each list type. |
+| Keep the active list title and total record count on the left of the DataTable header, with the Products / Supplies ToggleButton group on the right. | Preserve collection context and show its size while keeping the switcher separate and outside horizontal scrolling. |
 | Stack inventory value, warehouse details, and products on narrow screens. | Preserve the reading order when the summary and details cannot fit side by side. |
 
 The responsive warehouse content is implemented. Mobile app navigation remains
 a separate task; the existing desktop sidebar still limits the full page's
 usability on phone screens.
+
+## Products / Supplies switching
+
+- The header displays **Products** or **Supplies** with the active response’s
+  `page.totalElements`. This is the total record count across all pages.
+  Show zero for an empty list; omit the count until a response is available.
+- Products is the default view. The existing `ToggleButton.Group` provides
+  single selection; pressing the selected item does not clear the selection.
+- Store the selection in `view=products` or `view=supplies`. Missing or invalid
+  values resolve to Products. Reload and browser history restore the URL view.
+- Switching resets the page to 1, preserves page size, and clears sorting
+  because the two lists have different fields. This follows ProductsList's
+  reset-on-switch behavior; independent remembered pages are not implemented.
+- Only the selected list is fetched and prefetched on the server. Both lists
+  use the existing same-origin authenticated proxy and pagination conventions.
+- The supplies endpoint defines warehouse membership. Do not filter a global
+  supplies page in the browser or repeat the Warehouse column.
+- Supply numbers link to supply details. Both supply tables share the order:
+  Supply number, Supplier, Invoice number, Supply value, Created at. The global
+  list adds Warehouse and Status after Supplier; the warehouse list omits both.
+- Supply value uses the currency sign in each formatted amount; do not append
+  `(USD)` to its heading. Supply number and created date are required strings.
+  A nullable invoice number displays a dash. Response fields are required,
+  with explicit nulls for nullable values; `totalQuantity` is no longer returned.
+- Inventory value and warehouse details remain visible with the same meaning
+  in both views. Do not replace inventory value with a sum of supply values.
+- The switcher stays available while either list loads, fails, or is empty.
+  An empty supplies response displays **No supplies for this warehouse yet.**
+- Warehouse supply query keys include warehouse id and pagination under the
+  existing supply-list prefix. Supply creation and updates therefore invalidate
+  these lists along with the global list, including when a supply moves warehouse.
 
 ## Empty and error states
 
@@ -113,6 +145,12 @@ usability on phone screens.
   cover aggregate scope and independence from product-list failures.
 - [Warehouse pagination browser test](../../apps/store/e2e/WarehouseStockPagination.spec.ts)
   checks the aggregate while navigating product pages.
+- [Warehouse list switching tests](../../apps/store/src/features/warehouses/detail/WarehouseDetail/WarehouseDetailLists.test.tsx)
+  cover selection, loading, empty/error states, supply fields, and pagination.
+- [Warehouse supplies browser test](../../apps/store/e2e/WarehouseSupplies.spec.ts)
+  covers switching, pagination, reload, detail links, and browser history.
+- [Warehouse supplies API](https://ordero-service-production.up.railway.app/swagger-ui/index.html#/warehouse-controller/getWarehouseStockSupplies)
+  returns `PagedModelSupplyListDetailsResponse`; verified on 2026-10-28.
 - [Shared DataTable documentation](../data-tables.md) describes the reusable
   header and pagination APIs.
 

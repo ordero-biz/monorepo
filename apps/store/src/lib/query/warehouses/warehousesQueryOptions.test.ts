@@ -1,8 +1,10 @@
 import { QueryClient } from '@tanstack/react-query';
 import { WAREHOUSE_STATUS } from '@/lib/domain/warehouses/constants';
+import { suppliesQueryKeys } from '../supplies/suppliesQueryKeys';
 import {
   warehouseQueryOptions,
   warehouseStockQueryOptions,
+  warehouseSuppliesQueryOptions,
   warehousesListQueryOptions,
 } from './warehousesQueryOptions';
 
@@ -144,6 +146,53 @@ describe('warehouseStockQueryOptions', () => {
         warehouseStockQueryOptions({
           warehouseId: 1,
           fetchWarehouseStock: async () => ({ ok: false, error }),
+        })
+      )
+    ).rejects.toEqual(error);
+  });
+});
+
+describe('warehouseSuppliesQueryOptions', () => {
+  it('isolates warehouses and pages while sharing supply-list invalidation', async () => {
+    const client = createQueryClient();
+    const data = {
+      content: [],
+      page: { number: 0, size: 10, totalElements: 0, totalPages: 0 },
+    };
+    const fetchWarehouseSupplies = vi.fn(async () => ({
+      ok: true as const,
+      data,
+    }));
+    const input = { page: 1, size: 10 };
+    const options = warehouseSuppliesQueryOptions({
+      warehouseId: 7,
+      input,
+      fetchWarehouseSupplies,
+    });
+    await expect(client.fetchQuery(options)).resolves.toEqual(data);
+    expect(fetchWarehouseSupplies).toHaveBeenCalledExactlyOnceWith(7, input);
+    expect(
+      client.getQueryData(suppliesQueryKeys.warehouseListPage('7', input))
+    ).toEqual(data);
+    expect(
+      client.getQueryData(suppliesQueryKeys.warehouseListPage(8, input))
+    ).toBeUndefined();
+    expect(
+      client.getQueryData(
+        suppliesQueryKeys.warehouseListPage(7, { page: 2, size: 10 })
+      )
+    ).toBeUndefined();
+    await client.invalidateQueries({ queryKey: suppliesQueryKeys.list });
+    expect(client.getQueryState(options.queryKey)?.isInvalidated).toBe(true);
+  });
+
+  it('throws normalized backend errors', async () => {
+    const error = { status: 503, message: 'Supplies unavailable.' };
+    await expect(
+      createQueryClient().fetchQuery(
+        warehouseSuppliesQueryOptions({
+          warehouseId: 7,
+          fetchWarehouseSupplies: async () => ({ ok: false, error }),
         })
       )
     ).rejects.toEqual(error);

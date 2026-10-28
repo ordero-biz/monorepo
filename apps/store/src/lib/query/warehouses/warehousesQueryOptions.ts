@@ -3,10 +3,21 @@ import { queryOptions } from '@tanstack/react-query';
 import type {
   Warehouse,
   WarehouseStockItem,
+  WarehouseSupply,
 } from '@/lib/domain/warehouses/types';
 import type { PaginatedResponse } from '@/lib/server/types';
 import type { PaginationSearchInput } from '@/lib/utils/url';
+import { suppliesQueryKeys } from '../supplies/suppliesQueryKeys';
 import { warehousesQueryKeys } from './warehousesQueryKeys';
+
+type WarehouseSuppliesQueryOptionsArgs = {
+  warehouseId: string | number;
+  fetchWarehouseSupplies: (
+    warehouseId: string | number,
+    input?: PaginationSearchInput
+  ) => Promise<ApiResult<PaginatedResponse<WarehouseSupply>>>;
+  input?: PaginationSearchInput;
+};
 
 type WarehousesFetcher = (
   input?: PaginationSearchInput
@@ -63,4 +74,14 @@ export const warehouseStockQueryOptions = ({
   queryOptions({
     queryKey: warehousesQueryKeys.stockPage(warehouseId, input),
     queryFn: () => unwrapApiResult(fetchWarehouseStock(warehouseId, input)),
+  });
+
+export const warehouseSuppliesQueryOptions = ({
+  warehouseId,
+  fetchWarehouseSupplies,
+  input,
+}: WarehouseSuppliesQueryOptionsArgs) =>
+  queryOptions({
+    queryKey: suppliesQueryKeys.warehouseListPage(warehouseId, input),
+    queryFn: () => unwrapApiResult(fetchWarehouseSupplies(warehouseId, input)),
   });
