@@ -312,11 +312,23 @@ export const validateProductVariants = ({
 export const validateProductConfiguration = ({
   generationMode,
   value,
-}: ValidateProductConfigurationArgs) =>
-  validateProductVariants({
+}: ValidateProductConfigurationArgs) => {
+  const name = validateProductName({ value: value.name });
+  const category = validateProductCategory({ value: value.category });
+  const status = validateProductStatus({ value: value.status });
+  const variantErrors = validateProductVariants({
     requireAttributeValueIds: generationMode === PRODUCT_GENERATION_MODE.many,
     value,
   });
+  const fields = {
+    ...(name ? { name } : {}),
+    ...(category ? { category } : {}),
+    ...(status ? { status } : {}),
+    ...variantErrors?.fields,
+  };
+
+  return Object.keys(fields).length > 0 ? { fields } : undefined;
+};
 
 export const validateSingleProductConfiguration = (
   value: ProductVariantsCreationValues

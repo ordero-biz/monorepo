@@ -406,7 +406,7 @@ describe('validateProductVariants', () => {
 });
 
 describe('validateProductConfiguration', () => {
-  it('leaves single-field rules to the field validators', () => {
+  it('validates common product details without mounted fields', () => {
     expect(
       validateProductConfiguration({
         generationMode: PRODUCT_GENERATION_MODE.one,
@@ -426,7 +426,13 @@ describe('validateProductConfiguration', () => {
           status: 'ARCHIVED' as never,
         },
       })
-    ).toBeUndefined();
+    ).toEqual({
+      fields: {
+        name: 'Product name is required',
+        category: 'Category is required',
+        status: 'Product status must be Draft or Active',
+      },
+    });
   });
 
   it('applies multiple-product variant requirements without generation fields', () => {

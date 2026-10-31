@@ -20,7 +20,11 @@ export const ProductStatusSelector = ({
     required
     value={value}
   >
-    <Radio align="start" value={PRODUCT_STATUS.DRAFT}>
+    <Radio
+      align="start"
+      tabIndex={value === PRODUCT_STATUS.DRAFT ? 0 : -1}
+      value={PRODUCT_STATUS.DRAFT}
+    >
       <div className="flex flex-col">
         Draft
         <Typography color="text-secondary" variant="caption">
@@ -28,7 +32,11 @@ export const ProductStatusSelector = ({
         </Typography>
       </div>
     </Radio>
-    <Radio align="start" value={PRODUCT_STATUS.ACTIVE}>
+    <Radio
+      align="start"
+      tabIndex={value === PRODUCT_STATUS.ACTIVE ? 0 : -1}
+      value={PRODUCT_STATUS.ACTIVE}
+    >
       <div className="flex flex-col">
         Active
         <Typography color="text-secondary" variant="caption">

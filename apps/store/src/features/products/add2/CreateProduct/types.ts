@@ -3,6 +3,7 @@ import type { AttributeDropdown } from '@/lib/domain/attributes/types';
 import type {
   ProductGenerationValues as BaseProductGenerationValues,
   PRODUCT_GENERATION_MODE,
+  ProductCommonValues,
 } from '../../add/CreateProduct';
 import type { useProductVariantsGenerationForm } from './hooks/useProductVariantsGenerationForm';
 
@@ -47,4 +48,24 @@ export type AttributesAsyncComboboxProps = {
   onAttributeSelected: (attribute: AttributeDropdown) => void;
   onBlur: FocusEventHandler<HTMLInputElement>;
   selectedAttributes: AttributeDropdown[];
+};
+
+export type CommonProductDataProps = {
+  isEditing: boolean;
+  onEditingChange: (isEditing: boolean) => void;
+  values: ProductCommonValues;
+  variantCount: number;
+  editorErrors: ProductDetailsErrors;
+  onApply: (values: ProductCommonValues) => void;
+};
+
+export type ProductDetailsErrors = Partial<
+  Record<keyof ProductCommonValues, string>
+>;
+
+export type ProductDetailsEditorProps = {
+  initialValues: ProductCommonValues;
+  initialErrors: ProductDetailsErrors;
+  onApply: (values: ProductCommonValues) => void;
+  onCancel: () => void;
 };

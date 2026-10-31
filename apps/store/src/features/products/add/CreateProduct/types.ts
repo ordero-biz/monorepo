@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import type { AsyncComboboxMultipleProps } from '@/lib/components/AsyncCombobox';
 import type { AttributeDropdown } from '@/lib/domain/attributes/types';
 import type { CategorySelection } from '@/lib/domain/categories/types';
@@ -30,6 +31,8 @@ export type ProductVariantsGenerationFormProps = {
 };
 
 export type ProductVariantsCreationFormProps = {
+  commonProductFields?: ReactNode;
+  isEditingProductDetails?: boolean;
   productVariantsCreationForm: ProductVariantsCreationFormApi;
   generatedAttributes: AttributeDropdown[];
   generationMode: ProductGenerationMode;
@@ -118,6 +121,8 @@ export type EditProductVariantAttributesDialogProps = {
   open: boolean;
   productVariantName: string;
 };
+
+export type CommonProductFieldInputsProps = CommonProductFieldsProps;
 
 export type ProductImageDropzoneProps = {
   className?: string;

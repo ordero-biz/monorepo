@@ -5,12 +5,16 @@ import { GeneratedProductVariants } from './GeneratedProductVariants';
 import type { ProductVariantsCreationFormProps } from './types';
 
 export const ProductVariantsCreationForm = ({
+  commonProductFields,
+  isEditingProductDetails = false,
   productVariantsCreationForm,
   generatedAttributes,
   generationMode,
 }: ProductVariantsCreationFormProps) => {
   const handleSubmit = () => {
-    productVariantsCreationForm.handleSubmit();
+    if (!isEditingProductDetails) {
+      productVariantsCreationForm.handleSubmit();
+    }
   };
 
   return (
@@ -22,9 +26,11 @@ export const ProductVariantsCreationForm = ({
         handleSubmit();
       }}
     >
-      <CommonProductFields
-        productVariantsCreationForm={productVariantsCreationForm}
-      />
+      {commonProductFields ?? (
+        <CommonProductFields
+          productVariantsCreationForm={productVariantsCreationForm}
+        />
+      )}
       <GeneratedProductVariants
         productVariantsCreationForm={productVariantsCreationForm}
         generatedAttributes={generatedAttributes}
@@ -53,7 +59,7 @@ export const ProductVariantsCreationForm = ({
                       {(isSubmitting) => (
                         <Button
                           color="primary"
-                          disabled={isSubmitting}
+                          disabled={isSubmitting || isEditingProductDetails}
                           onClick={handleSubmit}
                           size="m"
                           type="button"

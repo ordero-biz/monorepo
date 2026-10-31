@@ -84,17 +84,19 @@ vi.mock('@/features/categories', async () => ({
     '@/features/categories'
   )),
   CategoriesAsyncCombobox: ({
+    invalid,
     errorText,
     onValueChange,
     value,
   }: Pick<
     ComponentProps<typeof CategoriesAsyncCombobox>,
-    'errorText' | 'value'
+    'errorText' | 'invalid' | 'value'
   > & {
     onValueChange: (value: CategorySelection | null) => void;
   }) => (
     <>
       <button
+        aria-invalid={invalid}
         onClick={() => onValueChange({ id: 2, name: 'Coffee and tea' })}
         type="button"
       >
@@ -191,7 +193,7 @@ describe('New product creation design', () => {
     ).toBeEnabled();
   }, 30000);
 
-  it('saves the reviewed product, refreshes product lists, and returns to products', async () => {
+  it('saves applied product details without changing variants, refreshes lists, and returns to products', async () => {
     vi.mocked(createProductGroup).mockResolvedValue({
       ok: true,
       data: {
@@ -216,6 +218,23 @@ describe('New product creation design', () => {
     await user.click(screen.getByRole('button', { name: 'Select category' }));
     await user.click(screen.getByRole('button', { name: 'Review variants' }));
     await screen.findByRole('form', { name: 'Product configuration' });
+    await user.click(screen.getByRole('button', { name: 'Edit details' }));
+    const product = screen.getByRole('region', { name: 'Product details' });
+    const productName = within(product).getByRole('textbox', {
+      name: 'Product name',
+    });
+    await user.clear(productName);
+    await user.type(productName, 'Updated shirt');
+    await user.type(
+      within(product).getByRole('textbox', { name: 'Description' }),
+      'Product description'
+    );
+    await user.click(within(product).getByRole('radio', { name: /^Active/ }));
+    await user.keyboard('{Enter}');
+    expect(createProductGroup).not.toHaveBeenCalled();
+    await user.click(
+      within(product).getByRole('button', { name: 'Apply changes' })
+    );
     await user.type(screen.getByRole('textbox', { name: 'SKU' }), 'SHIRT-1');
     await user.type(screen.getByRole('textbox', { name: 'Barcode' }), '123456');
     await user.click(screen.getByRole('button', { name: 'Create product' }));
@@ -224,8 +243,9 @@ describe('New product creation design', () => {
     );
     expect(createProductGroup).toHaveBeenCalledWith({
       categoryId: 2,
-      name: 'Shirt',
-      status: 'DRAFT',
+      name: 'Updated shirt',
+      description: 'Product description',
+      status: 'ACTIVE',
       productVariants: [
         {
           name: 'Shirt',
@@ -271,6 +291,12 @@ describe('New product creation design', () => {
     ).toBeVisible();
     expect(
       screen.queryByRole('form', { name: 'Product generation' })
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('region', { name: 'Product summary' })
+    ).toBeVisible();
+    expect(
+      screen.queryByRole('button', { name: 'Apply changes' })
     ).not.toBeInTheDocument();
     expect(mocks.push).not.toHaveBeenCalled();
   }, 15000);
@@ -385,6 +411,7 @@ describe('New product creation design', () => {
     const configuration = await screen.findByRole('form', {
       name: 'Product configuration',
     });
+    expect(screen.getByText('4 variants')).toBeVisible();
     for (const name of [
       'Shirt Blue Cotton',
       'Shirt Blue Linen',
@@ -594,24 +621,221 @@ describe('New product creation design', () => {
     const configuration = await screen.findByRole('form', {
       name: 'Product configuration',
     });
+    const product = within(configuration).getByRole('region', {
+      name: 'Product details',
+    });
+    const summary = within(product).getByRole('region', {
+      name: 'Product summary',
+    });
+    for (const label of [
+      'Product name',
+      'Category',
+      'Description',
+      'Status after creation',
+    ]) {
+      expect(within(summary).getByText(label)).toBeVisible();
+    }
+    expect(within(summary).getByText('Draft')).toBeVisible();
+    expect(within(summary).getByText('Kilograms coffee')).toBeVisible();
+    expect(within(summary).getByText('Coffee and tea')).toBeVisible();
+    expect(within(summary).getByText('Freshly roasted coffee.')).toBeVisible();
+    expect(within(product).getByText('1 variant')).toBeVisible();
+    expect(within(product).getByText('No image')).toBeVisible();
+    expect(within(product).queryByRole('textbox')).not.toBeInTheDocument();
+
+    await user.click(
+      within(product).getByRole('button', { name: 'Edit details' })
+    );
     expect(
-      within(configuration).getByRole('textbox', { name: 'Base product name' })
+      within(product).queryByRole('region', { name: 'Product summary' })
+    ).not.toBeInTheDocument();
+    await waitFor(() =>
+      expect(
+        within(product).getByRole('textbox', { name: 'Product name' })
+      ).toHaveFocus()
+    );
+    expect(
+      within(product).getByRole('textbox', { name: 'Product name' })
     ).toHaveValue('Kilograms coffee');
     expect(
-      within(
-        within(configuration).getByRole('region', { name: 'Common product' })
-      ).getByRole('textbox', {
-        name: 'Description',
-      })
+      within(product).getByRole('textbox', { name: 'Description' })
     ).toHaveValue('Freshly roasted coffee.');
     expect(
-      within(configuration).getByRole('button', { name: 'Coffee and tea' })
+      within(product).getByRole('button', { name: 'Coffee and tea' })
     ).toBeVisible();
     expect(
       within(configuration).getByRole('button', { name: 'Kilograms coffee' })
     ).toBeVisible();
     expect(
       screen.queryByRole('form', { name: 'Product generation' })
+    ).not.toBeInTheDocument();
+  });
+
+  it('updates shared details without regenerating variants and keeps invalid fields open', async () => {
+    const user = userEvent.setup();
+    setup();
+    await user.type(
+      screen.getByRole('textbox', { name: 'Product name' }),
+      'Coffee'
+    );
+    await user.click(screen.getByRole('button', { name: 'Select category' }));
+    await user.click(screen.getByRole('button', { name: 'Review variants' }));
+    const product = await screen.findByRole('region', {
+      name: 'Product details',
+    });
+    expect(within(product).getByText('No description added')).toBeVisible();
+    await user.click(
+      within(product).getByRole('button', { name: 'Edit details' })
+    );
+    const name = within(product).getByRole('textbox', {
+      name: 'Product name',
+    });
+    await user.clear(name);
+    await user.tab();
+    expect(
+      await within(product).findByText('Product name is required')
+    ).toBeVisible();
+    expect(
+      within(product).getByRole('button', { name: 'Apply changes' })
+    ).toBeEnabled();
+    await user.click(
+      within(product).getByRole('button', { name: 'Apply changes' })
+    );
+    expect(name).toBeVisible();
+    expect(
+      screen.getByRole('button', { name: 'Create product' })
+    ).toBeDisabled();
+    await user.type(name, 'Roasted coffee');
+    await user.type(
+      within(product).getByRole('textbox', { name: 'Description' }),
+      'Fresh coffee.'
+    );
+    await user.click(within(product).getByRole('radio', { name: /^Active/ }));
+    expect(
+      within(product).queryByRole('region', { name: 'Product summary' })
+    ).not.toBeInTheDocument();
+    expect(within(product).getByText('Editing')).toBeVisible();
+    expect(
+      within(product).getByRole('radiogroup', { name: 'Status after creation' })
+    ).toBeVisible();
+    await user.click(
+      within(product).getByRole('button', { name: 'Apply changes' })
+    );
+    const summary = within(product).getByRole('region', {
+      name: 'Product summary',
+    });
+    expect(within(summary).getByText('Active')).toBeVisible();
+    expect(
+      screen.getByRole('button', { name: 'Create product' })
+    ).toBeEnabled();
+    expect(within(product).getByText('Roasted coffee')).toBeVisible();
+    expect(
+      within(
+        within(product).getByRole('region', { name: 'Product summary' })
+      ).getByText('Fresh coffee.')
+    ).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Coffee' })).toBeVisible();
+    expect(within(product).queryByRole('textbox')).not.toBeInTheDocument();
+    await user.click(
+      within(product).getByRole('button', { name: 'Edit details' })
+    );
+    expect(
+      within(product).getByRole('textbox', { name: 'Product name' })
+    ).toHaveValue('Roasted coffee');
+    expect(
+      within(product).getByRole('textbox', { name: 'Description' })
+    ).toHaveValue('Fresh coffee.');
+    expect(createProductGroup).not.toHaveBeenCalled();
+  });
+
+  it('discards edits and validation errors on Cancel without changing product or variant details', async () => {
+    const user = userEvent.setup();
+    setup();
+    await user.type(
+      screen.getByRole('textbox', { name: 'Product name' }),
+      'Coffee'
+    );
+    await user.click(screen.getByRole('button', { name: 'Select category' }));
+    await user.type(
+      screen.getByRole('textbox', { name: 'Description' }),
+      'Original description'
+    );
+    await user.click(screen.getByRole('button', { name: 'Review variants' }));
+    const product = await screen.findByRole('region', {
+      name: 'Product details',
+    });
+    await user.click(
+      within(product).getByRole('button', { name: 'Edit details' })
+    );
+    await user.clear(
+      within(product).getByRole('textbox', { name: 'Product name' })
+    );
+    await user.type(
+      within(product).getByRole('textbox', { name: 'Description' }),
+      ' changed'
+    );
+    await user.click(within(product).getByRole('radio', { name: /^Active/ }));
+    await user.click(
+      within(product).getByRole('button', { name: 'Apply changes' })
+    );
+    expect(
+      await within(product).findByText('Product name is required')
+    ).toBeVisible();
+    await user.click(within(product).getByRole('button', { name: 'Cancel' }));
+    const summary = within(product).getByRole('region', {
+      name: 'Product summary',
+    });
+    expect(within(summary).getByText('Coffee')).toBeVisible();
+    expect(within(summary).getByText('Original description')).toBeVisible();
+    expect(within(summary).getByText('Draft')).toBeVisible();
+    expect(
+      within(product).queryByText('Product name is required')
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Create product' })
+    ).toBeEnabled();
+    expect(
+      within(product).getByRole('button', { name: 'Edit details' })
+    ).toHaveFocus();
+    await user.click(
+      within(product).getByRole('button', { name: 'Edit details' })
+    );
+    expect(
+      within(product).getByRole('textbox', { name: 'Product name' })
+    ).toHaveValue('Coffee');
+    expect(
+      within(product).getByRole('textbox', { name: 'Description' })
+    ).toHaveValue('Original description');
+    expect(
+      within(product).getByRole('radio', { name: /^Draft/ })
+    ).toBeChecked();
+    expect(createProductGroup).not.toHaveBeenCalled();
+  });
+
+  it('keeps the summary visible when the service returns only a general error', async () => {
+    vi.mocked(createProductGroup).mockResolvedValue({
+      ok: false,
+      error: { status: 503, message: 'Service unavailable. Try again.' },
+    });
+    const user = userEvent.setup();
+    setup();
+    await user.type(
+      screen.getByRole('textbox', { name: 'Product name' }),
+      'Coffee'
+    );
+    await user.click(screen.getByRole('button', { name: 'Select category' }));
+    await user.click(screen.getByRole('button', { name: 'Review variants' }));
+    await user.type(screen.getByRole('textbox', { name: 'SKU' }), 'COFFEE-1');
+    await user.type(screen.getByRole('textbox', { name: 'Barcode' }), '123456');
+    await user.click(screen.getByRole('button', { name: 'Create product' }));
+    expect(
+      await screen.findByText('Service unavailable. Try again.')
+    ).toBeVisible();
+    expect(
+      screen.getByRole('region', { name: 'Product summary' })
+    ).toBeVisible();
+    expect(
+      screen.queryByRole('button', { name: 'Apply changes' })
     ).not.toBeInTheDocument();
   });
 });
