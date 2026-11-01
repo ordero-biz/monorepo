@@ -240,7 +240,9 @@ describe('EditProductVariantAttributesDialog', () => {
     const user = userEvent.setup();
     const { onUpdate } = setup({ attributes: [], attributeValueIds: [] });
     await user.click(screen.getByRole('button', { name: 'Add attribute' }));
-    await user.click(await screen.findByRole('option', { name: 'Material' }));
+    await user.click(
+      await screen.findByRole('option', { name: /^Material\b/ })
+    );
     const values = screen.getByRole('combobox', { name: 'Material' });
     expect(values).toHaveFocus();
     await user.click(values);
@@ -265,9 +267,9 @@ describe('EditProductVariantAttributesDialog', () => {
     ).not.toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Add attribute' }));
     expect(
-      await screen.findByRole('option', { name: 'Material' })
+      await screen.findByRole('option', { name: /^Material\b/ })
     ).toHaveAttribute('aria-disabled', 'true');
-    await user.click(screen.getByRole('option', { name: 'Color' }));
+    await user.click(screen.getByRole('option', { name: /^Color\b/ }));
     expect(
       screen.queryByRole('button', { name: 'Remove Blue' })
     ).not.toBeInTheDocument();
@@ -288,7 +290,9 @@ describe('EditProductVariantAttributesDialog', () => {
       screen.getByRole('button', { name: 'Remove Color attribute' })
     );
     await user.click(screen.getByRole('button', { name: 'Add attribute' }));
-    await user.click(await screen.findByRole('option', { name: 'Material' }));
+    await user.click(
+      await screen.findByRole('option', { name: /^Material\b/ })
+    );
     await user.click(screen.getByRole('button', { name: 'Cancel' }));
     expect(onUpdate).not.toHaveBeenCalled();
     await act(async () => {

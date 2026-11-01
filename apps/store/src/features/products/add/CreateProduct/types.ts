@@ -1,5 +1,4 @@
 import type { ReactNode } from 'react';
-import type { AsyncComboboxMultipleProps } from '@/lib/components/AsyncCombobox';
 import type { AttributeDropdown } from '@/lib/domain/attributes/types';
 import type { CategorySelection } from '@/lib/domain/categories/types';
 import type { ProductStatus } from '@/lib/domain/products/types';
@@ -38,21 +37,6 @@ export type ProductVariantsCreationFormProps = {
   generatedAttributes: AttributeDropdown[];
   generationMode: ProductGenerationMode;
 };
-
-export type AttributesAsyncComboboxProps = Omit<
-  AsyncComboboxMultipleProps<AttributeDropdown>,
-  | 'emptyText'
-  | 'isOptionDisabled'
-  | 'loadErrorText'
-  | 'loadingText'
-  | 'loadOptions'
-  | 'getOptionLabel'
-  | 'getOptionValue'
-  | 'renderOption'
-  | 'pageSize'
-  | 'queryKey'
-  | 'staticOptions'
->;
 
 export type ProductTemplateFieldsProps = {
   productVariantsGenerationForm: ProductVariantsGenerationFormApi;

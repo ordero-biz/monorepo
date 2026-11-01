@@ -1,13 +1,11 @@
 import { Button, Combobox, FieldHelperText } from '@ordero/ui';
 import { useStore } from '@tanstack/react-form';
 import { useId, useState } from 'react';
+import { AttributesAsyncCombobox } from '@/features/attributes';
 import type { AttributeValue } from '@/lib/domain/attributes/types';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
 import { getAttributeValueSelections } from '../../add/CreateProduct';
-import {
-  AttributesAsyncCombobox,
-  AttributeValuesRow,
-} from '../../shared/ProductAttributeFields';
+import { AttributeValuesRow } from '../../shared/ProductAttributeFields';
 import type { ProductAttributeValuesFieldProps } from './types';
 
 const getValueId = (value: AttributeValue) => String(value.id);
@@ -121,10 +119,17 @@ export const ProductAttributeValuesField = ({
                       </label>
                       <div className="min-w-0">
                         <AttributesAsyncCombobox
+                          aria-label="Attribute"
+                          autoFocus
+                          defaultOpen
+                          name="attributes"
+                          size="s"
+                          value={null}
                           id={`${fieldId}-new-attribute`}
                           aria-describedby={`${fieldId}-new-attribute-hint`}
                           invalid={Boolean(attributesError)}
-                          onAttributeSelected={(attribute) => {
+                          onValueChange={(attribute) => {
+                            if (!attribute) return;
                             if (
                               attributes.some(
                                 (item) => item.id === attribute.id
@@ -147,7 +152,9 @@ export const ProductAttributeValuesField = ({
                             );
                           }}
                           onBlur={attributesField.handleBlur}
-                          selectedAttributes={attributes}
+                          disabledAttributeIds={attributes.map(
+                            (attribute) => attribute.id
+                          )}
                         />
                       </div>
                       <Button

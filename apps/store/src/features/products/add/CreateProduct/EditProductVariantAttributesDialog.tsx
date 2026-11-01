@@ -8,14 +8,12 @@ import {
 } from '@ordero/ui';
 import { X } from 'lucide-react';
 import { useEffect, useId, useState } from 'react';
+import { AttributesAsyncCombobox } from '@/features/attributes';
 import type {
   AttributeDropdown,
   AttributeValue,
 } from '@/lib/domain/attributes/types';
-import {
-  AttributesAsyncCombobox,
-  AttributeValuesRow,
-} from '../../shared/ProductAttributeFields';
+import { AttributeValuesRow } from '../../shared/ProductAttributeFields';
 import type { EditProductVariantAttributesDialogProps } from './types';
 
 const getValueId = (value: AttributeValue) => String(value.id);
@@ -181,10 +179,19 @@ export const EditProductVariantAttributesDialog = ({
                     </label>
                     <div className="min-w-0">
                       <AttributesAsyncCombobox
+                        aria-label="Attribute"
+                        autoFocus
+                        defaultOpen
+                        name="attributes"
+                        size="s"
+                        value={null}
                         id={`${fieldId}-new-attribute`}
                         aria-describedby={`${fieldId}-new-attribute-hint`}
-                        selectedAttributes={selectedAttributes}
-                        onAttributeSelected={(attribute) => {
+                        disabledAttributeIds={selectedAttributes.map(
+                          (attribute) => attribute.id
+                        )}
+                        onValueChange={(attribute) => {
+                          if (!attribute) return;
                           if (
                             selectedAttributes.some(
                               (item) => item.id === attribute.id

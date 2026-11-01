@@ -3,3 +3,5 @@ export {
   AttributesList,
   AttributesListHeader,
 } from '@/features/attributes/list/AttributesList';
+
+export { AttributesAsyncCombobox } from './shared/AttributesAsyncCombobox';

@@ -56,7 +56,9 @@ const addAttribute = async (
   name: string
 ) => {
   await user.click(screen.getByRole('button', { name: 'Add attribute' }));
-  await user.click(await screen.findByRole('option', { name }));
+  await user.click(
+    await screen.findByRole('option', { name: new RegExp(`^${name}\\b`) })
+  );
 };
 
 const selectValues = async (
@@ -486,9 +488,9 @@ describe('New product creation design', () => {
     ).not.toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Add attribute' }));
     expect(
-      await screen.findByRole('option', { name: 'Color' })
+      await screen.findByRole('option', { name: /^Color\b/ })
     ).toHaveAttribute('aria-disabled', 'true');
-    await user.click(screen.getByRole('option', { name: 'Material' }));
+    await user.click(screen.getByRole('option', { name: /^Material\b/ }));
     await selectValues(user, { attribute: 'Material', values: ['Cotton'] });
     await user.click(
       screen.getByRole('button', { name: 'Remove Color attribute' })

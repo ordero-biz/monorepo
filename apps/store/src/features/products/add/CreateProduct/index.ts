@@ -1,4 +1,3 @@
-export { AttributesAsyncCombobox } from './AttributesAsyncCombobox';
 export { CommonProductFieldInputs } from './CommonProductFieldInputs';
 export { CreateProduct } from './CreateProduct';
 export {
