@@ -1,8 +1,4 @@
-import type {
-  ComboboxMultipleProps,
-  ComboboxOption,
-  ComboboxSingleProps,
-} from '@ordero/ui';
+import type { ComboboxMultipleProps, ComboboxSingleProps } from '@ordero/ui';
 import type { QueryKey } from '@tanstack/react-query';
 
 export type AsyncComboboxLoadOptionsArgs = {
@@ -10,35 +6,35 @@ export type AsyncComboboxLoadOptionsArgs = {
   pageSize: number;
 };
 
-export type AsyncComboboxLoadOptionsResult = {
+export type AsyncComboboxLoadOptionsResult<TOption extends object> = {
+  options: TOption[];
   nextPage?: number;
-  options: ComboboxOption[];
 };
 
-type AsyncComboboxCommonProps = {
-  isOptionDisabled?: (option: ComboboxOption) => boolean;
-  loadErrorText?: ComboboxSingleProps['listErrorText'];
+type AsyncComboboxCommonProps<TOption extends object> = {
   loadOptions: (
     args: AsyncComboboxLoadOptionsArgs
-  ) => Promise<AsyncComboboxLoadOptionsResult>;
-  onListScroll?: ComboboxSingleProps['onListScroll'];
-  pageSize?: number;
+  ) => Promise<AsyncComboboxLoadOptionsResult<TOption>>;
   queryKey: QueryKey;
-  staticOptions?: ComboboxOption[];
+  pageSize?: number;
+  staticOptions?: TOption[];
+  loadErrorText?: ComboboxSingleProps<TOption>['listErrorText'];
 };
 
-export type AsyncComboboxSingleProps = Omit<
-  ComboboxSingleProps,
-  'listErrorText' | 'loading' | 'loadingMore' | 'onListScroll' | 'options'
-> &
-  AsyncComboboxCommonProps;
+type AsyncOwnedProps = 'options' | 'loading' | 'loadingMore' | 'listErrorText';
 
-export type AsyncComboboxMultipleProps = Omit<
-  ComboboxMultipleProps,
-  'listErrorText' | 'loading' | 'loadingMore' | 'onListScroll' | 'options'
+export type AsyncComboboxSingleProps<TOption extends object> = Omit<
+  ComboboxSingleProps<TOption>,
+  AsyncOwnedProps
 > &
-  AsyncComboboxCommonProps;
+  AsyncComboboxCommonProps<TOption>;
 
-export type AsyncComboboxProps =
-  | AsyncComboboxSingleProps
-  | AsyncComboboxMultipleProps;
+export type AsyncComboboxMultipleProps<TOption extends object> = Omit<
+  ComboboxMultipleProps<TOption>,
+  AsyncOwnedProps
+> &
+  AsyncComboboxCommonProps<TOption>;
+
+export type AsyncComboboxProps<TOption extends object> =
+  | AsyncComboboxSingleProps<TOption>
+  | AsyncComboboxMultipleProps<TOption>;

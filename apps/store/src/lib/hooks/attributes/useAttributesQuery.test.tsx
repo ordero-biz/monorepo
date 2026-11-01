@@ -31,6 +31,7 @@ describe('attributes queries', () => {
           id: 1,
           name: 'Size',
           sortOrder: 10,
+          status: 'DRAFT' as const,
           createdAt: '2026-05-26T20:55:51.542Z',
         },
       ],

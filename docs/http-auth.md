@@ -81,6 +81,18 @@ type ApiError = {
 };
 ```
 
+## Backend Error-Code Mapping
+
+Backends may return a stable `ApiError.code` alongside a generic message such
+as `Conflict`. For known, user-actionable codes, each app should keep a single
+app-owned code and message catalog (for example,
+`src/lib/constants/apiErrorCodes.ts`) and resolve it before showing a mutation
+toast or returning a form-level error.
+
+Keep codes app-owned unless the same backend contract is used by more than one
+app. Preserve `fieldErrors` for field-level form mapping. When a code is unknown
+or has no user-facing mapping, fall back to `ApiError.message`.
+
 Server-side session resolution uses a separate internal result shape:
 
 ```ts
@@ -221,6 +233,10 @@ from the backend. Keep feature-facing request helpers under
 `src/lib/client/api/[resource]/index.ts` and use the generic `apiFetch()`
 transport/error-normalization helper from `@ordero/api-client`.
 
+Keep request DTOs next to the API helper rather than deriving them from feature
+form-value types. For partial updates, feature submit utilities normalize and
+compare form values, then call the helper with only changed DTO fields.
+
 ```mermaid
 sequenceDiagram
   participant UI as Client UI
@@ -338,6 +354,32 @@ Backend writes remain uncached. Choose the caller shape based on the UI:
   workflow side effects.
 - Auth mutations such as logout should clear, invalidate, or seed
   `authQueryKeys.session` and any session-dependent query state after success.
+
+### Success Callbacks And Cache Ownership
+
+Keep the form hook's `onUpdated` or mutation hook's `onDeleted`/`onActivated`
+callback when it delegates success handling to the workflow. The workflow uses
+that callback to close/reset the dialog, update caches, or navigate. This does
+not require exposing another callback through the dialog, trigger, header, and
+detail page.
+
+For update and publish flows, give each affected query one owner for refreshing
+its data. When the workflow's awaited `invalidateQueries(...)` already
+refetches the active entity query, do not also pass `onUpdated={() => refetch()}`
+from the parent. Invalidate affected list, detail, and nested collection keys
+at the workflow layer without adding a second refresh for the same query.
+
+Expose a dialog-level success callback only when a consumer has additional
+workflow work, such as clearing table selection, updating a local form
+baseline, or navigating. Remove callback props and forwarding code when their
+only purpose is a duplicate refetch.
+
+For deletion, remove the deleted entity's detail and child-resource caches,
+invalidate affected collections, and navigate away if the current page
+requires that entity. Do not refetch its deleted detail. Keep an `onDeleted`
+callback when it clears parent-owned selection; clear that selection and close
+the confirmation dialog after deletion succeeds, without waiting for the list
+refresh to finish.
 
 ## Auth Page Guard Flow
 

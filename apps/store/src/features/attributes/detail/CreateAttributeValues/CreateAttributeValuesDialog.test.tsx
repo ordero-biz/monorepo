@@ -1,9 +1,14 @@
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createAttributeValues } from '@/lib/client/api/attributes';
+import {
+  ATTRIBUTE_STATUS,
+  ATTRIBUTE_VALUE_STATUS,
+} from '@/lib/domain/attributes/constants';
 import { attributesQueryKeys } from '@/lib/query/attributes/attributesQueryKeys';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { CreateAttributeValuesDialog } from './CreateAttributeValuesDialog';
+import type { CreateAttributeValuesDialogProps } from './types';
 
 const onOpenChangeMock = vi.fn();
 
@@ -16,10 +21,11 @@ vi.mock('@/lib/client/api/attributes', async () => ({
 
 const createAttributeValuesMock = vi.mocked(createAttributeValues);
 
-const { setup } = prepareStoreSetup({
+const { setup } = prepareStoreSetup<CreateAttributeValuesDialogProps>({
   component: CreateAttributeValuesDialog,
   props: {
     attributeId: 7,
+    attributeStatus: ATTRIBUTE_STATUS.ACTIVE,
     onOpenChange: onOpenChangeMock,
     open: true,
   },
@@ -47,6 +53,7 @@ describe('CreateAttributeValuesDialog', () => {
     });
     const saveButton = within(dialog).getByRole('button', { name: 'Save' });
 
+    expect(within(dialog).getByText('Attribute values')).toBeVisible();
     expect(
       within(dialog).queryByRole('button', {
         name: 'Remove attribute value 1',
@@ -115,6 +122,7 @@ describe('CreateAttributeValuesDialog', () => {
         {
           name: 'Green',
           sortOrder: 0,
+          status: ATTRIBUTE_VALUE_STATUS.DRAFT,
         },
       ],
     });
@@ -124,6 +132,53 @@ describe('CreateAttributeValuesDialog', () => {
       })
     );
     expect(onOpenChangeMock).toHaveBeenCalledWith(false);
+  });
+
+  it('allows active values when the attribute is active', async () => {
+    const user = userEvent.setup();
+
+    setup();
+
+    const dialog = screen.getByRole('dialog', {
+      name: 'Add attribute values',
+    });
+    const valueStatus = within(dialog).getByRole('combobox', {
+      name: 'Attribute value status 1',
+    });
+
+    expect(valueStatus).toBeEnabled();
+    expect(valueStatus).toBeRequired();
+    expect(
+      within(dialog).queryByText(
+        'Attribute values cannot be active while the attribute is a draft'
+      )
+    ).not.toBeInTheDocument();
+
+    await user.click(valueStatus);
+    await user.click(await screen.findByRole('option', { name: 'Active' }));
+
+    expect(valueStatus).toHaveTextContent('Active');
+  });
+
+  it('prevents active values when the attribute is a draft', () => {
+    setup({
+      attributeStatus: ATTRIBUTE_STATUS.DRAFT,
+    });
+
+    const dialog = screen.getByRole('dialog', {
+      name: 'Add attribute values',
+    });
+
+    expect(
+      within(dialog).getByRole('combobox', {
+        name: 'Attribute value status 1',
+      })
+    ).toBeDisabled();
+    expect(
+      within(dialog).getByText(
+        'Attribute values cannot be active while the attribute is a draft'
+      )
+    ).toBeVisible();
   });
 
   it('removes an added value row without clearing the remaining value', async () => {

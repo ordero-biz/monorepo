@@ -1,11 +1,20 @@
-import type { Supplier } from '@/lib/domain/suppliers';
+import type { Supplier } from '@/lib/domain/suppliers/types';
 
 export type SupplierDetailProps = {
   supplierId: string;
 };
 
 export type SupplierDetailHeaderProps = {
-  onUpdated: () => Promise<void> | void;
+  supplier: Supplier;
+};
+
+export type ActivateSupplierDialogProps = {
+  onOpenChange: (open: boolean) => void;
+  open: boolean;
+  supplier: Supplier;
+};
+
+export type ActivateSupplierDialogTriggerProps = {
   supplier: Supplier;
 };
 

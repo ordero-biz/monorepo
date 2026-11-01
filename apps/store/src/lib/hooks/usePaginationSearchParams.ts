@@ -10,6 +10,7 @@ import {
 
 type SetPaginationArgs = {
   page: number;
+  replace?: boolean;
   size: number;
   updateSearchParams?: SearchParamsUpdater;
 };
@@ -47,17 +48,17 @@ export const usePaginationSearchParams = ({
     pendingPaginationInput ?? searchPaginationInput;
   const page = currentPaginationInput.page ?? DEFAULT_PAGE.page;
   const size = currentPaginationInput.size ?? DEFAULT_PAGE.size;
-  const pushSearchParams = (nextSearchParams: URLSearchParams) => {
-    router.push(`${pathname}?${nextSearchParams.toString()}`, {
-      scroll: false,
-    });
-  };
   const setPagination = ({
     page: nextPage,
+    replace = false,
     size: nextSize,
     updateSearchParams,
   }: SetPaginationArgs) => {
     const nextSearchParams = new URLSearchParams(searchParams.toString());
+
+    const updateSearchParamsRouterAction = replace
+      ? router.replace
+      : router.push;
 
     updateSearchParams?.(nextSearchParams);
     setPendingPaginationInput({
@@ -67,7 +68,10 @@ export const usePaginationSearchParams = ({
     });
     nextSearchParams.set('page', String(nextPage));
     nextSearchParams.set('size', String(nextSize));
-    pushSearchParams(nextSearchParams);
+    updateSearchParamsRouterAction(
+      `${pathname}?${nextSearchParams.toString()}`,
+      { scroll: false }
+    );
   };
 
   useEffect(() => {
@@ -93,7 +97,13 @@ export const usePaginationSearchParams = ({
     router.replace(`${pathname}?${nextSearchParams.toString()}`, {
       scroll: false,
     });
-  }, [pathname, requestedPage, router, searchPaginationInput.page, searchParams]);
+  }, [
+    pathname,
+    requestedPage,
+    router,
+    searchPaginationInput.page,
+    searchParams,
+  ]);
 
   const resetPagination: ResetPagination = ({
     updateSearchParams,

@@ -94,12 +94,16 @@ export const DialogViewport = ({ children }: DialogViewportProps) => (
 );
 
 export const DialogPopup = ({
+  'aria-describedby': ariaDescribedBy,
   children,
   fullscreen = false,
   id,
   size = 'sm',
 }: DialogPopupProps) => (
   <DialogPrimitive.Popup
+    {...(ariaDescribedBy === undefined
+      ? {}
+      : { 'aria-describedby': ariaDescribedBy })}
     className={cn(
       popupClassName,
       popupScrollableLayoutClassName,

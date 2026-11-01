@@ -3,7 +3,7 @@
 import { Dialog } from '@ordero/ui';
 import { useQueryClient } from '@tanstack/react-query';
 import { warehousesQueryKeys } from '@/lib/query/warehouses/warehousesQueryKeys';
-import { WarehouseFormDialogContent } from '../../shared/WarehouseFormDialogContent';
+import { CreateWarehouseDialogFormContent } from './CreateWarehouseDialogFormContent';
 import { useCreateWarehouseForm } from './hooks/useCreateWarehouseForm';
 import type { CreateWarehouseDialogProps } from './types';
 
@@ -47,11 +47,7 @@ export const CreateWarehouseDialog = ({
                 <Dialog.Title>Add warehouse</Dialog.Title>
               </Dialog.Header>
 
-              <WarehouseFormDialogContent
-                form={form}
-                pendingText="Adding..."
-                submitText="Add"
-              />
+              <CreateWarehouseDialogFormContent form={form} />
             </form>
           </Dialog.Popup>
         </Dialog.Viewport>

@@ -59,6 +59,12 @@ const radioRingClassName =
 const labelClassName =
   'min-w-0 text-[length:var(--body2-size-desktop)] leading-[var(--body2-line-height-desktop)] font-[var(--body2-weight)]';
 
+// Align the first text line with the circle without shrinking its padded target.
+const startLabelPaddingClassNames: Record<RadioSize, string> = {
+  m: 'pt-[max(0px,calc((var(--radio-md-icon)+var(--radio-p)-var(--body2-line-height-desktop))/2))]',
+  s: 'pt-[max(0px,calc((var(--radio-sm-icon)+var(--radio-p)-var(--body2-line-height-desktop))/2))]',
+};
+
 const indicatorSizeClassNames: Record<RadioSize, string> = {
   m: 'size-[10px]',
   s: 'size-[8px]',
@@ -112,6 +118,7 @@ const getLabelColorClassName = ({ disabled }: { disabled: boolean }) =>
   disabled ? 'text-[var(--text-disabled)]' : 'text-[var(--text-primary)]';
 
 export const Radio = ({
+  align: alignProp,
   'aria-describedby': ariaDescribedBy,
   'aria-label': ariaLabel,
   'aria-labelledby': ariaLabelledBy,
@@ -132,6 +139,7 @@ export const Radio = ({
   title,
   value,
 }: RadioProps) => {
+  const align = alignProp ?? 'center';
   const generatedId = useId();
   const controlId = id ?? generatedId;
   const generatedLabelId = useId();
@@ -181,7 +189,10 @@ export const Radio = ({
   return (
     <label
       className={cn(
-        'inline-flex max-w-fit items-center gap-0 align-top',
+        'inline-flex max-w-fit gap-0 align-top',
+        align === 'start' && 'items-start',
+        align === 'center' && 'items-center',
+        align === 'end' && 'items-end',
         disabled ? 'cursor-not-allowed' : 'cursor-pointer'
       )}
       htmlFor={controlId}
@@ -250,7 +261,11 @@ export const Radio = ({
       />
       {children ? (
         <span
-          className={cn(labelClassName, getLabelColorClassName({ disabled }))}
+          className={cn(
+            labelClassName,
+            align === 'start' && startLabelPaddingClassNames[size],
+            getLabelColorClassName({ disabled })
+          )}
           data-slot="radio-label"
           id={radioLabelId}
         >

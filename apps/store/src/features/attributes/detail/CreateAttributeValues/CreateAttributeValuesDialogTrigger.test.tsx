@@ -1,5 +1,6 @@
 import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { ATTRIBUTE_STATUS } from '@/lib/domain/attributes/constants';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { CreateAttributeValuesDialogTrigger } from './CreateAttributeValuesDialogTrigger';
 
@@ -7,6 +8,7 @@ const { setup } = prepareStoreSetup({
   component: CreateAttributeValuesDialogTrigger,
   props: {
     attributeId: 7,
+    attributeStatus: ATTRIBUTE_STATUS.ACTIVE,
   },
 });
 

@@ -1,3 +1,4 @@
+import { SUPPLIER_STATUS } from '@/lib/domain/suppliers/constants';
 import {
   createSupplier,
   getSupplier,
@@ -37,6 +38,7 @@ describe('supplier client helpers', () => {
             {
               id: 1,
               name: 'Fresh Farms',
+              status: SUPPLIER_STATUS.DRAFT,
               email: 'orders@fresh.example',
               phone: '+1 555 0100',
               address: '123 Market St',
@@ -60,6 +62,7 @@ describe('supplier client helpers', () => {
           {
             id: 1,
             name: 'Fresh Farms',
+            status: SUPPLIER_STATUS.DRAFT,
             email: 'orders@fresh.example',
             phone: '+1 555 0100',
             address: '123 Market St',
@@ -117,6 +120,7 @@ describe('supplier client helpers', () => {
         JSON.stringify({
           id: 1,
           name: 'Fresh Farms',
+          status: SUPPLIER_STATUS.DRAFT,
           email: 'orders@fresh.example',
           phone: '+1 555 0100',
           address: '123 Market St',
@@ -130,6 +134,7 @@ describe('supplier client helpers', () => {
       data: {
         id: 1,
         name: 'Fresh Farms',
+        status: SUPPLIER_STATUS.DRAFT,
         email: 'orders@fresh.example',
         phone: '+1 555 0100',
         address: '123 Market St',
@@ -179,6 +184,7 @@ describe('supplier client helpers', () => {
         JSON.stringify({
           id: 1,
           name: 'Fresh Farms',
+          status: SUPPLIER_STATUS.DRAFT,
           email: 'orders@fresh.example',
           phone: '+1 555 0100',
           address: '123 Market St',
@@ -190,6 +196,7 @@ describe('supplier client helpers', () => {
     await expect(
       createSupplier({
         name: 'Fresh Farms',
+        status: SUPPLIER_STATUS.DRAFT,
         email: 'orders@fresh.example',
         phone: '+1 555 0100',
         address: '123 Market St',
@@ -200,6 +207,7 @@ describe('supplier client helpers', () => {
       data: {
         id: 1,
         name: 'Fresh Farms',
+        status: SUPPLIER_STATUS.DRAFT,
         email: 'orders@fresh.example',
         phone: '+1 555 0100',
         address: '123 Market St',
@@ -213,6 +221,7 @@ describe('supplier client helpers', () => {
         method: 'POST',
         body: JSON.stringify({
           name: 'Fresh Farms',
+          status: SUPPLIER_STATUS.DRAFT,
           email: 'orders@fresh.example',
           phone: '+1 555 0100',
           address: '123 Market St',
@@ -242,6 +251,7 @@ describe('supplier client helpers', () => {
     await expect(
       createSupplier({
         name: 'Fresh Farms',
+        status: SUPPLIER_STATUS.DRAFT,
         email: 'orders@fresh.example',
         phone: '+1 555 0100',
         address: '123 Market St',
@@ -268,6 +278,7 @@ describe('supplier client helpers', () => {
         JSON.stringify({
           id: 1,
           name: 'Fresh Farms Updated',
+          status: SUPPLIER_STATUS.DRAFT,
           email: 'orders.updated@fresh.example',
           phone: '+1 555 0101',
           address: '124 Market St',
@@ -280,6 +291,7 @@ describe('supplier client helpers', () => {
       updateSupplier({
         supplierId: 1,
         name: 'Fresh Farms Updated',
+        status: SUPPLIER_STATUS.DRAFT,
         email: 'orders.updated@fresh.example',
         phone: '+1 555 0101',
         address: '124 Market St',
@@ -290,6 +302,7 @@ describe('supplier client helpers', () => {
       data: {
         id: 1,
         name: 'Fresh Farms Updated',
+        status: SUPPLIER_STATUS.DRAFT,
         email: 'orders.updated@fresh.example',
         phone: '+1 555 0101',
         address: '124 Market St',
@@ -303,12 +316,68 @@ describe('supplier client helpers', () => {
         method: 'PATCH',
         body: JSON.stringify({
           name: 'Fresh Farms Updated',
+          status: SUPPLIER_STATUS.DRAFT,
           email: 'orders.updated@fresh.example',
           phone: '+1 555 0101',
           address: '124 Market St',
           comment: 'Updated supplier',
         }),
         cache: 'no-store',
+      })
+    );
+  });
+
+  it('patches only the status when publishing a supplier', async () => {
+    const fetchMock = vi.mocked(fetch);
+
+    fetchMock.mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          id: 1,
+          name: 'Fresh Farms',
+          status: SUPPLIER_STATUS.ACTIVE,
+        })
+      )
+    );
+
+    await updateSupplier({
+      supplierId: 1,
+      status: SUPPLIER_STATUS.ACTIVE,
+    });
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/backend/api/v1/suppliers/1',
+      expect.objectContaining({
+        method: 'PATCH',
+        body: JSON.stringify({ status: SUPPLIER_STATUS.ACTIVE }),
+      })
+    );
+  });
+
+  it('sends null when clearing a supplier contact field', async () => {
+    const fetchMock = vi.mocked(fetch);
+
+    fetchMock.mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          id: 1,
+          name: 'Fresh Farms',
+          status: SUPPLIER_STATUS.DRAFT,
+          email: null,
+        })
+      )
+    );
+
+    await updateSupplier({
+      supplierId: 1,
+      email: null,
+    });
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/backend/api/v1/suppliers/1',
+      expect.objectContaining({
+        method: 'PATCH',
+        body: JSON.stringify({ email: null }),
       })
     );
   });
@@ -333,6 +402,7 @@ describe('supplier client helpers', () => {
       updateSupplier({
         supplierId: 1,
         name: 'Fresh Farms',
+        status: SUPPLIER_STATUS.DRAFT,
         email: 'orders@fresh.example',
         phone: '+1 555 0100',
         address: '123 Market St',

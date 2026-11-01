@@ -1,47 +1,42 @@
-import {
-  updateUnitOfMeasurementSchema,
-  validateUpdateUnitOfMeasurementCode,
-  validateUpdateUnitOfMeasurementName,
-  validateUpdateUnitOfMeasurementSymbol,
-} from './validations';
+import { validateUnitOfMeasurementName } from '../../../shared/validations';
+import { updateUnitOfMeasurementSchema } from './validations';
 
 describe('update unit of measurement field validation', () => {
   it.each([
-    [
-      'code',
-      validateUpdateUnitOfMeasurementCode,
-      '   ',
-      'Unit code is required',
-    ],
-    [
-      'name',
-      validateUpdateUnitOfMeasurementName,
-      '   ',
-      'Unit name is required',
-    ],
-    [
-      'symbol',
-      validateUpdateUnitOfMeasurementSymbol,
-      '   ',
-      'Unit symbol is required',
-    ],
+    ['name', validateUnitOfMeasurementName, '   ', 'Unit name is required'],
   ])('rejects an invalid unit %s', (_, validate, value, errorMessage) => {
     expect(validate({ value })).toBe(errorMessage);
   });
 
-  it('trims required values while retaining the optional comment', () => {
+  it('trims required and optional values', () => {
     expect(
       updateUnitOfMeasurementSchema.parse({
-        code: ' G ',
         name: ' Gram ',
         symbol: ' g ',
         comment: ' Metric weight ',
       })
     ).toEqual({
-      code: 'G',
       name: 'Gram',
       symbol: 'g',
-      comment: ' Metric weight ',
+      comment: 'Metric weight',
     });
+  });
+
+  it('accepts a blank symbol', () => {
+    expect(
+      updateUnitOfMeasurementSchema.parse({
+        name: 'Gram',
+        symbol: '   ',
+        comment: '',
+      })
+    ).toMatchObject({ symbol: '' });
+  });
+
+  it('accepts omitted optional fields', () => {
+    expect(
+      updateUnitOfMeasurementSchema.parse({
+        name: 'Gram',
+      })
+    ).toEqual({ name: 'Gram' });
   });
 });

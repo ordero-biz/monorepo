@@ -1,4 +1,4 @@
-import { screen, waitFor } from '@testing-library/react';
+import { act, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getCategories } from '@/lib/client/api/categories';
 import { categoriesQueryKeys } from '@/lib/query/categories/categoriesQueryKeys';
@@ -41,7 +41,6 @@ describe('CategoriesAsyncCombobox', () => {
       data: {
         content: [
           {
-            color: '#2563eb',
             createdAt: '2026-07-01T10:54:34.839Z',
             id: 1,
             name: 'Shoes',
@@ -66,7 +65,7 @@ describe('CategoriesAsyncCombobox', () => {
     setup();
 
     await user.click(screen.getByRole('combobox', { name: 'Category' }));
-    await user.click(await screen.findByRole('option', { name: 'Shoes' }));
+    await user.click(await screen.findByRole('option', { name: /^Shoes\b/ }));
 
     expect(getCategoriesMock).toHaveBeenCalledWith({
       page: 1,
@@ -74,7 +73,60 @@ describe('CategoriesAsyncCombobox', () => {
       sort: ['name,asc'],
     });
     expect(mocks.onValueChange).toHaveBeenLastCalledWith(
-      '1',
+      { id: 1, name: 'Shoes', status: undefined },
+      expect.any(Object)
+    );
+  });
+
+  it('displays saved values before loading and responds to controlled resets', () => {
+    const {
+      renderResult: { rerender },
+    } = setup({ value: { id: 2, name: 'Saved category' } });
+    const input = screen.getByRole('combobox', { name: 'Category' });
+    expect(input).toHaveValue('Saved category');
+    expect(getCategoriesMock).not.toHaveBeenCalled();
+    rerender({ value: null });
+    expect(input).toHaveValue('');
+    expect(mocks.onValueChange).not.toHaveBeenCalled();
+  });
+
+  it('keeps an initial selection that is absent from loaded results', async () => {
+    const user = userEvent.setup();
+    mockSuccessfulCategories();
+    setup({ defaultValue: { id: 2, name: 'Saved category' } });
+    const input = screen.getByRole('combobox', { name: 'Category' });
+    expect(input).toHaveValue('Saved category');
+    await user.click(input);
+    await screen.findByRole('option', { name: 'Shoes' });
+    await user.keyboard('{Escape}');
+    expect(input).toHaveValue('Saved category');
+    expect(mocks.onValueChange).not.toHaveBeenCalled();
+  });
+
+  it('refreshes a saved label by ID without emitting a form change', async () => {
+    const user = userEvent.setup();
+    mockSuccessfulCategories();
+    setup({ value: { id: 1, name: 'Old name' } });
+    const input = screen.getByRole('combobox', { name: 'Category' });
+    await user.click(input);
+    expect(
+      await screen.findByRole('option', { name: 'Shoes' })
+    ).toHaveAttribute('aria-selected', 'true');
+    await user.keyboard('{Escape}');
+    expect(input).toHaveValue('Shoes');
+    expect(mocks.onValueChange).not.toHaveBeenCalled();
+  });
+
+  it('emits null for the explicit no-parent choice', async () => {
+    const user = userEvent.setup();
+    mockSuccessfulCategories();
+    setup({ allowNoParent: true, value: { id: 1, name: 'Shoes' } });
+    await user.click(screen.getByRole('combobox', { name: 'Category' }));
+    await user.click(
+      await screen.findByRole('option', { name: 'No parent category' })
+    );
+    expect(mocks.onValueChange).toHaveBeenLastCalledWith(
+      null,
       expect.any(Object)
     );
   });
@@ -87,7 +139,40 @@ describe('CategoriesAsyncCombobox', () => {
 
     await user.click(screen.getByRole('combobox', { name: 'Category' }));
 
-    expect(await screen.findByRole('option', { name: 'Shoes' })).toBeDisabled();
+    expect(
+      await screen.findByRole('option', { name: /^Shoes\b/ })
+    ).toHaveAttribute('aria-disabled', 'true');
+  });
+
+  it('shows a Draft chip for draft category options', async () => {
+    getCategoriesMock.mockResolvedValue({
+      ok: true,
+      data: {
+        content: [
+          {
+            createdAt: '2026-07-01T10:54:34.839Z',
+            id: 1,
+            name: 'Shoes',
+            sortOrder: 10,
+            status: 'DRAFT',
+          },
+        ],
+        page: {
+          number: 0,
+          size: 100,
+          totalElements: 1,
+          totalPages: 1,
+        },
+      },
+    });
+    const user = userEvent.setup();
+
+    setup();
+
+    await user.click(screen.getByRole('combobox', { name: 'Category' }));
+
+    expect(await screen.findByRole('option', { name: /Shoes/ })).toBeVisible();
+    expect(screen.getByText('Draft')).toBeVisible();
   });
 
   it('refetches when category list queries are invalidated', async () => {
@@ -100,8 +185,10 @@ describe('CategoriesAsyncCombobox', () => {
 
     await waitFor(() => expect(getCategoriesMock).toHaveBeenCalledTimes(1));
 
-    await queryClient.invalidateQueries({
-      queryKey: categoriesQueryKeys.list,
+    await act(async () => {
+      await queryClient.invalidateQueries({
+        queryKey: categoriesQueryKeys.list,
+      });
     });
 
     await waitFor(() => expect(getCategoriesMock).toHaveBeenCalledTimes(2));

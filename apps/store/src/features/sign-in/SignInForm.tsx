@@ -38,25 +38,32 @@ export const SignInForm = () => {
           onSubmit: ({ value }) => validateSignInEmail(value),
         }}
       >
-        {(field) => {
-          const errorText = getFieldSubmitChangeErrorText(field.state.meta);
+        {(field) => (
+          <form.Subscribe selector={(state) => state.submissionAttempts}>
+            {(submissionAttempts) => {
+              const errorText = getFieldSubmitChangeErrorText(
+                field.state.meta,
+                submissionAttempts
+              );
 
-          return (
-            <TextField
-              autoComplete="email"
-              errorText={errorText}
-              invalid={Boolean(errorText)}
-              label="Email address"
-              name={field.name}
-              onBlur={field.handleBlur}
-              onValueChange={(value) => field.handleChange(value)}
-              placeholder="example@gmail.com"
-              required
-              size="s"
-              value={field.state.value}
-            />
-          );
-        }}
+              return (
+                <TextField
+                  autoComplete="email"
+                  errorText={errorText}
+                  invalid={Boolean(errorText)}
+                  label="Email address"
+                  name={field.name}
+                  onBlur={field.handleBlur}
+                  onValueChange={(value) => field.handleChange(value)}
+                  placeholder="example@gmail.com"
+                  required
+                  size="s"
+                  value={field.state.value}
+                />
+              );
+            }}
+          </form.Subscribe>
+        )}
       </form.Field>
 
       <div className="flex flex-col gap-[var(--space-1)]">
@@ -67,24 +74,31 @@ export const SignInForm = () => {
             onSubmit: ({ value }) => validateSignInPassword(value),
           }}
         >
-          {(field) => {
-            const errorText = getFieldSubmitChangeErrorText(field.state.meta);
+          {(field) => (
+            <form.Subscribe selector={(state) => state.submissionAttempts}>
+              {(submissionAttempts) => {
+                const errorText = getFieldSubmitChangeErrorText(
+                  field.state.meta,
+                  submissionAttempts
+                );
 
-            return (
-              <PasswordField
-                errorText={errorText}
-                invalid={Boolean(errorText)}
-                label="Password"
-                name={field.name}
-                onBlur={field.handleBlur}
-                onValueChange={(value) => field.handleChange(value)}
-                placeholder="6+ characters"
-                required
-                size="s"
-                value={field.state.value}
-              />
-            );
-          }}
+                return (
+                  <PasswordField
+                    errorText={errorText}
+                    invalid={Boolean(errorText)}
+                    label="Password"
+                    name={field.name}
+                    onBlur={field.handleBlur}
+                    onValueChange={(value) => field.handleChange(value)}
+                    placeholder="6+ characters"
+                    required
+                    size="s"
+                    value={field.state.value}
+                  />
+                );
+              }}
+            </form.Subscribe>
+          )}
         </form.Field>
 
         <button className="w-fit text-left" type="button">

@@ -2,16 +2,24 @@
 
 import { Button, Card, Menu, PageHeader, Typography } from '@ordero/ui';
 import { EllipsisVertical, Pencil, Trash2 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { clientRoutes } from '@/lib/client/routes';
+import { AppBreadcrumbs } from '@/lib/components/AppBreadcrumbs';
+import { ATTRIBUTE_STATUS } from '@/lib/domain/attributes/constants';
 import { useAttributeQuery } from '@/lib/hooks/attributes/useAttributeQuery';
+import { DeleteAttributesDialog } from '../../shared';
+import { AttributeStatusChip } from '../../shared/AttributeStatusChip';
+import { attributesRootBreadcrumb } from '../../shared/breadcrumbs';
+import { ActivateAttributeDialogTrigger } from '../ActivateAttribute';
 import { CreateAttributeValuesDialogTrigger } from '../CreateAttributeValues';
-import { DeleteAttributeDialog } from '../DeleteAttribute';
 import { UpdateAttributeDialog } from '../UpdateAttribute';
 import type { AttributeDetailHeaderProps } from './types';
 
 export const AttributeDetailHeader = ({
   attributeId,
 }: AttributeDetailHeaderProps) => {
+  const router = useRouter();
   const attributeQuery = useAttributeQuery(attributeId);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
@@ -52,13 +60,34 @@ export const AttributeDetailHeader = ({
     );
   }
 
+  const isAttributeActive =
+    attributeQuery.data.status === ATTRIBUTE_STATUS.ACTIVE;
+
   return (
     <PageHeader.Root>
       <PageHeader.Left>
-        <Typography variant="h5">{attributeQuery.data.name}</Typography>
+        <div className="flex min-w-0 flex-col gap-[var(--space-0-5)]">
+          <div className="flex min-w-0 items-center gap-[var(--space-1)]">
+            <Typography variant="h5">{attributeQuery.data.name}</Typography>
+            <AttributeStatusChip status={attributeQuery.data.status} />
+          </div>
+          <AppBreadcrumbs
+            items={[
+              attributesRootBreadcrumb,
+              { id: 'current-attribute', label: attributeQuery.data.name },
+            ]}
+          />
+        </div>
       </PageHeader.Left>
       <PageHeader.Right>
-        <CreateAttributeValuesDialogTrigger attributeId={attributeId} />
+        {!isAttributeActive ? (
+          <ActivateAttributeDialogTrigger attribute={attributeQuery.data} />
+        ) : null}
+
+        <CreateAttributeValuesDialogTrigger
+          attributeId={attributeId}
+          attributeStatus={attributeQuery.data.status}
+        />
 
         <Menu.Root>
           <Menu.Trigger
@@ -72,13 +101,15 @@ export const AttributeDetailHeader = ({
           <Menu.Portal>
             <Menu.Positioner align="end">
               <Menu.Popup>
-                <Menu.Item onClick={() => setIsUpdateDialogOpen(true)}>
-                  <Pencil
-                    aria-hidden="true"
-                    className="size-[var(--icon-button-xs-icon)]"
-                  />
-                  Edit attribute name
-                </Menu.Item>
+                {!isAttributeActive ? (
+                  <Menu.Item onClick={() => setIsUpdateDialogOpen(true)}>
+                    <Pencil
+                      aria-hidden="true"
+                      className="size-[var(--icon-button-xs-icon)]"
+                    />
+                    Edit attribute name
+                  </Menu.Item>
+                ) : null}
                 <Menu.Item
                   color="error"
                   onClick={() => setIsDeleteDialogOpen(true)}
@@ -94,17 +125,17 @@ export const AttributeDetailHeader = ({
           </Menu.Portal>
         </Menu.Root>
 
-        <DeleteAttributeDialog
-          attribute={attributeQuery.data}
+        <DeleteAttributesDialog
+          attributes={[attributeQuery.data]}
+          onDeleted={() => {
+            router.push(clientRoutes.attributes);
+          }}
           onOpenChange={setIsDeleteDialogOpen}
           open={isDeleteDialogOpen}
         />
         <UpdateAttributeDialog
           attribute={attributeQuery.data}
           onOpenChange={setIsUpdateDialogOpen}
-          onUpdated={async () => {
-            await attributeQuery.refetch();
-          }}
           open={isUpdateDialogOpen}
         />
       </PageHeader.Right>

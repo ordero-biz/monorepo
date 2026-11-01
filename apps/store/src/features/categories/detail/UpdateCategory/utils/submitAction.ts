@@ -1,19 +1,21 @@
-import { updateCategory } from '@/lib/client/api/categories';
-import type { CategoryFormValues } from '../../../shared/validations';
+import {
+  type UpdateCategoryFieldData,
+  updateCategory,
+} from '@/lib/client/api/categories';
+import { getApiErrorMessage } from '@/lib/utils/apiError';
 
 type SubmitUpdateCategoryArgs = {
   categoryId: string | number;
-  value: CategoryFormValues;
+  submitData: UpdateCategoryFieldData;
 };
 
 export const submitUpdateCategory = async ({
   categoryId,
-  value,
+  submitData,
 }: SubmitUpdateCategoryArgs) => {
   const result = await updateCategory({
     categoryId,
-    name: value.name.trim(),
-    parentId: value.parentId ? Number(value.parentId) : null,
+    ...submitData,
   });
 
   if (!result.ok) {
@@ -21,7 +23,7 @@ export const submitUpdateCategory = async ({
       ok: false,
       error: {
         fieldErrors: result.error.fieldErrors,
-        formError: result.error.message,
+        formError: getApiErrorMessage(result.error),
       },
     } as const;
   }

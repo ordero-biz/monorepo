@@ -1,7 +1,14 @@
-export type { CategoryFormValues as CreateCategoryFormValues } from '../../../shared/validations';
-export {
+import { z } from 'zod';
+import {
   categoryNameSchema,
-  categoryParentIdSchema,
-  validateCategoryName,
-  validateCategoryParentId,
-} from '../../../shared/validations';
+  categoryParentSchema,
+  categoryStatusSchema,
+} from '@/features/categories/shared/validations';
+
+export const createCategoryFormSchema = z.object({
+  name: categoryNameSchema,
+  parentCategory: categoryParentSchema,
+  status: categoryStatusSchema,
+});
+
+export type CreateCategoryFormValues = z.infer<typeof createCategoryFormSchema>;

@@ -1,7 +1,7 @@
 'use client';
 
 import { Button, Card, DataTable, Typography } from '@ordero/ui';
-import type { Category } from '@/lib/domain/categories';
+import type { Category } from '@/lib/domain/categories/types';
 import { useCategoryChildrenQuery } from '@/lib/hooks/categories/useCategoryChildrenQuery';
 import { columns } from './columns';
 import type { CategoryDetailChildrenProps } from './types';

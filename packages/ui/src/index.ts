@@ -1,11 +1,4 @@
 export type {
-  ButtonColor,
-  ButtonProps,
-  ButtonSize,
-  ButtonVariant,
-} from './components/Button';
-export { Button } from './components/Button';
-export type {
   AccordionHeaderProps,
   AccordionItemProps,
   AccordionPanelProps,
@@ -14,6 +7,21 @@ export type {
 } from './components/Accordion';
 export { Accordion } from './components/Accordion';
 export type {
+  BreadcrumbItem,
+  BreadcrumbsProps,
+  BreadcrumbsRenderLink,
+  BreadcrumbsRenderLinkArgs,
+} from './components/Breadcrumbs';
+export { Breadcrumbs } from './components/Breadcrumbs';
+export type {
+  ButtonColor,
+  ButtonProps,
+  ButtonSize,
+  ButtonVariant,
+} from './components/Button';
+export { Button } from './components/Button';
+export type {
+  CardColor,
   CardContentProps,
   CardDescriptionProps,
   CardDividerProps,
@@ -54,21 +62,20 @@ export type {
 } from './components/Chip';
 export { Chip } from './components/Chip';
 export type {
-  ContextualActionBarLeftProps,
-  ContextualActionBarRightProps,
-  ContextualActionBarRootProps,
-} from './components/ContextualActionBar';
-export { ContextualActionBar } from './components/ContextualActionBar';
-export type {
   ComboboxChangeEventDetails,
   ComboboxMultipleProps,
-  ComboboxOption,
   ComboboxProps,
   ComboboxSingleProps,
   ComboboxSize,
   ComboboxVariant,
 } from './components/Combobox';
 export { Combobox } from './components/Combobox';
+export type {
+  ContextualActionBarLeftProps,
+  ContextualActionBarRightProps,
+  ContextualActionBarRootProps,
+} from './components/ContextualActionBar';
+export { ContextualActionBar } from './components/ContextualActionBar';
 export type {
   DataTableCellProps,
   DataTableCellVariant,
@@ -77,14 +84,17 @@ export type {
   DataTableColumnHeaderProps,
   DataTableColumnMeta,
   DataTableColumnWrap,
+  DataTableFooterColumns,
   DataTablePaginationProps,
   DataTablePaginationState,
   DataTableProps,
   DataTableRowSelectionState,
-  DataTableSelectionProps,
+  DataTableRowTone,
   DataTableSelectionCellProps,
   DataTableSelectionColumnHeaderProps,
+  DataTableSelectionProps,
   DataTableSortingState,
+  UseDataTableSelectionArgs,
 } from './components/DataTable';
 export {
   DataTable,
@@ -92,9 +102,8 @@ export {
   DataTableColumnHeader,
   DataTableSelectionCell,
   DataTableSelectionColumnHeader,
+  useDataTableSelection,
 } from './components/DataTable';
-export { useDataTableSelection } from './components/DataTable';
-export type { UseDataTableSelectionArgs } from './components/DataTable';
 export type {
   DialogBackdropProps,
   DialogCloseProps,
@@ -129,10 +138,16 @@ export type {
 } from './components/IconButton';
 export { IconButton } from './components/IconButton';
 export type {
+  InputProps,
+  InputSize,
+  InputVariant,
+} from './components/Input/index';
+export { Input } from './components/Input/index';
+export type {
   MenuAlign,
   MenuItemProps,
-  MenuPortalProps,
   MenuPopupProps,
+  MenuPortalProps,
   MenuPositionerProps,
   MenuRootProps,
   MenuSide,
@@ -140,12 +155,6 @@ export type {
   MenuTriggerProps,
 } from './components/Menu';
 export { Menu } from './components/Menu';
-export type {
-  InputProps,
-  InputSize,
-  InputVariant,
-} from './components/Input/index';
-export { Input } from './components/Input/index';
 export type { NumericFieldProps } from './components/NumericField';
 export { NumericField } from './components/NumericField';
 export type {
@@ -156,7 +165,12 @@ export type {
 export { PageHeader } from './components/PageHeader';
 export type { PasswordFieldProps } from './components/PasswordField';
 export { PasswordField } from './components/PasswordField';
-export type { RadioColor, RadioProps, RadioSize } from './components/Radio';
+export type {
+  RadioAlignment,
+  RadioColor,
+  RadioProps,
+  RadioSize,
+} from './components/Radio';
 export { Radio } from './components/Radio';
 export type {
   RadioGroupOrientation,
@@ -204,6 +218,14 @@ export type {
   TablePaginationRangeLabelArgs,
 } from './components/TablePagination';
 export { TablePagination } from './components/TablePagination';
+export type {
+  TabsListProps,
+  TabsPanelProps,
+  TabsRootProps,
+  TabsTabProps,
+  TabsValue,
+} from './components/Tabs';
+export { Tabs } from './components/Tabs';
 export type {
   TextareaChangeEventDetails,
   TextareaProps,

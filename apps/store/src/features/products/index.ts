@@ -1,4 +1,4 @@
-export { CreateProduct } from '@/features/products/list/CreateProduct';
+export { CreateProductWorkflow } from '@/features/products/add/CreateProductWorkflow';
 export {
   ProductsList,
   ProductsListHeader,

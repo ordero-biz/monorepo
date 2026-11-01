@@ -52,7 +52,7 @@ describe('url utils', () => {
   it('falls back to default pagination for missing or invalid values', () => {
     expect(
       getPaginationSearchInput({
-      page: '0',
+        page: '0',
         size: '0',
       })
     ).toEqual({

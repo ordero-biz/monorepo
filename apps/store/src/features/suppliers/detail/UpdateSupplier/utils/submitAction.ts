@@ -1,30 +1,26 @@
-import { updateSupplier } from '@/lib/client/api/suppliers';
-import type { SupplierEntityFormValues } from '../../../shared/SupplierFormDialogContent';
+import {
+  type UpdateSupplierFieldData,
+  updateSupplier,
+} from '@/lib/client/api/suppliers';
+import { getApiErrorMessage } from '@/lib/utils/apiError';
 
 type SubmitUpdateSupplierArgs = {
   supplierId: string | number;
-  value: SupplierEntityFormValues;
+  submitData: UpdateSupplierFieldData;
 };
 
 export const submitUpdateSupplier = async ({
   supplierId,
-  value,
+  submitData,
 }: SubmitUpdateSupplierArgs) => {
-  const result = await updateSupplier({
-    supplierId,
-    name: value.name.trim(),
-    email: value.email.trim(),
-    phone: value.phone.trim(),
-    address: value.address.trim(),
-    comment: value.comment.trim(),
-  });
+  const result = await updateSupplier({ supplierId, ...submitData });
 
   if (!result.ok) {
     return {
       ok: false,
       error: {
         fieldErrors: result.error.fieldErrors,
-        formError: result.error.message,
+        formError: getApiErrorMessage(result.error),
       },
     } as const;
   }

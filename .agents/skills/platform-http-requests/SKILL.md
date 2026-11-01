@@ -34,6 +34,11 @@ Use the existing architecture unless the user explicitly asks for a redesign.
 - Keep backend endpoint constants in `src/lib/server/api/path.ts`.
 - Normalize backend failures into the shared `ApiError` shape.
 - Use `ApiResult<T>` for client helper return values instead of throwing for ordinary HTTP failures.
+- Keep known backend error-code copy in an app-owned catalog, such as
+  `src/lib/constants/apiErrorCodes.ts`, unless the code contract is genuinely
+  shared by multiple apps. Use a shared app resolver before showing mutation
+  toasts or returning form-level errors. Unknown codes must fall back to
+  `ApiError.message`, and field errors must remain available for field mapping.
 - Keep shared HTTP/auth contracts in `@ordero/api-types`.
 - Keep browser-safe request transport in `@ordero/api-client`.
 - Keep Next.js server/BFF helpers in `@ordero/next-api`.
@@ -45,6 +50,10 @@ Use the existing architecture unless the user explicitly asks for a redesign.
 - Keep request/response DTOs near the API helper when backend wire shapes
   differ from domain entities, and map DTOs to domain entities before returning
   them to feature code.
+- Define create and update helper arguments as API DTOs, not feature form-value
+  types. Form values can have UI-specific representations such as string ids;
+  request DTOs must model the normalized backend contract and may serve
+  non-form callers.
 - Browser code must not import server-only packages such as `@ordero/next-api`.
 - Keep app-wide client providers in `src/app/AppProviders.tsx`; add Query,
   toast, or other app-wide providers there instead of nesting parallel wrappers
@@ -70,6 +79,17 @@ For authenticated backend REST calls:
   the client
 - let `app/api/backend/[...path]/route.ts` attach the Bearer token
 - do not introduce direct browser calls to `BACKEND_API_URL`
+
+For `PATCH` helpers:
+
+- keep the API argument as a partial normalized DTO plus the resource id
+- normalize and compare form values in the feature submit utility before
+  calling the helper
+- send only fields whose normalized values changed; treat an empty change set
+  as a no-op rather than sending a PATCH
+- model nullable update fields as `string | null` (or the applicable nullable
+  DTO type) when `null` clears a persisted value; do not use an empty string as
+  a clearing sentinel unless that is the explicit backend contract
 
 ## Adding A Cached Query Hook
 
@@ -124,6 +144,9 @@ For writes:
 - show mutation errors through the shared toast surface unless the failure maps
   to visible form fields
 - keep form backend errors mapped into TanStack Form submit errors when applicable
+- For a known backend `error.code`, resolve the user-facing message before
+  showing the toast or returning a form-level error. Do not duplicate code-to-copy
+  `switch` statements in individual features.
 
 ### Cache Invalidation Impact Map
 
@@ -202,6 +225,9 @@ Choose the smallest layer that proves the behavior:
 - feature-facing client request helpers:
   `src/lib/client/api/[resource]/index.test.ts`, covering the stable
   same-origin path, method, body, and result shape through `apiFetch`
+- for optional PATCH fields, assert the serialized `null` clearing payload at
+  the client-helper boundary; cover blank-create omission and unchanged-update
+  no-ops in the owning submit utility
 - shared server helpers: test package behavior in `packages/next-api` when the
   package behavior changes; keep app route-handler tests focused on app wiring
 - header forwarding changes: cover `packages/next-api` allow-list behavior and
@@ -237,6 +263,8 @@ Required coverage for new request flows:
   layer rather than in library-agnostic form tests
 - for relationship changes, every affected old/new owner or child-resource key;
   a generic list invalidation alone is not sufficient coverage
+- known error-code mappings and the fallback behavior for unknown codes when a
+  mutation introduces or consumes backend error codes
 - auth cookie clearing on backend `401` when relevant
 
 ## Validation

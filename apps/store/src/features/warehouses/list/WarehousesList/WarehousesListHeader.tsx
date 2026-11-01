@@ -1,10 +1,22 @@
 import { PageHeader, Typography } from '@ordero/ui';
+import { AppBreadcrumbs } from '@/lib/components/AppBreadcrumbs';
+import { warehousesRootBreadcrumb } from '../../shared/breadcrumbs';
 import { CreateWarehouseDialogTrigger } from '../CreateWarehouse';
 
 export const WarehousesListHeader = () => (
   <PageHeader.Root>
     <PageHeader.Left>
-      <Typography variant="h5">Warehouses list</Typography>
+      <div className="flex min-w-0 flex-col gap-[var(--space-0-5)]">
+        <Typography variant="h5">Warehouses list</Typography>
+        <AppBreadcrumbs
+          items={[
+            {
+              id: warehousesRootBreadcrumb.id,
+              label: warehousesRootBreadcrumb.label,
+            },
+          ]}
+        />
+      </div>
     </PageHeader.Left>
     <PageHeader.Right>
       <CreateWarehouseDialogTrigger />

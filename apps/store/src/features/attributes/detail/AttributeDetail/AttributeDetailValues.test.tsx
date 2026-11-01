@@ -1,6 +1,10 @@
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { getAttributeValues } from '@/lib/client/api/attributes';
+import {
+  getAttribute,
+  getAttributeValues,
+  updateAttributeValue,
+} from '@/lib/client/api/attributes';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { AttributeDetailValues } from './AttributeDetailValues';
 
@@ -8,10 +12,14 @@ vi.mock('@/lib/client/api/attributes', async () => ({
   ...(await vi.importActual<typeof import('@/lib/client/api/attributes')>(
     '@/lib/client/api/attributes'
   )),
+  getAttribute: vi.fn(),
   getAttributeValues: vi.fn(),
+  updateAttributeValue: vi.fn(),
 }));
 
+const getAttributeMock = vi.mocked(getAttribute);
 const getAttributeValuesMock = vi.mocked(getAttributeValues);
+const updateAttributeValueMock = vi.mocked(updateAttributeValue);
 
 const { setup } = prepareStoreSetup({
   component: AttributeDetailValues,
@@ -22,7 +30,19 @@ const { setup } = prepareStoreSetup({
 
 describe('AttributeDetailValues', () => {
   beforeEach(() => {
+    getAttributeMock.mockReset();
     getAttributeValuesMock.mockReset();
+    updateAttributeValueMock.mockReset();
+    getAttributeMock.mockResolvedValue({
+      ok: true,
+      data: {
+        id: 7,
+        name: 'Color',
+        sortOrder: 10,
+        status: 'ACTIVE',
+        createdAt: '2026-06-24T20:07:32.467Z',
+      },
+    });
   });
 
   it('loads attribute values', async () => {
@@ -44,6 +64,14 @@ describe('AttributeDetailValues', () => {
           id: 3,
           name: 'Blue',
           sortOrder: 0,
+          status: 'ACTIVE',
+          createdAt: '2026-06-24T20:07:32.467Z',
+        },
+        {
+          id: 4,
+          name: 'Green',
+          sortOrder: 1,
+          status: 'DRAFT',
           createdAt: '2026-06-24T20:07:32.467Z',
         },
       ],
@@ -55,7 +83,10 @@ describe('AttributeDetailValues', () => {
       await screen.findByRole('table', { name: 'Attribute values' })
     ).toBeVisible();
     expect(screen.getByText('Name')).toBeVisible();
+    expect(screen.getByRole('columnheader', { name: 'Status' })).toBeVisible();
     expect(screen.getByText('Blue')).toBeVisible();
+    expect(screen.getByText('Active')).toBeVisible();
+    expect(screen.getByText('Draft')).toBeVisible();
     expect(
       screen.getByRole('button', { name: 'Actions for Blue' })
     ).toBeVisible();
@@ -75,6 +106,7 @@ describe('AttributeDetailValues', () => {
           id: 3,
           name: 'Blue',
           sortOrder: 0,
+          status: 'DRAFT',
           createdAt: '2026-06-24T20:07:32.467Z',
         },
       ],
@@ -94,6 +126,120 @@ describe('AttributeDetailValues', () => {
     expect(
       screen.getByRole('textbox', { name: 'Attribute value name' })
     ).toHaveValue('Blue');
+  });
+
+  it('refreshes the attribute values once after publishing', async () => {
+    const draftValue = {
+      id: 3,
+      name: 'Blue',
+      sortOrder: 0,
+      status: 'DRAFT' as const,
+      createdAt: '2026-06-24T20:07:32.467Z',
+    };
+    const activeValue = { ...draftValue, status: 'ACTIVE' as const };
+    getAttributeValuesMock
+      .mockResolvedValueOnce({ ok: true, data: [draftValue] })
+      .mockResolvedValue({ ok: true, data: [activeValue] });
+    updateAttributeValueMock.mockResolvedValue({
+      ok: true,
+      data: activeValue,
+    });
+    const user = userEvent.setup();
+
+    setup();
+
+    await user.click(
+      await screen.findByRole('button', { name: 'Actions for Blue' })
+    );
+    await user.click(await screen.findByRole('menuitem', { name: 'Publish' }));
+
+    expect(
+      screen.getByRole('dialog', { name: 'Publish attribute value' })
+    ).toBeVisible();
+
+    await user.click(
+      within(
+        screen.getByRole('dialog', { name: 'Publish attribute value' })
+      ).getByRole('button', { name: 'Publish' })
+    );
+
+    expect(await screen.findByText('Active')).toBeVisible();
+    expect(
+      screen.queryByRole('dialog', { name: 'Publish attribute value' })
+    ).not.toBeInTheDocument();
+    expect(updateAttributeValueMock).toHaveBeenCalledExactlyOnceWith({
+      attributeValueId: 3,
+      status: 'ACTIVE',
+    });
+    expect(getAttributeValuesMock).toHaveBeenCalledTimes(2);
+  });
+
+  it('hides the edit action for active attribute values', async () => {
+    getAttributeValuesMock.mockResolvedValue({
+      ok: true,
+      data: [
+        {
+          id: 3,
+          name: 'Blue',
+          sortOrder: 0,
+          status: 'ACTIVE',
+          createdAt: '2026-06-24T20:07:32.467Z',
+        },
+      ],
+    });
+    const user = userEvent.setup();
+
+    setup();
+
+    await user.click(
+      await screen.findByRole('button', { name: 'Actions for Blue' })
+    );
+
+    expect(
+      await screen.findByRole('menuitem', { name: 'Delete' })
+    ).toBeVisible();
+    expect(
+      screen.queryByRole('menuitem', { name: 'Edit' })
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('menuitem', { name: 'Publish' })
+    ).not.toBeInTheDocument();
+  });
+
+  it('hides the publish action when the parent attribute is a draft', async () => {
+    getAttributeMock.mockResolvedValue({
+      ok: true,
+      data: {
+        id: 7,
+        name: 'Color',
+        sortOrder: 10,
+        status: 'DRAFT',
+        createdAt: '2026-06-24T20:07:32.467Z',
+      },
+    });
+    getAttributeValuesMock.mockResolvedValue({
+      ok: true,
+      data: [
+        {
+          id: 3,
+          name: 'Blue',
+          sortOrder: 0,
+          status: 'DRAFT',
+          createdAt: '2026-06-24T20:07:32.467Z',
+        },
+      ],
+    });
+    const user = userEvent.setup();
+
+    setup();
+
+    await user.click(
+      await screen.findByRole('button', { name: 'Actions for Blue' })
+    );
+
+    expect(
+      screen.queryByRole('menuitem', { name: 'Publish' })
+    ).not.toBeInTheDocument();
   });
 
   it('opens the delete dialog for the selected value', async () => {

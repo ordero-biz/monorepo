@@ -11,7 +11,7 @@ import {
 import { Trash2 } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { BaseLayoutContextualActionBar } from '@/features/app-shell';
-import type { UnitOfMeasurement } from '@/lib/domain/unitsOfMeasurement';
+import type { UnitOfMeasurement } from '@/lib/domain/units-of-measurement/types';
 import { useUnitsOfMeasurementQuery } from '@/lib/hooks/units-of-measurement/useUnitsOfMeasurementQuery';
 import { useTablePagination } from '@/lib/hooks/useTablePagination';
 import { DeleteUnitsOfMeasurementDialog } from '../../shared';
@@ -29,6 +29,8 @@ export const UnitsOfMeasurementList = ({
   paginationInput,
 }: UnitsOfMeasurementListProps) => {
   const unitsOfMeasurementQuery = useUnitsOfMeasurementQuery(paginationInput);
+
+  const unitsOfMeasurements = unitsOfMeasurementQuery.data?.content ?? [];
 
   const tablePagination = useTablePagination({
     pageMetadata: unitsOfMeasurementQuery.data?.page,
@@ -54,7 +56,7 @@ export const UnitsOfMeasurementList = ({
     selectedRows: selectedUnitsOfMeasurement,
     selection,
   } = useDataTableSelection({
-    data: unitsOfMeasurementQuery.data?.content ?? [],
+    data: unitsOfMeasurements,
     getRowCheckboxAriaLabel: getUnitOfMeasurementCheckboxAriaLabel,
     getRowId: getUnitOfMeasurementRowId,
     selectAllCheckboxAriaLabel: 'Select all units of measurement',
@@ -101,7 +103,7 @@ export const UnitsOfMeasurementList = ({
       <DataTable
         ariaLabel="Units of measurement list"
         columns={columns}
-        data={unitsOfMeasurementQuery.data.content}
+        data={unitsOfMeasurements}
         emptyMessage="No units of measurement found."
         getRowId={getUnitOfMeasurementRowId}
         manualPagination
@@ -131,7 +133,7 @@ export const UnitsOfMeasurementList = ({
                 onClick={() =>
                   setDeletingUnitsOfMeasurement(selectedUnitsOfMeasurement)
                 }
-                size="s"
+                size="m"
                 startIcon={<Trash2 aria-hidden="true" />}
                 variant="soft"
               >

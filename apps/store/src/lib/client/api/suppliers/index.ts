@@ -1,7 +1,7 @@
 'use client';
 
 import { apiFetch } from '@ordero/api-client';
-import type { Supplier } from '@/lib/domain/suppliers';
+import type { Supplier, SupplierStatus } from '@/lib/domain/suppliers/types';
 import type { PaginatedResponse } from '@/lib/server/types';
 import { tokenizePath } from '@/lib/utils/tokenizePath';
 import {
@@ -12,15 +12,18 @@ import { CLIENT_BACKEND_PATHS } from '../path';
 
 type SuppliersListResponse = PaginatedResponse<Supplier>;
 
-type CreateSupplierInput = {
+export type CreateSupplierData = {
   name: string;
-  email: string;
-  phone: string;
-  address: string;
-  comment: string;
+  status: SupplierStatus;
+  email?: string | null;
+  phone?: string | null;
+  address?: string | null;
+  comment?: string | null;
 };
 
-type UpdateSupplierInput = CreateSupplierInput & {
+export type UpdateSupplierFieldData = Partial<CreateSupplierData>;
+
+export type UpdateSupplierData = UpdateSupplierFieldData & {
   supplierId: string | number;
 };
 
@@ -40,13 +43,13 @@ export const getSupplier = (supplierId: string | number) =>
     }
   );
 
-export const createSupplier = (input: CreateSupplierInput) =>
+export const createSupplier = (input: CreateSupplierData) =>
   apiFetch<Supplier>(CLIENT_BACKEND_PATHS.suppliers, {
     method: 'POST',
     body: input,
   });
 
-export const updateSupplier = ({ supplierId, ...input }: UpdateSupplierInput) =>
+export const updateSupplier = ({ supplierId, ...input }: UpdateSupplierData) =>
   apiFetch<Supplier>(
     tokenizePath(CLIENT_BACKEND_PATHS.supplier, { id: supplierId }),
     {

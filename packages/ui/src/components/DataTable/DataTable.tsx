@@ -8,10 +8,11 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 import { cva } from 'class-variance-authority';
-import type { CSSProperties } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 import { useMemo, useState } from 'react';
 import { Checkbox } from '@/ui/components/Checkbox';
 import { TablePagination } from '@/ui/components/TablePagination';
+import { tableFooterRowClassName } from '@/ui/components/TablePagination/styles';
 import { cn } from '@/ui/lib/utils';
 import type {
   DataTableCellProps,
@@ -22,22 +23,43 @@ import type {
   DataTableSortingState,
 } from './types';
 
-const dataTableCellVariants = cva('flex items-center text-card-foreground', {
-  variants: {
-    variant: {
-      actions: 'px-[var(--spacing-2)]',
-      default: 'p-[var(--spacing-2)]',
+const dataTableCellVariants = cva(
+  'inline-flex items-center text-card-foreground',
+  {
+    variants: {
+      variant: {
+        actions: 'px-[var(--spacing-2)]',
+        default: 'p-[var(--spacing-2)]',
+      },
     },
-  },
-  defaultVariants: {
-    variant: 'default',
-  },
-});
+    defaultVariants: {
+      variant: 'default',
+    },
+  }
+);
 
 const tableShellStyle = {
   boxShadow:
     'var(--card-x1) var(--card-y1) var(--card-blur1) var(--card-spread1) var(--color-grey-20), var(--card-x2) var(--card-y2) var(--card-blur2) var(--card-spread2) var(--color-grey-12)',
 } satisfies CSSProperties;
+
+const dataTableRowVariants = cva('last:[&_td]:border-b-0', {
+  variants: {
+    tone: {
+      default:
+        'bg-card hover:bg-[var(--color-grey-8)] data-[state=selected]:bg-[var(--color-grey-8)]',
+      warning:
+        'bg-[var(--color-warning-8)] hover:bg-[var(--color-warning-16)] data-[state=selected]:bg-[var(--color-warning-16)]',
+    },
+  },
+  defaultVariants: { tone: 'default' },
+});
+
+const contentCellClassName =
+  'p-0 align-middle text-[length:var(--body2-size-desktop)] leading-[var(--body2-line-height-desktop)] font-[var(--body2-weight)] [font-family:var(--body2-family)] text-card-foreground';
+
+const hasContent = (content: ReactNode) =>
+  content != null && typeof content !== 'boolean' && content !== '';
 
 const resolveRowSelectionState = (
   updater:
@@ -110,10 +132,11 @@ const createSelectionColumn = <TData,>(): DataTableColumnDef<TData> => ({
       return null;
     }
 
-    const checkboxAriaLabel = table.options.meta?.dataTableSelection?.getRowCheckboxAriaLabel?.(
-      row.original,
-      row.index
-    ) ?? `Select row ${row.index + 1}`;
+    const checkboxAriaLabel =
+      table.options.meta?.dataTableSelection?.getRowCheckboxAriaLabel?.(
+        row.original,
+        row.index
+      ) ?? `Select row ${row.index + 1}`;
 
     return (
       <div className="flex items-center justify-center px-[var(--spacing-1)]">
@@ -140,8 +163,8 @@ const createSelectionColumn = <TData,>(): DataTableColumnDef<TData> => ({
       <div className="flex items-center justify-center px-[var(--spacing-1)]">
         <Checkbox
           aria-label={
-            table.options.meta?.dataTableSelection?.selectAllCheckboxAriaLabel ??
-            'Select all rows'
+            table.options.meta?.dataTableSelection
+              ?.selectAllCheckboxAriaLabel ?? 'Select all rows'
           }
           checked={table.getIsAllPageRowsSelected()}
           indeterminate={
@@ -169,8 +192,12 @@ export const DataTable = <TData,>({
   columns,
   data,
   emptyMessage = 'No results.',
+  footer,
+  footerColumns,
   getRowCanSelect,
   getRowId,
+  getRowTone,
+  header,
   manualPagination = false,
   manualSorting = false,
   onRowSelectionChange,
@@ -254,12 +281,29 @@ export const DataTable = <TData,>({
     },
   });
 
+  const footerCells = footerColumns
+    ? table.getVisibleLeafColumns().map((column) => ({
+        column,
+        content: Object.hasOwn(footerColumns, column.id)
+          ? footerColumns[column.id]
+          : undefined,
+      }))
+    : [];
+  const hasFooterColumns = footerCells.some(({ content }) =>
+    hasContent(content)
+  );
+
   return (
     <div
-      className="overflow-hidden rounded-[var(--card-radius)] bg-card text-card-foreground"
+      className="min-w-0 overflow-hidden rounded-[var(--card-radius)] bg-card text-card-foreground"
       data-slot="data-table"
       style={tableShellStyle}
     >
+      {hasContent(header) ? (
+        <div className="flex flex-wrap items-center justify-between gap-[var(--spacing-2)] p-[var(--card-content-p)]">
+          {header}
+        </div>
+      ) : null}
       <div className="overflow-x-auto">
         <table
           aria-label={ariaLabel}
@@ -305,7 +349,9 @@ export const DataTable = <TData,>({
               table.getRowModel().rows.map((row) => (
                 <tr
                   key={row.id}
-                  className="bg-card hover:bg-[var(--color-grey-8)] last:[&_td]:border-b-0 data-[state=selected]:bg-[var(--color-grey-8)]"
+                  className={dataTableRowVariants({
+                    tone: getRowTone?.(row.original, row.index),
+                  })}
                   data-state={row.getIsSelected() ? 'selected' : undefined}
                 >
                   {row.getVisibleCells().map((cell) => {
@@ -315,7 +361,8 @@ export const DataTable = <TData,>({
                       <td
                         key={cell.id}
                         className={cn(
-                          'border-b border-dashed border-[var(--color-divider)] p-0 align-middle text-[length:var(--body2-size-desktop)] leading-[var(--body2-line-height-desktop)] font-[var(--body2-weight)] [font-family:var(--body2-family)] text-card-foreground',
+                          contentCellClassName,
+                          'border-b border-dashed border-[var(--color-divider)]',
                           getAlignmentClassName(meta?.align),
                           meta?.wrap === 'nowrap' && 'whitespace-nowrap'
                         )}
@@ -341,8 +388,42 @@ export const DataTable = <TData,>({
               </tr>
             )}
           </tbody>
+          {hasFooterColumns ? (
+            <tfoot>
+              <tr className="bg-card">
+                {footerCells.map(({ column, content }) => {
+                  const meta = column.columnDef.meta;
+
+                  return (
+                    <td
+                      key={column.id}
+                      className={cn(
+                        contentCellClassName,
+                        'border-t border-dashed border-[var(--color-divider)]',
+                        getAlignmentClassName(meta?.align),
+                        meta?.wrap === 'nowrap' && 'whitespace-nowrap'
+                      )}
+                      style={getColumnStyle(meta ?? {})}
+                    >
+                      <DataTableCell>{content}</DataTableCell>
+                    </td>
+                  );
+                })}
+              </tr>
+            </tfoot>
+          ) : null}
         </table>
       </div>
+      {hasContent(footer) ? (
+        <div
+          className={cn(
+            tableFooterRowClassName,
+            'flex-wrap border-t border-dashed border-[var(--color-divider)]'
+          )}
+        >
+          {footer}
+        </div>
+      ) : null}
       {pagination ? (
         <div className="border-t border-dashed border-[var(--color-divider)]">
           <TablePagination

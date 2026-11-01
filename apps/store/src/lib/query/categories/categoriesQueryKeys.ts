@@ -4,7 +4,7 @@ export const categoriesQueryKeys = {
   list: ['categories', 'list'] as const,
   listPage: (input?: PaginationSearchInput) =>
     [...categoriesQueryKeys.list, input ?? {}] as const,
-  combobox: () => [...categoriesQueryKeys.list, 'category-combobox'] as const,
+  options: () => [...categoriesQueryKeys.list, 'options'] as const,
   detail: (categoryId: string | number) =>
     ['categories', 'detail', String(categoryId)] as const,
   children: (parentId: string | number) =>

@@ -21,10 +21,10 @@ describe('units of measurement client helpers', () => {
       getUnitsOfMeasurementPath({
         page: 2,
         size: 10,
-        sort: ['name,asc', 'code,desc'],
+        sort: ['name,asc', 'status,desc'],
       })
     ).toBe(
-      '/api/backend/api/v1/units-of-measurement?page=1&size=10&sort=name%2Casc&sort=code%2Cdesc'
+      '/api/backend/api/v1/units-of-measurement?page=1&size=10&sort=name%2Casc&sort=status%2Cdesc'
     );
   });
 
@@ -37,7 +37,7 @@ describe('units of measurement client helpers', () => {
           content: [
             {
               id: 1,
-              code: 'KG',
+              status: 'ACTIVE',
               name: 'Kilogram',
               symbol: 'kg',
               comment: 'Weight unit',
@@ -59,7 +59,7 @@ describe('units of measurement client helpers', () => {
         content: [
           {
             id: 1,
-            code: 'KG',
+            status: 'ACTIVE',
             name: 'Kilogram',
             symbol: 'kg',
             comment: 'Weight unit',
@@ -112,7 +112,7 @@ describe('units of measurement client helpers', () => {
     const fetchMock = vi.mocked(fetch);
     const unitOfMeasurement = {
       id: 1,
-      code: 'KG',
+      status: 'ACTIVE',
       name: 'Kilogram',
       symbol: 'kg',
       comment: 'Weight unit',
@@ -140,7 +140,7 @@ describe('units of measurement client helpers', () => {
       new Response(
         JSON.stringify({
           id: 1,
-          code: 'KG',
+          status: 'ACTIVE',
           name: 'Kilogram',
           symbol: 'kg',
           comment: 'Weight unit',
@@ -150,7 +150,7 @@ describe('units of measurement client helpers', () => {
 
     await expect(
       createUnitOfMeasurement({
-        code: 'KG',
+        status: 'ACTIVE',
         name: 'Kilogram',
         symbol: 'kg',
         comment: 'Weight unit',
@@ -159,7 +159,7 @@ describe('units of measurement client helpers', () => {
       ok: true,
       data: {
         id: 1,
-        code: 'KG',
+        status: 'ACTIVE',
         name: 'Kilogram',
         symbol: 'kg',
         comment: 'Weight unit',
@@ -171,7 +171,7 @@ describe('units of measurement client helpers', () => {
       expect.objectContaining({
         method: 'POST',
         body: JSON.stringify({
-          code: 'KG',
+          status: 'ACTIVE',
           name: 'Kilogram',
           symbol: 'kg',
           comment: 'Weight unit',
@@ -199,7 +199,7 @@ describe('units of measurement client helpers', () => {
 
     await expect(
       createUnitOfMeasurement({
-        code: 'KG',
+        status: 'ACTIVE',
         name: 'Kilogram',
         symbol: 'kg',
         comment: '',
@@ -217,11 +217,11 @@ describe('units of measurement client helpers', () => {
     });
   });
 
-  it('patches a unit of measurement through the backend proxy', async () => {
+  it('patches only supplied unit of measurement fields through the backend proxy', async () => {
     const fetchMock = vi.mocked(fetch);
     const unitOfMeasurement = {
       id: 1,
-      code: 'G',
+      status: 'ACTIVE',
       name: 'Gram',
       symbol: 'g',
       comment: 'Weight unit',
@@ -234,10 +234,8 @@ describe('units of measurement client helpers', () => {
     await expect(
       updateUnitOfMeasurement({
         unitOfMeasurementId: 1,
-        code: 'G',
         name: 'Gram',
-        symbol: 'g',
-        comment: 'Weight unit',
+        symbol: null,
       })
     ).resolves.toEqual({
       ok: true,
@@ -249,10 +247,8 @@ describe('units of measurement client helpers', () => {
       expect.objectContaining({
         method: 'PATCH',
         body: JSON.stringify({
-          code: 'G',
           name: 'Gram',
-          symbol: 'g',
-          comment: 'Weight unit',
+          symbol: null,
         }),
         cache: 'no-store',
       })
@@ -278,7 +274,7 @@ describe('units of measurement client helpers', () => {
     await expect(
       updateUnitOfMeasurement({
         unitOfMeasurementId: 1,
-        code: 'KG',
+        status: 'ACTIVE',
         name: 'Kilogram',
         symbol: 'kg',
         comment: '',

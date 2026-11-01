@@ -2,31 +2,33 @@
 
 import { Dialog } from '@ordero/ui';
 import { useQueryClient } from '@tanstack/react-query';
+import { WAREHOUSE_STATUS } from '@/lib/domain/warehouses/constants';
 import { warehousesQueryKeys } from '@/lib/query/warehouses/warehousesQueryKeys';
-import { WarehouseFormDialogContent } from '../../shared/WarehouseFormDialogContent';
 import { useUpdateWarehouseForm } from './hooks/useUpdateWarehouseForm';
 import type { UpdateWarehouseDialogProps } from './types';
+import { UpdateWarehouseFormDialogContent } from './UpdateWarehouseFormDialogContent';
 import { getWarehouseDefaultValues } from './utils/fields';
 
 export const UpdateWarehouseDialog = ({
   warehouse,
   onOpenChange,
-  onUpdated,
   open,
 }: UpdateWarehouseDialogProps) => {
   const queryClient = useQueryClient();
   const { form } = useUpdateWarehouseForm({
+    onNoChanges: () => handleOpenChange(false),
     warehouse,
     onUpdated: async (updatedWarehouse) => {
       form.reset(getWarehouseDefaultValues(updatedWarehouse));
       onOpenChange(false);
-      await queryClient.invalidateQueries({
-        queryKey: warehousesQueryKeys.list,
-      });
-      await queryClient.invalidateQueries({
-        queryKey: warehousesQueryKeys.detail(warehouse.id),
-      });
-      await onUpdated();
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: warehousesQueryKeys.list,
+        }),
+        queryClient.invalidateQueries({
+          queryKey: warehousesQueryKeys.detail(warehouse.id),
+        }),
+      ]);
     },
   });
 
@@ -37,6 +39,8 @@ export const UpdateWarehouseDialog = ({
       form.reset(getWarehouseDefaultValues(warehouse));
     }
   };
+
+  const isWarehouseActive = warehouse.status === WAREHOUSE_STATUS.ACTIVE;
 
   return (
     <Dialog.Root onOpenChange={handleOpenChange} open={open}>
@@ -55,10 +59,9 @@ export const UpdateWarehouseDialog = ({
                 <Dialog.Title>Edit warehouse</Dialog.Title>
               </Dialog.Header>
 
-              <WarehouseFormDialogContent
+              <UpdateWarehouseFormDialogContent
                 form={form}
-                pendingText="Saving..."
-                submitText="Save"
+                isWarehouseActive={isWarehouseActive}
               />
             </form>
           </Dialog.Popup>

@@ -1,4 +1,5 @@
 import { createUnitOfMeasurement } from '@/lib/client/api/units-of-measurement';
+import { UNIT_OF_MEASUREMENT_STATUS } from '@/lib/domain/units-of-measurement/constants';
 import { submitCreateUnitOfMeasurement } from './submitAction';
 
 vi.mock('@/lib/client/api/units-of-measurement', async () => ({
@@ -18,7 +19,7 @@ describe('submitCreateUnitOfMeasurement', () => {
   it('normalizes form values before creating the unit of measurement', async () => {
     const unitOfMeasurement = {
       id: 1,
-      code: 'KG',
+      status: UNIT_OF_MEASUREMENT_STATUS.ACTIVE,
       name: 'Kilogram',
       symbol: 'kg',
       comment: 'Weight unit',
@@ -30,9 +31,8 @@ describe('submitCreateUnitOfMeasurement', () => {
 
     await expect(
       submitCreateUnitOfMeasurement({
-        code: ' KG ',
+        status: 'ACTIVE',
         name: ' Kilogram ',
-        symbol: ' kg ',
         comment: ' Weight unit ',
       })
     ).resolves.toEqual({
@@ -41,9 +41,8 @@ describe('submitCreateUnitOfMeasurement', () => {
     });
 
     expect(createUnitOfMeasurementMock).toHaveBeenCalledWith({
-      code: 'KG',
       name: 'Kilogram',
-      symbol: 'kg',
+      status: 'ACTIVE',
       comment: 'Weight unit',
     });
   });
@@ -54,25 +53,20 @@ describe('submitCreateUnitOfMeasurement', () => {
       error: {
         status: 422,
         message: 'Unit of measurement creation failed.',
-        fieldErrors: {
-          code: 'Unit code already exists.',
-        },
+        fieldErrors: { status: 'Invalid status.' },
       },
     });
 
     await expect(
       submitCreateUnitOfMeasurement({
-        code: 'KG',
+        status: 'ACTIVE',
         name: 'Kilogram',
         symbol: 'kg',
-        comment: '',
       })
     ).resolves.toEqual({
       ok: false,
       error: {
-        fieldErrors: {
-          code: 'Unit code already exists.',
-        },
+        fieldErrors: { status: 'Invalid status.' },
         formError: 'Unit of measurement creation failed.',
       },
     });

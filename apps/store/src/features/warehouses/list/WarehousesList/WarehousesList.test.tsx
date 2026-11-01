@@ -1,11 +1,12 @@
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getWarehouses } from '@/lib/client/api/warehouses';
+import { WAREHOUSE_STATUS } from '@/lib/domain/warehouses/constants';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { WarehousesList } from './WarehousesList';
 
 const mocks = vi.hoisted(() => ({
-  pathname: '/products/warehouse',
+  pathname: '/warehouse',
   push: vi.fn(),
   searchParams: new URLSearchParams(),
 }));
@@ -63,8 +64,11 @@ describe('WarehousesList', () => {
         data: {
           content: [
             {
+              phone: null,
+              status: WAREHOUSE_STATUS.DRAFT,
+              totalItemQuantity: 0,
+              totalPrice: 0,
               id: 1,
-              code: 'WH-001',
               name: 'Main Warehouse',
               address: '123 Commerce Ave',
               comment: 'Primary stock location',
@@ -99,9 +103,12 @@ describe('WarehousesList', () => {
       data: {
         content: [
           {
+            phone: null,
+            totalItemQuantity: 0,
+            totalPrice: 0,
             id: 1,
-            code: 'WH-001',
             name: 'Main Warehouse',
+            status: WAREHOUSE_STATUS.DRAFT,
             address: '123 Commerce Ave',
             comment: 'Primary stock location',
           },
@@ -120,8 +127,10 @@ describe('WarehousesList', () => {
     expect(
       await screen.findByRole('table', { name: 'Warehouses list' })
     ).toBeVisible();
-    expect(screen.getByText('WH-001')).toBeVisible();
-    expect(screen.getByText('Main Warehouse')).toBeVisible();
+    expect(
+      screen.getByRole('link', { name: 'Main Warehouse' })
+    ).toHaveAttribute('href', '/warehouse/1');
+    expect(screen.getByText('Draft')).toBeVisible();
     expect(screen.getByText('123 Commerce Ave')).toBeVisible();
     expect(screen.getByText('Primary stock location')).toBeVisible();
   });
@@ -161,8 +170,11 @@ describe('WarehousesList', () => {
       data: {
         content: [
           {
+            phone: null,
+            status: WAREHOUSE_STATUS.DRAFT,
+            totalItemQuantity: 0,
+            totalPrice: 0,
             id: 2,
-            code: 'WH-002',
             name: 'Overflow Warehouse',
             address: '124 Commerce Ave',
             comment: 'Overflow stock location',
@@ -179,7 +191,7 @@ describe('WarehousesList', () => {
 
     setup({
       paginationInput: {
-        page: 1,
+        page: 2,
         size: 1,
       },
     });
@@ -236,7 +248,7 @@ describe('WarehousesList', () => {
     );
 
     expect(mocks.push).toHaveBeenCalledWith(
-      '/products/warehouse?page=2&size=25&sort=name%2Casc',
+      '/warehouse?page=2&size=25&sort=name%2Casc',
       { scroll: false }
     );
   });

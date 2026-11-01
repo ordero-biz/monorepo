@@ -1,0 +1,1 @@
+export { SupplyReadOnly } from './SupplyReadOnly';

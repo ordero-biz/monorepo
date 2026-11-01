@@ -1,9 +1,15 @@
-import type { Category } from '@/lib/domain/categories';
-import type { CategoryFormValues } from '../../../shared/validations';
+import type { UpdateCategoryFormValues } from '@/features/categories/detail/UpdateCategory/utils/validations';
+import type { Category } from '@/lib/domain/categories/types';
 
 export const getCategoryDefaultValues = (
   category: Category
-): CategoryFormValues => ({
+): UpdateCategoryFormValues => ({
   name: category.name ?? '',
-  parentId: category.parentCategory ? String(category.parentCategory.id) : null,
+  parentCategory: category.parentCategory
+    ? {
+        id: category.parentCategory.id,
+        name: category.parentCategory.name,
+        status: category.parentCategory.status,
+      }
+    : null,
 });

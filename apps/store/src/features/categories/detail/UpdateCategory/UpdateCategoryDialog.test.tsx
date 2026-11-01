@@ -6,7 +6,6 @@ import { prepareStoreSetup } from '@/test/prepareSetup';
 import { UpdateCategoryDialog } from './UpdateCategoryDialog';
 
 const onOpenChangeMock = vi.fn();
-const onUpdatedMock = vi.fn();
 
 vi.mock('@/lib/client/api/categories', async () => ({
   ...(await vi.importActual<typeof import('@/lib/client/api/categories')>(
@@ -23,7 +22,6 @@ const category = {
   id: 2,
   name: 'Sneakers',
   sortOrder: 15,
-  color: '#16a34a',
   createdAt: '2026-07-01T11:22:53.562Z',
   parentCategory: {
     id: 1,
@@ -37,7 +35,6 @@ const { setup } = prepareStoreSetup({
   props: {
     category,
     onOpenChange: onOpenChangeMock,
-    onUpdated: onUpdatedMock,
     open: true,
   },
 });
@@ -45,8 +42,8 @@ const { setup } = prepareStoreSetup({
 describe('UpdateCategoryDialog', () => {
   beforeEach(() => {
     onOpenChangeMock.mockClear();
-    onUpdatedMock.mockClear();
     updateCategoryMock.mockReset();
+    getCategoriesMock.mockReset();
     getCategoriesMock.mockResolvedValue({
       ok: true,
       data: {
@@ -55,7 +52,6 @@ describe('UpdateCategoryDialog', () => {
             id: 1,
             name: 'Shoes',
             sortOrder: 10,
-            color: '#2563eb',
             createdAt: '2026-07-01T10:54:34.839Z',
           },
           category,
@@ -76,7 +72,7 @@ describe('UpdateCategoryDialog', () => {
       data: { ...category, name: 'Running shoes' },
     });
     const user = userEvent.setup();
-    const { onOpenChange, onUpdated, queryClient } = setup();
+    const { onOpenChange, queryClient } = setup();
     const invalidateQueriesSpy = vi.spyOn(queryClient, 'invalidateQueries');
     const dialog = screen.getByRole('dialog', { name: 'Edit category' });
     const nameField = within(dialog).getByRole('textbox', { name: 'Name' });
@@ -88,7 +84,6 @@ describe('UpdateCategoryDialog', () => {
     expect(updateCategoryMock).toHaveBeenCalledWith({
       categoryId: 2,
       name: 'Running shoes',
-      parentId: 1,
     });
     await waitFor(() =>
       expect(invalidateQueriesSpy).toHaveBeenCalledWith({
@@ -102,22 +97,96 @@ describe('UpdateCategoryDialog', () => {
       queryKey: categoriesQueryKeys.children(1),
     });
     expect(onOpenChange).toHaveBeenCalledWith(false);
-    expect(onUpdated).toHaveBeenCalled();
   });
 
-  it('disables the category itself as a parent', async () => {
+  it('does not send normalized values that match the initial category', async () => {
+    const user = userEvent.setup();
+    const { onOpenChange, renderResult } = setup();
+    const dialog = screen.getByRole('dialog', { name: 'Edit category' });
+    const nameField = within(dialog).getByRole('textbox', { name: 'Name' });
+
+    await user.clear(nameField);
+    await user.type(nameField, ' Sneakers ');
+    await user.click(within(dialog).getByRole('button', { name: 'Save' }));
+
+    expect(updateCategoryMock).not.toHaveBeenCalled();
+    await waitFor(() => expect(onOpenChange).toHaveBeenCalledWith(false));
+    expect(screen.queryByText(/was updated/)).not.toBeInTheDocument();
+
+    renderResult.rerender({ open: false });
+    renderResult.rerender({ open: true });
+
+    expect(
+      within(screen.getByRole('dialog', { name: 'Edit category' })).getByRole(
+        'textbox',
+        { name: 'Name' }
+      )
+    ).toHaveValue('Sneakers');
+  });
+
+  it('shows the saved parent before loading its options', () => {
+    setup();
+    expect(
+      screen.getByRole('combobox', { name: 'Parent category' })
+    ).toHaveValue('Shoes');
+    expect(getCategoriesMock).not.toHaveBeenCalled();
+  });
+
+  it('submits null when the parent is removed', async () => {
+    const user = userEvent.setup();
+    updateCategoryMock.mockResolvedValue({
+      ok: true,
+      data: { ...category, parentCategory: null },
+    });
+    setup();
+    await user.click(screen.getByRole('combobox', { name: 'Parent category' }));
+    await user.click(
+      await screen.findByRole('option', { name: 'No parent category' })
+    );
+    await user.click(screen.getByRole('button', { name: 'Save' }));
+    expect(updateCategoryMock).toHaveBeenCalledWith({
+      categoryId: 2,
+      parentId: null,
+    });
+  });
+
+  it('maps backend parentId errors to the parent category field', async () => {
+    const user = userEvent.setup();
+    updateCategoryMock.mockResolvedValue({
+      ok: false,
+      error: {
+        status: 422,
+        message: 'Update failed',
+        fieldErrors: { parentId: 'Invalid parent category' },
+      },
+    });
+    setup();
+    await user.type(screen.getByRole('textbox', { name: 'Name' }), ' changed');
+    await user.click(screen.getByRole('button', { name: 'Save' }));
+    expect(await screen.findByText('Invalid parent category')).toBeVisible();
+    expect(
+      screen.getByRole('combobox', { name: 'Parent category' })
+    ).toHaveAccessibleDescription('Invalid parent category');
+  });
+
+  it('prevents the category itself from being selected as a parent', async () => {
     const user = userEvent.setup();
 
     setup();
 
     const dialog = screen.getByRole('dialog', { name: 'Edit category' });
 
-    await user.click(
-      within(dialog).getByRole('combobox', { name: 'Parent category' })
-    );
+    const parentCategoryField = within(dialog).getByRole('combobox', {
+      name: 'Parent category',
+    });
 
-    expect(screen.getByRole('option', { name: 'Shoes' })).toBeVisible();
-    expect(screen.getByRole('option', { name: 'Sneakers' })).toBeDisabled();
+    await user.clear(parentCategoryField);
+    await user.click(parentCategoryField);
+
+    expect(await screen.findByRole('option', { name: 'Shoes' })).toBeVisible();
+    expect(
+      await screen.findByRole('option', { name: 'Sneakers' })
+    ).toHaveAttribute('aria-disabled', 'true');
   });
 
   it('renders missing editable values as empty strings', () => {
@@ -133,6 +202,41 @@ describe('UpdateCategoryDialog', () => {
     expect(within(dialog).getByRole('textbox', { name: 'Name' })).toHaveValue(
       ''
     );
-    expect(within(dialog).getByRole('button', { name: 'Save' })).toBeDisabled();
+    expect(within(dialog).getByRole('button', { name: 'Save' })).toBeEnabled();
+  });
+
+  it('prevents another save while the update is in flight', async () => {
+    let resolveUpdate:
+      | ((value: Awaited<ReturnType<typeof updateCategory>>) => void)
+      | undefined;
+    updateCategoryMock.mockReturnValue(
+      new Promise((resolve) => {
+        resolveUpdate = resolve;
+      })
+    );
+    const user = userEvent.setup();
+
+    setup();
+
+    const dialog = screen.getByRole('dialog', { name: 'Edit category' });
+    const nameField = within(dialog).getByRole('textbox', { name: 'Name' });
+    const saveButton = within(dialog).getByRole('button', { name: 'Save' });
+
+    await user.clear(nameField);
+    await user.type(nameField, 'Running shoes');
+    await user.click(saveButton);
+
+    expect(saveButton).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Saving...' })).toBeVisible();
+
+    resolveUpdate?.({
+      ok: true,
+      data: {
+        ...category,
+        name: 'Running shoes',
+      },
+    });
+
+    await screen.findByRole('button', { name: 'Save' });
   });
 });

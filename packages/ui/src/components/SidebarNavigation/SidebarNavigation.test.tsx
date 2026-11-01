@@ -339,6 +339,93 @@ describe('SidebarNavigation', () => {
     ).toBeInTheDocument();
   });
 
+  it('reopens a collapsed branch when the active item changes within it', async () => {
+    const user = userEvent.setup();
+    const { rerender } = render(
+      <SidebarNavigationFixture
+        footer={false}
+        header={false}
+        sections={[
+          {
+            id: 'overview',
+            label: 'Overview',
+            items: [
+              {
+                id: 'product',
+                kind: 'collapse',
+                label: 'Product',
+                items: [
+                  {
+                    id: 'categories',
+                    kind: 'link',
+                    label: 'Categories',
+                    href: '/products/categories',
+                    active: true,
+                  },
+                  {
+                    id: 'attributes',
+                    kind: 'link',
+                    label: 'Attributes',
+                    href: '/products/attributes',
+                  },
+                ],
+              },
+            ],
+          },
+        ]}
+      />
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Product' }));
+
+    expect(
+      screen.queryByRole('link', { name: 'Categories' })
+    ).not.toBeInTheDocument();
+
+    rerender(
+      <SidebarNavigationFixture
+        footer={false}
+        header={false}
+        sections={[
+          {
+            id: 'overview',
+            label: 'Overview',
+            items: [
+              {
+                id: 'product',
+                kind: 'collapse',
+                label: 'Product',
+                items: [
+                  {
+                    id: 'categories',
+                    kind: 'link',
+                    label: 'Categories',
+                    href: '/products/categories',
+                  },
+                  {
+                    id: 'attributes',
+                    kind: 'link',
+                    label: 'Attributes',
+                    href: '/products/attributes',
+                    active: true,
+                  },
+                ],
+              },
+            ],
+          },
+        ]}
+      />
+    );
+
+    expect(
+      screen.getByRole('link', { name: 'Attributes' })
+    ).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Attributes' })).toHaveAttribute(
+      'aria-current',
+      'page'
+    );
+  });
+
   it('calls on click actions when enabled', async () => {
     const user = userEvent.setup();
 

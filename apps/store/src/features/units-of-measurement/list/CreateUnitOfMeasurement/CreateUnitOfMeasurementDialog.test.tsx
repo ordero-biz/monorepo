@@ -30,7 +30,7 @@ describe('CreateUnitOfMeasurementDialog', () => {
     onOpenChangeMock.mockClear();
   });
 
-  it('requires code, name, and symbol before add is available', async () => {
+  it('keeps the save draft CTA enabled and validates name on submit', async () => {
     const user = userEvent.setup();
 
     setup();
@@ -38,33 +38,53 @@ describe('CreateUnitOfMeasurementDialog', () => {
     const dialog = screen.getByRole('dialog', {
       name: 'Add unit of measurement',
     });
-    const codeField = within(dialog).getByRole('textbox', {
-      name: 'Code',
+    const addButton = within(dialog).getByRole('button', {
+      name: 'Save draft',
     });
-    const nameField = within(dialog).getByRole('textbox', {
-      name: 'Name',
+
+    expect(addButton).toBeEnabled();
+
+    await user.click(addButton);
+
+    expect(
+      await within(dialog).findByText('Unit name is required')
+    ).toBeVisible();
+    expect(addButton).toBeEnabled();
+    expect(createUnitOfMeasurementMock).not.toHaveBeenCalled();
+  });
+
+  it('explains the effects of each unit status', () => {
+    setup();
+
+    const dialog = screen.getByRole('dialog', {
+      name: 'Add unit of measurement',
+    });
+
+    expect(
+      within(dialog).getByText(
+        'Editable only. Cannot be used in supplies or tracked in analytics. Can be activated later'
+      )
+    ).toBeVisible();
+    expect(
+      within(dialog).getByText(
+        'Fully functional. Can be used in supplies and tracked in analytics. Name and status cannot be edited after publishing'
+      )
+    ).toBeVisible();
+  });
+
+  it('describes the symbol field', () => {
+    setup();
+
+    const dialog = screen.getByRole('dialog', {
+      name: 'Add unit of measurement',
     });
     const symbolField = within(dialog).getByRole('textbox', {
       name: 'Symbol',
     });
-    const addButton = within(dialog).getByRole('button', { name: 'Add' });
 
-    expect(addButton).toBeDisabled();
-
-    await user.type(codeField, 'KG');
-    await user.type(nameField, 'Kilogram');
-    expect(addButton).toBeDisabled();
-
-    await user.type(symbolField, '   ');
-    await user.tab();
-
-    expect(within(dialog).getByText('Unit symbol is required')).toBeVisible();
-    expect(addButton).toBeDisabled();
-
-    await user.clear(symbolField);
-    await user.type(symbolField, 'kg');
-
-    expect(addButton).toBeEnabled();
+    expect(symbolField).toHaveAccessibleDescription(
+      'Short abbreviation for the unit (e.g., kg, cm)'
+    );
   });
 
   it('creates a unit of measurement, closes the dialog, and invalidates the list', async () => {
@@ -73,9 +93,9 @@ describe('CreateUnitOfMeasurementDialog', () => {
       ok: true,
       data: {
         id: 1,
-        code: 'KG',
+        status: 'DRAFT',
         name: 'Kilogram',
-        symbol: 'kg',
+        symbol: '',
         comment: 'Weight unit',
       },
     });
@@ -87,28 +107,21 @@ describe('CreateUnitOfMeasurementDialog', () => {
       name: 'Add unit of measurement',
     });
 
-    await user.type(
-      within(dialog).getByRole('textbox', { name: 'Code' }),
-      ' KG '
-    );
+    await user.click(within(dialog).getByRole('radio', { name: /^Active/ }));
+
     await user.type(
       within(dialog).getByRole('textbox', { name: 'Name' }),
       ' Kilogram '
     );
     await user.type(
-      within(dialog).getByRole('textbox', { name: 'Symbol' }),
-      ' kg '
-    );
-    await user.type(
       within(dialog).getByRole('textbox', { name: 'Comment' }),
       ' Weight unit '
     );
-    await user.click(within(dialog).getByRole('button', { name: 'Add' }));
+    await user.click(within(dialog).getByRole('button', { name: 'Publish' }));
 
     expect(createUnitOfMeasurementMock).toHaveBeenCalledWith({
-      code: 'KG',
       name: 'Kilogram',
-      symbol: 'kg',
+      status: 'ACTIVE',
       comment: 'Weight unit',
     });
     await waitFor(() =>
@@ -127,7 +140,7 @@ describe('CreateUnitOfMeasurementDialog', () => {
         status: 422,
         message: 'Unit of measurement creation failed.',
         fieldErrors: {
-          code: 'Unit code already exists.',
+          name: 'Unit name already exists.',
         },
       },
     });
@@ -137,31 +150,28 @@ describe('CreateUnitOfMeasurementDialog', () => {
     const dialog = screen.getByRole('dialog', {
       name: 'Add unit of measurement',
     });
-    const codeField = within(dialog).getByRole('textbox', {
-      name: 'Code',
+    const nameField = within(dialog).getByRole('textbox', {
+      name: 'Name',
     });
 
-    await user.type(codeField, 'KG');
-    await user.type(
-      within(dialog).getByRole('textbox', { name: 'Name' }),
-      'Kilogram'
-    );
+    await user.type(nameField, 'Kilogram');
     await user.type(
       within(dialog).getByRole('textbox', { name: 'Symbol' }),
       'kg'
     );
-    await user.click(within(dialog).getByRole('button', { name: 'Add' }));
+    await user.click(
+      within(dialog).getByRole('button', { name: 'Save draft' })
+    );
 
     expect(createUnitOfMeasurementMock).toHaveBeenCalledWith({
-      code: 'KG',
       name: 'Kilogram',
+      status: 'DRAFT',
       symbol: 'kg',
-      comment: '',
     });
     expect(
-      await within(dialog).findByText('Unit code already exists.')
+      await within(dialog).findByText('Unit name already exists.')
     ).toBeVisible();
-    expect(codeField).toHaveAccessibleDescription('Unit code already exists.');
+    expect(nameField).toHaveAccessibleDescription('Unit name already exists.');
     expect(
       await screen.findByRole('dialog', {
         name: 'Unit of measurement creation failed.',

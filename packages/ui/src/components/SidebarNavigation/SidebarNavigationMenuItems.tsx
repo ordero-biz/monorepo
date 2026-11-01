@@ -1,7 +1,7 @@
 import { Accordion } from '@base-ui/react/accordion';
 import { Button as ButtonPrimitive } from '@base-ui/react/button';
 import { ChevronDown } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { cn } from '@/ui/lib/utils';
 import {
   accordionPanelClassName,
@@ -18,6 +18,7 @@ import type {
   SidebarNavigationRenderLink,
 } from './types';
 import {
+  getActiveItemIds,
   getExpandedItemIds,
   isItemBranchActive,
   toAccordionItemIds,
@@ -109,7 +110,7 @@ const SidebarNavigationItemContent = ({
       {item.kind === 'collapse' ? (
         <span
           className={cn(
-            'ml-[var(--space-1)] flex size-[var(--space-2)] shrink-0 items-center justify-center transition-transform',
+            'ml-[var(--space-1)] flex size-[var(--space-2)] shrink-0 items-center justify-center transition-transform duration-150 motion-reduce:transition-none',
             isOpen && 'rotate-180'
           )}
         >
@@ -187,21 +188,28 @@ export const SidebarNavigationMenuItems = ({
   renderLink,
   rootLabel,
 }: SidebarNavigationMenuItemsProps) => {
-  const expandedItemIds = getExpandedItemIds(items);
-  const expandedItemIdsKey = JSON.stringify(expandedItemIds);
-  const previousExpandedItemIdsKeyRef = useRef(expandedItemIdsKey);
+  const { expandedItemIds, navigationStateKey } = useMemo(() => {
+    const activeItemIds = getActiveItemIds(items);
+    const expandedItemIds = getExpandedItemIds(items);
+
+    return {
+      expandedItemIds,
+      navigationStateKey: `${JSON.stringify(activeItemIds)}:${JSON.stringify(expandedItemIds)}`,
+    };
+  }, [items]);
+  const previousNavigationStateKeyRef = useRef(navigationStateKey);
   const [openItemIds, setOpenItemIds] = useState<string[]>(expandedItemIds);
   const accordionLabel =
     labelPath.length > 0 ? `${rootLabel}: ${labelPath.join(' / ')}` : rootLabel;
 
   useEffect(() => {
-    if (previousExpandedItemIdsKeyRef.current === expandedItemIdsKey) {
+    if (previousNavigationStateKeyRef.current === navigationStateKey) {
       return;
     }
 
-    previousExpandedItemIdsKeyRef.current = expandedItemIdsKey;
+    previousNavigationStateKeyRef.current = navigationStateKey;
     setOpenItemIds(expandedItemIds);
-  }, [expandedItemIds, expandedItemIdsKey]);
+  }, [expandedItemIds, navigationStateKey]);
 
   const content = (
     <Accordion.Root

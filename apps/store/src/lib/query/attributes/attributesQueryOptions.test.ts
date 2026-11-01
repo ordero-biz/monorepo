@@ -21,6 +21,7 @@ describe('attribute query options', () => {
           id: 1,
           name: 'Size',
           sortOrder: 10,
+          status: 'DRAFT' as const,
           createdAt: '2026-07-01T10:54:34.839Z',
         },
       ],
@@ -49,6 +50,7 @@ describe('attribute query options', () => {
       id: 1,
       name: 'Size',
       sortOrder: 10,
+      status: 'DRAFT' as const,
       createdAt: '2026-07-01T10:54:34.839Z',
     };
     const values = [
@@ -56,6 +58,7 @@ describe('attribute query options', () => {
         id: 2,
         name: 'Large',
         sortOrder: 10,
+        status: 'DRAFT' as const,
         createdAt: '2026-07-01T10:54:34.839Z',
       },
     ];

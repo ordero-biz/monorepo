@@ -1,0 +1,1 @@
+export { SupplierStatusChip } from './SupplierStatusChip';

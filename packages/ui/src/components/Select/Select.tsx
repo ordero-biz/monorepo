@@ -7,6 +7,7 @@ import { useId, useMemo, useState } from 'react';
 import { Checkbox } from '@/ui/components/Checkbox';
 import { FieldHelperText } from '@/ui/components/FieldHelperText';
 import { FieldLabel } from '@/ui/components/FieldLabel';
+import { dropdownSurfaceClassName } from '@/ui/components/Select';
 import { cn } from '@/ui/lib/utils';
 import type { SelectProps } from './types';
 
@@ -57,8 +58,10 @@ const valueTextWidthClassNames = {
 const iconClassName =
   'ml-[var(--textfield-select-arrow-mr)] flex shrink-0 items-center justify-center text-[var(--text-secondary)] transition-transform data-[popup-open]:rotate-180 [&_svg]:size-[var(--textfield-select-arrow-icon)]';
 
-const popupClassName =
-  'overflow-hidden rounded-[var(--radius)] border border-[var(--color-grey-16)] bg-[var(--white-main)] p-[var(--menu-list-p)] shadow-[var(--dropdown-x1)_var(--dropdown-y1)_var(--dropdown-blur1)_var(--dropdown-spread1)_var(--color-grey-16),var(--dropdown-x2)_var(--dropdown-y2)_var(--dropdown-blur2)_var(--dropdown-spread2)_var(--color-grey-20)]';
+const popupClassName = cn(
+  'overflow-hidden rounded-[var(--radius)] border border-[var(--color-grey-16)] bg-[var(--white-main)] p-[var(--menu-list-p)] shadow-[var(--dropdown-x1)_var(--dropdown-y1)_var(--dropdown-blur1)_var(--dropdown-spread1)_var(--color-grey-16),var(--dropdown-x2)_var(--dropdown-y2)_var(--dropdown-blur2)_var(--dropdown-spread2)_var(--color-grey-20)]',
+  dropdownSurfaceClassName
+);
 
 const listClassName =
   'flex flex-col gap-[var(--menu-list-spacing)] rounded-[calc(var(--radius)-4px)]';

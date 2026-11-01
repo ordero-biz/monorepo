@@ -1,4 +1,4 @@
-import type { AttributeValue } from '@/lib/domain/attributes';
+import type { AttributeValue } from '@/lib/domain/attributes/types';
 export type UpdateAttributeValueDialogProps = {
   attributeId: string | number;
   attributeValue: AttributeValue;

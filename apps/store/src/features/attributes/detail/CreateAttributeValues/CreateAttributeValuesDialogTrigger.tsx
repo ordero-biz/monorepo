@@ -7,17 +7,24 @@ import type { CreateAttributeValuesDialogTriggerProps } from './types';
 
 export const CreateAttributeValuesDialogTrigger = ({
   attributeId,
+  attributeStatus,
 }: CreateAttributeValuesDialogTriggerProps) => {
   const [open, setOpen] = useState(false);
 
   return (
     <>
-      <Button color="primary" onClick={() => setOpen(true)} type="button">
+      <Button
+        color="inherit"
+        variant="soft"
+        onClick={() => setOpen(true)}
+        type="button"
+      >
         Add Value
       </Button>
 
       <CreateAttributeValuesDialog
         attributeId={attributeId}
+        attributeStatus={attributeStatus}
         onOpenChange={setOpen}
         open={open}
       />

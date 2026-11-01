@@ -1,15 +1,11 @@
 import { Card, Typography } from '@ordero/ui';
-import type { Category } from '@/lib/domain/categories';
+import type { Category } from '@/lib/domain/categories/types';
 import type { CategoryDetailField, CategoryDetailInfoProps } from './types';
 
 const getCategoryDetailData = (category: Category): CategoryDetailField[] => [
   {
     label: 'Parent category',
     value: category.parentCategory?.name,
-  },
-  {
-    label: 'Color',
-    value: category.color,
   },
 ];
 

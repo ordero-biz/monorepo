@@ -1,5 +1,23 @@
-import { CreateProduct } from '@/features/products';
+import { CreateProductWorkflow } from '@/features/products';
+import { getProductCreationMode } from '@/lib/domain/products/constants';
+import type { SearchParamsInput } from '@/lib/utils/url';
 
-export default function AddProductPage() {
-  return <CreateProduct />;
+type AddProductPageProps = {
+  searchParams?: Promise<SearchParamsInput>;
+};
+
+export default async function AddProductPage({
+  searchParams,
+}: AddProductPageProps = {}) {
+  const resolvedSearchParams = await searchParams;
+
+  const creationMode = getProductCreationMode(
+    resolvedSearchParams?.creationMode
+  );
+
+  return (
+    <div className="flex flex-col gap-[var(--space-2)]">
+      <CreateProductWorkflow creationMode={creationMode} />
+    </div>
+  );
 }

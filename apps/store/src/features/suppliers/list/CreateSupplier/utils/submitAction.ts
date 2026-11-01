@@ -1,14 +1,25 @@
 import { createSupplier } from '@/lib/client/api/suppliers';
-import type { SupplierEntityFormValues } from '../../../shared/SupplierFormDialogContent';
+import type { CreateSupplierFormValues } from './validations';
 
-export const submitCreateSupplier = async (value: SupplierEntityFormValues) => {
-  const result = await createSupplier({
-    name: value.name.trim(),
-    email: value.email.trim(),
-    phone: value.phone.trim(),
-    address: value.address.trim(),
-    comment: value.comment.trim(),
-  });
+const normalizeCreateSupplierFormData = (data: CreateSupplierFormValues) => {
+  const email = data.email?.trim();
+  const phone = data.phone?.trim();
+  const address = data.address?.trim();
+  const comment = data.comment?.trim();
+
+  return {
+    name: data.name.trim(),
+    status: data.status,
+    ...(email ? { email } : {}),
+    ...(phone ? { phone } : {}),
+    ...(address ? { address } : {}),
+    ...(comment ? { comment } : {}),
+  };
+};
+
+export const submitCreateSupplier = async (value: CreateSupplierFormValues) => {
+  const normalizedFormData = normalizeCreateSupplierFormData(value);
+  const result = await createSupplier(normalizedFormData);
 
   if (!result.ok) {
     return {

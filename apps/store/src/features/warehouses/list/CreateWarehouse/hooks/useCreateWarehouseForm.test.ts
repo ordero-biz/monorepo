@@ -1,5 +1,6 @@
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { WAREHOUSE_STATUS } from '@/lib/domain/warehouses/constants';
 import { prepareFormHookTestSetup } from '@/test/prepareFormHookTestSetup';
 import { submitCreateWarehouse } from '../utils/submitAction';
 import { useCreateWarehouseForm } from './useCreateWarehouseForm';
@@ -56,8 +57,11 @@ describe('useCreateWarehouseForm', () => {
     submitCreateWarehouseMock.mockResolvedValue({
       ok: true,
       data: {
+        phone: null,
+        status: WAREHOUSE_STATUS.DRAFT,
+        totalItemQuantity: 0,
+        totalPrice: 0,
         id: 1,
-        code: 'WH-001',
         name: 'Main Warehouse',
         address: '123 Commerce Ave',
         comment: 'Primary stock location',
@@ -79,7 +83,7 @@ describe('useCreateWarehouseForm', () => {
       ok: false,
       error: {
         fieldErrors: {
-          code: 'Warehouse code already exists.',
+          name: 'Warehouse name already exists.',
         },
         formError: 'Warehouse creation failed.',
       },

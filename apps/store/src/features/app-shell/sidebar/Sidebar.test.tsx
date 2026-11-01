@@ -1,0 +1,215 @@
+import { screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { useLogOut } from '@/lib/hooks/auth/useLogOut';
+import { prepareStoreSetup } from '@/test/prepareSetup';
+import { Sidebar } from './Sidebar';
+
+const mocks = vi.hoisted(() => ({
+  logOut: vi.fn(),
+  pathname: '/dashboard',
+}));
+
+vi.mock('next/navigation', () => ({
+  usePathname: () => mocks.pathname,
+}));
+
+vi.mock('@/lib/hooks/auth/useLogOut', () => ({
+  useLogOut: vi.fn(),
+}));
+
+const useLogOutMock = vi.mocked(useLogOut);
+
+const { setup } = prepareStoreSetup({
+  component: Sidebar,
+});
+
+describe('Store sidebar', () => {
+  beforeEach(() => {
+    mocks.logOut.mockReset();
+    mocks.pathname = '/dashboard';
+    useLogOutMock.mockReturnValue({
+      isLoggingOut: false,
+      logOut: mocks.logOut,
+    });
+  });
+
+  it('opens product navigation without selecting a child', async () => {
+    const user = userEvent.setup();
+
+    setup();
+
+    const sidebar = screen.getByRole('complementary');
+
+    expect(within(sidebar).getByText('Ordero')).toBeVisible();
+
+    const dashboardLink = within(sidebar).getByRole('link', {
+      name: 'Dashboard',
+    });
+
+    expect(dashboardLink).toBeVisible();
+    expect(dashboardLink).toHaveAttribute('href', '/dashboard');
+    expect(dashboardLink).toHaveAttribute('aria-current', 'page');
+
+    await user.click(within(sidebar).getByRole('button', { name: 'Product' }));
+
+    expect(
+      within(sidebar).getByRole('link', { name: 'Products' })
+    ).toHaveAttribute('href', '/products');
+    expect(
+      within(sidebar).getByRole('link', { name: 'Categories' })
+    ).toHaveAttribute('href', '/products/categories');
+    expect(
+      within(sidebar).getByRole('link', { name: 'Attributes' })
+    ).toHaveAttribute('href', '/products/attributes');
+    expect(
+      within(sidebar).queryByRole('link', { name: 'Units of measurement' })
+    ).not.toBeInTheDocument();
+
+    for (const linkName of ['Products', 'Categories', 'Attributes']) {
+      expect(
+        within(sidebar).getByRole('link', { name: linkName })
+      ).not.toHaveAttribute('aria-current');
+    }
+  });
+
+  it('opens warehouse navigation without selecting a child', async () => {
+    const user = userEvent.setup();
+
+    setup();
+
+    const sidebar = screen.getByRole('complementary');
+
+    await user.click(
+      within(sidebar).getByRole('button', { name: 'Warehouse' })
+    );
+
+    expect(
+      within(sidebar).getByRole('link', { name: 'Warehouse' })
+    ).toHaveAttribute('href', '/warehouse');
+    expect(
+      within(sidebar).getByRole('link', { name: 'Supplies' })
+    ).toHaveAttribute('href', '/warehouse/supplies');
+    expect(
+      within(sidebar).getByRole('link', { name: 'Suppliers' })
+    ).toHaveAttribute('href', '/warehouse/suppliers');
+    expect(
+      within(sidebar).getByRole('link', { name: 'Units of measurement' })
+    ).toHaveAttribute('href', '/warehouse/units-of-measurement');
+
+    for (const linkName of [
+      'Warehouse',
+      'Supplies',
+      'Suppliers',
+      'Units of measurement',
+    ]) {
+      expect(
+        within(sidebar).getByRole('link', { name: linkName })
+      ).not.toHaveAttribute('aria-current');
+    }
+  });
+
+  it('opens and highlights the parent branch for the most specific active route', () => {
+    mocks.pathname = '/products/categories/42';
+
+    setup();
+
+    const sidebar = screen.getByRole('complementary');
+    const productBranch = within(sidebar).getByRole('button', {
+      name: 'Product',
+    });
+    const categoryLink = within(sidebar).getByRole('link', {
+      name: 'Categories',
+    });
+
+    expect(productBranch).toHaveAttribute('aria-expanded', 'true');
+    expect(categoryLink).toHaveAttribute('aria-current', 'page');
+    expect(
+      within(sidebar).getByRole('link', { name: 'Products' })
+    ).not.toHaveAttribute('aria-current');
+  });
+
+  it('highlights the products link for the products route', () => {
+    mocks.pathname = '/products';
+
+    setup();
+
+    const sidebar = screen.getByRole('complementary');
+    const productBranch = within(sidebar).getByRole('button', {
+      name: 'Product',
+    });
+    const productsLink = within(sidebar).getByRole('link', {
+      name: 'Products',
+    });
+
+    expect(productBranch).toHaveAttribute('aria-expanded', 'true');
+    expect(productsLink).toHaveAttribute('aria-current', 'page');
+  });
+
+  it('opens the warehouse parent for an active nested route', () => {
+    mocks.pathname = '/warehouse/supplies/42';
+
+    setup();
+
+    const sidebar = screen.getByRole('complementary');
+    const productBranch = within(sidebar).getByRole('button', {
+      name: 'Product',
+    });
+    const warehouseBranch = within(sidebar).getByRole('button', {
+      name: 'Warehouse',
+    });
+    const suppliesLink = within(sidebar).getByRole('link', {
+      name: 'Supplies',
+    });
+
+    expect(productBranch).toHaveAttribute('aria-expanded', 'false');
+    expect(warehouseBranch).toHaveAttribute('aria-expanded', 'true');
+    expect(suppliesLink).toHaveAttribute('aria-current', 'page');
+  });
+
+  it('lets users collapse the active branch without clearing route activity', async () => {
+    const user = userEvent.setup();
+    mocks.pathname = '/products/categories';
+
+    setup();
+
+    const sidebar = screen.getByRole('complementary');
+    const productBranch = within(sidebar).getByRole('button', {
+      name: 'Product',
+    });
+
+    await user.click(productBranch);
+
+    expect(productBranch).toHaveAttribute('aria-expanded', 'false');
+    expect(
+      within(sidebar).queryByRole('link', { name: 'Categories' })
+    ).not.toBeInTheDocument();
+  });
+
+  it('calls the logout handler from the footer', async () => {
+    const user = userEvent.setup();
+
+    setup();
+
+    const sidebar = screen.getByRole('complementary');
+
+    await user.click(within(sidebar).getByRole('button', { name: 'Sign out' }));
+
+    expect(mocks.logOut).toHaveBeenCalledTimes(1);
+  });
+
+  it('shows the pending sign-out state', () => {
+    useLogOutMock.mockReturnValue({
+      isLoggingOut: true,
+      logOut: mocks.logOut,
+    });
+
+    setup();
+
+    const sidebar = screen.getByRole('complementary');
+    const signOutButton = within(sidebar).getByRole('button', {
+      name: 'Signing out',
+    });
+
+    expect(signOutButton).toBeDisabled();
+  });
+});

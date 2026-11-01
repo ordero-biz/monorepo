@@ -1,5 +1,6 @@
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { SUPPLIER_STATUS } from '@/lib/domain/suppliers/constants';
 import { prepareFormHookTestSetup } from '@/test/prepareFormHookTestSetup';
 import { submitCreateSupplier } from '../utils/submitAction';
 import { useCreateSupplierForm } from './useCreateSupplierForm';
@@ -60,6 +61,7 @@ describe('useCreateSupplierForm', () => {
       data: {
         id: 1,
         name: 'Fresh Farms',
+        status: SUPPLIER_STATUS.DRAFT,
         email: 'orders@fresh.example',
         phone: '+1 555 0100',
         address: '123 Market St',

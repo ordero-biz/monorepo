@@ -1,0 +1,1020 @@
+import { act, screen, waitFor, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { createProductGroup } from '@/lib/client/api/products';
+import type { AttributeDropdown } from '@/lib/domain/attributes/types';
+import { prepareStoreSetup } from '@/test/prepareSetup';
+import { CreateProduct } from './CreateProduct';
+import {
+  DEFAULT_MAX_GENERATED_PRODUCT_VARIANTS,
+  PRODUCT_GENERATION_MODE,
+} from './constants';
+import type { CreateProductProps } from './types';
+import {
+  validateMultipleProductsConfiguration,
+  validateSingleProductConfiguration,
+} from './utils/validations';
+
+const mocks = vi.hoisted(() => ({
+  createProductGroup: vi.fn(),
+  push: vi.fn(),
+}));
+
+const intersectionObserverCallbacks: IntersectionObserverCallback[] = [];
+
+class IntersectionObserverMock {
+  constructor(callback: IntersectionObserverCallback) {
+    intersectionObserverCallbacks.push(callback);
+  }
+
+  disconnect = vi.fn();
+  observe = vi.fn();
+}
+
+vi.mock('next/navigation', async () => ({
+  ...(await vi.importActual<typeof import('next/navigation')>(
+    'next/navigation'
+  )),
+  useRouter: () => ({
+    push: mocks.push,
+  }),
+}));
+
+vi.mock('@/lib/client/api/products', async () => ({
+  ...(await vi.importActual<typeof import('@/lib/client/api/products')>(
+    '@/lib/client/api/products'
+  )),
+  createProductGroup: mocks.createProductGroup,
+}));
+
+vi.mock('@/features/categories', () => ({
+  CategoriesAsyncCombobox: ({
+    errorText,
+    label,
+    onValueChange,
+  }: {
+    errorText?: string;
+    label: string;
+    onValueChange: (value: { id: number; name: string } | null) => void;
+  }) => (
+    <>
+      <button
+        onClick={() => onValueChange({ id: 2, name: 'Footwear' })}
+        type="button"
+      >
+        Select {label}
+      </button>
+      {errorText ? <span>{errorText}</span> : null}
+    </>
+  ),
+}));
+
+vi.mock('./AttributesAsyncCombobox', () => ({
+  AttributesAsyncCombobox: ({
+    label,
+    onValueChange,
+  }: {
+    label: string;
+    onValueChange?: (attributes: AttributeDropdown[]) => void;
+  }) => {
+    const manufactureAttribute = {
+      id: 8,
+      name: 'Manufacture',
+      sortOrder: 0,
+      status: 'DRAFT' as const,
+      createdAt: '2026-07-14T17:54:42.035Z',
+      attributeValues: [
+        {
+          id: 80,
+          name: 'China',
+          sortOrder: 0,
+          status: 'DRAFT' as const,
+          createdAt: '2026-07-14T17:54:42.036Z',
+        },
+        {
+          id: 81,
+          name: 'USA',
+          sortOrder: 1,
+          status: 'DRAFT' as const,
+          createdAt: '2026-07-14T17:54:42.036Z',
+        },
+        {
+          id: 82,
+          name: 'Ukraine',
+          sortOrder: 2,
+          status: 'DRAFT' as const,
+          createdAt: '2026-07-14T17:54:42.036Z',
+        },
+        {
+          id: 83,
+          name: 'India',
+          sortOrder: 3,
+          status: 'DRAFT' as const,
+          createdAt: '2026-07-14T17:54:42.036Z',
+        },
+        {
+          id: 84,
+          name: 'Brazil',
+          sortOrder: 4,
+          status: 'DRAFT' as const,
+          createdAt: '2026-07-14T17:54:42.036Z',
+        },
+        {
+          id: 85,
+          name: 'Germany',
+          sortOrder: 5,
+          status: 'DRAFT' as const,
+          createdAt: '2026-07-14T17:54:42.036Z',
+        },
+        {
+          id: 86,
+          name: 'Japan',
+          sortOrder: 6,
+          status: 'DRAFT' as const,
+          createdAt: '2026-07-14T17:54:42.036Z',
+        },
+      ],
+    };
+    const colorAttribute = {
+      id: 7,
+      name: 'Color',
+      sortOrder: 1,
+      status: 'DRAFT' as const,
+      createdAt: '2026-07-14T17:54:42.035Z',
+      attributeValues: [
+        {
+          id: 70,
+          name: 'Red',
+          sortOrder: 0,
+          status: 'DRAFT' as const,
+          createdAt: '2026-07-14T17:54:42.036Z',
+        },
+        {
+          id: 71,
+          name: 'Green',
+          sortOrder: 1,
+          status: 'DRAFT' as const,
+          createdAt: '2026-07-14T17:54:42.036Z',
+        },
+        {
+          id: 72,
+          name: 'Blue',
+          sortOrder: 2,
+          status: 'DRAFT' as const,
+          createdAt: '2026-07-14T17:54:42.036Z',
+        },
+      ],
+    };
+
+    return (
+      <>
+        <button
+          onClick={() =>
+            onValueChange?.([manufactureAttribute, colorAttribute])
+          }
+          type="button"
+        >
+          Select {label}
+        </button>
+        <button onClick={() => onValueChange?.([colorAttribute])} type="button">
+          Select Color Attribute
+        </button>
+      </>
+    );
+  },
+}));
+
+const createProductGroupMock = vi.mocked(createProductGroup);
+
+let getComputedStyleSpy: { mockRestore: () => void } | undefined;
+
+const { setup } = prepareStoreSetup<CreateProductProps>({
+  component: CreateProduct,
+  props: {
+    generationMode: PRODUCT_GENERATION_MODE.one,
+    maxGeneratedProductVariants: DEFAULT_MAX_GENERATED_PRODUCT_VARIANTS,
+    onCreated: vi.fn(),
+    validateConfiguration: validateSingleProductConfiguration,
+  },
+});
+
+const completeRequiredFields = async (
+  user: ReturnType<typeof userEvent.setup>
+) => {
+  await user.type(
+    screen.getByRole('textbox', { name: 'Base product name' }),
+    'Running Shoes'
+  );
+  await user.click(screen.getByRole('button', { name: 'Select Category' }));
+};
+
+describe('CreateProduct', () => {
+  beforeEach(() => {
+    createProductGroupMock.mockReset();
+    mocks.push.mockReset();
+    intersectionObserverCallbacks.length = 0;
+    vi.stubGlobal('IntersectionObserver', IntersectionObserverMock);
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    getComputedStyleSpy?.mockRestore();
+    getComputedStyleSpy = undefined;
+  });
+
+  it('keeps generation available before the template is complete', () => {
+    setup();
+
+    const continueButton = screen.getByRole('button', {
+      name: 'Next: Configure product',
+    });
+
+    expect(continueButton).toBeEnabled();
+  });
+
+  it('renders the multiple-product generation workflow', () => {
+    setup({
+      generationMode: PRODUCT_GENERATION_MODE.many,
+      validateConfiguration: validateMultipleProductsConfiguration,
+    });
+
+    expect(
+      screen.getByRole('button', { name: 'Next: Configure products' })
+    ).toBeEnabled();
+    expect(
+      screen.queryByRole('group', { name: 'Creation mode' })
+    ).not.toBeInTheDocument();
+  });
+
+  it('validates the product template before generating a preview', async () => {
+    const user = userEvent.setup();
+
+    setup();
+
+    await user.click(
+      screen.getByRole('button', { name: 'Next: Configure product' })
+    );
+
+    expect(await screen.findByText('Product name is required')).toBeVisible();
+    expect(await screen.findByText('Category is required')).toBeVisible();
+    expect(
+      screen.queryByRole('heading', { name: 'Generated product variants' })
+    ).not.toBeInTheDocument();
+    expect(createProductGroupMock).not.toHaveBeenCalled();
+  });
+
+  it('removes the generation form after product variants are generated', async () => {
+    const user = userEvent.setup();
+
+    setup();
+
+    expect(
+      screen.getByRole('form', { name: 'Product generation' })
+    ).toBeVisible();
+    expect(
+      screen.queryByRole('region', { name: 'Product template' })
+    ).not.toBeInTheDocument();
+
+    await completeRequiredFields(user);
+    await user.type(
+      screen.getByRole('textbox', { name: 'Description' }),
+      'Lightweight daily trainer'
+    );
+    await user.click(
+      screen.getByRole('button', { name: 'Next: Configure product' })
+    );
+
+    expect(
+      screen.queryByRole('form', { name: 'Product generation' })
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Next: Configure product' })
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('form', { name: 'Product configuration' })
+    ).toBeVisible();
+    const commonProduct = screen.getByRole('region', {
+      name: 'Common product',
+    });
+
+    expect(
+      within(commonProduct).getByRole('textbox', {
+        name: 'Base product name',
+      })
+    ).toHaveValue('Running Shoes');
+    expect(
+      within(commonProduct).getByRole('textbox', { name: 'Description' })
+    ).toHaveValue('Lightweight daily trainer');
+    expect(
+      screen.getByRole('heading', { name: 'Generated product variants' })
+    ).toBeVisible();
+    expect(createProductGroupMock).not.toHaveBeenCalled();
+  });
+
+  it('shows a template field error after blur and clears it on correction', async () => {
+    const user = userEvent.setup();
+
+    setup();
+
+    const productName = screen.getByRole('textbox', {
+      name: 'Base product name',
+    });
+
+    await user.click(productName);
+    await user.tab();
+
+    expect(await screen.findByText('Product name is required')).toBeVisible();
+
+    await user.type(productName, 'Running Shoes');
+
+    expect(
+      screen.queryByText('Product name is required')
+    ).not.toBeInTheDocument();
+  });
+
+  it('requires a selected attribute value before generating multiple products', async () => {
+    const user = userEvent.setup();
+
+    setup({
+      generationMode: PRODUCT_GENERATION_MODE.many,
+      validateConfiguration: validateMultipleProductsConfiguration,
+    });
+
+    await completeRequiredFields(user);
+    await user.click(
+      screen.getByRole('button', { name: 'Select Color Attribute' })
+    );
+    await user.click(
+      screen.getByRole('button', { name: 'Next: Configure products' })
+    );
+
+    expect(
+      await screen.findByText('Select at least one attribute value.')
+    ).toBeVisible();
+    expect(
+      screen.queryByRole('heading', { name: 'Generated product variants' })
+    ).not.toBeInTheDocument();
+  });
+
+  it('generates a single product preview without creating the product', async () => {
+    const user = userEvent.setup();
+
+    setup();
+
+    await completeRequiredFields(user);
+    await user.click(screen.getByRole('button', { name: 'Select Attributes' }));
+    await user.click(screen.getByRole('button', { name: 'Blue' }));
+    await user.click(
+      screen.getByRole('button', { name: 'Next: Configure product' })
+    );
+
+    expect(screen.getByDisplayValue('Running Shoes Blue')).toBeInTheDocument();
+    expect(screen.getByText('Attributes')).toBeVisible();
+    expect(screen.getAllByText('Blue')).toHaveLength(1);
+    expect(createProductGroupMock).not.toHaveBeenCalled();
+  });
+
+  it('collapses and expands a generated product variant', async () => {
+    const user = userEvent.setup();
+
+    setup();
+
+    await completeRequiredFields(user);
+    await user.click(screen.getByRole('button', { name: 'Select Attributes' }));
+    await user.click(screen.getByRole('button', { name: 'Blue' }));
+    await user.click(
+      screen.getByRole('button', { name: 'Next: Configure product' })
+    );
+
+    const productVariantTrigger = screen.getByRole('button', {
+      name: 'Running Shoes Blue',
+    });
+
+    await user.click(productVariantTrigger);
+
+    expect(
+      screen.queryByRole('textbox', { name: 'SKU' })
+    ).not.toBeInTheDocument();
+
+    await user.click(productVariantTrigger);
+
+    expect(screen.getByRole('textbox', { name: 'SKU' })).toBeVisible();
+  });
+
+  it('reopens an invalid variant after submitting the configuration form', async () => {
+    const user = userEvent.setup();
+
+    setup();
+
+    await completeRequiredFields(user);
+    await user.click(screen.getByRole('button', { name: 'Select Attributes' }));
+    await user.click(screen.getByRole('button', { name: 'Blue' }));
+    await user.click(
+      screen.getByRole('button', { name: 'Next: Configure product' })
+    );
+
+    const productVariantTrigger = screen.getByRole('button', {
+      name: 'Running Shoes Blue',
+    });
+
+    await user.click(productVariantTrigger);
+
+    expect(
+      screen.queryByRole('textbox', { name: 'SKU' })
+    ).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Create product' }));
+
+    expect(await screen.findByRole('textbox', { name: 'SKU' })).toHaveAttribute(
+      'aria-invalid',
+      'true'
+    );
+    expect(screen.getByText('SKU is required')).toBeVisible();
+
+    await user.click(productVariantTrigger);
+    await user.click(productVariantTrigger);
+
+    expect(screen.getByRole('textbox', { name: 'SKU' })).toHaveAttribute(
+      'aria-invalid',
+      'true'
+    );
+    expect(screen.getByText('SKU is required')).toBeVisible();
+  });
+
+  it('submits a single generated product without attribute values', async () => {
+    createProductGroupMock.mockResolvedValue({
+      ok: true,
+      data: {
+        id: 3,
+        name: 'Running Shoes',
+        description: '',
+        createdAt: '2026-07-03T07:20:30.291Z',
+        category: {
+          id: 2,
+          name: 'Footwear',
+          createdAt: '2026-07-01T07:20:30.291Z',
+        },
+      },
+    });
+    const user = userEvent.setup();
+    setup();
+
+    await completeRequiredFields(user);
+    await user.click(
+      screen.getByRole('button', { name: 'Next: Configure product' })
+    );
+    const productStatus = screen.getByRole('radiogroup', {
+      name: 'Product status',
+    });
+    const productVariantStatus = screen.getByRole('radiogroup', {
+      name: 'Product variant status',
+    });
+
+    await user.click(
+      within(productStatus).getByRole('radio', { name: /Active/ })
+    );
+
+    expect(
+      within(productVariantStatus).getByRole('radio', { name: /Draft/ })
+    ).toBeChecked();
+    await user.type(screen.getByRole('textbox', { name: 'SKU' }), 'SHOE');
+    await user.type(
+      screen.getByRole('textbox', { name: 'Barcode' }),
+      'barcode-1'
+    );
+    await user.click(screen.getByRole('button', { name: 'Create product' }));
+
+    await waitFor(() =>
+      expect(createProductGroupMock).toHaveBeenCalledWith({
+        name: 'Running Shoes',
+        status: 'ACTIVE',
+        categoryId: 2,
+        productVariants: [
+          {
+            name: 'Running Shoes',
+            status: 'DRAFT',
+            sku: 'SHOE',
+            barcode: 'barcode-1',
+            attributeValueIds: [],
+          },
+        ],
+      })
+    );
+  });
+
+  it('adds another variant attribute value from the same attribute for a single product', async () => {
+    const user = userEvent.setup();
+
+    setup();
+
+    await completeRequiredFields(user);
+    await user.click(screen.getByRole('button', { name: 'Select Attributes' }));
+    await user.click(screen.getByRole('button', { name: 'Blue' }));
+    await user.click(
+      screen.getByRole('button', { name: 'Next: Configure product' })
+    );
+
+    await user.click(
+      screen.getByRole('button', {
+        name: 'Edit attributes for Running Shoes Blue',
+      })
+    );
+    const dialog = screen.getByRole('dialog', {
+      name: 'Edit variant attributes for Running Shoes Blue',
+    });
+
+    await user.click(within(dialog).getByRole('button', { name: 'Red' }));
+    await user.click(within(dialog).getByRole('button', { name: 'Update' }));
+
+    const variantAttributes = screen.getByRole('treegrid', {
+      name: 'Attributes for Running Shoes Blue',
+    });
+
+    expect(within(variantAttributes).getByText('Red')).toBeVisible();
+    expect(within(variantAttributes).getByText('Blue')).toBeVisible();
+    expect(createProductGroupMock).not.toHaveBeenCalled();
+  });
+
+  it('removes a generated variant attribute with its chip action', async () => {
+    const user = userEvent.setup();
+
+    setup();
+
+    await completeRequiredFields(user);
+    await user.click(screen.getByRole('button', { name: 'Select Attributes' }));
+    await user.click(screen.getByRole('button', { name: 'Blue' }));
+    await user.click(
+      screen.getByRole('button', { name: 'Next: Configure product' })
+    );
+
+    const variantAttributes = screen.getByRole('treegrid', {
+      name: 'Attributes for Running Shoes Blue',
+    });
+
+    await user.click(
+      within(variantAttributes).getByRole('button', { name: 'Remove Blue' })
+    );
+
+    expect(
+      within(variantAttributes).queryByText('Blue')
+    ).not.toBeInTheDocument();
+    expect(
+      within(variantAttributes).getByRole('button', {
+        name: 'Add attributes for Running Shoes Blue',
+      })
+    ).toBeVisible();
+  });
+
+  it('adds attributes to a generated product that has none', async () => {
+    const user = userEvent.setup();
+
+    setup();
+
+    await completeRequiredFields(user);
+    await user.click(screen.getByRole('button', { name: 'Select Attributes' }));
+    await user.click(screen.getByRole('button', { name: 'Blue' }));
+    await user.click(
+      screen.getByRole('button', { name: 'Next: Configure product' })
+    );
+    await user.click(
+      screen.getByRole('button', {
+        name: 'Remove Blue',
+      })
+    );
+    await user.click(
+      screen.getByRole('button', {
+        name: 'Add attributes for Running Shoes Blue',
+      })
+    );
+
+    const dialog = screen.getByRole('dialog', {
+      name: 'Edit variant attributes for Running Shoes Blue',
+    });
+
+    await user.click(within(dialog).getByRole('button', { name: 'Blue' }));
+    await user.click(within(dialog).getByRole('button', { name: 'Update' }));
+
+    expect(
+      within(
+        screen.getByRole('treegrid', {
+          name: 'Attributes for Running Shoes Blue',
+        })
+      ).getByText('Blue')
+    ).toBeVisible();
+  });
+
+  it('shows only template-selected attributes in the variant attribute editor', async () => {
+    const user = userEvent.setup();
+
+    setup();
+
+    await completeRequiredFields(user);
+    await user.click(
+      screen.getByRole('button', { name: 'Select Color Attribute' })
+    );
+    await user.click(screen.getByRole('button', { name: 'Blue' }));
+    await user.click(
+      screen.getByRole('button', { name: 'Next: Configure product' })
+    );
+
+    await user.click(
+      screen.getByRole('button', {
+        name: 'Edit attributes for Running Shoes Blue',
+      })
+    );
+    const dialog = screen.getByRole('dialog', {
+      name: 'Edit variant attributes for Running Shoes Blue',
+    });
+
+    expect(within(dialog).getByText('Color:')).toBeVisible();
+    expect(within(dialog).queryByText('Manufacture:')).not.toBeInTheDocument();
+    expect(
+      within(dialog).queryByRole('button', { name: 'China' })
+    ).not.toBeInTheDocument();
+    expect(createProductGroupMock).not.toHaveBeenCalled();
+  });
+
+  it('generates multiple product previews from selected attribute value combinations', async () => {
+    const user = userEvent.setup();
+
+    setup({
+      generationMode: PRODUCT_GENERATION_MODE.many,
+      validateConfiguration: validateMultipleProductsConfiguration,
+    });
+
+    await completeRequiredFields(user);
+    await user.click(screen.getByRole('button', { name: 'Select Attributes' }));
+    await user.click(screen.getByRole('button', { name: 'China' }));
+    await user.click(screen.getByRole('button', { name: 'USA' }));
+    await user.click(screen.getByRole('button', { name: 'Red' }));
+    await user.click(screen.getByRole('button', { name: 'Green' }));
+    await user.click(screen.getByRole('button', { name: 'Blue' }));
+    await user.click(
+      screen.getByRole('button', { name: 'Next: Configure products' })
+    );
+
+    expect(
+      screen.getByDisplayValue('Running Shoes China Red')
+    ).toBeInTheDocument();
+    expect(
+      screen.getByDisplayValue('Running Shoes China Green')
+    ).toBeInTheDocument();
+    expect(
+      screen.getByDisplayValue('Running Shoes China Blue')
+    ).toBeInTheDocument();
+    expect(
+      screen.getByDisplayValue('Running Shoes USA Red')
+    ).toBeInTheDocument();
+    expect(
+      screen.getByDisplayValue('Running Shoes USA Green')
+    ).toBeInTheDocument();
+    expect(
+      screen.getByDisplayValue('Running Shoes USA Blue')
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByDisplayValue('Running Shoes Ukraine Red')
+    ).not.toBeInTheDocument();
+    expect(createProductGroupMock).not.toHaveBeenCalled();
+  });
+
+  it('generates multiple-mode previews from any selected attribute values', async () => {
+    const user = userEvent.setup();
+
+    setup({
+      generationMode: PRODUCT_GENERATION_MODE.many,
+      validateConfiguration: validateMultipleProductsConfiguration,
+    });
+
+    await completeRequiredFields(user);
+    await user.click(screen.getByRole('button', { name: 'Select Attributes' }));
+    await user.click(screen.getByRole('button', { name: 'Blue' }));
+    await user.click(
+      screen.getByRole('button', { name: 'Next: Configure products' })
+    );
+
+    expect(screen.getByDisplayValue('Running Shoes Blue')).toBeInTheDocument();
+    expect(
+      screen.queryByDisplayValue('Running Shoes China Blue')
+    ).not.toBeInTheDocument();
+    expect(createProductGroupMock).not.toHaveBeenCalled();
+  });
+
+  it('keeps focus while editing a variant loaded after the first page', async () => {
+    const user = userEvent.setup();
+
+    setup({
+      generationMode: PRODUCT_GENERATION_MODE.many,
+      validateConfiguration: validateMultipleProductsConfiguration,
+    });
+
+    await completeRequiredFields(user);
+    await user.click(screen.getByRole('button', { name: 'Select Attributes' }));
+
+    for (const attributeValueName of [
+      'China',
+      'USA',
+      'Ukraine',
+      'India',
+      'Brazil',
+      'Germany',
+      'Japan',
+      'Red',
+      'Green',
+      'Blue',
+    ]) {
+      await user.click(
+        screen.getByRole('button', { hidden: true, name: attributeValueName })
+      );
+    }
+
+    await user.click(
+      screen.getByRole('button', { name: 'Next: Configure products' })
+    );
+
+    expect(
+      screen.getAllByRole('textbox', { hidden: true, name: 'SKU' })
+    ).toHaveLength(20);
+
+    act(() => {
+      intersectionObserverCallbacks[0]?.(
+        [{ isIntersecting: true } as IntersectionObserverEntry],
+        {} as IntersectionObserver
+      );
+    });
+
+    const twentyFirstVariantSku = screen.getAllByRole('textbox', {
+      hidden: true,
+      name: 'SKU',
+    })[20];
+
+    await user.type(twentyFirstVariantSku, 'SKU-21');
+
+    expect(twentyFirstVariantSku).toHaveFocus();
+    expect(twentyFirstVariantSku).toHaveValue('SKU-21');
+  }, 20_000);
+
+  it('shows submit errors for generated variants loaded after the first page', async () => {
+    const user = userEvent.setup();
+
+    setup({
+      generationMode: PRODUCT_GENERATION_MODE.many,
+      validateConfiguration: validateMultipleProductsConfiguration,
+    });
+
+    await completeRequiredFields(user);
+    await user.click(screen.getByRole('button', { name: 'Select Attributes' }));
+
+    for (const attributeValueName of [
+      'China',
+      'USA',
+      'Ukraine',
+      'India',
+      'Brazil',
+      'Germany',
+      'Japan',
+      'Red',
+      'Green',
+      'Blue',
+    ]) {
+      await user.click(
+        screen.getByRole('button', { hidden: true, name: attributeValueName })
+      );
+    }
+
+    await user.click(
+      screen.getByRole('button', { name: 'Next: Configure products' })
+    );
+
+    await user.click(
+      screen.getByRole('button', { hidden: true, name: 'Create product' })
+    );
+
+    expect(await screen.findAllByText('Barcode is required')).toHaveLength(20);
+    expect(screen.getAllByText('SKU is required')).toHaveLength(20);
+
+    act(() => {
+      intersectionObserverCallbacks[0]?.(
+        [{ isIntersecting: true } as IntersectionObserverEntry],
+        {} as IntersectionObserver
+      );
+    });
+
+    expect(await screen.findAllByText('Barcode is required')).toHaveLength(21);
+    expect(screen.getAllByText('SKU is required')).toHaveLength(21);
+    expect(createProductGroupMock).not.toHaveBeenCalled();
+  }, 20_000);
+
+  it('keeps a variant panel visible after its last error is fixed', async () => {
+    const realGetComputedStyle = window.getComputedStyle.bind(window);
+
+    getComputedStyleSpy = vi
+      .spyOn(window, 'getComputedStyle')
+      .mockImplementation((element, pseudoElement) => {
+        const style = realGetComputedStyle(element, pseudoElement);
+
+        if (!element.classList.contains('accordion-panel')) {
+          return style;
+        }
+
+        return new Proxy(style, {
+          get: (target, property) => {
+            if (property === 'transitionDuration') {
+              return '0.15s';
+            }
+
+            if (property === 'animationName') {
+              return 'none';
+            }
+
+            const value = Reflect.get(target, property);
+
+            return typeof value === 'function' ? value.bind(target) : value;
+          },
+        });
+      });
+    const user = userEvent.setup();
+
+    setup({
+      generationMode: PRODUCT_GENERATION_MODE.many,
+      validateConfiguration: validateMultipleProductsConfiguration,
+    });
+
+    await completeRequiredFields(user);
+    await user.click(screen.getByRole('button', { name: 'Select Attributes' }));
+    await user.click(screen.getByRole('button', { name: 'China' }));
+    await user.click(screen.getByRole('button', { name: 'Red' }));
+    await user.click(
+      screen.getByRole('button', { name: 'Next: Configure products' })
+    );
+    await user.click(screen.getByRole('button', { name: 'Create product' }));
+    await user.type(screen.getByRole('textbox', { name: 'Barcode' }), 'B-1');
+    await user.type(screen.getByRole('textbox', { name: 'SKU' }), 'S-1');
+    await act(
+      () => new Promise((resolve) => requestAnimationFrame(() => resolve(null)))
+    );
+
+    expect(screen.queryByText('SKU is required')).not.toBeInTheDocument();
+    expect(
+      screen
+        .getByRole('region', { name: 'Running Shoes China Red' })
+        .hasAttribute('data-starting-style')
+    ).toBe(false);
+  }, 20_000);
+
+  it('submits the generated product variant collection', async () => {
+    createProductGroupMock.mockResolvedValue({
+      ok: true,
+      data: {
+        id: 3,
+        name: 'Running Shoes',
+        description: '',
+        createdAt: '2026-07-03T07:20:30.291Z',
+        category: {
+          id: 2,
+          name: 'Footwear',
+          createdAt: '2026-07-01T07:20:30.291Z',
+        },
+      },
+    });
+    const user = userEvent.setup();
+
+    setup();
+
+    await completeRequiredFields(user);
+    await user.click(screen.getByRole('button', { name: 'Select Attributes' }));
+    await user.click(screen.getByRole('button', { name: 'Blue' }));
+    await user.click(
+      screen.getByRole('button', { name: 'Next: Configure product' })
+    );
+    const createButton = screen.getByRole('button', { name: 'Create product' });
+
+    expect(createButton).toBeEnabled();
+
+    await user.click(createButton);
+
+    expect(await screen.findByText('Barcode is required')).toBeVisible();
+    expect(await screen.findByText('SKU is required')).toBeVisible();
+    expect(createProductGroupMock).not.toHaveBeenCalled();
+
+    await user.type(screen.getByRole('textbox', { name: 'SKU' }), 'SHOE-BLUE');
+    await user.type(
+      screen.getByRole('textbox', { name: 'Barcode' }),
+      'barcode-1'
+    );
+
+    expect(screen.queryByText('Barcode is required')).not.toBeInTheDocument();
+    expect(screen.queryByText('SKU is required')).not.toBeInTheDocument();
+    expect(createButton).toBeEnabled();
+
+    await user.click(createButton);
+
+    await waitFor(() =>
+      expect(createProductGroupMock).toHaveBeenCalledWith({
+        name: 'Running Shoes',
+        status: 'DRAFT',
+        categoryId: 2,
+        productVariants: [
+          {
+            name: 'Running Shoes Blue',
+            status: 'DRAFT',
+            sku: 'SHOE-BLUE',
+            barcode: 'barcode-1',
+            attributeValueIds: [72],
+          },
+        ],
+      })
+    );
+  });
+
+  it('shows backend errors without leaving the configuration stage', async () => {
+    createProductGroupMock.mockResolvedValue({
+      ok: false,
+      error: {
+        status: 422,
+        message: 'Product creation failed.',
+        fieldErrors: {
+          'productVariants[0].sku': 'SKU already exists.',
+        },
+      },
+    });
+    const user = userEvent.setup();
+
+    setup();
+
+    await completeRequiredFields(user);
+    await user.click(screen.getByRole('button', { name: 'Select Attributes' }));
+    await user.click(screen.getByRole('button', { name: 'Blue' }));
+    await user.click(
+      screen.getByRole('button', { name: 'Next: Configure product' })
+    );
+    await user.type(screen.getByRole('textbox', { name: 'SKU' }), 'SHOE-BLUE');
+    await user.type(
+      screen.getByRole('textbox', { name: 'Barcode' }),
+      'barcode-1'
+    );
+    await user.click(
+      screen.getByRole('button', { name: 'Running Shoes Blue' })
+    );
+
+    expect(
+      screen.queryByRole('textbox', { name: 'SKU' })
+    ).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Create product' }));
+
+    expect(
+      await screen.findByRole('dialog', { name: 'Product creation failed.' })
+    ).toBeVisible();
+    expect(
+      screen.queryByRole('form', { name: 'Product generation' })
+    ).not.toBeInTheDocument();
+    expect(await screen.findByRole('textbox', { name: 'SKU' })).toBeVisible();
+    expect(screen.getByText('SKU already exists.')).toBeVisible();
+    expect(mocks.push).not.toHaveBeenCalled();
+  });
+
+  it('renders values for selected attributes', async () => {
+    const user = userEvent.setup();
+
+    setup();
+
+    await user.click(screen.getByRole('button', { name: 'Select Attributes' }));
+
+    expect(screen.getByText('Color:')).toBeVisible();
+
+    const blueValue = screen.getByRole('button', { name: 'Blue' });
+
+    await user.click(blueValue);
+
+    expect(screen.getByRole('button', { name: 'Red' })).toBeVisible();
+    expect(blueValue).toHaveAttribute('aria-pressed', 'true');
+  });
+
+  it('preserves valid attribute values and clears removed attribute values', async () => {
+    const user = userEvent.setup();
+
+    setup();
+
+    await user.click(screen.getByRole('button', { name: 'Select Attributes' }));
+    await user.click(screen.getByRole('button', { name: 'China' }));
+    await user.click(screen.getByRole('button', { name: 'Blue' }));
+    await user.click(
+      screen.getByRole('button', { name: 'Select Color Attribute' })
+    );
+
+    expect(
+      screen.getByRole('button', { name: 'Blue', pressed: true })
+    ).toBeVisible();
+
+    await user.click(screen.getByRole('button', { name: 'Select Attributes' }));
+
+    expect(
+      screen.getByRole('button', { name: 'China', pressed: false })
+    ).toBeVisible();
+
+    await user.click(screen.getByRole('button', { name: 'Blue' }));
+
+    expect(
+      screen.getByRole('button', { name: 'Blue', pressed: false })
+    ).toBeVisible();
+  });
+});

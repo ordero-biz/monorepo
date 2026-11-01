@@ -19,6 +19,11 @@ export const BACKEND_PRODUCT_PATHS = {
   productVariants: '/api/v1/products/variants',
 } as const;
 
+export const BACKEND_SUPPLY_PATHS = {
+  supplies: '/api/v1/supplies',
+  supply: '/api/v1/supplies/{id}',
+} as const;
+
 export const BACKEND_SUPPLIER_PATHS = {
   suppliers: '/api/v1/suppliers',
   supplier: '/api/v1/suppliers/{id}',
@@ -32,4 +37,6 @@ export const BACKEND_UNITS_OF_MEASUREMENT_PATHS = {
 export const BACKEND_WAREHOUSE_PATHS = {
   warehouses: '/api/v1/warehouses',
   warehouse: '/api/v1/warehouses/{id}',
+  warehouseStock: '/api/v1/warehouses/{id}/stock',
+  warehouseSupplies: '/api/v1/warehouses/{id}/supplies',
 } as const;

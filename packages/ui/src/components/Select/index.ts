@@ -1,3 +1,4 @@
+export { dropdownSurfaceClassName } from './dropdownSurfaceClassName';
 export { Select } from './Select';
 export type {
   SelectMultipleProps,

@@ -1,6 +1,8 @@
 'use client';
 
 import { Button, Card, Typography } from '@ordero/ui';
+import { useRouter } from 'next/navigation';
+import { clientRoutes } from '@/lib/client/routes';
 import { useCategoryQuery } from '@/lib/hooks/categories/useCategoryQuery';
 import { CategoryDetailChildren } from './CategoryDetailChildren';
 import { CategoryDetailHeader } from './CategoryDetailHeader';
@@ -8,6 +10,7 @@ import { CategoryDetailInfo } from './CategoryDetailInfo';
 import type { CategoryDetailProps } from './types';
 
 export const CategoryDetail = ({ categoryId }: CategoryDetailProps) => {
+  const router = useRouter();
   const categoryQuery = useCategoryQuery(categoryId);
 
   if (categoryQuery.isPending) {
@@ -50,8 +53,8 @@ export const CategoryDetail = ({ categoryId }: CategoryDetailProps) => {
     <div className="flex flex-col gap-[var(--space-2)]">
       <CategoryDetailHeader
         category={categoryQuery.data}
-        onUpdated={async () => {
-          await categoryQuery.refetch();
+        onDeleted={() => {
+          router.push(clientRoutes.categories);
         }}
       />
       <CategoryDetailInfo category={categoryQuery.data} />

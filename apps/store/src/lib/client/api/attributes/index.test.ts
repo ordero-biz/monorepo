@@ -1,10 +1,15 @@
 import {
+  ATTRIBUTE_STATUS,
+  ATTRIBUTE_VALUE_STATUS,
+} from '@/lib/domain/attributes/constants';
+import {
   createAttribute,
   createAttributeValues,
   deleteAttributes,
   deleteAttributeValues,
   getAttribute,
   getAttributes,
+  getAttributesDropdown,
   getAttributesPath,
   getAttributeValues,
   updateAttribute,
@@ -117,6 +122,59 @@ describe('attribute client helpers', () => {
     );
   });
 
+  it('gets dropdown attributes with values from the backend proxy', async () => {
+    const fetchMock = vi.mocked(fetch);
+
+    fetchMock.mockResolvedValue(
+      new Response(
+        JSON.stringify([
+          {
+            id: 1,
+            name: 'Color',
+            sortOrder: 10,
+            createdAt: '2026-07-14T17:54:42.035Z',
+            attributeValues: [
+              {
+                id: 3,
+                name: 'Blue',
+                sortOrder: 0,
+                createdAt: '2026-07-14T17:54:42.036Z',
+              },
+            ],
+          },
+        ])
+      )
+    );
+
+    await expect(getAttributesDropdown()).resolves.toEqual({
+      ok: true,
+      data: [
+        {
+          id: 1,
+          name: 'Color',
+          sortOrder: 10,
+          createdAt: '2026-07-14T17:54:42.035Z',
+          attributeValues: [
+            {
+              id: 3,
+              name: 'Blue',
+              sortOrder: 0,
+              createdAt: '2026-07-14T17:54:42.036Z',
+            },
+          ],
+        },
+      ],
+    });
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/backend/api/v1/attributes/dropdown',
+      expect.objectContaining({
+        method: 'GET',
+        cache: 'no-store',
+      })
+    );
+  });
+
   it('returns normalized failures from the attributes route', async () => {
     vi.mocked(fetch).mockResolvedValue(
       new Response(
@@ -137,6 +195,31 @@ describe('attribute client helpers', () => {
         status: 503,
         message: 'Attributes lookup failed.',
         code: 'ATTRIBUTES_LOOKUP_FAILED',
+        fieldErrors: undefined,
+      },
+    });
+  });
+
+  it('returns normalized failures from the attributes dropdown route', async () => {
+    vi.mocked(fetch).mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          message: 'Attributes dropdown lookup failed.',
+          code: 'ATTRIBUTES_DROPDOWN_LOOKUP_FAILED',
+        }),
+        {
+          status: 503,
+          statusText: 'Service Unavailable',
+        }
+      )
+    );
+
+    await expect(getAttributesDropdown()).resolves.toEqual({
+      ok: false,
+      error: {
+        status: 503,
+        message: 'Attributes dropdown lookup failed.',
+        code: 'ATTRIBUTES_DROPDOWN_LOOKUP_FAILED',
         fieldErrors: undefined,
       },
     });
@@ -279,14 +362,17 @@ describe('attribute client helpers', () => {
       createAttribute({
         name: 'Material',
         sortOrder: 0,
+        status: ATTRIBUTE_STATUS.ACTIVE,
         attributeValues: [
           {
             name: 'Green',
             sortOrder: 0,
+            status: ATTRIBUTE_VALUE_STATUS.ACTIVE,
           },
           {
             name: 'Blue',
             sortOrder: 1,
+            status: ATTRIBUTE_VALUE_STATUS.DRAFT,
           },
         ],
       })
@@ -307,14 +393,17 @@ describe('attribute client helpers', () => {
         body: JSON.stringify({
           name: 'Material',
           sortOrder: 0,
+          status: ATTRIBUTE_STATUS.ACTIVE,
           attributeValues: [
             {
               name: 'Green',
               sortOrder: 0,
+              status: ATTRIBUTE_VALUE_STATUS.ACTIVE,
             },
             {
               name: 'Blue',
               sortOrder: 1,
+              status: ATTRIBUTE_VALUE_STATUS.DRAFT,
             },
           ],
         }),
@@ -346,6 +435,7 @@ describe('attribute client helpers', () => {
           {
             name: 'Green',
             sortOrder: 0,
+            status: 'DRAFT',
           },
         ],
       })
@@ -370,6 +460,7 @@ describe('attribute client helpers', () => {
             {
               name: 'Green',
               sortOrder: 0,
+              status: 'DRAFT',
             },
           ],
         }),
@@ -402,6 +493,7 @@ describe('attribute client helpers', () => {
           {
             name: 'Green',
             sortOrder: 0,
+            status: 'DRAFT',
           },
         ],
       })
@@ -459,6 +551,83 @@ describe('attribute client helpers', () => {
     );
   });
 
+  it('patches an attribute status through the backend proxy', async () => {
+    const fetchMock = vi.mocked(fetch);
+
+    fetchMock.mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          id: 7,
+          name: 'Material',
+          sortOrder: 10,
+          status: ATTRIBUTE_STATUS.ACTIVE,
+          createdAt: '2026-06-25T18:13:29.608Z',
+        })
+      )
+    );
+
+    await expect(
+      updateAttribute({
+        attributeId: 7,
+        status: ATTRIBUTE_STATUS.ACTIVE,
+      })
+    ).resolves.toEqual({
+      ok: true,
+      data: {
+        id: 7,
+        name: 'Material',
+        sortOrder: 10,
+        status: ATTRIBUTE_STATUS.ACTIVE,
+        createdAt: '2026-06-25T18:13:29.608Z',
+      },
+    });
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/backend/api/v1/attributes/7',
+      expect.objectContaining({
+        method: 'PATCH',
+        body: JSON.stringify({
+          status: ATTRIBUTE_STATUS.ACTIVE,
+        }),
+        cache: 'no-store',
+      })
+    );
+  });
+
+  it('returns normalized failures from the update attribute route', async () => {
+    vi.mocked(fetch).mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          message: 'Attribute update failed.',
+          fieldErrors: {
+            name: 'Attribute name already exists.',
+          },
+        }),
+        {
+          status: 422,
+          statusText: 'Unprocessable Entity',
+        }
+      )
+    );
+
+    await expect(
+      updateAttribute({
+        attributeId: 7,
+        name: 'Material',
+      })
+    ).resolves.toEqual({
+      ok: false,
+      error: {
+        status: 422,
+        message: 'Attribute update failed.',
+        code: undefined,
+        fieldErrors: {
+          name: 'Attribute name already exists.',
+        },
+      },
+    });
+  });
+
   it('patches an attribute value through the backend proxy', async () => {
     const fetchMock = vi.mocked(fetch);
 
@@ -477,7 +646,6 @@ describe('attribute client helpers', () => {
       updateAttributeValue({
         attributeValueId: 3,
         name: 'Navy',
-        sortOrder: 0,
       })
     ).resolves.toEqual({
       ok: true,
@@ -495,11 +663,83 @@ describe('attribute client helpers', () => {
         method: 'PATCH',
         body: JSON.stringify({
           name: 'Navy',
-          sortOrder: 0,
         }),
         cache: 'no-store',
       })
     );
+  });
+
+  it('patches an attribute value status through the backend proxy', async () => {
+    const fetchMock = vi.mocked(fetch);
+
+    fetchMock.mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          id: 3,
+          name: 'Navy',
+          sortOrder: 0,
+          status: ATTRIBUTE_VALUE_STATUS.ACTIVE,
+          createdAt: '2026-06-25T18:13:29.608Z',
+        })
+      )
+    );
+
+    await expect(
+      updateAttributeValue({
+        attributeValueId: 3,
+        status: ATTRIBUTE_VALUE_STATUS.ACTIVE,
+      })
+    ).resolves.toEqual({
+      ok: true,
+      data: {
+        id: 3,
+        name: 'Navy',
+        sortOrder: 0,
+        status: ATTRIBUTE_VALUE_STATUS.ACTIVE,
+        createdAt: '2026-06-25T18:13:29.608Z',
+      },
+    });
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/backend/api/v1/attributes/values/3',
+      expect.objectContaining({
+        method: 'PATCH',
+        body: JSON.stringify({
+          status: ATTRIBUTE_VALUE_STATUS.ACTIVE,
+        }),
+        cache: 'no-store',
+      })
+    );
+  });
+
+  it('returns normalized errors when publishing an attribute value fails', async () => {
+    vi.mocked(fetch).mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          code: 'ATTRIBUTE_VALUE_MODIFICATION_NOT_ALLOWED',
+          message: 'Conflict',
+        }),
+        {
+          status: 409,
+          statusText: 'Conflict',
+        }
+      )
+    );
+
+    await expect(
+      updateAttributeValue({
+        attributeValueId: 3,
+        status: ATTRIBUTE_VALUE_STATUS.ACTIVE,
+      })
+    ).resolves.toEqual({
+      ok: false,
+      error: {
+        status: 409,
+        code: 'ATTRIBUTE_VALUE_MODIFICATION_NOT_ALLOWED',
+        message: 'Conflict',
+        fieldErrors: undefined,
+      },
+    });
   });
 
   it('deletes attributes through the backend proxy', async () => {
@@ -574,10 +814,12 @@ describe('attribute client helpers', () => {
       createAttribute({
         name: 'Material',
         sortOrder: 0,
+        status: 'DRAFT',
         attributeValues: [
           {
             name: 'Green',
             sortOrder: 0,
+            status: 'DRAFT',
           },
         ],
       })

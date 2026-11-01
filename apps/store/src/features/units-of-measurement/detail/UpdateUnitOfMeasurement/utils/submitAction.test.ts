@@ -1,4 +1,5 @@
 import { updateUnitOfMeasurement } from '@/lib/client/api/units-of-measurement';
+import { UNIT_OF_MEASUREMENT_STATUS } from '@/lib/domain/units-of-measurement/constants';
 import { submitUpdateUnitOfMeasurement } from './submitAction';
 
 vi.mock('@/lib/client/api/units-of-measurement', async () => ({
@@ -15,10 +16,10 @@ describe('submitUpdateUnitOfMeasurement', () => {
     updateUnitOfMeasurementMock.mockReset();
   });
 
-  it('normalizes form values before updating the unit of measurement', async () => {
+  it('forwards changed fields when updating the unit of measurement', async () => {
     const unitOfMeasurement = {
       id: 1,
-      code: 'G',
+      status: UNIT_OF_MEASUREMENT_STATUS.ACTIVE,
       name: 'Gram',
       symbol: 'g',
       comment: 'Metric weight',
@@ -31,11 +32,9 @@ describe('submitUpdateUnitOfMeasurement', () => {
     await expect(
       submitUpdateUnitOfMeasurement({
         unitOfMeasurementId: 1,
-        value: {
-          code: ' G ',
-          name: ' Gram ',
-          symbol: ' g ',
-          comment: ' Metric weight ',
+        submitData: {
+          name: 'Gram',
+          symbol: null,
         },
       })
     ).resolves.toEqual({
@@ -45,10 +44,8 @@ describe('submitUpdateUnitOfMeasurement', () => {
 
     expect(updateUnitOfMeasurementMock).toHaveBeenCalledWith({
       unitOfMeasurementId: 1,
-      code: 'G',
       name: 'Gram',
-      symbol: 'g',
-      comment: 'Metric weight',
+      symbol: null,
     });
   });
 
@@ -58,28 +55,21 @@ describe('submitUpdateUnitOfMeasurement', () => {
       error: {
         status: 422,
         message: 'Unit of measurement update failed.',
-        fieldErrors: {
-          code: 'Unit code already exists.',
-        },
+        fieldErrors: { status: 'Invalid status.' },
       },
     });
 
     await expect(
       submitUpdateUnitOfMeasurement({
         unitOfMeasurementId: 1,
-        value: {
-          code: 'G',
-          name: 'Gram',
-          symbol: 'g',
-          comment: '',
+        submitData: {
+          comment: null,
         },
       })
     ).resolves.toEqual({
       ok: false,
       error: {
-        fieldErrors: {
-          code: 'Unit code already exists.',
-        },
+        fieldErrors: { status: 'Invalid status.' },
         formError: 'Unit of measurement update failed.',
       },
     });

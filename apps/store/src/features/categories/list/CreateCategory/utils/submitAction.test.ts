@@ -20,7 +20,6 @@ describe('submitCreateCategory', () => {
       id: 3,
       name: 'Sneakers',
       sortOrder: 15,
-      color: '#16a34a',
       createdAt: '2026-07-01T11:22:53.562Z',
       parentCategory: {
         id: 1,
@@ -36,7 +35,8 @@ describe('submitCreateCategory', () => {
     await expect(
       submitCreateCategory({
         name: '  Sneakers  ',
-        parentId: '1',
+        parentCategory: { id: 1, name: 'Shoes' },
+        status: 'ACTIVE',
       })
     ).resolves.toEqual({
       ok: true,
@@ -46,6 +46,7 @@ describe('submitCreateCategory', () => {
     expect(createCategoryMock).toHaveBeenCalledWith({
       name: 'Sneakers',
       parentId: 1,
+      status: 'ACTIVE',
     });
   });
 
@@ -64,7 +65,8 @@ describe('submitCreateCategory', () => {
     await expect(
       submitCreateCategory({
         name: 'Sneakers',
-        parentId: '1',
+        parentCategory: { id: 1, name: 'Shoes' },
+        status: 'DRAFT',
       })
     ).resolves.toEqual({
       ok: false,
@@ -77,12 +79,11 @@ describe('submitCreateCategory', () => {
     });
   });
 
-  it('sends parent id null when no parent category is selected', async () => {
+  it('omits the parent id when no parent category is selected', async () => {
     const category = {
       id: 3,
       name: 'Sneakers',
       sortOrder: 15,
-      color: '#16a34a',
       createdAt: '2026-07-01T11:22:53.562Z',
     };
     createCategoryMock.mockResolvedValue({
@@ -93,7 +94,8 @@ describe('submitCreateCategory', () => {
     await expect(
       submitCreateCategory({
         name: 'Sneakers',
-        parentId: null,
+        parentCategory: null,
+        status: 'DRAFT',
       })
     ).resolves.toEqual({
       ok: true,
@@ -102,7 +104,7 @@ describe('submitCreateCategory', () => {
 
     expect(createCategoryMock).toHaveBeenCalledWith({
       name: 'Sneakers',
-      parentId: null,
+      status: 'DRAFT',
     });
   });
 });

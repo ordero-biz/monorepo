@@ -14,17 +14,32 @@ import type {
 } from './types';
 
 const cardVariants = cva(
-  'relative flex flex-col overflow-hidden rounded-[var(--card-radius)] transition-shadow duration-150',
+  'relative flex min-w-0 flex-col overflow-hidden rounded-[var(--card-radius)] bg-card text-card-foreground transition-shadow duration-150',
   {
     variants: {
+      color: {
+        inherit:
+          '[--card-tint:transparent] [--card-outline:var(--color-paper-outlined)]',
+        primary:
+          '[--card-tint:var(--color-primary-8)] [--card-outline:var(--color-primary-20)]',
+        secondary:
+          '[--card-tint:var(--color-secondary-8)] [--card-outline:var(--color-secondary-20)]',
+        info: '[--card-tint:var(--color-info-8)] [--card-outline:var(--color-info-20)]',
+        success:
+          '[--card-tint:var(--color-success-8)] [--card-outline:var(--color-success-20)]',
+        warning:
+          '[--card-tint:var(--color-warning-8)] [--card-outline:var(--color-warning-20)]',
+        error:
+          '[--card-tint:var(--color-error-8)] [--card-outline:var(--color-error-20)]',
+      },
       variant: {
         filled:
-          'bg-[var(--card)] text-[var(--card-foreground)] shadow-[var(--card-x1)_var(--card-y1)_var(--card-blur1)_var(--card-spread1)_var(--color-shadow-20),var(--card-x2)_var(--card-y2)_var(--card-blur2)_var(--card-spread2)_var(--color-shadow-12)]',
-        outlined:
-          'border border-[var(--color-paper-outlined)] bg-[var(--card)] text-[var(--card-foreground)]',
+          'bg-[linear-gradient(var(--card-tint),var(--card-tint))] shadow-[var(--card-x1)_var(--card-y1)_var(--card-blur1)_var(--card-spread1)_var(--color-shadow-20),var(--card-x2)_var(--card-y2)_var(--card-blur2)_var(--card-spread2)_var(--color-shadow-12)]',
+        outlined: 'border border-[var(--card-outline)]',
       },
     },
     defaultVariants: {
+      color: 'inherit',
       variant: 'filled',
     },
   }
@@ -32,6 +47,7 @@ const cardVariants = cva(
 
 export const CardRoot = ({
   children,
+  color,
   id,
   onClick,
   ref,
@@ -53,7 +69,7 @@ export const CardRoot = ({
       onKeyDown={onClick ? handleKeyDown : undefined}
       role={onClick ? 'button' : undefined}
       tabIndex={onClick ? 0 : undefined}
-      className={cn(cardVariants({ variant }))}
+      className={cn(cardVariants({ color, variant }))}
       data-slot="card"
     >
       {children}

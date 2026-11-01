@@ -2,7 +2,9 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import type { CellContext, HeaderContext } from '@tanstack/react-table';
 import { format, parseISO } from 'date-fns';
 import { useState } from 'react';
+import { expect, within } from 'storybook/test';
 import { Chip } from '@/ui/components/Chip';
+import { Button } from '@/ui/components/Button';
 import {
   DataTable,
   DataTableCell,
@@ -11,6 +13,7 @@ import {
   type DataTableProps,
 } from '@/ui/components/DataTable';
 import { IconButton } from '@/ui/components/IconButton';
+import { Typography } from '@/ui/components/Typography';
 import { cn } from '@/ui/lib/utils';
 import { MoreVertical } from 'lucide-react';
 
@@ -337,6 +340,111 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {};
 
+export const WithHeader: Story = {
+  args: {
+    header: (
+      <>
+        <div className="flex items-center gap-[var(--spacing-1)]">
+          <h2>Products</h2>
+          <Chip size="s" variant="soft">{rows.length}</Chip>
+        </div>
+        <Button color="inherit" size="s">Export products</Button>
+      </>
+    ),
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('heading', { name: 'Products' })).toBeVisible();
+    await expect(canvas.getByRole('button', { name: 'Export products' })).toBeVisible();
+    await expect(canvas.getByRole('table', { name: 'Products table' })).toBeVisible();
+  },
+};
+
+export const EmptyWithHeader: Story = {
+  args: {
+    data: [],
+    header: <h2>Products (0)</h2>,
+  },
+};
+
+const summaryColumns: DataTableColumnDef<ProductRow>[] = [
+  {
+    accessorKey: 'name',
+    cell: productColumnCell,
+    header: productColumnHeader,
+  },
+  {
+    accessorKey: 'stockValue',
+    cell: ({ row }) => <DataTableCell>{row.original.stockValue}</DataTableCell>,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Stock" />
+    ),
+    meta: { align: 'right', wrap: 'nowrap' },
+  },
+  {
+    accessorKey: 'price',
+    cell: ({ row }) => <DataTableCell>{formatPrice(row.original.price)}</DataTableCell>,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Price" />
+    ),
+    meta: { align: 'right', wrap: 'nowrap' },
+  },
+];
+
+const totalPrice = rows.reduce((total, row) => total + row.price, 0);
+const footerColumns: DataTableProps<ProductRow>['footerColumns'] = {
+  name: <Typography variant="subtitle1">Totals</Typography>,
+  price: <Typography variant="subtitle1">{formatPrice(totalPrice)}</Typography>,
+  stockValue: rows.reduce((total, row) => total + row.stockValue, 0),
+};
+
+export const WithFooter: Story = {
+  args: {
+    columns: summaryColumns,
+    footer: (
+      <Typography variant="subtitle1">Total {formatPrice(totalPrice)}</Typography>
+    ),
+  },
+};
+
+export const WithFooterColumns: Story = {
+  args: {
+    columns: summaryColumns,
+    footerColumns,
+    selection: {
+      getRowCheckboxAriaLabel: (row) => `Select ${row.name}`,
+      selectAllCheckboxAriaLabel: 'Select all products',
+    },
+  },
+};
+
+export const WithBothFootersAndPagination: Story = {
+  args: {
+    columns: summaryColumns,
+    footer: (
+      <Typography color="text-secondary" variant="body2">
+        Totals cover all {rows.length} products.
+      </Typography>
+    ),
+    footerColumns,
+    pagination: {
+      onPageChange: () => undefined,
+      page: 0,
+      rowsPerPage: 5,
+      rowsPerPageOptions: [5, 10, 25],
+    },
+  },
+  render: (args) => <PaginatedDataTablePreview {...args} />,
+};
+
+export const EmptyWithFooterColumns: Story = {
+  args: {
+    columns: summaryColumns,
+    data: [],
+    footerColumns: { name: 'Totals', price: formatPrice(0), stockValue: 0 },
+  },
+};
+
 export const WithCheckboxSelection: Story = {
   args: {
     selection: {
@@ -362,6 +470,19 @@ export const Empty: Story = {
   args: {
     data: [],
     emptyMessage: 'No matching products found.',
+  },
+};
+
+export const WarningRows: Story = {
+  args: {
+    getRowTone: (row) => row.publish === 'Draft' ? 'warning' : 'default',
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const warning = canvas.getByRole('row', { name: /Mountain Trekking Boots/ });
+    const normal = canvas.getByRole('row', { name: /Urban Explorer Sneakers/ });
+    await expect(warning).toBeVisible();
+    await expect(getComputedStyle(warning).backgroundColor).not.toBe(getComputedStyle(normal).backgroundColor);
   },
 };
 

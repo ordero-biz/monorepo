@@ -17,7 +17,7 @@ const textareaFrameClassNames = {
 } as const;
 
 const textareaClassName =
-  'min-h-[var(--textarea-min-height)] w-full min-w-0 border-0 bg-transparent p-0 text-[length:var(--input-value-size-desktop)] leading-[var(--input-value-line-height-desktop)] font-[var(--input-value-weight)] outline-none placeholder:text-[var(--text-disabled)] disabled:cursor-not-allowed';
+  'w-full min-w-0 border-0 bg-transparent p-0 text-[length:var(--input-value-size-desktop)] leading-[var(--input-value-line-height-desktop)] font-[var(--input-value-weight)] outline-none placeholder:text-[var(--text-disabled)] disabled:cursor-not-allowed';
 
 const resizeClassNames: Record<TextareaResize, string> = {
   none: 'resize-none',
@@ -210,6 +210,7 @@ export const Textarea = ({
           autoComplete={autoComplete}
           className={cn(
             textareaClassName,
+            rows === undefined && 'min-h-[var(--textarea-min-height)]',
             resizeClassNames[resize],
             getTextareaTextColorClassName({ disabled })
           )}

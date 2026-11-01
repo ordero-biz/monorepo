@@ -1,5 +1,6 @@
 import { renderHook, waitFor } from '@testing-library/react';
 import { getUnitOfMeasurement } from '@/lib/client/api/units-of-measurement';
+import { UNIT_OF_MEASUREMENT_STATUS } from '@/lib/domain/units-of-measurement/constants';
 import { unitsOfMeasurementQueryKeys } from '@/lib/query/units-of-measurement/unitsOfMeasurementQueryKeys';
 import {
   createTestQueryClient,
@@ -22,7 +23,7 @@ const getUnitOfMeasurementMock = vi.mocked(getUnitOfMeasurement);
 
 const unitOfMeasurement = {
   id: 1,
-  code: 'KG',
+  status: UNIT_OF_MEASUREMENT_STATUS.ACTIVE,
   name: 'Kilogram',
   symbol: 'kg',
   comment: 'Weight unit',

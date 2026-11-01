@@ -1,4 +1,4 @@
-import type { Category } from '@/lib/domain/categories';
+import type { Category } from '@/lib/domain/categories/types';
 
 export type CategoryDetailProps = {
   categoryId: string;
@@ -6,7 +6,7 @@ export type CategoryDetailProps = {
 
 export type CategoryDetailHeaderProps = {
   category: Category;
-  onUpdated: () => Promise<void> | void;
+  onDeleted: () => Promise<void> | void;
 };
 
 export type CategoryDetailInfoProps = {
@@ -20,4 +20,14 @@ export type CategoryDetailChildrenProps = {
 export type CategoryDetailField = {
   label: string;
   value: string | number | null | undefined;
+};
+
+export type ActivateCategoryDialogTriggerProps = {
+  category: Category;
+};
+
+export type ActivateCategoryDialogProps = {
+  category: Category;
+  onOpenChange: (open: boolean) => void;
+  open: boolean;
 };

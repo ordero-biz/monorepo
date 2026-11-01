@@ -1,12 +1,12 @@
 import { prepareSetup } from '@ordero/test-config/react';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { vi } from 'vitest';
-import { Card } from './index';
+import { Card, type CardColor, type CardVariant } from './index';
 
 type CardTestFixtureProps = {
   includeAction?: boolean;
-  variant?: 'filled' | 'outlined';
+  color?: CardColor;
+  variant?: CardVariant;
   onClick?: () => void;
   dividerVariant?: 'solid' | 'dashed';
   title?: string;
@@ -14,12 +14,13 @@ type CardTestFixtureProps = {
 
 const CardTestFixture = ({
   includeAction = true,
+  color = 'inherit',
   variant = 'filled',
   onClick,
   dividerVariant = 'dashed',
   title = 'Card Title',
 }: CardTestFixtureProps) => (
-  <Card.Root variant={variant} onClick={onClick}>
+  <Card.Root color={color} variant={variant} onClick={onClick}>
     <Card.Header>
       <Card.Title>{title}</Card.Title>
       <Card.Description>Card Description</Card.Description>
@@ -73,10 +74,15 @@ describe('Card', () => {
     expect(onClick).toHaveBeenCalledTimes(1);
   });
 
-  it('handles keyboard activation when the root card is clickable', async () => {
+  it.each([
+    'filled',
+    'outlined',
+  ] satisfies readonly CardVariant[])('handles keyboard activation on a primary %s card', async (variant) => {
     const user = userEvent.setup();
 
     const { onClick, title } = setup({
+      color: 'primary',
+      variant,
       includeAction: false,
       onClick: vi.fn(),
       title: 'Open details',

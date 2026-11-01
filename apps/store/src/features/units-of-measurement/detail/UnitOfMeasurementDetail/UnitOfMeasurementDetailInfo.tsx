@@ -1,4 +1,4 @@
-import type { UnitOfMeasurement } from '@/lib/domain/unitsOfMeasurement';
+import type { UnitOfMeasurement } from '@/lib/domain/units-of-measurement/types';
 import { Card, Typography } from '@/ui/index';
 import type {
   UnitOfMeasurementDetailField,
@@ -8,10 +8,6 @@ import type {
 const getUnitOfMeasurementDetailData = (
   unitOfMeasurement: UnitOfMeasurement
 ): UnitOfMeasurementDetailField[] => [
-  {
-    label: 'Code',
-    value: unitOfMeasurement.code,
-  },
   {
     label: 'Symbol',
     value: unitOfMeasurement.symbol,

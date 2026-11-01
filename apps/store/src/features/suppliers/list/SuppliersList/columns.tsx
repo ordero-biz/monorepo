@@ -1,11 +1,13 @@
 import Link from 'next/link';
 import { getSupplierDetailRoute } from '@/lib/client/routes';
-import type { Supplier } from '@/lib/domain/suppliers';
+import type { Supplier } from '@/lib/domain/suppliers/types';
+import { formatDate } from '@/lib/utils/formatDate';
 import {
   DataTableCell,
   type DataTableColumnDef,
   DataTableColumnHeader,
 } from '@/ui/index';
+import { SupplierStatusChip } from '../../shared/SupplierStatusChip';
 
 export const columns: DataTableColumnDef<Supplier>[] = [
   {
@@ -24,7 +26,21 @@ export const columns: DataTableColumnDef<Supplier>[] = [
       <DataTableColumnHeader column={column} title="Name" />
     ),
     meta: {
-      width: '18%',
+      width: '13%',
+    },
+  },
+  {
+    accessorKey: 'status',
+    cell: ({ row }) => (
+      <DataTableCell>
+        <SupplierStatusChip status={row.original.status} />
+      </DataTableCell>
+    ),
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Status" />
+    ),
+    meta: {
+      width: '12%',
     },
   },
   {
@@ -34,7 +50,7 @@ export const columns: DataTableColumnDef<Supplier>[] = [
       <DataTableColumnHeader column={column} title="Email" />
     ),
     meta: {
-      width: '22%',
+      width: '16%',
     },
   },
   {
@@ -44,7 +60,7 @@ export const columns: DataTableColumnDef<Supplier>[] = [
       <DataTableColumnHeader column={column} title="Phone" />
     ),
     meta: {
-      width: '16%',
+      width: '12%',
     },
   },
   {
@@ -54,7 +70,7 @@ export const columns: DataTableColumnDef<Supplier>[] = [
       <DataTableColumnHeader column={column} title="Address" />
     ),
     meta: {
-      width: '24%',
+      width: '18%',
       wrap: 'wrap',
     },
   },
@@ -65,8 +81,22 @@ export const columns: DataTableColumnDef<Supplier>[] = [
       <DataTableColumnHeader column={column} title="Comment" />
     ),
     meta: {
-      width: '20%',
+      width: '15%',
       wrap: 'wrap',
+    },
+  },
+  {
+    accessorKey: 'createdAt',
+    cell: ({ row }) => (
+      <DataTableCell>
+        {row.original.createdAt ? formatDate(row.original.createdAt) : '-'}
+      </DataTableCell>
+    ),
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Created at" />
+    ),
+    meta: {
+      width: '14%',
     },
   },
 ];

@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { CategoryListHeader } from './CategoryListHeader';
 
@@ -19,6 +19,11 @@ describe('CategoryListHeader', () => {
     expect(
       screen.getByRole('heading', { name: 'Category list' })
     ).toBeVisible();
+    expect(
+      within(screen.getByRole('navigation', { name: 'Breadcrumb' })).getByText(
+        'Categories'
+      )
+    ).toHaveAttribute('aria-current', 'page');
     expect(screen.getByRole('button', { name: 'Add Category' })).toBeVisible();
   });
 });

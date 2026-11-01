@@ -31,6 +31,7 @@ export type DialogViewportProps = {
 };
 
 export type DialogPopupProps = {
+  'aria-describedby'?: string;
   children?: ReactNode;
   fullscreen?: boolean;
   id?: string;

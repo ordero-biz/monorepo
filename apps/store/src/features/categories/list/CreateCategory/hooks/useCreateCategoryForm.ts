@@ -1,6 +1,6 @@
 import { useToastManager } from '@ordero/ui';
 import { useForm } from '@tanstack/react-form';
-import type { Category } from '@/lib/domain/categories';
+import type { Category } from '@/lib/domain/categories/types';
 import { createCategoryDefaultValues } from '../constants';
 import { submitCreateCategory } from '../utils/submitAction';
 
@@ -20,7 +20,14 @@ export const useCreateCategoryForm = ({
       if (!result.ok) {
         formApi.setErrorMap({
           onSubmit: {
-            fields: result.error.fieldErrors ?? {},
+            fields: Object.fromEntries(
+              Object.entries(result.error.fieldErrors ?? {}).map(
+                ([field, error]) => [
+                  field === 'parentId' ? 'parentCategory' : field,
+                  error,
+                ]
+              )
+            ),
           },
         });
 

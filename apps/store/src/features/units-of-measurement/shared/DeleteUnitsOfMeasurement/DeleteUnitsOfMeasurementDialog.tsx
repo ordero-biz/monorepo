@@ -23,10 +23,12 @@ export const DeleteUnitsOfMeasurementDialog = ({
           queryKey: unitsOfMeasurementQueryKeys.detail(unit.id),
         });
       });
-      await queryClient.invalidateQueries({
-        queryKey: unitsOfMeasurementQueryKeys.list,
-      });
-      await onDeleted?.();
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: unitsOfMeasurementQueryKeys.list,
+        }),
+        onDeleted?.(),
+      ]);
     },
     unitOfMeasurementIds: unitsOfMeasurement.map((unit) => unit.id),
   });

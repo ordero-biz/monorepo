@@ -1,4 +1,5 @@
 import { updateSupplier } from '@/lib/client/api/suppliers';
+import { SUPPLIER_STATUS } from '@/lib/domain/suppliers/constants';
 import { submitUpdateSupplier } from './submitAction';
 
 vi.mock('@/lib/client/api/suppliers', async () => ({
@@ -10,48 +11,48 @@ vi.mock('@/lib/client/api/suppliers', async () => ({
 
 const updateSupplierMock = vi.mocked(updateSupplier);
 
+const supplier = {
+  id: 1,
+  name: 'Fresh Farms',
+  status: SUPPLIER_STATUS.DRAFT,
+  email: 'orders@fresh.example',
+  phone: '+1 555 0100',
+  address: '123 Market St',
+  comment: 'Preferred produce supplier',
+};
+
 describe('submitUpdateSupplier', () => {
   beforeEach(() => {
     updateSupplierMock.mockReset();
   });
 
-  it('normalizes form values before updating the supplier', async () => {
-    const supplier = {
-      id: 1,
-      name: 'Fresh Farms Updated',
-      email: 'orders.updated@fresh.example',
-      phone: '+1 555 0101',
-      address: '124 Market St',
-      comment: 'Updated supplier',
-    };
+  it('submits the normalized changed fields', async () => {
     updateSupplierMock.mockResolvedValue({
       ok: true,
-      data: supplier,
+      data: {
+        ...supplier,
+        name: 'Fresh Farms Updated',
+      },
     });
 
     await expect(
       submitUpdateSupplier({
         supplierId: 1,
-        value: {
-          name: '  Fresh Farms Updated  ',
-          email: '  orders.updated@fresh.example  ',
-          phone: '  +1 555 0101  ',
-          address: '  124 Market St  ',
-          comment: '  Updated supplier  ',
+        submitData: {
+          name: 'Fresh Farms Updated',
         },
       })
     ).resolves.toEqual({
       ok: true,
-      data: supplier,
+      data: {
+        ...supplier,
+        name: 'Fresh Farms Updated',
+      },
     });
 
     expect(updateSupplierMock).toHaveBeenCalledWith({
       supplierId: 1,
       name: 'Fresh Farms Updated',
-      email: 'orders.updated@fresh.example',
-      phone: '+1 555 0101',
-      address: '124 Market St',
-      comment: 'Updated supplier',
     });
   });
 
@@ -70,12 +71,8 @@ describe('submitUpdateSupplier', () => {
     await expect(
       submitUpdateSupplier({
         supplierId: 1,
-        value: {
-          name: 'Fresh Farms',
+        submitData: {
           email: 'orders@fresh.example',
-          phone: '+1 555 0100',
-          address: '123 Market St',
-          comment: '',
         },
       })
     ).resolves.toEqual({

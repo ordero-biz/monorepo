@@ -3,29 +3,23 @@
 import { Dialog } from '@ordero/ui';
 import { useQueryClient } from '@tanstack/react-query';
 import { categoriesQueryKeys } from '@/lib/query/categories/categoriesQueryKeys';
-import { CategoryFormDialogContent } from '../../shared/CategoryFormDialogContent';
 import { useUpdateCategoryForm } from './hooks/useUpdateCategoryForm';
 import type { UpdateCategoryDialogProps } from './types';
+import { UpdateCategoryDialogFormContent } from './UpdateCategoryDialogFormContent';
 import { getCategoryDefaultValues } from './utils/fields';
 
 export const UpdateCategoryDialog = ({
   category,
   onOpenChange,
-  onUpdated,
   open,
 }: UpdateCategoryDialogProps) => {
   const queryClient = useQueryClient();
   const { form } = useUpdateCategoryForm({
     category,
+    onNoChanges: () => handleOpenChange(false),
     onUpdated: async (updatedCategory) => {
       form.reset(getCategoryDefaultValues(updatedCategory));
       onOpenChange(false);
-      await queryClient.invalidateQueries({
-        queryKey: categoriesQueryKeys.list,
-      });
-      await queryClient.invalidateQueries({
-        queryKey: categoriesQueryKeys.detail(category.id),
-      });
       const parentCategoryIds = new Set(
         [
           category.parentCategory?.id,
@@ -33,14 +27,19 @@ export const UpdateCategoryDialog = ({
         ].filter((categoryId): categoryId is number => categoryId !== undefined)
       );
 
-      await Promise.all(
-        [...parentCategoryIds].map((parentCategoryId) =>
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: categoriesQueryKeys.list,
+        }),
+        queryClient.invalidateQueries({
+          queryKey: categoriesQueryKeys.detail(category.id),
+        }),
+        ...[...parentCategoryIds].map((parentCategoryId) =>
           queryClient.invalidateQueries({
             queryKey: categoriesQueryKeys.children(parentCategoryId),
           })
-        )
-      );
-      await onUpdated();
+        ),
+      ]);
     },
   });
 
@@ -69,11 +68,9 @@ export const UpdateCategoryDialog = ({
                 <Dialog.Title>Edit category</Dialog.Title>
               </Dialog.Header>
 
-              <CategoryFormDialogContent
+              <UpdateCategoryDialogFormContent
                 disabledCategoryIds={[category.id]}
                 form={form}
-                pendingText="Saving..."
-                submitText="Save"
               />
             </form>
           </Dialog.Popup>

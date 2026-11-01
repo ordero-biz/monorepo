@@ -1,15 +1,25 @@
 import { createUnitOfMeasurement } from '@/lib/client/api/units-of-measurement';
 import type { CreateUnitOfMeasurementFormValues } from './validations';
 
+const normalizeCreateUnitOfMeasurementFormData = (
+  data: CreateUnitOfMeasurementFormValues
+) => {
+  const symbol = data.symbol?.trim();
+  const comment = data.comment?.trim();
+
+  return {
+    name: data.name.trim(),
+    status: data.status,
+    ...(symbol ? { symbol } : {}),
+    ...(comment ? { comment } : {}),
+  };
+};
+
 export const submitCreateUnitOfMeasurement = async (
   value: CreateUnitOfMeasurementFormValues
 ) => {
-  const result = await createUnitOfMeasurement({
-    code: value.code.trim(),
-    name: value.name.trim(),
-    symbol: value.symbol.trim(),
-    comment: value.comment.trim(),
-  });
+  const normalizedFormData = normalizeCreateUnitOfMeasurementFormData(value);
+  const result = await createUnitOfMeasurement(normalizedFormData);
 
   if (!result.ok) {
     return {

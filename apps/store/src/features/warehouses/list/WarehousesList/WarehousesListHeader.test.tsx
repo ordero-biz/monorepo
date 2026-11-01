@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { WarehousesListHeader } from './WarehousesListHeader';
 
@@ -19,6 +19,11 @@ describe('WarehousesListHeader', () => {
     expect(
       screen.getByRole('heading', { name: 'Warehouses list' })
     ).toBeVisible();
+    expect(
+      within(screen.getByRole('navigation', { name: 'Breadcrumb' })).getByText(
+        'Warehouses'
+      )
+    ).toHaveAttribute('aria-current', 'page');
     expect(screen.getByRole('button', { name: 'Add Warehouse' })).toBeVisible();
   });
 });

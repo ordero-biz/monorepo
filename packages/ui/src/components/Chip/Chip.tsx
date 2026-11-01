@@ -42,7 +42,7 @@ const chipVariants = cva(
       {
         color: 'primary',
         variant: 'filled',
-        class: 'bg-[var(--primary-main)] text-[var(--primary-foreground)]',
+        class: 'bg-[var(--primary-main)] text-grey-800',
       },
       {
         color: 'secondary',
@@ -52,12 +52,12 @@ const chipVariants = cva(
       {
         color: 'info',
         variant: 'filled',
-        class: 'bg-[var(--info-main)] text-[var(--white-main)]',
+        class: 'bg-[var(--info-main)] text-grey-800',
       },
       {
         color: 'success',
         variant: 'filled',
-        class: 'bg-[var(--success-main)] text-[var(--white-main)]',
+        class: 'bg-[var(--success-main)] text-grey-800',
       },
       {
         color: 'warning',
@@ -67,7 +67,7 @@ const chipVariants = cva(
       {
         color: 'error',
         variant: 'filled',
-        class: 'bg-[var(--error-main)] text-[var(--white-main)]',
+        class: 'bg-[var(--error-main)] text-grey-800',
       },
       {
         color: 'inherit',
@@ -77,7 +77,7 @@ const chipVariants = cva(
       {
         color: 'primary',
         variant: 'outlined',
-        class: 'border-[var(--primary-main)] text-[var(--primary-main)]',
+        class: 'border-[var(--primary-main)] text-swap-dark-light-primary',
       },
       {
         color: 'secondary',
@@ -87,22 +87,22 @@ const chipVariants = cva(
       {
         color: 'info',
         variant: 'outlined',
-        class: 'border-[var(--info-main)] text-[var(--info-main)]',
+        class: 'border-[var(--info-main)] text-swap-dark-light-info',
       },
       {
         color: 'success',
         variant: 'outlined',
-        class: 'border-[var(--success-main)] text-[var(--success-main)]',
+        class: 'border-[var(--success-main)] text-swap-darker-lighter-success',
       },
       {
         color: 'warning',
         variant: 'outlined',
-        class: 'border-[var(--warning-main)] text-[var(--warning-main)]',
+        class: 'border-[var(--warning-main)] text-swap-darker-lighter-warning',
       },
       {
         color: 'error',
         variant: 'outlined',
-        class: 'border-[var(--error-main)] text-[var(--error-main)]',
+        class: 'border-[var(--error-main)] text-swap-dark-light-error',
       },
       {
         color: 'inherit',
@@ -127,12 +127,12 @@ const chipVariants = cva(
       {
         color: 'success',
         variant: 'soft',
-        class: 'bg-[var(--color-success-16)] text-[var(--success-dark)]',
+        class: 'bg-[var(--color-success-16)] text-swap-darker-lighter-success',
       },
       {
         color: 'warning',
         variant: 'soft',
-        class: 'bg-[var(--color-warning-16)] text-[var(--warning-dark)]',
+        class: 'bg-[var(--color-warning-16)] text-swap-darker-lighter-warning',
       },
       {
         color: 'error',

@@ -88,6 +88,23 @@ The form hook should not own:
 - field JSX, labels, adornments, icons, or validation message rendering
 - cross-feature abstractions before the pattern appears in several real forms
 
+For partial updates, the feature submit utility should normalize form values,
+compare them with the initial normalized values, and return only changed API
+fields. Keep the API request DTO separate from the form-value type: form values
+may contain UI-specific strings or omit fields supported by non-form commands.
+When no normalized fields changed, let the workflow perform its normal no-op
+close/reset behavior instead of issuing a request.
+
+For optional text fields, keep create and update transport semantics explicit:
+
+- omit blank optional values on create unless the endpoint requires `null`
+- send `null` on update when a populated persisted value is cleared
+- omit unchanged normalized values so PATCH preserves them
+
+Do not force create and update through one normalizer when their transport
+semantics differ. Extract a shared pure field normalizer only after the same
+normalization rule is used by several workflows.
+
 ### Field Sections
 
 Extract dense or repeated field groups into local components or field-section hooks when they have cohesive UI behavior:
@@ -109,8 +126,11 @@ For form-owned combobox fields:
 
 - wire fields through ordinary controlled props: `value`, `onValueChange`,
   `name`, `onBlur`, `invalid`, and `errorText`
-- use `value: string | null` for single selection and `value: string[]` with
+- use `value: TOption | null` for single selection and `value: TOption[]` with
   `multiple={true}` for multiple selection
+- supply `getOptionValue` for stable ID equality and `getOptionLabel` for display
+  text; keep selected records serializable and normalize them to backend IDs
+  before comparing or submitting form values
 - keep shared `@ordero/ui` comboboxes presentational and form-library agnostic
 - cover behavior in tests by opening the combobox by role and selecting options
   by role/name; do not assert variant classes or private DOM structure
@@ -153,6 +173,20 @@ Use callback names that describe the feature result:
 - `onCreated` for create forms that return a new entity id
 - `onUpdated` for update forms
 - `onSuccess` only when the result is intentionally generic
+
+Keep a form hook's `onUpdated` callback when it delegates close/reset, cache
+updates, or navigation to the workflow. A dialog does not need a public
+`onUpdated` prop merely because its form hook has one.
+
+When the workflow's awaited query invalidation already refreshes the active
+entity, do not forward an `onUpdated` callback through triggers, headers, or
+detail pages just to call `refetch()` again. Keep public success callbacks only
+for additional consumer-owned work, such as clearing selection, updating a
+local form baseline, or navigating. For deletion, preserve `onDeleted` when it
+clears parent-owned selection before the list refresh finishes.
+
+Follow `docs/http-auth.md` for cache ownership and deletion cleanup, and
+`docs/testing.md` for workflow coverage that catches duplicate refreshes.
 
 Return only what consumers need. Prefer `return { form }` until another returned value has a clear feature-owned reason.
 

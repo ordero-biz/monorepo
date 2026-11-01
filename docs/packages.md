@@ -76,6 +76,8 @@ Keep these in the app that owns the behavior:
 - app routes and navigation constants
 - same-origin API path constants and backend endpoint constants
 - feature-facing client API helpers
+- request DTOs owned by those API helpers; do not derive them from feature
+  form-value types
 - form payloads and validation schemas
 - app-specific user shapes
 - domain resources such as stores

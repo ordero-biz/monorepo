@@ -1,4 +1,4 @@
-import type { Supplier } from '@/lib/domain/suppliers';
+import type { Supplier } from '@/lib/domain/suppliers/types';
 import { Card, Typography } from '@/ui/index';
 import type { SupplierDetailField, SupplierDetailInfoProps } from './types';
 

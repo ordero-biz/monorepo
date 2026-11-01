@@ -4,15 +4,14 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useMemo } from 'react';
 import { IconButton } from '@/ui/components/IconButton';
 import { Select } from '@/ui/components/Select';
+import { cn } from '@/ui/lib/utils';
+import { tableFooterRowClassName } from './styles';
 import type {
   TablePaginationProps,
   TablePaginationRangeLabelArgs,
 } from './types';
 
 const defaultRowsPerPageOptions = [5, 10, 25] as const;
-
-const rootClassName =
-  'flex min-h-[56px] w-full items-center justify-end gap-[var(--spacing-2-5)] overflow-hidden bg-card py-[var(--spacing-1-25)] pl-[var(--spacing-2)] pr-[var(--spacing-1)] text-[length:var(--body2-size-desktop)] leading-[var(--body2-line-height-desktop)] font-[var(--body2-weight)] text-card-foreground';
 
 const labelClassName = 'whitespace-nowrap text-card-foreground';
 
@@ -126,48 +125,52 @@ export const TablePagination = ({
   return (
     <nav
       aria-label={ariaLabel}
-      className={rootClassName}
+      className={cn(tableFooterRowClassName, 'flex-wrap')}
       data-slot="table-pagination"
     >
-      <span className={`${labelClassName} ml-auto`}>{rowsPerPageLabel}</span>
-      <div className={rowsPerPageSelectWrapperClassName}>
-        <Select
-          aria-label="Rows per page"
-          alignItemWithTrigger={false}
-          disabled={disabled || !onRowsPerPageChange}
-          onValueChange={(value, details) => {
-            if (value === null) {
-              return;
-            }
+      <div className="flex items-center gap-[var(--spacing-2-5)]">
+        <span className={labelClassName}>{rowsPerPageLabel}</span>
+        <div className={rowsPerPageSelectWrapperClassName}>
+          <Select
+            aria-label="Rows per page"
+            alignItemWithTrigger={false}
+            disabled={disabled || !onRowsPerPageChange}
+            onValueChange={(value, details) => {
+              if (value === null) {
+                return;
+              }
 
-            onRowsPerPageChange?.(Number(value), details);
-          }}
-          options={rowsPerPageItems}
-          placeholder={selectedRowsPerPage}
-          size="s"
-          value={selectedRowsPerPage}
-          variant="outlined"
-          width="content"
-        />
+              onRowsPerPageChange?.(Number(value), details);
+            }}
+            options={rowsPerPageItems}
+            placeholder={selectedRowsPerPage}
+            size="s"
+            value={selectedRowsPerPage}
+            variant="outlined"
+            width="content"
+          />
+        </div>
       </div>
-      <span className={labelClassName}>{rangeLabel}</span>
-      <div className={actionsClassName}>
-        <IconButton
-          aria-label={previousPageLabel}
-          disabled={!canGoPrevious}
-          onClick={() => onPageChange(boundedPage - 1)}
-          size="s"
-        >
-          <ChevronLeft aria-hidden="true" />
-        </IconButton>
-        <IconButton
-          aria-label={nextPageLabel}
-          disabled={!canGoNext}
-          onClick={() => onPageChange(boundedPage + 1)}
-          size="s"
-        >
-          <ChevronRight aria-hidden="true" />
-        </IconButton>
+      <div className="flex items-center gap-[var(--spacing-2-5)]">
+        <span className={labelClassName}>{rangeLabel}</span>
+        <div className={actionsClassName}>
+          <IconButton
+            aria-label={previousPageLabel}
+            disabled={!canGoPrevious}
+            onClick={() => onPageChange(boundedPage - 1)}
+            size="s"
+          >
+            <ChevronLeft aria-hidden="true" />
+          </IconButton>
+          <IconButton
+            aria-label={nextPageLabel}
+            disabled={!canGoNext}
+            onClick={() => onPageChange(boundedPage + 1)}
+            size="s"
+          >
+            <ChevronRight aria-hidden="true" />
+          </IconButton>
+        </div>
       </div>
     </nav>
   );
