@@ -2,8 +2,19 @@ import type { MouseEventHandler, ReactNode, Ref } from 'react';
 
 export type CardVariant = 'filled' | 'outlined';
 
+export type CardColor =
+  | 'inherit'
+  | 'primary'
+  | 'secondary'
+  | 'info'
+  | 'success'
+  | 'warning'
+  | 'error';
+
 export type CardProps = {
   children?: ReactNode;
+  /** Semantic tint for filled cards or border color for outlined cards. */
+  color?: CardColor;
   id?: string;
   onClick?: MouseEventHandler<HTMLDivElement>;
   ref?: Ref<HTMLDivElement>;

@@ -64,7 +64,7 @@ const dataTableRowVariants = cva('last:[&_td]:border-b-0', {
 const contentCellClassName =
   'p-0 align-middle text-[length:var(--body2-size-desktop)] leading-[var(--body2-line-height-desktop)] font-[var(--body2-weight)] [font-family:var(--body2-family)] text-card-foreground';
 
-const hasTableContent = (content: ReactNode) =>
+const hasContent = (content: ReactNode) =>
   content != null && typeof content !== 'boolean' && content !== '';
 
 const resolveRowSelectionState = (
@@ -202,12 +202,12 @@ export const DataTable = <TData,>({
   columns,
   data,
   emptyMessage = 'No results.',
-  header,
   footer,
   footerColumns,
   getRowCanSelect,
   getRowId,
   getRowTone,
+  header,
   manualPagination = false,
   manualSorting = false,
   onRowSelectionChange,
@@ -312,17 +312,19 @@ export const DataTable = <TData,>({
       }))
     : [];
   const hasFooterColumns = footerCells.some(({ content }) =>
-    hasTableContent(content)
+    hasContent(content)
   );
 
   return (
     <div
-      className="overflow-hidden rounded-[var(--card-radius)] bg-card text-card-foreground"
+      className="min-w-0 overflow-hidden rounded-[var(--card-radius)] bg-card text-card-foreground"
       data-slot="data-table"
       style={tableShellStyle}
     >
-      {hasTableContent(header) ? (
-        <div className="p-[var(--spacing-3)]">{header}</div>
+      {hasContent(header) ? (
+        <div className="flex flex-wrap items-center justify-between gap-[var(--spacing-2)] p-[var(--card-content-p)]">
+          {header}
+        </div>
       ) : null}
       <div className="overflow-x-auto">
         <table
@@ -505,7 +507,7 @@ export const DataTable = <TData,>({
           ) : null}
         </table>
       </div>
-      {hasTableContent(footer) ? (
+      {hasContent(footer) ? (
         <div
           className={cn(
             tableFooterRowClassName,

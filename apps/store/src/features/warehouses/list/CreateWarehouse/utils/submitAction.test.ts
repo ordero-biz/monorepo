@@ -18,6 +18,10 @@ describe('submitCreateWarehouse', () => {
 
   it('normalizes form values before creating the warehouse', async () => {
     const warehouse = {
+      phone: null,
+      status: WAREHOUSE_STATUS.DRAFT,
+      totalItemQuantity: 0,
+      totalPrice: 0,
       id: 1,
       name: 'Main Warehouse',
       address: '123 Commerce Ave',
@@ -82,6 +86,11 @@ describe('submitCreateWarehouse', () => {
     createWarehouseMock.mockResolvedValue({
       ok: true,
       data: {
+        address: null,
+        phone: null,
+        status: WAREHOUSE_STATUS.DRAFT,
+        totalItemQuantity: 0,
+        totalPrice: 0,
         id: 1,
         name: 'Main Warehouse',
         comment: '',

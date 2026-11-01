@@ -4,6 +4,13 @@ import { getSupplyUpdateChanges } from './getUpdateChanges';
 import { mergeSupplyChanges } from './mergeSupplyChanges';
 
 const baseline: SupplyDetails = {
+  completedAt: null,
+  completedBy: null,
+  createdAt: '2026-10-28T10:00:00Z',
+  createdBy: 'owner@example.test',
+  updatedAt: '2026-10-28T10:00:00Z',
+  updatedBy: 'owner@example.test',
+
   id: 9,
   supplier: { id: 1, name: 'Supplier', status: 'ACTIVE' },
   warehouse: { id: 2, name: 'Warehouse', status: 'ACTIVE' },
@@ -11,12 +18,19 @@ const baseline: SupplyDetails = {
   supplyNumber: 'SUP-9',
   supplierInvoiceNumber: 'INV-1',
   comment: 'Original comment',
-  totalQuantity: 2,
+
   totalPrice: 10,
   supplyEntries: [
     {
+      comment: null,
+
       id: 17,
-      productVariant: { id: 11, name: 'Rice' },
+      productVariant: {
+        sku: '',
+        barcode: '',
+        id: 11,
+        name: 'Rice',
+      },
       unitOfMeasurement: { id: 3, name: 'Bag', status: 'ACTIVE' },
       quantity: 2,
       unitPrice: 5,
@@ -201,7 +215,12 @@ describe('mergeSupplyChanges', () => {
         {
           ...baseline.supplyEntries[0],
           id: 21,
-          productVariant: { id: 12, name: 'Beans' },
+          productVariant: {
+            sku: '',
+            barcode: '',
+            id: 12,
+            name: 'Beans',
+          },
         },
       ],
       version: 2,

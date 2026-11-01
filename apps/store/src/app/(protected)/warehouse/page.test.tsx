@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react';
+import { WAREHOUSE_STATUS } from '@/lib/domain/warehouses/constants';
 import { warehousesQueryKeys } from '@/lib/query/warehouses/warehousesQueryKeys';
 import { getServerWarehouses } from '@/lib/server/api/warehouses';
 import type { PaginationSearchInput } from '@/lib/utils/url';
@@ -38,6 +39,10 @@ describe('WarehousePage', () => {
     const warehouses = {
       content: [
         {
+          phone: null,
+          status: WAREHOUSE_STATUS.DRAFT,
+          totalItemQuantity: 0,
+          totalPrice: 0,
           id: 1,
           name: 'Main Warehouse',
           address: '123 Commerce Ave',

@@ -13,6 +13,13 @@ vi.mock('@/lib/client/api/supplies', async () => ({
 const createSupplyMock = vi.mocked(createSupply);
 
 const initialSupply: SupplyDetails = {
+  completedAt: null,
+  completedBy: null,
+  createdAt: '2026-10-28T10:00:00Z',
+  createdBy: 'owner@example.test',
+  updatedAt: '2026-10-28T10:00:00Z',
+  updatedBy: 'owner@example.test',
+
   id: 9,
   supplier: { id: 3, name: 'Global Foods', status: 'ACTIVE' },
   warehouse: { id: 4, name: 'Main Warehouse', status: 'ACTIVE' },
@@ -20,13 +27,18 @@ const initialSupply: SupplyDetails = {
   supplyNumber: 'SUP-001',
   supplierInvoiceNumber: 'INV-001',
   comment: 'First delivery',
-  totalQuantity: 20,
+
   totalPrice: 560,
   version: 2,
   supplyEntries: [
     {
       id: 17,
-      productVariant: { id: 11, name: 'Jasmine Rice 5kg', sku: 'RICE-5KG' },
+      productVariant: {
+        barcode: '',
+        id: 11,
+        name: 'Jasmine Rice 5kg',
+        sku: 'RICE-5KG',
+      },
       unitOfMeasurement: {
         id: 2,
         name: 'Bag',

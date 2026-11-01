@@ -106,8 +106,6 @@ export type DataTableProps<TData> = {
   columns: DataTableColumnDef<TData>[];
   data: TData[];
   emptyMessage?: string;
-  /** Content above the scrollable table; standard padding is provided. */
-  header?: ReactNode;
   /** Content below the scrollable table and above pagination, aligned to the end. */
   footer?: ReactNode;
   /** One summary row aligned with the visible columns; cell padding is provided. */
@@ -116,6 +114,8 @@ export type DataTableProps<TData> = {
   getRowId?: (originalRow: TData, index: number, parent?: Row<TData>) => string;
   /** Visual emphasis only; include a visible explanation in the row content. */
   getRowTone?: (row: TData, index: number) => DataTableRowTone;
+  /** Content above the column headers, outside horizontal scrolling; padding is provided. */
+  header?: ReactNode;
   manualPagination?: boolean;
   manualSorting?: boolean;
   onRowSelectionChange?: (rowSelection: DataTableRowSelectionState) => void;

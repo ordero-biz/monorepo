@@ -654,11 +654,16 @@ test.describe('Supply refresh and conflict resolution', () => {
         {
           ...draftSupply.supplyEntries[0],
           id: 18,
-          productVariant: { id: 12, name: 'Oats', sku: 'OATS' },
+          productVariant: {
+            barcode: '',
+            id: 12,
+            name: 'Oats',
+            sku: 'OATS',
+          },
           quantity: 3,
         },
       ],
-      totalQuantity: 5,
+
       totalPrice: 25,
     });
     await returnToEditor(page);
@@ -742,15 +747,25 @@ test.describe('Supply refresh and conflict resolution', () => {
           {
             ...draftSupply.supplyEntries[0],
             id: 18,
-            productVariant: { id: 12, name: 'Oats', sku: 'OATS' },
+            productVariant: {
+              barcode: '',
+              id: 12,
+              name: 'Oats',
+              sku: 'OATS',
+            },
           },
           {
             ...draftSupply.supplyEntries[0],
             id: 19,
-            productVariant: { id: 13, name: 'Lentils', sku: 'LENTILS' },
+            productVariant: {
+              barcode: '',
+              id: 13,
+              name: 'Lentils',
+              sku: 'LENTILS',
+            },
           },
         ],
-        totalQuantity: 6,
+
         totalPrice: 30,
       });
       await openEditor(page);
@@ -763,7 +778,7 @@ test.describe('Supply refresh and conflict resolution', () => {
           .map((entry, index) =>
             index === 0 ? { ...entry, quantity: 4 } : entry
           ),
-        totalQuantity: 8,
+
         totalPrice: 40,
       });
       await returnToEditor(page);

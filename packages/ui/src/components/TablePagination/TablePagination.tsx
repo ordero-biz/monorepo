@@ -125,48 +125,52 @@ export const TablePagination = ({
   return (
     <nav
       aria-label={ariaLabel}
-      className={cn(tableFooterRowClassName, 'overflow-hidden')}
+      className={cn(tableFooterRowClassName, 'flex-wrap')}
       data-slot="table-pagination"
     >
-      <span className={`${labelClassName} ml-auto`}>{rowsPerPageLabel}</span>
-      <div className={rowsPerPageSelectWrapperClassName}>
-        <Select
-          aria-label="Rows per page"
-          alignItemWithTrigger={false}
-          disabled={disabled || !onRowsPerPageChange}
-          onValueChange={(value, details) => {
-            if (value === null) {
-              return;
-            }
+      <div className="flex items-center gap-[var(--spacing-2-5)]">
+        <span className={labelClassName}>{rowsPerPageLabel}</span>
+        <div className={rowsPerPageSelectWrapperClassName}>
+          <Select
+            aria-label="Rows per page"
+            alignItemWithTrigger={false}
+            disabled={disabled || !onRowsPerPageChange}
+            onValueChange={(value, details) => {
+              if (value === null) {
+                return;
+              }
 
-            onRowsPerPageChange?.(Number(value), details);
-          }}
-          options={rowsPerPageItems}
-          placeholder={selectedRowsPerPage}
-          size="s"
-          value={selectedRowsPerPage}
-          variant="outlined"
-          width="content"
-        />
+              onRowsPerPageChange?.(Number(value), details);
+            }}
+            options={rowsPerPageItems}
+            placeholder={selectedRowsPerPage}
+            size="s"
+            value={selectedRowsPerPage}
+            variant="outlined"
+            width="content"
+          />
+        </div>
       </div>
-      <span className={labelClassName}>{rangeLabel}</span>
-      <div className={actionsClassName}>
-        <IconButton
-          aria-label={previousPageLabel}
-          disabled={!canGoPrevious}
-          onClick={() => onPageChange(boundedPage - 1)}
-          size="s"
-        >
-          <ChevronLeft aria-hidden="true" />
-        </IconButton>
-        <IconButton
-          aria-label={nextPageLabel}
-          disabled={!canGoNext}
-          onClick={() => onPageChange(boundedPage + 1)}
-          size="s"
-        >
-          <ChevronRight aria-hidden="true" />
-        </IconButton>
+      <div className="flex items-center gap-[var(--spacing-2-5)]">
+        <span className={labelClassName}>{rangeLabel}</span>
+        <div className={actionsClassName}>
+          <IconButton
+            aria-label={previousPageLabel}
+            disabled={!canGoPrevious}
+            onClick={() => onPageChange(boundedPage - 1)}
+            size="s"
+          >
+            <ChevronLeft aria-hidden="true" />
+          </IconButton>
+          <IconButton
+            aria-label={nextPageLabel}
+            disabled={!canGoNext}
+            onClick={() => onPageChange(boundedPage + 1)}
+            size="s"
+          >
+            <ChevronRight aria-hidden="true" />
+          </IconButton>
+        </div>
       </div>
     </nav>
   );

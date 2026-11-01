@@ -5,7 +5,7 @@ import { Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { BaseLayoutContextualActionBar } from '@/features/app-shell';
 import { FormConflictResolver } from '@/lib/components/FormConflictResolver';
-import { formatMoney } from '../formatMoney';
+import { formatMoney } from '@/lib/utils/formatMoney';
 import type { SupplyActionsProps } from './types';
 
 export const SupplyActions = ({
