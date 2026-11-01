@@ -212,6 +212,8 @@ export {
   SidebarNavigationSectionContent,
   SidebarNavigationSections,
 } from './components/SidebarNavigation';
+export type { SkeletonProps, SkeletonShape } from './components/Skeleton';
+export { Skeleton } from './components/Skeleton';
 export type {
   TablePaginationProps,
   TablePaginationRangeLabelArgs,

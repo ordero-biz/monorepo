@@ -1,8 +1,8 @@
 import { Textarea, TextField } from '@ordero/ui';
 import { useStore } from '@tanstack/react-form';
 import { AttributesAsyncCombobox } from '@/features/attributes';
-import { CategoriesAsyncCombobox } from '@/features/categories';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
+import { ProductCategoryCombobox } from '../../shared/ProductCategoryCombobox';
 import { PRODUCT_GENERATION_MODE } from './constants';
 import { ProductImageDropzone } from './ProductImageDropzone';
 import type { ProductTemplateFieldsProps } from './types';
@@ -73,7 +73,7 @@ export const ProductTemplateFields = ({
               );
 
               return (
-                <CategoriesAsyncCombobox
+                <ProductCategoryCombobox
                   errorText={errorText}
                   invalid={Boolean(errorText)}
                   label="Category"

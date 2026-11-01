@@ -99,7 +99,9 @@ vi.mock('@/features/categories', async () => ({
     <>
       <button
         aria-invalid={invalid}
-        onClick={() => onValueChange({ id: 2, name: 'Coffee and tea' })}
+        onClick={() =>
+          onValueChange({ id: 2, name: 'Coffee and tea', status: 'ACTIVE' })
+        }
         type="button"
       >
         {value?.name ?? 'Select category'}

@@ -1,7 +1,7 @@
 import { Textarea, TextField } from '@ordero/ui';
 import { useStore } from '@tanstack/react-form';
-import { CategoriesAsyncCombobox } from '@/features/categories';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
+import { ProductCategoryCombobox } from '../../shared/ProductCategoryCombobox';
 import { ProductImageDropzone } from './ProductImageDropzone';
 import { ProductStatusSelector } from './ProductStatusSelector';
 import type { CommonProductFieldInputsProps } from './types';
@@ -68,7 +68,7 @@ export const CommonProductFieldInputs = ({
               );
 
               return (
-                <CategoriesAsyncCombobox
+                <ProductCategoryCombobox
                   errorText={errorText}
                   invalid={Boolean(errorText)}
                   label="Category"

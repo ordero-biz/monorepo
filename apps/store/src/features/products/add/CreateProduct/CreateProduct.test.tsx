@@ -54,11 +54,15 @@ vi.mock('@/features/categories', () => ({
   }: {
     errorText?: string;
     label: string;
-    onValueChange: (value: { id: number; name: string } | null) => void;
+    onValueChange: (
+      value: { id: number; name: string; status: 'ACTIVE' } | null
+    ) => void;
   }) => (
     <>
       <button
-        onClick={() => onValueChange({ id: 2, name: 'Footwear' })}
+        onClick={() =>
+          onValueChange({ id: 2, name: 'Footwear', status: 'ACTIVE' })
+        }
         type="button"
       >
         Select {label}

@@ -58,6 +58,18 @@ describe('validateProductName', () => {
 });
 
 describe('validateProductCategory', () => {
+  it('rejects draft categories and accepts active categories', () => {
+    expect(
+      validateProductCategory({
+        value: { id: 2, name: 'Tea', status: 'DRAFT' },
+      })
+    ).toBe('Activate this category before using it for a product');
+    expect(
+      validateProductCategory({
+        value: { id: 2, name: 'Tea', status: 'ACTIVE' },
+      })
+    ).toBeUndefined();
+  });
   it('requires a category', () => {
     expect(validateProductCategory({ value: null })).toBe(
       'Category is required'
