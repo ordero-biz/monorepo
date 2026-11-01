@@ -4,6 +4,17 @@ App features live under `apps/*/src/features/[feature]`. Keep each feature
 organized around user-facing workflows and public entrypoints, not around file
 types alone.
 
+## Product Behavior Documentation
+
+Keep feature business rules and UX decision rationale in `docs/product/`.
+Use one document per user-facing workflow, covering its purpose, accepted
+rules, data sources, important states, decision rationale, and open questions.
+Link to the implementation and behavior tests, and update the document when
+those rules change. This guide covers code organization; shared UI and HTTP
+contracts remain in their existing guides.
+
+- [Warehouse detail business rules and UX decisions](product/warehouse-detail.md)
+
 ## Workflow Folders
 
 Split resource features by logical workflow once they contain more than one

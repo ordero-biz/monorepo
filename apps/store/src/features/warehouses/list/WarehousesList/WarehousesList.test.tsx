@@ -64,6 +64,10 @@ describe('WarehousesList', () => {
         data: {
           content: [
             {
+              phone: null,
+              status: WAREHOUSE_STATUS.DRAFT,
+              totalItemQuantity: 0,
+              totalPrice: 0,
               id: 1,
               name: 'Main Warehouse',
               address: '123 Commerce Ave',
@@ -99,6 +103,9 @@ describe('WarehousesList', () => {
       data: {
         content: [
           {
+            phone: null,
+            totalItemQuantity: 0,
+            totalPrice: 0,
             id: 1,
             name: 'Main Warehouse',
             status: WAREHOUSE_STATUS.DRAFT,
@@ -163,6 +170,10 @@ describe('WarehousesList', () => {
       data: {
         content: [
           {
+            phone: null,
+            status: WAREHOUSE_STATUS.DRAFT,
+            totalItemQuantity: 0,
+            totalPrice: 0,
             id: 2,
             name: 'Overflow Warehouse',
             address: '124 Commerce Ave',

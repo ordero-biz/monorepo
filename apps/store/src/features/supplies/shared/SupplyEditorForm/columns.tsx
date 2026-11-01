@@ -8,7 +8,7 @@ import {
 } from '@ordero/ui';
 import { EllipsisVertical, Package, Trash2 } from 'lucide-react';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
-import { formatMoney } from '../formatMoney';
+import { formatMoney } from '@/lib/utils/formatMoney';
 import {
   ProductVariantsAsyncCombobox,
   UnitsOfMeasurementAsyncCombobox,

@@ -28,12 +28,21 @@ describe('SupplyDetailPage', () => {
 
   it('prefetches the saved supply for the editor', async () => {
     const supply = {
+      comment: null,
+      completedAt: null,
+      completedBy: null,
+      supplierInvoiceNumber: null,
+      createdAt: '2026-10-28T10:00:00Z',
+      createdBy: 'owner@example.test',
+      updatedAt: '2026-10-28T10:00:00Z',
+      updatedBy: 'owner@example.test',
+
       id: 9,
       supplier: { id: 1, name: 'Fresh Farms', status: 'ACTIVE' },
       warehouse: { id: 2, name: 'Main Warehouse', status: 'ACTIVE' },
       status: SUPPLY_STATUS.DRAFT,
       supplyNumber: 'SUP-009',
-      totalQuantity: 0,
+
       totalPrice: 0,
       supplyEntries: [],
       version: 1,

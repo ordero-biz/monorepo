@@ -19,6 +19,9 @@ const updateWarehouseMock = vi.mocked(updateWarehouse);
 const onOpenChangeMock = vi.fn();
 
 const warehouse: Warehouse = {
+  phone: null,
+  totalItemQuantity: 0,
+  totalPrice: 0,
   id: 1,
   name: 'Main Warehouse',
   status: WAREHOUSE_STATUS.DRAFT,

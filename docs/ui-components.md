@@ -78,6 +78,33 @@ Avoid new `Object.assign(root, { Part })` compound APIs unless backward compatib
 
 Do not use the namespace pattern for single-part components such as `Button`, `Input`, `IconButton`, or `Chip`.
 
+## Card Variants and Colors
+
+`Card.Root` separates surface treatment (`variant`) from semantic color
+(`color`). Existing cards default to `variant="filled"` and `color="inherit"`.
+
+| Variant | Surface | Elevation |
+| --- | --- | --- |
+| `filled` | Paper background with a subtle tint when a color is selected. | Standard Card shadow. |
+| `outlined` | Paper background with a neutral or semantic colored border. | No shadow. |
+
+Colors are `inherit`, `primary`, `secondary`, `info`, `success`, `warning`, and
+`error`, matching the existing design-system palette. `inherit` keeps the
+neutral surface. Colored fills use the existing 8% color tokens over the paper
+background; outlines use the 20% color tokens. Text retains the standard Card
+foreground, and the existing radius and content spacing apply to every color.
+
+Use the shared API for colored cards instead of styling a custom container:
+
+```tsx
+<Card.Root color="primary">
+  <Card.Content>Inventory value</Card.Content>
+</Card.Root>
+```
+
+Include text explaining any status conveyed by color. The Card stories show
+both variants across the palette in light and dark themes.
+
 ## Stories And Tests
 
 Stories and tests should document the public API. For compound components, examples should use the namespace form consumers will use, such as `TopBar.Root`, `TopBar.Left`, and `TopBar.Right`.
