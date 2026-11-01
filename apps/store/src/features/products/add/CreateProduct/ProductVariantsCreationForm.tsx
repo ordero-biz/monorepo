@@ -6,6 +6,7 @@ import type { ProductVariantsCreationFormProps } from './types';
 
 export const ProductVariantsCreationForm = ({
   commonProductFields,
+  variantFields,
   isEditingProductDetails = false,
   productVariantsCreationForm,
   generatedAttributes,
@@ -31,11 +32,13 @@ export const ProductVariantsCreationForm = ({
           productVariantsCreationForm={productVariantsCreationForm}
         />
       )}
-      <GeneratedProductVariants
-        productVariantsCreationForm={productVariantsCreationForm}
-        generatedAttributes={generatedAttributes}
-        generationMode={generationMode}
-      />
+      {variantFields ?? (
+        <GeneratedProductVariants
+          productVariantsCreationForm={productVariantsCreationForm}
+          generatedAttributes={generatedAttributes}
+          generationMode={generationMode}
+        />
+      )}
       <productVariantsCreationForm.Subscribe
         selector={(state) => state.values.productVariants.length}
       >
@@ -48,8 +51,8 @@ export const ProductVariantsCreationForm = ({
                   <ContextualActionBar.Left>
                     <Typography variant="body2">
                       {productVariantCount === 1
-                        ? '1 product variant ready'
-                        : `${productVariantCount} product variants ready`}
+                        ? '1 product variant'
+                        : `${productVariantCount} product variants`}
                     </Typography>
                   </ContextualActionBar.Left>
                   <ContextualActionBar.Right>

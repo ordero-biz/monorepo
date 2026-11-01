@@ -12,6 +12,7 @@ import {
   type DataTableProps,
 } from '@/ui/components/DataTable';
 import { IconButton } from '@/ui/components/IconButton';
+import { TextField } from '@/ui/components/TextField';
 import { Typography } from '@/ui/components/Typography';
 import { cn } from '@/ui/lib/utils';
 import { MoreVertical } from 'lucide-react';
@@ -339,6 +340,71 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {};
 
+export const EditableCells: Story = {
+  args: {
+    data: rows.slice(0, 2),
+    columns: [
+      {
+        id: 'name',
+        header: () => <DataTableCell>Product name</DataTableCell>,
+        cell: ({ row }) => (
+          <DataTableCell width="full">
+            <TextField
+              aria-label={`Product name for row ${row.index + 1}`}
+              defaultValue={row.original.name}
+              size="s"
+            />
+          </DataTableCell>
+        ),
+        meta: { width: '70%' },
+      },
+      {
+        id: 'category',
+        header: () => <DataTableCell>Category</DataTableCell>,
+        cell: ({ row }) => (
+          <DataTableCell width="full">
+            <TextField
+              aria-label={`Category for row ${row.index + 1}`}
+              defaultValue={row.original.category}
+              size="s"
+            />
+          </DataTableCell>
+        ),
+        meta: { width: '30%' },
+      },
+    ],
+  },
+  play: async ({ canvasElement, userEvent }) => {
+    const canvas = within(canvasElement);
+    const name = canvas.getByRole('textbox', { name: 'Product name for row 1' });
+    await userEvent.clear(name);
+    await userEvent.type(name, 'Updated product');
+    await expect(name).toHaveValue('Updated product');
+  },
+};
+
+export const WithHeader: Story = {
+  args: {
+    header: (
+      <div>
+        <Typography variant="h5">Products ({rows.length})</Typography>
+        <Typography variant="body2" color="text-secondary">
+          Review product availability and pricing.
+        </Typography>
+      </div>
+    ),
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(
+      canvas.getByRole('heading', { name: `Products (${rows.length})` })
+    ).toBeVisible();
+    await expect(
+      canvas.getByRole('table', { name: 'Products table' })
+    ).toBeVisible();
+  },
+};
+
 const summaryColumns: DataTableColumnDef<ProductRow>[] = [
   {
     accessorKey: 'name',
@@ -487,5 +553,26 @@ export const WithLinkCell: Story = {
       },
     ],
     selectable: false,
+  },
+};
+
+export const ExpandableRows: Story = {
+  args: {
+    getRowId: row => row.id,
+    selection: { getRowCheckboxAriaLabel: row => `Select ${row.name}` },
+    rowDetails: {
+      getLabel: row => row.name,
+      render: row => <Typography variant="body2">Category: {row.category}</Typography>,
+    },
+  },
+  play: async ({ canvasElement, userEvent }) => {
+    const canvas = within(canvasElement);
+    const toggle = canvas.getByRole('button', { name: `Show details: ${rows[0].name}` });
+    await userEvent.click(toggle);
+    await expect(toggle).toHaveAttribute('aria-expanded', 'true');
+    await expect(canvas.getByRole('region', { name: rows[0].name })).toBeVisible();
+    await userEvent.click(canvas.getByRole('button', { name: `Show details: ${rows[1].name}` }));
+    await expect(canvas.getByRole('region', { name: rows[0].name })).toBeVisible();
+    await expect(canvas.getByRole('region', { name: rows[1].name })).toBeVisible();
   },
 };

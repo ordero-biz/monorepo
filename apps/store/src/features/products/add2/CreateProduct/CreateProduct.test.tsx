@@ -235,8 +235,19 @@ describe('New product creation design', () => {
     await user.click(
       within(product).getByRole('button', { name: 'Apply changes' })
     );
-    await user.type(screen.getByRole('textbox', { name: 'SKU' }), 'SHIRT-1');
-    await user.type(screen.getByRole('textbox', { name: 'Barcode' }), '123456');
+    const variantName = screen.getByRole('textbox', {
+      name: 'Variant name for variant 1',
+    });
+    await user.clear(variantName);
+    await user.type(variantName, 'Updated shirt variant');
+    await user.type(
+      screen.getByRole('textbox', { name: 'SKU for variant 1' }),
+      'SHIRT-1'
+    );
+    await user.type(
+      screen.getByRole('textbox', { name: 'Barcode for variant 1' }),
+      '123456'
+    );
     await user.click(screen.getByRole('button', { name: 'Create product' }));
     await waitFor(() =>
       expect(mocks.push).toHaveBeenCalledWith(clientRoutes.products)
@@ -248,7 +259,7 @@ describe('New product creation design', () => {
       status: 'ACTIVE',
       productVariants: [
         {
-          name: 'Shirt',
+          name: 'Updated shirt variant',
           status: 'DRAFT',
           sku: 'SHIRT-1',
           barcode: '123456',
@@ -282,8 +293,14 @@ describe('New product creation design', () => {
     await user.click(screen.getByRole('button', { name: 'Select category' }));
     await user.click(screen.getByRole('button', { name: 'Review variants' }));
     await screen.findByRole('form', { name: 'Product configuration' });
-    await user.type(screen.getByRole('textbox', { name: 'SKU' }), 'SHIRT-1');
-    await user.type(screen.getByRole('textbox', { name: 'Barcode' }), '123456');
+    await user.type(
+      screen.getByRole('textbox', { name: 'SKU for variant 1' }),
+      'SHIRT-1'
+    );
+    await user.type(
+      screen.getByRole('textbox', { name: 'Barcode for variant 1' }),
+      '123456'
+    );
     await user.click(screen.getByRole('button', { name: 'Create product' }));
     expect(await screen.findByText('SKU already exists.')).toBeVisible();
     expect(
@@ -418,7 +435,11 @@ describe('New product creation design', () => {
       'Shirt Red Cotton',
       'Shirt Red Linen',
     ]) {
-      expect(within(configuration).getByRole('button', { name })).toBeVisible();
+      expect(
+        within(configuration).getByRole('button', {
+          name: new RegExp(`^(Show|Hide) details: ${name}$`),
+        })
+      ).toBeVisible();
     }
   }, 15000);
 
@@ -451,12 +472,21 @@ describe('New product creation design', () => {
     const configuration = await screen.findByRole('form', {
       name: 'Product configuration',
     });
+    const detailsToggle = within(configuration).getByRole('button', {
+      name: /^(Show|Hide) details: Shirt Blue Red$/,
+    });
+    await user.click(detailsToggle);
+    await user.click(screen.getByRole('button', { name: 'Remove Blue' }));
+    await user.click(detailsToggle);
     expect(
-      within(configuration).getByRole('button', {
-        name: 'Shirt Blue Red',
-      })
-    ).toBeVisible();
-    expect(screen.getByText('1 product variant ready')).toBeVisible();
+      screen.queryByRole('button', { name: 'Remove Red', hidden: true })
+    ).not.toBeInTheDocument();
+    await user.click(detailsToggle);
+    expect(screen.getByRole('button', { name: 'Remove Red' })).toBeVisible();
+    expect(
+      screen.queryByRole('button', { name: 'Remove Blue' })
+    ).not.toBeInTheDocument();
+    expect(screen.getByText('1 product variant')).toBeVisible();
     expect(screen.getByText('Step 2 of 2 · Review & create')).toBeVisible();
     expect(
       screen.queryByText('Step 1 of 2 · Product setup')
@@ -550,7 +580,9 @@ describe('New product creation design', () => {
     expect(
       await screen.findByRole('form', { name: 'Product configuration' })
     ).toBeVisible();
-    expect(screen.getByRole('button', { name: 'Shirt' })).toBeVisible();
+    expect(
+      screen.getByRole('button', { name: /^(Show|Hide) details: Shirt$/ })
+    ).toBeVisible();
   });
 
   it('clears value errors in single mode and restores them when switching back to multiple mode', async () => {
@@ -664,7 +696,9 @@ describe('New product creation design', () => {
       within(product).getByRole('button', { name: 'Coffee and tea' })
     ).toBeVisible();
     expect(
-      within(configuration).getByRole('button', { name: 'Kilograms coffee' })
+      within(configuration).getByRole('button', {
+        name: /^(Show|Hide) details: Kilograms coffee$/,
+      })
     ).toBeVisible();
     expect(
       screen.queryByRole('form', { name: 'Product generation' })
@@ -734,7 +768,9 @@ describe('New product creation design', () => {
         within(product).getByRole('region', { name: 'Product summary' })
       ).getByText('Fresh coffee.')
     ).toBeVisible();
-    expect(screen.getByRole('button', { name: 'Coffee' })).toBeVisible();
+    expect(
+      screen.getByRole('button', { name: /^(Show|Hide) details: Coffee$/ })
+    ).toBeVisible();
     expect(within(product).queryByRole('textbox')).not.toBeInTheDocument();
     await user.click(
       within(product).getByRole('button', { name: 'Edit details' })
@@ -825,8 +861,14 @@ describe('New product creation design', () => {
     );
     await user.click(screen.getByRole('button', { name: 'Select category' }));
     await user.click(screen.getByRole('button', { name: 'Review variants' }));
-    await user.type(screen.getByRole('textbox', { name: 'SKU' }), 'COFFEE-1');
-    await user.type(screen.getByRole('textbox', { name: 'Barcode' }), '123456');
+    await user.type(
+      screen.getByRole('textbox', { name: 'SKU for variant 1' }),
+      'COFFEE-1'
+    );
+    await user.type(
+      screen.getByRole('textbox', { name: 'Barcode for variant 1' }),
+      '123456'
+    );
     await user.click(screen.getByRole('button', { name: 'Create product' }));
     expect(
       await screen.findByText('Service unavailable. Try again.')
@@ -837,5 +879,81 @@ describe('New product creation design', () => {
     expect(
       screen.queryByRole('button', { name: 'Apply changes' })
     ).not.toBeInTheDocument();
+  });
+  it('edits variant names inline and preserves collapsed details without opening them for name errors', async () => {
+    const user = userEvent.setup();
+    setup();
+    await user.type(
+      screen.getByRole('textbox', { name: 'Product name' }),
+      'Coffee'
+    );
+    await user.click(screen.getByRole('button', { name: 'Select category' }));
+    await user.click(screen.getByRole('button', { name: 'Review variants' }));
+    const table = screen.getByRole('table', { name: 'Product variants' });
+    const toggle = within(table).getByRole('button', {
+      name: /^(Show|Hide) details: Coffee$/,
+    });
+    expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    expect(
+      within(table).getByRole('columnheader', { name: 'Variant name *' })
+    ).toBeVisible();
+    const name = within(table).getByRole('textbox', {
+      name: 'Variant name for variant 1',
+    });
+    expect(name).toHaveValue('Coffee');
+    await user.type(
+      within(table).getByRole('textbox', { name: 'SKU for variant 1' }),
+      'COFFEE-1'
+    );
+    await user.type(
+      within(table).getByRole('textbox', { name: 'Barcode for variant 1' }),
+      '123456'
+    );
+    expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    await user.click(toggle);
+    expect(
+      within(table).queryByRole('textbox', { name: 'Product variant name' })
+    ).not.toBeInTheDocument();
+    await user.type(
+      within(table).getByRole('textbox', { name: 'Description' }),
+      'Variant description'
+    );
+    await user.clear(name);
+    await user.click(
+      within(table).getByRole('button', {
+        name: /^(Show|Hide) details: Variant 1$/,
+      })
+    );
+    expect(
+      within(table).queryByRole('textbox', {
+        name: 'Description',
+        hidden: true,
+      })
+    ).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Create product' }));
+    expect(
+      await within(table).findByText('Product variant name is required')
+    ).toBeVisible();
+    expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    await user.click(toggle);
+    expect(
+      within(table).getByRole('textbox', { name: 'Description' })
+    ).toHaveValue('Variant description');
+    expect(
+      within(table).getByRole('textbox', { name: 'SKU for variant 1' })
+    ).toHaveValue('COFFEE-1');
+    expect(createProductGroup).not.toHaveBeenCalled();
+    await user.type(
+      within(table).getByRole('textbox', {
+        name: 'Variant name for variant 1',
+      }),
+      'Roasted coffee'
+    );
+    expect(
+      within(table).queryByText('Product variant name is required')
+    ).not.toBeInTheDocument();
+    expect(
+      within(table).getByRole('textbox', { name: 'Description' })
+    ).toBeVisible();
   });
 });

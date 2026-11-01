@@ -9,7 +9,7 @@ import type {
 } from './types';
 import { getInvalidProductVariantIndexes } from './utils/productVariantErrors';
 
-const EditGeneratedProductVariantAttributes = ({
+export const EditGeneratedProductVariantAttributes = ({
   allowMultipleValuesPerAttribute,
   attributes,
   productVariantsCreationForm,

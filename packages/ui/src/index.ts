@@ -87,6 +87,7 @@ export type {
   DataTablePaginationProps,
   DataTablePaginationState,
   DataTableProps,
+  DataTableRowDetailsProps,
   DataTableRowSelectionState,
   DataTableRowTone,
   DataTableSelectionCellProps,

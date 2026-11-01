@@ -2,8 +2,11 @@ import type { FocusEventHandler } from 'react';
 import type { AttributeDropdown } from '@/lib/domain/attributes/types';
 import type {
   ProductGenerationValues as BaseProductGenerationValues,
+  GeneratedProductVariantsProps,
   PRODUCT_GENERATION_MODE,
   ProductCommonValues,
+  ProductVariantAttributesProps,
+  ProductVariantsCreationFormApi,
 } from '../../add/CreateProduct';
 import type { useProductVariantsGenerationForm } from './hooks/useProductVariantsGenerationForm';
 
@@ -68,4 +71,22 @@ export type ProductDetailsEditorProps = {
   initialErrors: ProductDetailsErrors;
   onApply: (values: ProductCommonValues) => void;
   onCancel: () => void;
+};
+
+type ProductVariantFieldProps = {
+  form: ProductVariantsCreationFormApi;
+  variantIndex: number;
+};
+
+export type ProductVariantDetailsProps = ProductVariantAttributesProps;
+
+export type ProductVariantsTableProps = GeneratedProductVariantsProps;
+
+export type ProductVariantNameFieldProps = ProductVariantFieldProps;
+export type ProductVariantSkuFieldProps = ProductVariantFieldProps;
+export type ProductVariantBarcodeFieldProps = ProductVariantFieldProps;
+export type ProductVariantStatusFieldProps = ProductVariantFieldProps;
+
+export type GetColumnsArgs = {
+  form: ProductVariantsCreationFormApi;
 };

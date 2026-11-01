@@ -22,6 +22,7 @@ import {
 import { CommonProductData } from './CommonProductData';
 import { useProductVariantsGenerationForm } from './hooks/useProductVariantsGenerationForm';
 import { ProductVariantsGenerationForm } from './ProductVariantsGenerationForm';
+import { ProductVariantsTable } from './ProductVariantsTable';
 import {
   getProductDetailsErrors,
   getProductDetailsFormErrors,
@@ -110,6 +111,15 @@ export const CreateProduct = () => {
         />
       ) : (
         <ProductVariantsCreationForm
+          variantFields={
+            <ProductVariantsTable
+              productVariantsCreationForm={productVariantsCreationForm}
+              generatedAttributes={generatedAttributes}
+              generationMode={productVariantsGenerationForm.getFieldValue(
+                'generationMode'
+              )}
+            />
+          }
           isEditingProductDetails={isEditingProductDetails}
           commonProductFields={
             <productVariantsCreationForm.Subscribe

@@ -32,6 +32,7 @@ export type ProductVariantsGenerationFormProps = {
 
 export type ProductVariantsCreationFormProps = {
   commonProductFields?: ReactNode;
+  variantFields?: ReactNode;
   isEditingProductDetails?: boolean;
   productVariantsCreationForm: ProductVariantsCreationFormApi;
   generatedAttributes: AttributeDropdown[];
@@ -168,3 +169,8 @@ export type ProductStatusSelectorProps = {
 
 export type ProductGenerationMode =
   (typeof PRODUCT_GENERATION_MODE)[keyof typeof PRODUCT_GENERATION_MODE];
+
+export type ProductVariantAttributesProps = Omit<
+  GeneratedProductVariantCardProps,
+  'hasErrors'
+> & { productVariantName: string };
