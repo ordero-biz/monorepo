@@ -120,6 +120,140 @@ describe('New product creation design', () => {
     });
   });
 
+  it('adds and removes attributes only for the edited variant and submits the applied values', async () => {
+    vi.mocked(createProductGroup).mockResolvedValue({
+      ok: false,
+      error: { status: 503, message: 'Unavailable' },
+    });
+    const user = userEvent.setup();
+    setup();
+    await user.type(
+      screen.getByRole('textbox', { name: 'Product name' }),
+      'Shirt'
+    );
+    await user.click(screen.getByRole('button', { name: 'Select category' }));
+    await user.click(screen.getByRole('radio', { name: 'Multiple variants' }));
+    await addAttribute(user, 'Color');
+    await selectValues(user, { attribute: 'Color', values: ['Blue', 'Red'] });
+    await user.click(screen.getByRole('button', { name: 'Review variants' }));
+    await user.click(
+      await screen.findByRole('button', { name: 'Show details: Shirt Blue' })
+    );
+    await user.click(
+      screen.getByRole('button', { name: 'Edit attributes for Shirt Blue' })
+    );
+    await addAttribute(user, 'Material');
+    await user.click(screen.getByRole('combobox', { name: 'Material' }));
+    await user.click(screen.getByRole('option', { name: 'Cotton' }));
+    await user.click(screen.getByRole('button', { name: 'Apply changes' }));
+    expect(screen.getByRole('button', { name: 'Remove Cotton' })).toBeVisible();
+    expect(screen.queryByText('SKU is required')).not.toBeInTheDocument();
+    expect(screen.queryByText('Barcode is required')).not.toBeInTheDocument();
+    expect(createProductGroup).not.toHaveBeenCalled();
+    expect(screen.getByRole('button', { name: 'Remove Blue' })).toBeVisible();
+    await user.click(
+      screen.getByRole('button', { name: 'Edit attributes for Shirt Blue' })
+    );
+    await user.click(
+      screen.getByRole('button', { name: 'Remove Color attribute' })
+    );
+    await user.click(screen.getByRole('button', { name: 'Apply changes' }));
+    expect(screen.queryByText('SKU is required')).not.toBeInTheDocument();
+    expect(screen.queryByText('Barcode is required')).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Remove Blue' })
+    ).not.toBeInTheDocument();
+
+    await user.click(
+      screen.getByRole('button', { name: 'Edit attributes for Shirt Blue' })
+    );
+    expect(screen.getByRole('combobox', { name: 'Material' })).toHaveValue(
+      'Cotton'
+    );
+    expect(
+      screen.queryByRole('combobox', { name: 'Color' })
+    ).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Cancel' }));
+    await user.click(
+      screen.getByRole('button', { name: 'Show details: Shirt Red' })
+    );
+    await user.click(
+      screen.getByRole('button', { name: 'Edit attributes for Shirt Red' })
+    );
+    expect(screen.getByRole('combobox', { name: 'Color' })).toHaveValue('Red');
+    expect(
+      screen.queryByRole('combobox', { name: 'Material' })
+    ).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Cancel' }));
+
+    for (const index of [1, 2]) {
+      await user.type(
+        screen.getByRole('textbox', { name: `SKU for variant ${index}` }),
+        `SHIRT-${index}`
+      );
+      await user.type(
+        screen.getByRole('textbox', { name: `Barcode for variant ${index}` }),
+        `100${index}`
+      );
+    }
+    await user.click(screen.getByRole('button', { name: 'Create product' }));
+    await waitFor(() =>
+      expect(createProductGroup).toHaveBeenCalledWith(
+        expect.objectContaining({
+          productVariants: [
+            expect.objectContaining({
+              name: 'Shirt Blue',
+              attributeValueIds: [21],
+            }),
+            expect.objectContaining({
+              name: 'Shirt Red',
+              attributeValueIds: [12],
+            }),
+          ],
+        })
+      )
+    );
+  }, 15000);
+
+  it('allows adding attributes in review when none were selected in setup', async () => {
+    const user = userEvent.setup();
+    setup();
+    await user.type(
+      screen.getByRole('textbox', { name: 'Product name' }),
+      'Shirt'
+    );
+    await user.click(screen.getByRole('button', { name: 'Select category' }));
+    await user.click(screen.getByRole('button', { name: 'Review variants' }));
+    await user.click(
+      await screen.findByRole('button', { name: 'Show details: Shirt' })
+    );
+    await user.click(
+      screen.getByRole('button', { name: 'Add attributes for Shirt' })
+    );
+    await addAttribute(user, 'Color');
+    await user.click(screen.getByRole('combobox', { name: 'Color' }));
+    await user.click(screen.getByRole('option', { name: 'Blue' }));
+    await user.click(screen.getByRole('option', { name: 'Red' }));
+    await user.keyboard('{Escape}');
+    await user.click(screen.getByRole('button', { name: 'Apply changes' }));
+    expect(screen.getByRole('button', { name: 'Remove Blue' })).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Remove Red' })).toBeVisible();
+    await user.click(
+      screen.getByRole('button', { name: 'Edit attributes for Shirt' })
+    );
+    await user.click(
+      screen.getByRole('button', { name: 'Remove Color attribute' })
+    );
+    await user.click(screen.getByRole('button', { name: 'Apply changes' }));
+    await user.click(
+      screen.getByRole('button', { name: 'Add attributes for Shirt' })
+    );
+    expect(
+      screen.queryByRole('combobox', { name: 'Color' })
+    ).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Add attribute' })).toBeVisible();
+  });
+
   it('shows a load error and lets users cancel when attributes cannot be loaded', async () => {
     vi.mocked(getAttributesDropdown).mockResolvedValue({
       ok: false,
@@ -486,7 +620,9 @@ describe('New product creation design', () => {
     expect(
       screen.queryByRole('button', { name: 'Remove Blue' })
     ).not.toBeInTheDocument();
-    expect(screen.getByText('1 product variant')).toBeVisible();
+    expect(
+      screen.getByText('You’re creating 1 product with 1 variant')
+    ).toBeVisible();
     expect(screen.getByText('Step 2 of 2 · Review & create')).toBeVisible();
     expect(
       screen.queryByText('Step 1 of 2 · Product setup')

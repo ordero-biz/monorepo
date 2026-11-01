@@ -519,11 +519,15 @@ describe('CreateProduct', () => {
       })
     );
     const dialog = screen.getByRole('dialog', {
-      name: 'Edit variant attributes for Running Shoes Blue',
+      name: 'Edit attributes',
     });
 
-    await user.click(within(dialog).getByRole('button', { name: 'Red' }));
-    await user.click(within(dialog).getByRole('button', { name: 'Update' }));
+    await user.click(within(dialog).getByRole('combobox', { name: 'Color' }));
+    await user.click(screen.getByRole('option', { name: 'Red' }));
+    await user.keyboard('{Escape}');
+    await user.click(
+      within(dialog).getByRole('button', { name: 'Apply changes' })
+    );
 
     const variantAttributes = screen.getByRole('treegrid', {
       name: 'Attributes for Running Shoes Blue',
@@ -587,11 +591,15 @@ describe('CreateProduct', () => {
     );
 
     const dialog = screen.getByRole('dialog', {
-      name: 'Edit variant attributes for Running Shoes Blue',
+      name: 'Edit attributes',
     });
 
-    await user.click(within(dialog).getByRole('button', { name: 'Blue' }));
-    await user.click(within(dialog).getByRole('button', { name: 'Update' }));
+    await user.click(within(dialog).getByRole('combobox', { name: 'Color' }));
+    await user.click(screen.getByRole('option', { name: 'Blue' }));
+    await user.keyboard('{Escape}');
+    await user.click(
+      within(dialog).getByRole('button', { name: 'Apply changes' })
+    );
 
     expect(
       within(
@@ -622,11 +630,15 @@ describe('CreateProduct', () => {
       })
     );
     const dialog = screen.getByRole('dialog', {
-      name: 'Edit variant attributes for Running Shoes Blue',
+      name: 'Edit attributes',
     });
 
-    expect(within(dialog).getByText('Color:')).toBeVisible();
-    expect(within(dialog).queryByText('Manufacture:')).not.toBeInTheDocument();
+    expect(
+      within(dialog).getByRole('combobox', { name: 'Color' })
+    ).toBeVisible();
+    expect(
+      within(dialog).queryByRole('combobox', { name: 'Manufacture' })
+    ).not.toBeInTheDocument();
     expect(
       within(dialog).queryByRole('button', { name: 'China' })
     ).not.toBeInTheDocument();

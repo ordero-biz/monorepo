@@ -10,6 +10,7 @@ export { EditGeneratedProductVariantAttributes } from './GeneratedProductVariant
 export { useCreateProductForm } from './hooks/useCreateProductForm';
 export { useIncrementalProductVariants } from './hooks/useIncrementalProductVariants';
 export { useProductGenerationState } from './hooks/useProductGenerationState';
+export { useProductVariantAttributes } from './hooks/useProductVariantAttributes';
 export { useProductVariantsGenerationForm } from './hooks/useProductVariantsGenerationForm';
 export { ProductImageDropzone } from './ProductImageDropzone';
 export { ProductStatusSelector } from './ProductStatusSelector';

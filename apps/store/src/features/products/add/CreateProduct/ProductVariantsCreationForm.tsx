@@ -51,8 +51,8 @@ export const ProductVariantsCreationForm = ({
                   <ContextualActionBar.Left>
                     <Typography variant="body2">
                       {productVariantCount === 1
-                        ? '1 product variant'
-                        : `${productVariantCount} product variants`}
+                        ? 'You’re creating 1 product with 1 variant'
+                        : `You’re creating 1 product with ${productVariantCount} variants`}
                     </Typography>
                   </ContextualActionBar.Left>
                   <ContextualActionBar.Right>

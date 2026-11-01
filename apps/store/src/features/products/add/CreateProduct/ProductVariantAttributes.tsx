@@ -39,7 +39,7 @@ export const ProductVariantAttributes = ({
           attributeValueIdsField.state.value
         );
 
-        return attributes.length > 0 ? (
+        return (
           <div className="flex flex-col gap-[var(--space-0-5)]">
             <FieldLabel
               as="span"
@@ -98,7 +98,7 @@ export const ProductVariantAttributes = ({
               <FieldHelperText invalid>{errorText}</FieldHelperText>
             ) : null}
           </div>
-        ) : null;
+        );
       }}
     </productVariantsCreationForm.Field>
   );

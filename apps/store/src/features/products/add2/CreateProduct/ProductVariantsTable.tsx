@@ -5,6 +5,7 @@ import {
   EditGeneratedProductVariantAttributes,
   PRODUCT_GENERATION_MODE,
   useIncrementalProductVariants,
+  useProductVariantAttributes,
 } from '../../add/CreateProduct';
 import { getInvalidProductVariantIndexes } from '../../add/CreateProduct/utils/productVariantErrors';
 import { getColumns } from './columns';
@@ -23,6 +24,8 @@ export const ProductVariantsTable = ({
   generatedAttributes,
   generationMode,
 }: ProductVariantsTableProps) => {
+  const { getVariantAttributes, updateVariantAttributes } =
+    useProductVariantAttributes(generatedAttributes);
   const variantNames = useStore(
     form.store,
     (state) => state.values.productVariants.map((variant) => variant.name),
@@ -92,7 +95,7 @@ export const ProductVariantsTable = ({
           getLabel: (index) => variantNames[index] || `Variant ${index + 1}`,
           render: (index) => (
             <ProductVariantDetails
-              attributes={generatedAttributes}
+              attributes={getVariantAttributes(index)}
               productVariantsCreationForm={form}
               variantIndex={index}
               productVariantName={variantNames[index]}
@@ -112,7 +115,8 @@ export const ProductVariantsTable = ({
           allowMultipleValuesPerAttribute={
             generationMode === PRODUCT_GENERATION_MODE.one
           }
-          attributes={generatedAttributes}
+          attributes={getVariantAttributes(editingVariantIndex)}
+          onAttributesUpdated={updateVariantAttributes}
           productVariantsCreationForm={form}
           onOpenChange={(open) => {
             if (!open) setEditingVariantIndex(null);

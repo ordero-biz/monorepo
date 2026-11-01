@@ -13,9 +13,7 @@ export const ProductVariantDetails = memo(
     return (
       <div className="grid items-start gap-[var(--space-3)] md:grid-cols-[minmax(0,1fr)_var(--space-20)]">
         <div className="flex min-w-0 flex-col gap-[var(--space-2)]">
-          {props.attributes.length > 0 ? (
-            <ProductVariantAttributes {...props} />
-          ) : null}
+          <ProductVariantAttributes {...props} />
           <form.Field name={`productVariants[${variantIndex}].description`}>
             {(field) => (
               <Textarea

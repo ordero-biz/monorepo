@@ -341,7 +341,7 @@ export const DataTable = <TData,>({
                   <th
                     scope="col"
                     rowSpan={table.getHeaderGroups().length}
-                    className="bg-[var(--background-neutral)] p-0"
+                    className="w-0 whitespace-nowrap bg-[var(--background-neutral)] p-0"
                   >
                     <span className="sr-only">Details</span>
                   </th>
@@ -389,7 +389,7 @@ export const DataTable = <TData,>({
                       <td
                         className={cn(
                           contentCellClassName,
-                          'border-b border-dashed border-[var(--color-divider)] border-l-[length:var(--space-2px)] [border-left-style:solid]',
+                          'w-0 whitespace-nowrap border-b border-dashed border-[var(--color-divider)] border-l-[length:var(--space-2px)] [border-left-style:solid]',
                           expandedRows[row.id]
                             ? 'border-l-primary'
                             : 'border-l-transparent'

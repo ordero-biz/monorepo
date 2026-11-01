@@ -76,7 +76,7 @@ export type GeneratedProductVariantsProps = {
 };
 
 export type GeneratedProductVariantListProps = {
-  attributes: AttributeDropdown[];
+  getVariantAttributes: (variantIndex: number) => AttributeDropdown[];
   productVariantsCreationForm: ProductVariantsCreationFormApi;
   invalidVariantIndexes: number[];
   onEditAttributes: (variantIndex: number) => void;
@@ -94,6 +94,10 @@ export type GeneratedProductVariantCardProps = {
 };
 
 export type EditGeneratedProductVariantAttributesProps = {
+  onAttributesUpdated: (
+    variantIndex: number,
+    attributes: AttributeDropdown[]
+  ) => void;
   allowMultipleValuesPerAttribute: boolean;
   attributes: AttributeDropdown[];
   productVariantsCreationForm: ProductVariantsCreationFormApi;
@@ -118,7 +122,7 @@ export type EditProductVariantAttributesDialogProps = {
   attributeValueIds: number[];
   attributes: AttributeDropdown[];
   onOpenChange: (open: boolean) => void;
-  onUpdate: (attributeValueIds: number[]) => void;
+  onUpdate: (values: ProductVariantAttributesUpdate) => void;
   open: boolean;
   productVariantName: string;
 };
@@ -174,3 +178,8 @@ export type ProductVariantAttributesProps = Omit<
   GeneratedProductVariantCardProps,
   'hasErrors'
 > & { productVariantName: string };
+
+export type ProductVariantAttributesUpdate = {
+  attributeValueIds: number[];
+  attributes: AttributeDropdown[];
+};

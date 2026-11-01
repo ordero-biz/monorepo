@@ -262,6 +262,8 @@ Use `rowDetails` for secondary content below a record. The table adds a leading
 Show details / Hide details button and a detail row spanning all columns, including selection. Each
 button exposes `aria-expanded` and controls a labelled region. Expanding a row
 is independent of selecting it or editing its cells.
+The details column fits its non-wrapping button and cell padding; spare table
+width is available to the data columns.
 
 ```tsx
 <DataTable
