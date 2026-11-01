@@ -9,14 +9,13 @@ const { setup } = prepareStoreSetup<WarehouseDetailInventoryValueProps>({
 });
 
 describe('WarehouseDetailInventoryValue', () => {
-  it('shows the formatted inventory value, currency, valuation basis, and warehouse scope', () => {
+  it('shows the formatted inventory value, valuation basis, and warehouse scope', () => {
     setup();
 
     const summary = screen.getByRole('region', { name: 'Inventory value' });
 
     expect(within(summary).getByText('Inventory value')).toBeVisible();
     expect(within(summary).getByText('$4,285.00')).toBeVisible();
-    expect(within(summary).getByText('USD')).toBeVisible();
     expect(
       within(summary).getByText('At cost · All products in this warehouse')
     ).toBeVisible();
@@ -32,6 +31,5 @@ describe('WarehouseDetailInventoryValue', () => {
     setup({ totalPrice });
 
     expect(screen.getByText(amount)).toBeVisible();
-    expect(screen.getByText('USD')).toBeVisible();
   });
 });

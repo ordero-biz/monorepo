@@ -54,7 +54,6 @@ test('paginates warehouse stock through the URL, reload, and browser history', a
       name: 'Inventory value',
     });
     await expect(inventoryValue.getByText('$877.50')).toBeVisible();
-    await expect(inventoryValue.getByText('USD')).toBeVisible();
     await expect(
       table.getByText('Stock product 11', { exact: true })
     ).toBeVisible();

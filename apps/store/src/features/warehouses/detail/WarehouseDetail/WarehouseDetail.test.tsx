@@ -202,7 +202,6 @@ describe('WarehouseDetail', () => {
       name: 'Inventory value',
     });
     expect(within(summary).getByText('$4,285.00')).toBeVisible();
-    expect(within(summary).getByText('USD')).toBeVisible();
     expect(
       within(summary).getByText('At cost · All products in this warehouse')
     ).toBeVisible();

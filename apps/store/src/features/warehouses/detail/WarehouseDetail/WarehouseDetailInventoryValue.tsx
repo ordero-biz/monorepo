@@ -19,7 +19,6 @@ export const WarehouseDetailInventoryValue = ({
               <span className="min-w-0 break-words text-[length:var(--h2-size-mobile)] leading-[var(--h2-line-height-mobile)] font-[var(--h2-weight)] tabular-nums [font-family:var(--h2-family)] md:text-[length:var(--h2-size-desktop)] md:leading-[var(--h2-line-height-desktop)]">
                 {formatMoney(totalPrice)}
               </span>
-              <Typography variant="subtitle2">USD</Typography>
             </dd>
           </dl>
           <Typography color="text-secondary" variant="body2">
