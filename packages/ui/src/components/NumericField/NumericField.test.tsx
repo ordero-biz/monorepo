@@ -132,7 +132,9 @@ describe('NumericField', () => {
     await user.tab();
 
     expect(input).toHaveDisplayValue('12');
-    expect(screen.getByRole('button', { name: 'Next focus target' })).toHaveFocus();
+    expect(
+      screen.getByRole('button', { name: 'Next focus target' })
+    ).toHaveFocus();
   });
 
   it('keeps intermediate decimal input visible in controlled usage', async () => {
@@ -174,6 +176,9 @@ describe('NumericField', () => {
     await user.clear(input);
 
     expect(input).toHaveDisplayValue('');
-    expect(onValueChange).toHaveBeenLastCalledWith(undefined, expect.any(Object));
+    expect(onValueChange).toHaveBeenLastCalledWith(
+      undefined,
+      expect.any(Object)
+    );
   });
 });

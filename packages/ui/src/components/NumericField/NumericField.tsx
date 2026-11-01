@@ -47,11 +47,7 @@ const sanitizeNumericValue = ({
       continue;
     }
 
-    if (
-      character === '-' &&
-      allowNegative &&
-      sanitizedValue.length === 0
-    ) {
+    if (character === '-' && allowNegative && sanitizedValue.length === 0) {
       sanitizedValue = '-';
       continue;
     }
@@ -215,7 +211,9 @@ export const NumericField = (props: NumericFieldProps) => {
       helperText={helperText}
       id={id}
       inputMode={
-        getClampedFractionDigits(maxFractionDigits) === 0 ? 'numeric' : 'decimal'
+        getClampedFractionDigits(maxFractionDigits) === 0
+          ? 'numeric'
+          : 'decimal'
       }
       invalid={invalid}
       label={label}
