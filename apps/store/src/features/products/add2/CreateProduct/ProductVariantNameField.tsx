@@ -10,6 +10,7 @@ export const ProductVariantNameField = memo(
       form.store,
       (state) => state.submissionAttempts
     );
+
     return (
       <form.Field name={`productVariants[${variantIndex}].name`}>
         {(field) => {
@@ -17,6 +18,7 @@ export const ProductVariantNameField = memo(
             field.state.meta,
             submissionAttempts
           );
+
           return (
             <TextField
               aria-label={`Variant name for variant ${variantIndex + 1}`}

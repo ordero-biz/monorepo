@@ -17,6 +17,7 @@ export const ProductVariantAttributes = ({
     productVariantsCreationForm.store,
     (state) => state.submissionAttempts
   );
+
   return (
     <productVariantsCreationForm.Field
       name={`productVariants[${variantIndex}].attributeValueIds` as const}

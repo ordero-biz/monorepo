@@ -10,6 +10,7 @@ export const ProductVariantBarcodeField = memo(
       form.store,
       (state) => state.submissionAttempts
     );
+
     return (
       <form.Field name={`productVariants[${variantIndex}].barcode`}>
         {(field) => {
@@ -17,6 +18,7 @@ export const ProductVariantBarcodeField = memo(
             field.state.meta,
             submissionAttempts
           );
+
           return (
             <TextField
               aria-label={`Barcode for variant ${variantIndex + 1}`}

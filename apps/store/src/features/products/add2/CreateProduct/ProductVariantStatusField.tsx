@@ -16,6 +16,7 @@ export const ProductVariantStatusField = memo(
       form.store,
       (state) => state.submissionAttempts
     );
+
     return (
       <form.Field
         name={`productVariants[${variantIndex}].status`}
@@ -29,6 +30,7 @@ export const ProductVariantStatusField = memo(
             field.state.meta,
             submissionAttempts
           );
+
           return (
             <Select
               aria-label={`Status for variant ${variantIndex + 1}`}

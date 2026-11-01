@@ -9,6 +9,7 @@ import type { ProductVariantDetailsProps } from './types';
 export const ProductVariantDetails = memo(
   (props: ProductVariantDetailsProps) => {
     const { productVariantsCreationForm: form, variantIndex } = props;
+
     return (
       <div className="grid items-start gap-[var(--space-3)] md:grid-cols-[minmax(0,1fr)_var(--space-20)]">
         <div className="flex min-w-0 flex-col gap-[var(--space-2)]">

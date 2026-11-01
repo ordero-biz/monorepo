@@ -99,43 +99,41 @@ export const getColumns = ({
         const index = row.index;
 
         return (
-          <DataTableCell>
-            <div className="w-[320px]">
-              <form.Field
-                listeners={getEntryListeners(index)}
-                name={`supplyEntries[${index}].productVariant` as const}
-                validators={getEntryValidators(index, 'productVariant')}
-              >
-                {(field) => (
-                  <form.Subscribe
-                    selector={(state) =>
-                      [state.isSubmitting, state.submissionAttempts] as const
-                    }
-                  >
-                    {([disabled, submissionAttempts]) => {
-                      const errorText = getFieldSubmitChangeErrorText(
-                        field.state.meta,
-                        submissionAttempts
-                      );
-                      return (
-                        <ProductVariantsAsyncCombobox
-                          disabled={disabled}
-                          aria-label={`Product for row ${index + 1}`}
-                          errorText={errorText}
-                          invalid={Boolean(errorText)}
-                          name={field.name}
-                          onBlur={field.handleBlur}
-                          onValueChange={field.handleChange}
-                          required
-                          size="s"
-                          value={field.state.value}
-                        />
-                      );
-                    }}
-                  </form.Subscribe>
-                )}
-              </form.Field>
-            </div>
+          <DataTableCell width="full">
+            <form.Field
+              listeners={getEntryListeners(index)}
+              name={`supplyEntries[${index}].productVariant` as const}
+              validators={getEntryValidators(index, 'productVariant')}
+            >
+              {(field) => (
+                <form.Subscribe
+                  selector={(state) =>
+                    [state.isSubmitting, state.submissionAttempts] as const
+                  }
+                >
+                  {([disabled, submissionAttempts]) => {
+                    const errorText = getFieldSubmitChangeErrorText(
+                      field.state.meta,
+                      submissionAttempts
+                    );
+                    return (
+                      <ProductVariantsAsyncCombobox
+                        disabled={disabled}
+                        aria-label={`Product for row ${index + 1}`}
+                        errorText={errorText}
+                        invalid={Boolean(errorText)}
+                        name={field.name}
+                        onBlur={field.handleBlur}
+                        onValueChange={field.handleChange}
+                        required
+                        size="s"
+                        value={field.state.value}
+                      />
+                    );
+                  }}
+                </form.Subscribe>
+              )}
+            </form.Field>
           </DataTableCell>
         );
       },
@@ -150,43 +148,41 @@ export const getColumns = ({
         const index = row.index;
 
         return (
-          <DataTableCell>
-            <div className="w-[var(--space-16)]">
-              <form.Field
-                listeners={getEntryListeners(index)}
-                name={`supplyEntries[${index}].unitOfMeasurement` as const}
-                validators={getEntryValidators(index, 'unitOfMeasurement')}
-              >
-                {(field) => (
-                  <form.Subscribe
-                    selector={(state) =>
-                      [state.isSubmitting, state.submissionAttempts] as const
-                    }
-                  >
-                    {([disabled, submissionAttempts]) => {
-                      const errorText = getFieldSubmitChangeErrorText(
-                        field.state.meta,
-                        submissionAttempts
-                      );
-                      return (
-                        <UnitsOfMeasurementAsyncCombobox
-                          disabled={disabled}
-                          aria-label={`Unit for row ${index + 1}`}
-                          errorText={errorText}
-                          invalid={Boolean(errorText)}
-                          name={field.name}
-                          onBlur={field.handleBlur}
-                          onValueChange={field.handleChange}
-                          required
-                          size="s"
-                          value={field.state.value}
-                        />
-                      );
-                    }}
-                  </form.Subscribe>
-                )}
-              </form.Field>
-            </div>
+          <DataTableCell width="full">
+            <form.Field
+              listeners={getEntryListeners(index)}
+              name={`supplyEntries[${index}].unitOfMeasurement` as const}
+              validators={getEntryValidators(index, 'unitOfMeasurement')}
+            >
+              {(field) => (
+                <form.Subscribe
+                  selector={(state) =>
+                    [state.isSubmitting, state.submissionAttempts] as const
+                  }
+                >
+                  {([disabled, submissionAttempts]) => {
+                    const errorText = getFieldSubmitChangeErrorText(
+                      field.state.meta,
+                      submissionAttempts
+                    );
+                    return (
+                      <UnitsOfMeasurementAsyncCombobox
+                        disabled={disabled}
+                        aria-label={`Unit for row ${index + 1}`}
+                        errorText={errorText}
+                        invalid={Boolean(errorText)}
+                        name={field.name}
+                        onBlur={field.handleBlur}
+                        onValueChange={field.handleChange}
+                        required
+                        size="s"
+                        value={field.state.value}
+                      />
+                    );
+                  }}
+                </form.Subscribe>
+              )}
+            </form.Field>
           </DataTableCell>
         );
       },
@@ -198,44 +194,42 @@ export const getColumns = ({
     {
       id: 'quantity',
       cell: ({ row }) => (
-        <DataTableCell>
-          <div className="w-[105px]">
-            <form.Field
-              listeners={getEntryListeners(row.index)}
-              name={`supplyEntries[${row.index}].quantity` as const}
-              validators={getEntryValidators(row.index, 'quantity')}
-            >
-              {(field) => (
-                <form.Subscribe
-                  selector={(state) =>
-                    [state.isSubmitting, state.submissionAttempts] as const
-                  }
-                >
-                  {([disabled, submissionAttempts]) => {
-                    const errorText = getFieldSubmitChangeErrorText(
-                      field.state.meta,
-                      submissionAttempts
-                    );
-                    return (
-                      <TextField
-                        disabled={disabled}
-                        aria-label={`Quantity for row ${row.index + 1}`}
-                        errorText={errorText}
-                        invalid={Boolean(errorText)}
-                        name={field.name}
-                        onBlur={field.handleBlur}
-                        onValueChange={field.handleChange}
-                        required
-                        size="s"
-                        type="number"
-                        value={field.state.value}
-                      />
-                    );
-                  }}
-                </form.Subscribe>
-              )}
-            </form.Field>
-          </div>
+        <DataTableCell width="full">
+          <form.Field
+            listeners={getEntryListeners(row.index)}
+            name={`supplyEntries[${row.index}].quantity` as const}
+            validators={getEntryValidators(row.index, 'quantity')}
+          >
+            {(field) => (
+              <form.Subscribe
+                selector={(state) =>
+                  [state.isSubmitting, state.submissionAttempts] as const
+                }
+              >
+                {([disabled, submissionAttempts]) => {
+                  const errorText = getFieldSubmitChangeErrorText(
+                    field.state.meta,
+                    submissionAttempts
+                  );
+                  return (
+                    <TextField
+                      disabled={disabled}
+                      aria-label={`Quantity for row ${row.index + 1}`}
+                      errorText={errorText}
+                      invalid={Boolean(errorText)}
+                      name={field.name}
+                      onBlur={field.handleBlur}
+                      onValueChange={field.handleChange}
+                      required
+                      size="s"
+                      type="number"
+                      value={field.state.value}
+                    />
+                  );
+                }}
+              </form.Subscribe>
+            )}
+          </form.Field>
         </DataTableCell>
       ),
       header: ({ column }) => (
@@ -246,44 +240,42 @@ export const getColumns = ({
     {
       id: 'unitPrice',
       cell: ({ row }) => (
-        <DataTableCell>
-          <div className="w-[115px]">
-            <form.Field
-              listeners={getEntryListeners(row.index)}
-              name={`supplyEntries[${row.index}].unitPrice` as const}
-              validators={getEntryValidators(row.index, 'unitPrice')}
-            >
-              {(field) => (
-                <form.Subscribe
-                  selector={(state) =>
-                    [state.isSubmitting, state.submissionAttempts] as const
-                  }
-                >
-                  {([disabled, submissionAttempts]) => {
-                    const errorText = getFieldSubmitChangeErrorText(
-                      field.state.meta,
-                      submissionAttempts
-                    );
-                    return (
-                      <TextField
-                        disabled={disabled}
-                        aria-label={`Unit price for row ${row.index + 1}`}
-                        errorText={errorText}
-                        invalid={Boolean(errorText)}
-                        name={field.name}
-                        onBlur={field.handleBlur}
-                        onValueChange={field.handleChange}
-                        required
-                        size="s"
-                        type="number"
-                        value={field.state.value}
-                      />
-                    );
-                  }}
-                </form.Subscribe>
-              )}
-            </form.Field>
-          </div>
+        <DataTableCell width="full">
+          <form.Field
+            listeners={getEntryListeners(row.index)}
+            name={`supplyEntries[${row.index}].unitPrice` as const}
+            validators={getEntryValidators(row.index, 'unitPrice')}
+          >
+            {(field) => (
+              <form.Subscribe
+                selector={(state) =>
+                  [state.isSubmitting, state.submissionAttempts] as const
+                }
+              >
+                {([disabled, submissionAttempts]) => {
+                  const errorText = getFieldSubmitChangeErrorText(
+                    field.state.meta,
+                    submissionAttempts
+                  );
+                  return (
+                    <TextField
+                      disabled={disabled}
+                      aria-label={`Unit price for row ${row.index + 1}`}
+                      errorText={errorText}
+                      invalid={Boolean(errorText)}
+                      name={field.name}
+                      onBlur={field.handleBlur}
+                      onValueChange={field.handleChange}
+                      required
+                      size="s"
+                      type="number"
+                      value={field.state.value}
+                    />
+                  );
+                }}
+              </form.Subscribe>
+            )}
+          </form.Field>
         </DataTableCell>
       ),
       header: ({ column }) => (
@@ -317,29 +309,27 @@ export const getColumns = ({
     {
       id: 'comment',
       cell: ({ row }) => (
-        <DataTableCell>
-          <div className="w-[180px]">
-            <form.Field
-              listeners={getEntryListeners(row.index)}
-              name={`supplyEntries[${row.index}].comment` as const}
-            >
-              {(field) => (
-                <form.Subscribe selector={(state) => state.isSubmitting}>
-                  {(disabled) => (
-                    <TextField
-                      disabled={disabled}
-                      aria-label={`Comment for row ${row.index + 1}`}
-                      name={field.name}
-                      onBlur={field.handleBlur}
-                      onValueChange={field.handleChange}
-                      size="s"
-                      value={field.state.value}
-                    />
-                  )}
-                </form.Subscribe>
-              )}
-            </form.Field>
-          </div>
+        <DataTableCell width="full">
+          <form.Field
+            listeners={getEntryListeners(row.index)}
+            name={`supplyEntries[${row.index}].comment` as const}
+          >
+            {(field) => (
+              <form.Subscribe selector={(state) => state.isSubmitting}>
+                {(disabled) => (
+                  <TextField
+                    disabled={disabled}
+                    aria-label={`Comment for row ${row.index + 1}`}
+                    name={field.name}
+                    onBlur={field.handleBlur}
+                    onValueChange={field.handleChange}
+                    size="s"
+                    value={field.state.value}
+                  />
+                )}
+              </form.Subscribe>
+            )}
+          </form.Field>
         </DataTableCell>
       ),
       header: ({ column }) => (

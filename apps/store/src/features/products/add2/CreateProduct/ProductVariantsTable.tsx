@@ -30,22 +30,27 @@ export const ProductVariantsTable = ({
       previous.length === next.length &&
       previous.every((name, index) => name === next[index])
   );
+
   const invalidDetailIndexes = useStore(form.store, (state) =>
     getInvalidProductVariantIndexes(
       state.fieldMeta,
       productVariantDetailFields
     ).join(',')
   );
+
   const submissionAttempts = useStore(
     form.store,
     (state) => state.submissionAttempts
   );
+
   const { visibleVariantIndexes, hasMoreVariants, loadMoreRef } =
     useIncrementalProductVariants({ productVariantCount: variantNames.length });
+
   const [expandedRows, setExpandedRows] = useState<Record<string, boolean>>({});
   const [editingVariantIndex, setEditingVariantIndex] = useState<number | null>(
     null
   );
+
   useEffect(() => {
     if (!invalidDetailIndexes || submissionAttempts === 0) return;
     setExpandedRows((current) => ({
