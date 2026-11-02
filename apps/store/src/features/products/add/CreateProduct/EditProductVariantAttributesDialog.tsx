@@ -1,6 +1,5 @@
 import {
   Button,
-  Combobox,
   Dialog,
   FieldHelperText,
   IconButton,
@@ -8,16 +7,14 @@ import {
 } from '@ordero/ui';
 import { X } from 'lucide-react';
 import { useEffect, useId, useState } from 'react';
-import { AttributesAsyncCombobox } from '@/features/attributes';
 import type {
   AttributeDropdown,
   AttributeValue,
 } from '@/lib/domain/attributes/types';
 import { AttributeValuesRow } from '../../shared/ProductAttributeFields';
+import { ProductAttributesCombobox } from '../../shared/ProductAttributesCombobox';
+import { ProductAttributeValuesCombobox } from '../../shared/ProductAttributeValuesCombobox';
 import type { EditProductVariantAttributesDialogProps } from './types';
-
-const getValueId = (value: AttributeValue) => String(value.id);
-const getValueLabel = (value: AttributeValue) => value.name;
 
 export const EditProductVariantAttributesDialog = ({
   allowMultipleValuesPerAttribute,
@@ -54,6 +51,19 @@ export const EditProductVariantAttributesDialog = ({
   ) => {
     const attributeIds = new Set(
       attribute.attributeValues.map((value) => value.id)
+    );
+    const valuesById = new Map(values.map((value) => [value.id, value]));
+    setSelectedAttributes((current) =>
+      current.map((item) =>
+        item.id === attribute.id
+          ? {
+              ...item,
+              attributeValues: item.attributeValues.map(
+                (value) => valuesById.get(value.id) ?? value
+              ),
+            }
+          : item
+      )
     );
     setSelectedAttributeValueIds((currentIds) => [
       ...currentIds.filter((id) => !attributeIds.has(id)),
@@ -109,7 +119,8 @@ export const EditProductVariantAttributesDialog = ({
                     >
                       <div className="min-w-0">
                         {allowMultipleValuesPerAttribute ? (
-                          <Combobox<AttributeValue>
+                          <ProductAttributeValuesCombobox
+                            attribute={attribute}
                             id={inputId}
                             aria-describedby={
                               selectedValues.length === 0 ? hintId : undefined
@@ -119,8 +130,6 @@ export const EditProductVariantAttributesDialog = ({
                             multiple
                             options={attribute.attributeValues}
                             value={selectedValues}
-                            getOptionValue={getValueId}
-                            getOptionLabel={getValueLabel}
                             onValueChange={(values) =>
                               updateAttributeValues(attribute, values)
                             }
@@ -129,7 +138,8 @@ export const EditProductVariantAttributesDialog = ({
                             size="s"
                           />
                         ) : (
-                          <Combobox<AttributeValue>
+                          <ProductAttributeValuesCombobox
+                            attribute={attribute}
                             id={inputId}
                             aria-describedby={
                               selectedValues.length === 0 ? hintId : undefined
@@ -138,8 +148,6 @@ export const EditProductVariantAttributesDialog = ({
                             name={`attributeValues[${attribute.id}]`}
                             options={attribute.attributeValues}
                             value={selectedValues[0] ?? null}
-                            getOptionValue={getValueId}
-                            getOptionLabel={getValueLabel}
                             onValueChange={(value) =>
                               updateAttributeValues(
                                 attribute,
@@ -178,7 +186,7 @@ export const EditProductVariantAttributesDialog = ({
                       Attribute
                     </label>
                     <div className="min-w-0">
-                      <AttributesAsyncCombobox
+                      <ProductAttributesCombobox
                         aria-label="Attribute"
                         autoFocus
                         defaultOpen

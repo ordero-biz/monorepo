@@ -2,7 +2,12 @@ import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { ComponentProps } from 'react';
 import type { CategoriesAsyncCombobox } from '@/features/categories';
-import { getAttributesDropdown } from '@/lib/client/api/attributes';
+import {
+  getAttribute,
+  getAttributesDropdown,
+  getAttributeValues,
+  updateAttributeValue,
+} from '@/lib/client/api/attributes';
 import { createProductGroup } from '@/lib/client/api/products';
 import { clientRoutes } from '@/lib/client/routes';
 import type { AttributeDropdown } from '@/lib/domain/attributes/types';
@@ -28,17 +33,32 @@ vi.mock('@/lib/client/api/attributes', async () => ({
     '@/lib/client/api/attributes'
   )),
   getAttributesDropdown: vi.fn(),
+  getAttribute: vi.fn(),
+  getAttributeValues: vi.fn(),
+  updateAttributeValue: vi.fn(),
 }));
 
 const color: AttributeDropdown = {
   id: 1,
   name: 'Color',
   sortOrder: 0,
-  status: 'DRAFT',
+  status: 'ACTIVE',
   createdAt: '2026-10-21T00:00:00Z',
   attributeValues: [
-    { id: 11, name: 'Blue', sortOrder: 0, createdAt: '2026-10-21T00:00:00Z' },
-    { id: 12, name: 'Red', sortOrder: 1, createdAt: '2026-10-21T00:00:00Z' },
+    {
+      id: 11,
+      name: 'Blue',
+      sortOrder: 0,
+      status: 'ACTIVE',
+      createdAt: '2026-10-21T00:00:00Z',
+    },
+    {
+      id: 12,
+      name: 'Red',
+      sortOrder: 1,
+      status: 'ACTIVE',
+      createdAt: '2026-10-21T00:00:00Z',
+    },
   ],
 };
 const material: AttributeDropdown = {
@@ -118,10 +138,72 @@ describe('New product creation design', () => {
     mocks.push.mockReset();
     vi.mocked(createProductGroup).mockReset();
     vi.mocked(getAttributesDropdown).mockReset();
+    vi.mocked(getAttribute).mockReset();
+    vi.mocked(getAttributeValues).mockReset();
+    vi.mocked(updateAttributeValue).mockReset();
     vi.mocked(getAttributesDropdown).mockResolvedValue({
       ok: true,
       data: [color, material],
     });
+  });
+
+  it.each([
+    'DRAFT',
+    'ACTIVE',
+  ] as const)('generates variants with the reviewed value name when its current status is %s', async (status) => {
+    const draft = { ...color.attributeValues[0], status: 'DRAFT' as const };
+    const renamed = { ...draft, name: 'Navy', status };
+    vi.mocked(getAttributesDropdown).mockResolvedValue({
+      ok: true,
+      data: [{ ...color, attributeValues: [draft, color.attributeValues[1]] }],
+    });
+    vi.mocked(getAttribute).mockResolvedValue({ ok: true, data: color });
+    vi.mocked(getAttributeValues).mockResolvedValue({
+      ok: true,
+      data: [renamed, color.attributeValues[1]],
+    });
+    vi.mocked(updateAttributeValue).mockResolvedValue({
+      ok: true,
+      data: { ...renamed, status: 'ACTIVE' },
+    });
+    const user = userEvent.setup();
+    setup();
+    await user.type(
+      screen.getByRole('textbox', { name: 'Product name' }),
+      'Shirt'
+    );
+    await user.click(screen.getByRole('button', { name: 'Select category' }));
+    await user.click(screen.getByRole('radio', { name: 'Multiple variants' }));
+    await addAttribute(user, 'Color');
+    await selectValues(user, { attribute: 'Color', values: ['Red'] });
+    await user.click(screen.getByRole('combobox', { name: 'Color values' }));
+    await user.click(screen.getByRole('option', { name: 'Blue Draft' }));
+    const dialog = await screen.findByRole('dialog', {
+      name:
+        status === 'ACTIVE'
+          ? 'Select attribute value'
+          : 'Activate attribute value?',
+    });
+    const confirm = within(dialog).getByRole('button', {
+      name: status === 'ACTIVE' ? 'Select value' : 'Activate and select',
+    });
+    await waitFor(() => expect(confirm).toBeEnabled());
+    expect(within(dialog).getByText('Navy')).toBeVisible();
+    await user.click(confirm);
+    await waitFor(() =>
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    );
+    expect(screen.getByRole('button', { name: 'Remove Navy' })).toBeVisible();
+    await user.click(screen.getByRole('button', { name: 'Review variants' }));
+    expect(
+      await screen.findByRole('button', { name: 'Show details: Shirt Navy' })
+    ).toBeVisible();
+    expect(
+      screen.getByRole('button', { name: 'Show details: Shirt Red' })
+    ).toBeVisible();
+    expect(
+      screen.queryByRole('button', { name: 'Show details: Shirt Blue' })
+    ).not.toBeInTheDocument();
   });
 
   it('adds and removes attributes only for the edited variant and submits the applied values', async () => {

@@ -1,15 +1,15 @@
-import { Button, Combobox, FieldHelperText } from '@ordero/ui';
+import { Button, FieldHelperText } from '@ordero/ui';
 import { useStore } from '@tanstack/react-form';
 import { useId, useState } from 'react';
-import { AttributesAsyncCombobox } from '@/features/attributes';
 import type { AttributeValue } from '@/lib/domain/attributes/types';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
 import { getAttributeValueSelections } from '../../add/CreateProduct';
 import { AttributeValuesRow } from '../../shared/ProductAttributeFields';
+import { ProductAttributesCombobox } from '../../shared/ProductAttributesCombobox';
+import { ProductAttributeValuesCombobox } from '../../shared/ProductAttributeValuesCombobox';
 import type { ProductAttributeValuesFieldProps } from './types';
 
 const getValueId = (value: AttributeValue) => String(value.id);
-const getValueLabel = (value: AttributeValue) => value.name;
 
 export const ProductAttributeValuesField = ({
   productVariantsGenerationForm,
@@ -76,7 +76,8 @@ export const ProductAttributeValuesField = ({
                         }}
                       >
                         <div className="min-w-0">
-                          <Combobox<AttributeValue>
+                          <ProductAttributeValuesCombobox
+                            attribute={attribute}
                             id={`${fieldId}-${attributeId}-values`}
                             aria-label={`${attribute.name} values`}
                             aria-describedby={
@@ -86,13 +87,28 @@ export const ProductAttributeValuesField = ({
                             }
                             autoFocus={focusAttributeId === attribute.id}
                             emptyText="No values found"
-                            getOptionLabel={getValueLabel}
-                            getOptionValue={getValueId}
                             invalid={Boolean(valuesError)}
                             multiple
                             name={`attributeValues[${attributeId}]`}
                             onBlur={valuesField.handleBlur}
                             onValueChange={(values) => {
+                              const valuesById = new Map(
+                                values.map((value) => [value.id, value])
+                              );
+                              attributesField.handleChange(
+                                attributes.map((item) =>
+                                  item.id === attribute.id
+                                    ? {
+                                        ...item,
+                                        attributeValues:
+                                          item.attributeValues.map(
+                                            (value) =>
+                                              valuesById.get(value.id) ?? value
+                                          ),
+                                      }
+                                    : item
+                                )
+                              );
                               valuesField.handleChange({
                                 ...valuesField.state.value,
                                 [attributeId]: values.map(getValueId),
@@ -118,7 +134,7 @@ export const ProductAttributeValuesField = ({
                         Attribute
                       </label>
                       <div className="min-w-0">
-                        <AttributesAsyncCombobox
+                        <ProductAttributesCombobox
                           aria-label="Attribute"
                           autoFocus
                           defaultOpen

@@ -41,7 +41,10 @@ export const useReviewProductCategory = (categoryId: number) => {
         category
       );
 
-      // Categories can also appear as parents and in children collections.
+      // Mark related caches stale: lists, dropdowns, and other category details
+      // may still show this category as Draft, including as a parent.
+      // Active queries refetch now; inactive queries refresh when used again.
+      // Exclude this category's exact detail query, already updated above.
       queryClient.invalidateQueries({
         queryKey: ['categories'],
         predicate: (query) =>

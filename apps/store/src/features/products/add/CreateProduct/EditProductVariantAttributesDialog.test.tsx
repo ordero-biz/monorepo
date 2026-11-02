@@ -1,6 +1,12 @@
-import { act, screen, within } from '@testing-library/react';
+import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { getAttributesDropdown } from '@/lib/client/api/attributes';
+import {
+  getAttribute,
+  getAttributesDropdown,
+  getAttributeValues,
+  updateAttribute,
+  updateAttributeValue,
+} from '@/lib/client/api/attributes';
 import type { AttributeDropdown } from '@/lib/domain/attributes/types';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { EditProductVariantAttributesDialog } from './EditProductVariantAttributesDialog';
@@ -11,27 +17,31 @@ vi.mock('@/lib/client/api/attributes', async () => ({
     '@/lib/client/api/attributes'
   )),
   getAttributesDropdown: vi.fn(),
+  getAttribute: vi.fn(),
+  getAttributeValues: vi.fn(),
+  updateAttribute: vi.fn(),
+  updateAttributeValue: vi.fn(),
 }));
 
 const colorAttribute: AttributeDropdown = {
   id: 1,
   name: 'Color',
   sortOrder: 0,
-  status: 'DRAFT',
+  status: 'ACTIVE',
   createdAt: '2026-09-04T12:00:00.000Z',
   attributeValues: [
     {
       id: 11,
       name: 'Blue',
       sortOrder: 0,
-      status: 'DRAFT',
+      status: 'ACTIVE',
       createdAt: '2026-09-04T12:00:00.000Z',
     },
     {
       id: 12,
       name: 'Red',
       sortOrder: 1,
-      status: 'DRAFT',
+      status: 'ACTIVE',
       createdAt: '2026-09-04T12:00:00.000Z',
     },
   ],
@@ -41,14 +51,14 @@ const materialAttribute: AttributeDropdown = {
   id: 2,
   name: 'Material',
   sortOrder: 1,
-  status: 'DRAFT',
+  status: 'ACTIVE',
   createdAt: '2026-09-04T12:00:00.000Z',
   attributeValues: [
     {
       id: 21,
       name: 'Cotton',
       sortOrder: 0,
-      status: 'DRAFT',
+      status: 'ACTIVE',
       createdAt: '2026-09-04T12:00:00.000Z',
     },
   ],
@@ -78,6 +88,142 @@ describe('EditProductVariantAttributesDialog', () => {
     vi.mocked(getAttributesDropdown).mockResolvedValue({
       ok: true,
       data: [colorAttribute, materialAttribute],
+    });
+  });
+
+  it.each([
+    false,
+    true,
+  ])('reviews a draft value without applying the editor (multiple=%s)', async (multiple) => {
+    const user = userEvent.setup();
+    const draftRed = {
+      ...colorAttribute.attributeValues[1],
+      status: 'DRAFT' as const,
+    };
+    const selectedAttribute = {
+      ...colorAttribute,
+      attributeValues: [colorAttribute.attributeValues[0], draftRed],
+    };
+    const reviewedRed = {
+      ...colorAttribute.attributeValues[1],
+      name: 'Crimson',
+    };
+    vi.mocked(getAttribute).mockResolvedValue({
+      ok: true,
+      data: colorAttribute,
+    });
+    vi.mocked(getAttributeValues).mockResolvedValue({
+      ok: true,
+      data: selectedAttribute.attributeValues,
+    });
+    vi.mocked(updateAttributeValue).mockResolvedValue({
+      ok: true,
+      data: reviewedRed,
+    });
+    const { onUpdate, onOpenChange } = setup({
+      attributes: [selectedAttribute],
+      allowMultipleValuesPerAttribute: multiple,
+    });
+    const input = screen.getByRole('combobox', { name: 'Color' });
+    await user.click(input);
+    await user.click(screen.getByRole('option', { name: 'Red Draft' }));
+    let review = await screen.findByRole('dialog', {
+      name: 'Activate attribute value?',
+    });
+    await user.click(within(review).getByRole('button', { name: 'Cancel' }));
+    await waitFor(() => expect(input).toHaveFocus());
+    expect(onUpdate).not.toHaveBeenCalled();
+    expect(onOpenChange).not.toHaveBeenCalled();
+    await user.click(input);
+    await user.click(screen.getByRole('option', { name: 'Red Draft' }));
+    review = await screen.findByRole('dialog', {
+      name: 'Activate attribute value?',
+    });
+    const confirm = within(review).getByRole('button', {
+      name: 'Activate and select',
+    });
+    await waitFor(() => expect(confirm).toBeEnabled());
+    await user.click(confirm);
+    await waitFor(() => expect(input).toHaveFocus());
+    expect(getDialog()).toBeVisible();
+    expect(onUpdate).not.toHaveBeenCalled();
+    expect(onOpenChange).not.toHaveBeenCalled();
+    if (multiple) {
+      expect(
+        screen.getByRole('button', { name: 'Remove Crimson' })
+      ).toBeVisible();
+    } else {
+      expect(input).toHaveValue('Crimson');
+    }
+    await user.click(screen.getByRole('button', { name: 'Apply changes' }));
+    expect(onUpdate).toHaveBeenCalledWith({
+      attributeValueIds: multiple ? [11, 12] : [12],
+      attributes: [
+        {
+          ...colorAttribute,
+          attributeValues: [colorAttribute.attributeValues[0], reviewedRed],
+        },
+      ],
+    });
+  });
+
+  it('reviews a draft inside the editor without applying or closing the parent dialog', async () => {
+    const user = userEvent.setup();
+    const draft = { ...materialAttribute, status: 'DRAFT' as const };
+    vi.mocked(getAttributesDropdown).mockResolvedValue({
+      ok: true,
+      data: [colorAttribute, draft],
+    });
+    vi.mocked(getAttribute).mockResolvedValue({ ok: true, data: draft });
+    vi.mocked(getAttributeValues).mockResolvedValue({
+      ok: true,
+      data: materialAttribute.attributeValues,
+    });
+    vi.mocked(updateAttribute).mockResolvedValue({
+      ok: true,
+      data: materialAttribute,
+    });
+    const { onUpdate, onOpenChange } = setup({ attributes: [colorAttribute] });
+    await user.click(screen.getByRole('button', { name: 'Add attribute' }));
+    await user.click(
+      await screen.findByRole('option', { name: 'Material Draft' })
+    );
+    let review = await screen.findByRole('dialog', {
+      name: 'Activate attribute?',
+    });
+    await user.click(within(review).getByRole('button', { name: 'Cancel' }));
+    await waitFor(() =>
+      expect(
+        screen.queryByRole('dialog', { name: 'Activate attribute?' })
+      ).not.toBeInTheDocument()
+    );
+    expect(getDialog()).toBeVisible();
+    expect(onUpdate).not.toHaveBeenCalled();
+    expect(onOpenChange).not.toHaveBeenCalled();
+    const attributeInput = screen.getByRole('combobox', { name: 'Attribute' });
+    await waitFor(() => expect(attributeInput).toHaveFocus());
+    await user.click(attributeInput);
+    await user.click(
+      await screen.findByRole('option', { name: 'Material Draft' })
+    );
+    review = await screen.findByRole('dialog', { name: 'Activate attribute?' });
+    const confirm = within(review).getByRole('button', {
+      name: 'Activate and select',
+    });
+    await waitFor(() => expect(confirm).toBeEnabled());
+    await user.click(confirm);
+    const valuesInput = await screen.findByRole('combobox', {
+      name: 'Material',
+    });
+    await waitFor(() => expect(valuesInput).toHaveFocus());
+    expect(getDialog()).toBeVisible();
+    expect(onUpdate).not.toHaveBeenCalled();
+    expect(onOpenChange).not.toHaveBeenCalled();
+    await user.keyboard('{Escape}');
+    await user.click(screen.getByRole('button', { name: 'Apply changes' }));
+    expect(onUpdate).toHaveBeenCalledWith({
+      attributeValueIds: [11],
+      attributes: [colorAttribute, materialAttribute],
     });
   });
 

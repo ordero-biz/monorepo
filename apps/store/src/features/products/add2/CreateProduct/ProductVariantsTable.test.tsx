@@ -21,11 +21,23 @@ const attributes: AttributeDropdown[] = [
     id: 1,
     name: 'Color',
     sortOrder: 0,
-    status: 'DRAFT',
+    status: 'ACTIVE',
     createdAt: '2026-10-21T00:00:00Z',
     attributeValues: [
-      { id: 1, name: 'Blue', sortOrder: 0, createdAt: '2026-10-21T00:00:00Z' },
-      { id: 2, name: 'Red', sortOrder: 1, createdAt: '2026-10-21T00:00:00Z' },
+      {
+        id: 1,
+        name: 'Blue',
+        sortOrder: 0,
+        status: 'ACTIVE',
+        createdAt: '2026-10-21T00:00:00Z',
+      },
+      {
+        id: 2,
+        name: 'Red',
+        sortOrder: 1,
+        status: 'ACTIVE',
+        createdAt: '2026-10-21T00:00:00Z',
+      },
     ],
   },
 ];
