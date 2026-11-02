@@ -1,8 +1,10 @@
-import type { FocusEventHandler } from 'react';
-import type { AttributeDropdown } from '@/lib/domain/attributes/types';
 import type {
   ProductGenerationValues as BaseProductGenerationValues,
+  GeneratedProductVariantsProps,
   PRODUCT_GENERATION_MODE,
+  ProductCommonValues,
+  ProductVariantAttributesProps,
+  ProductVariantsCreationFormApi,
 } from '../../add/CreateProduct';
 import type { useProductVariantsGenerationForm } from './hooks/useProductVariantsGenerationForm';
 
@@ -40,11 +42,40 @@ export type ProductAttributeValuesFieldProps = {
   productVariantsGenerationForm: ProductVariantsGenerationFormApi;
 };
 
-export type AttributesAsyncComboboxProps = {
-  'aria-describedby': string;
-  id: string;
-  invalid?: boolean;
-  onAttributeSelected: (attribute: AttributeDropdown) => void;
-  onBlur: FocusEventHandler<HTMLInputElement>;
-  selectedAttributes: AttributeDropdown[];
+export type CommonProductDataProps = {
+  isEditing: boolean;
+  onEditingChange: (isEditing: boolean) => void;
+  values: ProductCommonValues;
+  variantCount: number;
+  editorErrors: ProductDetailsErrors;
+  onApply: (values: ProductCommonValues) => void;
+};
+
+export type ProductDetailsErrors = Partial<
+  Record<keyof ProductCommonValues, string>
+>;
+
+export type ProductDetailsEditorProps = {
+  initialValues: ProductCommonValues;
+  initialErrors: ProductDetailsErrors;
+  onApply: (values: ProductCommonValues) => void;
+  onCancel: () => void;
+};
+
+type ProductVariantFieldProps = {
+  form: ProductVariantsCreationFormApi;
+  variantIndex: number;
+};
+
+export type ProductVariantDetailsProps = ProductVariantAttributesProps;
+
+export type ProductVariantsTableProps = GeneratedProductVariantsProps;
+
+export type ProductVariantNameFieldProps = ProductVariantFieldProps;
+export type ProductVariantSkuFieldProps = ProductVariantFieldProps;
+export type ProductVariantBarcodeFieldProps = ProductVariantFieldProps;
+export type ProductVariantStatusFieldProps = ProductVariantFieldProps;
+
+export type GetColumnsArgs = {
+  form: ProductVariantsCreationFormApi;
 };

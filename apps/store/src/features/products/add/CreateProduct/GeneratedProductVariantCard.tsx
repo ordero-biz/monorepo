@@ -1,20 +1,11 @@
-import {
-  Accordion,
-  Chip,
-  FieldHelperText,
-  FieldLabel,
-  IconButton,
-  Textarea,
-  TextField,
-} from '@ordero/ui';
+import { Accordion, Textarea, TextField } from '@ordero/ui';
 import { useStore } from '@tanstack/react-form';
-import { Pencil, Plus } from 'lucide-react';
 import { memo, useState } from 'react';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
 import { ProductImageDropzone } from './ProductImageDropzone';
 import { ProductStatusSelector } from './ProductStatusSelector';
+import { ProductVariantAttributes } from './ProductVariantAttributes';
 import type { GeneratedProductVariantCardProps } from './types';
-import { getProductVariantAttributeValues } from './utils/productGeneration';
 import { validateProductStatus } from './utils/validations';
 
 export const GeneratedProductVariantCard = memo(
@@ -180,94 +171,14 @@ export const GeneratedProductVariantCard = memo(
                     </div>
                   </div>
 
-                  <productVariantsCreationForm.Field
-                    name={
-                      `productVariants[${variantIndex}].attributeValueIds` as const
-                    }
-                  >
-                    {(attributeValueIdsField) => {
-                      const validationErrorText = getFieldSubmitChangeErrorText(
-                        attributeValueIdsField.state.meta,
-                        submissionAttempts
-                      );
-                      const hasNoAttributeValues =
-                        attributeValueIdsField.state.value.length === 0;
-                      const errorText =
-                        validationErrorText ??
-                        (requireAttributeValueIds && hasNoAttributeValues
-                          ? 'Select at least one attribute value'
-                          : undefined);
-                      const selectedAttributeValues =
-                        getProductVariantAttributeValues(
-                          attributes,
-                          attributeValueIdsField.state.value
-                        );
-
-                      return attributes.length > 0 ? (
-                        <div className="flex flex-col gap-[var(--space-0-5)]">
-                          <FieldLabel
-                            as="span"
-                            invalid={Boolean(errorText)}
-                            required={requireAttributeValueIds}
-                          >
-                            Attributes
-                          </FieldLabel>
-                          <div
-                            aria-label={`Attributes for ${productVariantName}`}
-                            className="flex flex-wrap items-center gap-[var(--space-1)]"
-                            role="treegrid"
-                          >
-                            {selectedAttributeValues.map((attributeValue) => (
-                              <Chip
-                                aria-label={attributeValue.name}
-                                key={attributeValue.id}
-                                onDelete={() => {
-                                  attributeValueIdsField.handleChange(
-                                    attributeValueIdsField.state.value.filter(
-                                      (selectedAttributeValueId) =>
-                                        selectedAttributeValueId !==
-                                        attributeValue.id
-                                    )
-                                  );
-                                }}
-                                size="s"
-                                variant="soft"
-                              >
-                                {attributeValue.name}
-                              </Chip>
-                            ))}
-                            {selectedAttributeValues.length === 0 ? (
-                              <IconButton
-                                aria-label={`Add attributes for ${productVariantName}`}
-                                onClick={() => onEditAttributes(variantIndex)}
-                                size="xs"
-                                title={`Add attributes for ${productVariantName}`}
-                                type="button"
-                              >
-                                <Plus aria-hidden="true" />
-                              </IconButton>
-                            ) : null}
-                            {selectedAttributeValues.length > 0 ? (
-                              <IconButton
-                                aria-label={`Edit attributes for ${productVariantName}`}
-                                onClick={() => onEditAttributes(variantIndex)}
-                                size="xs"
-                                title={`Edit attributes for ${productVariantName}`}
-                                type="button"
-                              >
-                                <Pencil aria-hidden="true" />
-                              </IconButton>
-                            ) : null}
-                          </div>
-                          {errorText ? (
-                            <FieldHelperText invalid>
-                              {errorText}
-                            </FieldHelperText>
-                          ) : null}
-                        </div>
-                      ) : null;
-                    }}
-                  </productVariantsCreationForm.Field>
+                  <ProductVariantAttributes
+                    attributes={attributes}
+                    productVariantsCreationForm={productVariantsCreationForm}
+                    onEditAttributes={onEditAttributes}
+                    requireAttributeValueIds={requireAttributeValueIds}
+                    variantIndex={variantIndex}
+                    productVariantName={productVariantName}
+                  />
                 </div>
               </Accordion.Panel>
             </Accordion.Item>

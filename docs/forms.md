@@ -97,6 +97,10 @@ by several workflows.
 
 ## Validation & UX Model
 
+For entering an inline editor and returning focus to its trigger, use the
+store app's [accessibility focus hooks](accessibility-focus.md). Keep focus
+movement separate from form validation and editor open/close decisions.
+
 To ensure a calmer, less intrusive user experience, implement this validation visibility model:
 
 - **Do not show client validation errors on the first keystroke.**

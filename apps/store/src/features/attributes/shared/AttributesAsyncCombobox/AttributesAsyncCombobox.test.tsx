@@ -1,4 +1,4 @@
-import { act, screen, waitFor } from '@testing-library/react';
+import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getAttributesDropdown } from '@/lib/client/api/attributes';
 import type { AttributeDropdown } from '@/lib/domain/attributes/types';
@@ -66,13 +66,52 @@ describe('AttributesAsyncCombobox', () => {
     });
   };
 
+  it('shows draft status like categories and keeps single selection labels plain', async () => {
+    const user = userEvent.setup();
+    getAttributesDropdownMock.mockResolvedValue({
+      ok: true,
+      data: [color, { ...material, status: 'ACTIVE' }],
+    });
+    const { onValueChange } = setup({ multiple: false });
+    const input = screen.getByRole('combobox', { name: 'Attributes' });
+    await user.click(input);
+    const draftOption = await screen.findByRole('option', { name: /^Color\b/ });
+    expect(within(draftOption).getByText('Draft')).toBeVisible();
+    expect(
+      within(screen.getByRole('option', { name: 'Material' })).queryByText(
+        'Draft'
+      )
+    ).not.toBeInTheDocument();
+    await user.click(draftOption);
+    expect(onValueChange).toHaveBeenCalledWith(color, expect.any(Object));
+    expect(input).toHaveValue('Color');
+  });
+
+  it('disables excluded attributes without preventing selection of other attributes', async () => {
+    const user = userEvent.setup();
+    mockSuccessfulAttributes();
+    const { onValueChange } = setup({
+      multiple: false,
+      disabledAttributeIds: [color.id],
+    });
+    await user.click(screen.getByRole('combobox', { name: 'Attributes' }));
+    const disabledOption = await screen.findByRole('option', {
+      name: /^Color\b/,
+    });
+    expect(disabledOption).toHaveAttribute('aria-disabled', 'true');
+    await user.click(disabledOption);
+    expect(onValueChange).not.toHaveBeenCalled();
+    await user.click(screen.getByRole('option', { name: /^Material\b/ }));
+    expect(onValueChange).toHaveBeenCalledWith(material, expect.any(Object));
+  });
+
   it('emits selected objects with their nested attribute values', async () => {
     const user = userEvent.setup();
     mockSuccessfulAttributes();
     setup();
     await user.click(screen.getByRole('combobox', { name: 'Attributes' }));
-    await user.click(await screen.findByRole('option', { name: 'Color' }));
-    await user.click(screen.getByRole('option', { name: 'Material' }));
+    await user.click(await screen.findByRole('option', { name: /^Color\b/ }));
+    await user.click(screen.getByRole('option', { name: /^Material\b/ }));
     expect(getAttributesDropdownMock).toHaveBeenCalledWith();
     expect(mocks.onValueChange).toHaveBeenLastCalledWith(
       [color, material],
@@ -110,7 +149,9 @@ describe('AttributesAsyncCombobox', () => {
     setup({ defaultValue: [color] });
     expect(screen.getByRole('button', { name: 'Remove Color' })).toBeVisible();
     await user.click(screen.getByRole('combobox', { name: 'Attributes' }));
-    await user.click(await screen.findByRole('option', { name: 'Material' }));
+    await user.click(
+      await screen.findByRole('option', { name: /^Material\b/ })
+    );
     expect(mocks.onValueChange).toHaveBeenLastCalledWith(
       [color, material],
       expect.any(Object)
@@ -123,7 +164,7 @@ describe('AttributesAsyncCombobox', () => {
     const { queryClient } = setup({ value: [{ ...color }] });
     await user.click(screen.getByRole('combobox', { name: 'Attributes' }));
     expect(
-      await screen.findByRole('option', { name: 'Color' })
+      await screen.findByRole('option', { name: /^Color\b/ })
     ).toHaveAttribute('aria-selected', 'true');
     const refreshedColor = {
       ...color,
@@ -145,7 +186,7 @@ describe('AttributesAsyncCombobox', () => {
     ).toBeVisible();
     expect(mocks.onValueChange).not.toHaveBeenCalled();
     await user.click(screen.getByRole('combobox', { name: 'Attributes' }));
-    await user.click(screen.getByRole('option', { name: 'Material' }));
+    await user.click(screen.getByRole('option', { name: /^Material\b/ }));
     expect(mocks.onValueChange).toHaveBeenLastCalledWith(
       [refreshedColor, material],
       expect.any(Object)

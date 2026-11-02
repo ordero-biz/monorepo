@@ -1,14 +1,15 @@
-import { Button, Combobox, FieldHelperText } from '@ordero/ui';
+import { Button, FieldHelperText } from '@ordero/ui';
 import { useStore } from '@tanstack/react-form';
 import { useId, useState } from 'react';
 import type { AttributeValue } from '@/lib/domain/attributes/types';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
 import { getAttributeValueSelections } from '../../add/CreateProduct';
-import { AttributesAsyncCombobox } from './AttributesAsyncCombobox';
+import { AttributeValuesRow } from '../../shared/ProductAttributeFields';
+import { ProductAttributesCombobox } from '../../shared/ProductAttributesCombobox';
+import { ProductAttributeValuesCombobox } from '../../shared/ProductAttributeValuesCombobox';
 import type { ProductAttributeValuesFieldProps } from './types';
 
 const getValueId = (value: AttributeValue) => String(value.id);
-const getValueLabel = (value: AttributeValue) => value.name;
 
 export const ProductAttributeValuesField = ({
   productVariantsGenerationForm,
@@ -53,24 +54,30 @@ export const ProductAttributeValuesField = ({
                       valuesField.state.value[attributeId] ?? [];
 
                     return (
-                      <section
-                        aria-labelledby={`attribute-${attributeId}-heading`}
-                        className={`grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-[var(--space-1)] rounded-[var(--radius)] border border-border p-[var(--space-1-5)] transition-colors md:grid-cols-[var(--space-18)_minmax(0,1fr)_auto] ${selectedIds.length === 0 ? 'bg-[var(--color-primary-8)]' : 'bg-card'}`}
+                      <AttributeValuesRow
                         key={attribute.id}
+                        attributeName={attribute.name}
+                        inputId={`${fieldId}-${attributeId}-values`}
+                        hintId={`${fieldId}-${attributeId}-hint`}
+                        empty={selectedIds.length === 0}
+                        multiple
+                        onRemove={() => {
+                          const remainingAttributes = attributes.filter(
+                            (item) => item.id !== attribute.id
+                          );
+                          attributesField.handleChange(remainingAttributes);
+                          valuesField.handleChange(
+                            getAttributeValueSelections(
+                              valuesField.state.value,
+                              remainingAttributes
+                            )
+                          );
+                          setAnnouncement(`${attribute.name} removed.`);
+                        }}
                       >
-                        <h4
-                          className="col-span-2 min-w-0 break-words font-semibold md:col-span-1"
-                          id={`attribute-${attributeId}-heading`}
-                        >
-                          <label
-                            className="cursor-pointer"
-                            htmlFor={`${fieldId}-${attributeId}-values`}
-                          >
-                            {attribute.name}
-                          </label>
-                        </h4>
                         <div className="min-w-0">
-                          <Combobox<AttributeValue>
+                          <ProductAttributeValuesCombobox
+                            attribute={attribute}
                             id={`${fieldId}-${attributeId}-values`}
                             aria-label={`${attribute.name} values`}
                             aria-describedby={
@@ -80,13 +87,28 @@ export const ProductAttributeValuesField = ({
                             }
                             autoFocus={focusAttributeId === attribute.id}
                             emptyText="No values found"
-                            getOptionLabel={getValueLabel}
-                            getOptionValue={getValueId}
                             invalid={Boolean(valuesError)}
                             multiple
                             name={`attributeValues[${attributeId}]`}
                             onBlur={valuesField.handleBlur}
                             onValueChange={(values) => {
+                              const valuesById = new Map(
+                                values.map((value) => [value.id, value])
+                              );
+                              attributesField.handleChange(
+                                attributes.map((item) =>
+                                  item.id === attribute.id
+                                    ? {
+                                        ...item,
+                                        attributeValues:
+                                          item.attributeValues.map(
+                                            (value) =>
+                                              valuesById.get(value.id) ?? value
+                                          ),
+                                      }
+                                    : item
+                                )
+                              );
                               valuesField.handleChange({
                                 ...valuesField.state.value,
                                 [attributeId]: values.map(getValueId),
@@ -99,40 +121,7 @@ export const ProductAttributeValuesField = ({
                             )}
                           />
                         </div>
-                        <Button
-                          aria-label={`Remove ${attribute.name} attribute`}
-                          color="inherit"
-                          onClick={() => {
-                            const remainingAttributes = attributes.filter(
-                              (item) => item.id !== attribute.id
-                            );
-                            attributesField.handleChange(remainingAttributes);
-                            valuesField.handleChange(
-                              getAttributeValueSelections(
-                                valuesField.state.value,
-                                remainingAttributes
-                              )
-                            );
-                            setAnnouncement(`${attribute.name} removed.`);
-                          }}
-                          size="s"
-                          type="button"
-                          variant="text"
-                        >
-                          Remove
-                        </Button>
-                        {selectedIds.length === 0 ? (
-                          <div className="col-span-2 md:col-span-1 md:col-start-2">
-                            <FieldHelperText
-                              as="p"
-                              id={`${fieldId}-${attributeId}-hint`}
-                            >
-                              Choose one or more {attribute.name.toLowerCase()}{' '}
-                              values
-                            </FieldHelperText>
-                          </div>
-                        ) : null}
-                      </section>
+                      </AttributeValuesRow>
                     );
                   })}
 
@@ -145,11 +134,18 @@ export const ProductAttributeValuesField = ({
                         Attribute
                       </label>
                       <div className="min-w-0">
-                        <AttributesAsyncCombobox
+                        <ProductAttributesCombobox
+                          aria-label="Attribute"
+                          autoFocus
+                          defaultOpen
+                          name="attributes"
+                          size="s"
+                          value={null}
                           id={`${fieldId}-new-attribute`}
                           aria-describedby={`${fieldId}-new-attribute-hint`}
                           invalid={Boolean(attributesError)}
-                          onAttributeSelected={(attribute) => {
+                          onValueChange={(attribute) => {
+                            if (!attribute) return;
                             if (
                               attributes.some(
                                 (item) => item.id === attribute.id
@@ -172,7 +168,9 @@ export const ProductAttributeValuesField = ({
                             );
                           }}
                           onBlur={attributesField.handleBlur}
-                          selectedAttributes={attributes}
+                          disabledAttributeIds={attributes.map(
+                            (attribute) => attribute.id
+                          )}
                         />
                       </div>
                       <Button

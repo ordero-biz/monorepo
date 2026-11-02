@@ -5,12 +5,17 @@ import { GeneratedProductVariants } from './GeneratedProductVariants';
 import type { ProductVariantsCreationFormProps } from './types';
 
 export const ProductVariantsCreationForm = ({
+  commonProductFields,
+  variantFields,
+  isEditingProductDetails = false,
   productVariantsCreationForm,
   generatedAttributes,
   generationMode,
 }: ProductVariantsCreationFormProps) => {
   const handleSubmit = () => {
-    productVariantsCreationForm.handleSubmit();
+    if (!isEditingProductDetails) {
+      productVariantsCreationForm.handleSubmit();
+    }
   };
 
   return (
@@ -22,14 +27,18 @@ export const ProductVariantsCreationForm = ({
         handleSubmit();
       }}
     >
-      <CommonProductFields
-        productVariantsCreationForm={productVariantsCreationForm}
-      />
-      <GeneratedProductVariants
-        productVariantsCreationForm={productVariantsCreationForm}
-        generatedAttributes={generatedAttributes}
-        generationMode={generationMode}
-      />
+      {commonProductFields ?? (
+        <CommonProductFields
+          productVariantsCreationForm={productVariantsCreationForm}
+        />
+      )}
+      {variantFields ?? (
+        <GeneratedProductVariants
+          productVariantsCreationForm={productVariantsCreationForm}
+          generatedAttributes={generatedAttributes}
+          generationMode={generationMode}
+        />
+      )}
       <productVariantsCreationForm.Subscribe
         selector={(state) => state.values.productVariants.length}
       >
@@ -42,8 +51,8 @@ export const ProductVariantsCreationForm = ({
                   <ContextualActionBar.Left>
                     <Typography variant="body2">
                       {productVariantCount === 1
-                        ? '1 product variant ready'
-                        : `${productVariantCount} product variants ready`}
+                        ? 'You’re creating 1 product with 1 variant'
+                        : `You’re creating 1 product with ${productVariantCount} variants`}
                     </Typography>
                   </ContextualActionBar.Left>
                   <ContextualActionBar.Right>
@@ -53,7 +62,7 @@ export const ProductVariantsCreationForm = ({
                       {(isSubmitting) => (
                         <Button
                           color="primary"
-                          disabled={isSubmitting}
+                          disabled={isSubmitting || isEditingProductDetails}
                           onClick={handleSubmit}
                           size="m"
                           type="button"

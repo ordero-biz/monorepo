@@ -84,6 +84,71 @@ describe('DataTable', () => {
     },
   });
 
+  it('expands details with the keyboard and preserves edits when kept mounted', async () => {
+    const user = userEvent.setup();
+    setup({
+      getRowId: (row) => row.id,
+      selection: {},
+      rowDetails: {
+        getLabel: (row: InvoiceRow) => `Details for ${row.id}`,
+        keepMounted: true,
+        render: (row) => <input aria-label={`Note for ${row.id}`} />,
+      },
+    });
+    const toggle = screen.getByRole('button', {
+      name: 'Show details: Details for INV-001',
+    });
+    expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    expect(toggle).toHaveTextContent('Show details');
+    expect(
+      screen.queryByRole('textbox', { name: 'Note for INV-001' })
+    ).not.toBeInTheDocument();
+    toggle.focus();
+    await user.keyboard('{Enter}');
+    expect(toggle).toHaveAttribute('aria-expanded', 'true');
+    expect(toggle).toHaveTextContent('Hide details');
+    const details = screen.getByRole('region', { name: 'Details for INV-001' });
+    expect(details).toBeVisible();
+    await user.type(within(details).getByRole('textbox'), 'Keep this note');
+    await user.click(toggle);
+    expect(
+      screen.queryByRole('region', { name: 'Details for INV-001' })
+    ).not.toBeInTheDocument();
+    await user.click(toggle);
+    expect(
+      screen.getByRole('textbox', { name: 'Note for INV-001' })
+    ).toHaveValue('Keep this note');
+    expect(
+      screen.getByRole('checkbox', { name: 'Select row 1' })
+    ).not.toBeChecked();
+  });
+
+  it('reports controlled expansion without changing it until the parent updates', async () => {
+    const user = userEvent.setup();
+    const { rowDetails } = setup({
+      getRowId: (row: InvoiceRow) => row.id,
+      rowDetails: {
+        expandedRows: { 'INV-002': true },
+        onExpandedRowsChange: vi.fn(),
+        getLabel: (row: InvoiceRow) => `Details for ${row.id}`,
+        render: (row: InvoiceRow) => `Invoice ${row.id} details`,
+      },
+    });
+    expect(
+      screen.getByRole('region', { name: 'Details for INV-002' })
+    ).toBeVisible();
+    await user.click(
+      screen.getByRole('button', { name: 'Show details: Details for INV-001' })
+    );
+    expect(rowDetails?.onExpandedRowsChange).toHaveBeenCalledWith({
+      'INV-002': true,
+      'INV-001': true,
+    });
+    expect(
+      screen.queryByRole('region', { name: 'Details for INV-001' })
+    ).not.toBeInTheDocument();
+  });
+
   it('renders the configured headers and custom cell content', () => {
     setup({
       columns: [
@@ -118,6 +183,22 @@ describe('DataTable', () => {
     });
 
     expect(screen.getByText('Nothing to show here.')).toBeInTheDocument();
+  });
+
+  it('supports a heading and description above an empty table', () => {
+    setup({
+      data: [],
+      header: (
+        <div>
+          <h2>Invoices</h2>
+          <p>Review your invoices.</p>
+        </div>
+      ),
+    });
+
+    expect(screen.getByRole('heading', { name: 'Invoices' })).toBeVisible();
+    expect(screen.getByText('Review your invoices.')).toBeVisible();
+    expect(screen.getByText('No results.')).toBeVisible();
   });
 
   it('renders standalone footer content without pagination', () => {
