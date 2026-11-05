@@ -66,6 +66,26 @@ export type SidebarNavigationProps = {
   ref?: Ref<HTMLDivElement>;
 };
 
+export type SidebarNavigationContextValue = {
+  collapsed: boolean;
+  /** True when a provider manages the collapsed state and a toggle is shown. */
+  collapsible: boolean;
+  setCollapsed: (collapsed: boolean) => void;
+  toggleCollapsed: () => void;
+};
+
+export type SidebarNavigationProviderProps = {
+  children: ReactNode;
+  collapsed?: boolean;
+  defaultCollapsed?: boolean;
+  onCollapsedChange?: (collapsed: boolean) => void;
+};
+
+export type SidebarNavigationToggleProps = {
+  collapseLabel?: string;
+  expandLabel?: string;
+};
+
 export type SidebarNavigationHeaderProps = {
   children: ReactNode;
 };

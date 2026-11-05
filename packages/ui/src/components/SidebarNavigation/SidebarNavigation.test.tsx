@@ -7,6 +7,7 @@ import {
   SidebarNavigationContent,
   SidebarNavigationFooter,
   SidebarNavigationHeader,
+  SidebarNavigationProvider,
   SidebarNavigationSections,
 } from './index';
 import type { SidebarNavigationSectionConfig } from './types';
@@ -506,5 +507,96 @@ describe('SidebarNavigation', () => {
       'href',
       '/app/orders'
     );
+  });
+
+  describe('collapse', () => {
+    const collapseSections: SidebarNavigationSectionConfig[] = [
+      {
+        id: 'overview',
+        label: 'Overview',
+        collapsible: true,
+        items: [
+          {
+            id: 'dashboard',
+            kind: 'link',
+            label: 'Dashboard',
+            href: '/dashboard',
+            icon: <LayoutDashboard aria-hidden="true" />,
+          },
+          {
+            id: 'product',
+            kind: 'collapse',
+            label: 'Product',
+            icon: <Package aria-hidden="true" />,
+            items: [
+              {
+                id: 'category',
+                kind: 'link',
+                label: 'Category',
+                href: '/category',
+              },
+            ],
+          },
+        ],
+      },
+    ];
+
+    const renderWithProvider = (defaultCollapsed = false) =>
+      render(
+        <SidebarNavigationProvider defaultCollapsed={defaultCollapsed}>
+          <SidebarNavigation id="test-sidebar">
+            <SidebarNavigationContent>
+              <SidebarNavigationSections sections={collapseSections} />
+            </SidebarNavigationContent>
+          </SidebarNavigation>
+        </SidebarNavigationProvider>
+      );
+
+    it('does not render a toggle without a provider', () => {
+      setup();
+
+      expect(
+        screen.queryByRole('button', { name: 'Collapse sidebar' })
+      ).not.toBeInTheDocument();
+    });
+
+    it('toggles the collapsed state with the edge button', async () => {
+      const user = userEvent.setup();
+
+      renderWithProvider();
+
+      const sidebar = screen.getByRole('complementary');
+      expect(sidebar).toHaveAttribute('data-collapsed', 'false');
+
+      await user.click(
+        screen.getByRole('button', { name: 'Collapse sidebar' })
+      );
+
+      expect(sidebar).toHaveAttribute('data-collapsed', 'true');
+      expect(document.cookie).toContain('sidebar_navigation_collapsed=true');
+
+      await user.click(screen.getByRole('button', { name: 'Expand sidebar' }));
+
+      expect(sidebar).toHaveAttribute('data-collapsed', 'false');
+    });
+
+    it('keeps links reachable and opens branch children in a popover when collapsed', async () => {
+      const user = userEvent.setup();
+
+      renderWithProvider(true);
+
+      expect(
+        screen.getByRole('link', { name: 'Dashboard' })
+      ).toBeInTheDocument();
+      expect(
+        screen.queryByRole('link', { name: 'Category' })
+      ).not.toBeInTheDocument();
+
+      await user.click(screen.getByRole('button', { name: 'Product' }));
+
+      expect(
+        await screen.findByRole('link', { name: 'Category' })
+      ).toBeInTheDocument();
+    });
   });
 });

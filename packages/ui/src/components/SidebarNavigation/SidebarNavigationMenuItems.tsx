@@ -1,17 +1,28 @@
 import { Accordion } from '@base-ui/react/accordion';
 import { Button as ButtonPrimitive } from '@base-ui/react/button';
+import { Popover } from '@base-ui/react/popover';
+import { Tooltip } from '@base-ui/react/tooltip';
 import { ChevronDown } from 'lucide-react';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { type ReactElement, useEffect, useMemo, useRef, useState } from 'react';
 import { cn } from '@/ui/lib/utils';
 import {
   accordionPanelClassName,
   accordionPanelContentClassName,
+  collapsedHiddenClassName,
+  collapsedRemovedClassName,
   iconSlotClassName,
   itemLabelClassName,
   nestedItemClassName,
   nestedItemWrapperClassName,
   nestedListContainerClassName,
+  popoverPopupClassName,
+  popoverTitleClassName,
+  tooltipPopupClassName,
 } from './classNames';
+import {
+  SidebarNavigationExpandedScope,
+  useSidebarNavigation,
+} from './SidebarNavigationProvider';
 import type {
   SidebarNavigationCollapseItem,
   SidebarNavigationItem,
@@ -97,6 +108,7 @@ const SidebarNavigationItemContent = ({
       <span
         className={cn(
           itemLabelClassName,
+          collapsedHiddenClassName,
           branchActive
             ? 'font-[var(--nav-item-active-weight)]'
             : 'font-[var(--nav-item-weight)]'
@@ -105,12 +117,20 @@ const SidebarNavigationItemContent = ({
         {item.label}
       </span>
       {item.badge ? (
-        <span className="ml-[var(--space-1)] shrink-0">{item.badge}</span>
+        <span
+          className={cn(
+            'ml-[var(--space-1)] shrink-0',
+            collapsedRemovedClassName
+          )}
+        >
+          {item.badge}
+        </span>
       ) : null}
       {item.kind === 'collapse' ? (
         <span
           className={cn(
             'ml-[var(--space-1)] flex size-[var(--space-2)] shrink-0 items-center justify-center transition-transform duration-150 motion-reduce:transition-none',
+            collapsedRemovedClassName,
             isOpen && 'rotate-180'
           )}
         >
@@ -181,6 +201,89 @@ const SidebarNavigationLeafItem = ({
   });
 };
 
+const SidebarNavigationCollapsedTooltip = ({
+  children,
+  label,
+}: {
+  children: ReactElement;
+  label: string;
+}) => (
+  <Tooltip.Root>
+    <Tooltip.Trigger
+      render={
+        <div
+          className="w-full"
+          data-slot="sidebar-navigation-tooltip-trigger"
+        />
+      }
+    >
+      {children}
+    </Tooltip.Trigger>
+    <Tooltip.Portal>
+      <Tooltip.Positioner side="right" sideOffset={20}>
+        <Tooltip.Popup className={tooltipPopupClassName}>{label}</Tooltip.Popup>
+      </Tooltip.Positioner>
+    </Tooltip.Portal>
+  </Tooltip.Root>
+);
+
+const SidebarNavigationCollapsedBranch = ({
+  item,
+  renderLink,
+  rootLabel,
+}: {
+  item: SidebarNavigationCollapseItem;
+  renderLink?: SidebarNavigationRenderLink;
+  rootLabel: string;
+}) => {
+  const [open, setOpen] = useState(false);
+  const branchActive = isItemBranchActive(item);
+
+  return (
+    <Popover.Root onOpenChange={setOpen} open={open}>
+      <Popover.Trigger
+        aria-label={item.label}
+        className={getItemClassName({
+          active: branchActive,
+          depth: 0,
+          disabled: Boolean(item.disabled),
+        })}
+        data-slot="sidebar-navigation-collapsed-branch"
+        disabled={item.disabled}
+      >
+        <SidebarNavigationItemContent item={item} />
+      </Popover.Trigger>
+      <Popover.Portal>
+        <Popover.Positioner align="start" side="right" sideOffset={20}>
+          <Popover.Popup
+            aria-label={`${item.label} submenu`}
+            className={popoverPopupClassName}
+            // Close the popover once a link inside it is followed.
+            onClick={(event) => {
+              if ((event.target as HTMLElement).closest('a[href]')) {
+                setOpen(false);
+              }
+            }}
+          >
+            <div aria-hidden="true" className={popoverTitleClassName}>
+              {item.label}
+            </div>
+            <SidebarNavigationExpandedScope>
+              <SidebarNavigationMenuItems
+                depth={0}
+                items={item.items}
+                labelPath={[item.label]}
+                renderLink={renderLink}
+                rootLabel={rootLabel}
+              />
+            </SidebarNavigationExpandedScope>
+          </Popover.Popup>
+        </Popover.Positioner>
+      </Popover.Portal>
+    </Popover.Root>
+  );
+};
+
 export const SidebarNavigationMenuItems = ({
   depth,
   items,
@@ -188,6 +291,7 @@ export const SidebarNavigationMenuItems = ({
   renderLink,
   rootLabel,
 }: SidebarNavigationMenuItemsProps) => {
+  const { collapsed } = useSidebarNavigation();
   const { expandedItemIds, navigationStateKey } = useMemo(() => {
     const activeItemIds = getActiveItemIds(items);
     const expandedItemIds = getExpandedItemIds(items);
@@ -230,6 +334,28 @@ export const SidebarNavigationMenuItems = ({
     >
       {items.map((item) => {
         const branchActive = isItemBranchActive(item);
+
+        if (depth === 0 && collapsed) {
+          return (
+            <li data-slot="sidebar-navigation-menu-item" key={item.id}>
+              {item.kind === 'collapse' ? (
+                <SidebarNavigationCollapsedBranch
+                  item={item}
+                  renderLink={renderLink}
+                  rootLabel={rootLabel}
+                />
+              ) : (
+                <SidebarNavigationCollapsedTooltip label={item.label}>
+                  <SidebarNavigationLeafItem
+                    depth={depth}
+                    item={item}
+                    renderLink={renderLink}
+                  />
+                </SidebarNavigationCollapsedTooltip>
+              )}
+            </li>
+          );
+        }
 
         if (item.kind !== 'collapse') {
           if (depth === 0) {

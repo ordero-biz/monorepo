@@ -17,6 +17,7 @@ import {
   SidebarNavigationContent,
   SidebarNavigationFooter,
   SidebarNavigationHeader,
+  SidebarNavigationProvider,
   SidebarNavigationSections,
   type SidebarNavigationSectionConfig,
 } from '@/ui/components/SidebarNavigation';
@@ -238,6 +239,31 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {};
+
+export const Collapsible: Story = {
+  render: () => (
+    <SidebarNavigationProvider>
+      <SidebarNavigation id="collapsible-sidebar">
+        <SidebarNavigationHeader>
+          <div className="flex items-center gap-[var(--space-1)] px-[var(--space-1-5)]">
+            <div className="flex size-[32px] shrink-0 items-center justify-center rounded-[var(--radius-50-token)] bg-primary text-primary-foreground">
+              <Package className="size-4" />
+            </div>
+            <span className="whitespace-nowrap text-[length:var(--subtitle1-size-desktop)] leading-[var(--subtitle1-line-height-desktop)] font-[var(--subtitle1-weight)] text-[var(--text-primary)] transition-opacity duration-200 group-data-[collapsed=true]/sidebar-navigation:opacity-0">
+              Ordero
+            </span>
+          </div>
+        </SidebarNavigationHeader>
+        <SidebarNavigationContent>
+          <SidebarNavigationSections sections={sections} />
+        </SidebarNavigationContent>
+      </SidebarNavigation>
+      <main className="flex-1 p-[var(--space-3)]">
+        Press the edge button to collapse the sidebar.
+      </main>
+    </SidebarNavigationProvider>
+  ),
+};
 
 export const WithoutHeaderOrFooter: Story = {
   args: {

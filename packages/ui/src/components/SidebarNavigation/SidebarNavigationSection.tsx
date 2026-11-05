@@ -10,6 +10,7 @@ import {
   sectionLabelClassName,
   sectionRootClassName,
 } from './classNames';
+import { useSidebarNavigation } from './SidebarNavigationProvider';
 import type { SidebarNavigationSectionProps } from './types';
 import { toAccordionItemIds } from './utils';
 
@@ -30,11 +31,13 @@ export const SidebarNavigationSection = ({
     setOpenSectionIds(defaultExpanded ? [id] : []);
   }, [defaultExpanded, id]);
 
+  const { collapsed } = useSidebarNavigation();
+
   if (hidden) {
     return null;
   }
 
-  if (!collapsible || !label) {
+  if (!collapsible || !label || collapsed) {
     return (
       <section
         className={sectionRootClassName}
@@ -42,7 +45,18 @@ export const SidebarNavigationSection = ({
         id={id}
         ref={ref}
       >
-        {label ? <div className={sectionLabelClassName}>{label}</div> : null}
+        {label ? (
+          <div
+            aria-hidden={collapsed ? true : undefined}
+            className={cn(
+              sectionLabelClassName,
+              'whitespace-nowrap',
+              collapsed && 'invisible'
+            )}
+          >
+            {label}
+          </div>
+        ) : null}
         {children}
       </section>
     );
