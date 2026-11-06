@@ -12,15 +12,15 @@ import {
 import {
   PRODUCT_GENERATION_MODE,
   type ProductCommonValues,
-  ProductVariantsCreationForm,
   type ProductVariantsGeneratedArgs,
-  useCreateProductForm,
   useProductGenerationState,
   validateMultipleProductsConfiguration,
   validateSingleProductConfiguration,
 } from '../../add/CreateProduct';
 import { CommonProductData } from './CommonProductData';
+import { useCreateProductForm } from './hooks/useCreateProductForm';
 import { useProductVariantsGenerationForm } from './hooks/useProductVariantsGenerationForm';
+import { ProductVariantsCreationForm } from './ProductVariantsCreationForm';
 import { ProductVariantsGenerationForm } from './ProductVariantsGenerationForm';
 import { ProductVariantsTable } from './ProductVariantsTable';
 import {
@@ -44,25 +44,26 @@ export const CreateProduct = () => {
     }
   };
 
-  const { form: productVariantsCreationForm } = useCreateProductForm({
-    onFieldErrors: openProductDetailsEditorForErrors,
-    onCreated: async () => {
-      await Promise.all([
-        queryClient.invalidateQueries({
-          queryKey: productGroupsQueryKeys.list,
-        }),
-        queryClient.invalidateQueries({
-          queryKey: productVariantsQueryKeys.list,
-        }),
-      ]);
-      router.push(clientRoutes.products);
-    },
-    validateConfiguration: (value) =>
-      productVariantsGenerationForm.getFieldValue('generationMode') ===
-      PRODUCT_GENERATION_MODE.one
-        ? validateSingleProductConfiguration(value)
-        : validateMultipleProductsConfiguration(value),
-  });
+  const { form: productVariantsCreationForm, submitProductForm } =
+    useCreateProductForm({
+      onFieldErrors: openProductDetailsEditorForErrors,
+      onCreated: async () => {
+        await Promise.all([
+          queryClient.invalidateQueries({
+            queryKey: productGroupsQueryKeys.list,
+          }),
+          queryClient.invalidateQueries({
+            queryKey: productVariantsQueryKeys.list,
+          }),
+        ]);
+        router.push(clientRoutes.products);
+      },
+      validateConfiguration: (value) =>
+        productVariantsGenerationForm.getFieldValue('generationMode') ===
+        PRODUCT_GENERATION_MODE.one
+          ? validateSingleProductConfiguration(value)
+          : validateMultipleProductsConfiguration(value),
+    });
 
   const {
     generatedAttributes,
@@ -111,6 +112,7 @@ export const CreateProduct = () => {
         />
       ) : (
         <ProductVariantsCreationForm
+          onSubmit={submitProductForm}
           variantFields={
             <ProductVariantsTable
               productVariantsCreationForm={productVariantsCreationForm}
@@ -158,10 +160,6 @@ export const CreateProduct = () => {
               )}
             </productVariantsCreationForm.Subscribe>
           }
-          generatedAttributes={generatedAttributes}
-          generationMode={productVariantsGenerationForm.getFieldValue(
-            'generationMode'
-          )}
           productVariantsCreationForm={productVariantsCreationForm}
         />
       )}
