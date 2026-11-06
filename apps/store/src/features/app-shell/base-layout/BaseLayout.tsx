@@ -1,4 +1,10 @@
-import { cn, SidebarNavigationProvider, TopBar, Typography } from '@ordero/ui';
+import {
+  cn,
+  SidebarNavigationProvider,
+  SidebarNavigationTrigger,
+  TopBar,
+  Typography,
+} from '@ordero/ui';
 import { Sidebar } from '../sidebar';
 import type { BaseLayoutProps } from './types';
 
@@ -28,6 +34,7 @@ export const BaseLayout = ({
       <main className={baseLayoutMainClassName}>
         <TopBar.Root id="store-page-header">
           <TopBar.Left>
+            <SidebarNavigationTrigger />
             <Typography variant="h6">Store</Typography>
           </TopBar.Left>
         </TopBar.Root>

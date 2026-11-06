@@ -8,10 +8,10 @@ import { useSidebarNavigation } from './SidebarNavigationProvider';
 import type { SidebarNavigationToggleProps } from './types';
 
 export const SidebarNavigationToggle = ({
-  collapseLabel = 'Collapse sidebar',
-  expandLabel = 'Expand sidebar',
+  collapseLabel,
   controls,
-}: SidebarNavigationToggleProps & { controls?: string }) => {
+  expandLabel,
+}: SidebarNavigationToggleProps) => {
   const { collapsed, collapsible, toggleCollapsed } = useSidebarNavigation();
 
   if (!collapsible) {
@@ -32,7 +32,7 @@ export const SidebarNavigationToggle = ({
       <ChevronLeft
         aria-hidden="true"
         className={cn(
-          'size-4 transition-transform duration-200 motion-reduce:transition-none',
+          'size-4 transition-transform duration-[var(--sidebar-navigation-duration)] motion-reduce:transition-none',
           collapsed && 'rotate-180'
         )}
         strokeWidth={2.5}

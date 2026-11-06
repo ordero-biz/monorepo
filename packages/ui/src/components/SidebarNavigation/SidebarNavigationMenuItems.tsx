@@ -20,7 +20,7 @@ import {
   tooltipPopupClassName,
 } from './classNames';
 import {
-  SidebarNavigationExpandedScope,
+  SidebarNavigationScope,
   useSidebarNavigation,
 } from './SidebarNavigationProvider';
 import type {
@@ -201,6 +201,10 @@ const SidebarNavigationLeafItem = ({
   });
 };
 
+// Clears the 16px rail padding past the item edge plus a 4px gap, so popups
+// open beside the rail instead of over its border.
+const COLLAPSED_POPUP_SIDE_OFFSET = 20;
+
 const SidebarNavigationCollapsedTooltip = ({
   children,
   label,
@@ -220,7 +224,7 @@ const SidebarNavigationCollapsedTooltip = ({
       {children}
     </Tooltip.Trigger>
     <Tooltip.Portal>
-      <Tooltip.Positioner side="right" sideOffset={20}>
+      <Tooltip.Positioner side="right" sideOffset={COLLAPSED_POPUP_SIDE_OFFSET}>
         <Tooltip.Popup className={tooltipPopupClassName}>{label}</Tooltip.Popup>
       </Tooltip.Positioner>
     </Tooltip.Portal>
@@ -254,7 +258,11 @@ const SidebarNavigationCollapsedBranch = ({
         <SidebarNavigationItemContent item={item} />
       </Popover.Trigger>
       <Popover.Portal>
-        <Popover.Positioner align="start" side="right" sideOffset={20}>
+        <Popover.Positioner
+          align="start"
+          side="right"
+          sideOffset={COLLAPSED_POPUP_SIDE_OFFSET}
+        >
           <Popover.Popup
             aria-label={`${item.label} submenu`}
             className={popoverPopupClassName}
@@ -268,7 +276,7 @@ const SidebarNavigationCollapsedBranch = ({
             <div aria-hidden="true" className={popoverTitleClassName}>
               {item.label}
             </div>
-            <SidebarNavigationExpandedScope>
+            <SidebarNavigationScope collapsed={false}>
               <SidebarNavigationMenuItems
                 depth={0}
                 items={item.items}
@@ -276,7 +284,7 @@ const SidebarNavigationCollapsedBranch = ({
                 renderLink={renderLink}
                 rootLabel={rootLabel}
               />
-            </SidebarNavigationExpandedScope>
+            </SidebarNavigationScope>
           </Popover.Popup>
         </Popover.Positioner>
       </Popover.Portal>

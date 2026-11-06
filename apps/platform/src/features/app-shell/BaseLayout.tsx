@@ -1,4 +1,10 @@
-import { cn, SidebarNavigationProvider, TopBar, Typography } from '@ordero/ui';
+import {
+  cn,
+  SidebarNavigationProvider,
+  SidebarNavigationTrigger,
+  TopBar,
+  Typography,
+} from '@ordero/ui';
 import { Sidebar } from './Sidebar';
 import type { BaseLayoutProps } from './types';
 
@@ -20,6 +26,7 @@ export const BaseLayout = ({
       <main className="flex min-w-0 flex-1 flex-col">
         <TopBar.Root id="platform-page-header">
           <TopBar.Left>
+            <SidebarNavigationTrigger />
             <Typography variant="h6">Platform</Typography>
           </TopBar.Left>
         </TopBar.Root>

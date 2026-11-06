@@ -1,3 +1,33 @@
+/*
+ * Sidebar motion, shared by the width change, the mobile drawer and app
+ * layout parts that follow the sidebar width. Defined on :root because the
+ * drawer is portaled outside the provider.
+ */
+:root {
+  --sidebar-navigation-duration: 200ms;
+  --sidebar-navigation-overlay-duration: 300ms;
+  --sidebar-navigation-easing: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sidebar-navigation-provider {
+  --sidebar-navigation-panel-width: var(--nav-width);
+  --sidebar-navigation-width: var(--sidebar-navigation-panel-width);
+}
+
+.sidebar-navigation-provider[data-collapsed='true'] {
+  --sidebar-navigation-panel-width: var(--nav-mini-width);
+}
+
+/*
+ * Mobile: the sidebar is hidden and opens as a drawer from the page header,
+ * so it takes no layout space. Keep the width in sync with --breakpoint-md.
+ */
+@media (width < 900px) {
+  .sidebar-navigation-provider {
+    --sidebar-navigation-width: 0px;
+  }
+}
+
 .sidebar-navigation-panel {
   box-sizing: border-box;
   overflow: hidden;

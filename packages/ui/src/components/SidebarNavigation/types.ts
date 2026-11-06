@@ -62,14 +62,34 @@ export type SidebarNavigationItem =
 
 export type SidebarNavigationProps = {
   children: ReactNode;
+  /** Accessible name of the edge button while the sidebar is expanded. */
+  collapseLabel?: string;
+  /** Accessible name of the edge button while the sidebar is collapsed. */
+  expandLabel?: string;
   id?: string;
+  /** Accessible name of the sidebar and of its mobile overlay. */
+  label?: string;
   ref?: Ref<HTMLDivElement>;
+};
+
+export type SidebarNavigationTriggerProps = {
+  /** Accessible name of the button that opens the mobile drawer. */
+  label?: string;
+};
+
+export type SidebarNavigationBrandProps = {
+  logo: ReactNode;
+  title: string;
 };
 
 export type SidebarNavigationContextValue = {
   collapsed: boolean;
   /** True when a provider manages the collapsed state and a toggle is shown. */
   collapsible: boolean;
+  /** True below the mobile breakpoint, where the sidebar opens as an overlay. */
+  isMobile: boolean;
+  /** Id of the mobile drawer, for the trigger's `aria-controls`. */
+  overlayId?: string;
   setCollapsed: (collapsed: boolean) => void;
   toggleCollapsed: () => void;
 };
@@ -82,8 +102,9 @@ export type SidebarNavigationProviderProps = {
 };
 
 export type SidebarNavigationToggleProps = {
-  collapseLabel?: string;
-  expandLabel?: string;
+  collapseLabel: string;
+  controls?: string;
+  expandLabel: string;
 };
 
 export type SidebarNavigationHeaderProps = {

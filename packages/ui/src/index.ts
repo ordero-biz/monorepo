@@ -186,6 +186,7 @@ export { Select } from './components/Select';
 export type {
   SidebarNavigationActionItem,
   SidebarNavigationActionSelectArgs,
+  SidebarNavigationBrandProps,
   SidebarNavigationCollapseItem,
   SidebarNavigationContentProps,
   SidebarNavigationContextValue,
@@ -202,11 +203,12 @@ export type {
   SidebarNavigationSectionContentProps,
   SidebarNavigationSectionProps,
   SidebarNavigationSectionsProps,
-  SidebarNavigationToggleProps,
+  SidebarNavigationTriggerProps,
 } from './components/SidebarNavigation';
 export {
   SIDEBAR_NAVIGATION_COLLAPSED_COOKIE,
   SidebarNavigation,
+  SidebarNavigationBrand,
   SidebarNavigationContent,
   SidebarNavigationFooter,
   SidebarNavigationHeader,
@@ -215,7 +217,7 @@ export {
   SidebarNavigationSection,
   SidebarNavigationSectionContent,
   SidebarNavigationSections,
-  SidebarNavigationToggle,
+  SidebarNavigationTrigger,
   useSidebarNavigation,
 } from './components/SidebarNavigation';
 export type {

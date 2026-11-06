@@ -1,5 +1,6 @@
 export { SIDEBAR_NAVIGATION_COLLAPSED_COOKIE } from './constants';
 export { SidebarNavigation } from './SidebarNavigation';
+export { SidebarNavigationBrand } from './SidebarNavigationBrand';
 export { SidebarNavigationContent } from './SidebarNavigationContent';
 export { SidebarNavigationFooter } from './SidebarNavigationFooter';
 export { SidebarNavigationHeader } from './SidebarNavigationHeader';
@@ -11,10 +12,11 @@ export {
 export { SidebarNavigationSection } from './SidebarNavigationSection';
 export { SidebarNavigationSectionContent } from './SidebarNavigationSectionContent';
 export { SidebarNavigationSections } from './SidebarNavigationSections';
-export { SidebarNavigationToggle } from './SidebarNavigationToggle';
+export { SidebarNavigationTrigger } from './SidebarNavigationTrigger';
 export type {
   SidebarNavigationActionItem,
   SidebarNavigationActionSelectArgs,
+  SidebarNavigationBrandProps,
   SidebarNavigationCollapseItem,
   SidebarNavigationContentProps,
   SidebarNavigationContextValue,
@@ -31,5 +33,5 @@ export type {
   SidebarNavigationSectionContentProps,
   SidebarNavigationSectionProps,
   SidebarNavigationSectionsProps,
-  SidebarNavigationToggleProps,
+  SidebarNavigationTriggerProps,
 } from './types';
