@@ -1,15 +1,22 @@
 import { prepareSetup } from '@ordero/test-config/react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Boxes, LayoutDashboard, Package, Settings } from 'lucide-react';
 import {
+  SIDEBAR_NAVIGATION_COLLAPSED_COOKIE,
   SidebarNavigation,
+  SidebarNavigationBrand,
   SidebarNavigationContent,
   SidebarNavigationFooter,
   SidebarNavigationHeader,
+  SidebarNavigationProvider,
   SidebarNavigationSections,
+  SidebarNavigationTrigger,
 } from './index';
-import type { SidebarNavigationSectionConfig } from './types';
+import type {
+  SidebarNavigationProviderProps,
+  SidebarNavigationSectionConfig,
+} from './types';
 
 type SidebarNavigationFixtureProps = {
   footer?: boolean;
@@ -506,5 +513,284 @@ describe('SidebarNavigation', () => {
       'href',
       '/app/orders'
     );
+  });
+
+  describe('collapse', () => {
+    const collapseSections: SidebarNavigationSectionConfig[] = [
+      {
+        id: 'overview',
+        label: 'Overview',
+        collapsible: true,
+        defaultExpanded: true,
+        items: [
+          {
+            id: 'dashboard',
+            kind: 'link',
+            label: 'Dashboard',
+            href: '/dashboard',
+            icon: <LayoutDashboard aria-hidden="true" />,
+          },
+          {
+            id: 'product',
+            kind: 'collapse',
+            label: 'Product',
+            icon: <Package aria-hidden="true" />,
+            items: [
+              {
+                id: 'category',
+                kind: 'link',
+                label: 'Category',
+                href: '/category',
+              },
+            ],
+          },
+        ],
+      },
+    ];
+
+    type CollapsibleSidebarFixtureProps = Omit<
+      SidebarNavigationProviderProps,
+      'children'
+    >;
+
+    const CollapsibleSidebarFixture = (
+      props: CollapsibleSidebarFixtureProps
+    ) => (
+      <SidebarNavigationProvider {...props}>
+        <SidebarNavigation id="test-sidebar">
+          <SidebarNavigationHeader>
+            <SidebarNavigationBrand
+              logo={<Package aria-hidden="true" />}
+              title="Ordero"
+            />
+          </SidebarNavigationHeader>
+          <SidebarNavigationContent>
+            <SidebarNavigationSections sections={collapseSections} />
+          </SidebarNavigationContent>
+        </SidebarNavigation>
+        <main>
+          <SidebarNavigationTrigger />
+          Page content
+        </main>
+      </SidebarNavigationProvider>
+    );
+
+    const { setup: setupCollapsible } =
+      prepareSetup<CollapsibleSidebarFixtureProps>({
+        component: CollapsibleSidebarFixture,
+        props: {
+          defaultCollapsed: false,
+        },
+      });
+
+    it('does not render a toggle without a provider', () => {
+      setup();
+
+      expect(
+        screen.queryByRole('button', { name: 'Collapse sidebar' })
+      ).not.toBeInTheDocument();
+    });
+
+    it('collapses and expands with the edge button', async () => {
+      const user = userEvent.setup();
+
+      setupCollapsible();
+
+      await user.click(
+        screen.getByRole('button', { name: 'Collapse sidebar' })
+      );
+
+      expect(
+        screen.getByRole('button', { name: 'Expand sidebar' })
+      ).toHaveAttribute('aria-expanded', 'false');
+
+      await user.click(screen.getByRole('button', { name: 'Expand sidebar' }));
+
+      expect(
+        screen.getByRole('button', { name: 'Collapse sidebar' })
+      ).toHaveAttribute('aria-expanded', 'true');
+    });
+
+    it('reports desktop changes and persists them in the cookie the server reads', async () => {
+      const user = userEvent.setup();
+
+      const { onCollapsedChange } = setupCollapsible({
+        onCollapsedChange: vi.fn(),
+      });
+
+      await user.click(
+        screen.getByRole('button', { name: 'Collapse sidebar' })
+      );
+
+      expect(onCollapsedChange).toHaveBeenCalledWith(true);
+      expect(document.cookie).toContain(
+        `${SIDEBAR_NAVIGATION_COLLAPSED_COOKIE}=true`
+      );
+    });
+
+    it('keeps links reachable and opens branch children in a popover when collapsed', async () => {
+      const user = userEvent.setup();
+
+      setupCollapsible({ defaultCollapsed: true });
+
+      expect(
+        screen.getByRole('link', { name: 'Dashboard' })
+      ).toBeInTheDocument();
+      expect(
+        screen.queryByRole('link', { name: 'Category' })
+      ).not.toBeInTheDocument();
+
+      await user.click(screen.getByRole('button', { name: 'Product' }));
+
+      expect(
+        await screen.findByRole('link', { name: 'Category' })
+      ).toBeInTheDocument();
+    });
+
+    it('leaves a controlled state to the consumer and does not persist it', async () => {
+      const user = userEvent.setup();
+      // biome-ignore lint/suspicious/noDocumentCookie: resets the persisted state for this test
+      document.cookie = `${SIDEBAR_NAVIGATION_COLLAPSED_COOKIE}=false; path=/`;
+
+      const { onCollapsedChange } = setupCollapsible({
+        collapsed: false,
+        onCollapsedChange: vi.fn(),
+      });
+
+      await user.click(
+        screen.getByRole('button', { name: 'Collapse sidebar' })
+      );
+
+      expect(onCollapsedChange).toHaveBeenCalledWith(true);
+      expect(
+        screen.getByRole('button', { name: 'Collapse sidebar' })
+      ).toHaveAttribute('aria-expanded', 'true');
+      expect(document.cookie).toContain(
+        `${SIDEBAR_NAVIGATION_COLLAPSED_COOKIE}=false`
+      );
+    });
+
+    describe('on mobile', () => {
+      beforeEach(() => {
+        vi.stubGlobal('matchMedia', (query: string) => ({
+          addEventListener: vi.fn(),
+          matches: true,
+          media: query,
+          removeEventListener: vi.fn(),
+        }));
+      });
+
+      afterEach(() => {
+        vi.unstubAllGlobals();
+      });
+
+      const openDrawer = async (user: ReturnType<typeof userEvent.setup>) => {
+        await user.click(
+          screen.getByRole('button', { name: 'Open navigation' })
+        );
+
+        return screen.findByRole('dialog', { name: 'Sidebar navigation' });
+      };
+
+      it('starts closed regardless of the desktop state', () => {
+        setupCollapsible({ defaultCollapsed: false });
+
+        expect(
+          screen.getByRole('button', { name: 'Open navigation' })
+        ).toHaveAttribute('aria-expanded', 'false');
+        expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      });
+
+      it('opens the expanded sidebar in a modal drawer and moves focus into it', async () => {
+        const user = userEvent.setup();
+
+        setupCollapsible();
+
+        const drawer = await openDrawer(user);
+
+        expect(
+          within(drawer).getByRole('link', { name: 'Dashboard' })
+        ).toBeVisible();
+        // While the modal drawer is open the page behind it, including the
+        // menu button, is hidden from assistive technology.
+        expect(
+          screen.getByRole('button', { hidden: true, name: 'Open navigation' })
+        ).toHaveAttribute('aria-controls', drawer.id);
+        await waitFor(() =>
+          expect(drawer).toContainElement(document.activeElement as HTMLElement)
+        );
+      });
+
+      it('closes after a link is selected', async () => {
+        const user = userEvent.setup();
+
+        setupCollapsible();
+
+        const drawer = await openDrawer(user);
+
+        await user.click(
+          within(drawer).getByRole('link', { name: 'Dashboard' })
+        );
+
+        await waitFor(() =>
+          expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+        );
+      });
+
+      it('stays open when a branch is expanded', async () => {
+        const user = userEvent.setup();
+
+        setupCollapsible();
+
+        const drawer = await openDrawer(user);
+
+        await user.click(
+          within(drawer).getByRole('button', { name: 'Product' })
+        );
+
+        expect(
+          within(drawer).getByRole('link', { name: 'Category' })
+        ).toBeInTheDocument();
+        expect(screen.getByRole('dialog')).toBeInTheDocument();
+      });
+
+      it('keeps branches the user expanded open the next time it opens', async () => {
+        const user = userEvent.setup();
+
+        setupCollapsible();
+
+        const drawer = await openDrawer(user);
+
+        await user.click(
+          within(drawer).getByRole('button', { name: 'Product' })
+        );
+        await user.keyboard('{Escape}');
+        await waitFor(() =>
+          expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+        );
+
+        const reopenedDrawer = await openDrawer(user);
+
+        expect(
+          within(reopenedDrawer).getByRole('link', { name: 'Category' })
+        ).toBeVisible();
+      });
+
+      it('closes on Escape and returns focus to the menu button', async () => {
+        const user = userEvent.setup();
+
+        setupCollapsible();
+
+        await openDrawer(user);
+        await user.keyboard('{Escape}');
+
+        await waitFor(() =>
+          expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+        );
+        expect(
+          screen.getByRole('button', { name: 'Open navigation' })
+        ).toHaveFocus();
+      });
+    });
   });
 });

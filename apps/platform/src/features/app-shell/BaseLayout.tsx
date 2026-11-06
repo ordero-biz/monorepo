@@ -1,4 +1,10 @@
-import { cn, TopBar, Typography } from '@ordero/ui';
+import {
+  cn,
+  SidebarNavigationProvider,
+  SidebarNavigationTrigger,
+  TopBar,
+  Typography,
+} from '@ordero/ui';
 import { Sidebar } from './Sidebar';
 import type { BaseLayoutProps } from './types';
 
@@ -10,16 +16,22 @@ const baseLayoutContentClassName = cn(
   'xl:max-w-[var(--layout-container-xl)] xl:px-7'
 );
 
-export const BaseLayout = ({ children }: BaseLayoutProps) => (
-  <div className="mx-auto flex min-h-screen w-full">
-    <Sidebar />
-    <main className="flex min-w-0 flex-1 flex-col">
-      <TopBar.Root id="platform-page-header">
-        <TopBar.Left>
-          <Typography variant="h6">Platform</Typography>
-        </TopBar.Left>
-      </TopBar.Root>
-      <section className={baseLayoutContentClassName}>{children}</section>
-    </main>
-  </div>
-);
+export const BaseLayout = ({
+  children,
+  defaultSidebarCollapsed = false,
+}: BaseLayoutProps) => {
+  return (
+    <SidebarNavigationProvider defaultCollapsed={defaultSidebarCollapsed}>
+      <Sidebar />
+      <main className="flex min-w-0 flex-1 flex-col">
+        <TopBar.Root id="platform-page-header">
+          <TopBar.Left>
+            <SidebarNavigationTrigger />
+            <Typography variant="h6">Platform</Typography>
+          </TopBar.Left>
+        </TopBar.Root>
+        <section className={baseLayoutContentClassName}>{children}</section>
+      </main>
+    </SidebarNavigationProvider>
+  );
+};

@@ -11,13 +11,17 @@ import {
   Users,
   Warehouse,
 } from 'lucide-react';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { Button } from '@/ui/components/Button';
 import {
   SidebarNavigation,
+  SidebarNavigationBrand,
   SidebarNavigationContent,
   SidebarNavigationFooter,
   SidebarNavigationHeader,
+  SidebarNavigationProvider,
   SidebarNavigationSections,
+  SidebarNavigationTrigger,
   type SidebarNavigationSectionConfig,
 } from '@/ui/components/SidebarNavigation';
 
@@ -158,14 +162,7 @@ const SidebarShell = ({
   <SidebarNavigation>
     {header ? (
       <SidebarNavigationHeader>
-        <div className="flex items-center gap-[var(--space-1)] px-[var(--space-1-5)]">
-          <div className="flex size-[32px] items-center justify-center rounded-[var(--radius-50-token)] bg-primary text-primary-foreground">
-            <Package className="size-4" />
-          </div>
-          <span className="text-[length:var(--subtitle1-size-desktop)] leading-[var(--subtitle1-line-height-desktop)] font-[var(--subtitle1-weight)] text-[var(--text-primary)]">
-            Ordero
-          </span>
-        </div>
+        <SidebarNavigationBrand logo={<Package />} title="Ordero" />
       </SidebarNavigationHeader>
     ) : null}
     <SidebarNavigationContent>
@@ -207,6 +204,24 @@ const SidebarNavigationStory = ({
   </div>
 );
 
+const CollapsibleSidebarShell = () => (
+  <SidebarNavigationProvider>
+    <SidebarNavigation id="collapsible-sidebar">
+      <SidebarNavigationHeader>
+        <SidebarNavigationBrand logo={<Package />} title="Ordero" />
+      </SidebarNavigationHeader>
+      <SidebarNavigationContent>
+        <SidebarNavigationSections sections={sections} />
+      </SidebarNavigationContent>
+    </SidebarNavigation>
+    <main className="flex flex-1 flex-col gap-[var(--space-2)] p-[var(--space-3)]">
+      <SidebarNavigationTrigger />
+      Press the edge button to collapse the sidebar. On mobile, open it with
+      the menu button.
+    </main>
+  </SidebarNavigationProvider>
+);
+
 const meta = {
   title: 'Components/SidebarNavigation',
   component: SidebarNavigationStory,
@@ -238,6 +253,66 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {};
+
+export const Collapsible: Story = {
+  render: () => <CollapsibleSidebarShell />,
+};
+
+// On mobile the sidebar is hidden; the menu button opens it as a drawer.
+const mobileGlobals = {
+  viewport: { isRotated: false, value: 'mobile1' },
+};
+
+const openMobileDrawer = async (canvasElement: HTMLElement) => {
+  const canvas = within(canvasElement);
+  const page = within(canvasElement.ownerDocument.body);
+
+  await userEvent.click(
+    canvas.getByRole('button', { name: 'Open navigation' })
+  );
+
+  return page.findByRole('dialog', { name: 'Sidebar navigation' });
+};
+
+export const MobileDrawerOpen: Story = {
+  globals: mobileGlobals,
+  render: () => <CollapsibleSidebarShell />,
+  play: async ({ canvasElement }) => {
+    const drawer = await openMobileDrawer(canvasElement);
+
+    await expect(
+      within(drawer).getByRole('link', { name: 'Dashboard' })
+    ).toBeVisible();
+  },
+};
+
+export const MobileDrawerDismiss: Story = {
+  globals: mobileGlobals,
+  render: () => <CollapsibleSidebarShell />,
+  play: async ({ canvasElement }) => {
+    const documentBody = canvasElement.ownerDocument.body;
+    const page = within(documentBody);
+
+    await openMobileDrawer(canvasElement);
+
+    const backdrop = documentBody.querySelector(
+      '[data-slot="sidebar-navigation-backdrop"]'
+    );
+
+    if (!(backdrop instanceof HTMLElement)) {
+      throw new Error('Sidebar navigation backdrop is not rendered');
+    }
+
+    await userEvent.click(backdrop);
+
+    await waitFor(() =>
+      expect(page.queryByRole('dialog')).not.toBeInTheDocument()
+    );
+    await expect(
+      within(canvasElement).getByRole('button', { name: 'Open navigation' })
+    ).toHaveFocus();
+  },
+};
 
 export const WithoutHeaderOrFooter: Story = {
   args: {
