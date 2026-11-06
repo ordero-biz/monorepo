@@ -1,7 +1,7 @@
 import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { getAttributesDropdown } from '@/lib/client/api/attributes';
 import { createProductGroup } from '@/lib/client/api/products';
-import type { AttributeDropdown } from '@/lib/domain/attributes/types';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { CreateProduct } from './CreateProduct';
 import {
@@ -68,120 +68,123 @@ vi.mock('@/features/categories', () => ({
   ),
 }));
 
-vi.mock('./AttributesAsyncCombobox', () => ({
-  AttributesAsyncCombobox: ({
-    label,
-    onValueChange,
-  }: {
-    label: string;
-    onValueChange?: (attributes: AttributeDropdown[]) => void;
-  }) => {
-    const manufactureAttribute = {
-      id: 8,
-      name: 'Manufacture',
+vi.mock('@/lib/client/api/attributes', async () => ({
+  ...(await vi.importActual<typeof import('@/lib/client/api/attributes')>(
+    '@/lib/client/api/attributes'
+  )),
+  getAttributesDropdown: vi.fn(),
+}));
+
+const manufactureAttribute = {
+  id: 8,
+  name: 'Manufacture',
+  sortOrder: 0,
+  status: 'DRAFT' as const,
+  createdAt: '2026-07-14T17:54:42.035Z',
+  attributeValues: [
+    {
+      id: 80,
+      name: 'China',
       sortOrder: 0,
       status: 'DRAFT' as const,
-      createdAt: '2026-07-14T17:54:42.035Z',
-      attributeValues: [
-        {
-          id: 80,
-          name: 'China',
-          sortOrder: 0,
-          status: 'DRAFT' as const,
-          createdAt: '2026-07-14T17:54:42.036Z',
-        },
-        {
-          id: 81,
-          name: 'USA',
-          sortOrder: 1,
-          status: 'DRAFT' as const,
-          createdAt: '2026-07-14T17:54:42.036Z',
-        },
-        {
-          id: 82,
-          name: 'Ukraine',
-          sortOrder: 2,
-          status: 'DRAFT' as const,
-          createdAt: '2026-07-14T17:54:42.036Z',
-        },
-        {
-          id: 83,
-          name: 'India',
-          sortOrder: 3,
-          status: 'DRAFT' as const,
-          createdAt: '2026-07-14T17:54:42.036Z',
-        },
-        {
-          id: 84,
-          name: 'Brazil',
-          sortOrder: 4,
-          status: 'DRAFT' as const,
-          createdAt: '2026-07-14T17:54:42.036Z',
-        },
-        {
-          id: 85,
-          name: 'Germany',
-          sortOrder: 5,
-          status: 'DRAFT' as const,
-          createdAt: '2026-07-14T17:54:42.036Z',
-        },
-        {
-          id: 86,
-          name: 'Japan',
-          sortOrder: 6,
-          status: 'DRAFT' as const,
-          createdAt: '2026-07-14T17:54:42.036Z',
-        },
-      ],
-    };
-    const colorAttribute = {
-      id: 7,
-      name: 'Color',
+      createdAt: '2026-07-14T17:54:42.036Z',
+    },
+    {
+      id: 81,
+      name: 'USA',
       sortOrder: 1,
       status: 'DRAFT' as const,
-      createdAt: '2026-07-14T17:54:42.035Z',
-      attributeValues: [
-        {
-          id: 70,
-          name: 'Red',
-          sortOrder: 0,
-          status: 'DRAFT' as const,
-          createdAt: '2026-07-14T17:54:42.036Z',
-        },
-        {
-          id: 71,
-          name: 'Green',
-          sortOrder: 1,
-          status: 'DRAFT' as const,
-          createdAt: '2026-07-14T17:54:42.036Z',
-        },
-        {
-          id: 72,
-          name: 'Blue',
-          sortOrder: 2,
-          status: 'DRAFT' as const,
-          createdAt: '2026-07-14T17:54:42.036Z',
-        },
-      ],
-    };
+      createdAt: '2026-07-14T17:54:42.036Z',
+    },
+    {
+      id: 82,
+      name: 'Ukraine',
+      sortOrder: 2,
+      status: 'DRAFT' as const,
+      createdAt: '2026-07-14T17:54:42.036Z',
+    },
+    {
+      id: 83,
+      name: 'India',
+      sortOrder: 3,
+      status: 'DRAFT' as const,
+      createdAt: '2026-07-14T17:54:42.036Z',
+    },
+    {
+      id: 84,
+      name: 'Brazil',
+      sortOrder: 4,
+      status: 'DRAFT' as const,
+      createdAt: '2026-07-14T17:54:42.036Z',
+    },
+    {
+      id: 85,
+      name: 'Germany',
+      sortOrder: 5,
+      status: 'DRAFT' as const,
+      createdAt: '2026-07-14T17:54:42.036Z',
+    },
+    {
+      id: 86,
+      name: 'Japan',
+      sortOrder: 6,
+      status: 'DRAFT' as const,
+      createdAt: '2026-07-14T17:54:42.036Z',
+    },
+  ],
+};
+const colorAttribute = {
+  id: 7,
+  name: 'Color',
+  sortOrder: 1,
+  status: 'DRAFT' as const,
+  createdAt: '2026-07-14T17:54:42.035Z',
+  attributeValues: [
+    {
+      id: 70,
+      name: 'Red',
+      sortOrder: 0,
+      status: 'DRAFT' as const,
+      createdAt: '2026-07-14T17:54:42.036Z',
+    },
+    {
+      id: 71,
+      name: 'Green',
+      sortOrder: 1,
+      status: 'DRAFT' as const,
+      createdAt: '2026-07-14T17:54:42.036Z',
+    },
+    {
+      id: 72,
+      name: 'Blue',
+      sortOrder: 2,
+      status: 'DRAFT' as const,
+      createdAt: '2026-07-14T17:54:42.036Z',
+    },
+  ],
+};
 
-    return (
-      <>
-        <button
-          onClick={() =>
-            onValueChange?.([manufactureAttribute, colorAttribute])
-          }
-          type="button"
-        >
-          Select {label}
-        </button>
-        <button onClick={() => onValueChange?.([colorAttribute])} type="button">
-          Select Color Attribute
-        </button>
-      </>
+const selectAttributes = async (
+  user: ReturnType<typeof userEvent.setup>,
+  names = ['Manufacture', 'Color']
+) => {
+  for (const name of ['Manufacture', 'Color']) {
+    const remove = screen.queryByRole('button', { name: `Remove ${name}` });
+    if (remove && !names.includes(name)) await user.click(remove);
+  }
+  const missingNames = names.filter(
+    (name) => !screen.queryByRole('button', { name: `Remove ${name}` })
+  );
+  if (!missingNames.length) return;
+
+  await user.click(screen.getByRole('combobox', { name: 'Attributes' }));
+  for (const name of missingNames) {
+    await user.click(
+      await screen.findByRole('option', { name: new RegExp(`^${name}\\b`) })
     );
-  },
-}));
+  }
+  await user.keyboard('{Escape}');
+};
 
 const createProductGroupMock = vi.mocked(createProductGroup);
 
@@ -209,6 +212,10 @@ const completeRequiredFields = async (
 
 describe('CreateProduct', () => {
   beforeEach(() => {
+    vi.mocked(getAttributesDropdown).mockResolvedValue({
+      ok: true,
+      data: [manufactureAttribute, colorAttribute],
+    });
     createProductGroupMock.mockReset();
     mocks.push.mockReset();
     intersectionObserverCallbacks.length = 0;
@@ -340,9 +347,7 @@ describe('CreateProduct', () => {
     });
 
     await completeRequiredFields(user);
-    await user.click(
-      screen.getByRole('button', { name: 'Select Color Attribute' })
-    );
+    await selectAttributes(user, ['Color']);
     await user.click(
       screen.getByRole('button', { name: 'Next: Configure products' })
     );
@@ -361,7 +366,7 @@ describe('CreateProduct', () => {
     setup();
 
     await completeRequiredFields(user);
-    await user.click(screen.getByRole('button', { name: 'Select Attributes' }));
+    await selectAttributes(user);
     await user.click(screen.getByRole('button', { name: 'Blue' }));
     await user.click(
       screen.getByRole('button', { name: 'Next: Configure product' })
@@ -379,7 +384,7 @@ describe('CreateProduct', () => {
     setup();
 
     await completeRequiredFields(user);
-    await user.click(screen.getByRole('button', { name: 'Select Attributes' }));
+    await selectAttributes(user);
     await user.click(screen.getByRole('button', { name: 'Blue' }));
     await user.click(
       screen.getByRole('button', { name: 'Next: Configure product' })
@@ -406,7 +411,7 @@ describe('CreateProduct', () => {
     setup();
 
     await completeRequiredFields(user);
-    await user.click(screen.getByRole('button', { name: 'Select Attributes' }));
+    await selectAttributes(user);
     await user.click(screen.getByRole('button', { name: 'Blue' }));
     await user.click(
       screen.getByRole('button', { name: 'Next: Configure product' })
@@ -507,7 +512,7 @@ describe('CreateProduct', () => {
     setup();
 
     await completeRequiredFields(user);
-    await user.click(screen.getByRole('button', { name: 'Select Attributes' }));
+    await selectAttributes(user);
     await user.click(screen.getByRole('button', { name: 'Blue' }));
     await user.click(
       screen.getByRole('button', { name: 'Next: Configure product' })
@@ -519,11 +524,15 @@ describe('CreateProduct', () => {
       })
     );
     const dialog = screen.getByRole('dialog', {
-      name: 'Edit variant attributes for Running Shoes Blue',
+      name: 'Edit attributes',
     });
 
-    await user.click(within(dialog).getByRole('button', { name: 'Red' }));
-    await user.click(within(dialog).getByRole('button', { name: 'Update' }));
+    await user.click(within(dialog).getByRole('combobox', { name: 'Color' }));
+    await user.click(screen.getByRole('option', { name: 'Red' }));
+    await user.keyboard('{Escape}');
+    await user.click(
+      within(dialog).getByRole('button', { name: 'Apply changes' })
+    );
 
     const variantAttributes = screen.getByRole('treegrid', {
       name: 'Attributes for Running Shoes Blue',
@@ -540,7 +549,7 @@ describe('CreateProduct', () => {
     setup();
 
     await completeRequiredFields(user);
-    await user.click(screen.getByRole('button', { name: 'Select Attributes' }));
+    await selectAttributes(user);
     await user.click(screen.getByRole('button', { name: 'Blue' }));
     await user.click(
       screen.getByRole('button', { name: 'Next: Configure product' })
@@ -570,7 +579,7 @@ describe('CreateProduct', () => {
     setup();
 
     await completeRequiredFields(user);
-    await user.click(screen.getByRole('button', { name: 'Select Attributes' }));
+    await selectAttributes(user);
     await user.click(screen.getByRole('button', { name: 'Blue' }));
     await user.click(
       screen.getByRole('button', { name: 'Next: Configure product' })
@@ -587,11 +596,15 @@ describe('CreateProduct', () => {
     );
 
     const dialog = screen.getByRole('dialog', {
-      name: 'Edit variant attributes for Running Shoes Blue',
+      name: 'Edit attributes',
     });
 
-    await user.click(within(dialog).getByRole('button', { name: 'Blue' }));
-    await user.click(within(dialog).getByRole('button', { name: 'Update' }));
+    await user.click(within(dialog).getByRole('combobox', { name: 'Color' }));
+    await user.click(screen.getByRole('option', { name: 'Blue' }));
+    await user.keyboard('{Escape}');
+    await user.click(
+      within(dialog).getByRole('button', { name: 'Apply changes' })
+    );
 
     expect(
       within(
@@ -608,9 +621,7 @@ describe('CreateProduct', () => {
     setup();
 
     await completeRequiredFields(user);
-    await user.click(
-      screen.getByRole('button', { name: 'Select Color Attribute' })
-    );
+    await selectAttributes(user, ['Color']);
     await user.click(screen.getByRole('button', { name: 'Blue' }));
     await user.click(
       screen.getByRole('button', { name: 'Next: Configure product' })
@@ -622,11 +633,15 @@ describe('CreateProduct', () => {
       })
     );
     const dialog = screen.getByRole('dialog', {
-      name: 'Edit variant attributes for Running Shoes Blue',
+      name: 'Edit attributes',
     });
 
-    expect(within(dialog).getByText('Color:')).toBeVisible();
-    expect(within(dialog).queryByText('Manufacture:')).not.toBeInTheDocument();
+    expect(
+      within(dialog).getByRole('combobox', { name: 'Color' })
+    ).toBeVisible();
+    expect(
+      within(dialog).queryByRole('combobox', { name: 'Manufacture' })
+    ).not.toBeInTheDocument();
     expect(
       within(dialog).queryByRole('button', { name: 'China' })
     ).not.toBeInTheDocument();
@@ -642,7 +657,7 @@ describe('CreateProduct', () => {
     });
 
     await completeRequiredFields(user);
-    await user.click(screen.getByRole('button', { name: 'Select Attributes' }));
+    await selectAttributes(user);
     await user.click(screen.getByRole('button', { name: 'China' }));
     await user.click(screen.getByRole('button', { name: 'USA' }));
     await user.click(screen.getByRole('button', { name: 'Red' }));
@@ -685,7 +700,7 @@ describe('CreateProduct', () => {
     });
 
     await completeRequiredFields(user);
-    await user.click(screen.getByRole('button', { name: 'Select Attributes' }));
+    await selectAttributes(user);
     await user.click(screen.getByRole('button', { name: 'Blue' }));
     await user.click(
       screen.getByRole('button', { name: 'Next: Configure products' })
@@ -707,7 +722,7 @@ describe('CreateProduct', () => {
     });
 
     await completeRequiredFields(user);
-    await user.click(screen.getByRole('button', { name: 'Select Attributes' }));
+    await selectAttributes(user);
 
     for (const attributeValueName of [
       'China',
@@ -761,7 +776,7 @@ describe('CreateProduct', () => {
     });
 
     await completeRequiredFields(user);
-    await user.click(screen.getByRole('button', { name: 'Select Attributes' }));
+    await selectAttributes(user);
 
     for (const attributeValueName of [
       'China',
@@ -839,7 +854,7 @@ describe('CreateProduct', () => {
     });
 
     await completeRequiredFields(user);
-    await user.click(screen.getByRole('button', { name: 'Select Attributes' }));
+    await selectAttributes(user);
     await user.click(screen.getByRole('button', { name: 'China' }));
     await user.click(screen.getByRole('button', { name: 'Red' }));
     await user.click(
@@ -880,7 +895,7 @@ describe('CreateProduct', () => {
     setup();
 
     await completeRequiredFields(user);
-    await user.click(screen.getByRole('button', { name: 'Select Attributes' }));
+    await selectAttributes(user);
     await user.click(screen.getByRole('button', { name: 'Blue' }));
     await user.click(
       screen.getByRole('button', { name: 'Next: Configure product' })
@@ -941,7 +956,7 @@ describe('CreateProduct', () => {
     setup();
 
     await completeRequiredFields(user);
-    await user.click(screen.getByRole('button', { name: 'Select Attributes' }));
+    await selectAttributes(user);
     await user.click(screen.getByRole('button', { name: 'Blue' }));
     await user.click(
       screen.getByRole('button', { name: 'Next: Configure product' })
@@ -977,7 +992,7 @@ describe('CreateProduct', () => {
 
     setup();
 
-    await user.click(screen.getByRole('button', { name: 'Select Attributes' }));
+    await selectAttributes(user);
 
     expect(screen.getByText('Color:')).toBeVisible();
 
@@ -994,18 +1009,16 @@ describe('CreateProduct', () => {
 
     setup();
 
-    await user.click(screen.getByRole('button', { name: 'Select Attributes' }));
+    await selectAttributes(user);
     await user.click(screen.getByRole('button', { name: 'China' }));
     await user.click(screen.getByRole('button', { name: 'Blue' }));
-    await user.click(
-      screen.getByRole('button', { name: 'Select Color Attribute' })
-    );
+    await selectAttributes(user, ['Color']);
 
     expect(
       screen.getByRole('button', { name: 'Blue', pressed: true })
     ).toBeVisible();
 
-    await user.click(screen.getByRole('button', { name: 'Select Attributes' }));
+    await selectAttributes(user);
 
     expect(
       screen.getByRole('button', { name: 'China', pressed: false })

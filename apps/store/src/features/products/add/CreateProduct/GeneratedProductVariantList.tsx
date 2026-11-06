@@ -5,7 +5,7 @@ import { useIncrementalProductVariants } from './hooks/useIncrementalProductVari
 import type { GeneratedProductVariantListProps } from './types';
 
 export const GeneratedProductVariantList = ({
-  attributes,
+  getVariantAttributes,
   productVariantsCreationForm,
   invalidVariantIndexes,
   onEditAttributes,
@@ -89,7 +89,7 @@ export const GeneratedProductVariantList = ({
     >
       {visibleVariantIndexes.map((variantIndex) => (
         <GeneratedProductVariantCard
-          attributes={attributes}
+          attributes={getVariantAttributes(variantIndex)}
           hasErrors={invalidVariantIndexesSet.has(variantIndex)}
           productVariantsCreationForm={productVariantsCreationForm}
           key={variantIndex}
