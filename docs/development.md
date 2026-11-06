@@ -28,5 +28,9 @@ takes precedence over the local value.
 | Platform | `pnpm --dir apps/platform dev` | `pnpm --dir apps/platform dev:remote` | http://localhost:3000 |
 | Store | `pnpm --dir apps/store dev` | `pnpm --dir apps/store dev:remote` | http://localhost:3001 |
 
+The same commands are available from the repository root:
+`pnpm dev:platform`, `pnpm dev:platform:remote`, `pnpm dev:store` and
+`pnpm dev:store:remote`.
+
 Both backend URLs use the server-only `BACKEND_API_URL` variable. Do not
 prefix it with `NEXT_PUBLIC_`.
