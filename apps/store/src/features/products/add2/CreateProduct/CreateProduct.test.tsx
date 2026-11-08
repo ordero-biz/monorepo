@@ -206,7 +206,31 @@ describe('New product creation design', () => {
     ).not.toBeInTheDocument();
   });
 
-  it('adds and removes attributes only for the edited variant and submits the applied values', async () => {
+  it('submits reviewed attribute changes only for the edited variant', async () => {
+    const draftCotton = {
+      ...material.attributeValues[0],
+      status: 'DRAFT' as const,
+    };
+    const draftMaterial = {
+      ...material,
+      attributeValues: [draftCotton, material.attributeValues[1]],
+    };
+    vi.mocked(getAttributesDropdown).mockResolvedValue({
+      ok: true,
+      data: [color, draftMaterial],
+    });
+    vi.mocked(getAttribute).mockResolvedValue({
+      ok: true,
+      data: draftMaterial,
+    });
+    vi.mocked(getAttributeValues).mockResolvedValue({
+      ok: true,
+      data: draftMaterial.attributeValues,
+    });
+    vi.mocked(updateAttributeValue).mockResolvedValue({
+      ok: true,
+      data: { ...draftCotton, name: 'Pima Cotton', status: 'ACTIVE' },
+    });
     vi.mocked(createProductGroup).mockResolvedValue({
       ok: false,
       error: { status: 503, message: 'Unavailable' },
@@ -230,9 +254,20 @@ describe('New product creation design', () => {
     );
     await addAttribute(user, 'Material');
     await user.click(screen.getByRole('combobox', { name: 'Material' }));
-    await user.click(screen.getByRole('option', { name: 'Cotton' }));
+    await user.click(screen.getByRole('option', { name: 'Cotton Draft' }));
+    const review = await screen.findByRole('dialog', {
+      name: 'Activate attribute value?',
+    });
+    const activate = within(review).getByRole('button', {
+      name: 'Activate and select',
+    });
+    await waitFor(() => expect(activate).toBeEnabled());
+    await user.click(activate);
+    await waitFor(() => expect(review).not.toBeInTheDocument());
     await user.click(screen.getByRole('button', { name: 'Apply changes' }));
-    expect(screen.getByRole('button', { name: 'Remove Cotton' })).toBeVisible();
+    expect(
+      screen.getByRole('button', { name: 'Remove Pima Cotton' })
+    ).toBeVisible();
     expect(screen.queryByText('SKU is required')).not.toBeInTheDocument();
     expect(screen.queryByText('Barcode is required')).not.toBeInTheDocument();
     expect(createProductGroup).not.toHaveBeenCalled();
@@ -254,7 +289,7 @@ describe('New product creation design', () => {
       screen.getByRole('button', { name: 'Edit attributes for Shirt Blue' })
     );
     expect(screen.getByRole('combobox', { name: 'Material' })).toHaveValue(
-      'Cotton'
+      'Pima Cotton'
     );
     expect(
       screen.queryByRole('combobox', { name: 'Color' })
@@ -272,6 +307,12 @@ describe('New product creation design', () => {
     ).not.toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Cancel' }));
 
+    await user.click(
+      screen.getByRole('button', { name: 'Hide details: Shirt Blue' })
+    );
+    await user.click(
+      screen.getByRole('button', { name: 'Hide details: Shirt Red' })
+    );
     for (const index of [1, 2]) {
       await user.type(
         screen.getByRole('textbox', { name: `SKU for variant ${index}` }),

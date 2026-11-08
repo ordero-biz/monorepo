@@ -1,11 +1,13 @@
+import type { ReactNode } from 'react';
 import type {
   ProductGenerationValues as BaseProductGenerationValues,
+  ProductVariantAttributesProps as BaseProductVariantAttributesProps,
   GeneratedProductVariantsProps,
   PRODUCT_GENERATION_MODE,
   ProductCommonValues,
-  ProductVariantAttributesProps,
   ProductVariantsCreationFormApi,
 } from '../../add/CreateProduct';
+import type { EditGeneratedProductVariantAttributesProps as BaseEditGeneratedProductVariantAttributesProps } from '../../add/CreateProduct/types';
 import type { useProductVariantsGenerationForm } from './hooks/useProductVariantsGenerationForm';
 
 export type ProductVariantsGenerationFormApi = ReturnType<
@@ -78,4 +80,17 @@ export type ProductVariantStatusFieldProps = ProductVariantFieldProps;
 
 export type GetColumnsArgs = {
   form: ProductVariantsCreationFormApi;
+};
+
+export type ProductVariantAttributesProps = BaseProductVariantAttributesProps;
+
+export type EditGeneratedProductVariantAttributesProps =
+  BaseEditGeneratedProductVariantAttributesProps;
+
+export type ProductVariantsCreationFormProps = {
+  onSubmit: () => Promise<void>;
+  commonProductFields: ReactNode;
+  variantFields: ReactNode;
+  isEditingProductDetails: boolean;
+  productVariantsCreationForm: ProductVariantsCreationFormApi;
 };

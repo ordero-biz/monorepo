@@ -2,13 +2,13 @@ import { DataTable, Typography } from '@ordero/ui';
 import { useStore } from '@tanstack/react-form';
 import { useEffect, useMemo, useState } from 'react';
 import {
-  EditGeneratedProductVariantAttributes,
   PRODUCT_GENERATION_MODE,
   useIncrementalProductVariants,
   useProductVariantAttributes,
 } from '../../add/CreateProduct';
 import { getInvalidProductVariantIndexes } from '../../add/CreateProduct/utils/productVariantErrors';
 import { getColumns } from './columns';
+import { EditGeneratedProductVariantAttributes } from './EditGeneratedProductVariantAttributes';
 import { ProductVariantDetails } from './ProductVariantDetails';
 import type { ProductVariantsTableProps } from './types';
 

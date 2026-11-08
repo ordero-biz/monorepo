@@ -1,9 +1,7 @@
 import { FieldLabel, Textarea } from '@ordero/ui';
 import { memo } from 'react';
-import {
-  ProductImageDropzone,
-  ProductVariantAttributes,
-} from '../../add/CreateProduct';
+import { ProductImageDropzone } from '../../add/CreateProduct';
+import { ProductVariantAttributes } from './ProductVariantAttributes';
 import type { ProductVariantDetailsProps } from './types';
 
 export const ProductVariantDetails = memo(

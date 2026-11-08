@@ -1,12 +1,12 @@
 import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { useLayoutEffect, useState } from 'react';
+import { StrictMode, useLayoutEffect, useState } from 'react';
 import { createProductGroup } from '@/lib/client/api/products';
 import type { AttributeDropdown } from '@/lib/domain/attributes/types';
 import { prepareStoreSetup } from '@/test/prepareSetup';
-import { useCreateProductForm } from '../../add/CreateProduct/hooks/useCreateProductForm';
 import type { CreateProductVariantValues } from '../../add/CreateProduct/types';
 import { validateMultipleProductsConfiguration } from '../../add/CreateProduct/utils/validations';
+import { useCreateProductForm } from './hooks/useCreateProductForm';
 import { ProductVariantsTable } from './ProductVariantsTable';
 
 vi.mock('@/lib/client/api/products', async () => ({
@@ -45,7 +45,7 @@ const attributes: AttributeDropdown[] = [
 const validateConfiguration = vi.fn(validateMultipleProductsConfiguration);
 
 const TableWithInvalidDetails = () => {
-  const { form } = useCreateProductForm({
+  const { form, submitProductForm } = useCreateProductForm({
     onCreated: vi.fn(),
     validateConfiguration,
   });
@@ -80,7 +80,7 @@ const TableWithInvalidDetails = () => {
       noValidate
       onSubmit={(event) => {
         event.preventDefault();
-        void form.handleSubmit();
+        submitProductForm();
       }}
     >
       <ProductVariantsTable
@@ -133,6 +133,136 @@ it('opens only rows with hidden errors on submission and preserves already-open 
   expect(toggle).toHaveAttribute('aria-expanded', 'true');
 });
 
+const { setup: setupStrict } = prepareStoreSetup({
+  component: () => (
+    <StrictMode>
+      <TableWithInvalidDetails />
+    </StrictMode>
+  ),
+});
+
+it.each([
+  ['normal rendering', setup],
+  ['Strict Mode', setupStrict],
+] as const)('shows duplicate attribute errors for collapsed rows in %s', async (_, setupTable) => {
+  vi.mocked(createProductGroup).mockReset();
+  vi.mocked(createProductGroup).mockResolvedValue({
+    ok: false,
+    error: { status: 500, message: 'Try again' },
+  });
+  const user = userEvent.setup();
+  setupTable();
+  await user.type(
+    screen.getByRole('textbox', { name: 'SKU for variant 2' }),
+    'TEA-1'
+  );
+  await user.type(
+    screen.getByRole('textbox', { name: 'Barcode for variant 2' }),
+    '654321'
+  );
+  const coffeeToggle = screen.getByRole('button', {
+    name: 'Show details: Coffee',
+  });
+  const teaToggle = screen.getByRole('button', { name: 'Show details: Tea' });
+  await user.click(coffeeToggle);
+  await user.click(
+    screen.getByRole('button', { name: 'Add attributes for Coffee' })
+  );
+  await user.click(screen.getByRole('combobox', { name: 'Color' }));
+  await user.click(screen.getByRole('option', { name: 'Blue' }));
+  await user.click(screen.getByRole('button', { name: 'Apply changes' }));
+  await user.click(coffeeToggle);
+  expect(coffeeToggle).toHaveAttribute('aria-expanded', 'false');
+  expect(teaToggle).toHaveAttribute('aria-expanded', 'false');
+  validateConfiguration.mockClear();
+  await user.click(screen.getByRole('button', { name: 'Create product' }));
+  await waitFor(() => {
+    expect(coffeeToggle).toHaveAttribute('aria-expanded', 'true');
+    expect(teaToggle).toHaveAttribute('aria-expanded', 'true');
+  });
+  expect(
+    await screen.findAllByText(
+      'Attribute values must be unique across variants'
+    )
+  ).toHaveLength(2);
+  expect(createProductGroup).not.toHaveBeenCalled();
+  validateConfiguration.mockClear();
+  await user.click(screen.getByRole('button', { name: 'Create product' }));
+  expect(
+    screen.getAllByText('Attribute values must be unique across variants')
+  ).toHaveLength(2);
+  expect(createProductGroup).not.toHaveBeenCalled();
+  await user.click(coffeeToggle);
+  await user.click(coffeeToggle);
+  expect(
+    screen.getAllByText('Attribute values must be unique across variants')
+  ).toHaveLength(2);
+  await user.click(
+    screen.getByRole('button', { name: 'Edit attributes for Coffee' })
+  );
+  await user.click(screen.getByRole('button', { name: 'Cancel' }));
+  expect(
+    screen.getAllByText('Attribute values must be unique across variants')
+  ).toHaveLength(2);
+  await user.click(
+    screen.getByRole('button', { name: 'Edit attributes for Coffee' })
+  );
+  await user.click(screen.getByRole('combobox', { name: 'Color' }));
+  await user.click(screen.getByRole('option', { name: 'Red' }));
+  validateConfiguration.mockClear();
+  await user.click(screen.getByRole('button', { name: 'Apply changes' }));
+  expect(validateConfiguration).not.toHaveBeenCalled();
+  expect(
+    screen.getAllByText('Attribute values must be unique across variants')
+  ).toHaveLength(2);
+  await user.click(coffeeToggle);
+  await user.click(teaToggle);
+  validateConfiguration.mockClear();
+  await user.click(screen.getByRole('button', { name: 'Create product' }));
+  await waitFor(() => expect(createProductGroup).toHaveBeenCalledTimes(1));
+  expect(createProductGroup).toHaveBeenCalledWith(
+    expect.objectContaining({
+      productVariants: [
+        expect.objectContaining({ attributeValueIds: [2] }),
+        expect.objectContaining({ attributeValueIds: [1] }),
+      ],
+    })
+  );
+  await user.click(coffeeToggle);
+  await user.click(teaToggle);
+  expect(
+    screen.queryByText('Attribute values must be unique across variants')
+  ).not.toBeInTheDocument();
+});
+
+it('discards dialog changes on cancel without validating the product', async () => {
+  const user = userEvent.setup();
+  setup();
+  await user.click(screen.getByRole('button', { name: 'Show details: Tea' }));
+  await user.click(
+    screen.getByRole('button', { name: 'Edit attributes for Tea' })
+  );
+  await user.click(screen.getByRole('combobox', { name: 'Color' }));
+  validateConfiguration.mockClear();
+  await user.click(screen.getByRole('option', { name: 'Red' }));
+  await user.click(screen.getByRole('button', { name: 'Cancel' }));
+
+  expect(screen.getByRole('button', { name: 'Remove Blue' })).toBeVisible();
+  expect(
+    screen.queryByRole('button', { name: 'Remove Red' })
+  ).not.toBeInTheDocument();
+  expect(validateConfiguration).not.toHaveBeenCalled();
+  expect(screen.queryByText('SKU is required')).not.toBeInTheDocument();
+
+  await user.click(
+    screen.getByRole('button', { name: 'Edit attributes for Tea' })
+  );
+  const dialog = screen.getByRole('dialog', { name: 'Edit attributes' });
+  expect(within(dialog).getByRole('combobox', { name: 'Color' })).toHaveValue(
+    'Blue'
+  );
+});
+
 it('applies attribute drafts without running validation, including after a failed submission', async () => {
   const user = userEvent.setup();
   setup();
@@ -180,7 +310,7 @@ const incrementalAttributes: AttributeDropdown[] = [
 ];
 const onCreated = vi.fn();
 const TableWithIncrementalVariants = () => {
-  const { form } = useCreateProductForm({
+  const { form, submitProductForm } = useCreateProductForm({
     onCreated,
     validateConfiguration: validateMultipleProductsConfiguration,
   });
@@ -198,7 +328,7 @@ const TableWithIncrementalVariants = () => {
       noValidate
       onSubmit={(event) => {
         event.preventDefault();
-        void form.handleSubmit();
+        submitProductForm();
       }}
     >
       <ProductVariantsTable
