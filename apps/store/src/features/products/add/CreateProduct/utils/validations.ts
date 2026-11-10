@@ -22,7 +22,7 @@ export const productCategorySchema = z
   .object({
     id: z.number().int().positive(),
     name: z.string(),
-    status: z.enum([CATEGORY_STATUS.DRAFT, CATEGORY_STATUS.ACTIVE]),
+    status: z.enum([CATEGORY_STATUS.DRAFT, CATEGORY_STATUS.ACTIVE]).optional(),
   })
   .nullable()
   .refine((value) => value !== null, 'Category is required')

@@ -244,6 +244,27 @@ it('blocks selection if the value has been removed', async () => {
   expect(onValueChange).not.toHaveBeenCalled();
 });
 
+it('reviews unknown statuses and blocks selection until status is known', async () => {
+  const user = userEvent.setup();
+  const unknown = { ...draft, status: undefined };
+  vi.mocked(getAttributeValues).mockResolvedValue({
+    ok: true,
+    data: [unknown],
+  });
+  setup({ options: [unknown] });
+  await user.click(screen.getByRole('combobox', { name: 'Roast' }));
+  await user.click(screen.getByRole('option', { name: 'Light' }));
+  const dialog = await screen.findByRole('dialog', {
+    name: 'Activate attribute value?',
+  });
+  expect(await within(dialog).findByRole('alert')).toHaveTextContent(
+    'Value status is unavailable'
+  );
+  expect(
+    within(dialog).getByRole('button', { name: 'Activate and select' })
+  ).toBeDisabled();
+});
+
 it.each([
   'parent',
   'values',

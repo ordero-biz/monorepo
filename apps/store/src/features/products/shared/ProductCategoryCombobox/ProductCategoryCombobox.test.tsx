@@ -277,6 +277,23 @@ describe('Product category selection', () => {
     expect(updateCategory).not.toHaveBeenCalled();
   });
 
+  it('does not assume a missing status is active', async () => {
+    const user = userEvent.setup();
+    vi.mocked(getCategory).mockResolvedValue({
+      ok: true,
+      data: { ...draft, status: undefined },
+    });
+    const { onValueChange } = setup();
+    const dialog = await openReview(user);
+    expect(await within(dialog).findByRole('alert')).toHaveTextContent(
+      'Category status is unavailable'
+    );
+    expect(
+      within(dialog).getByRole('button', { name: 'Activate and select' })
+    ).toBeDisabled();
+    expect(onValueChange).not.toHaveBeenCalled();
+  });
+
   it('prevents duplicate confirmation and closing during activation', async () => {
     const user = userEvent.setup();
     let finish!: (value: Awaited<ReturnType<typeof updateCategory>>) => void;

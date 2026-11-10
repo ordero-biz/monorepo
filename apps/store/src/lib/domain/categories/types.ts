@@ -14,7 +14,7 @@ export type Category = {
   id: number;
   name: string;
   sortOrder: number;
-  status: CategoryStatus;
+  status?: CategoryStatus;
   createdAt: string;
   parentCategory?: CategoryParent | null;
 };
