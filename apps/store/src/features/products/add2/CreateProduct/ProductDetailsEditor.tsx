@@ -1,6 +1,5 @@
 import { Button, Textarea, TextField, Typography } from '@ordero/ui';
 import { useStore } from '@tanstack/react-form';
-import { CategoriesAsyncCombobox } from '@/features/categories';
 import { useInitialFocus } from '@/lib/hooks/accessibility/useInitialFocus';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
 import {
@@ -9,6 +8,7 @@ import {
   validateProductName,
   validateProductStatus,
 } from '../../add/CreateProduct';
+import { ProductCategoryCombobox } from '../../shared/ProductCategoryCombobox';
 import { useProductDetailsForm } from './hooks/useProductDetailsForm';
 import { ProductImagePlaceholder } from './ProductImagePlaceholder';
 import type { ProductDetailsEditorProps } from './types';
@@ -83,7 +83,7 @@ export const ProductDetailsEditor = ({
                 );
 
                 return (
-                  <CategoriesAsyncCombobox
+                  <ProductCategoryCombobox
                     errorText={errorText}
                     invalid={Boolean(errorText)}
                     label="Category"

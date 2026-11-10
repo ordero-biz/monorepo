@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { CATEGORY_STATUS } from '@/lib/domain/categories/constants';
 import { PRODUCT_STATUS } from '@/lib/domain/products/constants';
 import type { ProductStatus } from '@/lib/domain/products/types';
 import { getValidationMessage } from '@/lib/utils/form/validation/message';
@@ -18,9 +19,17 @@ export const productNameSchema = z
   .min(1, 'Product name is required');
 
 export const productCategorySchema = z
-  .object({ id: z.number().int().positive(), name: z.string() })
+  .object({
+    id: z.number().int().positive(),
+    name: z.string(),
+    status: z.enum([CATEGORY_STATUS.DRAFT, CATEGORY_STATUS.ACTIVE]).optional(),
+  })
   .nullable()
-  .refine((value) => value !== null, 'Category is required');
+  .refine((value) => value !== null, 'Category is required')
+  .refine(
+    (value) => value?.status !== CATEGORY_STATUS.DRAFT,
+    'Activate this category before using it for a product'
+  );
 
 export const productAttributesSchema = z
   .array(z.object({ id: z.number() }))

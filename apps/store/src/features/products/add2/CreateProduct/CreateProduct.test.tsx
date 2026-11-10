@@ -2,7 +2,12 @@ import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { ComponentProps } from 'react';
 import type { CategoriesAsyncCombobox } from '@/features/categories';
-import { getAttributesDropdown } from '@/lib/client/api/attributes';
+import {
+  getAttribute,
+  getAttributesDropdown,
+  getAttributeValues,
+  updateAttributeValue,
+} from '@/lib/client/api/attributes';
 import { createProductGroup } from '@/lib/client/api/products';
 import { clientRoutes } from '@/lib/client/routes';
 import type { AttributeDropdown } from '@/lib/domain/attributes/types';
@@ -28,17 +33,32 @@ vi.mock('@/lib/client/api/attributes', async () => ({
     '@/lib/client/api/attributes'
   )),
   getAttributesDropdown: vi.fn(),
+  getAttribute: vi.fn(),
+  getAttributeValues: vi.fn(),
+  updateAttributeValue: vi.fn(),
 }));
 
 const color: AttributeDropdown = {
   id: 1,
   name: 'Color',
   sortOrder: 0,
-  status: 'DRAFT',
+  status: 'ACTIVE',
   createdAt: '2026-10-21T00:00:00Z',
   attributeValues: [
-    { id: 11, name: 'Blue', sortOrder: 0, createdAt: '2026-10-21T00:00:00Z' },
-    { id: 12, name: 'Red', sortOrder: 1, createdAt: '2026-10-21T00:00:00Z' },
+    {
+      id: 11,
+      name: 'Blue',
+      sortOrder: 0,
+      status: 'ACTIVE',
+      createdAt: '2026-10-21T00:00:00Z',
+    },
+    {
+      id: 12,
+      name: 'Red',
+      sortOrder: 1,
+      status: 'ACTIVE',
+      createdAt: '2026-10-21T00:00:00Z',
+    },
   ],
 };
 const material: AttributeDropdown = {
@@ -99,7 +119,9 @@ vi.mock('@/features/categories', async () => ({
     <>
       <button
         aria-invalid={invalid}
-        onClick={() => onValueChange({ id: 2, name: 'Coffee and tea' })}
+        onClick={() =>
+          onValueChange({ id: 2, name: 'Coffee and tea', status: 'ACTIVE' })
+        }
         type="button"
       >
         {value?.name ?? 'Select category'}
@@ -116,13 +138,99 @@ describe('New product creation design', () => {
     mocks.push.mockReset();
     vi.mocked(createProductGroup).mockReset();
     vi.mocked(getAttributesDropdown).mockReset();
+    vi.mocked(getAttribute).mockReset();
+    vi.mocked(getAttributeValues).mockReset();
+    vi.mocked(updateAttributeValue).mockReset();
     vi.mocked(getAttributesDropdown).mockResolvedValue({
       ok: true,
       data: [color, material],
     });
   });
 
-  it('adds and removes attributes only for the edited variant and submits the applied values', async () => {
+  it.each([
+    'DRAFT',
+    'ACTIVE',
+  ] as const)('generates variants with the reviewed value name when its current status is %s', async (status) => {
+    const draft = { ...color.attributeValues[0], status: 'DRAFT' as const };
+    const renamed = { ...draft, name: 'Navy', status };
+    vi.mocked(getAttributesDropdown).mockResolvedValue({
+      ok: true,
+      data: [{ ...color, attributeValues: [draft, color.attributeValues[1]] }],
+    });
+    vi.mocked(getAttribute).mockResolvedValue({ ok: true, data: color });
+    vi.mocked(getAttributeValues).mockResolvedValue({
+      ok: true,
+      data: [renamed, color.attributeValues[1]],
+    });
+    vi.mocked(updateAttributeValue).mockResolvedValue({
+      ok: true,
+      data: { ...renamed, status: 'ACTIVE' },
+    });
+    const user = userEvent.setup();
+    setup();
+    await user.type(
+      screen.getByRole('textbox', { name: 'Product name' }),
+      'Shirt'
+    );
+    await user.click(screen.getByRole('button', { name: 'Select category' }));
+    await user.click(screen.getByRole('radio', { name: 'Multiple variants' }));
+    await addAttribute(user, 'Color');
+    await selectValues(user, { attribute: 'Color', values: ['Red'] });
+    await user.click(screen.getByRole('combobox', { name: 'Color values' }));
+    await user.click(screen.getByRole('option', { name: 'Blue Draft' }));
+    const dialog = await screen.findByRole('dialog', {
+      name:
+        status === 'ACTIVE'
+          ? 'Select attribute value'
+          : 'Activate attribute value?',
+    });
+    const confirm = within(dialog).getByRole('button', {
+      name: status === 'ACTIVE' ? 'Select value' : 'Activate and select',
+    });
+    await waitFor(() => expect(confirm).toBeEnabled());
+    expect(within(dialog).getByText('Navy')).toBeVisible();
+    await user.click(confirm);
+    await waitFor(() =>
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    );
+    expect(screen.getByRole('button', { name: 'Remove Navy' })).toBeVisible();
+    await user.click(screen.getByRole('button', { name: 'Review variants' }));
+    expect(
+      await screen.findByRole('button', { name: 'Show details: Shirt Navy' })
+    ).toBeVisible();
+    expect(
+      screen.getByRole('button', { name: 'Show details: Shirt Red' })
+    ).toBeVisible();
+    expect(
+      screen.queryByRole('button', { name: 'Show details: Shirt Blue' })
+    ).not.toBeInTheDocument();
+  });
+
+  it('submits reviewed attribute changes only for the edited variant', async () => {
+    const draftCotton = {
+      ...material.attributeValues[0],
+      status: 'DRAFT' as const,
+    };
+    const draftMaterial = {
+      ...material,
+      attributeValues: [draftCotton, material.attributeValues[1]],
+    };
+    vi.mocked(getAttributesDropdown).mockResolvedValue({
+      ok: true,
+      data: [color, draftMaterial],
+    });
+    vi.mocked(getAttribute).mockResolvedValue({
+      ok: true,
+      data: draftMaterial,
+    });
+    vi.mocked(getAttributeValues).mockResolvedValue({
+      ok: true,
+      data: draftMaterial.attributeValues,
+    });
+    vi.mocked(updateAttributeValue).mockResolvedValue({
+      ok: true,
+      data: { ...draftCotton, name: 'Pima Cotton', status: 'ACTIVE' },
+    });
     vi.mocked(createProductGroup).mockResolvedValue({
       ok: false,
       error: { status: 503, message: 'Unavailable' },
@@ -146,9 +254,20 @@ describe('New product creation design', () => {
     );
     await addAttribute(user, 'Material');
     await user.click(screen.getByRole('combobox', { name: 'Material' }));
-    await user.click(screen.getByRole('option', { name: 'Cotton' }));
+    await user.click(screen.getByRole('option', { name: 'Cotton Draft' }));
+    const review = await screen.findByRole('dialog', {
+      name: 'Activate attribute value?',
+    });
+    const activate = within(review).getByRole('button', {
+      name: 'Activate and select',
+    });
+    await waitFor(() => expect(activate).toBeEnabled());
+    await user.click(activate);
+    await waitFor(() => expect(review).not.toBeInTheDocument());
     await user.click(screen.getByRole('button', { name: 'Apply changes' }));
-    expect(screen.getByRole('button', { name: 'Remove Cotton' })).toBeVisible();
+    expect(
+      screen.getByRole('button', { name: 'Remove Pima Cotton' })
+    ).toBeVisible();
     expect(screen.queryByText('SKU is required')).not.toBeInTheDocument();
     expect(screen.queryByText('Barcode is required')).not.toBeInTheDocument();
     expect(createProductGroup).not.toHaveBeenCalled();
@@ -170,7 +289,7 @@ describe('New product creation design', () => {
       screen.getByRole('button', { name: 'Edit attributes for Shirt Blue' })
     );
     expect(screen.getByRole('combobox', { name: 'Material' })).toHaveValue(
-      'Cotton'
+      'Pima Cotton'
     );
     expect(
       screen.queryByRole('combobox', { name: 'Color' })
@@ -188,6 +307,12 @@ describe('New product creation design', () => {
     ).not.toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Cancel' }));
 
+    await user.click(
+      screen.getByRole('button', { name: 'Hide details: Shirt Blue' })
+    );
+    await user.click(
+      screen.getByRole('button', { name: 'Hide details: Shirt Red' })
+    );
     for (const index of [1, 2]) {
       await user.type(
         screen.getByRole('textbox', { name: `SKU for variant ${index}` }),
