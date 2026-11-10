@@ -141,14 +141,6 @@ export const ReviewProductCategory = ({
               </Typography>
             </div>
           </div>
-          {currentCategory &&
-          !currentCategory.status &&
-          !categoryQuery.isError ? (
-            <p role="alert">
-              Category status is unavailable. Check its full details before
-              continuing.
-            </p>
-          ) : null}
           {activateCategory.isError ? (
             <p role="alert">{getApiErrorMessage(activateCategory.error)}</p>
           ) : null}

@@ -203,14 +203,14 @@ describe('product generation', () => {
         value: {
           attributes,
           attributeValues: { '1': ['11', '12'], '2': ['21'] },
-          category: { id: 3, name: 'Footwear' },
+          category: { status: 'ACTIVE', id: 3, name: 'Footwear' },
           description: 'Lightweight',
           name: 'Running Shoes',
         },
       })
     ).toEqual({
       attributes,
-      category: { id: 3, name: 'Footwear' },
+      category: { status: 'ACTIVE', id: 3, name: 'Footwear' },
       description: 'Lightweight',
       name: 'Running Shoes',
       productVariants: [
@@ -241,7 +241,7 @@ describe('product generation', () => {
         value: {
           attributes,
           attributeValues: { '1': ['11', '12'], '2': ['21'] },
-          category: { id: 3, name: 'Footwear' },
+          category: { status: 'ACTIVE', id: 3, name: 'Footwear' },
           description: '',
           name: 'Running Shoes',
         },
@@ -253,7 +253,7 @@ describe('product generation', () => {
         value: {
           attributes: [],
           attributeValues: {},
-          category: { id: 3, name: 'Footwear' },
+          category: { status: 'ACTIVE', id: 3, name: 'Footwear' },
           description: '',
           name: 'Running Shoes',
         },

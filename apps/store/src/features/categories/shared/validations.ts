@@ -12,7 +12,7 @@ export const categoryParentSchema = z
   .object({
     id: z.number().int().positive(),
     name: z.string(),
-    status: z.enum([CATEGORY_STATUS.DRAFT, CATEGORY_STATUS.ACTIVE]).optional(),
+    status: z.enum([CATEGORY_STATUS.DRAFT, CATEGORY_STATUS.ACTIVE]),
   })
   .nullable();
 

@@ -17,11 +17,13 @@ describe('submitCreateCategory', () => {
 
   it('normalizes form values before creating the category', async () => {
     const category = {
+      status: 'ACTIVE' as const,
       id: 3,
       name: 'Sneakers',
       sortOrder: 15,
       createdAt: '2026-07-01T11:22:53.562Z',
       parentCategory: {
+        status: 'ACTIVE' as const,
         id: 1,
         name: 'Shoes',
         createdAt: '2026-07-01T10:54:34.839Z',
@@ -35,7 +37,7 @@ describe('submitCreateCategory', () => {
     await expect(
       submitCreateCategory({
         name: '  Sneakers  ',
-        parentCategory: { id: 1, name: 'Shoes' },
+        parentCategory: { status: 'ACTIVE', id: 1, name: 'Shoes' },
         status: 'ACTIVE',
       })
     ).resolves.toEqual({
@@ -65,7 +67,7 @@ describe('submitCreateCategory', () => {
     await expect(
       submitCreateCategory({
         name: 'Sneakers',
-        parentCategory: { id: 1, name: 'Shoes' },
+        parentCategory: { status: 'ACTIVE', id: 1, name: 'Shoes' },
         status: 'DRAFT',
       })
     ).resolves.toEqual({
@@ -81,6 +83,7 @@ describe('submitCreateCategory', () => {
 
   it('omits the parent id when no parent category is selected', async () => {
     const category = {
+      status: 'ACTIVE' as const,
       id: 3,
       name: 'Sneakers',
       sortOrder: 15,

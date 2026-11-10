@@ -64,6 +64,7 @@ describe('useActivateCategory', () => {
     updateCategoryMock.mockResolvedValue({
       ok: true,
       data: {
+        status: 'ACTIVE' as const,
         id: 2,
         name: 'Sneakers',
         sortOrder: 15,

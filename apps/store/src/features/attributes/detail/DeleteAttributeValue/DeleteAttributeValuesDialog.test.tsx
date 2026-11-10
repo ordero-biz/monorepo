@@ -22,12 +22,14 @@ const { setup } = prepareStoreSetup({
     attributeId: 7,
     attributeValues: [
       {
+        status: 'ACTIVE',
         id: 3,
         name: 'Blue',
         sortOrder: 0,
         createdAt: '2026-06-24T20:07:32.467Z',
       },
       {
+        status: 'ACTIVE',
         id: 4,
         name: 'Red',
         sortOrder: 1,

@@ -20,6 +20,7 @@ const { setup } = prepareStoreSetup({
   props: {
     attributeId: 7,
     attributeValue: {
+      status: 'ACTIVE',
       id: 3,
       name: 'Blue',
       sortOrder: 0,

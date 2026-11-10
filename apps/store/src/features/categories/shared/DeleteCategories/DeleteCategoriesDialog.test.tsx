@@ -21,6 +21,7 @@ const singleCategory = {
   status: 'DRAFT' as const,
   createdAt: '2026-06-24T20:07:32.467Z',
   parentCategory: {
+    status: 'ACTIVE' as const,
     id: 3,
     name: 'Fashion',
     createdAt: '2026-06-20T20:07:32.467Z',
@@ -36,6 +37,7 @@ const multipleCategories = [
     status: 'ACTIVE' as const,
     createdAt: '2026-06-25T20:07:32.467Z',
     parentCategory: {
+      status: 'ACTIVE' as const,
       id: 4,
       name: 'Clothing',
       createdAt: '2026-06-21T20:07:32.467Z',

@@ -41,6 +41,7 @@ describe('CategoriesAsyncCombobox', () => {
       data: {
         content: [
           {
+            status: 'ACTIVE' as const,
             createdAt: '2026-07-01T10:54:34.839Z',
             id: 1,
             name: 'Shoes',
@@ -73,7 +74,7 @@ describe('CategoriesAsyncCombobox', () => {
       sort: ['name,asc'],
     });
     expect(mocks.onValueChange).toHaveBeenLastCalledWith(
-      { id: 1, name: 'Shoes', status: undefined },
+      { id: 1, name: 'Shoes', status: 'ACTIVE' },
       expect.any(Object)
     );
   });
@@ -81,7 +82,7 @@ describe('CategoriesAsyncCombobox', () => {
   it('displays saved values before loading and responds to controlled resets', () => {
     const {
       renderResult: { rerender },
-    } = setup({ value: { id: 2, name: 'Saved category' } });
+    } = setup({ value: { status: 'ACTIVE', id: 2, name: 'Saved category' } });
     const input = screen.getByRole('combobox', { name: 'Category' });
     expect(input).toHaveValue('Saved category');
     expect(getCategoriesMock).not.toHaveBeenCalled();
@@ -93,7 +94,9 @@ describe('CategoriesAsyncCombobox', () => {
   it('keeps an initial selection that is absent from loaded results', async () => {
     const user = userEvent.setup();
     mockSuccessfulCategories();
-    setup({ defaultValue: { id: 2, name: 'Saved category' } });
+    setup({
+      defaultValue: { status: 'ACTIVE', id: 2, name: 'Saved category' },
+    });
     const input = screen.getByRole('combobox', { name: 'Category' });
     expect(input).toHaveValue('Saved category');
     await user.click(input);
@@ -106,7 +109,7 @@ describe('CategoriesAsyncCombobox', () => {
   it('refreshes a saved label by ID without emitting a form change', async () => {
     const user = userEvent.setup();
     mockSuccessfulCategories();
-    setup({ value: { id: 1, name: 'Old name' } });
+    setup({ value: { status: 'ACTIVE', id: 1, name: 'Old name' } });
     const input = screen.getByRole('combobox', { name: 'Category' });
     await user.click(input);
     expect(
@@ -120,7 +123,10 @@ describe('CategoriesAsyncCombobox', () => {
   it('emits null for the explicit no-parent choice', async () => {
     const user = userEvent.setup();
     mockSuccessfulCategories();
-    setup({ allowNoParent: true, value: { id: 1, name: 'Shoes' } });
+    setup({
+      allowNoParent: true,
+      value: { status: 'ACTIVE', id: 1, name: 'Shoes' },
+    });
     await user.click(screen.getByRole('combobox', { name: 'Category' }));
     await user.click(
       await screen.findByRole('option', { name: 'No parent category' })

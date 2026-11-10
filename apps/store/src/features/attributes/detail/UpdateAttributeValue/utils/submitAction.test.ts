@@ -50,6 +50,7 @@ describe('submitUpdateAttributeValue', () => {
 
   it('transfers prepared attribute value update data', async () => {
     const attributeValue = {
+      status: 'ACTIVE' as const,
       id: 3,
       name: 'Navy',
       sortOrder: 0,
