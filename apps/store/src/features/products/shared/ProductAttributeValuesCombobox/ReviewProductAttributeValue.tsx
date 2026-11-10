@@ -150,12 +150,6 @@ export const ReviewProductAttributeValue = ({
               details to review it.
             </p>
           ) : null}
-          {!queryError && currentValue && !currentValue.status ? (
-            <p role="alert">
-              Value status is unavailable. Check attribute details before
-              continuing.
-            </p>
-          ) : null}
           {activateAttributeValue.isError ? (
             <p role="alert">
               {getApiErrorMessage(activateAttributeValue.error)}
