@@ -1,4 +1,4 @@
-import { SIDEBAR_NAVIGATION_COLLAPSED_COOKIE } from '@ordero/ui';
+import { SIDEBAR_NAVIGATION_COLLAPSED_COOKIE_NAME } from '@ordero/ui';
 import { cookies } from 'next/headers';
 import type { ReactNode } from 'react';
 import { BaseLayout } from '@/features/app-shell';
@@ -14,11 +14,11 @@ export default async function ProtectedLayout({
   await requireAuthenticatedRoute();
 
   const cookieStore = await cookies();
-  const defaultSidebarCollapsed =
-    cookieStore.get(SIDEBAR_NAVIGATION_COLLAPSED_COOKIE)?.value === 'true';
+  const isInitialSidebarCollapsed =
+    cookieStore.get(SIDEBAR_NAVIGATION_COLLAPSED_COOKIE_NAME)?.value === 'true';
 
   return (
-    <BaseLayout defaultSidebarCollapsed={defaultSidebarCollapsed}>
+    <BaseLayout isInitialSidebarCollapsed={isInitialSidebarCollapsed}>
       {children}
     </BaseLayout>
   );

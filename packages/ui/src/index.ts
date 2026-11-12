@@ -206,7 +206,7 @@ export type {
   SidebarNavigationTriggerProps,
 } from './components/SidebarNavigation';
 export {
-  SIDEBAR_NAVIGATION_COLLAPSED_COOKIE,
+  SIDEBAR_NAVIGATION_COLLAPSED_COOKIE_NAME,
   SidebarNavigation,
   SidebarNavigationBrand,
   SidebarNavigationContent,
@@ -285,4 +285,6 @@ export type {
   TypographyVariant,
 } from './components/Typography';
 export { Typography } from './components/Typography';
+export type { ViewportBreakpoint } from './hooks/useBelowViewportBreakpoint';
+export { useBelowViewportBreakpoint } from './hooks/useBelowViewportBreakpoint';
 export { cn } from './lib/utils';

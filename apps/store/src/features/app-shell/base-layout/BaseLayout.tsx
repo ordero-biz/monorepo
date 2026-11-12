@@ -26,10 +26,13 @@ const baseLayoutMainClassName = cn(
 
 export const BaseLayout = ({
   children,
-  defaultSidebarCollapsed = false,
+  isInitialSidebarCollapsed = false,
 }: BaseLayoutProps) => {
   return (
-    <SidebarNavigationProvider defaultCollapsed={defaultSidebarCollapsed}>
+    <SidebarNavigationProvider
+      breakpoint="md"
+      defaultCollapsed={isInitialSidebarCollapsed}
+    >
       <Sidebar />
       <main className={baseLayoutMainClassName}>
         <TopBar.Root id="store-page-header">

@@ -8,143 +8,128 @@ import {
   useId,
   useMemo,
   useState,
-  useSyncExternalStore,
 } from 'react';
-import { providerClassName } from './classNames';
+import { cn } from '@/ui/lib/utils';
+import { providerClassName, sidebarBreakpointClasses } from './classNames';
 import {
-  SIDEBAR_NAVIGATION_COLLAPSED_COOKIE,
+  DEFAULT_SIDEBAR_BREAKPOINT,
+  SIDEBAR_NAVIGATION_COLLAPSED_COOKIE_NAME,
   SIDEBAR_NAVIGATION_COOKIE_MAX_AGE,
-  SIDEBAR_NAVIGATION_MOBILE_BREAKPOINT_FALLBACK,
-  SIDEBAR_NAVIGATION_MOBILE_BREAKPOINT_TOKEN,
 } from './constants';
 import type {
   SidebarNavigationContextValue,
   SidebarNavigationProviderProps,
 } from './types';
 
-const defaultContextValue: SidebarNavigationContextValue = {
+const standaloneContextValue: SidebarNavigationContextValue = {
   collapsed: false,
   collapsible: false,
-  isMobile: false,
+  setDrawerOpen: () => undefined,
   overlayId: undefined,
   setCollapsed: () => undefined,
   toggleCollapsed: () => undefined,
 };
 
-const SidebarNavigationContext =
-  createContext<SidebarNavigationContextValue>(defaultContextValue);
+const SidebarNavigationContext = createContext<
+  SidebarNavigationContextValue & { sectionIdPrefix?: string }
+>(standaloneContextValue);
 
 export const useSidebarNavigation = () => useContext(SidebarNavigationContext);
 
-/**
- * Overrides how a subtree renders the items, e.g. the expanded menu inside a
- * branch popover or the mobile drawer.
- */
-export const SidebarNavigationScope = ({
-  children,
-  collapsed,
-}: {
+type SidebarNavigationDisplayScopeProps = {
   children: ReactNode;
-  collapsed: boolean;
-}) => {
-  const parent = useSidebarNavigation();
-  const value = useMemo(() => ({ ...parent, collapsed }), [parent, collapsed]);
+  renderCollapsed: boolean;
+  sectionIdPrefix?: string;
+};
+
+/** Lets a drawer or popover render expanded items independently of sidebar state. */
+export const SidebarNavigationDisplayScope = ({
+  children,
+  renderCollapsed,
+  sectionIdPrefix,
+}: SidebarNavigationDisplayScopeProps) => {
+  const parentContext = useSidebarNavigation();
+  const displayContext = useMemo(
+    () => ({
+      ...parentContext,
+      collapsed: renderCollapsed,
+      sectionIdPrefix: sectionIdPrefix ?? parentContext.sectionIdPrefix,
+    }),
+    [parentContext, renderCollapsed, sectionIdPrefix]
+  );
 
   return (
-    <SidebarNavigationContext.Provider value={value}>
+    <SidebarNavigationContext.Provider value={displayContext}>
       {children}
     </SidebarNavigationContext.Provider>
   );
 };
 
-const persistCollapsed = (collapsed: boolean) => {
+const persistDesktopCollapsed = (isDesktopCollapsed: boolean) => {
   // biome-ignore lint/suspicious/noDocumentCookie: mirrors shadcn sidebar persistence so the server can read the state on first render
-  document.cookie = `${SIDEBAR_NAVIGATION_COLLAPSED_COOKIE}=${collapsed}; path=/; max-age=${SIDEBAR_NAVIGATION_COOKIE_MAX_AGE}; samesite=lax`;
+  document.cookie = `${SIDEBAR_NAVIGATION_COLLAPSED_COOKIE_NAME}=${isDesktopCollapsed}; path=/; max-age=${SIDEBAR_NAVIGATION_COOKIE_MAX_AGE}; samesite=lax`;
 };
-
-let mobileBreakpoint: string | undefined;
-
-const getMobileMediaQuery = () => {
-  mobileBreakpoint ??=
-    getComputedStyle(document.documentElement)
-      .getPropertyValue(SIDEBAR_NAVIGATION_MOBILE_BREAKPOINT_TOKEN)
-      .trim() || SIDEBAR_NAVIGATION_MOBILE_BREAKPOINT_FALLBACK;
-
-  return window.matchMedia?.(`(width < ${mobileBreakpoint})`);
-};
-
-const subscribeToMobile = (onChange: () => void) => {
-  const mediaQuery = getMobileMediaQuery();
-
-  mediaQuery?.addEventListener?.('change', onChange);
-
-  return () => mediaQuery?.removeEventListener?.('change', onChange);
-};
-
-const getIsMobile = () => Boolean(getMobileMediaQuery()?.matches);
-
-// The server cannot know the viewport, so it renders the desktop layout.
-const getIsMobileOnServer = () => false;
 
 export const SidebarNavigationProvider = ({
+  breakpoint = DEFAULT_SIDEBAR_BREAKPOINT,
   children,
-  collapsed: collapsedProp,
-  defaultCollapsed = false,
-  onCollapsedChange,
+  collapsed: controlledDesktopCollapsed,
+  defaultCollapsed: defaultDesktopCollapsed = false,
+  onCollapsedChange: onDesktopCollapsedChange,
 }: SidebarNavigationProviderProps) => {
-  const isMobile = useSyncExternalStore(
-    subscribeToMobile,
-    getIsMobile,
-    getIsMobileOnServer
+  const [internalDesktopCollapsed, setInternalDesktopCollapsed] = useState(
+    defaultDesktopCollapsed
   );
-  const [uncontrolledCollapsed, setUncontrolledCollapsed] =
-    useState(defaultCollapsed);
-  // On mobile the sidebar is an overlay that starts closed and is not persisted.
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const overlayId = useId();
-  const desktopCollapsed = collapsedProp ?? uncontrolledCollapsed;
-  const collapsed = isMobile ? !mobileOpen : desktopCollapsed;
-
-  const setCollapsed = useCallback(
+  const [drawerOpen, setDrawerOpen] = useState<boolean>();
+  const mobileDrawerId = useId();
+  const isDesktopCollapsed =
+    controlledDesktopCollapsed ?? internalDesktopCollapsed;
+  const updateDesktopCollapsed = useCallback(
     (nextCollapsed: boolean) => {
-      if (isMobile) {
-        setMobileOpen(!nextCollapsed);
-        return;
+      if (controlledDesktopCollapsed === undefined) {
+        setInternalDesktopCollapsed(nextCollapsed);
+        persistDesktopCollapsed(nextCollapsed);
       }
 
-      // A controlled consumer owns the state and decides where to keep it.
-      if (collapsedProp === undefined) {
-        setUncontrolledCollapsed(nextCollapsed);
-        persistCollapsed(nextCollapsed);
-      }
-
-      onCollapsedChange?.(nextCollapsed);
+      onDesktopCollapsedChange?.(nextCollapsed);
     },
-    [collapsedProp, isMobile, onCollapsedChange]
+    [controlledDesktopCollapsed, onDesktopCollapsedChange]
   );
 
-  const toggleCollapsed = useCallback(
-    () => setCollapsed(!collapsed),
-    [collapsed, setCollapsed]
+  const toggleDesktopCollapsed = useCallback(
+    () => updateDesktopCollapsed(!isDesktopCollapsed),
+    [isDesktopCollapsed, updateDesktopCollapsed]
   );
 
-  const value = useMemo<SidebarNavigationContextValue>(
+  const navigationContext = useMemo<SidebarNavigationContextValue>(
     () => ({
-      collapsed,
+      breakpoint,
+      collapsed: isDesktopCollapsed,
       collapsible: true,
-      isMobile,
-      overlayId,
-      setCollapsed,
-      toggleCollapsed,
+      drawerOpen,
+      overlayId: mobileDrawerId,
+      setDrawerOpen,
+      setCollapsed: updateDesktopCollapsed,
+      toggleCollapsed: toggleDesktopCollapsed,
     }),
-    [collapsed, isMobile, overlayId, setCollapsed, toggleCollapsed]
+    [
+      breakpoint,
+      isDesktopCollapsed,
+      drawerOpen,
+      mobileDrawerId,
+      updateDesktopCollapsed,
+      toggleDesktopCollapsed,
+    ]
   );
 
   return (
-    <SidebarNavigationContext.Provider value={value}>
+    <SidebarNavigationContext.Provider value={navigationContext}>
       <div
-        className={providerClassName}
-        data-collapsed={desktopCollapsed ? 'true' : 'false'}
+        className={cn(
+          providerClassName,
+          sidebarBreakpointClasses[breakpoint].layout
+        )}
+        data-collapsed={isDesktopCollapsed ? 'true' : 'false'}
         data-slot="sidebar-navigation-provider"
       >
         {children}

@@ -11,24 +11,22 @@
 
 .sidebar-navigation-provider {
   --sidebar-navigation-panel-width: var(--nav-width);
-  --sidebar-navigation-width: var(--sidebar-navigation-panel-width);
+}
+
+/* The selected breakpoint's utility overrides this width in drawer mode. */
+@layer components {
+  .sidebar-navigation-provider {
+    --sidebar-navigation-width: var(--sidebar-navigation-panel-width);
+  }
 }
 
 .sidebar-navigation-provider[data-collapsed='true'] {
   --sidebar-navigation-panel-width: var(--nav-mini-width);
 }
 
-/*
- * Mobile: the sidebar is hidden and opens as a drawer from the page header,
- * so it takes no layout space. Keep the width in sync with --breakpoint-md.
- */
-@media (width < 900px) {
-  .sidebar-navigation-provider {
-    --sidebar-navigation-width: 0px;
-  }
-}
-
 .sidebar-navigation-panel {
+  /* Base UI supplies the measured height as an inline custom property. */
+  --accordion-panel-height: auto;
   box-sizing: border-box;
   overflow: hidden;
   height: var(--accordion-panel-height);

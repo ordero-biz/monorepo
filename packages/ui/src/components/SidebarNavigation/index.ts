@@ -1,4 +1,4 @@
-export { SIDEBAR_NAVIGATION_COLLAPSED_COOKIE } from './constants';
+export { SIDEBAR_NAVIGATION_COLLAPSED_COOKIE_NAME } from './constants';
 export { SidebarNavigation } from './SidebarNavigation';
 export { SidebarNavigationBrand } from './SidebarNavigationBrand';
 export { SidebarNavigationContent } from './SidebarNavigationContent';

@@ -1,5 +1,32 @@
 import { dropdownSurfaceClassName } from '@/ui/components/Select';
+import type { ViewportBreakpoint } from '@/ui/hooks/useBelowViewportBreakpoint';
 import { cn } from '@/ui/lib/utils';
+
+export const sidebarBreakpointClasses = {
+  sm: {
+    rail: 'max-sm:hidden',
+    trigger: 'sm:hidden',
+    layout: 'max-sm:[--sidebar-navigation-width:0px]',
+  },
+  md: {
+    rail: 'max-md:hidden',
+    trigger: 'md:hidden',
+    layout: 'max-md:[--sidebar-navigation-width:0px]',
+  },
+  lg: {
+    rail: 'max-lg:hidden',
+    trigger: 'lg:hidden',
+    layout: 'max-lg:[--sidebar-navigation-width:0px]',
+  },
+  xl: {
+    rail: 'max-xl:hidden',
+    trigger: 'xl:hidden',
+    layout: 'max-xl:[--sidebar-navigation-width:0px]',
+  },
+} satisfies Record<
+  ViewportBreakpoint,
+  { rail: string; trigger: string; layout: string }
+>;
 
 export const providerClassName =
   'sidebar-navigation-provider flex min-h-screen w-full';
@@ -7,7 +34,7 @@ export const providerClassName =
 // The aside reserves layout space; the panel inside it holds the visible
 // sidebar and can grow past the aside to overlay content on mobile.
 export const shellClassName =
-  'group/sidebar-navigation sticky top-0 z-[1] h-screen max-md:hidden w-[var(--sidebar-navigation-width,var(--nav-width))] min-w-[var(--sidebar-navigation-width,var(--nav-width))] shrink-0 transition-[width,min-width] duration-[var(--sidebar-navigation-duration)] ease-[var(--sidebar-navigation-easing)] motion-reduce:transition-none';
+  'group/sidebar-navigation sticky top-0 z-[1] h-screen w-[var(--sidebar-navigation-width,var(--nav-width))] min-w-[var(--sidebar-navigation-width,var(--nav-width))] shrink-0 transition-[width,min-width] duration-[var(--sidebar-navigation-duration)] ease-[var(--sidebar-navigation-easing)] motion-reduce:transition-none';
 
 export const panelClassName =
   'relative h-full w-[var(--sidebar-navigation-panel-width,var(--nav-width))] border-r border-border bg-background transition-[width] duration-[var(--sidebar-navigation-duration)] ease-[var(--sidebar-navigation-easing)] motion-reduce:transition-none';
@@ -47,7 +74,7 @@ export const popoverPopupClassName = cn(
 export const popoverTitleClassName =
   'px-[var(--space-1-5)] pb-[var(--space-0-5)] pt-[var(--space-1)] text-[length:var(--nav-subheader-size-desktop)] leading-[var(--nav-subheader-line-height-desktop)] font-[var(--nav-subheader-weight)] uppercase text-[var(--text-secondary)]';
 
-export const triggerClassName = 'inline-flex md:hidden';
+export const triggerClassName = 'inline-flex';
 
 export const brandClassName =
   'flex items-center gap-[var(--space-1)] px-[var(--space-1-5)]';

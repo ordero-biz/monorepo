@@ -278,11 +278,27 @@ export const MobileDrawerOpen: Story = {
   globals: mobileGlobals,
   render: () => <CollapsibleSidebarShell />,
   play: async ({ canvasElement }) => {
-    const drawer = await openMobileDrawer(canvasElement);
+    const document = canvasElement.ownerDocument;
+    const transitions = new Set<EventTarget>();
+    const recordSlide = (event: TransitionEvent) => {
+      if (event.propertyName === 'transform' && event.target) {
+        transitions.add(event.target);
+      }
+    };
+    document.addEventListener('transitionrun', recordSlide);
 
-    await expect(
-      within(drawer).getByRole('link', { name: 'Dashboard' })
-    ).toBeVisible();
+    try {
+      const drawer = await openMobileDrawer(canvasElement);
+
+      await expect(
+        within(drawer).getByRole('link', { name: 'Dashboard' })
+      ).toBeVisible();
+      if (!document.defaultView?.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        await waitFor(() => expect(transitions.has(drawer)).toBe(true));
+      }
+    } finally {
+      document.removeEventListener('transitionrun', recordSlide);
+    }
   },
 };
 

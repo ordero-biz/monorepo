@@ -3,7 +3,9 @@
 import './styles.css';
 import { Drawer } from '@base-ui/react/drawer';
 import { Tooltip } from '@base-ui/react/tooltip';
-import type { MouseEvent } from 'react';
+import { type MouseEvent, useEffect, useRef } from 'react';
+import { useBelowViewportBreakpoint } from '@/ui/hooks/useBelowViewportBreakpoint';
+import { cn } from '@/ui/lib/utils';
 import {
   overlayBackdropClassName,
   overlayPopupClassName,
@@ -11,9 +13,11 @@ import {
   panelClassName,
   shellClassName,
   shellInnerClassName,
+  sidebarBreakpointClasses,
 } from './classNames';
+import { DEFAULT_SIDEBAR_BREAKPOINT } from './constants';
 import {
-  SidebarNavigationScope,
+  SidebarNavigationDisplayScope,
   useSidebarNavigation,
 } from './SidebarNavigationProvider';
 import { SidebarNavigationToggle } from './SidebarNavigationToggle';
@@ -31,18 +35,34 @@ export const SidebarNavigation = ({
   label = 'Sidebar navigation',
   ref,
 }: SidebarNavigationProps) => {
-  const { collapsed, collapsible, isMobile, overlayId, setCollapsed } =
-    useSidebarNavigation();
-  // On mobile the sidebar itself is hidden (and its items are not rendered)
-  // and opens in a modal drawer from SidebarNavigationTrigger in the header.
-  const railCollapsed = isMobile || collapsed;
-  const overlayOpen = collapsible && isMobile && !collapsed;
+  const {
+    breakpoint = DEFAULT_SIDEBAR_BREAKPOINT,
+    collapsed,
+    collapsible,
+    drawerOpen,
+    overlayId,
+    setDrawerOpen,
+  } = useSidebarNavigation();
+  const isBelowBreakpoint = useBelowViewportBreakpoint(breakpoint);
+  const desktopToggleRef = useRef<HTMLButtonElement>(null);
+  const closedOnDesktop = useRef(false);
+
+  useEffect(() => {
+    if (!drawerOpen) {
+      return;
+    }
+
+    closedOnDesktop.current = !isBelowBreakpoint;
+    if (!isBelowBreakpoint) {
+      setDrawerOpen(false);
+    }
+  }, [drawerOpen, isBelowBreakpoint, setDrawerOpen]);
 
   // Close the drawer once an item is selected. React events bubble through
   // portals, so this also covers links inside nested popovers.
   const handleOverlayClick = (event: MouseEvent<HTMLElement>) => {
     if ((event.target as Element).closest(selectableItemSelector)) {
-      setCollapsed(true);
+      setDrawerOpen(false);
     }
   };
 
@@ -50,35 +70,35 @@ export const SidebarNavigation = ({
     <Tooltip.Provider delay={0}>
       <aside
         aria-label={label}
-        className={shellClassName}
-        data-collapsed={railCollapsed ? 'true' : 'false'}
+        className={cn(
+          shellClassName,
+          sidebarBreakpointClasses[breakpoint].rail
+        )}
+        data-collapsed={collapsed ? 'true' : 'false'}
         data-slot="sidebar-navigation"
         id={id}
         ref={ref}
       >
-        {isMobile ? null : (
+        {!isBelowBreakpoint && (
           <div className={panelClassName} data-slot="sidebar-navigation-rail">
-            <div className={shellInnerClassName}>
-              <SidebarNavigationScope collapsed={railCollapsed}>
-                {children}
-              </SidebarNavigationScope>
-            </div>
+            <div className={shellInnerClassName}>{children}</div>
             <SidebarNavigationToggle
               collapseLabel={collapseLabel}
               controls={id}
               expandLabel={expandLabel}
+              ref={desktopToggleRef}
             />
           </div>
         )}
       </aside>
-      {collapsible && isMobile ? (
+      {collapsible ? (
         <Drawer.Root
-          onOpenChange={(open) => setCollapsed(!open)}
-          open={overlayOpen}
+          onOpenChange={setDrawerOpen}
+          open={drawerOpen === true}
           swipeDirection="left"
         >
-          {/* Kept mounted so branches the user expanded stay open between visits. */}
-          <Drawer.Portal keepMounted>
+          {/* Mount the content on first open and retain expanded branches afterward. */}
+          <Drawer.Portal keepMounted={drawerOpen !== undefined}>
             <Drawer.Backdrop
               className={overlayBackdropClassName}
               data-slot="sidebar-navigation-backdrop"
@@ -89,13 +109,19 @@ export const SidebarNavigation = ({
                 className={overlayPopupClassName}
                 data-collapsed="false"
                 data-slot="sidebar-navigation-overlay"
+                finalFocus={() =>
+                  closedOnDesktop.current ? desktopToggleRef.current : true
+                }
                 id={overlayId}
                 onClick={handleOverlayClick}
               >
                 <div className={shellInnerClassName}>
-                  <SidebarNavigationScope collapsed={false}>
+                  <SidebarNavigationDisplayScope
+                    renderCollapsed={false}
+                    sectionIdPrefix={overlayId}
+                  >
                     {children}
-                  </SidebarNavigationScope>
+                  </SidebarNavigationDisplayScope>
                 </div>
               </Drawer.Popup>
             </Drawer.Viewport>

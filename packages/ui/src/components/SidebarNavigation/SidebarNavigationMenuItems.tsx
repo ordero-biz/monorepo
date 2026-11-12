@@ -20,7 +20,7 @@ import {
   tooltipPopupClassName,
 } from './classNames';
 import {
-  SidebarNavigationScope,
+  SidebarNavigationDisplayScope,
   useSidebarNavigation,
 } from './SidebarNavigationProvider';
 import type {
@@ -62,7 +62,7 @@ const getItemClassName = ({
       ? 'cursor-not-allowed text-[var(--text-disabled)]'
       : 'cursor-pointer',
     active && depth === 0
-      ? 'bg-[var(--color-primary-8)] text-[var(--primary-main)] hover:bg-[var(--color-primary-8)] hover:text-[var(--primary-main)]'
+      ? 'bg-[var(--color-primary-8)] text-swap-dark-light-primary hover:bg-[var(--color-primary-8)] hover:text-swap-dark-light-primary'
       : null,
     active && depth > 0
       ? 'bg-[var(--color-grey-8)] text-foreground hover:bg-[var(--color-grey-8)]'
@@ -276,7 +276,7 @@ const SidebarNavigationCollapsedBranch = ({
             <div aria-hidden="true" className={popoverTitleClassName}>
               {item.label}
             </div>
-            <SidebarNavigationScope collapsed={false}>
+            <SidebarNavigationDisplayScope renderCollapsed={false}>
               <SidebarNavigationMenuItems
                 depth={0}
                 items={item.items}
@@ -284,7 +284,7 @@ const SidebarNavigationCollapsedBranch = ({
                 renderLink={renderLink}
                 rootLabel={rootLabel}
               />
-            </SidebarNavigationScope>
+            </SidebarNavigationDisplayScope>
           </Popover.Popup>
         </Popover.Positioner>
       </Popover.Portal>
@@ -331,12 +331,8 @@ export const SidebarNavigationMenuItems = ({
         setOpenItemIds(toAccordionItemIds(nextValue))
       }
       multiple
-      render={(props) => (
-        <ul
-          {...props}
-          className={props.className}
-          data-slot="sidebar-navigation-menu"
-        />
+      render={({ role: _role, ...listProps }) => (
+        <ul {...listProps} data-slot="sidebar-navigation-menu" />
       )}
       value={openItemIds}
     >

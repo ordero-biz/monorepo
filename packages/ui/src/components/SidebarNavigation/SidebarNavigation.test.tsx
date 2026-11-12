@@ -1,9 +1,10 @@
 import { prepareSetup } from '@ordero/test-config/react';
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Boxes, LayoutDashboard, Package, Settings } from 'lucide-react';
+import { renderToString } from 'react-dom/server';
 import {
-  SIDEBAR_NAVIGATION_COLLAPSED_COOKIE,
+  SIDEBAR_NAVIGATION_COLLAPSED_COOKIE_NAME,
   SidebarNavigation,
   SidebarNavigationBrand,
   SidebarNavigationContent,
@@ -624,7 +625,7 @@ describe('SidebarNavigation', () => {
 
       expect(onCollapsedChange).toHaveBeenCalledWith(true);
       expect(document.cookie).toContain(
-        `${SIDEBAR_NAVIGATION_COLLAPSED_COOKIE}=true`
+        `${SIDEBAR_NAVIGATION_COLLAPSED_COOKIE_NAME}=true`
       );
     });
 
@@ -650,7 +651,7 @@ describe('SidebarNavigation', () => {
     it('leaves a controlled state to the consumer and does not persist it', async () => {
       const user = userEvent.setup();
       // biome-ignore lint/suspicious/noDocumentCookie: resets the persisted state for this test
-      document.cookie = `${SIDEBAR_NAVIGATION_COLLAPSED_COOKIE}=false; path=/`;
+      document.cookie = `${SIDEBAR_NAVIGATION_COLLAPSED_COOKIE_NAME}=false; path=/`;
 
       const { onCollapsedChange } = setupCollapsible({
         collapsed: false,
@@ -666,21 +667,29 @@ describe('SidebarNavigation', () => {
         screen.getByRole('button', { name: 'Collapse sidebar' })
       ).toHaveAttribute('aria-expanded', 'true');
       expect(document.cookie).toContain(
-        `${SIDEBAR_NAVIGATION_COLLAPSED_COOKIE}=false`
+        `${SIDEBAR_NAVIGATION_COLLAPSED_COOKIE_NAME}=false`
       );
     });
 
     describe('on mobile', () => {
+      let matchingMediaQuery: string;
+      let mediaQuery: EventTarget & { matches: boolean };
+      const matchMedia = vi.fn((query: string) =>
+        Object.assign(mediaQuery, { matches: query === matchingMediaQuery })
+      );
+
       beforeEach(() => {
-        vi.stubGlobal('matchMedia', (query: string) => ({
-          addEventListener: vi.fn(),
-          matches: true,
-          media: query,
-          removeEventListener: vi.fn(),
-        }));
+        matchingMediaQuery = '(width < 900px)';
+        document.documentElement.style.setProperty('--breakpoint-md', '900px');
+        document.documentElement.style.setProperty('--breakpoint-lg', '1200px');
+        mediaQuery = Object.assign(new EventTarget(), { matches: true });
+        matchMedia.mockClear();
+        vi.stubGlobal('matchMedia', matchMedia);
       });
 
       afterEach(() => {
+        document.documentElement.style.removeProperty('--breakpoint-md');
+        document.documentElement.style.removeProperty('--breakpoint-lg');
         vi.unstubAllGlobals();
       });
 
@@ -699,6 +708,43 @@ describe('SidebarNavigation', () => {
           screen.getByRole('button', { name: 'Open navigation' })
         ).toHaveAttribute('aria-expanded', 'false');
         expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      });
+
+      it('removes the desktop rail after hydrating on mobile', () => {
+        const fixture = <CollapsibleSidebarFixture />;
+        const serverMarkup = new DOMParser().parseFromString(
+          renderToString(fixture),
+          'text/html'
+        );
+        const container = document.body.appendChild(
+          document.createElement('div')
+        );
+        container.append(...serverMarkup.body.childNodes);
+        const onRecoverableError = vi.fn();
+
+        expect(matchMedia).not.toHaveBeenCalled();
+        expect(
+          within(container).getByRole('link', { name: 'Dashboard' })
+        ).toBeInTheDocument();
+
+        render(fixture, { container, hydrate: true, onRecoverableError });
+
+        expect(onRecoverableError).not.toHaveBeenCalled();
+        expect(
+          within(container).queryByRole('link', { name: 'Dashboard' })
+        ).not.toBeInTheDocument();
+        expect(
+          screen.getByRole('button', { name: 'Open navigation' })
+        ).toBeInTheDocument();
+      });
+
+      it('opens the drawer at the breakpoint selected by the app shell', async () => {
+        matchingMediaQuery = '(width < 1200px)';
+        const user = userEvent.setup();
+
+        setupCollapsible({ breakpoint: 'lg' });
+
+        expect(await openDrawer(user)).toBeVisible();
       });
 
       it('opens the expanded sidebar in a modal drawer and moves focus into it', async () => {
@@ -790,6 +836,24 @@ describe('SidebarNavigation', () => {
         expect(
           screen.getByRole('button', { name: 'Open navigation' })
         ).toHaveFocus();
+      });
+
+      it('closes on crossing to desktop and returns focus to the rail toggle', async () => {
+        const user = userEvent.setup();
+        setupCollapsible();
+
+        await openDrawer(user);
+        act(() => {
+          mediaQuery.matches = false;
+          mediaQuery.dispatchEvent(new Event('change'));
+        });
+
+        await waitFor(() => {
+          expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+          expect(
+            screen.getByRole('button', { name: 'Collapse sidebar' })
+          ).toHaveFocus();
+        });
       });
     });
   });

@@ -4,6 +4,7 @@ import type {
   ReactNode,
   Ref,
 } from 'react';
+import type { ViewportBreakpoint } from '@/ui/hooks/useBelowViewportBreakpoint';
 
 type SidebarNavigationBaseItem = {
   active?: boolean;
@@ -83,18 +84,22 @@ export type SidebarNavigationBrandProps = {
 };
 
 export type SidebarNavigationContextValue = {
+  breakpoint?: ViewportBreakpoint;
   collapsed: boolean;
   /** True when a provider manages the collapsed state and a toggle is shown. */
   collapsible: boolean;
-  /** True below the mobile breakpoint, where the sidebar opens as an overlay. */
-  isMobile: boolean;
+  /** Undefined until the drawer has first been opened. */
+  drawerOpen?: boolean;
   /** Id of the mobile drawer, for the trigger's `aria-controls`. */
   overlayId?: string;
   setCollapsed: (collapsed: boolean) => void;
+  setDrawerOpen: (open: boolean) => void;
   toggleCollapsed: () => void;
 };
 
 export type SidebarNavigationProviderProps = {
+  /** Below this viewport breakpoint, navigation opens in a drawer. */
+  breakpoint?: ViewportBreakpoint;
   children: ReactNode;
   collapsed?: boolean;
   defaultCollapsed?: boolean;
@@ -105,6 +110,7 @@ export type SidebarNavigationToggleProps = {
   collapseLabel: string;
   controls?: string;
   expandLabel: string;
+  ref?: Ref<HTMLButtonElement>;
 };
 
 export type SidebarNavigationHeaderProps = {

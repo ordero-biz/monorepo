@@ -31,7 +31,8 @@ export const SidebarNavigationSection = ({
     setOpenSectionIds(defaultExpanded ? [id] : []);
   }, [defaultExpanded, id]);
 
-  const { collapsed } = useSidebarNavigation();
+  const { collapsed, sectionIdPrefix } = useSidebarNavigation();
+  const sectionId = sectionIdPrefix ? `${sectionIdPrefix}-${id}` : id;
 
   if (hidden) {
     return null;
@@ -42,7 +43,7 @@ export const SidebarNavigationSection = ({
       <section
         className={sectionRootClassName}
         data-slot="sidebar-navigation-section"
-        id={id}
+        id={sectionId}
         ref={ref}
       >
         {label ? (
@@ -66,7 +67,7 @@ export const SidebarNavigationSection = ({
     <section
       className={sectionRootClassName}
       data-slot="sidebar-navigation-section"
-      id={id}
+      id={sectionId}
       ref={ref}
     >
       <Accordion.Root

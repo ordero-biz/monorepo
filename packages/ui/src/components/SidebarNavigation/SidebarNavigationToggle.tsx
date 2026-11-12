@@ -11,6 +11,7 @@ export const SidebarNavigationToggle = ({
   collapseLabel,
   controls,
   expandLabel,
+  ref,
 }: SidebarNavigationToggleProps) => {
   const { collapsed, collapsible, toggleCollapsed } = useSidebarNavigation();
 
@@ -26,6 +27,7 @@ export const SidebarNavigationToggle = ({
       className={toggleClassName}
       data-slot="sidebar-navigation-toggle"
       onClick={toggleCollapsed}
+      ref={ref}
       title={collapsed ? expandLabel : collapseLabel}
       type="button"
     >

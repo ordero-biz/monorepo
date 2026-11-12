@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 
 export type BaseLayoutProps = {
   children: ReactNode;
-  defaultSidebarCollapsed?: boolean;
+  isInitialSidebarCollapsed?: boolean;
 };
 
 export type BaseLayoutContextualActionBarProps = {

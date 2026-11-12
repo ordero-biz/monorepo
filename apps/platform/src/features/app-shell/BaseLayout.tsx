@@ -18,10 +18,13 @@ const baseLayoutContentClassName = cn(
 
 export const BaseLayout = ({
   children,
-  defaultSidebarCollapsed = false,
+  isInitialSidebarCollapsed = false,
 }: BaseLayoutProps) => {
   return (
-    <SidebarNavigationProvider defaultCollapsed={defaultSidebarCollapsed}>
+    <SidebarNavigationProvider
+      breakpoint="md"
+      defaultCollapsed={isInitialSidebarCollapsed}
+    >
       <Sidebar />
       <main className="flex min-w-0 flex-1 flex-col">
         <TopBar.Root id="platform-page-header">
