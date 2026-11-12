@@ -258,9 +258,21 @@ export const Collapsible: Story = {
   render: () => <CollapsibleSidebarShell />,
 };
 
-// On mobile the sidebar is hidden; the menu button opens it as a drawer.
 const mobileGlobals = {
   viewport: { isRotated: false, value: 'mobile1' },
+};
+
+export const StandaloneOnMobile: Story = {
+  globals: mobileGlobals,
+  play: async ({ canvasElement }) => {
+    const sidebar = within(canvasElement).getByRole('complementary', {
+      name: 'Sidebar navigation',
+    });
+
+    await expect(
+      within(sidebar).getByRole('link', { name: 'Dashboard' })
+    ).toBeVisible();
+  },
 };
 
 const openMobileDrawer = async (canvasElement: HTMLElement) => {

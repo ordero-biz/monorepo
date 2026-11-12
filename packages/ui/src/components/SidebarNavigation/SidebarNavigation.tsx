@@ -44,6 +44,7 @@ export const SidebarNavigation = ({
     setDrawerOpen,
   } = useSidebarNavigation();
   const isBelowBreakpoint = useBelowViewportBreakpoint(breakpoint);
+  const showRail = !collapsible || !isBelowBreakpoint;
   const desktopToggleRef = useRef<HTMLButtonElement>(null);
   const closedOnDesktop = useRef(false);
 
@@ -72,14 +73,14 @@ export const SidebarNavigation = ({
         aria-label={label}
         className={cn(
           shellClassName,
-          sidebarBreakpointClasses[breakpoint].rail
+          collapsible && sidebarBreakpointClasses[breakpoint].rail
         )}
         data-collapsed={collapsed ? 'true' : 'false'}
         data-slot="sidebar-navigation"
         id={id}
         ref={ref}
       >
-        {!isBelowBreakpoint && (
+        {showRail && (
           <div className={panelClassName} data-slot="sidebar-navigation-rail">
             <div className={shellInnerClassName}>{children}</div>
             <SidebarNavigationToggle
