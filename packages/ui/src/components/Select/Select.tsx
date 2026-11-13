@@ -8,14 +8,19 @@ import { Checkbox } from '@/ui/components/Checkbox';
 import { FieldHelperText } from '@/ui/components/FieldHelperText';
 import { FieldLabel } from '@/ui/components/FieldLabel';
 import { dropdownSurfaceClassName } from '@/ui/components/Select';
+import {
+  fieldSurfaceClassNames,
+  fieldValueTypographyClassName,
+  getFieldSurfaceStateClassName,
+} from '@/ui/lib/fieldStyles';
 import { cn } from '@/ui/lib/utils';
 import type { SelectProps } from './types';
 
 const triggerClassNames = {
   outlined:
-    'relative flex w-full min-w-0 cursor-pointer items-center justify-between rounded-[var(--textfield-outlined-radius)] bg-background px-[var(--textfield-outlined-px)] transition-[box-shadow] disabled:cursor-not-allowed',
+    'relative flex w-full min-w-0 cursor-pointer items-center justify-between px-[var(--textfield-outlined-px)] disabled:cursor-not-allowed',
   filled:
-    'relative flex w-full min-w-0 cursor-pointer items-center justify-between rounded-[var(--textfield-filled-radius)] px-[var(--textfield-filled-pl)] pr-[var(--textfield-filled-pr)] transition-[background-color] disabled:cursor-not-allowed',
+    'relative flex w-full min-w-0 cursor-pointer items-center justify-between px-[var(--textfield-filled-pl)] pr-[var(--textfield-filled-pr)] disabled:cursor-not-allowed',
 } as const;
 
 const triggerSizeClassNames = {
@@ -50,9 +55,8 @@ const valueContainerWidthClassNames = {
 } as const;
 
 const valueTextWidthClassNames = {
-  content:
-    'whitespace-nowrap text-left text-[length:var(--input-value-size-desktop)] leading-[var(--input-value-line-height-desktop)] font-[var(--input-value-weight)]',
-  full: 'min-w-0 flex-1 truncate text-left text-[length:var(--input-value-size-desktop)] leading-[var(--input-value-line-height-desktop)] font-[var(--input-value-weight)]',
+  content: 'whitespace-nowrap text-left',
+  full: 'min-w-0 flex-1 truncate text-left',
 } as const;
 
 const iconClassName =
@@ -89,52 +93,6 @@ const iconSizeClassNames = {
   m: 'size-[20px]',
   s: 'size-[18px]',
 } as const;
-
-const getSelectStateClassName = ({
-  active,
-  disabled,
-  invalid,
-  variant,
-}: {
-  active: boolean;
-  disabled: boolean;
-  invalid: boolean;
-  variant: NonNullable<SelectProps['variant']>;
-}) => {
-  if (variant === 'filled') {
-    if (invalid) {
-      return 'bg-[var(--color-error-8)] hover:bg-[var(--color-error-8)]';
-    }
-
-    if (active) {
-      return 'bg-[var(--color-grey-16)] hover:bg-[var(--color-grey-16)]';
-    }
-
-    if (disabled) {
-      return 'bg-[var(--color-grey-8)] hover:bg-[var(--color-grey-8)]';
-    }
-
-    return 'bg-[var(--color-grey-8)] hover:bg-[var(--color-grey-16)]';
-  }
-
-  if (disabled) {
-    return 'shadow-[inset_0_0_0_1px_var(--color-grey-20)] hover:shadow-[inset_0_0_0_1px_var(--color-grey-20)]';
-  }
-
-  if (invalid && active) {
-    return 'shadow-[inset_0_0_0_2px_var(--destructive)] hover:shadow-[inset_0_0_0_2px_var(--destructive)]';
-  }
-
-  if (invalid) {
-    return 'shadow-[inset_0_0_0_1px_var(--destructive)] hover:shadow-[inset_0_0_0_1px_var(--destructive)]';
-  }
-
-  if (active) {
-    return 'shadow-[inset_0_0_0_2px_var(--foreground)] hover:shadow-[inset_0_0_0_2px_var(--foreground)]';
-  }
-
-  return 'shadow-[inset_0_0_0_1px_var(--input)] hover:shadow-[inset_0_0_0_1px_var(--foreground)]';
-};
 
 const getTextColorClassName = ({ disabled }: { disabled: boolean }) =>
   disabled ? 'text-[var(--text-disabled)]' : 'text-foreground';
@@ -241,10 +199,11 @@ export const Select = (props: SelectProps) => {
         aria-label={ariaLabel}
         aria-labelledby={labelledBy}
         className={cn(
+          fieldSurfaceClassNames[variant],
           triggerClassNames[variant],
           triggerSizeClassNames[variant][size],
           triggerWidthClassNames[width],
-          getSelectStateClassName({
+          getFieldSurfaceStateClassName({
             active: isActive,
             disabled,
             invalid,
@@ -286,6 +245,7 @@ export const Select = (props: SelectProps) => {
               ) : null}
               <span
                 className={cn(
+                  fieldValueTypographyClassName,
                   valueTextWidthClassNames[width],
                   getTextColorClassName({ disabled })
                 )}
