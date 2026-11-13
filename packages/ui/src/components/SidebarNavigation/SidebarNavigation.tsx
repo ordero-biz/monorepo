@@ -45,7 +45,7 @@ export const SidebarNavigation = ({
   const desktopToggleRef = useRef<HTMLButtonElement>(null);
   const closedOnDesktop = useRef(false);
 
-  const showRail = !collapsible || !isBelowBreakpoint;
+  const railHidden = collapsible && isBelowBreakpoint;
 
   useEffect(() => {
     if (!drawerOpen) {
@@ -71,20 +71,26 @@ export const SidebarNavigation = ({
         )}
         data-collapsed={collapsed ? 'true' : 'false'}
         data-slot="sidebar-navigation"
+        hidden={railHidden}
         id={id}
         ref={ref}
       >
-        {showRail && (
-          <div className={panelClassName} data-slot="sidebar-navigation-rail">
-            <div className={shellInnerClassName}>{children}</div>
-            <SidebarNavigationRailToggle
-              collapseLabel={collapseLabel}
-              controls={id}
-              expandLabel={expandLabel}
-              ref={desktopToggleRef}
-            />
+        <div className={panelClassName} data-slot="sidebar-navigation-rail">
+          <div className={shellInnerClassName}>
+            <SidebarNavigationScopeProvider
+              railHidden={railHidden}
+              renderCollapsed={collapsed}
+            >
+              {children}
+            </SidebarNavigationScopeProvider>
           </div>
-        )}
+          <SidebarNavigationRailToggle
+            collapseLabel={collapseLabel}
+            controls={id}
+            expandLabel={expandLabel}
+            ref={desktopToggleRef}
+          />
+        </div>
       </aside>
       {collapsible ? (
         <Drawer.Root

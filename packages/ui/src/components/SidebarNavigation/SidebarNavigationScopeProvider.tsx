@@ -3,6 +3,7 @@ import { useSidebarNavigation } from './SidebarNavigationProvider';
 
 type SidebarNavigationScopeValue = {
   onItemSelect?: () => void;
+  railHidden?: boolean;
   renderCollapsed: boolean;
   sectionIdPrefix?: string;
 };
@@ -25,6 +26,7 @@ export const useSidebarNavigationScope = (): SidebarNavigationScopeValue => {
 export const SidebarNavigationScopeProvider = ({
   children,
   onItemSelect,
+  railHidden,
   renderCollapsed,
   sectionIdPrefix,
 }: SidebarNavigationScopeProviderProps) => {
@@ -34,9 +36,10 @@ export const SidebarNavigationScopeProvider = ({
     () => ({
       renderCollapsed,
       onItemSelect: onItemSelect ?? parentScope?.onItemSelect,
+      railHidden: railHidden ?? parentScope?.railHidden,
       sectionIdPrefix: sectionIdPrefix ?? parentScope?.sectionIdPrefix,
     }),
-    [onItemSelect, parentScope, renderCollapsed, sectionIdPrefix]
+    [onItemSelect, parentScope, railHidden, renderCollapsed, sectionIdPrefix]
   );
 
   return (

@@ -330,7 +330,8 @@ export const SidebarNavigationMenuItems = ({
   renderLink,
   rootLabel,
 }: SidebarNavigationMenuItemsProps) => {
-  const { renderCollapsed, onItemSelect } = useSidebarNavigationScope();
+  const { renderCollapsed, onItemSelect, railHidden } =
+    useSidebarNavigationScope();
   const { expandedItemIds, navigationStateKey } = useMemo(() => {
     const activeItemIds = getActiveItemIds(items);
     const expandedItemIds = getExpandedItemIds(items);
@@ -371,6 +372,11 @@ export const SidebarNavigationMenuItems = ({
         const branchActive = isItemBranchActive(item);
 
         if (depth === 0 && renderCollapsed) {
+          // Portaled popovers and tooltips would otherwise outlive the hidden rail.
+          if (railHidden) {
+            return null;
+          }
+
           return (
             <li data-slot="sidebar-navigation-menu-item" key={item.id}>
               {item.kind === 'collapse' ? (

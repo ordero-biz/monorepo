@@ -719,7 +719,7 @@ describe('SidebarNavigation', () => {
         expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
       });
 
-      it('removes the desktop rail after hydrating on mobile', () => {
+      it('hides the desktop rail after hydrating on mobile', () => {
         const fixture = <CollapsibleSidebarFixture />;
         const serverMarkup = new DOMParser().parseFromString(
           renderToString(fixture),
@@ -975,6 +975,46 @@ describe('SidebarNavigation', () => {
             screen.getByRole('button', { name: 'Expand sidebar' })
           ).toHaveFocus()
         );
+      });
+
+      it('preserves expanded desktop branches across the mobile breakpoint', async () => {
+        matchingMediaQuery = '';
+        const user = userEvent.setup();
+        setupCollapsible();
+
+        await user.click(screen.getByRole('button', { name: 'Product' }));
+        expect(screen.getByRole('link', { name: 'Category' })).toBeVisible();
+
+        act(() => {
+          mediaQuery.matches = true;
+          mediaQuery.dispatchEvent(new Event('change'));
+        });
+        expect(
+          screen.queryByRole('link', { name: 'Category' })
+        ).not.toBeInTheDocument();
+
+        act(() => {
+          mediaQuery.matches = false;
+          mediaQuery.dispatchEvent(new Event('change'));
+        });
+        expect(screen.getByRole('link', { name: 'Category' })).toBeVisible();
+      });
+
+      it('dismisses a desktop popover when entering mobile', async () => {
+        matchingMediaQuery = '';
+        const user = userEvent.setup();
+        setupCollapsible({ defaultCollapsed: true });
+
+        await user.click(screen.getByRole('button', { name: 'Product' }));
+        expect(
+          await screen.findByRole('dialog', { name: 'Product submenu' })
+        ).toBeVisible();
+
+        act(() => {
+          mediaQuery.matches = true;
+          mediaQuery.dispatchEvent(new Event('change'));
+        });
+        expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
       });
 
       it('closes on crossing to desktop and returns focus to the rail toggle', async () => {
