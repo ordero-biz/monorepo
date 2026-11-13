@@ -3,22 +3,20 @@
 import { Field } from '@base-ui/react/field';
 import { NumberField } from '@base-ui/react/number-field';
 import {
+  type ClipboardEvent,
   useCallback,
   useId,
   useLayoutEffect,
-  useMemo,
   useRef,
   useState,
 } from 'react';
 import { FieldHelperText } from '@/ui/components/FieldHelperText';
 import { FieldLabel } from '@/ui/components/FieldLabel';
 import { getInputClassName, InputFrame } from '@/ui/components/Input';
+import { localizeNumberPaste } from './localizeNumberPaste';
 import type { NumericFieldProps } from './types';
 
-const format = { maximumFractionDigits: 20, maximumSignificantDigits: 21 };
-const precisionError = 'Enter a number with fewer decimal places.';
-const numberError = 'Enter a valid number.';
-const rejectedEditError = 'The number was not accepted.';
+const baseUiFractionLimit = 20;
 
 const getSupportedValue = (
   value: number | undefined,
@@ -46,10 +44,10 @@ export const NumericField = (props: NumericFieldProps) => {
     helperText,
     id,
     inputMode,
-    invalid,
+    invalid = false,
     label,
     locale,
-    maxFractionDigits = Infinity,
+    maxFractionDigits = baseUiFractionLimit,
     name,
     onBlur,
     onFocus,
@@ -65,55 +63,23 @@ export const NumericField = (props: NumericFieldProps) => {
     value,
     variant,
   } = props;
-  const isControlled = 'value' in props;
   const fieldRef = useRef<HTMLDivElement>(null);
-  const nativeInputRef = useRef<HTMLInputElement>(null);
   const supportTextId = useId();
+  const pasteMessageId = useId();
   const [focused, setFocused] = useState(false);
   const [documentLanguage, setDocumentLanguage] = useState('en');
-  const [draftError, setDraftError] = useState('');
-  const [proposedValue, setProposedValue] = useState<number | null>();
-  const [uncontrolledValue, setUncontrolledValue] = useState(defaultValue);
-  const number = getSupportedValue(
-    isControlled ? value : uncontrolledValue,
-    allowNegative
-  );
-  const fractionLimit = Number.isNaN(maxFractionDigits)
-    ? Infinity
-    : Math.max(0, Math.floor(maxFractionDigits));
-  const numberFormat = useMemo(() => {
-    try {
-      return new Intl.NumberFormat(locale ?? documentLanguage, format);
-    } catch {
-      return new Intl.NumberFormat(documentLanguage, format);
-    }
-  }, [locale, documentLanguage]);
-  const localeName = numberFormat.resolvedOptions().locale;
-  const parts = numberFormat.formatToParts(-1234567890123.7);
-  const decimal = parts.find((part) => part.type === 'decimal')?.value ?? '.';
-  const group = parts.find((part) => part.type === 'group')?.value;
-  const minus = parts.find((part) => part.type === 'minusSign')?.value ?? '-';
-  const integerParts = parts.filter((part) => part.type === 'integer');
-  const groupSize = Array.from(integerParts.at(-1)?.value ?? '').length;
-  const repeatGroupSize = Array.from(integerParts.at(-2)?.value ?? '').length;
-  const fraction =
-    number === undefined
-      ? undefined
-      : numberFormat
-          .formatToParts(number)
-          .find((part) => part.type === 'fraction');
-  const error =
-    draftError ||
-    (Array.from(fraction?.value ?? '').length > fractionLimit
-      ? precisionError
-      : '') ||
-    (proposedValue !== undefined && !Object.is(proposedValue, number ?? null)
-      ? rejectedEditError
-      : '');
-  const isInvalid = Boolean(invalid || error);
-  const message = (isInvalid ? (errorText ?? error) : undefined) || undefined;
+  const [pasteMessage, setPasteMessage] = useState('');
+  const fieldLocale = locale ?? documentLanguage;
+  const fractionDigits = Number.isNaN(maxFractionDigits)
+    ? baseUiFractionLimit
+    : Math.min(baseUiFractionLimit, Math.max(0, Math.floor(maxFractionDigits)));
+  const hasErrorText = Boolean(invalid && errorText);
   const describedBy =
-    [ariaDescribedBy, message || helperText ? supportTextId : undefined]
+    [
+      ariaDescribedBy,
+      hasErrorText || helperText ? supportTextId : undefined,
+      pasteMessage ? pasteMessageId : undefined,
+    ]
       .filter(Boolean)
       .join(' ') || undefined;
 
@@ -128,125 +94,102 @@ export const NumericField = (props: NumericFieldProps) => {
     }
   }, []);
 
-  useLayoutEffect(() => {
-    nativeInputRef.current?.setCustomValidity(error);
-  }, [error]);
-
   const setInputRef = useCallback(
-    (element: HTMLInputElement | null) => {
+    (input: HTMLInputElement | null) => {
       if (typeof ref === 'function') {
-        return ref(element);
+        return ref(input);
       }
       if (ref) {
-        ref.current = element;
+        ref.current = input;
       }
     },
     [ref]
   );
 
-  const getDraftError = (text: string) => {
-    const cleaned = text.trim().replace(/\p{Bidi_Control}/gu, '');
-    const unsigned = cleaned.startsWith(minus)
-      ? cleaned.slice(minus.length)
-      : cleaned.replace(/^[+\-−]/u, '');
-    const normalized =
-      group && /^\p{Zs}$/u.test(group)
-        ? unsigned.replace(/\p{Zs}/gu, group)
-        : unsigned;
-    const [integer, fraction, repeatedDecimal] = normalized.split(decimal);
-    const groups = group ? integer.split(group) : [integer];
-    if (
-      (cleaned !== '' && !/\p{Decimal_Number}/u.test(cleaned)) ||
-      repeatedDecimal !== undefined ||
-      groups.some((part) => !/^\p{Decimal_Number}*$/u.test(part)) ||
-      (fraction !== undefined && !/^\p{Decimal_Number}*$/u.test(fraction))
-    ) {
-      return numberError;
+  const handlePaste = (event: ClipboardEvent<HTMLInputElement>) => {
+    if (event.defaultPrevented || disabled || readOnly) {
+      return;
     }
 
-    if (
-      groups.length > 1 &&
-      (groups[0].length === 0 ||
-        Array.from(groups[0]).length > repeatGroupSize ||
-        Array.from(groups.at(-1) ?? '').length !== groupSize ||
-        groups
-          .slice(1, -1)
-          .some((part) => Array.from(part).length !== repeatGroupSize))
-    ) {
-      return numberError;
+    const text = event.clipboardData.getData('text/plain');
+    const result = localizeNumberPaste(text, fieldLocale);
+    if ('reason' in result) {
+      event.preventDefault();
+      const example = new Intl.NumberFormat(fieldLocale, {
+        maximumFractionDigits: fractionDigits,
+      }).format(fractionDigits === 0 ? 1234 : 1234.56);
+      const reason =
+        result.reason === 'ambiguous'
+          ? 'The pasted number could have more than one value.'
+          : 'The pasted text uses an unsupported number format.';
+      setPasteMessage(`${reason} Enter a number like ${example}.`);
+      return;
     }
 
-    const digits = fraction?.match(/\p{Decimal_Number}/gu);
-    return (digits?.length ?? 0) > fractionLimit ? precisionError : '';
+    setPasteMessage('');
+    const localizedText = result.text;
+    if (localizedText === text) {
+      return;
+    }
+
+    event.preventDefault();
+    const input = event.currentTarget;
+
+    // Send the translated text through Base UI's usual input handling.
+    input.setRangeText(localizedText, 0, input.value.length, 'end');
+    input.dispatchEvent(new Event('input', { bubbles: true }));
   };
 
   return (
     <Field.Root
       className="flex w-full min-w-0 flex-col"
       disabled={disabled}
-      invalid={isInvalid}
+      invalid={invalid}
     >
       {label && (
         <FieldLabel
           active={focused}
           disabled={disabled}
-          invalid={isInvalid}
+          invalid={invalid}
           required={required}
         >
           {label}
         </FieldLabel>
       )}
       <NumberField.Root
-        allowOutOfRange
         className="min-w-0"
-        disabled={disabled}
-        format={format}
+        defaultValue={getSupportedValue(defaultValue, allowNegative)}
+        format={{ maximumFractionDigits: fractionDigits }}
         id={id}
-        inputRef={nativeInputRef}
-        locale={localeName}
+        locale={fieldLocale}
         min={allowNegative ? undefined : 0}
         name={name}
         onValueChange={(nextValue, details) => {
-          if (details.reason === 'keyboard') {
-            setDraftError('');
-          }
-          const target = details.event.target;
           if (
-            details.reason === 'input-change' &&
-            target instanceof HTMLInputElement &&
-            getDraftError(target.value)
+            details.reason === 'input-change' ||
+            details.reason === 'keyboard' ||
+            (details.reason === 'input-clear' && details.event.type === 'input')
           ) {
-            details.cancel();
-            return;
-          }
-          if (
-            nextValue !== null &&
-            (!Number.isFinite(nextValue) || (!allowNegative && nextValue < 0))
-          ) {
-            details.cancel();
-            setDraftError(numberError);
-            return;
+            setPasteMessage('');
           }
           onValueChange?.(nextValue ?? undefined, details);
-          if (details.isCanceled || isControlled) {
-            setProposedValue(nextValue);
-          } else {
-            setUncontrolledValue(nextValue ?? undefined);
-            setProposedValue(undefined);
-          }
         }}
         readOnly={readOnly}
         ref={fieldRef}
         required={required}
         step="any"
-        value={number ?? null}
+        value={
+          'value' in props
+            ? (getSupportedValue(value, allowNegative) ?? null)
+            : undefined
+        }
       >
         <InputFrame
           disabled={disabled}
           endAdornment={endAdornment}
           endIcon={endIcon}
           focused={focused}
-          invalid={isInvalid}
+          invalid={invalid}
           size={size}
           startAdornment={startAdornment}
           startIcon={startIcon}
@@ -260,47 +203,31 @@ export const NumericField = (props: NumericFieldProps) => {
             autoFocus={autoFocus}
             className={getInputClassName(disabled)}
             inputMode={
-              inputMode ?? (fractionLimit === 0 ? 'numeric' : 'decimal')
+              inputMode ?? (fractionDigits === 0 ? 'numeric' : 'decimal')
             }
             onBlur={(event) => {
-              if (error) {
-                event.preventDefault();
-              } else {
-                setProposedValue(undefined);
-              }
               setFocused(false);
               onBlur?.(event);
             }}
-            onChange={(event) =>
-              setDraftError(getDraftError(event.currentTarget.value))
-            }
-            onKeyDown={onKeyDown}
             onFocus={(event) => {
               setFocused(true);
               onFocus?.(event);
             }}
-            onPaste={(event) => {
-              const error = getDraftError(
-                event.clipboardData.getData('text/plain')
-              );
-              setDraftError(error);
-              if (error) {
-                event.preventDefault();
-              }
-            }}
+            onKeyDown={onKeyDown}
+            onPaste={handlePaste}
             placeholder={placeholder}
             ref={setInputRef}
           />
         </InputFrame>
       </NumberField.Root>
-      {message ? (
+      {hasErrorText ? (
         <FieldHelperText
           as="field-error"
           icon={errorIcon}
           id={supportTextId}
           invalid
         >
-          {message}
+          {errorText}
         </FieldHelperText>
       ) : helperText ? (
         <FieldHelperText
@@ -311,6 +238,13 @@ export const NumericField = (props: NumericFieldProps) => {
           {helperText}
         </FieldHelperText>
       ) : null}
+      <div aria-atomic="true" aria-live="polite">
+        {pasteMessage && (
+          <FieldHelperText id={pasteMessageId} invalid>
+            {pasteMessage}
+          </FieldHelperText>
+        )}
+      </div>
     </Field.Root>
   );
 };

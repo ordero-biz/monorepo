@@ -9,7 +9,7 @@ export type NumericFieldProps = Omit<
   defaultValue?: number;
   /** BCP 47 locale for numeric display and editing. Defaults to the surrounding language. */
   locale?: string;
-  /** Marks values with excess fractional digits invalid. */
+  /** Maximum fractional digits used by Base UI for formatting and rounding. Defaults to 20. */
   maxFractionDigits?: number;
   onValueChange?: (
     value: number | undefined,

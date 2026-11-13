@@ -96,9 +96,8 @@ describe('NumericField', () => {
     expect(onValueChange).toHaveBeenLastCalledWith(12.34, expect.any(Object));
   });
 
-  it('marks excess fractional digits invalid until corrected', async () => {
+  it('rounds to the configured precision on blur', async () => {
     const user = userEvent.setup();
-
     const { label, onValueChange } = setup({
       label: 'Amount',
       maxFractionDigits: 2,
@@ -110,19 +109,16 @@ describe('NumericField', () => {
     await user.type(input, '12.345');
 
     expect(input).toHaveDisplayValue('12.345');
-    expect(input).toBeInvalid();
-    expect(input).toHaveAttribute('inputmode', 'decimal');
-    expect(onValueChange).toHaveBeenLastCalledWith(12.34, expect.any(Object));
+    expect(onValueChange).toHaveBeenLastCalledWith(12.35, expect.any(Object));
 
-    await user.keyboard('{Backspace}');
+    await user.tab();
 
+    expect(input).toHaveDisplayValue('12.35');
     expect(input).toBeValid();
-    expect(input).toHaveDisplayValue('12.34');
   });
 
-  it('uses integer-only input mode when fraction digits are disabled', async () => {
+  it('uses the numeric keyboard and rounds to a whole number in integer mode', async () => {
     const user = userEvent.setup();
-
     const { label, onValueChange } = setup({
       label: 'Quantity',
       maxFractionDigits: 0,
@@ -131,47 +127,12 @@ describe('NumericField', () => {
 
     const input = screen.getByRole('textbox', { name: label });
 
-    await user.type(input, '12.34');
+    await user.type(input, '12.6');
+    await user.tab();
 
-    expect(input).toHaveDisplayValue('12.34');
     expect(input).toHaveAttribute('inputmode', 'numeric');
-    expect(input).toBeInvalid();
-    expect(onValueChange).toHaveBeenLastCalledWith(12, expect.any(Object));
-
-    await user.keyboard('{Backspace}{Backspace}');
-    await user.tab();
-
-    expect(input).toHaveDisplayValue('12');
-  });
-
-  it.each([
-    { locale: 'en-US', pastedValue: '12.34' },
-    { locale: 'de-DE', pastedValue: '12,34' },
-  ])('rejects decimal paste in integer mode for $locale', async ({
-    locale,
-    pastedValue,
-  }) => {
-    const user = userEvent.setup();
-    const { label, onValueChange } = setup({
-      label: 'Quantity',
-      locale,
-      maxFractionDigits: 0,
-      onValueChange: vi.fn(),
-    });
-    const input = screen.getByRole('textbox', { name: label });
-
-    await user.click(input);
-    await user.paste(pastedValue);
-    await user.tab();
-
-    expect(input).toHaveDisplayValue('');
-    expect(input).toBeInvalid();
-    expect(onValueChange).not.toHaveBeenCalled();
-
-    await user.type(input, '12');
-
-    expect(input).toBeValid();
-    expect(onValueChange).toHaveBeenLastCalledWith(12, expect.any(Object));
+    expect(input).toHaveDisplayValue('13');
+    expect(onValueChange).toHaveBeenLastCalledWith(13, expect.any(Object));
   });
 
   it('blocks Enter submission until a required draft contains a number', async () => {
@@ -235,6 +196,128 @@ describe('NumericField', () => {
     );
   });
 
+  it.each([
+    { locale: 'en-US', pasted: '1\u202f234,56', display: '1,234.56' },
+    { locale: 'de-DE', pasted: '1\u202f234,56', display: '1.234,56' },
+    { locale: 'de-DE', pasted: '1,234.56', display: '1.234,56' },
+    { locale: 'fr-FR', pasted: '1.234,56', display: '1\u202f234,56' },
+    { locale: 'en-US', pasted: '١٬٢٣٤٫٥٦', display: '1,234.56' },
+    { locale: 'ar-EG', pasted: '1,234.56', display: '١٬٢٣٤٫٥٦' },
+  ])('pastes $pasted as $display in $locale', async ({
+    locale,
+    pasted,
+    display,
+  }) => {
+    const user = userEvent.setup();
+    const { label, onValueChange } = setup({
+      label: 'Amount',
+      locale,
+      onValueChange: vi.fn(),
+    });
+    const input = screen.getByRole('textbox', { name: label });
+
+    await user.click(input);
+    await user.paste(pasted);
+
+    expect(onValueChange).toHaveBeenLastCalledWith(1234.56, expect.any(Object));
+
+    await user.tab();
+
+    expect(input).toHaveDisplayValue(display);
+  });
+
+  it.each([
+    { locale: 'en-US', value: 1234 },
+    { locale: 'de-DE', value: 1.234 },
+  ])('uses the field locale first when pasting 1,234 in $locale', async ({
+    locale,
+    value,
+  }) => {
+    const user = userEvent.setup();
+    const { label, onValueChange } = setup({
+      label: 'Amount',
+      locale,
+      onValueChange: vi.fn(),
+    });
+
+    await user.click(screen.getByRole('textbox', { name: label }));
+    await user.paste('1,234');
+
+    expect(onValueChange).toHaveBeenLastCalledWith(value, expect.any(Object));
+  });
+
+  it.each([
+    {
+      pasted: '1,234',
+      reason: 'The pasted number could have more than one value.',
+    },
+    {
+      pasted: '1 23,45',
+      reason: 'The pasted text uses an unsupported number format.',
+    },
+    {
+      pasted: '12,34 EUR',
+      reason: 'The pasted text uses an unsupported number format.',
+    },
+  ])('explains why $pasted was rejected without changing the amount', async ({
+    pasted,
+    reason,
+  }) => {
+    const user = userEvent.setup();
+    const { label, onValueChange } = setup({
+      defaultValue: 12,
+      label: 'Amount',
+      locale: 'ar-EG',
+      onValueChange: vi.fn(),
+    });
+    const input = screen.getByRole('textbox', { name: label });
+
+    await user.click(input);
+    await user.paste(pasted);
+    await user.tab();
+
+    expect(input).toHaveDisplayValue('١٢');
+    expect(input).toHaveAccessibleDescription(
+      `${reason} Enter a number like ١٬٢٣٤٫٥٦.`
+    );
+    expect(
+      screen.getByText(`${reason} Enter a number like ١٬٢٣٤٫٥٦.`)
+    ).toBeVisible();
+    expect(onValueChange).not.toHaveBeenCalled();
+  });
+
+  it('clears rejected-paste feedback after typing or pasting a valid value', async () => {
+    const user = userEvent.setup();
+    const { label, onValueChange } = setup({
+      label: 'Amount',
+      locale: 'de-DE',
+      helperText: 'Enter the amount paid.',
+      maxFractionDigits: 0,
+      onValueChange: vi.fn(),
+    });
+    const input = screen.getByRole('textbox', { name: label });
+
+    await user.click(input);
+    await user.paste('12 EUR');
+
+    const message =
+      'The pasted text uses an unsupported number format. Enter a number like 1.234.';
+    expect(screen.getByText(message)).toBeVisible();
+
+    await user.type(input, '2');
+
+    expect(input).toHaveAccessibleDescription('Enter the amount paid.');
+    expect(onValueChange).toHaveBeenLastCalledWith(2, expect.any(Object));
+
+    await user.paste('12 EUR');
+    await user.paste('1234');
+    await user.tab();
+
+    expect(screen.queryByText(message)).not.toBeInTheDocument();
+    expect(input).toHaveDisplayValue('1.234');
+    expect(onValueChange).toHaveBeenLastCalledWith(1234, expect.any(Object));
+  });
+
   it('uses the surrounding language and submits a canonical decimal', async () => {
     const user = userEvent.setup();
     const onSubmit = vi.fn();
@@ -254,53 +337,24 @@ describe('NumericField', () => {
     expect(input).toHaveDisplayValue('1.234,56');
 
     await user.clear(input);
-    await user.paste('1,234.56');
-    expect(input).toBeInvalid();
-    await user.click(screen.getByRole('button', { name: 'Save' }));
-    expect(onSubmit).not.toHaveBeenCalled();
-
-    await user.clear(input);
     await user.paste('1.234,56');
     await user.keyboard('{Enter}');
     expect(onSubmit).toHaveBeenCalledWith(['1234.56']);
   });
 
-  it('keeps an out-of-precision controlled value visible and blocks submission', async () => {
-    const user = userEvent.setup();
-    const onSubmit = vi.fn();
-    const Form = ({ maxFractionDigits }: { maxFractionDigits: number }) => (
-      <form
-        onSubmit={(event) => {
-          event.preventDefault();
-          onSubmit(new FormData(event.currentTarget).get('amount'));
-        }}
-      >
-        <NumericField
-          label="Amount"
-          maxFractionDigits={maxFractionDigits}
-          name="amount"
-          value={12.34}
-        />
-        <button type="submit">Save</button>
-      </form>
-    );
-    const { rerender } = render(<Form maxFractionDigits={0} />);
+  it('formats controlled values with the configured precision', () => {
+    const { label, renderResult } = setup({
+      label: 'Amount',
+      maxFractionDigits: 0,
+      value: 12.34,
+    });
+    const input = screen.getByRole('textbox', { name: label });
 
-    const input = screen.getByRole('textbox', { name: 'Amount' });
-    const save = screen.getByRole('button', { name: 'Save' });
+    expect(input).toHaveDisplayValue('12');
+
+    renderResult.rerender({ maxFractionDigits: 2 });
 
     expect(input).toHaveDisplayValue('12.34');
-    expect(input).toHaveAccessibleDescription(
-      'Enter a number with fewer decimal places.'
-    );
-    await user.click(save);
-    expect(onSubmit).not.toHaveBeenCalled();
-
-    rerender(<Form maxFractionDigits={2} />);
-
-    expect(input).toBeValid();
-    await user.click(save);
-    expect(onSubmit).toHaveBeenCalledWith('12.34');
   });
 
   it('supports negative values when enabled', async () => {
@@ -377,12 +431,17 @@ describe('NumericField', () => {
     expect(input).toHaveDisplayValue('0.5');
   });
 
-  it('blocks a controlled draft that the parent declines', async () => {
+  it('submits the value supplied by the controlled parent', async () => {
     const user = userEvent.setup();
     const onValueChange = vi.fn();
     const onSubmit = vi.fn();
     render(
-      <form onSubmit={onSubmit}>
+      <form
+        onSubmit={(event) => {
+          event.preventDefault();
+          onSubmit(new FormData(event.currentTarget).get('amount'));
+        }}
+      >
         <NumericField
           label="Amount"
           name="amount"
@@ -397,11 +456,10 @@ describe('NumericField', () => {
     await user.type(input, '3');
 
     expect(onValueChange).toHaveBeenLastCalledWith(123, expect.any(Object));
-    expect(input).toHaveDisplayValue('123');
-    expect(input).toBeInvalid();
 
     await user.click(screen.getByRole('button', { name: 'Save' }));
-    expect(onSubmit).not.toHaveBeenCalled();
+
+    expect(onSubmit).toHaveBeenCalledWith('12');
   });
 
   it('emits undefined when the field is cleared', async () => {
