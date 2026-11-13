@@ -61,7 +61,12 @@ export const productStatusSchema = z.enum(
   }
 );
 
-type ProductVariantField = 'attributeValueIds' | 'barcode' | 'name' | 'sku';
+type ProductVariantField =
+  | 'attributeValueIds'
+  | 'barcode'
+  | 'name'
+  | 'sku'
+  | 'status';
 
 type ProductVariantTextField = 'barcode' | 'name' | 'sku';
 
@@ -218,6 +223,23 @@ export const validateProductStatus = ({
 }: ValidationArgs<ProductStatus>) =>
   getValidationMessage(productStatusSchema, value);
 
+export const validateProductVariantStatus = ({
+  value,
+  productStatus,
+}: ValidationArgs<ProductStatus> & { productStatus: ProductStatus }) => {
+  const statusError = validateProductStatus({ value });
+  if (statusError) {
+    return statusError;
+  }
+  if (
+    productStatus === PRODUCT_STATUS.DRAFT &&
+    value === PRODUCT_STATUS.ACTIVE
+  ) {
+    return 'Variants can be active only when the product is active';
+  }
+  return undefined;
+};
+
 export const validateProductAttributes = ({
   value,
 }: ValidationArgs<ProductGenerationValues['attributes']>) =>
@@ -271,6 +293,15 @@ export const validateProductVariants = ({
   value,
 }: ValidateProductVariantsArgs) => {
   const errors: ProductVariantFieldErrors = {};
+  value.productVariants.forEach((variant, index) => {
+    const error = validateProductVariantStatus({
+      value: variant.status,
+      productStatus: value.status,
+    });
+    if (error) {
+      errors[`productVariants[${index}].status`] = error;
+    }
+  });
   const barcodeDuplicateIndexes = getDuplicateVariantFieldIndexes({
     fieldName: 'barcode',
     productVariants: value.productVariants,

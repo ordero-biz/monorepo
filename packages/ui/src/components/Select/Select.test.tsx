@@ -60,6 +60,43 @@ describe('Select', () => {
     );
   });
 
+  it('describes options without adding their descriptions to the selected value', async () => {
+    const user = userEvent.setup();
+    const { 'aria-label': ariaLabel, onValueChange } = setup({
+      options: [
+        { label: 'List', value: 'list' },
+        {
+          label: 'Details',
+          value: 'details',
+          description: 'Show the complete record.',
+        },
+        {
+          label: 'Create',
+          value: 'create',
+          disabled: true,
+          description: 'Requires permission to create records.',
+        },
+      ],
+    });
+    const trigger = screen.getByRole('combobox', { name: ariaLabel });
+    await user.click(trigger);
+    const disabledOption = screen.getByRole('option', { name: 'Create' });
+    expect(disabledOption).toHaveAttribute('aria-disabled', 'true');
+    expect(disabledOption).toHaveAccessibleDescription(
+      'Requires permission to create records.'
+    );
+    await user.click(disabledOption);
+    expect(onValueChange).not.toHaveBeenCalled();
+    const details = screen.getByRole('option', { name: 'Details' });
+    expect(details).toHaveAccessibleDescription('Show the complete record.');
+    await user.click(details);
+    expect(onValueChange).toHaveBeenLastCalledWith(
+      'details',
+      expect.any(Object)
+    );
+    expect(trigger).toHaveTextContent(/^Details$/);
+  });
+
   it('supports selecting multiple options', async () => {
     const user = userEvent.setup();
 

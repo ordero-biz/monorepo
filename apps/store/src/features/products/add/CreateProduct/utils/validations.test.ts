@@ -418,6 +418,55 @@ describe('validateProductVariants', () => {
 });
 
 describe('validateProductConfiguration', () => {
+  it.each([
+    'one',
+    'many',
+  ] as const)('rejects active variants of a draft product in %s mode, including later rows', (generationMode) => {
+    const variants = Array.from({ length: 25 }, (_, index) => ({
+      attributeValueIds: [index + 1],
+      barcode: `barcode-${index}`,
+      description: '',
+      name: `Variant ${index}`,
+      sku: `sku-${index}`,
+      status: index === 24 ? PRODUCT_STATUS.ACTIVE : PRODUCT_STATUS.DRAFT,
+    }));
+    expect(
+      validateProductConfiguration({
+        generationMode,
+        value: getProductVariantsCreationValues(variants),
+      })
+    ).toEqual({
+      fields: {
+        'productVariants[24].status':
+          'Variants can be active only when the product is active',
+      },
+    });
+  });
+
+  it.each([
+    [PRODUCT_STATUS.DRAFT, PRODUCT_STATUS.DRAFT],
+    [PRODUCT_STATUS.ACTIVE, PRODUCT_STATUS.DRAFT],
+    [PRODUCT_STATUS.ACTIVE, PRODUCT_STATUS.ACTIVE],
+  ])('allows an active product with variant statuses %s and %s', (first, second) => {
+    const variants = [first, second].map((status, index) => ({
+      attributeValueIds: [index + 1],
+      barcode: `barcode-${index}`,
+      description: '',
+      name: `Variant ${index}`,
+      sku: `sku-${index}`,
+      status,
+    }));
+    expect(
+      validateProductConfiguration({
+        generationMode: PRODUCT_GENERATION_MODE.many,
+        value: {
+          ...getProductVariantsCreationValues(variants),
+          status: PRODUCT_STATUS.ACTIVE,
+        },
+      })
+    ).toBeUndefined();
+  });
+
   it('validates common product details without mounted fields', () => {
     expect(
       validateProductConfiguration({
@@ -443,6 +492,7 @@ describe('validateProductConfiguration', () => {
         name: 'Product name is required',
         category: 'Category is required',
         status: 'Product status must be Draft or Active',
+        'productVariants[0].status': 'Product status must be Draft or Active',
       },
     });
   });

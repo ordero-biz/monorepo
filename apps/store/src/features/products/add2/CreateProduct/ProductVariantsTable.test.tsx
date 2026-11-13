@@ -320,6 +320,7 @@ const TableWithIncrementalVariants = () => {
     form.setFieldValue('name', 'Coffee');
     form.setFieldValue('category', { id: 1, name: 'Coffee and tea' });
     form.setFieldValue('productVariants', incrementalVariants);
+    form.setFieldValue('status', 'ACTIVE');
     setReady(true);
   }, [form]);
 
@@ -461,7 +462,7 @@ describe('incrementally loaded variant rows', () => {
     expect(createProductGroup).toHaveBeenCalledWith({
       name: 'Coffee',
       categoryId: 1,
-      status: 'DRAFT',
+      status: 'ACTIVE',
       productVariants: incrementalVariants.map(
         ({ description: _description, ...variant }, index) => ({
           ...variant,

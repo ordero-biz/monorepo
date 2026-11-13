@@ -1,14 +1,18 @@
 import { revalidateLogic, useForm } from '@tanstack/react-form';
+import { PRODUCT_STATUS } from '@/lib/domain/products/constants';
 import {
   createProductGenerationDefaultValues,
   DEFAULT_MAX_GENERATED_PRODUCT_VARIANTS,
   getProductVariantsGeneratedArgs,
   PRODUCT_GENERATION_MODE,
-  type ProductVariantsGeneratedArgs,
   validateProductAttributes,
+  validateProductStatus,
   validateProductTemplate,
 } from '../../../add/CreateProduct';
-import type { ProductGenerationValues } from '../types';
+import type {
+  ProductGenerationValues,
+  ProductVariantsGeneratedArgs,
+} from '../types';
 
 type UseProductVariantsGenerationFormArgs = {
   onProductVariantsGenerated: (args: ProductVariantsGeneratedArgs) => void;
@@ -17,6 +21,7 @@ type UseProductVariantsGenerationFormArgs = {
 const defaultValues: ProductGenerationValues = {
   ...createProductGenerationDefaultValues,
   generationMode: PRODUCT_GENERATION_MODE.one,
+  status: PRODUCT_STATUS.DRAFT,
 };
 
 export const useProductVariantsGenerationForm = ({
@@ -37,7 +42,9 @@ export const useProductVariantsGenerationForm = ({
             ? validateProductAttributes({ value: value.attributes })
             : undefined;
 
-        if (!templateErrors && !attributesError) {
+        const statusError = validateProductStatus({ value: value.status });
+
+        if (!templateErrors && !attributesError && !statusError) {
           return undefined;
         }
 
@@ -45,17 +52,19 @@ export const useProductVariantsGenerationForm = ({
           fields: {
             ...templateErrors?.fields,
             attributes: attributesError,
+            status: statusError,
           },
         };
       },
     },
     onSubmit: ({ value }) => {
-      onProductVariantsGenerated(
-        getProductVariantsGeneratedArgs({
+      onProductVariantsGenerated({
+        ...getProductVariantsGeneratedArgs({
           generationMode: value.generationMode,
           value,
-        })
-      );
+        }),
+        status: value.status,
+      });
     },
   });
 

@@ -3,6 +3,8 @@ import { PRODUCT_STATUS } from '@/lib/domain/products/constants';
 import type { ProductStatusSelectorProps } from './types';
 
 export const ProductStatusSelector = ({
+  draftDescription = 'Save for further editing. Cannot be supplied or sold. Can be activated later',
+  activeDescription = 'Can be supplied and sold',
   errorText,
   invalid = false,
   label,
@@ -28,7 +30,7 @@ export const ProductStatusSelector = ({
       <div className="flex flex-col">
         Draft
         <Typography color="text-secondary" variant="caption">
-          Editable only. Can be activated later
+          {draftDescription}
         </Typography>
       </div>
     </Radio>
@@ -40,7 +42,7 @@ export const ProductStatusSelector = ({
       <div className="flex flex-col">
         Active
         <Typography color="text-secondary" variant="caption">
-          Fully functional and available for sale
+          {activeDescription}
         </Typography>
       </div>
     </Radio>

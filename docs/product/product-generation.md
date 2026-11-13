@@ -32,8 +32,10 @@ it does not establish that required fields are complete or that anything is save
 
 ### 1. Product setup
 
-1. Enter the product name and select a category. Both are required. Description
-   is optional.
+1. Enter the product name and select a category. Both are required and appear
+   side by side on wider screens. Below them, the optional Description has a
+   taller, non-resizable textarea beside **Status after creation** (Draft by
+   default). The fields stack on narrower screens.
 2. Choose **Single variant** or **Multiple variants**. Single variant is the
    default.
 3. Use **Add attribute** to select an attribute, then choose its values. Setup
@@ -46,7 +48,8 @@ it does not establish that required fields are complete or that anything is save
    Valid setup generates the variants locally and moves to **Review & create**.
 
 Changing the mode changes how the existing selections will be interpreted; it
-does not clear them. Adding an attribute focuses its values control, and adding
+does not clear them. Adding an attribute focuses its values control and scrolls
+the **Add attribute** button into view after the new row renders. Adding
 or removing attributes is announced to assistive technology. Cancelling the add
 control leaves existing selections intact.
 
@@ -103,11 +106,11 @@ For example: **Coffee Brazil Whole bean**. Names remain editable in review.
 | --- | --- | --- |
 | Product name and category | Copied from setup. | Edited through the shared details editor. |
 | Product description | Copied from setup. | Independent of each generated variant's description. |
-| Product status | Draft. | Can be changed to Active in the shared details editor. |
+| Product status | Copied from setup; defaults to Draft. | Can be changed in the shared details editor. |
 | Variant name | Product name plus selected value names. | Editable directly; not regenerated when shared details or attributes change. |
 | Variant description | Copy of the setup description. | Edited independently in expanded details. |
 | Variant SKU and barcode | Empty strings. | User must fill both before creation. |
-| Variant status | Draft. | Edited individually; changing product status does not change variant statuses. |
+| Variant status | Draft. | Active is available only under an Active product. Applying Draft to the product explicitly confirms changing its Active variants to Draft. |
 | Variant attributes | Selected value IDs for that variant. | Can be changed independently of other variants. |
 | Images | No stored value. | Current image controls are visual placeholders and are absent from the submission payload. |
 
@@ -115,16 +118,63 @@ Shared details are a starting point for generation, not a continuing inheritance
 relationship. Applying a new product name or description must not overwrite
 variant edits. No automatic name update occurs after editing variant attributes.
 
-The frontend exposes product and variant statuses separately. This document does
-not define their combined effect on storefront availability; that requires the
-service's product lifecycle contract.
+### Product and variant status dependency
+
+Draft is for saving a product for further editing without using it in supplies
+or sales. Active allows its Active variants to be supplied and sold; Draft variants remain unavailable
+and can be activated later. Explain this purpose before the dependency rules.
+
+A Draft product can contain only Draft variants. An Active product can contain
+Draft variants, Active variants, or a mix; all-Draft variants are also allowed.
+Both statuses remain unsaved choices until **Create product**. Changing these
+choices does not use the permanent catalog activation dialog.
+
+Product status is selected in step 1 and carried into review. Generated variants
+remain Draft even when the product is Active; individual variant statuses are
+chosen in step 2. The setup Active option explains this next step.
+
+The review editor radio descriptions explain the purpose and relationship:
+
+- **Draft:** “Save for further editing. The product cannot be supplied or sold,
+  and all variants must remain Draft.”
+- **Active:** “Allow active variants to be supplied and sold. Draft variants
+  remain unavailable and can be activated later.”
+
+The read summary labels the value **Product status after creation**, with
+“Cannot be supplied or sold. All variants must remain Draft.” or “Only active
+variants can be supplied and sold.” **Edit details** opens the existing inline editor.
+
+Under a Draft product, Active remains visible but disabled in each variant dropdown.
+Its description reads “Product is Draft. Change its status in Product details.”
+This explanation appears beside the restricted option, with no extra action in the
+list or repeated restriction above the table. Under an Active product, the option
+is enabled and its restriction description is removed. The table introduction
+explains that Active variants can be supplied and sold and Draft variants cannot.
+
+| Product status change | Behavior |
+| --- | --- |
+| Draft → Active | Applying enables Active in variant controls; existing variant choices stay unchanged. |
+| Active → Draft, no Active variants | Apply normally without additional confirmation. |
+| Active → Draft, some Active variants | Show the affected count and change the editor action to **Apply and set N variants to Draft**. |
+
+Selecting the Draft radio alone does not change variant values. Only a valid
+Apply changes the product and affected variants together, including variants not
+yet rendered. Cancel preserves the previous values. Switching the radio back to
+Active removes the notice and restores **Apply changes**. Other variant fields
+remain untouched. Final configuration validation also rejects Active variants
+under a Draft product, including collapsed or not-yet-rendered rows.
+
+The table restriction and inline confirmation belong to the redesigned route;
+both routes share final validation. Availability descriptions express status
+eligibility; they do not promise stock availability or automatic storefront
+publishing, which depend on further service rules.
 
 ## Applying edits and saving
 
 | Action | Scope | Persists to the service? |
 | --- | --- | --- |
 | Review variants | Generates the local variant collection. | No. |
-| Apply changes in shared details | Validates and copies name, category, description, and status into the creation form. | No. |
+| Apply changes in shared details | Validates and copies shared fields; when explicitly confirmed, also sets Active variants to Draft. | No. |
 | Edit a table field | Updates that variant in the creation form. | No. |
 | Apply changes in the attributes dialog | Copies the local attribute selection into the edited variant. | No. |
 | Activate and select a draft catalog entity | Activates the category, attribute, or attribute value, then selects it. | Yes, immediately and across the catalog. |
@@ -253,6 +303,7 @@ enforcement.
 | Shared product details | Non-blank name, selected category, and supported Draft or Active status. An explicitly Draft category is rejected. |
 | Variant name | Required after trimming whitespace. Duplicate names are allowed by the current client validator. |
 | SKU and barcode | Required after trimming; each must be unique across the submitted variants. Every conflicting row receives an error. Comparison is case-sensitive. |
+| Variant status | Must be Draft or Active. Active is invalid when the product is Draft. |
 | Attribute values | At least one per variant in multiple mode; optional in single mode. Non-empty value sets must be unique across variants, ignoring ID order and repeated IDs. |
 | Description | Optional for the product and each variant. |
 | Validation scope | All variant values, including collapsed and not-yet-rendered rows. |
@@ -290,6 +341,8 @@ selected entity's status on submission.
 | Label name, category, description, and status explicitly in the summary. | Values alone can be ambiguous, especially when product and category names resemble each other. |
 | Keep name, category, and status together; place description beside them on wider screens. | Avoid gaps caused by unrelated content heights and give longer descriptions their own space. |
 | Use **Status after creation** and neutral status text. | Avoid suggesting an unsaved product is already active. |
+| Explain the Draft restriction once above the table and disable its Active options. | Prevent invalid choices and provide a direct route to change product status without repeating a message on every row. |
+| Confirm affected variants in the existing inline editor before applying Draft. | Make the scope explicit without silently overwriting variant choices or adding another dialog. |
 | Use an inline editor for shared details and a dialog for variant attributes. | Keep product context visible while giving attribute additions and removals a bounded Apply/Cancel flow. |
 | Keep variant name, SKU, barcode, and status visible in table columns. | Support comparison and completion of the frequent per-variant fields without opening every row. |
 | Use a labelled **Show details / Hide details** button with a chevron. Start all rows closed. | Make expansion discoverable without forcing a large first row open. The button column fits its content. |
@@ -328,8 +381,9 @@ This does not establish complete mobile usability for the surrounding app shell.
   manual edits. Define those rules before exposing regeneration.
 - **Recovery:** no autosave or persisted creation draft. Draft status is a status
   to save on creation, not evidence of an existing saved record.
-- **Availability:** define how product and variant statuses combine before adding
-  promises about storefront visibility or sale eligibility.
+- **Availability:** the product/variant status dependency is defined above;
+  confirm any further service rules before promising storefront visibility or
+  availability in a particular supply or sale.
 - **Validation architecture:** the existing submission-attempt visibility mechanism
   remains temporarily. Follow the [application-wide validation TODO](../todos/form-validation.md)
   after the product creation work rather than introducing a separate policy here.

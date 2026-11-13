@@ -147,6 +147,8 @@ export type CreateProductVariantValues = {
 };
 
 export type ProductStatusSelectorProps = {
+  draftDescription?: string;
+  activeDescription?: string;
   errorText?: string;
   invalid?: boolean;
   label: string;

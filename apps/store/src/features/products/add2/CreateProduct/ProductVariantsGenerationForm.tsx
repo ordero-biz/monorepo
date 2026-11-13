@@ -26,7 +26,7 @@ export const ProductVariantsGenerationForm = ({
       productVariantsGenerationForm.handleSubmit();
     }}
   >
-    <div className="grid grid-cols-1 gap-[var(--space-2)] lg:grid-cols-[minmax(0,1.85fr)_minmax(0,1fr)]">
+    <div className="grid grid-cols-1 gap-[var(--space-2)] lg:grid-cols-[minmax(0,2.5fr)_minmax(0,1fr)]">
       <div className="flex min-w-0 flex-col gap-[var(--space-2)]">
         <section aria-labelledby="common-product-data-title">
           <Card.Root variant="filled">
@@ -36,8 +36,7 @@ export const ProductVariantsGenerationForm = ({
                   Shared product details
                 </Card.Title>
                 <Card.Description>
-                  Name, category, description, and photos are shared across all
-                  variants
+                  Define shared product details and choose the product status
                 </Card.Description>
               </div>
             </Card.Header>

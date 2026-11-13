@@ -210,6 +210,7 @@ export const Select = (props: SelectProps) => {
   const multiple = props.multiple ?? false;
   const generatedLabelId = useId();
   const supportTextId = useId();
+  const optionId = useId();
   const [focused, setFocused] = useState(false);
   const [open, setOpen] = useState(defaultOpen ?? false);
   const hasErrorText = Boolean(invalid && errorText);
@@ -315,16 +316,34 @@ export const Select = (props: SelectProps) => {
           className="z-50 min-w-[var(--anchor-width)]"
           sideOffset={4}
         >
-          <SelectPrimitive.Popup className={popupClassName}>
+          <SelectPrimitive.Popup
+            className={cn(
+              popupClassName,
+              options.some((option) => option.description) &&
+                'w-[var(--anchor-width)]'
+            )}
+          >
             <SelectPrimitive.List className={listClassName}>
-              {options.map((option) => (
+              {options.map((option, index) => (
                 <SelectPrimitive.Item
+                  aria-describedby={
+                    option.description
+                      ? `${optionId}-${index}-description`
+                      : undefined
+                  }
+                  aria-labelledby={
+                    option.description
+                      ? `${optionId}-${index}-label`
+                      : undefined
+                  }
                   className={cn(
                     itemClassName,
+                    option.description && 'h-auto py-[var(--menu-item-py)]',
                     multiple
                       ? itemWithCheckboxPaddingClassNames[variant]
                       : itemPaddingClassNames[variant],
-                    option.disabled ? 'cursor-not-allowed opacity-50' : ''
+                    option.disabled && 'cursor-not-allowed',
+                    option.disabled && !option.description && 'opacity-50'
                   )}
                   disabled={option.disabled}
                   key={option.value}
@@ -348,9 +367,29 @@ export const Select = (props: SelectProps) => {
                       )}
                     />
                   ) : null}
-                  <SelectPrimitive.ItemText className={itemTextClassName}>
-                    {option.label}
-                  </SelectPrimitive.ItemText>
+                  {option.description ? (
+                    <span className="flex min-w-0 flex-1 flex-col gap-[var(--space-0-5)]">
+                      <SelectPrimitive.ItemText
+                        className={cn(
+                          itemTextClassName,
+                          option.disabled && 'text-[var(--text-disabled)]'
+                        )}
+                        id={`${optionId}-${index}-label`}
+                      >
+                        {option.label}
+                      </SelectPrimitive.ItemText>
+                      <span
+                        className="whitespace-normal break-words text-[length:var(--caption-size-desktop)] leading-[var(--caption-line-height-desktop)] font-[var(--caption-weight)] text-muted-foreground"
+                        id={`${optionId}-${index}-description`}
+                      >
+                        {option.description}
+                      </span>
+                    </span>
+                  ) : (
+                    <SelectPrimitive.ItemText className={itemTextClassName}>
+                      {option.label}
+                    </SelectPrimitive.ItemText>
+                  )}
                 </SelectPrimitive.Item>
               ))}
             </SelectPrimitive.List>
