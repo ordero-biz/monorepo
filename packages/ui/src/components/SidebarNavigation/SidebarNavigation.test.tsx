@@ -822,6 +822,24 @@ describe('SidebarNavigation', () => {
         ).toBeVisible();
       });
 
+      it('closes with the in-drawer button and returns focus to the menu button', async () => {
+        const user = userEvent.setup();
+        setupCollapsible();
+
+        const drawer = await openDrawer(user);
+
+        await user.click(
+          within(drawer).getByRole('button', { name: 'Close navigation' })
+        );
+
+        await waitFor(() => {
+          expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+          expect(
+            screen.getByRole('button', { name: 'Open navigation' })
+          ).toHaveFocus();
+        });
+      });
+
       it('closes on Escape and returns focus to the menu button', async () => {
         const user = userEvent.setup();
 

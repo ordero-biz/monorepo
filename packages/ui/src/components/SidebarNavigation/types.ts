@@ -63,6 +63,8 @@ export type SidebarNavigationItem =
 
 export type SidebarNavigationProps = {
   children: ReactNode;
+  /** Accessible name of the button that closes the mobile drawer. */
+  closeLabel?: string;
   /** Accessible name of the edge button while the sidebar is expanded. */
   collapseLabel?: string;
   /** Accessible name of the edge button while the sidebar is collapsed. */

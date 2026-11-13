@@ -3,7 +3,9 @@
 import './styles.css';
 import { Drawer } from '@base-ui/react/drawer';
 import { Tooltip } from '@base-ui/react/tooltip';
+import { X } from 'lucide-react';
 import { type MouseEvent, useEffect, useRef } from 'react';
+import { IconButton } from '@/ui/components/IconButton';
 import { useBelowViewportBreakpoint } from '@/ui/hooks/useBelowViewportBreakpoint';
 import { cn } from '@/ui/lib/utils';
 import {
@@ -29,6 +31,7 @@ const selectableItemSelector =
 
 export const SidebarNavigation = ({
   children,
+  closeLabel = 'Close navigation',
   collapseLabel = 'Collapse sidebar',
   expandLabel = 'Expand sidebar',
   id,
@@ -116,6 +119,11 @@ export const SidebarNavigation = ({
                 id={overlayId}
                 onClick={handleOverlayClick}
               >
+                <div className="sidebar-navigation-drawer-close">
+                  <Drawer.Close aria-label={closeLabel} render={<IconButton />}>
+                    <X aria-hidden="true" />
+                  </Drawer.Close>
+                </div>
                 <div className={shellInnerClassName}>
                   <SidebarNavigationDisplayScope
                     renderCollapsed={false}

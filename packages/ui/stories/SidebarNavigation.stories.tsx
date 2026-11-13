@@ -301,16 +301,55 @@ export const MobileDrawerOpen: Story = {
 
     try {
       const drawer = await openMobileDrawer(canvasElement);
+      const closeButton = within(drawer).getByRole('button', {
+        name: 'Close navigation',
+      });
 
       await expect(
         within(drawer).getByRole('link', { name: 'Dashboard' })
       ).toBeVisible();
+      await expect(closeButton.getBoundingClientRect().right).toBeLessThan(
+        drawer.getBoundingClientRect().right
+      );
       if (!document.defaultView?.matchMedia('(prefers-reduced-motion: reduce)').matches) {
         await waitFor(() => expect(transitions.has(drawer)).toBe(true));
       }
     } finally {
       document.removeEventListener('transitionrun', recordSlide);
     }
+  },
+};
+
+export const MobileDrawerCloseButton: Story = {
+  globals: { viewport: { isRotated: false, value: 'mobile2' } },
+  render: () => <CollapsibleSidebarShell />,
+  play: async ({ canvasElement }) => {
+    const drawer = await openMobileDrawer(canvasElement);
+    const closeButton = within(drawer).getByRole('button', {
+      name: 'Close navigation',
+    });
+    const document = canvasElement.ownerDocument;
+
+    await waitFor(() => {
+      const { left, right, top, bottom } = closeButton.getBoundingClientRect();
+      const hitTarget = document.elementFromPoint(
+        (left + right) / 2,
+        (top + bottom) / 2
+      );
+
+      expect(left).toBeGreaterThan(drawer.getBoundingClientRect().right);
+      expect(right).toBeLessThanOrEqual(document.documentElement.clientWidth);
+      expect(closeButton.contains(hitTarget)).toBe(true);
+    });
+
+    await userEvent.click(closeButton);
+
+    await waitFor(() => {
+      expect(within(document.body).queryByRole('dialog')).not.toBeInTheDocument();
+      expect(
+        within(canvasElement).getByRole('button', { name: 'Open navigation' })
+      ).toHaveFocus();
+    });
   },
 };
 

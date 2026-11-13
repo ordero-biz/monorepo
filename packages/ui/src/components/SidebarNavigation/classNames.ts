@@ -47,7 +47,7 @@ export const overlayBackdropClassName = `fixed inset-0 z-50 min-h-dvh bg-[var(--
 export const overlayViewportClassName = 'fixed inset-0 z-50';
 
 // Slides in from the left and follows the finger while it is swiped away.
-export const overlayPopupClassName = `group/sidebar-navigation absolute inset-y-0 left-0 h-dvh w-[var(--nav-width)] border-r border-border bg-background outline-none [transform:translateX(var(--drawer-swipe-movement-x,0px))] transition-transform data-[ending-style]:[transform:translateX(-100%)] data-[starting-style]:[transform:translateX(-100%)] data-[swiping]:transition-none ${overlayTransitionClassName}`;
+export const overlayPopupClassName = `sidebar-navigation-drawer group/sidebar-navigation absolute inset-y-0 left-0 flex h-dvh w-[var(--nav-width)] max-w-full flex-col border-r border-border bg-background outline-none [transform:translateX(var(--drawer-swipe-movement-x,0px))] transition-transform data-[ending-style]:[transform:translateX(calc(-100%_-_var(--sidebar-navigation-drawer-close-overhang,0px)))] data-[starting-style]:[transform:translateX(calc(-100%_-_var(--sidebar-navigation-drawer-close-overhang,0px)))] data-[swiping]:transition-none ${overlayTransitionClassName}`;
 
 export const shellInnerClassName =
   'flex h-full min-h-0 w-full flex-col overflow-hidden';
