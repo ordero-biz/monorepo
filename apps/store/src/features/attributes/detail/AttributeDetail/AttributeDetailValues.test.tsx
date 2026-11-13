@@ -247,6 +247,7 @@ describe('AttributeDetailValues', () => {
       ok: true,
       data: [
         {
+          status: 'ACTIVE' as const,
           id: 3,
           name: 'Blue',
           sortOrder: 0,
@@ -276,6 +277,7 @@ describe('AttributeDetailValues', () => {
       ok: true,
       data: [
         {
+          status: 'ACTIVE' as const,
           id: 3,
           name: 'Blue',
           sortOrder: 0,
@@ -317,6 +319,7 @@ describe('AttributeDetailValues', () => {
         ok: true,
         data: [
           {
+            status: 'ACTIVE',
             id: 3,
             name: 'Blue',
             sortOrder: 0,

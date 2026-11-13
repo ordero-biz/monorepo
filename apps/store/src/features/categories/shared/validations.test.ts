@@ -18,7 +18,9 @@ describe('category validations', () => {
 
   it('accepts a selected or absent parent category', () => {
     expect(
-      validateCategoryParent({ value: { id: 1, name: 'Shoes' } })
+      validateCategoryParent({
+        value: { status: 'ACTIVE', id: 1, name: 'Shoes' },
+      })
     ).toBeUndefined();
     expect(validateCategoryParent({ value: null })).toBeUndefined();
   });

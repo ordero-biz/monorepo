@@ -58,6 +58,7 @@ describe('useCreateCategoryForm', () => {
     submitCreateCategoryMock.mockResolvedValue({
       ok: true,
       data: {
+        status: 'ACTIVE' as const,
         id: 3,
         name: 'Sneakers',
         sortOrder: 15,

@@ -37,12 +37,14 @@ describe('CategoriesPage', () => {
     const categories = {
       content: [
         {
+          status: 'ACTIVE' as const,
           id: 1,
           name: 'Shoes',
           sortOrder: 10,
           color: '#2563eb',
           createdAt: '2026-07-01T10:54:34.839Z',
           parentCategory: {
+            status: 'ACTIVE' as const,
             id: 2,
             name: 'Fashion',
             createdAt: '2026-06-30T10:54:34.839Z',

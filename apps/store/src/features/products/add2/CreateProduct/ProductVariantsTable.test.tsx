@@ -53,7 +53,11 @@ const TableWithInvalidDetails = () => {
 
   useLayoutEffect(() => {
     form.setFieldValue('name', 'Coffee');
-    form.setFieldValue('category', { id: 1, name: 'Coffee and tea' });
+    form.setFieldValue('category', {
+      status: 'ACTIVE',
+      id: 1,
+      name: 'Coffee and tea',
+    });
     form.setFieldValue('productVariants', [
       {
         name: 'Coffee',
@@ -301,6 +305,7 @@ const incrementalAttributes: AttributeDropdown[] = [
   {
     ...attributes[0],
     attributeValues: incrementalVariants.map((_, index) => ({
+      status: 'ACTIVE',
       id: index + 1,
       name: `Color ${index + 1}`,
       sortOrder: index,
@@ -318,7 +323,11 @@ const TableWithIncrementalVariants = () => {
 
   useLayoutEffect(() => {
     form.setFieldValue('name', 'Coffee');
-    form.setFieldValue('category', { id: 1, name: 'Coffee and tea' });
+    form.setFieldValue('category', {
+      status: 'ACTIVE',
+      id: 1,
+      name: 'Coffee and tea',
+    });
     form.setFieldValue('productVariants', incrementalVariants);
     setReady(true);
   }, [form]);
