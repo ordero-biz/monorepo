@@ -569,7 +569,11 @@ describe('SidebarNavigation', () => {
               logo={<Package aria-hidden="true" />}
               title="Ordero"
             />
-            {headerLink ? <a href="#help">Help</a> : null}
+            {headerLink ? (
+              <a href="#help" id="sidebar-help-link">
+                Help
+              </a>
+            ) : null}
           </SidebarNavigationHeader>
           <SidebarNavigationContent>
             <SidebarNavigationSections sections={sections} />
@@ -652,6 +656,109 @@ describe('SidebarNavigation', () => {
       expect(
         await screen.findByRole('link', { name: 'Category' })
       ).toBeInTheDocument();
+    });
+
+    it('keeps a nested branch open when switching between the expanded rail and its popover', async () => {
+      const user = userEvent.setup();
+      setupCollapsible({
+        sections: [
+          {
+            id: 'catalog',
+            items: [
+              {
+                id: 'products',
+                kind: 'collapse',
+                label: 'Products',
+                items: [
+                  {
+                    id: 'categories',
+                    kind: 'collapse',
+                    label: 'Categories',
+                    items: [
+                      {
+                        id: 'clothing',
+                        kind: 'link',
+                        label: 'Clothing',
+                        href: '/clothing',
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      });
+
+      await user.click(screen.getByRole('button', { name: 'Products' }));
+      await user.click(screen.getByRole('button', { name: 'Categories' }));
+      expect(screen.getByRole('link', { name: 'Clothing' })).toBeVisible();
+
+      await user.click(
+        screen.getByRole('button', { name: 'Collapse sidebar' })
+      );
+      await user.click(screen.getByRole('button', { name: 'Products' }));
+      const submenu = await screen.findByRole('dialog', {
+        name: 'Products submenu',
+      });
+      expect(
+        within(submenu).getByRole('link', { name: 'Clothing' })
+      ).toBeVisible();
+
+      await user.keyboard('{Escape}');
+      await user.click(screen.getByRole('button', { name: 'Expand sidebar' }));
+      expect(screen.getByRole('link', { name: 'Clothing' })).toBeVisible();
+    });
+
+    it('closes a collapsed submenu after an action runs and restores focus to its trigger', async () => {
+      const user = userEvent.setup();
+      const {
+        sections: [
+          {
+            items: [branch],
+          },
+        ],
+      } = setupCollapsible({
+        defaultCollapsed: true,
+        sections: [
+          {
+            id: 'catalog',
+            items: [
+              {
+                id: 'products',
+                kind: 'collapse',
+                label: 'Products',
+                items: [
+                  {
+                    id: 'refresh',
+                    kind: 'action',
+                    label: 'Refresh catalog',
+                    onSelect: vi.fn(),
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      });
+      const action = branch?.kind === 'collapse' ? branch.items[0] : undefined;
+      if (action?.kind !== 'action') {
+        throw new Error('Expected a submenu action');
+      }
+
+      const trigger = screen.getByRole('button', { name: 'Products' });
+      await user.click(trigger);
+      const submenu = await screen.findByRole('dialog', {
+        name: 'Products submenu',
+      });
+      within(submenu).getByRole('button', { name: 'Refresh catalog' }).focus();
+      await user.keyboard('{Enter}');
+
+      expect(action.onSelect).toHaveBeenCalledOnce();
+      await waitFor(() => {
+        expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+        expect(trigger).toHaveFocus();
+      });
     });
 
     it('leaves a controlled state to the consumer and does not persist it', async () => {
@@ -837,6 +944,40 @@ describe('SidebarNavigation', () => {
         expect(
           screen.getByRole('dialog', { name: 'Sidebar navigation' })
         ).toBeInTheDocument();
+      });
+
+      it('renders one copy of custom header content when switching between rail and drawer', async () => {
+        matchingMediaQuery = '';
+        const user = userEvent.setup();
+        setupCollapsible({ headerLink: true });
+
+        expect(screen.getByText('Help')).toBeVisible();
+
+        act(() => {
+          mediaQuery.matches = true;
+          mediaQuery.dispatchEvent(new Event('change'));
+        });
+        const drawer = await openDrawer(user);
+
+        expect(screen.getByText('Help')).toBe(
+          within(drawer).getByRole('link', { name: 'Help' })
+        );
+        expect(screen.getByText('Help')).toHaveAttribute(
+          'id',
+          'sidebar-help-link'
+        );
+
+        await user.keyboard('{Escape}');
+        await waitFor(() =>
+          expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+        );
+        expect(screen.getByText('Help')).not.toBeVisible();
+
+        act(() => {
+          mediaQuery.matches = false;
+          mediaQuery.dispatchEvent(new Event('change'));
+        });
+        expect(screen.getByText('Help')).toBeVisible();
       });
 
       it('runs the selected action and closes the drawer', async () => {

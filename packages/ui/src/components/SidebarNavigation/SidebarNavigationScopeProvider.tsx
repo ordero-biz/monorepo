@@ -1,11 +1,15 @@
 import { createContext, type ReactNode, useContext, useMemo } from 'react';
 import { useSidebarNavigation } from './SidebarNavigationProvider';
 
+export type SidebarNavigationExpansionState = Map<
+  string,
+  { defaultKey: string; openIds: string[] }
+>;
+
 type SidebarNavigationScopeValue = {
+  expansionState?: SidebarNavigationExpansionState;
   onItemSelect?: () => void;
-  railHidden?: boolean;
   renderCollapsed: boolean;
-  sectionIdPrefix?: string;
 };
 
 type SidebarNavigationScopeProviderProps = SidebarNavigationScopeValue & {
@@ -25,21 +29,19 @@ export const useSidebarNavigationScope = (): SidebarNavigationScopeValue => {
 /** Supplies rendering and selection settings for a drawer or popover subtree. */
 export const SidebarNavigationScopeProvider = ({
   children,
+  expansionState,
   onItemSelect,
-  railHidden,
   renderCollapsed,
-  sectionIdPrefix,
 }: SidebarNavigationScopeProviderProps) => {
   const parentScope = useContext(SidebarNavigationScopeContext);
 
   const scopedContext = useMemo(
     () => ({
       renderCollapsed,
+      expansionState: expansionState ?? parentScope?.expansionState,
       onItemSelect: onItemSelect ?? parentScope?.onItemSelect,
-      railHidden: railHidden ?? parentScope?.railHidden,
-      sectionIdPrefix: sectionIdPrefix ?? parentScope?.sectionIdPrefix,
     }),
-    [onItemSelect, parentScope, railHidden, renderCollapsed, sectionIdPrefix]
+    [expansionState, onItemSelect, parentScope, renderCollapsed]
   );
 
   return (

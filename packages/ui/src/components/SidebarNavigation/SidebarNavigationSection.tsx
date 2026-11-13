@@ -2,7 +2,7 @@
 
 import { Accordion } from '@base-ui/react/accordion';
 import { ChevronDown } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useMemo } from 'react';
 import { cn } from '@/ui/lib/utils';
 import {
   accordionPanelClassName,
@@ -12,6 +12,7 @@ import {
 } from './classNames';
 import { useSidebarNavigationScope } from './SidebarNavigationScopeProvider';
 import type { SidebarNavigationSectionProps } from './types';
+import { useSidebarNavigationExpansion } from './useSidebarNavigationExpansion';
 import { toAccordionItemIds } from './utils';
 
 export const SidebarNavigationSection = ({
@@ -23,16 +24,16 @@ export const SidebarNavigationSection = ({
   label,
   ref,
 }: SidebarNavigationSectionProps) => {
-  const [openSectionIds, setOpenSectionIds] = useState<string[]>(
-    defaultExpanded ? [id] : []
+  const defaultOpenIds = useMemo(
+    () => (defaultExpanded ? [id] : []),
+    [defaultExpanded, id]
   );
-
-  useEffect(() => {
-    setOpenSectionIds(defaultExpanded ? [id] : []);
-  }, [defaultExpanded, id]);
-
-  const { renderCollapsed, sectionIdPrefix } = useSidebarNavigationScope();
-  const sectionId = sectionIdPrefix ? `${sectionIdPrefix}-${id}` : id;
+  const [openSectionIds, setOpenSectionIds] = useSidebarNavigationExpansion({
+    defaultKey: String(defaultExpanded),
+    defaultOpenIds,
+    groupKey: `section:${id}`,
+  });
+  const { renderCollapsed } = useSidebarNavigationScope();
 
   if (hidden) {
     return null;
@@ -43,7 +44,7 @@ export const SidebarNavigationSection = ({
       <section
         className={sectionRootClassName}
         data-slot="sidebar-navigation-section"
-        id={sectionId}
+        id={id}
         ref={ref}
       >
         {label ? (
@@ -67,7 +68,7 @@ export const SidebarNavigationSection = ({
     <section
       className={sectionRootClassName}
       data-slot="sidebar-navigation-section"
-      id={sectionId}
+      id={id}
       ref={ref}
     >
       <Accordion.Root

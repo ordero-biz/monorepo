@@ -3,7 +3,7 @@ import { Button as ButtonPrimitive } from '@base-ui/react/button';
 import { Popover } from '@base-ui/react/popover';
 import { Tooltip } from '@base-ui/react/tooltip';
 import { ChevronDown } from 'lucide-react';
-import { type ReactElement, useEffect, useMemo, useRef, useState } from 'react';
+import { type ReactElement, useMemo, useState } from 'react';
 import { cn } from '@/ui/lib/utils';
 import {
   accordionPanelClassName,
@@ -28,6 +28,7 @@ import type {
   SidebarNavigationItem,
   SidebarNavigationRenderLink,
 } from './types';
+import { useSidebarNavigationExpansion } from './useSidebarNavigationExpansion';
 import {
   getActiveItemIds,
   getExpandedItemIds,
@@ -37,6 +38,7 @@ import {
 
 type SidebarNavigationMenuItemsProps = {
   depth: number;
+  groupKey?: string;
   items: SidebarNavigationItem[];
   labelPath?: string[];
   renderLink?: SidebarNavigationRenderLink;
@@ -262,10 +264,12 @@ const SidebarNavigationCollapsedTooltip = ({
 );
 
 const SidebarNavigationCollapsedBranch = ({
+  groupKey,
   item,
   renderLink,
   rootLabel,
 }: {
+  groupKey: string;
   item: SidebarNavigationCollapseItem;
   renderLink?: SidebarNavigationRenderLink;
   rootLabel: string;
@@ -297,19 +301,17 @@ const SidebarNavigationCollapsedBranch = ({
           <Popover.Popup
             aria-label={`${item.label} submenu`}
             className={popoverPopupClassName}
-            // Close the popover once a link inside it is followed.
-            onClick={(event) => {
-              if ((event.target as HTMLElement).closest('a[href]')) {
-                setOpen(false);
-              }
-            }}
           >
             <div aria-hidden="true" className={popoverTitleClassName}>
               {item.label}
             </div>
-            <SidebarNavigationScopeProvider renderCollapsed={false}>
+            <SidebarNavigationScopeProvider
+              onItemSelect={() => setOpen(false)}
+              renderCollapsed={false}
+            >
               <SidebarNavigationMenuItems
                 depth={0}
+                groupKey={groupKey}
                 items={item.items}
                 labelPath={[item.label]}
                 renderLink={renderLink}
@@ -325,13 +327,16 @@ const SidebarNavigationCollapsedBranch = ({
 
 export const SidebarNavigationMenuItems = ({
   depth,
+  groupKey,
   items,
   labelPath = [],
   renderLink,
   rootLabel,
 }: SidebarNavigationMenuItemsProps) => {
-  const { renderCollapsed, onItemSelect, railHidden } =
-    useSidebarNavigationScope();
+  const { renderCollapsed, onItemSelect } = useSidebarNavigationScope();
+  const menuKey =
+    groupKey ??
+    `menu:${JSON.stringify([rootLabel, items.map(({ id }) => id)])}`;
   const { expandedItemIds, navigationStateKey } = useMemo(() => {
     const activeItemIds = getActiveItemIds(items);
     const expandedItemIds = getExpandedItemIds(items);
@@ -341,19 +346,13 @@ export const SidebarNavigationMenuItems = ({
       navigationStateKey: `${JSON.stringify(activeItemIds)}:${JSON.stringify(expandedItemIds)}`,
     };
   }, [items]);
-  const previousNavigationStateKeyRef = useRef(navigationStateKey);
-  const [openItemIds, setOpenItemIds] = useState<string[]>(expandedItemIds);
+  const [openItemIds, setOpenItemIds] = useSidebarNavigationExpansion({
+    defaultKey: navigationStateKey,
+    defaultOpenIds: expandedItemIds,
+    groupKey: menuKey,
+  });
   const accordionLabel =
     labelPath.length > 0 ? `${rootLabel}: ${labelPath.join(' / ')}` : rootLabel;
-
-  useEffect(() => {
-    if (previousNavigationStateKeyRef.current === navigationStateKey) {
-      return;
-    }
-
-    previousNavigationStateKeyRef.current = navigationStateKey;
-    setOpenItemIds(expandedItemIds);
-  }, [expandedItemIds, navigationStateKey]);
 
   const content = (
     <Accordion.Root
@@ -370,17 +369,14 @@ export const SidebarNavigationMenuItems = ({
     >
       {items.map((item) => {
         const branchActive = isItemBranchActive(item);
+        const childGroupKey = `${menuKey}/${JSON.stringify(item.id)}`;
 
         if (depth === 0 && renderCollapsed) {
-          // Portaled popovers and tooltips would otherwise outlive the hidden rail.
-          if (railHidden) {
-            return null;
-          }
-
           return (
             <li data-slot="sidebar-navigation-menu-item" key={item.id}>
               {item.kind === 'collapse' ? (
                 <SidebarNavigationCollapsedBranch
+                  groupKey={childGroupKey}
                   item={item}
                   renderLink={renderLink}
                   rootLabel={rootLabel}
@@ -468,6 +464,7 @@ export const SidebarNavigationMenuItems = ({
               >
                 <SidebarNavigationMenuItems
                   depth={depth + 1}
+                  groupKey={childGroupKey}
                   items={item.items}
                   labelPath={[...labelPath, item.label]}
                   renderLink={renderLink}

@@ -4,7 +4,7 @@ import './styles.css';
 import { Drawer } from '@base-ui/react/drawer';
 import { Tooltip } from '@base-ui/react/tooltip';
 import { X } from 'lucide-react';
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { IconButton } from '@/ui/components/IconButton';
 import { useBelowViewportBreakpoint } from '@/ui/hooks/useBelowViewportBreakpoint';
 import { cn } from '@/ui/lib/utils';
@@ -20,7 +20,10 @@ import {
 import { DEFAULT_SIDEBAR_BREAKPOINT } from './constants';
 import { useSidebarNavigation } from './SidebarNavigationProvider';
 import { SidebarNavigationRailToggle } from './SidebarNavigationRailToggle';
-import { SidebarNavigationScopeProvider } from './SidebarNavigationScopeProvider';
+import {
+  type SidebarNavigationExpansionState,
+  SidebarNavigationScopeProvider,
+} from './SidebarNavigationScopeProvider';
 import type { SidebarNavigationProps } from './types';
 
 export const SidebarNavigation = ({
@@ -44,14 +47,24 @@ export const SidebarNavigation = ({
 
   const desktopToggleRef = useRef<HTMLButtonElement>(null);
   const closedOnDesktop = useRef(false);
+  const [drawerPresent, setDrawerPresent] = useState(false);
+  const [desktopExpansion] = useState<SidebarNavigationExpansionState>(
+    () => new Map()
+  );
+  const [drawerExpansion] = useState<SidebarNavigationExpansionState>(
+    () => new Map()
+  );
 
   const railHidden = collapsible && isBelowBreakpoint;
+  // Keep the drawer content in place until its exit transition finishes.
+  const useDrawer = railHidden || drawerOpen === true || drawerPresent;
 
   useEffect(() => {
     if (!drawerOpen) {
       return;
     }
 
+    setDrawerPresent(true);
     closedOnDesktop.current = !isBelowBreakpoint;
 
     if (!isBelowBreakpoint) {
@@ -77,12 +90,14 @@ export const SidebarNavigation = ({
       >
         <div className={panelClassName} data-slot="sidebar-navigation-rail">
           <div className={shellInnerClassName}>
-            <SidebarNavigationScopeProvider
-              railHidden={railHidden}
-              renderCollapsed={collapsed}
-            >
-              {children}
-            </SidebarNavigationScopeProvider>
+            {useDrawer ? null : (
+              <SidebarNavigationScopeProvider
+                expansionState={desktopExpansion}
+                renderCollapsed={collapsed}
+              >
+                {children}
+              </SidebarNavigationScopeProvider>
+            )}
           </div>
           <SidebarNavigationRailToggle
             collapseLabel={collapseLabel}
@@ -95,10 +110,10 @@ export const SidebarNavigation = ({
       {collapsible ? (
         <Drawer.Root
           onOpenChange={setDrawerOpen}
+          onOpenChangeComplete={setDrawerPresent}
           open={drawerOpen === true}
           swipeDirection="left"
         >
-          {/* Mount the content on first open and retain expanded branches afterward. */}
           <Drawer.Portal keepMounted={drawerOpen !== undefined}>
             <Drawer.Backdrop
               className={overlayBackdropClassName}
@@ -121,13 +136,15 @@ export const SidebarNavigation = ({
                   </Drawer.Close>
                 </div>
                 <div className={shellInnerClassName}>
-                  <SidebarNavigationScopeProvider
-                    onItemSelect={closeDrawer}
-                    renderCollapsed={false}
-                    sectionIdPrefix={overlayId}
-                  >
-                    {children}
-                  </SidebarNavigationScopeProvider>
+                  {useDrawer ? (
+                    <SidebarNavigationScopeProvider
+                      expansionState={drawerExpansion}
+                      onItemSelect={closeDrawer}
+                      renderCollapsed={false}
+                    >
+                      {children}
+                    </SidebarNavigationScopeProvider>
+                  ) : null}
                 </div>
               </Drawer.Popup>
             </Drawer.Viewport>
