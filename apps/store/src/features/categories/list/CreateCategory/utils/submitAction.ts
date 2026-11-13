@@ -1,4 +1,5 @@
 import { createCategory } from '@/lib/client/api/categories';
+import { getApiErrorMessage } from '@/lib/utils/apiError';
 import type { CreateCategoryFormValues } from './validations';
 
 const normalizeCreateCategoryFormData = (data: CreateCategoryFormValues) => {
@@ -20,7 +21,7 @@ export const submitCreateCategory = async (value: CreateCategoryFormValues) => {
       ok: false,
       error: {
         fieldErrors: result.error.fieldErrors,
-        formError: result.error.message,
+        formError: getApiErrorMessage(result.error),
       },
     } as const;
   }

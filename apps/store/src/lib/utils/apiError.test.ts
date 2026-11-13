@@ -20,6 +20,15 @@ describe('getApiErrorMessage', () => {
     ).toBe('Active attributes cannot be edited');
   });
 
+  it('maps the duplicate attribute name error', () => {
+    expect(
+      getApiErrorMessage({
+        code: API_ERROR_CODES.ATTRIBUTE_NAME_ALREADY_EXISTS,
+        message: 'Conflict',
+      })
+    ).toBe('Attribute name already exists.');
+  });
+
   it('maps the active attribute value modification error', () => {
     expect(
       getApiErrorMessage({
@@ -38,6 +47,15 @@ describe('getApiErrorMessage', () => {
     ).toBe('Active categories cannot be edited');
   });
 
+  it('maps the duplicate category name error', () => {
+    expect(
+      getApiErrorMessage({
+        code: API_ERROR_CODES.CATEGORY_NAME_ALREADY_EXISTS,
+        message: 'Conflict',
+      })
+    ).toBe('Category name already exists.');
+  });
+
   it('maps the active supplier modification error', () => {
     expect(
       getApiErrorMessage({
@@ -47,6 +65,15 @@ describe('getApiErrorMessage', () => {
     ).toBe('Cannot edit name or status of an active supplier');
   });
 
+  it('maps the duplicate supplier name error', () => {
+    expect(
+      getApiErrorMessage({
+        code: API_ERROR_CODES.SUPPLIER_NAME_ALREADY_EXISTS,
+        message: 'Conflict',
+      })
+    ).toBe('Supplier name already exists.');
+  });
+
   it('maps the active unit of measurement modification error', () => {
     expect(
       getApiErrorMessage({
@@ -54,6 +81,24 @@ describe('getApiErrorMessage', () => {
         message: 'Conflict',
       })
     ).toBe('Cannot edit name or status of an active unit of measurement');
+  });
+
+  it('maps the duplicate unit of measurement name error', () => {
+    expect(
+      getApiErrorMessage({
+        code: API_ERROR_CODES.UNIT_OF_MEASUREMENT_NAME_ALREADY_EXISTS,
+        message: 'Conflict',
+      })
+    ).toBe('Unit name already exists.');
+  });
+
+  it('maps the duplicate warehouse name error', () => {
+    expect(
+      getApiErrorMessage({
+        code: API_ERROR_CODES.WAREHOUSE_NAME_ALREADY_EXISTS,
+        message: 'Conflict',
+      })
+    ).toBe('Warehouse name already exists.');
   });
 
   it('returns the backend message when the error code has no mapping', () => {
