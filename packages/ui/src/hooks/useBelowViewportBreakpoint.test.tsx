@@ -1,9 +1,13 @@
 import { act, renderHook } from '@testing-library/react';
-import { useBelowViewportBreakpoint } from './useBelowViewportBreakpoint';
+import {
+  useBelowViewportBreakpoint,
+  type ViewportBreakpoint,
+} from './useBelowViewportBreakpoint';
 
 describe('useBelowViewportBreakpoint', () => {
   afterEach(() => {
     document.documentElement.style.removeProperty('--breakpoint-md');
+    document.documentElement.style.removeProperty('--breakpoint-lg');
     vi.unstubAllGlobals();
   });
 
@@ -44,5 +48,33 @@ describe('useBelowViewportBreakpoint', () => {
     expect(removeListener).toHaveBeenCalledExactlyOnceWith(
       ...addListener.mock.calls[0]
     );
+  });
+
+  it('switches subscriptions when the breakpoint changes', () => {
+    document.documentElement.style.setProperty('--breakpoint-md', '900px');
+    document.documentElement.style.setProperty('--breakpoint-lg', '1200px');
+    const mediumQuery = Object.assign(new EventTarget(), { matches: false });
+    const largeQuery = Object.assign(new EventTarget(), { matches: true });
+    const removeMediumListener = vi.spyOn(mediumQuery, 'removeEventListener');
+    vi.stubGlobal('matchMedia', (query: string) =>
+      query === '(width < 900px)' ? mediumQuery : largeQuery
+    );
+
+    const { rerender, result } = renderHook(
+      (breakpoint: ViewportBreakpoint) =>
+        useBelowViewportBreakpoint(breakpoint),
+      { initialProps: 'md' }
+    );
+    expect(result.current).toBe(false);
+
+    rerender('lg');
+    expect(result.current).toBe(true);
+    expect(removeMediumListener).toHaveBeenCalledOnce();
+
+    act(() => {
+      largeQuery.matches = false;
+      largeQuery.dispatchEvent(new Event('change'));
+    });
+    expect(result.current).toBe(false);
   });
 });

@@ -553,10 +553,12 @@ describe('SidebarNavigation', () => {
       SidebarNavigationProviderProps,
       'children'
     > & {
+      headerLink?: boolean;
       sections?: SidebarNavigationSectionConfig[];
     };
 
     const CollapsibleSidebarFixture = ({
+      headerLink = false,
       sections = collapseSections,
       ...props
     }: CollapsibleSidebarFixtureProps) => (
@@ -567,6 +569,7 @@ describe('SidebarNavigation', () => {
               logo={<Package aria-hidden="true" />}
               title="Ordero"
             />
+            {headerLink ? <a href="#help">Help</a> : null}
           </SidebarNavigationHeader>
           <SidebarNavigationContent>
             <SidebarNavigationSections sections={sections} />
@@ -704,8 +707,11 @@ describe('SidebarNavigation', () => {
         return screen.findByRole('dialog', { name: 'Sidebar navigation' });
       };
 
-      it('starts closed regardless of the desktop state', () => {
-        setupCollapsible({ defaultCollapsed: false });
+      it.each([
+        false,
+        true,
+      ])('starts closed with desktop collapsed set to %s', (defaultCollapsed) => {
+        setupCollapsible({ defaultCollapsed });
 
         expect(
           screen.getByRole('button', { name: 'Open navigation' })
@@ -784,6 +790,53 @@ describe('SidebarNavigation', () => {
         await waitFor(() =>
           expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
         );
+      });
+
+      it('closes after keyboard activation of a custom-rendered menu link', async () => {
+        const user = userEvent.setup();
+        setupCollapsible({
+          sections: [
+            {
+              id: 'orders',
+              items: [
+                {
+                  id: 'orders-link',
+                  kind: 'link',
+                  label: 'Orders',
+                  href: '/orders',
+                  renderLink: ({ children, href }) => (
+                    <a
+                      href={`/app${href}`}
+                      onClick={(event) => event.preventDefault()}
+                    >
+                      {children}
+                    </a>
+                  ),
+                },
+              ],
+            },
+          ],
+        });
+
+        const drawer = await openDrawer(user);
+        within(drawer).getByRole('link', { name: 'Orders' }).focus();
+        await user.keyboard('{Enter}');
+
+        await waitFor(() =>
+          expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+        );
+      });
+
+      it('stays open when a link in the custom header is selected', async () => {
+        const user = userEvent.setup();
+        setupCollapsible({ headerLink: true });
+
+        const drawer = await openDrawer(user);
+        await user.click(within(drawer).getByRole('link', { name: 'Help' }));
+
+        expect(
+          screen.getByRole('dialog', { name: 'Sidebar navigation' })
+        ).toBeInTheDocument();
       });
 
       it('runs the selected action and closes the drawer', async () => {
@@ -895,6 +948,33 @@ describe('SidebarNavigation', () => {
         expect(
           screen.getByRole('button', { name: 'Open navigation' })
         ).toHaveFocus();
+      });
+
+      it('allows expanding drawer sections and preserves the collapsed desktop rail', async () => {
+        const user = userEvent.setup();
+        setupCollapsible({ defaultCollapsed: true });
+
+        const drawer = await openDrawer(user);
+        const overview = within(drawer).getByRole('button', {
+          name: 'Overview',
+        });
+        await user.click(overview);
+        expect(overview).toHaveAttribute('aria-expanded', 'false');
+        await user.click(overview);
+        expect(
+          within(drawer).getByRole('link', { name: 'Dashboard' })
+        ).toBeInTheDocument();
+
+        act(() => {
+          mediaQuery.matches = false;
+          mediaQuery.dispatchEvent(new Event('change'));
+        });
+
+        await waitFor(() =>
+          expect(
+            screen.getByRole('button', { name: 'Expand sidebar' })
+          ).toHaveFocus()
+        );
       });
 
       it('closes on crossing to desktop and returns focus to the rail toggle', async () => {
