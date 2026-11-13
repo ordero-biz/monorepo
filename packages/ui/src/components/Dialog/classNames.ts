@@ -2,7 +2,7 @@ export const rootClassName =
   'relative w-full rounded-[var(--dialog-radius)] bg-background text-foreground shadow-lg outline-none';
 
 export const backdropClassName =
-  'fixed inset-0 min-h-dvh bg-[var(--dialog-backdrop)] transition-opacity duration-150 data-[ending-style]:opacity-0 data-[starting-style]:opacity-0 supports-[-webkit-touch-callout:none]:absolute';
+  'fixed inset-0 z-50 min-h-dvh bg-[var(--dialog-backdrop)] transition-opacity duration-150 data-[ending-style]:opacity-0 data-[starting-style]:opacity-0 supports-[-webkit-touch-callout:none]:absolute';
 
 export const viewportClassName =
   'fixed inset-0 z-50 flex items-center justify-center overflow-hidden p-[var(--dialog-content-px)]';

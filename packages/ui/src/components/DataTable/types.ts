@@ -57,6 +57,8 @@ export type DataTableSelectionCellProps<TData extends RowData> = {
 export type DataTableCellProps = {
   children: ReactNode;
   variant?: DataTableCellVariant;
+  /** Fill the column's available width, for example for editable fields. */
+  width?: 'auto' | 'full';
 };
 
 export type DataTableRowSelectionState = RowSelectionState;
@@ -89,6 +91,16 @@ export type DataTableSortingState = SortingState;
 /** Summary content keyed by resolved leaf column IDs. */
 export type DataTableFooterColumns = Partial<Record<string, ReactNode>>;
 
+export type DataTableRowDetailsProps<TData> = {
+  /** Identifies the detail region and adds row context to Show/Hide details. */
+  getLabel: (row: TData, index: number) => string;
+  render: (row: TData, index: number) => ReactNode;
+  expandedRows?: Record<string, boolean>;
+  onExpandedRowsChange?: (expandedRows: Record<string, boolean>) => void;
+  /** Preserve mounted form fields while their detail row is hidden. */
+  keepMounted?: boolean;
+};
+
 export type DataTableProps<TData> = {
   ariaLabel: string;
   columns: DataTableColumnDef<TData>[];
@@ -110,6 +122,7 @@ export type DataTableProps<TData> = {
   onSortingChange?: (sorting: DataTableSortingState) => void;
   pagination?: DataTablePaginationProps;
   rowSelection?: DataTableRowSelectionState;
+  rowDetails?: DataTableRowDetailsProps<TData>;
   selection?: DataTableSelectionProps<TData>;
   sorting?: DataTableSortingState;
   selectable?: boolean;

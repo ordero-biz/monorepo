@@ -58,6 +58,18 @@ describe('validateProductName', () => {
 });
 
 describe('validateProductCategory', () => {
+  it('rejects draft categories and accepts active categories', () => {
+    expect(
+      validateProductCategory({
+        value: { id: 2, name: 'Tea', status: 'DRAFT' },
+      })
+    ).toBe('Activate this category before using it for a product');
+    expect(
+      validateProductCategory({
+        value: { id: 2, name: 'Tea', status: 'ACTIVE' },
+      })
+    ).toBeUndefined();
+  });
   it('requires a category', () => {
     expect(validateProductCategory({ value: null })).toBe(
       'Category is required'
@@ -406,7 +418,7 @@ describe('validateProductVariants', () => {
 });
 
 describe('validateProductConfiguration', () => {
-  it('leaves single-field rules to the field validators', () => {
+  it('validates common product details without mounted fields', () => {
     expect(
       validateProductConfiguration({
         generationMode: PRODUCT_GENERATION_MODE.one,
@@ -426,7 +438,13 @@ describe('validateProductConfiguration', () => {
           status: 'ARCHIVED' as never,
         },
       })
-    ).toBeUndefined();
+    ).toEqual({
+      fields: {
+        name: 'Product name is required',
+        category: 'Category is required',
+        status: 'Product status must be Draft or Active',
+      },
+    });
   });
 
   it('applies multiple-product variant requirements without generation fields', () => {

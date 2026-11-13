@@ -11,13 +11,17 @@ import {
   Users,
   Warehouse,
 } from 'lucide-react';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { Button } from '@/ui/components/Button';
 import {
   SidebarNavigation,
+  SidebarNavigationBrand,
   SidebarNavigationContent,
   SidebarNavigationFooter,
   SidebarNavigationHeader,
+  SidebarNavigationProvider,
   SidebarNavigationSections,
+  SidebarNavigationDrawerTrigger,
   type SidebarNavigationSectionConfig,
 } from '@/ui/components/SidebarNavigation';
 
@@ -158,14 +162,7 @@ const SidebarShell = ({
   <SidebarNavigation>
     {header ? (
       <SidebarNavigationHeader>
-        <div className="flex items-center gap-[var(--space-1)] px-[var(--space-1-5)]">
-          <div className="flex size-[32px] items-center justify-center rounded-[var(--radius-50-token)] bg-primary text-primary-foreground">
-            <Package className="size-4" />
-          </div>
-          <span className="text-[length:var(--subtitle1-size-desktop)] leading-[var(--subtitle1-line-height-desktop)] font-[var(--subtitle1-weight)] text-[var(--text-primary)]">
-            Ordero
-          </span>
-        </div>
+        <SidebarNavigationBrand logo={<Package />} title="Ordero" />
       </SidebarNavigationHeader>
     ) : null}
     <SidebarNavigationContent>
@@ -207,6 +204,26 @@ const SidebarNavigationStory = ({
   </div>
 );
 
+const CollapsibleSidebarShell = ({
+  items = sections,
+}: Partial<Pick<SidebarNavigationStoryProps, 'items'>>) => (
+  <SidebarNavigationProvider>
+    <SidebarNavigation id="collapsible-sidebar">
+      <SidebarNavigationHeader>
+        <SidebarNavigationBrand logo={<Package />} title="Ordero" />
+      </SidebarNavigationHeader>
+      <SidebarNavigationContent>
+        <SidebarNavigationSections sections={items} />
+      </SidebarNavigationContent>
+    </SidebarNavigation>
+    <main className="flex flex-1 flex-col gap-[var(--space-2)] p-[var(--space-3)]">
+      <SidebarNavigationDrawerTrigger />
+      Press the edge button to collapse the sidebar. On mobile, open it with
+      the menu button.
+    </main>
+  </SidebarNavigationProvider>
+);
+
 const meta = {
   title: 'Components/SidebarNavigation',
   component: SidebarNavigationStory,
@@ -238,6 +255,240 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {};
+
+export const Collapsible: Story = {
+  render: () => <CollapsibleSidebarShell />,
+};
+
+export const CollapsedItemsWithoutIcons: Story = {
+  args: {
+    items: [
+      {
+        id: 'overview',
+        items: [
+          {
+            id: 'dashboard',
+            kind: 'link',
+            label: 'Dashboard',
+            href: '/dashboard',
+          },
+          {
+            id: 'products',
+            kind: 'collapse',
+            label: 'Products',
+            items: [
+              {
+                id: 'categories',
+                kind: 'link',
+                label: 'Categories',
+                href: '/categories',
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  },
+  render: ({ items }) => <CollapsibleSidebarShell items={items} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const page = within(canvasElement.ownerDocument.body);
+
+    await userEvent.click(
+      canvas.getByRole('button', { name: 'Collapse sidebar' })
+    );
+
+    const dashboard = canvas.getByRole('link', { name: 'Dashboard' });
+    const products = canvas.getByRole('button', { name: 'Products' });
+
+    await expect(within(dashboard).getByText('D')).toBeVisible();
+    await expect(within(products).getByText('P')).toBeVisible();
+    await expect(products).toHaveAttribute('title', 'Products');
+    await userEvent.tab({ shift: true });
+    await expect(products).toHaveFocus();
+    await userEvent.keyboard('{Enter}');
+    await expect(
+      await page.findByRole('link', { name: 'Categories' })
+    ).toBeVisible();
+  },
+};
+
+export const CollapsedScrollableSubmenu: Story = {
+  args: {
+    items: [
+      {
+        id: 'catalog',
+        items: [
+          {
+            id: 'categories',
+            kind: 'collapse',
+            label: 'Categories',
+            items: Array.from({ length: 30 }, (_, index) => ({
+              id: `category-${index + 1}`,
+              kind: 'link',
+              label: `Category ${index + 1}`,
+              href: `/categories/${index + 1}`,
+            })),
+          },
+        ],
+      },
+    ],
+  },
+  render: ({ items }) => <CollapsibleSidebarShell items={items} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const document = canvasElement.ownerDocument;
+
+    await userEvent.click(
+      canvas.getByRole('button', { name: 'Collapse sidebar' })
+    );
+    await userEvent.click(canvas.getByRole('button', { name: 'Categories' }));
+
+    const submenu = await within(document.body).findByRole('dialog', {
+      name: 'Categories submenu',
+    });
+    const lastLink = within(submenu).getByRole('link', { name: 'Category 30' });
+
+    await waitFor(() => {
+      expect(submenu.getBoundingClientRect().bottom).toBeLessThanOrEqual(
+        document.documentElement.clientHeight
+      );
+      expect(submenu.scrollHeight).toBeGreaterThan(submenu.clientHeight);
+    });
+
+    lastLink.scrollIntoView({ block: 'nearest' });
+
+    const { left, right, top, bottom } = lastLink.getBoundingClientRect();
+    const hitTarget = document.elementFromPoint(
+      (left + right) / 2,
+      (top + bottom) / 2
+    );
+    await expect(lastLink.contains(hitTarget)).toBe(true);
+  },
+};
+
+const mobileGlobals = {
+  viewport: { isRotated: false, value: 'mobile1' },
+};
+
+export const StandaloneOnMobile: Story = {
+  globals: mobileGlobals,
+  play: async ({ canvasElement }) => {
+    const sidebar = within(canvasElement).getByRole('complementary', {
+      name: 'Sidebar navigation',
+    });
+
+    await expect(
+      within(sidebar).getByRole('link', { name: 'Dashboard' })
+    ).toBeVisible();
+  },
+};
+
+const openMobileDrawer = async (canvasElement: HTMLElement) => {
+  const canvas = within(canvasElement);
+  const page = within(canvasElement.ownerDocument.body);
+
+  await userEvent.click(
+    canvas.getByRole('button', { name: 'Open navigation' })
+  );
+
+  return page.findByRole('dialog', { name: 'Sidebar navigation' });
+};
+
+export const MobileDrawerOpen: Story = {
+  globals: mobileGlobals,
+  render: () => <CollapsibleSidebarShell />,
+  play: async ({ canvasElement }) => {
+    const document = canvasElement.ownerDocument;
+    const transitions = new Set<EventTarget>();
+    const recordSlide = (event: TransitionEvent) => {
+      if (event.propertyName === 'transform' && event.target) {
+        transitions.add(event.target);
+      }
+    };
+    document.addEventListener('transitionrun', recordSlide);
+
+    try {
+      const drawer = await openMobileDrawer(canvasElement);
+      const closeButton = within(drawer).getByRole('button', {
+        name: 'Close navigation',
+      });
+
+      await expect(
+        within(drawer).getByRole('link', { name: 'Dashboard' })
+      ).toBeVisible();
+      await expect(closeButton.getBoundingClientRect().right).toBeLessThan(
+        drawer.getBoundingClientRect().right
+      );
+      if (!document.defaultView?.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        await waitFor(() => expect(transitions.has(drawer)).toBe(true));
+      }
+    } finally {
+      document.removeEventListener('transitionrun', recordSlide);
+    }
+  },
+};
+
+export const MobileDrawerCloseButton: Story = {
+  globals: { viewport: { isRotated: false, value: 'mobile2' } },
+  render: () => <CollapsibleSidebarShell />,
+  play: async ({ canvasElement }) => {
+    const drawer = await openMobileDrawer(canvasElement);
+    const closeButton = within(drawer).getByRole('button', {
+      name: 'Close navigation',
+    });
+    const document = canvasElement.ownerDocument;
+
+    await waitFor(() => {
+      const { left, right, top, bottom } = closeButton.getBoundingClientRect();
+      const hitTarget = document.elementFromPoint(
+        (left + right) / 2,
+        (top + bottom) / 2
+      );
+
+      expect(left).toBeGreaterThan(drawer.getBoundingClientRect().right);
+      expect(right).toBeLessThanOrEqual(document.documentElement.clientWidth);
+      expect(closeButton.contains(hitTarget)).toBe(true);
+    });
+
+    await userEvent.click(closeButton);
+
+    await waitFor(() => {
+      expect(within(document.body).queryByRole('dialog')).not.toBeInTheDocument();
+      expect(
+        within(canvasElement).getByRole('button', { name: 'Open navigation' })
+      ).toHaveFocus();
+    });
+  },
+};
+
+export const MobileDrawerDismiss: Story = {
+  globals: mobileGlobals,
+  render: () => <CollapsibleSidebarShell />,
+  play: async ({ canvasElement }) => {
+    const documentBody = canvasElement.ownerDocument.body;
+    const page = within(documentBody);
+
+    await openMobileDrawer(canvasElement);
+
+    const backdrop = documentBody.querySelector(
+      '[data-slot="sidebar-navigation-backdrop"]'
+    );
+
+    if (!(backdrop instanceof HTMLElement)) {
+      throw new Error('Sidebar navigation backdrop is not rendered');
+    }
+
+    await userEvent.click(backdrop);
+
+    await waitFor(() =>
+      expect(page.queryByRole('dialog')).not.toBeInTheDocument()
+    );
+    await expect(
+      within(canvasElement).getByRole('button', { name: 'Open navigation' })
+    ).toHaveFocus();
+  },
+};
 
 export const WithoutHeaderOrFooter: Story = {
   args: {

@@ -2,6 +2,7 @@ import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { prepareFormHookTestSetup } from '@/test/prepareFormHookTestSetup';
 import { submitCreateProduct } from '../utils/submitAction';
+import { validateSingleProductConfiguration } from '../utils/validations';
 import { useCreateProductForm } from './useCreateProductForm';
 
 const { addToastMock } = vi.hoisted(() => ({
@@ -24,11 +25,12 @@ vi.mock('../utils/submitAction', async () => ({
 
 const submitCreateProductMock = vi.mocked(submitCreateProduct);
 const validateConfiguration = () => undefined;
+const defaultHookProps: Parameters<typeof useCreateProductForm>[0] = {
+  onCreated: vi.fn(),
+  validateConfiguration,
+};
 const { setup } = prepareFormHookTestSetup({
-  hookProps: {
-    onCreated: vi.fn(),
-    validateConfiguration,
-  },
+  hookProps: defaultHookProps,
   useFormHook: useCreateProductForm,
 });
 
@@ -103,5 +105,27 @@ describe('useCreateProductForm', () => {
       })
     );
     expect(onCreated).not.toHaveBeenCalled();
+  });
+
+  it('validates common details without mounted inputs before sending a request', async () => {
+    const user = userEvent.setup();
+    const { hookProps } = setup({
+      hookProps: {
+        onCreated: vi.fn(),
+        onFieldErrors: vi.fn(),
+        validateConfiguration: validateSingleProductConfiguration,
+      },
+    });
+
+    await user.click(screen.getByRole('button', { name: 'Submit' }));
+
+    await waitFor(() =>
+      expect(hookProps?.onFieldErrors).toHaveBeenCalledWith({
+        name: 'Product name is required',
+        category: 'Category is required',
+      })
+    );
+    expect(submitCreateProductMock).not.toHaveBeenCalled();
+    expect(hookProps?.onCreated).not.toHaveBeenCalled();
   });
 });

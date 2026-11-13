@@ -88,6 +88,7 @@ export type {
   DataTablePaginationProps,
   DataTablePaginationState,
   DataTableProps,
+  DataTableRowDetailsProps,
   DataTableRowSelectionState,
   DataTableRowTone,
   DataTableSelectionCellProps,
@@ -188,31 +189,44 @@ export { Select } from './components/Select';
 export type {
   SidebarNavigationActionItem,
   SidebarNavigationActionSelectArgs,
+  SidebarNavigationBrandProps,
   SidebarNavigationCollapseItem,
   SidebarNavigationContentProps,
+  SidebarNavigationContextValue,
+  SidebarNavigationDrawerTriggerProps,
   SidebarNavigationFooterProps,
   SidebarNavigationHeaderProps,
   SidebarNavigationItem,
   SidebarNavigationLinkItem,
   SidebarNavigationMenuProps,
   SidebarNavigationProps,
+  SidebarNavigationProviderProps,
   SidebarNavigationRenderLink,
   SidebarNavigationRenderLinkArgs,
   SidebarNavigationSectionConfig,
   SidebarNavigationSectionContentProps,
   SidebarNavigationSectionProps,
   SidebarNavigationSectionsProps,
+  SidebarNavigationTriggerProps,
 } from './components/SidebarNavigation';
 export {
+  SIDEBAR_NAVIGATION_COLLAPSED_COOKIE_NAME,
   SidebarNavigation,
+  SidebarNavigationBrand,
   SidebarNavigationContent,
+  SidebarNavigationDrawerTrigger,
   SidebarNavigationFooter,
   SidebarNavigationHeader,
   SidebarNavigationMenu,
+  SidebarNavigationProvider,
   SidebarNavigationSection,
   SidebarNavigationSectionContent,
   SidebarNavigationSections,
+  SidebarNavigationTrigger,
+  useSidebarNavigation,
 } from './components/SidebarNavigation';
+export type { SkeletonProps, SkeletonShape } from './components/Skeleton';
+export { Skeleton } from './components/Skeleton';
 export type {
   TablePaginationProps,
   TablePaginationRangeLabelArgs,
@@ -278,4 +292,6 @@ export type {
   TypographyVariant,
 } from './components/Typography';
 export { Typography } from './components/Typography';
+export type { ViewportBreakpoint } from './hooks/useBelowViewportBreakpoint';
+export { useBelowViewportBreakpoint } from './hooks/useBelowViewportBreakpoint';
 export { cn } from './lib/utils';

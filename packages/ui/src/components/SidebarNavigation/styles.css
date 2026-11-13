@@ -1,4 +1,60 @@
+/*
+ * Sidebar motion, shared by the width change, the mobile drawer and app
+ * layout parts that follow the sidebar width. Defined on :root because the
+ * drawer is portaled outside the provider.
+ */
+:root {
+  --sidebar-navigation-duration: 200ms;
+  --sidebar-navigation-overlay-duration: 300ms;
+  --sidebar-navigation-easing: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sidebar-navigation-provider {
+  --sidebar-navigation-panel-width: var(--nav-width);
+}
+
+/* The selected breakpoint's utility overrides this width in drawer mode. */
+@layer components {
+  .sidebar-navigation-provider {
+    --sidebar-navigation-width: var(--sidebar-navigation-panel-width);
+  }
+}
+
+.sidebar-navigation-provider[data-collapsed='true'] {
+  --sidebar-navigation-panel-width: var(--nav-mini-width);
+}
+
+.sidebar-navigation-drawer-close {
+  display: flex;
+  flex-shrink: 0;
+  justify-content: flex-end;
+  padding: var(--space-1) var(--space-2) 0;
+}
+
+/* 280px drawer + 40px close button + 8px clearance on each side. */
+@media (width >= 336px) {
+  .sidebar-navigation-drawer {
+    --sidebar-navigation-drawer-close-overhang: calc(
+      var(--space-1) +
+      var(--icon-button-md-size)
+    );
+  }
+
+  .sidebar-navigation-drawer-close {
+    position: absolute;
+    top: var(--space-1);
+    left: calc(100% + var(--space-1));
+    padding: 0;
+  }
+
+  .sidebar-navigation-drawer-close svg {
+    color: var(--white-main);
+  }
+}
+
 .sidebar-navigation-panel {
+  /* Base UI supplies the measured height as an inline custom property. */
+  --accordion-panel-height: auto;
   box-sizing: border-box;
   overflow: hidden;
   height: var(--accordion-panel-height);

@@ -49,10 +49,17 @@ selection. Compute domain comparisons in the feature and pass a cheap flag
 lookup here. Include a visible explanation such as “Different” in a cell;
 row color alone must not convey the meaning.
 
+## Editable cells
+
+Use `<DataTableCell width="full">` around form controls so they fill the
+column's available width inside the standard cell padding. The default cell
+width fits its content. Define column sizing through `meta.width` or
+`meta.minWidth`, rather than a wrapper around the control.
+
 ## Header content
 
 Use `header` for a title, count, or feature-owned controls above the column
-headers. The component provides padding, a bottom divider, and a wrapping flex
+headers. The component provides padding and a wrapping flex
 layout with space between its children. Group related content in an inner
 element. The header stays outside horizontal scrolling and remains visible
 when the table is empty. Omit it on tables that do not need a header.
@@ -248,3 +255,45 @@ layer:
 
 Use Testing Library for component-local behavior, Storybook browser checks for
 shared component states, and Playwright only for routed, composed app flows.
+
+## Expandable row details
+
+Use `rowDetails` for secondary content below a record. The table adds a leading
+Show details / Hide details button and a detail row spanning all columns, including selection. Each
+button exposes `aria-expanded` and controls a labelled region. Expanding a row
+is independent of selecting it or editing its cells.
+The details column fits its non-wrapping button and cell padding; spare table
+width is available to the data columns.
+
+```tsx
+<DataTable
+  ariaLabel="Products"
+  columns={columns}
+  data={products}
+  getRowId={product => String(product.id)}
+  rowDetails={{
+    getLabel: product => product.name,
+    render: product => <ProductDetails product={product} />,
+  }}
+/>
+```
+
+Expansion is uncontrolled by default. Supply `expandedRows` (a record of row IDs
+to booleans) and `onExpandedRowsChange` when the feature must reveal a row after
+validation. Use the same stable `getRowId` across updates, sorting, and pagination.
+Multiple rows can be expanded independently. Details follow their parent rows
+and do not count as separate records for selection or pagination.
+
+By default, collapsed details unmount. Set `keepMounted: true` for editors that
+must retain field registration and local state while hidden. Only rows rendered
+on the current page are mounted; the feature must own persistent form values
+across pagination. Validation and decisions about which rows to open stay in the
+feature. Expansion itself does not move focus into the details.
+
+`getLabel` identifies the detail region and provides context for the toggle’s
+accessible name (for example, “Show details: Coffee”). Expanded details share an
+accent border with their toggle and retain the normal card background. Features can open
+a row initially through `expandedRows`; subsequent user choices stay feature-owned.
+An expanded group ends with a narrow 4px gap before the next record, separating
+adjacent open groups and interrupting the accent border. This decorative border
+does not add table rows or change the accessible record count.

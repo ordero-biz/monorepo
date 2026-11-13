@@ -3,14 +3,16 @@ import { useState } from 'react';
 import { PRODUCT_GENERATION_MODE } from './constants';
 import { EditProductVariantAttributesDialog } from './EditProductVariantAttributesDialog';
 import { GeneratedProductVariantList } from './GeneratedProductVariantList';
+import { useProductVariantAttributes } from './hooks/useProductVariantAttributes';
 import type {
   EditGeneratedProductVariantAttributesProps,
   GeneratedProductVariantsProps,
 } from './types';
 import { getInvalidProductVariantIndexes } from './utils/productVariantErrors';
 
-const EditGeneratedProductVariantAttributes = ({
+export const EditGeneratedProductVariantAttributes = ({
   allowMultipleValuesPerAttribute,
+  onAttributesUpdated,
   attributes,
   productVariantsCreationForm,
   onOpenChange,
@@ -29,7 +31,16 @@ const EditGeneratedProductVariantAttributes = ({
             attributes={attributes}
             attributeValueIds={attributeValueIdsField.state.value}
             onOpenChange={onOpenChange}
-            onUpdate={attributeValueIdsField.handleChange}
+            onUpdate={({
+              attributeValueIds,
+              attributes: updatedAttributes,
+            }) => {
+              onAttributesUpdated(variantIndex, updatedAttributes);
+              // Applying a dialog draft must not trigger form validation.
+              attributeValueIdsField.setValue(attributeValueIds, {
+                dontValidate: true,
+              });
+            }}
             open
             productVariantName={nameField.state.value}
           />
@@ -44,6 +55,8 @@ export const GeneratedProductVariants = ({
   generatedAttributes,
   generationMode,
 }: GeneratedProductVariantsProps) => {
+  const { getVariantAttributes, updateVariantAttributes } =
+    useProductVariantAttributes(generatedAttributes);
   const [editingVariantIndex, setEditingVariantIndex] = useState<number | null>(
     null
   );
@@ -73,7 +86,7 @@ export const GeneratedProductVariants = ({
           <div className="mt-3">
             <Typography variant="h5">Generated product variants</Typography>
             <GeneratedProductVariantList
-              attributes={generatedAttributes}
+              getVariantAttributes={getVariantAttributes}
               productVariantsCreationForm={productVariantsCreationForm}
               invalidVariantIndexes={invalidVariantIndexes}
               onEditAttributes={setEditingVariantIndex}
@@ -88,7 +101,8 @@ export const GeneratedProductVariants = ({
                 allowMultipleValuesPerAttribute={
                   generationMode === PRODUCT_GENERATION_MODE.one
                 }
-                attributes={generatedAttributes}
+                attributes={getVariantAttributes(editingVariantIndex)}
+                onAttributesUpdated={updateVariantAttributes}
                 productVariantsCreationForm={productVariantsCreationForm}
                 onOpenChange={handleAttributesDialogOpenChange}
                 variantIndex={editingVariantIndex}

@@ -1,4 +1,4 @@
-import type { AsyncComboboxMultipleProps } from '@/lib/components/AsyncCombobox';
+import type { ReactNode } from 'react';
 import type { AttributeDropdown } from '@/lib/domain/attributes/types';
 import type { CategorySelection } from '@/lib/domain/categories/types';
 import type { ProductStatus } from '@/lib/domain/products/types';
@@ -30,25 +30,13 @@ export type ProductVariantsGenerationFormProps = {
 };
 
 export type ProductVariantsCreationFormProps = {
+  commonProductFields?: ReactNode;
+  variantFields?: ReactNode;
+  isEditingProductDetails?: boolean;
   productVariantsCreationForm: ProductVariantsCreationFormApi;
   generatedAttributes: AttributeDropdown[];
   generationMode: ProductGenerationMode;
 };
-
-export type AttributesAsyncComboboxProps = Omit<
-  AsyncComboboxMultipleProps<AttributeDropdown>,
-  | 'emptyText'
-  | 'isOptionDisabled'
-  | 'loadErrorText'
-  | 'loadingText'
-  | 'loadOptions'
-  | 'getOptionLabel'
-  | 'getOptionValue'
-  | 'renderOption'
-  | 'pageSize'
-  | 'queryKey'
-  | 'staticOptions'
->;
 
 export type ProductTemplateFieldsProps = {
   productVariantsGenerationForm: ProductVariantsGenerationFormApi;
@@ -72,7 +60,7 @@ export type GeneratedProductVariantsProps = {
 };
 
 export type GeneratedProductVariantListProps = {
-  attributes: AttributeDropdown[];
+  getVariantAttributes: (variantIndex: number) => AttributeDropdown[];
   productVariantsCreationForm: ProductVariantsCreationFormApi;
   invalidVariantIndexes: number[];
   onEditAttributes: (variantIndex: number) => void;
@@ -90,6 +78,10 @@ export type GeneratedProductVariantCardProps = {
 };
 
 export type EditGeneratedProductVariantAttributesProps = {
+  onAttributesUpdated: (
+    variantIndex: number,
+    attributes: AttributeDropdown[]
+  ) => void;
   allowMultipleValuesPerAttribute: boolean;
   attributes: AttributeDropdown[];
   productVariantsCreationForm: ProductVariantsCreationFormApi;
@@ -114,10 +106,12 @@ export type EditProductVariantAttributesDialogProps = {
   attributeValueIds: number[];
   attributes: AttributeDropdown[];
   onOpenChange: (open: boolean) => void;
-  onUpdate: (attributeValueIds: number[]) => void;
+  onUpdate: (values: ProductVariantAttributesUpdate) => void;
   open: boolean;
   productVariantName: string;
 };
+
+export type CommonProductFieldInputsProps = CommonProductFieldsProps;
 
 export type ProductImageDropzoneProps = {
   className?: string;
@@ -163,3 +157,13 @@ export type ProductStatusSelectorProps = {
 
 export type ProductGenerationMode =
   (typeof PRODUCT_GENERATION_MODE)[keyof typeof PRODUCT_GENERATION_MODE];
+
+export type ProductVariantAttributesProps = Omit<
+  GeneratedProductVariantCardProps,
+  'hasErrors'
+> & { productVariantName: string };
+
+export type ProductVariantAttributesUpdate = {
+  attributeValueIds: number[];
+  attributes: AttributeDropdown[];
+};
