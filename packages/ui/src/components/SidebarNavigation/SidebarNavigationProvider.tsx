@@ -2,7 +2,6 @@
 
 import {
   createContext,
-  type ReactNode,
   useCallback,
   useContext,
   useId,
@@ -30,40 +29,11 @@ const standaloneContextValue: SidebarNavigationContextValue = {
   toggleCollapsed: () => undefined,
 };
 
-const SidebarNavigationContext = createContext<
-  SidebarNavigationContextValue & { sectionIdPrefix?: string }
->(standaloneContextValue);
+const SidebarNavigationContext = createContext<SidebarNavigationContextValue>(
+  standaloneContextValue
+);
 
 export const useSidebarNavigation = () => useContext(SidebarNavigationContext);
-
-type SidebarNavigationDisplayScopeProps = {
-  children: ReactNode;
-  renderCollapsed: boolean;
-  sectionIdPrefix?: string;
-};
-
-/** Lets a drawer or popover render expanded items independently of sidebar state. */
-export const SidebarNavigationDisplayScope = ({
-  children,
-  renderCollapsed,
-  sectionIdPrefix,
-}: SidebarNavigationDisplayScopeProps) => {
-  const parentContext = useSidebarNavigation();
-  const displayContext = useMemo(
-    () => ({
-      ...parentContext,
-      collapsed: renderCollapsed,
-      sectionIdPrefix: sectionIdPrefix ?? parentContext.sectionIdPrefix,
-    }),
-    [parentContext, renderCollapsed, sectionIdPrefix]
-  );
-
-  return (
-    <SidebarNavigationContext.Provider value={displayContext}>
-      {children}
-    </SidebarNavigationContext.Provider>
-  );
-};
 
 const persistDesktopCollapsed = (isDesktopCollapsed: boolean) => {
   // biome-ignore lint/suspicious/noDocumentCookie: mirrors shadcn sidebar persistence so the server can read the state on first render
@@ -81,9 +51,12 @@ export const SidebarNavigationProvider = ({
     defaultDesktopCollapsed
   );
   const [drawerOpen, setDrawerOpen] = useState<boolean>();
+
   const mobileDrawerId = useId();
+
   const isDesktopCollapsed =
     controlledDesktopCollapsed ?? internalDesktopCollapsed;
+
   const updateDesktopCollapsed = useCallback(
     (nextCollapsed: boolean) => {
       if (controlledDesktopCollapsed === undefined) {

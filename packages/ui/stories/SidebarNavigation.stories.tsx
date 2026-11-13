@@ -21,7 +21,7 @@ import {
   SidebarNavigationHeader,
   SidebarNavigationProvider,
   SidebarNavigationSections,
-  SidebarNavigationTrigger,
+  SidebarNavigationDrawerTrigger,
   type SidebarNavigationSectionConfig,
 } from '@/ui/components/SidebarNavigation';
 
@@ -217,7 +217,7 @@ const CollapsibleSidebarShell = ({
       </SidebarNavigationContent>
     </SidebarNavigation>
     <main className="flex flex-1 flex-col gap-[var(--space-2)] p-[var(--space-3)]">
-      <SidebarNavigationTrigger />
+      <SidebarNavigationDrawerTrigger />
       Press the edge button to collapse the sidebar. On mobile, open it with
       the menu button.
     </main>

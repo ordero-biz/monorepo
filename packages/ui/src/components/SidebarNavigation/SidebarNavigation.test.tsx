@@ -8,11 +8,11 @@ import {
   SidebarNavigation,
   SidebarNavigationBrand,
   SidebarNavigationContent,
+  SidebarNavigationDrawerTrigger,
   SidebarNavigationFooter,
   SidebarNavigationHeader,
   SidebarNavigationProvider,
   SidebarNavigationSections,
-  SidebarNavigationTrigger,
 } from './index';
 import type {
   SidebarNavigationProviderProps,
@@ -552,11 +552,14 @@ describe('SidebarNavigation', () => {
     type CollapsibleSidebarFixtureProps = Omit<
       SidebarNavigationProviderProps,
       'children'
-    >;
+    > & {
+      sections?: SidebarNavigationSectionConfig[];
+    };
 
-    const CollapsibleSidebarFixture = (
-      props: CollapsibleSidebarFixtureProps
-    ) => (
+    const CollapsibleSidebarFixture = ({
+      sections = collapseSections,
+      ...props
+    }: CollapsibleSidebarFixtureProps) => (
       <SidebarNavigationProvider {...props}>
         <SidebarNavigation id="test-sidebar">
           <SidebarNavigationHeader>
@@ -566,11 +569,11 @@ describe('SidebarNavigation', () => {
             />
           </SidebarNavigationHeader>
           <SidebarNavigationContent>
-            <SidebarNavigationSections sections={collapseSections} />
+            <SidebarNavigationSections sections={sections} />
           </SidebarNavigationContent>
         </SidebarNavigation>
         <main>
-          <SidebarNavigationTrigger />
+          <SidebarNavigationDrawerTrigger />
           Page content
         </main>
       </SidebarNavigationProvider>
@@ -778,6 +781,44 @@ describe('SidebarNavigation', () => {
           within(drawer).getByRole('link', { name: 'Dashboard' })
         );
 
+        await waitFor(() =>
+          expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+        );
+      });
+
+      it('runs the selected action and closes the drawer', async () => {
+        const user = userEvent.setup();
+        const {
+          sections: [
+            {
+              items: [action],
+            },
+          ],
+        } = setupCollapsible({
+          sections: [
+            {
+              id: 'account',
+              label: 'Account',
+              items: [
+                {
+                  id: 'settings',
+                  kind: 'action',
+                  label: 'Settings',
+                  onSelect: vi.fn(),
+                },
+              ],
+            },
+          ],
+        });
+
+        const drawer = await openDrawer(user);
+        const settings = within(drawer).getByRole('button', {
+          name: action.label,
+        });
+        settings.focus();
+        await user.keyboard('{Enter}');
+
+        expect(action.onSelect).toHaveBeenCalledOnce();
         await waitFor(() =>
           expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
         );

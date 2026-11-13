@@ -2,6 +2,10 @@ export { SIDEBAR_NAVIGATION_COLLAPSED_COOKIE_NAME } from './constants';
 export { SidebarNavigation } from './SidebarNavigation';
 export { SidebarNavigationBrand } from './SidebarNavigationBrand';
 export { SidebarNavigationContent } from './SidebarNavigationContent';
+export {
+  SidebarNavigationDrawerTrigger,
+  SidebarNavigationDrawerTrigger as SidebarNavigationTrigger,
+} from './SidebarNavigationDrawerTrigger';
 export { SidebarNavigationFooter } from './SidebarNavigationFooter';
 export { SidebarNavigationHeader } from './SidebarNavigationHeader';
 export { SidebarNavigationMenu } from './SidebarNavigationMenu';
@@ -12,7 +16,6 @@ export {
 export { SidebarNavigationSection } from './SidebarNavigationSection';
 export { SidebarNavigationSectionContent } from './SidebarNavigationSectionContent';
 export { SidebarNavigationSections } from './SidebarNavigationSections';
-export { SidebarNavigationTrigger } from './SidebarNavigationTrigger';
 export type {
   SidebarNavigationActionItem,
   SidebarNavigationActionSelectArgs,
@@ -20,6 +23,8 @@ export type {
   SidebarNavigationCollapseItem,
   SidebarNavigationContentProps,
   SidebarNavigationContextValue,
+  SidebarNavigationDrawerTriggerProps,
+  SidebarNavigationDrawerTriggerProps as SidebarNavigationTriggerProps,
   SidebarNavigationFooterProps,
   SidebarNavigationHeaderProps,
   SidebarNavigationItem,
@@ -33,5 +38,4 @@ export type {
   SidebarNavigationSectionContentProps,
   SidebarNavigationSectionProps,
   SidebarNavigationSectionsProps,
-  SidebarNavigationTriggerProps,
 } from './types';

@@ -6,15 +6,15 @@ import { cn } from '@/ui/lib/utils';
 import { sidebarBreakpointClasses, triggerClassName } from './classNames';
 import { DEFAULT_SIDEBAR_BREAKPOINT } from './constants';
 import { useSidebarNavigation } from './SidebarNavigationProvider';
-import type { SidebarNavigationTriggerProps } from './types';
+import type { SidebarNavigationDrawerTriggerProps } from './types';
 
 /**
  * Opens the sidebar drawer on mobile, where the sidebar itself is hidden.
  * Place it in the page header; it is hidden from the mobile breakpoint up.
  */
-export const SidebarNavigationTrigger = ({
+export const SidebarNavigationDrawerTrigger = ({
   label = 'Open navigation',
-}: SidebarNavigationTriggerProps) => {
+}: SidebarNavigationDrawerTriggerProps) => {
   const {
     breakpoint = DEFAULT_SIDEBAR_BREAKPOINT,
     collapsible,

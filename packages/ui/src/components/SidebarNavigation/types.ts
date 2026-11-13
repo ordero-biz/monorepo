@@ -75,7 +75,7 @@ export type SidebarNavigationProps = {
   ref?: Ref<HTMLDivElement>;
 };
 
-export type SidebarNavigationTriggerProps = {
+export type SidebarNavigationDrawerTriggerProps = {
   /** Accessible name of the button that opens the mobile drawer. */
   label?: string;
 };
@@ -87,6 +87,7 @@ export type SidebarNavigationBrandProps = {
 
 export type SidebarNavigationContextValue = {
   breakpoint?: ViewportBreakpoint;
+  /** Whether the desktop rail is collapsed. */
   collapsed: boolean;
   /** True when a provider manages the collapsed state and a toggle is shown. */
   collapsible: boolean;
@@ -108,7 +109,7 @@ export type SidebarNavigationProviderProps = {
   onCollapsedChange?: (collapsed: boolean) => void;
 };
 
-export type SidebarNavigationToggleProps = {
+export type SidebarNavigationRailToggleProps = {
   collapseLabel: string;
   controls?: string;
   expandLabel: string;

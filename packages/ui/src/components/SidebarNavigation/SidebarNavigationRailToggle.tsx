@@ -5,14 +5,14 @@ import { ChevronLeft } from 'lucide-react';
 import { cn } from '@/ui/lib/utils';
 import { toggleClassName } from './classNames';
 import { useSidebarNavigation } from './SidebarNavigationProvider';
-import type { SidebarNavigationToggleProps } from './types';
+import type { SidebarNavigationRailToggleProps } from './types';
 
-export const SidebarNavigationToggle = ({
+export const SidebarNavigationRailToggle = ({
   collapseLabel,
   controls,
   expandLabel,
   ref,
-}: SidebarNavigationToggleProps) => {
+}: SidebarNavigationRailToggleProps) => {
   const { collapsed, collapsible, toggleCollapsed } = useSidebarNavigation();
 
   if (!collapsible) {

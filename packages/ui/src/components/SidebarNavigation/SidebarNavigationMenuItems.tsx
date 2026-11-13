@@ -20,9 +20,9 @@ import {
   tooltipPopupClassName,
 } from './classNames';
 import {
-  SidebarNavigationDisplayScope,
-  useSidebarNavigation,
-} from './SidebarNavigationProvider';
+  SidebarNavigationScopeProvider,
+  useSidebarNavigationScope,
+} from './SidebarNavigationScopeProvider';
 import type {
   SidebarNavigationCollapseItem,
   SidebarNavigationItem,
@@ -110,9 +110,10 @@ const SidebarNavigationItemContent = ({
   item: SidebarNavigationItem;
   isOpen?: boolean;
 }) => {
-  const { collapsed } = useSidebarNavigation();
+  const { renderCollapsed } = useSidebarNavigationScope();
   const branchActive = isItemBranchActive(item);
-  const fallback = collapsed && !item.icon ? getLabelInitial(item.label) : null;
+  const fallback =
+    renderCollapsed && !item.icon ? getLabelInitial(item.label) : null;
 
   return (
     <>
@@ -175,6 +176,7 @@ const SidebarNavigationLeafItem = ({
   item: Exclude<SidebarNavigationItem, SidebarNavigationCollapseItem>;
   renderLink?: SidebarNavigationRenderLink;
 }) => {
+  const { onItemSelect } = useSidebarNavigationScope();
   const className = getItemClassName({
     active: Boolean(item.active),
     depth,
@@ -188,7 +190,10 @@ const SidebarNavigationLeafItem = ({
         className={className}
         data-slot="sidebar-navigation-action"
         disabled={item.disabled}
-        onClick={(event) => item.onSelect({ event, item })}
+        onClick={(event) => {
+          item.onSelect({ event, item });
+          onItemSelect?.();
+        }}
         type="button"
       >
         {content}
@@ -302,7 +307,7 @@ const SidebarNavigationCollapsedBranch = ({
             <div aria-hidden="true" className={popoverTitleClassName}>
               {item.label}
             </div>
-            <SidebarNavigationDisplayScope renderCollapsed={false}>
+            <SidebarNavigationScopeProvider renderCollapsed={false}>
               <SidebarNavigationMenuItems
                 depth={0}
                 items={item.items}
@@ -310,7 +315,7 @@ const SidebarNavigationCollapsedBranch = ({
                 renderLink={renderLink}
                 rootLabel={rootLabel}
               />
-            </SidebarNavigationDisplayScope>
+            </SidebarNavigationScopeProvider>
           </Popover.Popup>
         </Popover.Positioner>
       </Popover.Portal>
@@ -325,7 +330,7 @@ export const SidebarNavigationMenuItems = ({
   renderLink,
   rootLabel,
 }: SidebarNavigationMenuItemsProps) => {
-  const { collapsed } = useSidebarNavigation();
+  const { renderCollapsed, onItemSelect } = useSidebarNavigationScope();
   const { expandedItemIds, navigationStateKey } = useMemo(() => {
     const activeItemIds = getActiveItemIds(items);
     const expandedItemIds = getExpandedItemIds(items);
@@ -365,7 +370,7 @@ export const SidebarNavigationMenuItems = ({
       {items.map((item) => {
         const branchActive = isItemBranchActive(item);
 
-        if (depth === 0 && collapsed) {
+        if (depth === 0 && renderCollapsed) {
           return (
             <li data-slot="sidebar-navigation-menu-item" key={item.id}>
               {item.kind === 'collapse' ? (
@@ -388,23 +393,17 @@ export const SidebarNavigationMenuItems = ({
         }
 
         if (item.kind !== 'collapse') {
-          if (depth === 0) {
-            return (
-              <li data-slot="sidebar-navigation-menu-item" key={item.id}>
-                <SidebarNavigationLeafItem
-                  depth={depth}
-                  item={item}
-                  renderLink={renderLink}
-                />
-              </li>
-            );
-          }
-
           return (
+            // biome-ignore lint/a11y/useKeyWithClickEvents: The link handles keyboard activation and its click bubbles to this row.
             <li
-              className={nestedItemWrapperClassName}
+              className={depth > 0 ? nestedItemWrapperClassName : undefined}
               data-slot="sidebar-navigation-menu-item"
               key={item.id}
+              onClick={
+                item.kind === 'link' && !item.disabled
+                  ? onItemSelect
+                  : undefined
+              }
             >
               <SidebarNavigationLeafItem
                 depth={depth}

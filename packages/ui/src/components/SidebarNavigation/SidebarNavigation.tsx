@@ -4,7 +4,7 @@ import './styles.css';
 import { Drawer } from '@base-ui/react/drawer';
 import { Tooltip } from '@base-ui/react/tooltip';
 import { X } from 'lucide-react';
-import { type MouseEvent, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { IconButton } from '@/ui/components/IconButton';
 import { useBelowViewportBreakpoint } from '@/ui/hooks/useBelowViewportBreakpoint';
 import { cn } from '@/ui/lib/utils';
@@ -18,16 +18,10 @@ import {
   sidebarBreakpointClasses,
 } from './classNames';
 import { DEFAULT_SIDEBAR_BREAKPOINT } from './constants';
-import {
-  SidebarNavigationDisplayScope,
-  useSidebarNavigation,
-} from './SidebarNavigationProvider';
-import { SidebarNavigationToggle } from './SidebarNavigationToggle';
+import { useSidebarNavigation } from './SidebarNavigationProvider';
+import { SidebarNavigationRailToggle } from './SidebarNavigationRailToggle';
+import { SidebarNavigationScopeProvider } from './SidebarNavigationScopeProvider';
 import type { SidebarNavigationProps } from './types';
-
-// Leaf items only: links and actions. Branch triggers just expand a submenu.
-const selectableItemSelector =
-  'a[href], [data-slot="sidebar-navigation-action"]';
 
 export const SidebarNavigation = ({
   children,
@@ -47,9 +41,11 @@ export const SidebarNavigation = ({
     setDrawerOpen,
   } = useSidebarNavigation();
   const isBelowBreakpoint = useBelowViewportBreakpoint(breakpoint);
-  const showRail = !collapsible || !isBelowBreakpoint;
+
   const desktopToggleRef = useRef<HTMLButtonElement>(null);
   const closedOnDesktop = useRef(false);
+
+  const showRail = !collapsible || !isBelowBreakpoint;
 
   useEffect(() => {
     if (!drawerOpen) {
@@ -57,18 +53,13 @@ export const SidebarNavigation = ({
     }
 
     closedOnDesktop.current = !isBelowBreakpoint;
+
     if (!isBelowBreakpoint) {
       setDrawerOpen(false);
     }
   }, [drawerOpen, isBelowBreakpoint, setDrawerOpen]);
 
-  // Close the drawer once an item is selected. React events bubble through
-  // portals, so this also covers links inside nested popovers.
-  const handleOverlayClick = (event: MouseEvent<HTMLElement>) => {
-    if ((event.target as Element).closest(selectableItemSelector)) {
-      setDrawerOpen(false);
-    }
-  };
+  const closeDrawer = useCallback(() => setDrawerOpen(false), [setDrawerOpen]);
 
   return (
     <Tooltip.Provider delay={0}>
@@ -86,7 +77,7 @@ export const SidebarNavigation = ({
         {showRail && (
           <div className={panelClassName} data-slot="sidebar-navigation-rail">
             <div className={shellInnerClassName}>{children}</div>
-            <SidebarNavigationToggle
+            <SidebarNavigationRailToggle
               collapseLabel={collapseLabel}
               controls={id}
               expandLabel={expandLabel}
@@ -117,7 +108,6 @@ export const SidebarNavigation = ({
                   closedOnDesktop.current ? desktopToggleRef.current : true
                 }
                 id={overlayId}
-                onClick={handleOverlayClick}
               >
                 <div className="sidebar-navigation-drawer-close">
                   <Drawer.Close aria-label={closeLabel} render={<IconButton />}>
@@ -125,12 +115,13 @@ export const SidebarNavigation = ({
                   </Drawer.Close>
                 </div>
                 <div className={shellInnerClassName}>
-                  <SidebarNavigationDisplayScope
+                  <SidebarNavigationScopeProvider
+                    onItemSelect={closeDrawer}
                     renderCollapsed={false}
                     sectionIdPrefix={overlayId}
                   >
                     {children}
-                  </SidebarNavigationDisplayScope>
+                  </SidebarNavigationScopeProvider>
                 </div>
               </Drawer.Popup>
             </Drawer.Viewport>

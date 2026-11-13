@@ -1,7 +1,7 @@
 import {
   cn,
+  SidebarNavigationDrawerTrigger,
   SidebarNavigationProvider,
-  SidebarNavigationTrigger,
   TopBar,
   Typography,
 } from '@ordero/ui';
@@ -29,7 +29,7 @@ export const BaseLayout = ({
       <main className="flex min-w-0 flex-1 flex-col">
         <TopBar.Root id="platform-page-header">
           <TopBar.Left>
-            <SidebarNavigationTrigger />
+            <SidebarNavigationDrawerTrigger />
             <Typography variant="h6">Platform</Typography>
           </TopBar.Left>
         </TopBar.Root>
