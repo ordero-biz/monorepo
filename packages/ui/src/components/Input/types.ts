@@ -2,6 +2,7 @@ import type { InputChangeEventDetails } from '@base-ui/react/input';
 import type {
   ElementType,
   FocusEventHandler,
+  HTMLAttributes,
   HTMLInputAutoCompleteAttribute,
   HTMLInputTypeAttribute,
   KeyboardEventHandler,
@@ -24,6 +25,7 @@ export type InputProps = {
   endIcon?: ElementType<{ className?: string }>;
   focused?: boolean;
   id?: string;
+  inputMode?: HTMLAttributes<HTMLInputElement>['inputMode'];
   invalid?: boolean;
   name?: string;
   onBlur?: FocusEventHandler<HTMLInputElement>;
@@ -41,3 +43,16 @@ export type InputProps = {
   value?: string;
   variant?: InputVariant;
 };
+
+export type InputFrameProps = Pick<
+  InputProps,
+  | 'disabled'
+  | 'endAdornment'
+  | 'endIcon'
+  | 'focused'
+  | 'invalid'
+  | 'size'
+  | 'startAdornment'
+  | 'startIcon'
+  | 'variant'
+> & { children: ReactNode };

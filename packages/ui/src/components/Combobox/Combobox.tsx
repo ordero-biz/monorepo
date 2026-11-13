@@ -8,18 +8,19 @@ import { Chip } from '@/ui/components/Chip';
 import { FieldHelperText } from '@/ui/components/FieldHelperText';
 import { FieldLabel } from '@/ui/components/FieldLabel';
 import { dropdownSurfaceClassName } from '@/ui/components/Select';
+import {
+  fieldSurfaceClassNames,
+  fieldValueTypographyClassName,
+  getFieldSurfaceStateClassName,
+} from '@/ui/lib/fieldStyles';
 import { cn } from '@/ui/lib/utils';
-import type {
-  ComboboxChangeEventDetails,
-  ComboboxProps,
-  ComboboxVariant,
-} from './types';
+import type { ComboboxChangeEventDetails, ComboboxProps } from './types';
 
 const inputGroupClassNames = {
   outlined:
-    'relative flex w-full min-w-0 cursor-text items-center rounded-[var(--textfield-outlined-radius)] bg-background px-[var(--textfield-outlined-px)] transition-[box-shadow] data-[disabled]:cursor-not-allowed',
+    'relative flex w-full min-w-0 cursor-text items-center px-[var(--textfield-outlined-px)] data-[disabled]:cursor-not-allowed',
   filled:
-    'relative flex w-full min-w-0 cursor-text items-center rounded-[var(--textfield-filled-radius)] px-[var(--textfield-filled-pl)] pr-[var(--textfield-filled-pr)] transition-[background-color] data-[disabled]:cursor-not-allowed',
+    'relative flex w-full min-w-0 cursor-text items-center px-[var(--textfield-filled-pl)] pr-[var(--textfield-filled-pr)] data-[disabled]:cursor-not-allowed',
 } as const;
 
 const inputGroupSizeClassNames = {
@@ -42,7 +43,7 @@ const inputContainerClassName =
   'flex min-w-0 flex-1 flex-wrap items-center gap-[var(--space-0-5)] py-[var(--space-0-5)]';
 
 const inputClassName =
-  'h-[var(--input-value-line-height-desktop)] min-w-[8ch] flex-1 border-0 bg-transparent p-0 text-[length:var(--input-value-size-desktop)] leading-[var(--input-value-line-height-desktop)] font-[var(--input-value-weight)] outline-none placeholder:text-[var(--text-disabled)] disabled:cursor-not-allowed';
+  'h-[var(--input-value-line-height-desktop)] min-w-[8ch] flex-1 border-0 bg-transparent p-0 outline-none placeholder:text-[var(--text-disabled)] disabled:cursor-not-allowed';
 
 const triggerClassName =
   'ml-[var(--textfield-select-arrow-mr)] flex shrink-0 cursor-pointer items-center justify-center rounded-full text-[var(--text-secondary)] outline-none transition-[color,transform] data-[popup-open]:rotate-180 focus-visible:ring-2 focus-visible:ring-ring/50 disabled:cursor-not-allowed [&_svg]:size-[var(--textfield-select-arrow-icon)]';
@@ -81,52 +82,6 @@ const iconSizeClassNames = {
   m: 'size-[20px]',
   s: 'size-[18px]',
 } as const;
-
-const getComboboxStateClassName = ({
-  active,
-  disabled,
-  invalid,
-  variant,
-}: {
-  active: boolean;
-  disabled: boolean;
-  invalid: boolean;
-  variant: ComboboxVariant;
-}) => {
-  if (variant === 'filled') {
-    if (invalid) {
-      return 'bg-[var(--color-error-8)] hover:bg-[var(--color-error-8)]';
-    }
-
-    if (active) {
-      return 'bg-[var(--color-grey-16)] hover:bg-[var(--color-grey-16)]';
-    }
-
-    if (disabled) {
-      return 'bg-[var(--color-grey-8)] hover:bg-[var(--color-grey-8)]';
-    }
-
-    return 'bg-[var(--color-grey-8)] hover:bg-[var(--color-grey-16)]';
-  }
-
-  if (disabled) {
-    return 'shadow-[inset_0_0_0_1px_var(--color-grey-20)] hover:shadow-[inset_0_0_0_1px_var(--color-grey-20)]';
-  }
-
-  if (invalid && active) {
-    return 'shadow-[inset_0_0_0_2px_var(--destructive)] hover:shadow-[inset_0_0_0_2px_var(--destructive)]';
-  }
-
-  if (invalid) {
-    return 'shadow-[inset_0_0_0_1px_var(--destructive)] hover:shadow-[inset_0_0_0_1px_var(--destructive)]';
-  }
-
-  if (active) {
-    return 'shadow-[inset_0_0_0_2px_var(--foreground)] hover:shadow-[inset_0_0_0_2px_var(--foreground)]';
-  }
-
-  return 'shadow-[inset_0_0_0_1px_var(--input)] hover:shadow-[inset_0_0_0_1px_var(--foreground)]';
-};
 
 const getTextColorClassName = ({ disabled }: { disabled: boolean }) =>
   disabled ? 'text-[var(--text-disabled)]' : 'text-foreground';
@@ -248,7 +203,11 @@ export const Combobox = <TOption extends object>(
       aria-label={ariaLabel}
       aria-labelledby={labelledBy}
       autoFocus={autoFocus}
-      className={cn(inputClassName, getTextColorClassName({ disabled }))}
+      className={cn(
+        fieldValueTypographyClassName,
+        inputClassName,
+        getTextColorClassName({ disabled })
+      )}
       disabled={disabled}
       id={id}
       onBlur={(event) => {
@@ -360,9 +319,10 @@ export const Combobox = <TOption extends object>(
     <>
       <ComboboxPrimitive.InputGroup
         className={cn(
+          fieldSurfaceClassNames[variant],
           inputGroupClassNames[variant],
           inputGroupSizeClassNames[variant][size],
-          getComboboxStateClassName({
+          getFieldSurfaceStateClassName({
             active: isActive,
             disabled,
             invalid,

@@ -156,6 +156,8 @@ export type {
   MenuTriggerProps,
 } from './components/Menu';
 export { Menu } from './components/Menu';
+export type { NumericFieldProps } from './components/NumericField';
+export { NumericField } from './components/NumericField';
 export type {
   PageHeaderLeftProps,
   PageHeaderProps,
