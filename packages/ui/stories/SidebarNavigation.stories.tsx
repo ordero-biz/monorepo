@@ -313,6 +313,60 @@ export const CollapsedItemsWithoutIcons: Story = {
   },
 };
 
+export const CollapsedScrollableSubmenu: Story = {
+  args: {
+    items: [
+      {
+        id: 'catalog',
+        items: [
+          {
+            id: 'categories',
+            kind: 'collapse',
+            label: 'Categories',
+            items: Array.from({ length: 30 }, (_, index) => ({
+              id: `category-${index + 1}`,
+              kind: 'link',
+              label: `Category ${index + 1}`,
+              href: `/categories/${index + 1}`,
+            })),
+          },
+        ],
+      },
+    ],
+  },
+  render: ({ items }) => <CollapsibleSidebarShell items={items} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const document = canvasElement.ownerDocument;
+
+    await userEvent.click(
+      canvas.getByRole('button', { name: 'Collapse sidebar' })
+    );
+    await userEvent.click(canvas.getByRole('button', { name: 'Categories' }));
+
+    const submenu = await within(document.body).findByRole('dialog', {
+      name: 'Categories submenu',
+    });
+    const lastLink = within(submenu).getByRole('link', { name: 'Category 30' });
+
+    await waitFor(() => {
+      expect(submenu.getBoundingClientRect().bottom).toBeLessThanOrEqual(
+        document.documentElement.clientHeight
+      );
+      expect(submenu.scrollHeight).toBeGreaterThan(submenu.clientHeight);
+    });
+
+    lastLink.scrollIntoView({ block: 'nearest' });
+
+    const { left, right, top, bottom } = lastLink.getBoundingClientRect();
+    const hitTarget = document.elementFromPoint(
+      (left + right) / 2,
+      (top + bottom) / 2
+    );
+    await expect(lastLink.contains(hitTarget)).toBe(true);
+  },
+};
+
 const mobileGlobals = {
   viewport: { isRotated: false, value: 'mobile1' },
 };

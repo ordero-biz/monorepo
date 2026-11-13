@@ -67,7 +67,7 @@ export const tooltipPopupClassName =
 
 // Matches the Menu popup surface so nested navigation looks like other menus.
 export const popoverPopupClassName = cn(
-  'z-50 flex min-w-[var(--space-20)] flex-col gap-[var(--menu-list-spacing)] rounded-[var(--radius)] border border-border bg-popover p-[var(--menu-list-p)] text-popover-foreground shadow-[var(--dropdown-x1)_var(--dropdown-y1)_var(--dropdown-blur1)_var(--dropdown-spread1)_var(--color-grey-16),var(--dropdown-x2)_var(--dropdown-y2)_var(--dropdown-blur2)_var(--dropdown-spread2)_var(--color-grey-20)] outline-none transition-opacity duration-100 data-[ending-style]:opacity-0 data-[starting-style]:opacity-0',
+  'z-50 flex max-h-[var(--available-height)] min-w-[var(--space-20)] flex-col gap-[var(--menu-list-spacing)] overflow-y-auto overscroll-contain rounded-[var(--radius)] border border-border bg-popover p-[var(--menu-list-p)] text-popover-foreground shadow-[var(--dropdown-x1)_var(--dropdown-y1)_var(--dropdown-blur1)_var(--dropdown-spread1)_var(--color-grey-16),var(--dropdown-x2)_var(--dropdown-y2)_var(--dropdown-blur2)_var(--dropdown-spread2)_var(--color-grey-20)] outline-none transition-opacity duration-100 data-[ending-style]:opacity-0 data-[starting-style]:opacity-0',
   dropdownSurfaceClassName
 );
 
