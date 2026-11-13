@@ -81,8 +81,8 @@ export const ProductVariantsTable = ({
               Product variants ({variantNames.length})
             </Typography>
             <Typography variant="body2" color="text-secondary">
-              Edit names, SKUs, barcodes, and statuses below. Open details to
-              edit attributes, description, and image.
+              Active variants can be supplied and sold; Draft variants cannot.
+              Open details to edit attributes, description, and image.
             </Typography>
           </div>
         }

@@ -11,6 +11,13 @@ export const PRODUCT_GENERATION_MODE = {
 
 export const DEFAULT_MAX_GENERATED_PRODUCT_VARIANTS = 500;
 
+export const productStatusDescriptions = {
+  draftDescription:
+    'Save for further editing. The product cannot be supplied or sold, and all variants must remain Draft.',
+  activeDescription:
+    'Allow active variants to be supplied and sold. Draft variants remain unavailable and can be activated later.',
+};
+
 export const createProductGenerationDefaultValues: ProductGenerationValues = {
   attributes: [],
   attributeValues: {},

@@ -454,6 +454,353 @@ describe('New product creation design', () => {
     ).toBeEnabled();
   }, 30000);
 
+  it('carries the product status from setup into creation while generated variants remain Draft', async () => {
+    vi.mocked(createProductGroup).mockResolvedValue({
+      ok: false,
+      error: { message: 'Try again', status: 500 },
+    });
+    const user = userEvent.setup();
+    setup();
+    expect(screen.getByRole('radio', { name: /^Draft/ })).toBeChecked();
+    await user.type(
+      screen.getByRole('textbox', { name: 'Product name' }),
+      'Coffee'
+    );
+    await user.click(screen.getByRole('button', { name: 'Select category' }));
+    await user.click(screen.getByRole('radio', { name: /^Active/ }));
+    await user.click(screen.getByRole('button', { name: 'Review variants' }));
+    expect(
+      screen.getByText('Only active variants can be supplied and sold.')
+    ).toBeVisible();
+    const variantStatus = screen.getByRole('combobox', {
+      name: 'Status for variant 1',
+    });
+    expect(variantStatus).toHaveTextContent('Draft');
+    await user.click(variantStatus);
+    expect(
+      await screen.findByRole('option', { name: 'Active' })
+    ).not.toHaveAttribute('aria-disabled', 'true');
+    await user.keyboard('{Escape}');
+    await user.type(
+      screen.getByRole('textbox', { name: 'SKU for variant 1' }),
+      'COFFEE'
+    );
+    await user.type(
+      screen.getByRole('textbox', { name: 'Barcode for variant 1' }),
+      '1001'
+    );
+    await user.click(screen.getByRole('button', { name: 'Create product' }));
+    await waitFor(() =>
+      expect(createProductGroup).toHaveBeenCalledWith({
+        categoryId: 2,
+        name: 'Coffee',
+        status: 'ACTIVE',
+        productVariants: [
+          {
+            name: 'Coffee',
+            sku: 'COFFEE',
+            barcode: '1001',
+            status: 'DRAFT',
+            attributeValueIds: [],
+          },
+        ],
+      })
+    );
+  });
+
+  it('explains the draft restriction and enables active variants only after applying an active product status', async () => {
+    const user = userEvent.setup();
+    setup();
+    await user.type(
+      screen.getByRole('textbox', { name: 'Product name' }),
+      'Coffee'
+    );
+    await user.click(screen.getByRole('button', { name: 'Select category' }));
+    await user.click(screen.getByRole('button', { name: 'Review variants' }));
+    expect(
+      screen.getByText(
+        'Cannot be supplied or sold. All variants must remain Draft.'
+      )
+    ).toBeVisible();
+    const variantStatus = screen.getByRole('combobox', {
+      name: 'Status for variant 1',
+    });
+    await user.click(variantStatus);
+    expect(
+      await screen.findByRole('option', { name: 'Active' })
+    ).toHaveAttribute('aria-disabled', 'true');
+    expect(
+      screen.getByRole('option', { name: 'Active' })
+    ).toHaveAccessibleDescription(
+      'Product is Draft. Change its status in Product details.'
+    );
+    await user.keyboard('{Escape}');
+    await user.click(screen.getByRole('button', { name: 'Edit details' }));
+    const details = screen.getByRole('region', { name: 'Product details' });
+    await waitFor(() =>
+      expect(
+        within(details).getByRole('textbox', { name: 'Product name' })
+      ).toHaveFocus()
+    );
+    expect(
+      within(details).getByText(
+        'Save for further editing. The product cannot be supplied or sold, and all variants must remain Draft.'
+      )
+    ).toBeVisible();
+    expect(
+      within(details).getByText(
+        'Allow active variants to be supplied and sold. Draft variants remain unavailable and can be activated later.'
+      )
+    ).toBeVisible();
+    await user.click(within(details).getByRole('radio', { name: /^Active/ }));
+    await user.click(variantStatus);
+    expect(
+      await screen.findByRole('option', { name: 'Active' })
+    ).toHaveAttribute('aria-disabled', 'true');
+    await user.keyboard('{Escape}');
+    await user.click(within(details).getByRole('button', { name: 'Cancel' }));
+    expect(
+      screen.getByText(
+        'Cannot be supplied or sold. All variants must remain Draft.'
+      )
+    ).toBeVisible();
+    await user.click(screen.getByRole('button', { name: 'Edit details' }));
+    await user.click(within(details).getByRole('radio', { name: /^Active/ }));
+    await user.click(
+      within(details).getByRole('button', { name: 'Apply changes' })
+    );
+    expect(
+      screen.getByText('Only active variants can be supplied and sold.')
+    ).toBeVisible();
+    expect(
+      screen.queryByRole('button', { name: 'Edit product status' })
+    ).not.toBeInTheDocument();
+    expect(variantStatus).toHaveTextContent('Draft');
+    await user.click(variantStatus);
+    expect(
+      await screen.findByRole('option', { name: 'Active' })
+    ).not.toHaveAttribute('aria-disabled', 'true');
+    expect(
+      screen.queryByText(
+        'Product is Draft. Change its status in Product details.'
+      )
+    ).not.toBeInTheDocument();
+    await user.click(screen.getByRole('option', { name: 'Active' }));
+    expect(variantStatus).toHaveTextContent('Active');
+    expect(createProductGroup).not.toHaveBeenCalled();
+  });
+
+  it('confirms active variant changes only on Apply and preserves variants on Cancel or invalid shared details', async () => {
+    vi.mocked(createProductGroup).mockResolvedValue({
+      ok: false,
+      error: { message: 'Try again', status: 500 },
+    });
+    const user = userEvent.setup();
+    setup();
+    await user.type(
+      screen.getByRole('textbox', { name: 'Product name' }),
+      'Shirt'
+    );
+    await user.click(screen.getByRole('button', { name: 'Select category' }));
+    await user.click(screen.getByRole('radio', { name: 'Multiple variants' }));
+    await addAttribute(user, 'Color');
+    await selectValues(user, { attribute: 'Color', values: ['Blue', 'Red'] });
+    await user.click(screen.getByRole('button', { name: 'Review variants' }));
+    const details = screen.getByRole('region', { name: 'Product details' });
+    await user.click(screen.getByRole('button', { name: 'Edit details' }));
+    await user.click(within(details).getByRole('radio', { name: /^Active/ }));
+    await user.click(
+      within(details).getByRole('button', { name: 'Apply changes' })
+    );
+    for (const index of [1, 2]) {
+      await user.type(
+        screen.getByRole('textbox', { name: `SKU for variant ${index}` }),
+        `SKU-${index}`
+      );
+      await user.type(
+        screen.getByRole('textbox', { name: `Barcode for variant ${index}` }),
+        `100${index}`
+      );
+    }
+    const firstStatus = screen.getByRole('combobox', {
+      name: 'Status for variant 1',
+    });
+    const secondStatus = screen.getByRole('combobox', {
+      name: 'Status for variant 2',
+    });
+    await user.click(firstStatus);
+    await user.click(screen.getByRole('option', { name: 'Active' }));
+    await user.click(screen.getByRole('button', { name: 'Create product' }));
+    await waitFor(() =>
+      expect(createProductGroup).toHaveBeenCalledWith(
+        expect.objectContaining({
+          status: 'ACTIVE',
+          productVariants: [
+            expect.objectContaining({ status: 'ACTIVE' }),
+            expect.objectContaining({ status: 'DRAFT' }),
+          ],
+        })
+      )
+    );
+    vi.mocked(createProductGroup).mockClear();
+    await user.click(screen.getByRole('button', { name: 'Edit details' }));
+    await user.click(within(details).getByRole('radio', { name: /^Draft/ }));
+    expect(
+      screen.getByText('1 active variant will also be changed to Draft.')
+    ).toBeVisible();
+    expect(firstStatus).toHaveTextContent('Active');
+    await user.click(within(details).getByRole('radio', { name: /^Active/ }));
+    expect(
+      screen.queryByText('1 active variant will also be changed to Draft.')
+    ).not.toBeInTheDocument();
+    expect(
+      within(details).getByRole('button', { name: 'Apply changes' })
+    ).toBeVisible();
+    await user.click(within(details).getByRole('radio', { name: /^Draft/ }));
+    await user.click(within(details).getByRole('button', { name: 'Cancel' }));
+    expect(firstStatus).toHaveTextContent('Active');
+    expect(
+      screen.getByText('Only active variants can be supplied and sold.')
+    ).toBeVisible();
+    await user.click(secondStatus);
+    await user.click(screen.getByRole('option', { name: 'Active' }));
+    await user.click(screen.getByRole('button', { name: 'Edit details' }));
+    await user.click(within(details).getByRole('radio', { name: /^Draft/ }));
+    expect(
+      screen.getByText('2 active variants will also be changed to Draft.')
+    ).toBeVisible();
+    const name = within(details).getByRole('textbox', { name: 'Product name' });
+    await user.clear(name);
+    await user.click(
+      within(details).getByRole('button', {
+        name: 'Apply and set 2 variants to Draft',
+      })
+    );
+    expect(screen.getByText('Product name is required')).toBeVisible();
+    expect(firstStatus).toHaveTextContent('Active');
+    expect(secondStatus).toHaveTextContent('Active');
+    await user.type(name, 'Shirt');
+    await user.click(
+      within(details).getByRole('button', {
+        name: 'Apply and set 2 variants to Draft',
+      })
+    );
+    expect(firstStatus).toHaveTextContent('Draft');
+    expect(secondStatus).toHaveTextContent('Draft');
+    expect(
+      screen.getByText(
+        'Cannot be supplied or sold. All variants must remain Draft.'
+      )
+    ).toBeVisible();
+    expect(createProductGroup).not.toHaveBeenCalled();
+    await user.click(screen.getByRole('button', { name: 'Create product' }));
+    await waitFor(() =>
+      expect(createProductGroup).toHaveBeenCalledWith({
+        categoryId: 2,
+        name: 'Shirt',
+        status: 'DRAFT',
+        productVariants: [
+          {
+            name: 'Shirt Blue',
+            sku: 'SKU-1',
+            barcode: '1001',
+            status: 'DRAFT',
+            attributeValueIds: [11],
+          },
+          {
+            name: 'Shirt Red',
+            sku: 'SKU-2',
+            barcode: '1002',
+            status: 'DRAFT',
+            attributeValueIds: [12],
+          },
+        ],
+      })
+    );
+  }, 15000);
+
+  it.each([
+    false,
+    true,
+  ])('retries after setting a rejected active variant to Draft (unrelated SKU error: %s)', async (hasSkuError) => {
+    vi.mocked(createProductGroup).mockResolvedValueOnce({
+      ok: false,
+      error: {
+        status: 422,
+        message: 'Product creation failed.',
+        fieldErrors: {
+          'productVariants[0].status': 'Variant cannot be activated.',
+          ...(hasSkuError
+            ? { 'productVariants[0].sku': 'SKU already exists.' }
+            : {}),
+        },
+      },
+    });
+    vi.mocked(createProductGroup).mockResolvedValue({
+      ok: false,
+      error: { status: 500, message: 'Try again' },
+    });
+    const user = userEvent.setup();
+    setup();
+    await user.type(
+      screen.getByRole('textbox', { name: 'Product name' }),
+      'Coffee'
+    );
+    await user.click(screen.getByRole('button', { name: 'Select category' }));
+    await user.click(screen.getByRole('radio', { name: /^Active/ }));
+    await user.click(screen.getByRole('button', { name: 'Review variants' }));
+    const sku = screen.getByRole('textbox', { name: 'SKU for variant 1' });
+    await user.type(sku, 'COFFEE');
+    await user.type(
+      screen.getByRole('textbox', { name: 'Barcode for variant 1' }),
+      '1001'
+    );
+    const variantStatus = screen.getByRole('combobox', {
+      name: 'Status for variant 1',
+    });
+    await user.click(variantStatus);
+    await user.click(screen.getByRole('option', { name: 'Active' }));
+    await user.click(screen.getByRole('button', { name: 'Create product' }));
+    expect(
+      await screen.findByText('Variant cannot be activated.')
+    ).toBeVisible();
+
+    await user.click(screen.getByRole('button', { name: 'Edit details' }));
+    const details = screen.getByRole('region', { name: 'Product details' });
+    await user.click(within(details).getByRole('radio', { name: /^Draft/ }));
+    await user.click(
+      within(details).getByRole('button', {
+        name: 'Apply and set 1 variant to Draft',
+      })
+    );
+    expect(variantStatus).toHaveTextContent('Draft');
+    expect(
+      screen.queryByText('Variant cannot be activated.')
+    ).not.toBeInTheDocument();
+    if (hasSkuError) {
+      expect(screen.getByText('SKU already exists.')).toBeVisible();
+      await user.click(screen.getByRole('button', { name: 'Create product' }));
+      expect(createProductGroup).toHaveBeenCalledTimes(1);
+      await user.type(sku, '-NEW');
+    }
+    await user.click(screen.getByRole('button', { name: 'Create product' }));
+    await waitFor(() => expect(createProductGroup).toHaveBeenCalledTimes(2));
+    expect(createProductGroup).toHaveBeenLastCalledWith({
+      categoryId: 2,
+      name: 'Coffee',
+      status: 'DRAFT',
+      productVariants: [
+        {
+          name: 'Coffee',
+          sku: hasSkuError ? 'COFFEE-NEW' : 'COFFEE',
+          barcode: '1001',
+          status: 'DRAFT',
+          attributeValueIds: [],
+        },
+      ],
+    });
+  });
+
   it('saves applied product details without changing variants, refreshes lists, and returns to products', async () => {
     vi.mocked(createProductGroup).mockResolvedValue({
       ok: true,
@@ -926,7 +1273,7 @@ describe('New product creation design', () => {
       'Product name',
       'Category',
       'Description',
-      'Status after creation',
+      'Product status after creation',
     ]) {
       expect(within(summary).getByText(label)).toBeVisible();
     }

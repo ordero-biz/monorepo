@@ -12,6 +12,8 @@ export type SelectVariant = 'outlined' | 'filled';
 export type SelectWidth = 'content' | 'full';
 
 export type SelectOption = {
+  /** Supporting text shown only in the option list, not in the selected value. */
+  description?: ReactNode;
   disabled?: boolean;
   label: ReactNode;
   value: string;

@@ -253,3 +253,25 @@ export const ContentWidth: Story = {
     );
   },
 };
+
+export const OptionDescriptions: Story = {
+  args: {
+    label: 'Variant status',
+    defaultOpen: true,
+    defaultValue: 'draft',
+    options: [
+      { label: 'Draft', value: 'draft' },
+      {
+        label: 'Active',
+        value: 'active',
+        disabled: true,
+        description: 'Product is Draft. Change its status in Product details.',
+      },
+    ],
+  },
+  render: (args) => (
+    <div className="w-[calc(var(--space-20)*2)] max-w-full">
+      <Select {...args} />
+    </div>
+  ),
+};

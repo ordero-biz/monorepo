@@ -40,7 +40,7 @@ export const getColumns = ({
   },
   {
     id: 'status',
-    header: () => <DataTableCell>Status after creation</DataTableCell>,
+    header: () => <DataTableCell>Status after creation *</DataTableCell>,
     cell: ({ row }) => (
       <DataTableCell width="full">
         <ProductVariantStatusField form={form} variantIndex={row.original} />

@@ -1,6 +1,6 @@
 import { Button, FieldHelperText } from '@ordero/ui';
 import { useStore } from '@tanstack/react-form';
-import { useId, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import type { AttributeValue } from '@/lib/domain/attributes/types';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
 import { getAttributeValueSelections } from '../../add/CreateProduct';
@@ -22,6 +22,27 @@ export const ProductAttributeValuesField = ({
   const [isAddingAttribute, setIsAddingAttribute] = useState(false);
   const [focusAttributeId, setFocusAttributeId] = useState<number | null>(null);
   const [announcement, setAnnouncement] = useState('');
+
+  const addAttributeButtonRef = useRef<HTMLButtonElement>(null);
+  const scrollAfterAttributeCount = useRef<number | null>(null);
+
+  const attributeCount = useStore(
+    productVariantsGenerationForm.store,
+    (state) => state.values.attributes.length
+  );
+
+  useEffect(() => {
+    if (scrollAfterAttributeCount.current !== attributeCount) {
+      return;
+    }
+
+    scrollAfterAttributeCount.current = null;
+
+    addAttributeButtonRef.current?.scrollIntoView?.({
+      block: 'center',
+      inline: 'nearest',
+    });
+  }, [attributeCount]);
 
   return (
     <productVariantsGenerationForm.Field name="attributes">
@@ -154,6 +175,8 @@ export const ProductAttributeValuesField = ({
                               return;
                             }
                             const nextAttributes = [...attributes, attribute];
+                            scrollAfterAttributeCount.current =
+                              nextAttributes.length;
                             attributesField.handleChange(nextAttributes);
                             valuesField.handleChange(
                               getAttributeValueSelections(
@@ -197,6 +220,7 @@ export const ProductAttributeValuesField = ({
                       <Button
                         aria-label="Add attribute"
                         onClick={() => setIsAddingAttribute(true)}
+                        ref={addAttributeButtonRef}
                         type="button"
                         variant="text"
                       >

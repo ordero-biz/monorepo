@@ -6,15 +6,16 @@ import type {
   UseDataTableSelectionArgs,
 } from './types';
 
-export const useDataTableSelection = <TData,>({
+export const useDataTableSelection = <TData>({
   data,
   getRowCanSelect,
   getRowCheckboxAriaLabel,
   getRowId,
   selectAllCheckboxAriaLabel,
 }: UseDataTableSelectionArgs<TData>) => {
-  const [rowSelection, setRowSelection] =
-    useState<DataTableRowSelectionState>({});
+  const [rowSelection, setRowSelection] = useState<DataTableRowSelectionState>(
+    {}
+  );
   const clearSelection = useCallback(() => setRowSelection({}), []);
   const selectedRows = useMemo(
     () =>

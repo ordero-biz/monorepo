@@ -1,5 +1,7 @@
 import { Button, Textarea, TextField, Typography } from '@ordero/ui';
 import { useStore } from '@tanstack/react-form';
+import { Info } from 'lucide-react';
+import { PRODUCT_STATUS } from '@/lib/domain/products/constants';
 import { useInitialFocus } from '@/lib/hooks/accessibility/useInitialFocus';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
 import {
@@ -8,12 +10,14 @@ import {
   validateProductName,
   validateProductStatus,
 } from '../../add/CreateProduct';
+import { productStatusDescriptions } from '../../add/CreateProduct/constants';
 import { ProductCategoryCombobox } from '../../shared/ProductCategoryCombobox';
 import { useProductDetailsForm } from './hooks/useProductDetailsForm';
 import { ProductImagePlaceholder } from './ProductImagePlaceholder';
 import type { ProductDetailsEditorProps } from './types';
 
 export const ProductDetailsEditor = ({
+  activeVariantCount,
   initialValues,
   initialErrors,
   onApply,
@@ -31,6 +35,13 @@ export const ProductDetailsEditor = ({
   );
 
   const initialFocusRef = useInitialFocus({ preferInvalid: true });
+  const status = useStore(form.store, (state) => state.values.status);
+
+  const willSetVariantsToDraft =
+    status === PRODUCT_STATUS.DRAFT && activeVariantCount > 0;
+  const affectedVariants = `${activeVariantCount} ${activeVariantCount === 1 ? 'variant' : 'variants'}`;
+
+  const applyChanges = () => form.handleSubmit();
 
   return (
     <div ref={initialFocusRef} className="flex flex-col gap-[var(--space-2)]">
@@ -114,6 +125,7 @@ export const ProductDetailsEditor = ({
 
                 return (
                   <ProductStatusSelector
+                    {...productStatusDescriptions}
                     errorText={errorText}
                     invalid={Boolean(errorText)}
                     label="Status after creation"
@@ -153,21 +165,38 @@ export const ProductDetailsEditor = ({
           </div>
         </div>
       </div>
+      <div
+        aria-live="polite"
+        className={willSetVariantsToDraft ? undefined : 'sr-only'}
+      >
+        {willSetVariantsToDraft ? (
+          <div className="flex items-start gap-[var(--space-1)] rounded-[var(--radius)] bg-muted p-[var(--space-1-5)]">
+            <Info
+              aria-hidden="true"
+              className="size-[var(--space-2-5)] shrink-0 text-muted-foreground"
+            />
+            <Typography variant="body2">
+              {activeVariantCount === 1
+                ? '1 active variant will also be changed to Draft.'
+                : `${activeVariantCount} active variants will also be changed to Draft.`}
+            </Typography>
+          </div>
+        ) : null}
+      </div>
       <div className="flex flex-wrap items-center justify-between gap-[var(--space-2)]">
         <Typography color="text-secondary" variant="caption">
-          Variant details stay unchanged.
+          {willSetVariantsToDraft
+            ? 'Other variant details stay unchanged.'
+            : 'Variant details stay unchanged.'}
         </Typography>
-        <div className="flex gap-[var(--space-1)]">
+        <div className="flex flex-wrap gap-[var(--space-1)]">
           <Button onClick={onCancel} size="s" type="button" variant="outlined">
             Cancel
           </Button>
-          <Button
-            color="primary"
-            onClick={() => form.handleSubmit()}
-            size="s"
-            type="button"
-          >
-            Apply changes
+          <Button color="primary" onClick={applyChanges} size="s" type="button">
+            {willSetVariantsToDraft
+              ? `Apply and set ${affectedVariants} to Draft`
+              : 'Apply changes'}
           </Button>
         </div>
       </div>

@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import type {
   ProductGenerationValues as BaseProductGenerationValues,
   ProductVariantAttributesProps as BaseProductVariantAttributesProps,
+  ProductVariantsGeneratedArgs as BaseProductVariantsGeneratedArgs,
   GeneratedProductVariantsProps,
   PRODUCT_GENERATION_MODE,
   ProductCommonValues,
@@ -19,7 +20,11 @@ export type ProductGenerationMode =
 
 export type ProductGenerationValues = BaseProductGenerationValues & {
   generationMode: ProductGenerationMode;
+  status: ProductCommonValues['status'];
 };
+
+export type ProductVariantsGeneratedArgs = BaseProductVariantsGeneratedArgs &
+  Pick<ProductCommonValues, 'status'>;
 
 export type ProductGenerationModeSelectorProps = {
   generationMode: ProductGenerationMode;
@@ -50,6 +55,7 @@ export type CommonProductDataProps = {
   values: ProductCommonValues;
   variantCount: number;
   editorErrors: ProductDetailsErrors;
+  activeVariantCount: number;
   onApply: (values: ProductCommonValues) => void;
 };
 
@@ -58,6 +64,7 @@ export type ProductDetailsErrors = Partial<
 >;
 
 export type ProductDetailsEditorProps = {
+  activeVariantCount: number;
   initialValues: ProductCommonValues;
   initialErrors: ProductDetailsErrors;
   onApply: (values: ProductCommonValues) => void;

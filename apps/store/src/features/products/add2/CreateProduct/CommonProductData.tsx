@@ -10,6 +10,7 @@ export const CommonProductData = ({
   onEditingChange,
   values,
   variantCount,
+  activeVariantCount,
   editorErrors,
   onApply,
 }: CommonProductDataProps) => {
@@ -73,22 +74,23 @@ export const CommonProductData = ({
                         Category
                       </dt>
                       <dd>
-                        <Typography variant="body2">
+                        <Typography variant="subtitle2">
                           {category?.name ?? 'No category selected'}
                         </Typography>
                       </dd>
                     </div>
                     <div className="flex flex-col gap-[var(--space-0-5)]">
                       <dt className="text-[length:var(--caption-size-desktop)] leading-[var(--caption-line-height-desktop)] text-muted-foreground">
-                        Status after creation
+                        Product status after creation
                       </dt>
                       <dd>
-                        <Typography variant="body2">
+                        <Typography variant="subtitle2">
                           {status === 'ACTIVE' ? 'Active' : 'Draft'}
                         </Typography>
                         <Typography color="text-secondary" variant="caption">
-                          This status will take effect when you create the
-                          product.
+                          {status === 'ACTIVE'
+                            ? 'Only active variants can be supplied and sold.'
+                            : 'Cannot be supplied or sold. All variants must remain Draft.'}
                         </Typography>
                       </dd>
                     </div>
@@ -113,6 +115,7 @@ export const CommonProductData = ({
             <div hidden={!isEditing} id={`${id}-fields`}>
               {isEditing ? (
                 <ProductDetailsEditor
+                  activeVariantCount={activeVariantCount}
                   initialValues={values}
                   initialErrors={editorErrors}
                   onApply={onApply}

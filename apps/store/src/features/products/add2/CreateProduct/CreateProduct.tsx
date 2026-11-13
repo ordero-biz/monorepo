@@ -5,6 +5,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { clientRoutes } from '@/lib/client/routes';
+import { PRODUCT_STATUS } from '@/lib/domain/products/constants';
 import {
   productGroupsQueryKeys,
   productVariantsQueryKeys,
@@ -12,7 +13,6 @@ import {
 import {
   PRODUCT_GENERATION_MODE,
   type ProductCommonValues,
-  type ProductVariantsGeneratedArgs,
   useProductGenerationState,
   validateMultipleProductsConfiguration,
   validateSingleProductConfiguration,
@@ -23,6 +23,7 @@ import { useProductVariantsGenerationForm } from './hooks/useProductVariantsGene
 import { ProductVariantsCreationForm } from './ProductVariantsCreationForm';
 import { ProductVariantsGenerationForm } from './ProductVariantsGenerationForm';
 import { ProductVariantsTable } from './ProductVariantsTable';
+import type { ProductVariantsGeneratedArgs } from './types';
 import {
   getProductDetailsErrors,
   getProductDetailsFormErrors,
@@ -78,6 +79,7 @@ export const CreateProduct = () => {
     productVariantsCreationForm.setFieldValue('category', args.category);
     productVariantsCreationForm.setFieldValue('description', args.description);
     productVariantsCreationForm.setFieldValue('name', args.name);
+    productVariantsCreationForm.setFieldValue('status', args.status);
     productVariantsCreationForm.setFieldValue(
       'productVariants',
       args.productVariants
@@ -132,6 +134,9 @@ export const CreateProduct = () => {
                   state.values.description,
                   state.values.status,
                   state.values.productVariants.length,
+                  state.values.productVariants.filter(
+                    (variant) => variant.status === PRODUCT_STATUS.ACTIVE
+                  ).length,
                   state.fieldMeta,
                   state.submissionAttempts,
                 ] as const
@@ -143,12 +148,14 @@ export const CreateProduct = () => {
                 description,
                 status,
                 variantCount,
+                activeVariantCount,
                 fieldMeta,
                 submissionAttempts,
               ]) => (
                 <CommonProductData
                   values={{ name, category, description, status }}
                   variantCount={variantCount}
+                  activeVariantCount={activeVariantCount}
                   isEditing={isEditingProductDetails}
                   editorErrors={getProductDetailsFormErrors({
                     fieldMeta,
