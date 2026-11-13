@@ -91,6 +91,18 @@ const defaultLinkRenderer: SidebarNavigationRenderLink = ({
   </a>
 );
 
+const labelSegmenter =
+  typeof Intl.Segmenter === 'function' ? new Intl.Segmenter() : undefined;
+
+const getLabelInitial = (label: string) => {
+  const trimmedLabel = label.trim();
+
+  return (
+    labelSegmenter?.segment(trimmedLabel).containing(0)?.segment ??
+    trimmedLabel[Symbol.iterator]().next().value
+  );
+};
+
 const SidebarNavigationItemContent = ({
   item,
   isOpen,
@@ -98,12 +110,25 @@ const SidebarNavigationItemContent = ({
   item: SidebarNavigationItem;
   isOpen?: boolean;
 }) => {
+  const { collapsed } = useSidebarNavigation();
   const branchActive = isItemBranchActive(item);
+  const fallback = collapsed && !item.icon ? getLabelInitial(item.label) : null;
 
   return (
     <>
       {item.icon ? (
         <span className={iconSlotClassName}>{item.icon}</span>
+      ) : null}
+      {fallback ? (
+        <span
+          aria-hidden="true"
+          className={cn(
+            iconSlotClassName,
+            'font-[var(--nav-item-active-weight)] uppercase'
+          )}
+        >
+          {fallback}
+        </span>
       ) : null}
       <span
         className={cn(
@@ -254,6 +279,7 @@ const SidebarNavigationCollapsedBranch = ({
         })}
         data-slot="sidebar-navigation-collapsed-branch"
         disabled={item.disabled}
+        title={item.icon ? undefined : item.label}
       >
         <SidebarNavigationItemContent item={item} />
       </Popover.Trigger>

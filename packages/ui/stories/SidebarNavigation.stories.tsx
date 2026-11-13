@@ -204,14 +204,16 @@ const SidebarNavigationStory = ({
   </div>
 );
 
-const CollapsibleSidebarShell = () => (
+const CollapsibleSidebarShell = ({
+  items = sections,
+}: Partial<Pick<SidebarNavigationStoryProps, 'items'>>) => (
   <SidebarNavigationProvider>
     <SidebarNavigation id="collapsible-sidebar">
       <SidebarNavigationHeader>
         <SidebarNavigationBrand logo={<Package />} title="Ordero" />
       </SidebarNavigationHeader>
       <SidebarNavigationContent>
-        <SidebarNavigationSections sections={sections} />
+        <SidebarNavigationSections sections={items} />
       </SidebarNavigationContent>
     </SidebarNavigation>
     <main className="flex flex-1 flex-col gap-[var(--space-2)] p-[var(--space-3)]">
@@ -256,6 +258,59 @@ export const Default: Story = {};
 
 export const Collapsible: Story = {
   render: () => <CollapsibleSidebarShell />,
+};
+
+export const CollapsedItemsWithoutIcons: Story = {
+  args: {
+    items: [
+      {
+        id: 'overview',
+        items: [
+          {
+            id: 'dashboard',
+            kind: 'link',
+            label: 'Dashboard',
+            href: '/dashboard',
+          },
+          {
+            id: 'products',
+            kind: 'collapse',
+            label: 'Products',
+            items: [
+              {
+                id: 'categories',
+                kind: 'link',
+                label: 'Categories',
+                href: '/categories',
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  },
+  render: ({ items }) => <CollapsibleSidebarShell items={items} />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const page = within(canvasElement.ownerDocument.body);
+
+    await userEvent.click(
+      canvas.getByRole('button', { name: 'Collapse sidebar' })
+    );
+
+    const dashboard = canvas.getByRole('link', { name: 'Dashboard' });
+    const products = canvas.getByRole('button', { name: 'Products' });
+
+    await expect(within(dashboard).getByText('D')).toBeVisible();
+    await expect(within(products).getByText('P')).toBeVisible();
+    await expect(products).toHaveAttribute('title', 'Products');
+    await userEvent.tab({ shift: true });
+    await expect(products).toHaveFocus();
+    await userEvent.keyboard('{Enter}');
+    await expect(
+      await page.findByRole('link', { name: 'Categories' })
+    ).toBeVisible();
+  },
 };
 
 const mobileGlobals = {
