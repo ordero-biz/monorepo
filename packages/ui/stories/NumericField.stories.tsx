@@ -51,6 +51,15 @@ export const Currency: Story = {
     })),
 };
 
+export const Localized: Story = {
+  render: (args) => (
+    <div className={previewGridClassName}>
+      <NumericField {...args} defaultValue={1234.56} label="German amount" locale="de-DE" />
+      <NumericField {...args} defaultValue={1234.56} label="Arabic amount" locale="ar-EG" />
+    </div>
+  ),
+};
+
 export const Invalid: Story = {
   render: (args) =>
     renderVariantPair(args, () => ({

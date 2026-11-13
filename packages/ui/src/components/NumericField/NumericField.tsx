@@ -1,126 +1,34 @@
 'use client';
 
-import type { InputChangeEventDetails } from '@base-ui/react/input';
-import { useEffect, useState } from 'react';
-import { TextField } from '@/ui/components/TextField';
+import { Field } from '@base-ui/react/field';
+import { NumberField } from '@base-ui/react/number-field';
+import {
+  useCallback,
+  useId,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
+import { FieldHelperText } from '@/ui/components/FieldHelperText';
+import { FieldLabel } from '@/ui/components/FieldLabel';
+import { getInputClassName, InputFrame } from '@/ui/components/Input';
 import type { NumericFieldProps } from './types';
 
-type SanitizeNumericValueArgs = {
-  allowNegative: boolean;
-  maxFractionDigits?: number;
-  value: string;
-};
+const format = { maximumFractionDigits: 20, maximumSignificantDigits: 21 };
+const precisionError = 'Enter a number with fewer decimal places.';
+const numberError = 'Enter a valid number.';
+const rejectedEditError = 'The number was not accepted.';
 
-const getClampedFractionDigits = (maxFractionDigits?: number) => {
-  if (maxFractionDigits === undefined) {
-    return undefined;
-  }
-
-  return Math.max(0, Math.floor(maxFractionDigits));
-};
-
-const sanitizeNumericValue = ({
-  allowNegative,
-  maxFractionDigits,
-  value,
-}: SanitizeNumericValueArgs) => {
-  const clampedFractionDigits = getClampedFractionDigits(maxFractionDigits);
-  let sanitizedValue = '';
-  let hasDecimalSeparator = false;
-  let fractionDigitsCount = 0;
-
-  for (const character of value) {
-    if (character >= '0' && character <= '9') {
-      if (hasDecimalSeparator) {
-        if (
-          clampedFractionDigits === undefined ||
-          fractionDigitsCount < clampedFractionDigits
-        ) {
-          sanitizedValue += character;
-          fractionDigitsCount += 1;
-        }
-
-        continue;
-      }
-
-      sanitizedValue += character;
-      continue;
-    }
-
-    if (character === '-' && allowNegative && sanitizedValue.length === 0) {
-      sanitizedValue = '-';
-      continue;
-    }
-
-    if (
-      (character === '.' || character === ',') &&
-      !hasDecimalSeparator &&
-      clampedFractionDigits !== 0
-    ) {
-      hasDecimalSeparator = true;
-      sanitizedValue += '.';
-    }
-  }
-
-  return sanitizedValue;
-};
-
-const getParsedNumericValue = (value: string) => {
-  if (value === '' || value === '-' || value === '.' || value === '-.') {
-    return undefined;
-  }
-
-  if (value.endsWith('.')) {
-    return getParsedNumericValue(value.slice(0, -1));
-  }
-
-  const parsedValue = Number(value);
-
-  return Number.isFinite(parsedValue) ? parsedValue : undefined;
-};
-
-const normalizeNumericValue = (value: string) => {
-  if (value === '' || value === '-' || value === '.' || value === '-.') {
-    return '';
-  }
-
-  if (value.endsWith('.')) {
-    return value.slice(0, -1);
-  }
-
-  if (value.startsWith('-.')) {
-    return `-0${value.slice(1)}`;
-  }
-
-  if (value.startsWith('.')) {
-    return `0${value}`;
-  }
-
-  return value;
-};
-
-const getDisplayValueFromNumber = ({
-  allowNegative,
-  maxFractionDigits,
-  value,
-}: {
-  allowNegative: boolean;
-  maxFractionDigits?: number;
-  value?: number;
-}) => {
-  if (value === undefined) {
-    return '';
-  }
-
-  return sanitizeNumericValue({
-    allowNegative,
-    maxFractionDigits,
-    value: String(value),
-  });
-};
+const getSupportedValue = (
+  value: number | undefined,
+  allowNegative: boolean
+) =>
+  value !== undefined && Number.isFinite(value) && (allowNegative || value >= 0)
+    ? value
+    : undefined;
 
 export const NumericField = (props: NumericFieldProps) => {
-  const isControlled = 'value' in props;
   const {
     'aria-describedby': ariaDescribedBy,
     'aria-label': ariaLabel,
@@ -137,9 +45,11 @@ export const NumericField = (props: NumericFieldProps) => {
     helperIcon,
     helperText,
     id,
-    invalid = false,
+    inputMode,
+    invalid,
     label,
-    maxFractionDigits,
+    locale,
+    maxFractionDigits = Infinity,
     name,
     onBlur,
     onFocus,
@@ -149,97 +59,258 @@ export const NumericField = (props: NumericFieldProps) => {
     readOnly,
     ref,
     required,
-    size = 'm',
+    size,
     startAdornment,
     startIcon,
     value,
-    variant = 'outlined',
+    variant,
   } = props;
-  const [inputValue, setInputValue] = useState(() =>
-    getDisplayValueFromNumber({
-      allowNegative,
-      maxFractionDigits,
-      value: isControlled ? value : defaultValue,
-    })
+  const isControlled = 'value' in props;
+  const fieldRef = useRef<HTMLDivElement>(null);
+  const nativeInputRef = useRef<HTMLInputElement>(null);
+  const supportTextId = useId();
+  const [focused, setFocused] = useState(false);
+  const [documentLanguage, setDocumentLanguage] = useState('en');
+  const [draftError, setDraftError] = useState('');
+  const [proposedValue, setProposedValue] = useState<number | null>();
+  const [uncontrolledValue, setUncontrolledValue] = useState(defaultValue);
+  const number = getSupportedValue(
+    isControlled ? value : uncontrolledValue,
+    allowNegative
+  );
+  const fractionLimit = Number.isNaN(maxFractionDigits)
+    ? Infinity
+    : Math.max(0, Math.floor(maxFractionDigits));
+  const numberFormat = useMemo(() => {
+    try {
+      return new Intl.NumberFormat(locale ?? documentLanguage, format);
+    } catch {
+      return new Intl.NumberFormat(documentLanguage, format);
+    }
+  }, [locale, documentLanguage]);
+  const localeName = numberFormat.resolvedOptions().locale;
+  const parts = numberFormat.formatToParts(-1234567890123.7);
+  const decimal = parts.find((part) => part.type === 'decimal')?.value ?? '.';
+  const group = parts.find((part) => part.type === 'group')?.value;
+  const minus = parts.find((part) => part.type === 'minusSign')?.value ?? '-';
+  const integerParts = parts.filter((part) => part.type === 'integer');
+  const groupSize = Array.from(integerParts.at(-1)?.value ?? '').length;
+  const repeatGroupSize = Array.from(integerParts.at(-2)?.value ?? '').length;
+  const fraction =
+    number === undefined
+      ? undefined
+      : numberFormat
+          .formatToParts(number)
+          .find((part) => part.type === 'fraction');
+  const error =
+    draftError ||
+    (Array.from(fraction?.value ?? '').length > fractionLimit
+      ? precisionError
+      : '') ||
+    (proposedValue !== undefined && !Object.is(proposedValue, number ?? null)
+      ? rejectedEditError
+      : '');
+  const isInvalid = Boolean(invalid || error);
+  const message = (isInvalid ? (errorText ?? error) : undefined) || undefined;
+  const describedBy =
+    [ariaDescribedBy, message || helperText ? supportTextId : undefined]
+      .filter(Boolean)
+      .join(' ') || undefined;
+
+  useLayoutEffect(() => {
+    const language = fieldRef.current?.closest('[lang]')?.getAttribute('lang');
+    if (language) {
+      try {
+        setDocumentLanguage(Intl.getCanonicalLocales(language)[0] ?? 'en');
+      } catch {
+        // An invalid HTML language tag leaves the default in place.
+      }
+    }
+  }, []);
+
+  useLayoutEffect(() => {
+    nativeInputRef.current?.setCustomValidity(error);
+  }, [error]);
+
+  const setInputRef = useCallback(
+    (element: HTMLInputElement | null) => {
+      if (typeof ref === 'function') {
+        return ref(element);
+      }
+      if (ref) {
+        ref.current = element;
+      }
+    },
+    [ref]
   );
 
-  useEffect(() => {
-    if (!isControlled) {
-      return;
+  const getDraftError = (text: string) => {
+    const cleaned = text.trim().replace(/\p{Bidi_Control}/gu, '');
+    const unsigned = cleaned.startsWith(minus)
+      ? cleaned.slice(minus.length)
+      : cleaned.replace(/^[+\-−]/u, '');
+    const normalized =
+      group && /^\p{Zs}$/u.test(group)
+        ? unsigned.replace(/\p{Zs}/gu, group)
+        : unsigned;
+    const [integer, fraction, repeatedDecimal] = normalized.split(decimal);
+    const groups = group ? integer.split(group) : [integer];
+    if (
+      (cleaned !== '' && !/\p{Decimal_Number}/u.test(cleaned)) ||
+      repeatedDecimal !== undefined ||
+      groups.some((part) => !/^\p{Decimal_Number}*$/u.test(part)) ||
+      (fraction !== undefined && !/^\p{Decimal_Number}*$/u.test(fraction))
+    ) {
+      return numberError;
     }
 
-    setInputValue(
-      getDisplayValueFromNumber({
-        allowNegative,
-        maxFractionDigits,
-        value,
-      })
-    );
-  }, [allowNegative, isControlled, maxFractionDigits, value]);
-
-  const handleValueChange = (
-    nextValue: string,
-    details: InputChangeEventDetails
-  ) => {
-    const sanitizedValue = sanitizeNumericValue({
-      allowNegative,
-      maxFractionDigits,
-      value: nextValue,
-    });
-
-    if (sanitizedValue === inputValue) {
-      return;
+    if (
+      groups.length > 1 &&
+      (groups[0].length === 0 ||
+        Array.from(groups[0]).length > repeatGroupSize ||
+        Array.from(groups.at(-1) ?? '').length !== groupSize ||
+        groups
+          .slice(1, -1)
+          .some((part) => Array.from(part).length !== repeatGroupSize))
+    ) {
+      return numberError;
     }
 
-    setInputValue(sanitizedValue);
-    onValueChange?.(getParsedNumericValue(sanitizedValue), details);
+    const digits = fraction?.match(/\p{Decimal_Number}/gu);
+    return (digits?.length ?? 0) > fractionLimit ? precisionError : '';
   };
 
   return (
-    <TextField
-      aria-describedby={ariaDescribedBy}
-      aria-label={ariaLabel}
-      aria-labelledby={ariaLabelledBy}
-      autoComplete={autoComplete}
-      autoFocus={autoFocus}
+    <Field.Root
+      className="flex w-full min-w-0 flex-col"
       disabled={disabled}
-      endAdornment={endAdornment}
-      endIcon={endIcon}
-      errorIcon={errorIcon}
-      errorText={errorText}
-      helperIcon={helperIcon}
-      helperText={helperText}
-      id={id}
-      inputMode={
-        getClampedFractionDigits(maxFractionDigits) === 0
-          ? 'numeric'
-          : 'decimal'
-      }
-      invalid={invalid}
-      label={label}
-      name={name}
-      onBlur={(event) => {
-        const normalizedValue = normalizeNumericValue(inputValue);
-
-        if (normalizedValue !== inputValue) {
-          setInputValue(normalizedValue);
-        }
-
-        onBlur?.(event);
-      }}
-      onFocus={onFocus}
-      onKeyDown={onKeyDown}
-      onValueChange={handleValueChange}
-      placeholder={placeholder}
-      readOnly={readOnly}
-      ref={ref}
-      required={required}
-      size={size}
-      startAdornment={startAdornment}
-      startIcon={startIcon}
-      type="text"
-      value={inputValue}
-      variant={variant}
-    />
+      invalid={isInvalid}
+    >
+      {label && (
+        <FieldLabel
+          active={focused}
+          disabled={disabled}
+          invalid={isInvalid}
+          required={required}
+        >
+          {label}
+        </FieldLabel>
+      )}
+      <NumberField.Root
+        allowOutOfRange
+        className="min-w-0"
+        disabled={disabled}
+        format={format}
+        id={id}
+        inputRef={nativeInputRef}
+        locale={localeName}
+        min={allowNegative ? undefined : 0}
+        name={name}
+        onValueChange={(nextValue, details) => {
+          if (details.reason === 'keyboard') {
+            setDraftError('');
+          }
+          const target = details.event.target;
+          if (
+            details.reason === 'input-change' &&
+            target instanceof HTMLInputElement &&
+            getDraftError(target.value)
+          ) {
+            details.cancel();
+            return;
+          }
+          if (
+            nextValue !== null &&
+            (!Number.isFinite(nextValue) || (!allowNegative && nextValue < 0))
+          ) {
+            details.cancel();
+            setDraftError(numberError);
+            return;
+          }
+          onValueChange?.(nextValue ?? undefined, details);
+          if (details.isCanceled || isControlled) {
+            setProposedValue(nextValue);
+          } else {
+            setUncontrolledValue(nextValue ?? undefined);
+            setProposedValue(undefined);
+          }
+        }}
+        readOnly={readOnly}
+        ref={fieldRef}
+        required={required}
+        step="any"
+        value={number ?? null}
+      >
+        <InputFrame
+          disabled={disabled}
+          endAdornment={endAdornment}
+          endIcon={endIcon}
+          focused={focused}
+          invalid={isInvalid}
+          size={size}
+          startAdornment={startAdornment}
+          startIcon={startIcon}
+          variant={variant}
+        >
+          <NumberField.Input
+            aria-describedby={describedBy}
+            aria-label={ariaLabel}
+            aria-labelledby={ariaLabelledBy}
+            autoComplete={autoComplete ?? 'off'}
+            autoFocus={autoFocus}
+            className={getInputClassName(disabled)}
+            inputMode={
+              inputMode ?? (fractionLimit === 0 ? 'numeric' : 'decimal')
+            }
+            onBlur={(event) => {
+              if (error) {
+                event.preventDefault();
+              } else {
+                setProposedValue(undefined);
+              }
+              setFocused(false);
+              onBlur?.(event);
+            }}
+            onChange={(event) =>
+              setDraftError(getDraftError(event.currentTarget.value))
+            }
+            onKeyDown={onKeyDown}
+            onFocus={(event) => {
+              setFocused(true);
+              onFocus?.(event);
+            }}
+            onPaste={(event) => {
+              const error = getDraftError(
+                event.clipboardData.getData('text/plain')
+              );
+              setDraftError(error);
+              if (error) {
+                event.preventDefault();
+              }
+            }}
+            placeholder={placeholder}
+            ref={setInputRef}
+          />
+        </InputFrame>
+      </NumberField.Root>
+      {message ? (
+        <FieldHelperText
+          as="field-error"
+          icon={errorIcon}
+          id={supportTextId}
+          invalid
+        >
+          {message}
+        </FieldHelperText>
+      ) : helperText ? (
+        <FieldHelperText
+          as="field-description"
+          icon={helperIcon}
+          id={supportTextId}
+        >
+          {helperText}
+        </FieldHelperText>
+      ) : null}
+    </Field.Root>
   );
 };

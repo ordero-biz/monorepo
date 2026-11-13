@@ -43,3 +43,16 @@ export type InputProps = {
   value?: string;
   variant?: InputVariant;
 };
+
+export type InputFrameProps = Pick<
+  InputProps,
+  | 'disabled'
+  | 'endAdornment'
+  | 'endIcon'
+  | 'focused'
+  | 'invalid'
+  | 'size'
+  | 'startAdornment'
+  | 'startIcon'
+  | 'variant'
+> & { children: ReactNode };

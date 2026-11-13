@@ -1,4 +1,4 @@
-import type { InputChangeEventDetails } from '@base-ui/react/input';
+import type { NumberField } from '@base-ui/react/number-field';
 import type { TextFieldProps } from '@/ui/components/TextField';
 
 export type NumericFieldProps = Omit<
@@ -7,10 +7,13 @@ export type NumericFieldProps = Omit<
 > & {
   allowNegative?: boolean;
   defaultValue?: number;
+  /** BCP 47 locale for numeric display and editing. Defaults to the surrounding language. */
+  locale?: string;
+  /** Marks values with excess fractional digits invalid. */
   maxFractionDigits?: number;
   onValueChange?: (
     value: number | undefined,
-    details: InputChangeEventDetails
+    details: NumberField.Root.ChangeEventDetails
   ) => void;
   value?: number;
 };
