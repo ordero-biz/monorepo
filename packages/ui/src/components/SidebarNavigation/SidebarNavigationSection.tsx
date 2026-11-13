@@ -2,7 +2,7 @@
 
 import { Accordion } from '@base-ui/react/accordion';
 import { ChevronDown } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useMemo } from 'react';
 import { cn } from '@/ui/lib/utils';
 import {
   accordionPanelClassName,
@@ -10,7 +10,9 @@ import {
   sectionLabelClassName,
   sectionRootClassName,
 } from './classNames';
+import { useSidebarNavigationScope } from './SidebarNavigationScopeProvider';
 import type { SidebarNavigationSectionProps } from './types';
+import { useSidebarNavigationExpansion } from './useSidebarNavigationExpansion';
 import { toAccordionItemIds } from './utils';
 
 export const SidebarNavigationSection = ({
@@ -22,19 +24,22 @@ export const SidebarNavigationSection = ({
   label,
   ref,
 }: SidebarNavigationSectionProps) => {
-  const [openSectionIds, setOpenSectionIds] = useState<string[]>(
-    defaultExpanded ? [id] : []
+  const defaultOpenIds = useMemo(
+    () => (defaultExpanded ? [id] : []),
+    [defaultExpanded, id]
   );
-
-  useEffect(() => {
-    setOpenSectionIds(defaultExpanded ? [id] : []);
-  }, [defaultExpanded, id]);
+  const [openSectionIds, setOpenSectionIds] = useSidebarNavigationExpansion({
+    defaultKey: String(defaultExpanded),
+    defaultOpenIds,
+    groupKey: `section:${id}`,
+  });
+  const { renderCollapsed } = useSidebarNavigationScope();
 
   if (hidden) {
     return null;
   }
 
-  if (!collapsible || !label) {
+  if (!collapsible || !label || renderCollapsed) {
     return (
       <section
         className={sectionRootClassName}
@@ -42,7 +47,18 @@ export const SidebarNavigationSection = ({
         id={id}
         ref={ref}
       >
-        {label ? <div className={sectionLabelClassName}>{label}</div> : null}
+        {label ? (
+          <div
+            aria-hidden={renderCollapsed ? true : undefined}
+            className={cn(
+              sectionLabelClassName,
+              'whitespace-nowrap',
+              renderCollapsed && 'invisible'
+            )}
+          >
+            {label}
+          </div>
+        ) : null}
         {children}
       </section>
     );

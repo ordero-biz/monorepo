@@ -4,6 +4,7 @@ import type {
   ReactNode,
   Ref,
 } from 'react';
+import type { ViewportBreakpoint } from '@/ui/hooks/useBelowViewportBreakpoint';
 
 type SidebarNavigationBaseItem = {
   active?: boolean;
@@ -62,8 +63,57 @@ export type SidebarNavigationItem =
 
 export type SidebarNavigationProps = {
   children: ReactNode;
+  /** Accessible name of the button that closes the mobile drawer. */
+  closeLabel?: string;
+  /** Accessible name of the edge button while the sidebar is expanded. */
+  collapseLabel?: string;
+  /** Accessible name of the edge button while the sidebar is collapsed. */
+  expandLabel?: string;
   id?: string;
+  /** Accessible name of the sidebar and of its mobile overlay. */
+  label?: string;
   ref?: Ref<HTMLDivElement>;
+};
+
+export type SidebarNavigationDrawerTriggerProps = {
+  /** Accessible name of the button that opens the mobile drawer. */
+  label?: string;
+};
+
+export type SidebarNavigationBrandProps = {
+  logo: ReactNode;
+  title: string;
+};
+
+export type SidebarNavigationContextValue = {
+  breakpoint?: ViewportBreakpoint;
+  /** Whether the desktop rail is collapsed. */
+  collapsed: boolean;
+  /** True when a provider manages the collapsed state and a toggle is shown. */
+  collapsible: boolean;
+  /** Undefined until the drawer has first been opened. */
+  drawerOpen?: boolean;
+  /** Id of the mobile drawer, for the trigger's `aria-controls`. */
+  overlayId?: string;
+  setCollapsed: (collapsed: boolean) => void;
+  setDrawerOpen: (open: boolean) => void;
+  toggleCollapsed: () => void;
+};
+
+export type SidebarNavigationProviderProps = {
+  /** Below this viewport breakpoint, navigation opens in a drawer. */
+  breakpoint?: ViewportBreakpoint;
+  children: ReactNode;
+  collapsed?: boolean;
+  defaultCollapsed?: boolean;
+  onCollapsedChange?: (collapsed: boolean) => void;
+};
+
+export type SidebarNavigationRailToggleProps = {
+  collapseLabel: string;
+  controls?: string;
+  expandLabel: string;
+  ref?: Ref<HTMLButtonElement>;
 };
 
 export type SidebarNavigationHeaderProps = {

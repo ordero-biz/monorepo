@@ -135,6 +135,8 @@
     var(--figma-spacing-0-5)
   );
   --figma-nav-width: calc(var(--figma-spacing-20) + var(--figma-spacing-15));
+  --figma-nav-mini-width: var(--figma-spacing-10);
+  --figma-nav-toggle-size: 26px;
 
   /* slider */
   --figma-slider-marks-color: var(--figma-grey-48);
@@ -423,6 +425,8 @@
   --nav-item-root-height-token: var(--figma-nav-item-root-height);
   --nav-item-sub-height-token: var(--figma-nav-item-sub-height);
   --nav-width-token: var(--figma-nav-width);
+  --nav-mini-width-token: var(--figma-nav-mini-width);
+  --nav-toggle-size-token: var(--figma-nav-toggle-size);
 
   /* slider bridge */
   --slider-marks-color-token: var(--figma-slider-marks-color);
@@ -625,20 +629,18 @@
   --layout-container-xl: var(--figma-breakpoint-xl);
 }
 
-@theme inline {
-  /* Component token exports */
-
-  /* breakpoints */
-  /*
-   * Tailwind emits breakpoint tokens into media queries, where CSS custom
-   * properties are invalid. Keep these values literal and synchronized with
-   * the Figma breakpoint tokens above.
-   */
+/* Keep the tokens available at runtime for JavaScript media queries. Tailwind
+ * also inlines their literal values into responsive utilities. */
+@theme static {
   --breakpoint-sm: 600px;
   --breakpoint-md: 900px;
   --breakpoint-lg: 1200px;
   --breakpoint-xl: 1536px;
   --breakpoint-2xl: initial;
+}
+
+@theme inline {
+  /* Component token exports */
 
   /* fab */
   --fab-icon: var(--fab-icon-token);
@@ -773,6 +775,8 @@
   --nav-item-root-height: var(--nav-item-root-height-token);
   --nav-item-sub-height: var(--nav-item-sub-height-token);
   --nav-width: var(--nav-width-token);
+  --nav-mini-width: var(--nav-mini-width-token);
+  --nav-toggle-size: var(--nav-toggle-size-token);
 
   /* slider */
   --slider-marks-color: var(--slider-marks-color-token);
