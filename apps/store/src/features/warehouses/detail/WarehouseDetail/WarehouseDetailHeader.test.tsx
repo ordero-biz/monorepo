@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { clientRoutes, getAddTransferRoute } from '@/lib/client/routes';
 import { WAREHOUSE_STATUS } from '@/lib/domain/warehouses/constants';
 import { prepareStoreSetup } from '@/test/prepareSetup';
+import type { WarehouseDetailHeaderProps } from './types';
 import { WarehouseDetailHeader } from './WarehouseDetailHeader';
 
 const mocks = vi.hoisted(() => ({
@@ -13,7 +14,7 @@ vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: mocks.push, replace: vi.fn() }),
 }));
 
-const { setup } = prepareStoreSetup({
+const { setup } = prepareStoreSetup<WarehouseDetailHeaderProps>({
   component: WarehouseDetailHeader,
   props: {
     warehouse: {
@@ -56,5 +57,32 @@ describe('WarehouseDetailHeader', () => {
     );
 
     expect(mocks.push).toHaveBeenCalledWith(getAddTransferRoute(1));
+  });
+
+  it('hides transfer creation for a draft warehouse', async () => {
+    const user = userEvent.setup();
+    setup({
+      warehouse: {
+        phone: null,
+        totalItemQuantity: 0,
+        totalPrice: 0,
+        id: 1,
+        name: 'Main Warehouse',
+        status: WAREHOUSE_STATUS.DRAFT,
+        address: '123 Commerce Ave',
+        comment: 'Primary stock location',
+      },
+    });
+
+    await user.click(
+      screen.getByRole('button', { name: 'Actions for Main Warehouse' })
+    );
+
+    expect(
+      await screen.findByRole('menuitem', { name: 'Edit warehouse' })
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('menuitem', { name: 'Create transfer' })
+    ).not.toBeInTheDocument();
   });
 });

@@ -57,15 +57,19 @@ export const WarehouseDetailHeader = ({
                   />
                   Edit warehouse
                 </Menu.Item>
-                <Menu.Item
-                  onClick={() => router.push(getAddTransferRoute(warehouse.id))}
-                >
-                  <ArrowRightLeft
-                    aria-hidden="true"
-                    className="size-[var(--icon-button-xs-icon)]"
-                  />
-                  Create transfer
-                </Menu.Item>
+                {isWarehouseActive ? (
+                  <Menu.Item
+                    onClick={() =>
+                      router.push(getAddTransferRoute(warehouse.id))
+                    }
+                  >
+                    <ArrowRightLeft
+                      aria-hidden="true"
+                      className="size-[var(--icon-button-xs-icon)]"
+                    />
+                    Create transfer
+                  </Menu.Item>
+                ) : null}
               </Menu.Popup>
             </Menu.Positioner>
           </Menu.Portal>
