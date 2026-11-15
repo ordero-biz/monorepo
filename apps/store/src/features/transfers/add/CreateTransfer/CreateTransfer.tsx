@@ -1,7 +1,8 @@
 'use client';
 
-import { Card, PageHeader, Typography } from '@ordero/ui';
+import { Card, PageHeader, Typography, useToastManager } from '@ordero/ui';
 import { useQuery } from '@tanstack/react-query';
+import { useEffect, useEffectEvent } from 'react';
 import { warehousesRootBreadcrumb } from '@/features/warehouses/shared/breadcrumbs';
 import { getWarehouse } from '@/lib/client/api/warehouses';
 import { getWarehouseDetailRoute } from '@/lib/client/routes';
@@ -11,10 +12,25 @@ import { CreateTransferForm } from './CreateTransferForm';
 import type { CreateTransferProps, TransferWarehouseSelection } from './types';
 
 export const CreateTransfer = ({ sourceWarehouseId }: CreateTransferProps) => {
+  const { add: addToast } = useToastManager();
   const sourceWarehouseQuery = useQuery({
     ...warehouseQueryOptions(sourceWarehouseId ?? 0, getWarehouse),
     enabled: sourceWarehouseId !== undefined,
+    refetchOnWindowFocus: false,
   });
+
+  const showSourceWarehouseNotice = useEffectEvent(() => {
+    addToast({
+      title: 'Choose a source warehouse',
+      type: 'info',
+    });
+  });
+
+  useEffect(() => {
+    if (sourceWarehouseQuery.isLoadingError) {
+      showSourceWarehouseNotice();
+    }
+  }, [sourceWarehouseQuery.isLoadingError]);
 
   if (sourceWarehouseId !== undefined && sourceWarehouseQuery.isPending) {
     return (

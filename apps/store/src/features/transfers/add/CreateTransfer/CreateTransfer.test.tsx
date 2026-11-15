@@ -1,4 +1,6 @@
-import { screen, within } from '@testing-library/react';
+import { focusManager } from '@tanstack/react-query';
+import { act, screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { getWarehouse, getWarehouses } from '@/lib/client/api/warehouses';
 import { WAREHOUSE_STATUS } from '@/lib/domain/warehouses/constants';
 import { prepareStoreSetup } from '@/test/prepareSetup';
@@ -69,12 +71,70 @@ describe('CreateTransfer', () => {
     ).toHaveAttribute('href', '/warehouse/1');
   });
 
-  it('leaves the source warehouse empty without a source warehouse id', async () => {
+  it('prompts the user to choose a source warehouse after a failed lookup', async () => {
+    const user = userEvent.setup();
+    getWarehouseMock.mockResolvedValueOnce({
+      ok: false,
+      error: { status: 404, message: 'Warehouse not found' },
+    });
+    setup({ sourceWarehouseId: 42 });
+
+    expect(await screen.findByText('Choose a source warehouse')).toBeVisible();
+    expect(screen.getByText('Create transfer')).toBeVisible();
+    expect(
+      screen.getByRole('navigation', { name: 'Breadcrumb' })
+    ).toBeVisible();
+
+    const form = screen.getByRole('form', { name: 'Transfer' });
+    const source = within(form).getByRole('combobox', {
+      name: /From warehouse/,
+    });
+    expect(source).toHaveValue('');
+    await user.click(source);
+    await user.click(
+      await screen.findByRole('option', { name: 'Main Warehouse' })
+    );
+    expect(source).toHaveValue('Main Warehouse');
+  });
+
+  it('keeps the manually selected source when the browser tab regains focus', async () => {
+    const user = userEvent.setup();
+    getWarehouseMock.mockResolvedValueOnce({
+      ok: false,
+      error: { status: 404, message: 'Warehouse not found' },
+    });
+    setup({ sourceWarehouseId: 42 });
+
+    const source = await screen.findByRole('combobox', {
+      name: /From warehouse/,
+    });
+    await user.click(source);
+    await user.click(
+      await screen.findByRole('option', { name: 'Main Warehouse' })
+    );
+
+    try {
+      act(() => focusManager.setFocused(false));
+      await act(async () => focusManager.setFocused(true));
+
+      expect(getWarehouseMock).toHaveBeenCalledTimes(1);
+      expect(source).toHaveValue('Main Warehouse');
+    } finally {
+      focusManager.setFocused(undefined);
+    }
+  });
+
+  it('allows selecting a source manually without a source warehouse id', async () => {
+    const user = userEvent.setup();
     setup();
 
-    expect(
-      await screen.findByRole('combobox', { name: /From warehouse/ })
-    ).toHaveValue('');
+    const source = screen.getByRole('combobox', { name: /From warehouse/ });
+    expect(source).toHaveValue('');
+    await user.click(source);
+    await user.click(
+      await screen.findByRole('option', { name: 'Main Warehouse' })
+    );
+    expect(source).toHaveValue('Main Warehouse');
     expect(getWarehouseMock).not.toHaveBeenCalled();
   });
 
