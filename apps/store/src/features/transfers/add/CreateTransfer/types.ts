@@ -1,3 +1,4 @@
+import type { WarehousesAsyncComboboxProps } from '@/features/warehouses/shared/WarehousesAsyncCombobox';
 import type { WarehouseSelection } from '@/lib/domain/warehouses/types';
 import type { useCreateTransferForm } from './hooks/useCreateTransferForm';
 
@@ -20,4 +21,26 @@ export type CreateTransferFormProps = {
 
 export type TransferInformationProps = {
   form: ReturnType<typeof useCreateTransferForm>['form'];
+};
+
+export type TransferWarehouseComboboxProps = Pick<
+  WarehousesAsyncComboboxProps,
+  | 'errorText'
+  | 'invalid'
+  | 'isOptionDisabled'
+  | 'label'
+  | 'name'
+  | 'onBlur'
+  | 'placeholder'
+  | 'required'
+  | 'size'
+  | 'value'
+> & {
+  onValueChange: (warehouse: TransferWarehouseSelection | null) => void;
+};
+
+export type ReviewTransferWarehouseProps = {
+  onBusyChange: (isPublishing: boolean) => void;
+  onSelect: (warehouse: TransferWarehouseSelection) => void;
+  warehouse: TransferWarehouseSelection;
 };

@@ -1,7 +1,7 @@
 import { Card, Textarea, TextField } from '@ordero/ui';
 import { useStore } from '@tanstack/react-form';
-import { WarehousesAsyncCombobox } from '@/features/warehouses/shared/WarehousesAsyncCombobox';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
+import { TransferWarehouseCombobox } from './TransferWarehouseCombobox';
 import type { TransferInformationProps } from './types';
 import {
   validateTransferDestinationWarehouse,
@@ -14,6 +14,7 @@ export const TransferInformation = ({ form }: TransferInformationProps) => {
     form.store,
     (state) => state.submissionAttempts
   );
+
   const sourceWarehouse = useStore(
     form.store,
     (state) => state.values.sourceWarehouse
@@ -68,7 +69,7 @@ export const TransferInformation = ({ form }: TransferInformationProps) => {
                 );
 
                 return (
-                  <WarehousesAsyncCombobox
+                  <TransferWarehouseCombobox
                     errorText={errorText}
                     invalid={Boolean(errorText)}
                     label="From warehouse"
@@ -102,7 +103,7 @@ export const TransferInformation = ({ form }: TransferInformationProps) => {
                 );
 
                 return (
-                  <WarehousesAsyncCombobox
+                  <TransferWarehouseCombobox
                     errorText={errorText}
                     invalid={Boolean(errorText)}
                     isOptionDisabled={(warehouse) =>

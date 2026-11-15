@@ -1,8 +1,13 @@
 import { focusManager } from '@tanstack/react-query';
-import { act, screen, within } from '@testing-library/react';
+import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { getWarehouse, getWarehouses } from '@/lib/client/api/warehouses';
+import {
+  getWarehouse,
+  getWarehouses,
+  updateWarehouse,
+} from '@/lib/client/api/warehouses';
 import { WAREHOUSE_STATUS } from '@/lib/domain/warehouses/constants';
+import { warehousesQueryKeys } from '@/lib/query/warehouses/warehousesQueryKeys';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { CreateTransfer } from './CreateTransfer';
 import type { CreateTransferProps } from './types';
@@ -13,10 +18,12 @@ vi.mock('@/lib/client/api/warehouses', async () => ({
   )),
   getWarehouse: vi.fn(),
   getWarehouses: vi.fn(),
+  updateWarehouse: vi.fn(),
 }));
 
 const getWarehouseMock = vi.mocked(getWarehouse);
 const getWarehousesMock = vi.mocked(getWarehouses);
+const updateWarehouseMock = vi.mocked(updateWarehouse);
 
 const warehouse = {
   id: 1,
@@ -29,6 +36,13 @@ const warehouse = {
   totalPrice: 0,
 };
 
+const draftWarehouse = {
+  ...warehouse,
+  id: 2,
+  name: 'Unfinished Warehouse',
+  status: WAREHOUSE_STATUS.DRAFT,
+};
+
 const { setup } = prepareStoreSetup<CreateTransferProps>({
   component: CreateTransfer,
 });
@@ -36,12 +50,16 @@ const { setup } = prepareStoreSetup<CreateTransferProps>({
 describe('CreateTransfer', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    getWarehouseMock.mockResolvedValue({ ok: true, data: warehouse });
+    updateWarehouseMock.mockReset();
+    getWarehouseMock.mockImplementation(async (warehouseId) => ({
+      ok: true,
+      data: warehouseId === draftWarehouse.id ? draftWarehouse : warehouse,
+    }));
     getWarehousesMock.mockResolvedValue({
       ok: true,
       data: {
-        content: [warehouse],
-        page: { number: 0, size: 100, totalElements: 1, totalPages: 1 },
+        content: [warehouse, draftWarehouse],
+        page: { number: 0, size: 100, totalElements: 2, totalPages: 1 },
       },
     });
   });
@@ -136,6 +154,111 @@ describe('CreateTransfer', () => {
     );
     expect(source).toHaveValue('Main Warehouse');
     expect(getWarehouseMock).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    'From warehouse',
+    'To warehouse',
+  ])('opens review instead of selecting a draft in %s', async (label) => {
+    const user = userEvent.setup();
+    setup();
+
+    const picker = screen.getByRole('combobox', { name: label });
+    await user.click(picker);
+    const draftOption = await screen.findByRole('option', {
+      name: 'Unfinished Warehouse Draft',
+    });
+
+    await user.click(draftOption);
+    expect(picker).toHaveValue('');
+    const review = await screen.findByRole('dialog', {
+      name: 'Publish warehouse?',
+    });
+    expect(
+      within(review).getByRole('link', { name: /View warehouse details/ })
+    ).toHaveAttribute('href', '/warehouse/2');
+    await user.click(within(review).getByRole('button', { name: 'Cancel' }));
+    await waitFor(() => expect(picker).toHaveFocus());
+
+    await user.click(picker);
+    await user.click(screen.getByRole('option', { name: 'Main Warehouse' }));
+    expect(picker).toHaveValue('Main Warehouse');
+  });
+
+  it('keeps review open after publishing fails and selects after a successful retry', async () => {
+    const user = userEvent.setup();
+    const publishedWarehouse = {
+      ...draftWarehouse,
+      status: WAREHOUSE_STATUS.ACTIVE,
+    };
+    updateWarehouseMock
+      .mockResolvedValueOnce({
+        ok: false,
+        error: { status: 409, message: 'Could not publish warehouse' },
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        data: publishedWarehouse,
+      });
+    const { queryClient } = setup();
+    const invalidateQueries = vi.spyOn(queryClient, 'invalidateQueries');
+
+    const picker = screen.getByRole('combobox', { name: 'From warehouse' });
+    await user.click(picker);
+    await user.click(
+      await screen.findByRole('option', { name: 'Unfinished Warehouse Draft' })
+    );
+    const review = await screen.findByRole('dialog', {
+      name: 'Publish warehouse?',
+    });
+    const publish = within(review).getByRole('button', {
+      name: 'Publish and select',
+    });
+    await waitFor(() => expect(publish).toBeEnabled());
+    expect(within(review).getByText('Draft')).toBeVisible();
+
+    await user.click(publish);
+    expect(await within(review).findByRole('alert')).toHaveTextContent(
+      'Could not publish warehouse'
+    );
+    expect(picker).toHaveValue('');
+
+    await user.click(publish);
+    await waitFor(() => expect(picker).toHaveValue(draftWarehouse.name));
+    expect(updateWarehouseMock).toHaveBeenLastCalledWith({
+      warehouseId: draftWarehouse.id,
+      status: WAREHOUSE_STATUS.ACTIVE,
+    });
+    expect(
+      queryClient.getQueryData(warehousesQueryKeys.detail(draftWarehouse.id))
+    ).toEqual(publishedWarehouse);
+    expect(invalidateQueries).toHaveBeenCalledWith({
+      queryKey: warehousesQueryKeys.list,
+    });
+  });
+
+  it('selects a warehouse published elsewhere without publishing again', async () => {
+    const user = userEvent.setup();
+    getWarehouseMock.mockResolvedValueOnce({
+      ok: true,
+      data: { ...draftWarehouse, status: WAREHOUSE_STATUS.ACTIVE },
+    });
+    setup();
+
+    const picker = screen.getByRole('combobox', { name: 'To warehouse' });
+    await user.click(picker);
+    await user.click(
+      await screen.findByRole('option', { name: 'Unfinished Warehouse Draft' })
+    );
+    const review = await screen.findByRole('dialog', {
+      name: 'Select warehouse',
+    });
+    await user.click(
+      within(review).getByRole('button', { name: 'Select warehouse' })
+    );
+
+    expect(picker).toHaveValue(draftWarehouse.name);
+    expect(updateWarehouseMock).not.toHaveBeenCalled();
   });
 
   it('does not render a save action yet', async () => {
