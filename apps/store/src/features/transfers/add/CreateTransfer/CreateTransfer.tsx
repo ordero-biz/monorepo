@@ -15,6 +15,19 @@ export const CreateTransfer = ({ sourceWarehouseId }: CreateTransferProps) => {
     ...warehouseQueryOptions(sourceWarehouseId ?? 0, getWarehouse),
     enabled: sourceWarehouseId !== undefined,
   });
+
+  if (sourceWarehouseId !== undefined && sourceWarehouseQuery.isPending) {
+    return (
+      <Card.Root variant="filled">
+        <Card.Content>
+          <Typography color="text-secondary" variant="body2">
+            Loading warehouse...
+          </Typography>
+        </Card.Content>
+      </Card.Root>
+    );
+  }
+
   const sourceWarehouse: TransferWarehouseSelection | null =
     sourceWarehouseQuery.data
       ? {
@@ -23,9 +36,6 @@ export const CreateTransfer = ({ sourceWarehouseId }: CreateTransferProps) => {
           status: sourceWarehouseQuery.data.status,
         }
       : null;
-  // Wait for the source warehouse so the form mounts with it preselected.
-  const isSourceWarehouseLoading =
-    sourceWarehouseId !== undefined && sourceWarehouseQuery.isPending;
 
   return (
     <div className="flex flex-col gap-[var(--space-2)]">
@@ -52,17 +62,7 @@ export const CreateTransfer = ({ sourceWarehouseId }: CreateTransferProps) => {
         </PageHeader.Left>
       </PageHeader.Root>
 
-      {isSourceWarehouseLoading ? (
-        <Card.Root variant="filled">
-          <Card.Content>
-            <Typography color="text-secondary" variant="body2">
-              Loading warehouse...
-            </Typography>
-          </Card.Content>
-        </Card.Root>
-      ) : (
-        <CreateTransferForm sourceWarehouse={sourceWarehouse} />
-      )}
+      <CreateTransferForm sourceWarehouse={sourceWarehouse} />
     </div>
   );
 };

@@ -44,8 +44,16 @@ describe('CreateTransfer', () => {
     });
   });
 
-  it('preselects the source warehouse when opened from a warehouse', async () => {
+  it('shows the loading card before opening the form with the source warehouse selected', async () => {
     setup({ sourceWarehouseId: 1 });
+
+    expect(screen.getByText('Loading warehouse...')).toBeVisible();
+    expect(
+      screen.queryByRole('navigation', { name: 'Breadcrumb' })
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('form', { name: 'Transfer' })
+    ).not.toBeInTheDocument();
 
     expect(
       await screen.findByRole('combobox', { name: /From warehouse/ })
