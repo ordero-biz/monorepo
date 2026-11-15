@@ -1,8 +1,7 @@
-import { Dialog } from '@ordero/ui';
 import { useState } from 'react';
 import { WarehousesAsyncCombobox } from '@/features/warehouses/shared/WarehousesAsyncCombobox';
 import { WAREHOUSE_STATUS } from '@/lib/domain/warehouses/constants';
-import { ReviewTransferWarehouse } from './ReviewTransferWarehouse';
+import { TransferWarehouseReviewDialog } from './TransferWarehouseReviewDialog';
 import type {
   TransferWarehouseComboboxProps,
   TransferWarehouseSelection,
@@ -16,11 +15,6 @@ export const TransferWarehouseCombobox = ({
   const [open, setOpen] = useState(false);
   const [warehouseToReview, setWarehouseToReview] =
     useState<TransferWarehouseSelection | null>(null);
-  const [isPublishing, setIsPublishing] = useState(false);
-
-  const closeReview = () => {
-    setWarehouseToReview(null);
-  };
 
   return (
     <>
@@ -41,31 +35,11 @@ export const TransferWarehouseCombobox = ({
         }}
         open={open}
       />
-      <Dialog.Root
-        open={Boolean(warehouseToReview)}
-        onOpenChange={(nextOpen) => {
-          if (!nextOpen && !isPublishing) closeReview();
-        }}
-      >
-        <Dialog.Portal>
-          <Dialog.Backdrop />
-          <Dialog.Viewport>
-            <Dialog.Popup size="xs">
-              {warehouseToReview ? (
-                <ReviewTransferWarehouse
-                  key={warehouseToReview.id}
-                  onBusyChange={setIsPublishing}
-                  onSelect={(warehouse) => {
-                    onValueChange(warehouse);
-                    closeReview();
-                  }}
-                  warehouse={warehouseToReview}
-                />
-              ) : null}
-            </Dialog.Popup>
-          </Dialog.Viewport>
-        </Dialog.Portal>
-      </Dialog.Root>
+      <TransferWarehouseReviewDialog
+        onClose={() => setWarehouseToReview(null)}
+        onSelect={onValueChange}
+        warehouse={warehouseToReview}
+      />
     </>
   );
 };

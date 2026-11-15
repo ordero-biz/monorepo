@@ -115,6 +115,72 @@ describe('CreateTransfer', () => {
     expect(source).toHaveValue('Main Warehouse');
   });
 
+  it('reviews a draft source from the URL and leaves the picker empty on cancel', async () => {
+    const user = userEvent.setup();
+    setup({ sourceWarehouseId: draftWarehouse.id });
+
+    const review = await screen.findByRole('dialog', {
+      name: 'Publish warehouse?',
+    });
+    await user.click(within(review).getByRole('button', { name: 'Cancel' }));
+
+    const source = await screen.findByRole('combobox', {
+      name: 'From warehouse',
+    });
+    expect(source).toHaveValue('');
+    await waitFor(() => expect(source).toHaveFocus());
+    expect(updateWarehouseMock).not.toHaveBeenCalled();
+
+    await user.click(source);
+    await user.click(screen.getByRole('option', { name: 'Main Warehouse' }));
+    expect(source).toHaveValue('Main Warehouse');
+  });
+
+  it.each([
+    { action: 'Cancel', expectedSource: '' },
+    { action: 'Select warehouse', expectedSource: draftWarehouse.name },
+  ])('keeps review open after a focus refresh and handles $action', async ({
+    action,
+    expectedSource,
+  }) => {
+    const user = userEvent.setup();
+    setup({ sourceWarehouseId: draftWarehouse.id });
+
+    const review = await screen.findByRole('dialog', {
+      name: 'Publish warehouse?',
+    });
+    const publish = within(review).getByRole('button', {
+      name: 'Publish and select',
+    });
+    await waitFor(() => expect(publish).toBeEnabled());
+    getWarehouseMock.mockResolvedValueOnce({
+      ok: true,
+      data: { ...draftWarehouse, status: WAREHOUSE_STATUS.ACTIVE },
+    });
+
+    try {
+      act(() => focusManager.setFocused(false));
+      await act(async () => focusManager.setFocused(true));
+
+      const activeReview = await screen.findByRole('dialog', {
+        name: 'Select warehouse',
+      });
+      await user.click(
+        within(activeReview).getByRole('button', { name: action })
+      );
+
+      const source = await screen.findByRole('combobox', {
+        name: 'From warehouse',
+      });
+      expect(source).toHaveValue(expectedSource);
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      await waitFor(() => expect(source).toHaveFocus());
+      expect(updateWarehouseMock).not.toHaveBeenCalled();
+    } finally {
+      focusManager.setFocused(undefined);
+    }
+  });
+
   it('keeps the manually selected source when the browser tab regains focus', async () => {
     const user = userEvent.setup();
     getWarehouseMock.mockResolvedValueOnce({
@@ -185,7 +251,7 @@ describe('CreateTransfer', () => {
     expect(picker).toHaveValue('Main Warehouse');
   });
 
-  it('keeps review open after publishing fails and selects after a successful retry', async () => {
+  it('opens review for a draft source ID and selects it after a successful publish retry', async () => {
     const user = userEvent.setup();
     const publishedWarehouse = {
       ...draftWarehouse,
@@ -200,14 +266,9 @@ describe('CreateTransfer', () => {
         ok: true,
         data: publishedWarehouse,
       });
-    const { queryClient } = setup();
+    const { queryClient } = setup({ sourceWarehouseId: draftWarehouse.id });
     const invalidateQueries = vi.spyOn(queryClient, 'invalidateQueries');
 
-    const picker = screen.getByRole('combobox', { name: 'From warehouse' });
-    await user.click(picker);
-    await user.click(
-      await screen.findByRole('option', { name: 'Unfinished Warehouse Draft' })
-    );
     const review = await screen.findByRole('dialog', {
       name: 'Publish warehouse?',
     });
@@ -221,10 +282,11 @@ describe('CreateTransfer', () => {
     expect(await within(review).findByRole('alert')).toHaveTextContent(
       'Could not publish warehouse'
     );
-    expect(picker).toHaveValue('');
-
     await user.click(publish);
-    await waitFor(() => expect(picker).toHaveValue(draftWarehouse.name));
+    const picker = await screen.findByRole('combobox', {
+      name: 'From warehouse',
+    });
+    expect(picker).toHaveValue(draftWarehouse.name);
     expect(updateWarehouseMock).toHaveBeenLastCalledWith({
       warehouseId: draftWarehouse.id,
       status: WAREHOUSE_STATUS.ACTIVE,

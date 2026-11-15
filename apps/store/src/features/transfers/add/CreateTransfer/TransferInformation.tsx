@@ -9,7 +9,10 @@ import {
   validateTransferSourceWarehouse,
 } from './validations';
 
-export const TransferInformation = ({ form }: TransferInformationProps) => {
+export const TransferInformation = ({
+  form,
+  sourceWarehouseRef,
+}: TransferInformationProps) => {
   const submissionAttempts = useStore(
     form.store,
     (state) => state.submissionAttempts
@@ -77,6 +80,7 @@ export const TransferInformation = ({ form }: TransferInformationProps) => {
                     onBlur={field.handleBlur}
                     onValueChange={field.handleChange}
                     placeholder="Select warehouse"
+                    ref={sourceWarehouseRef}
                     required
                     size="s"
                     value={field.state.value}

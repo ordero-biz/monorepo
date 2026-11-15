@@ -17,6 +17,7 @@ import type {
 // including SSR requests, so tests can run independently and in parallel.
 type Session = {
   categories?: Category[];
+  warehouses?: Warehouse[];
   warehouseStock?: WarehouseStockItem[];
   warehouseSupplies?: WarehouseSupply[];
   saved: SupplyDetails;
@@ -133,6 +134,36 @@ const server = createServer(async (request, response) => {
         0
       ),
     };
+    const warehouseId = path.match(/^\/api\/v1\/warehouses\/(\d+)$/)?.[1];
+    if (warehouseId && session.warehouses) {
+      const current = session.warehouses.find(
+        ({ id }) => id === Number(warehouseId)
+      );
+      if (!current) {
+        respond({
+          response,
+          status: 404,
+          body: { message: 'Warehouse not found.' },
+        });
+        return;
+      }
+      if (request.method === 'PATCH') {
+        const { status } = await readJson<Pick<Warehouse, 'status'>>(request);
+        if (current.status !== 'DRAFT' || status !== 'ACTIVE') {
+          respond({
+            response,
+            status: 409,
+            body: { message: 'Only a draft warehouse can be published.' },
+          });
+          return;
+        }
+        current.status = status;
+      }
+      if (request.method === 'GET' || request.method === 'PATCH') {
+        respond({ response, body: current });
+        return;
+      }
+    }
     if (
       request.method === 'GET' &&
       path === `/api/v1/warehouses/${saved.warehouse.id}`
@@ -261,7 +292,7 @@ const server = createServer(async (request, response) => {
     const lists: Record<string, unknown[]> = {
       '/api/v1/supplies': [saved],
       '/api/v1/suppliers': [saved.supplier],
-      '/api/v1/warehouses': [warehouse],
+      '/api/v1/warehouses': session.warehouses ?? [warehouse],
       '/api/v1/products/variants': session.products,
       '/api/v1/units-of-measurement': [session.unit],
     };

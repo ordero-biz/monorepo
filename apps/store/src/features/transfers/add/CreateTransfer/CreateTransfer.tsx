@@ -78,7 +78,10 @@ export const CreateTransfer = ({ sourceWarehouseId }: CreateTransferProps) => {
         </PageHeader.Left>
       </PageHeader.Root>
 
-      <CreateTransferForm sourceWarehouse={sourceWarehouse} />
+      <CreateTransferForm
+        key={sourceWarehouseId}
+        sourceWarehouse={sourceWarehouse}
+      />
     </div>
   );
 };

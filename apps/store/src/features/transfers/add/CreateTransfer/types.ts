@@ -1,3 +1,4 @@
+import type { Ref } from 'react';
 import type { WarehousesAsyncComboboxProps } from '@/features/warehouses/shared/WarehousesAsyncCombobox';
 import type { WarehouseSelection } from '@/lib/domain/warehouses/types';
 import type { useCreateTransferForm } from './hooks/useCreateTransferForm';
@@ -21,6 +22,7 @@ export type CreateTransferFormProps = {
 
 export type TransferInformationProps = {
   form: ReturnType<typeof useCreateTransferForm>['form'];
+  sourceWarehouseRef: Ref<HTMLInputElement>;
 };
 
 export type TransferWarehouseComboboxProps = Pick<
@@ -32,11 +34,18 @@ export type TransferWarehouseComboboxProps = Pick<
   | 'name'
   | 'onBlur'
   | 'placeholder'
+  | 'ref'
   | 'required'
   | 'size'
   | 'value'
 > & {
   onValueChange: (warehouse: TransferWarehouseSelection | null) => void;
+};
+
+export type TransferWarehouseReviewDialogProps = {
+  onClose: () => void;
+  onSelect: (warehouse: TransferWarehouseSelection) => void;
+  warehouse: TransferWarehouseSelection | null;
 };
 
 export type ReviewTransferWarehouseProps = {

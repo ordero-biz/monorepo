@@ -13,6 +13,7 @@ export const useReviewTransferWarehouse = (warehouseId: number) => {
     ...warehouseQueryOptions(warehouseId, getWarehouse),
     staleTime: 0,
     refetchOnMount: 'always',
+    refetchOnWindowFocus: 'always',
   });
 
   const publishWarehouse = useMutation<Warehouse, ApiError>({
