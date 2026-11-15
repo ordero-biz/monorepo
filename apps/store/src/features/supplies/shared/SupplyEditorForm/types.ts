@@ -1,15 +1,12 @@
 import type { ProductVariant } from '@/lib/domain/products/types';
 import type { Supplier } from '@/lib/domain/suppliers/types';
 import type { UnitOfMeasurement } from '@/lib/domain/units-of-measurement/types';
-import type { Warehouse } from '@/lib/domain/warehouses/types';
+import type { WarehouseSelection } from '@/lib/domain/warehouses/types';
 import type { useSubmitSupplyForm } from './hooks/useSubmitSupplyForm';
 
 export type SupplySupplierSelection = Pick<Supplier, 'id' | 'name' | 'status'>;
 
-export type SupplyWarehouseSelection = Pick<
-  Warehouse,
-  'id' | 'name' | 'status'
->;
+export type SupplyWarehouseSelection = WarehouseSelection;
 
 export type SupplyProductVariantFormValue = Pick<
   ProductVariant,

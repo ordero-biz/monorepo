@@ -39,3 +39,5 @@ export type WarehouseSupply = Pick<
   | 'totalPrice'
   | 'createdAt'
 >;
+
+export type WarehouseSelection = Pick<Warehouse, 'id' | 'name' | 'status'>;

@@ -8,15 +8,15 @@ import {
   type AsyncComboboxLoadOptionsResult,
 } from '@/lib/components/AsyncCombobox';
 import { WAREHOUSE_STATUS } from '@/lib/domain/warehouses/constants';
+import type { WarehouseSelection } from '@/lib/domain/warehouses/types';
 import { warehousesQueryKeys } from '@/lib/query/warehouses/warehousesQueryKeys';
-import type { SupplyWarehouseSelection } from '../types';
 import type { WarehousesAsyncComboboxProps } from './types';
 
 const loadWarehouseOptions = async ({
   page,
   pageSize,
 }: AsyncComboboxLoadOptionsArgs): Promise<
-  AsyncComboboxLoadOptionsResult<SupplyWarehouseSelection>
+  AsyncComboboxLoadOptionsResult<WarehouseSelection>
 > => {
   const result = await getWarehouses({
     page,
@@ -38,11 +38,10 @@ const loadWarehouseOptions = async ({
   };
 };
 
-const getWarehouseValue = (warehouse: SupplyWarehouseSelection) =>
+const getWarehouseValue = (warehouse: WarehouseSelection) =>
   String(warehouse.id);
-const getWarehouseLabel = (warehouse: SupplyWarehouseSelection) =>
-  warehouse.name;
-const renderWarehouseOption = (warehouse: SupplyWarehouseSelection) => (
+const getWarehouseLabel = (warehouse: WarehouseSelection) => warehouse.name;
+const renderWarehouseOption = (warehouse: WarehouseSelection) => (
   <span className="flex min-w-0 items-center gap-[var(--space-1)]">
     <span className="truncate">{warehouse.name}</span>
     {warehouse.status === WAREHOUSE_STATUS.DRAFT ? (

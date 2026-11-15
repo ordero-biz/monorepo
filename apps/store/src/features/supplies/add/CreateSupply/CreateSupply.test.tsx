@@ -33,6 +33,38 @@ vi.mock('@/lib/client/api/supplies', async () => ({
   createSupply: mocks.createSupply,
 }));
 
+vi.mock('@/features/warehouses/shared/WarehousesAsyncCombobox', () => ({
+  WarehousesAsyncCombobox: ({
+    value,
+    onValueChange,
+    label,
+    errorText,
+  }: {
+    value: SupplyWarehouseSelection | null;
+    onValueChange: (value: SupplyWarehouseSelection | null) => void;
+    label: string;
+    errorText?: string;
+  }) => (
+    <>
+      <select
+        aria-label={label}
+        value={value?.id ?? ''}
+        onChange={(event) =>
+          onValueChange(
+            event.currentTarget.value
+              ? { id: 4, name: 'Main Warehouse', status: 'ACTIVE' }
+              : null
+          )
+        }
+      >
+        <option value="">Select</option>
+        <option value="4">Main Warehouse</option>
+      </select>
+      {errorText ? <span role="alert">{errorText}</span> : null}
+    </>
+  ),
+}));
+
 vi.mock('../../shared/SupplyEditorForm/selectors', async () => {
   return {
     ...(await vi.importActual<
@@ -63,35 +95,6 @@ vi.mock('../../shared/SupplyEditorForm/selectors', async () => {
         >
           <option value="">Select</option>
           <option value="3">Global Foods</option>
-        </select>
-        {errorText ? <span role="alert">{errorText}</span> : null}
-      </>
-    ),
-    WarehousesAsyncCombobox: ({
-      value,
-      onValueChange,
-      label,
-      errorText,
-    }: {
-      value: SupplyWarehouseSelection | null;
-      onValueChange: (value: SupplyWarehouseSelection | null) => void;
-      label: string;
-      errorText?: string;
-    }) => (
-      <>
-        <select
-          aria-label={label}
-          value={value?.id ?? ''}
-          onChange={(event) =>
-            onValueChange(
-              event.currentTarget.value
-                ? { id: 4, name: 'Main Warehouse', status: 'ACTIVE' }
-                : null
-            )
-          }
-        >
-          <option value="">Select</option>
-          <option value="4">Main Warehouse</option>
         </select>
         {errorText ? <span role="alert">{errorText}</span> : null}
       </>

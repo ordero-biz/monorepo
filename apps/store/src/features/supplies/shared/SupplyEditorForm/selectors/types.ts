@@ -4,7 +4,6 @@ import type {
   SupplyProductVariantFormValue,
   SupplySupplierSelection,
   SupplyUnitOfMeasurementSelection,
-  SupplyWarehouseSelection,
 } from '../types';
 
 export type ProductVariantComboboxOption = {
@@ -29,8 +28,6 @@ type ResourceAsyncComboboxProps<TOption extends object> = Omit<
 >;
 export type SuppliersAsyncComboboxProps =
   ResourceAsyncComboboxProps<SupplySupplierSelection>;
-export type WarehousesAsyncComboboxProps =
-  ResourceAsyncComboboxProps<SupplyWarehouseSelection>;
 export type ProductVariantsAsyncComboboxProps =
   ResourceAsyncComboboxProps<SupplyProductVariantFormValue>;
 export type UnitsOfMeasurementAsyncComboboxProps =

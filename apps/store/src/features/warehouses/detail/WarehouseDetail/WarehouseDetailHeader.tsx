@@ -1,6 +1,8 @@
 import { Menu, PageHeader, Typography } from '@ordero/ui';
-import { EllipsisVertical, Pencil } from 'lucide-react';
+import { ArrowRightLeft, EllipsisVertical, Pencil } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { getAddTransferRoute } from '@/lib/client/routes';
 import { AppBreadcrumbs } from '@/lib/components/AppBreadcrumbs';
 import { WAREHOUSE_STATUS } from '@/lib/domain/warehouses/constants';
 import { warehousesRootBreadcrumb } from '../../shared/breadcrumbs';
@@ -12,6 +14,7 @@ import type { WarehouseDetailHeaderProps } from './types';
 export const WarehouseDetailHeader = ({
   warehouse,
 }: WarehouseDetailHeaderProps) => {
+  const router = useRouter();
   const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
   const isWarehouseActive = warehouse.status === WAREHOUSE_STATUS.ACTIVE;
 
@@ -54,6 +57,19 @@ export const WarehouseDetailHeader = ({
                   />
                   Edit warehouse
                 </Menu.Item>
+                {isWarehouseActive ? (
+                  <Menu.Item
+                    onClick={() =>
+                      router.push(getAddTransferRoute(warehouse.id))
+                    }
+                  >
+                    <ArrowRightLeft
+                      aria-hidden="true"
+                      className="size-[var(--icon-button-xs-icon)]"
+                    />
+                    Create transfer
+                  </Menu.Item>
+                ) : null}
               </Menu.Popup>
             </Menu.Positioner>
           </Menu.Portal>

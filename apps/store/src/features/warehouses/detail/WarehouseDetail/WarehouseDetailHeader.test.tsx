@@ -1,10 +1,20 @@
 import { screen, within } from '@testing-library/react';
-import { clientRoutes } from '@/lib/client/routes';
+import userEvent from '@testing-library/user-event';
+import { clientRoutes, getAddTransferRoute } from '@/lib/client/routes';
 import { WAREHOUSE_STATUS } from '@/lib/domain/warehouses/constants';
 import { prepareStoreSetup } from '@/test/prepareSetup';
+import type { WarehouseDetailHeaderProps } from './types';
 import { WarehouseDetailHeader } from './WarehouseDetailHeader';
 
-const { setup } = prepareStoreSetup({
+const mocks = vi.hoisted(() => ({
+  push: vi.fn(),
+}));
+
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({ push: mocks.push, replace: vi.fn() }),
+}));
+
+const { setup } = prepareStoreSetup<WarehouseDetailHeaderProps>({
   component: WarehouseDetailHeader,
   props: {
     warehouse: {
@@ -33,5 +43,46 @@ describe('WarehouseDetailHeader', () => {
       'aria-current',
       'page'
     );
+  });
+
+  it('navigates to transfer creation with the current warehouse as source', async () => {
+    const user = userEvent.setup();
+    setup();
+
+    await user.click(
+      screen.getByRole('button', { name: 'Actions for Main Warehouse' })
+    );
+    await user.click(
+      await screen.findByRole('menuitem', { name: 'Create transfer' })
+    );
+
+    expect(mocks.push).toHaveBeenCalledWith(getAddTransferRoute(1));
+  });
+
+  it('hides transfer creation for a draft warehouse', async () => {
+    const user = userEvent.setup();
+    setup({
+      warehouse: {
+        phone: null,
+        totalItemQuantity: 0,
+        totalPrice: 0,
+        id: 1,
+        name: 'Main Warehouse',
+        status: WAREHOUSE_STATUS.DRAFT,
+        address: '123 Commerce Ave',
+        comment: 'Primary stock location',
+      },
+    });
+
+    await user.click(
+      screen.getByRole('button', { name: 'Actions for Main Warehouse' })
+    );
+
+    expect(
+      await screen.findByRole('menuitem', { name: 'Edit warehouse' })
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('menuitem', { name: 'Create transfer' })
+    ).not.toBeInTheDocument();
   });
 });
