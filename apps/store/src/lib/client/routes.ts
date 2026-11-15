@@ -2,6 +2,7 @@ import {
   PRODUCT_CREATION_MODE_SEARCH_PARAM,
   type ProductCreationMode,
 } from '@/lib/domain/products/constants';
+import { TRANSFER_SOURCE_WAREHOUSE_SEARCH_PARAM } from '@/lib/domain/transfers/constants';
 
 export const clientRoutes = {
   home: '/',
@@ -14,12 +15,18 @@ export const clientRoutes = {
   supplies: '/warehouse/supplies',
   addSupply: '/warehouse/supplies/add',
   suppliers: '/warehouse/suppliers',
+  addTransfer: '/warehouse/transfers/add',
   unitsOfMeasurement: '/warehouse/units-of-measurement',
   warehouses: '/warehouse',
 } as const;
 
 export const getAddProductRoute = (creationMode: ProductCreationMode) =>
   `${clientRoutes.addProduct}?${PRODUCT_CREATION_MODE_SEARCH_PARAM}=${creationMode}`;
+
+export const getAddTransferRoute = (sourceWarehouseId?: string | number) =>
+  sourceWarehouseId === undefined
+    ? clientRoutes.addTransfer
+    : `${clientRoutes.addTransfer}?${TRANSFER_SOURCE_WAREHOUSE_SEARCH_PARAM}=${sourceWarehouseId}`;
 
 export const getAttributeDetailRoute = (attributeId: string | number) =>
   `/products/attributes/${attributeId}`;

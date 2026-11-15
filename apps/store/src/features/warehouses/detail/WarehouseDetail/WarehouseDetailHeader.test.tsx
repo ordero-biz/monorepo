@@ -1,8 +1,17 @@
 import { screen, within } from '@testing-library/react';
-import { clientRoutes } from '@/lib/client/routes';
+import userEvent from '@testing-library/user-event';
+import { clientRoutes, getAddTransferRoute } from '@/lib/client/routes';
 import { WAREHOUSE_STATUS } from '@/lib/domain/warehouses/constants';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { WarehouseDetailHeader } from './WarehouseDetailHeader';
+
+const mocks = vi.hoisted(() => ({
+  push: vi.fn(),
+}));
+
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({ push: mocks.push, replace: vi.fn() }),
+}));
 
 const { setup } = prepareStoreSetup({
   component: WarehouseDetailHeader,
@@ -33,5 +42,19 @@ describe('WarehouseDetailHeader', () => {
       'aria-current',
       'page'
     );
+  });
+
+  it('navigates to transfer creation with the current warehouse as source', async () => {
+    const user = userEvent.setup();
+    setup();
+
+    await user.click(
+      screen.getByRole('button', { name: 'Actions for Main Warehouse' })
+    );
+    await user.click(
+      await screen.findByRole('menuitem', { name: 'Create transfer' })
+    );
+
+    expect(mocks.push).toHaveBeenCalledWith(getAddTransferRoute(1));
   });
 });
