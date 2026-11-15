@@ -1,7 +1,9 @@
 import { Card, Textarea, TextField } from '@ordero/ui';
 import { useStore } from '@tanstack/react-form';
+// Direct path: the warehouses barrel pulls in WarehouseDetail, which imports supplies.
+import { WarehousesAsyncCombobox } from '@/features/warehouses/shared/WarehousesAsyncCombobox';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
-import { SuppliersAsyncCombobox, WarehousesAsyncCombobox } from './selectors';
+import { SuppliersAsyncCombobox } from './selectors';
 import type { SupplyInformationProps } from './types';
 import {
   validateSupplyNumber,
