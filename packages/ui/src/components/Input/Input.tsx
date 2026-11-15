@@ -150,6 +150,7 @@ export const Input = ({
   endIcon: EndIcon,
   focused,
   id,
+  inputMode,
   invalid = false,
   name,
   onBlur,
@@ -219,6 +220,7 @@ export const Input = ({
           defaultValue={defaultValue}
           disabled={disabled}
           id={id}
+          inputMode={inputMode}
           name={name}
           onBlur={(event) => {
             setFocusedState(false);
