@@ -6,7 +6,7 @@ export type CategoryStatus =
 export type CategoryParent = {
   id: number;
   name: string;
-  status?: CategoryStatus;
+  status: CategoryStatus;
   createdAt: string;
 };
 
@@ -14,7 +14,7 @@ export type Category = {
   id: number;
   name: string;
   sortOrder: number;
-  status?: CategoryStatus;
+  status: CategoryStatus;
   createdAt: string;
   parentCategory?: CategoryParent | null;
 };

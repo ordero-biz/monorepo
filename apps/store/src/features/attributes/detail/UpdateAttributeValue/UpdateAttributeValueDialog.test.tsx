@@ -22,6 +22,7 @@ const { setup } = prepareStoreSetup({
   props: {
     attributeId: 7,
     attributeValue: {
+      status: 'ACTIVE',
       id: 3,
       name: 'Blue',
       sortOrder: 0,
@@ -42,6 +43,7 @@ describe('UpdateAttributeValueDialog', () => {
     updateAttributeValueMock.mockResolvedValue({
       ok: true,
       data: {
+        status: 'ACTIVE' as const,
         id: 3,
         name: 'Navy',
         sortOrder: 0,
@@ -163,6 +165,7 @@ describe('UpdateAttributeValueDialog', () => {
     resolveUpdate?.({
       ok: true,
       data: {
+        status: 'ACTIVE',
         id: 3,
         name: 'Navy',
         sortOrder: 0,

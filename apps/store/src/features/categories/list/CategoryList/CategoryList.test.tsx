@@ -214,50 +214,6 @@ describe('CategoryList', () => {
     ).not.toBeInTheDocument();
   });
 
-  it('leaves the parent status cell empty when the parent has no status', async () => {
-    getCategoriesMock.mockResolvedValue({
-      ok: true,
-      data: {
-        content: [
-          {
-            id: 3,
-            name: 'Socks',
-            sortOrder: 30,
-            status: 'DRAFT',
-            createdAt: '2026-07-03T10:54:34.839Z',
-            parentCategory: {
-              id: 4,
-              name: 'Clothing',
-              createdAt: '2026-06-30T10:54:34.839Z',
-            },
-          },
-        ],
-        page: {
-          size: 10,
-          number: 0,
-          totalElements: 1,
-          totalPages: 1,
-        },
-      },
-    });
-
-    setup();
-
-    const row = await screen.findByRole('row', {
-      name: 'Socks Draft Clothing 03 Jul 2026',
-    });
-
-    expect(within(row).getByRole('link', { name: 'Clothing' })).toHaveAttribute(
-      'href',
-      '/products/categories/4'
-    );
-    expect(
-      within(row)
-        .getAllByRole('cell')
-        .map((cell) => cell.textContent)
-    ).toEqual(['', 'Socks', 'Draft', 'Clothing', '', '03 Jul 2026', '']);
-  });
-
   it('shows bulk delete actions for selected categories', async () => {
     getCategoriesMock.mockResolvedValue({
       ok: true,

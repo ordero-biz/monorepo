@@ -22,6 +22,7 @@ describe('submitCreateAttributeValues', () => {
   it('normalizes non-empty values before adding them', async () => {
     const attributeValues = [
       {
+        status: 'ACTIVE' as const,
         id: 3,
         name: 'Green',
         sortOrder: 0,

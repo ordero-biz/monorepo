@@ -95,6 +95,7 @@ describe('CreateAttributeValuesDialog', () => {
       ok: true,
       data: [
         {
+          status: 'ACTIVE' as const,
           id: 3,
           name: 'Green',
           sortOrder: 0,
@@ -291,6 +292,7 @@ describe('CreateAttributeValuesDialog', () => {
       ok: true,
       data: [
         {
+          status: 'ACTIVE',
           id: 3,
           name: 'Green',
           sortOrder: 0,

@@ -135,12 +135,6 @@ export const ReviewProductAttribute = ({
               </Typography>
             </div>
           </div>
-          {currentAttribute && !currentAttribute.status && !queryError ? (
-            <p role="alert">
-              Attribute status is unavailable. Check its full details before
-              continuing.
-            </p>
-          ) : null}
           {activateAttribute.isError ? (
             <p role="alert">{getApiErrorMessage(activateAttribute.error)}</p>
           ) : null}

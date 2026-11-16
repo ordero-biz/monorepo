@@ -21,7 +21,7 @@ describe('useProductGenerationState', () => {
     act(() => {
       result.current.onProductVariantsGenerated({
         attributes,
-        category: { id: 2, name: 'Footwear' },
+        category: { status: 'ACTIVE', id: 2, name: 'Footwear' },
         description: '',
         name: 'Running Shoes',
         productVariants: [],

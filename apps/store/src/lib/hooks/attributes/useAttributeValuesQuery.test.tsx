@@ -27,6 +27,7 @@ describe('attribute values query', () => {
   it('returns attribute values by attribute id', async () => {
     const values = [
       {
+        status: 'ACTIVE' as const,
         id: 2,
         name: 'Medium',
         sortOrder: 20,

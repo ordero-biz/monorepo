@@ -73,6 +73,7 @@ describe('useUpdateAttributeValueForm', () => {
   it('submits changed fields and reports success', async () => {
     getAttributeValueUpdateChangesMock.mockReturnValue({ name: 'Navy' });
     const updatedAttributeValue = {
+      status: 'ACTIVE' as const,
       id: 3,
       name: 'Navy',
       sortOrder: 0,

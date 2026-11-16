@@ -19,7 +19,7 @@ export type AttributeValue = {
   id: number;
   name: string;
   sortOrder: number;
-  status?: AttributeValueStatus;
+  status: AttributeValueStatus;
   createdAt: string;
 };
 

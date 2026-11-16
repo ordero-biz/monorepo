@@ -27,6 +27,7 @@ const color: AttributeDropdown = {
   createdAt: '2026-10-14T00:00:00.000Z',
   attributeValues: [
     {
+      status: 'ACTIVE',
       id: 71,
       name: 'Blue',
       sortOrder: 0,
@@ -64,7 +65,7 @@ const TestForm = ({ onProductVariantsGenerated }: TestFormProps) => {
           form.reset({
             ...createProductGenerationDefaultValues,
             name: 'Shirt',
-            category: { id: 2, name: 'Footwear' },
+            category: { status: 'ACTIVE', id: 2, name: 'Footwear' },
             attributes: [color],
             attributeValues: { '7': ['71'] },
           })
@@ -148,7 +149,7 @@ describe('ProductTemplateFields attribute selection', () => {
     await user.click(screen.getByRole('button', { name: 'Generate' }));
     expect(onProductVariantsGenerated).toHaveBeenCalledWith({
       attributes: [material, color],
-      category: { id: 2, name: 'Footwear' },
+      category: { status: 'ACTIVE', id: 2, name: 'Footwear' },
       description: '',
       name: 'Shirt',
       productVariants: [

@@ -17,6 +17,7 @@ describe('categoriesListQueryOptions', () => {
     const categories = {
       content: [
         {
+          status: 'ACTIVE' as const,
           id: 1,
           name: 'Shoes',
           sortOrder: 10,
@@ -62,6 +63,7 @@ describe('categoryChildrenQueryOptions', () => {
   it('uses a category child-resource key and unwraps children', async () => {
     const children = [
       {
+        status: 'ACTIVE' as const,
         id: 3,
         name: 'Running shoes',
         sortOrder: 20,

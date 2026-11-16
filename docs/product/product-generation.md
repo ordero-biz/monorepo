@@ -223,9 +223,9 @@ how product creation presents and applies those rules.
 
 1. Keep Draft categories, attributes, and values searchable with a **Draft**
    badge. Hiding them would make a known catalog record appear to be missing.
-2. Select Active entries directly. Attempting to add a Draft or unknown-status
-   entry opens review without changing the current selection or triggering the
-   field's blur/change validation.
+2. Select Active entries directly. Attempting to add a Draft entry opens review
+   without changing the current selection or triggering the field's blur/change
+   validation.
 3. Load current data and identify the entity being reviewed. Show a category's
    parent and name, an attribute's name, or the attribute and value together.
 4. Explain the entity-specific permanent consequence in one compact notice.
@@ -246,9 +246,9 @@ users a way to inspect more context while keeping the product form in place.
 
 | Review | Data needed before confirmation |
 | --- | --- |
-| Category | Current category details, including a known status. |
+| Category | Current category details. |
 | Attribute | Current attribute details and its values, with both reads successful. |
-| Attribute value | Current parent attribute and its values; the chosen value must still exist, its status must be known, and the parent must be Active. |
+| Attribute value | Current parent attribute and its values; the chosen value must still exist and the parent must be Active. |
 
 A Draft parent blocks value confirmation and directs the user to attribute
 management; the review never activates the parent implicitly. Do not infer an
@@ -260,8 +260,8 @@ approximate size. Keep the explanation, notice, details link, and actions visibl
 to reduce layout movement. Allow long names to wrap naturally. Background refresh
 retains loaded content, and loading is announced to screen readers.
 
-Disable confirmation while checking data, after a failed read, or when status is
-unavailable. Failed reads offer retry. A missing value explains that it is no
+Disable confirmation while checking data or after a failed read. Failed reads
+offer retry. A missing value explains that it is no
 longer available. Activation errors remain inline with the review open and the
 previous selection unchanged, allowing another attempt.
 
@@ -291,16 +291,15 @@ live under `products/shared` and apply the rules above.
 Category and attribute review are used in both creation routes. Value review is
 used in redesigned setup and in the variant attribute editor, supporting single
 and multiple selection. The legacy setup's value toggle controls have not been
-migrated. Existing validators reject an explicitly Draft category, while legacy
-category records may omit status. Selection review resolves unknown status; it
-does not add fresh status requests to every final submission or replace service
+migrated. Existing validators reject a Draft category. Selection review does not
+add fresh status requests to every final submission or replace service
 enforcement.
 
 ## Validation and request outcomes
 
 | Check | Current rule |
 | --- | --- |
-| Shared product details | Non-blank name, selected category, and supported Draft or Active status. An explicitly Draft category is rejected. |
+| Shared product details | Non-blank name, selected category, and supported Draft or Active status. A Draft category is rejected. |
 | Variant name | Required after trimming whitespace. Duplicate names are allowed by the current client validator. |
 | SKU and barcode | Required after trimming; each must be unique across the submitted variants. Every conflicting row receives an error. Comparison is case-sensitive. |
 | Variant status | Must be Draft or Active. Active is invalid when the product is Draft. |
