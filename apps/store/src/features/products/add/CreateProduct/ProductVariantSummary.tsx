@@ -1,6 +1,6 @@
 import { Card, Typography } from '@ordero/ui';
 import { Barcode, Eye, SlidersHorizontal } from 'lucide-react';
-import { DEFAULT_MAX_GENERATED_PRODUCT_VARIANTS } from '../../add/CreateProduct';
+import { DEFAULT_MAX_GENERATED_PRODUCT_VARIANTS } from './constants';
 import type { ProductVariantSummaryProps } from './types';
 
 const nextStepTasks = [

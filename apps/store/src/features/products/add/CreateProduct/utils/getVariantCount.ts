@@ -2,7 +2,7 @@ import type { AttributeDropdown } from '@/lib/domain/attributes/types';
 import {
   DEFAULT_MAX_GENERATED_PRODUCT_VARIANTS,
   PRODUCT_GENERATION_MODE,
-} from '../../../add/CreateProduct';
+} from '../constants';
 import type { ProductGenerationMode } from '../types';
 
 type GetVariantCountArgs = {

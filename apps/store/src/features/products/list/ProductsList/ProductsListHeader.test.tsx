@@ -1,10 +1,6 @@
 import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { getAddProductRoute } from '@/lib/client/routes';
-import {
-  PRODUCT_CREATION_MODE,
-  PRODUCTS_LIST_MODE,
-} from '@/lib/domain/products/constants';
+import { PRODUCTS_LIST_MODE } from '@/lib/domain/products/constants';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { ProductsListHeader } from './ProductsListHeader';
 
@@ -34,7 +30,7 @@ describe('ProductsListHeader', () => {
     routerPushMock.mockClear();
   });
 
-  it('opens the single-product workflow', async () => {
+  it('opens product creation from the Add Product button', async () => {
     const user = userEvent.setup();
 
     setup();
@@ -48,23 +44,14 @@ describe('ProductsListHeader', () => {
       )
     ).toHaveAttribute('aria-current', 'page');
 
-    await user.click(screen.getByRole('button', { name: 'Single product' }));
+    expect(
+      screen.queryByRole('button', {
+        name: /^(Single product|Multiple products)$/,
+      })
+    ).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Add Product' }));
 
-    expect(routerPushMock).toHaveBeenCalledWith(
-      getAddProductRoute(PRODUCT_CREATION_MODE.single)
-    );
-  });
-
-  it('opens the multiple-product workflow', async () => {
-    const user = userEvent.setup();
-
-    setup();
-
-    await user.click(screen.getByRole('button', { name: 'Multiple products' }));
-
-    expect(routerPushMock).toHaveBeenCalledWith(
-      getAddProductRoute(PRODUCT_CREATION_MODE.multiple)
-    );
+    expect(routerPushMock).toHaveBeenCalledWith('/add');
   });
 
   it('shows products as the active list mode by default', () => {

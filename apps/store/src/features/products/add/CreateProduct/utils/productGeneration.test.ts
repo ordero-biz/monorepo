@@ -11,7 +11,6 @@ import {
   getProductVariantsGeneratedArgs,
   getSelectedAttributeValueGroups,
   getSelectedAttributeValues,
-  updateAttributeValueSelection,
 } from './productGeneration';
 
 const attributes: AttributeDropdown[] = [
@@ -86,27 +85,6 @@ describe('product generation', () => {
         [attributes[1]]
       )
     ).toEqual({ '1': ['11'] });
-  });
-
-  it('adds and removes an attribute value selection', () => {
-    const selectedAttributeValues = { '1': ['11'], '2': ['21'] };
-
-    expect(
-      updateAttributeValueSelection({
-        attributeId: '1',
-        attributeValueId: '12',
-        attributeValuesByAttributeId: selectedAttributeValues,
-        pressed: true,
-      })
-    ).toEqual({ '1': ['11', '12'], '2': ['21'] });
-    expect(
-      updateAttributeValueSelection({
-        attributeId: '1',
-        attributeValueId: '11',
-        attributeValuesByAttributeId: selectedAttributeValues,
-        pressed: false,
-      })
-    ).toEqual({ '1': [], '2': ['21'] });
   });
 
   it('maps selected values to their display values and variant payload', () => {

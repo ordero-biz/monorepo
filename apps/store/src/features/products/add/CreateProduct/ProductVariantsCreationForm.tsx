@@ -1,20 +1,17 @@
 import { Button, ContextualActionBar, Typography } from '@ordero/ui';
 import { BaseLayoutContextualActionBar } from '@/features/app-shell';
-import { CommonProductFields } from './CommonProductFields';
-import { GeneratedProductVariants } from './GeneratedProductVariants';
 import type { ProductVariantsCreationFormProps } from './types';
 
 export const ProductVariantsCreationForm = ({
+  onSubmit,
   commonProductFields,
   variantFields,
   isEditingProductDetails = false,
   productVariantsCreationForm,
-  generatedAttributes,
-  generationMode,
 }: ProductVariantsCreationFormProps) => {
   const handleSubmit = () => {
     if (!isEditingProductDetails) {
-      productVariantsCreationForm.handleSubmit();
+      onSubmit();
     }
   };
 
@@ -27,18 +24,8 @@ export const ProductVariantsCreationForm = ({
         handleSubmit();
       }}
     >
-      {commonProductFields ?? (
-        <CommonProductFields
-          productVariantsCreationForm={productVariantsCreationForm}
-        />
-      )}
-      {variantFields ?? (
-        <GeneratedProductVariants
-          productVariantsCreationForm={productVariantsCreationForm}
-          generatedAttributes={generatedAttributes}
-          generationMode={generationMode}
-        />
-      )}
+      {commonProductFields}
+      {variantFields}
       <productVariantsCreationForm.Subscribe
         selector={(state) => state.values.productVariants.length}
       >

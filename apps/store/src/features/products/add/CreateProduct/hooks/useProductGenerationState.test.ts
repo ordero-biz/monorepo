@@ -25,6 +25,7 @@ describe('useProductGenerationState', () => {
         description: '',
         name: 'Running Shoes',
         productVariants: [],
+        status: 'DRAFT',
       });
     });
 

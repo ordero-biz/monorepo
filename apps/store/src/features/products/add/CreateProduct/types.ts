@@ -14,67 +14,87 @@ export type ProductVariantsGenerationFormApi = ReturnType<
   typeof useProductVariantsGenerationForm
 >['form'];
 
-export type CreateProductProps = {
+export type ProductGenerationModeSelectorProps = {
   generationMode: ProductGenerationMode;
-  maxGeneratedProductVariants: number;
-  onCreated: () => Promise<void> | void;
-  validateConfiguration: Parameters<
-    typeof useCreateProductForm
-  >[0]['validateConfiguration'];
+  onGenerationModeChange: (generationMode: ProductGenerationMode) => void;
 };
 
 export type ProductVariantsGenerationFormProps = {
   productVariantsGenerationForm: ProductVariantsGenerationFormApi;
-  generationMode: ProductGenerationMode;
-  maxGeneratedProductVariants: number;
 };
 
 export type ProductVariantsCreationFormProps = {
-  commonProductFields?: ReactNode;
-  variantFields?: ReactNode;
-  isEditingProductDetails?: boolean;
+  onSubmit: () => Promise<void>;
+  commonProductFields: ReactNode;
+  variantFields: ReactNode;
+  isEditingProductDetails: boolean;
   productVariantsCreationForm: ProductVariantsCreationFormApi;
-  generatedAttributes: AttributeDropdown[];
-  generationMode: ProductGenerationMode;
 };
 
 export type ProductTemplateFieldsProps = {
   productVariantsGenerationForm: ProductVariantsGenerationFormApi;
-  generationMode: ProductGenerationMode;
+};
+
+export type ProductVariantSummaryProps = {
+  hasAttributes: boolean;
+  showSingleVariantExplanation?: boolean;
+  variantCount: number;
 };
 
 export type ProductAttributeValuesFieldProps = {
   productVariantsGenerationForm: ProductVariantsGenerationFormApi;
 };
 
-export type GenerateProductActionsProps = {
-  productVariantsGenerationForm: ProductVariantsGenerationFormApi;
-  generationMode: ProductGenerationMode;
-  maxGeneratedProductVariants: number;
+export type CommonProductDataProps = {
+  isEditing: boolean;
+  onEditingChange: (isEditing: boolean) => void;
+  values: ProductCommonValues;
+  variantCount: number;
+  editorErrors: ProductDetailsErrors;
+  activeVariantCount: number;
+  onApply: (values: ProductCommonValues) => void;
 };
 
-export type GeneratedProductVariantsProps = {
+export type ProductDetailsErrors = Partial<
+  Record<keyof ProductCommonValues, string>
+>;
+
+export type ProductDetailsEditorProps = {
+  activeVariantCount: number;
+  initialValues: ProductCommonValues;
+  initialErrors: ProductDetailsErrors;
+  onApply: (values: ProductCommonValues) => void;
+  onCancel: () => void;
+};
+
+export type ProductVariantsTableProps = {
   productVariantsCreationForm: ProductVariantsCreationFormApi;
   generatedAttributes: AttributeDropdown[];
   generationMode: ProductGenerationMode;
 };
 
-export type GeneratedProductVariantListProps = {
-  getVariantAttributes: (variantIndex: number) => AttributeDropdown[];
-  productVariantsCreationForm: ProductVariantsCreationFormApi;
-  invalidVariantIndexes: number[];
-  onEditAttributes: (variantIndex: number) => void;
-  productVariantCount: number;
-  requireAttributeValueIds: boolean;
+type ProductVariantFieldProps = {
+  form: ProductVariantsCreationFormApi;
+  variantIndex: number;
 };
 
-export type GeneratedProductVariantCardProps = {
+export type ProductVariantDetailsProps = ProductVariantAttributesProps;
+export type ProductVariantNameFieldProps = ProductVariantFieldProps;
+export type ProductVariantSkuFieldProps = ProductVariantFieldProps;
+export type ProductVariantBarcodeFieldProps = ProductVariantFieldProps;
+export type ProductVariantStatusFieldProps = ProductVariantFieldProps;
+
+export type GetColumnsArgs = {
+  form: ProductVariantsCreationFormApi;
+};
+
+export type ProductVariantAttributesProps = {
   attributes: AttributeDropdown[];
-  hasErrors: boolean;
   productVariantsCreationForm: ProductVariantsCreationFormApi;
   onEditAttributes: (variantIndex: number) => void;
   requireAttributeValueIds: boolean;
   variantIndex: number;
+  productVariantName: string;
 };
 
 export type EditGeneratedProductVariantAttributesProps = {
@@ -95,10 +115,7 @@ export type ProductVariantsGeneratedArgs = {
   description: string;
   name: string;
   productVariants: CreateProductVariantValues[];
-};
-
-export type CommonProductFieldsProps = {
-  productVariantsCreationForm: ProductVariantsCreationFormApi;
+  status: ProductStatus;
 };
 
 export type EditProductVariantAttributesDialogProps = {
@@ -110,8 +127,6 @@ export type EditProductVariantAttributesDialogProps = {
   open: boolean;
   productVariantName: string;
 };
-
-export type CommonProductFieldInputsProps = CommonProductFieldsProps;
 
 export type ProductImageDropzoneProps = {
   className?: string;
@@ -131,6 +146,11 @@ export type ProductGenerationValues = {
   category: CategorySelection | null;
   description: string;
   name: string;
+};
+
+export type ProductGenerationFormValues = ProductGenerationValues & {
+  generationMode: ProductGenerationMode;
+  status: ProductStatus;
 };
 
 export type ProductVariantsCreationValues = ProductCommonValues & {
@@ -159,11 +179,6 @@ export type ProductStatusSelectorProps = {
 
 export type ProductGenerationMode =
   (typeof PRODUCT_GENERATION_MODE)[keyof typeof PRODUCT_GENERATION_MODE];
-
-export type ProductVariantAttributesProps = Omit<
-  GeneratedProductVariantCardProps,
-  'hasErrors'
-> & { productVariantName: string };
 
 export type ProductVariantAttributesUpdate = {
   attributeValueIds: number[];

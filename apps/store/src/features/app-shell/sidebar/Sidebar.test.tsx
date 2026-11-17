@@ -128,8 +128,11 @@ describe('Store sidebar', () => {
     ).not.toHaveAttribute('aria-current');
   });
 
-  it('highlights the products link for the products route', () => {
-    mocks.pathname = '/products';
+  it.each([
+    '/products',
+    '/add',
+  ])('highlights the Products link on %s', (pathname) => {
+    mocks.pathname = pathname;
 
     setup();
 
