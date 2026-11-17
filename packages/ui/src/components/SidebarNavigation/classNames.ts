@@ -34,7 +34,7 @@ export const providerClassName =
 // The aside reserves layout space; the panel inside it holds the visible
 // sidebar and can grow past the aside to overlay content on mobile.
 export const shellClassName =
-  'group/sidebar-navigation sticky top-0 z-[1] h-screen w-[var(--sidebar-navigation-width,var(--nav-width))] min-w-[var(--sidebar-navigation-width,var(--nav-width))] shrink-0 transition-[width,min-width] duration-[var(--sidebar-navigation-duration)] ease-[var(--sidebar-navigation-easing)] motion-reduce:transition-none';
+  'group/sidebar-navigation sticky top-0 z-20 h-screen w-[var(--sidebar-navigation-width,var(--nav-width))] min-w-[var(--sidebar-navigation-width,var(--nav-width))] shrink-0 transition-[width,min-width] duration-[var(--sidebar-navigation-duration)] ease-[var(--sidebar-navigation-easing)] motion-reduce:transition-none';
 
 export const panelClassName =
   'relative isolate h-full w-[var(--sidebar-navigation-panel-width,var(--nav-width))] border-r border-border bg-background transition-[width] duration-[var(--sidebar-navigation-duration)] ease-[var(--sidebar-navigation-easing)] motion-reduce:transition-none';
