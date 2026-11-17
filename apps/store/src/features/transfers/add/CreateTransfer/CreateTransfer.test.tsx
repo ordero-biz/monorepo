@@ -12,6 +12,12 @@ import { prepareStoreSetup } from '@/test/prepareSetup';
 import { CreateTransfer } from './CreateTransfer';
 import type { CreateTransferProps } from './types';
 
+const mocks = vi.hoisted(() => ({ replace: vi.fn() }));
+
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({ replace: mocks.replace }),
+}));
+
 vi.mock('@/lib/client/api/warehouses', async () => ({
   ...(await vi.importActual<typeof import('@/lib/client/api/warehouses')>(
     '@/lib/client/api/warehouses'
@@ -321,14 +327,5 @@ describe('CreateTransfer', () => {
 
     expect(picker).toHaveValue(draftWarehouse.name);
     expect(updateWarehouseMock).not.toHaveBeenCalled();
-  });
-
-  it('does not render a save action yet', async () => {
-    setup();
-
-    await screen.findByRole('form', { name: 'Transfer' });
-    expect(
-      screen.queryByRole('button', { name: /save/i })
-    ).not.toBeInTheDocument();
   });
 });

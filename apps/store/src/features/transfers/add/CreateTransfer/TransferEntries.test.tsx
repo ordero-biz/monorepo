@@ -1,14 +1,24 @@
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { createTransfer } from '@/lib/client/api/transfers';
 import {
   getWarehouse,
   getWarehouseStock,
   getWarehouses,
 } from '@/lib/client/api/warehouses';
+import { TRANSFER_STATUS } from '@/lib/domain/transfers/constants';
+import type { TransferDetails } from '@/lib/domain/transfers/types';
 import { WAREHOUSE_STATUS } from '@/lib/domain/warehouses/constants';
+import { warehousesQueryKeys } from '@/lib/query/warehouses/warehousesQueryKeys';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { CreateTransfer } from './CreateTransfer';
 import type { CreateTransferProps } from './types';
+
+const mocks = vi.hoisted(() => ({ replace: vi.fn() }));
+
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({ replace: mocks.replace }),
+}));
 
 vi.mock('@/lib/client/api/warehouses', async () => ({
   ...(await vi.importActual<typeof import('@/lib/client/api/warehouses')>(
@@ -19,9 +29,14 @@ vi.mock('@/lib/client/api/warehouses', async () => ({
   getWarehouseStock: vi.fn(),
 }));
 
+vi.mock('@/lib/client/api/transfers', () => ({
+  createTransfer: vi.fn(),
+}));
+
 const getWarehouseMock = vi.mocked(getWarehouse);
 const getWarehousesMock = vi.mocked(getWarehouses);
 const getWarehouseStockMock = vi.mocked(getWarehouseStock);
+const createTransferMock = vi.mocked(createTransfer);
 
 const createWarehouse = (id: number, name: string) => ({
   id,
@@ -61,6 +76,27 @@ const stockByWarehouse: Record<number, ReturnType<typeof stockItem>[]> = {
   [northWarehouse.id]: [stockItem(21, 'Penne Pasta 500g', 'GR-3110', 40)],
 };
 
+const createdTransfer = (
+  status: TransferDetails['status']
+): TransferDetails => ({
+  id: 5,
+  sourceWarehouse: { id: 1, name: 'Main Warehouse', status: 'ACTIVE' },
+  destinationWarehouse: { id: 2, name: 'East Warehouse', status: 'ACTIVE' },
+  transferNumber: 'Weekend restock',
+  status,
+  comment: null,
+  dispatchedAt: null,
+  dispatchedBy: null,
+  completedAt: null,
+  completedBy: null,
+  createdAt: '2026-11-16T10:00:00Z',
+  createdBy: 'owner@example.test',
+  updatedAt: '2026-11-16T10:00:00Z',
+  updatedBy: 'owner@example.test',
+  transferEntries: [],
+  version: 1,
+});
+
 const { setup } = prepareStoreSetup<CreateTransferProps>({
   component: CreateTransfer,
 });
@@ -81,6 +117,18 @@ const openWithMainWarehouse = async () => {
   const result = setup({ sourceWarehouseId: mainWarehouse.id });
   await screen.findByRole('form', { name: 'Transfer' });
   return result;
+};
+
+const fillTransferInformation = async (user: User) => {
+  await user.type(
+    screen.getByRole('textbox', { name: /Name/ }),
+    ' Weekend restock '
+  );
+  await pickOption(
+    user,
+    screen.getByRole('combobox', { name: /To warehouse/ }),
+    /East Warehouse/
+  );
 };
 
 describe('TransferEntries', () => {
@@ -275,5 +323,143 @@ describe('TransferEntries', () => {
     expect(
       screen.queryByRole('combobox', { name: 'Product for row 2' })
     ).not.toBeInTheDocument();
+  });
+
+  it('saves a draft and returns to the source warehouse', async () => {
+    const user = userEvent.setup();
+    createTransferMock.mockResolvedValue({
+      ok: true,
+      data: createdTransfer(TRANSFER_STATUS.DRAFT),
+    });
+    await openWithMainWarehouse();
+    await fillTransferInformation(user);
+    await pickOption(user, getProduct(1), /Jasmine Rice 5kg/);
+    await user.type(getQuantity(1), '20');
+    await user.type(
+      screen.getByRole('textbox', { name: 'Comment for row 1' }),
+      ' Fragile '
+    );
+    await user.click(
+      screen.getByRole('button', { name: '+ Add another product' })
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Save draft' }));
+
+    await waitFor(() =>
+      expect(mocks.replace).toHaveBeenCalledWith('/warehouse/1')
+    );
+    expect(createTransferMock).toHaveBeenCalledWith({
+      sourceWarehouseId: 1,
+      destinationWarehouseId: 2,
+      transferNumber: 'Weekend restock',
+      status: TRANSFER_STATUS.DRAFT,
+      transferEntries: [
+        {
+          productVariantId: 11,
+          unitOfMeasurementId: 4,
+          quantity: 20,
+          comment: 'Fragile',
+        },
+      ],
+    });
+    expect(await screen.findByText('Transfer draft created.')).toBeVisible();
+  });
+
+  it('starts a transfer after confirmation and refreshes both warehouses', async () => {
+    const user = userEvent.setup();
+    createTransferMock.mockResolvedValue({
+      ok: true,
+      data: createdTransfer(TRANSFER_STATUS.IN_TRANSIT),
+    });
+    const { queryClient } = await openWithMainWarehouse();
+    const invalidateQueries = vi.spyOn(queryClient, 'invalidateQueries');
+    await fillTransferInformation(user);
+    await pickOption(user, getProduct(1), /Jasmine Rice 5kg/);
+    await user.type(getQuantity(1), '20');
+
+    await user.click(screen.getByRole('button', { name: 'Transfer' }));
+    const dialog = await screen.findByRole('dialog', {
+      name: 'Start transfer',
+    });
+    expect(dialog).toHaveTextContent(
+      'The transfer will be marked as In Transit. Its products will be unavailable for stock operations until the transfer is completed.'
+    );
+    await user.click(
+      within(dialog).getByRole('button', { name: 'Start transfer' })
+    );
+
+    await waitFor(() =>
+      expect(mocks.replace).toHaveBeenCalledWith('/warehouse/1')
+    );
+    expect(createTransferMock).toHaveBeenCalledWith(
+      expect.objectContaining({ status: TRANSFER_STATUS.IN_TRANSIT })
+    );
+    for (const warehouseId of [mainWarehouse.id, eastWarehouse.id]) {
+      expect(invalidateQueries).toHaveBeenCalledWith({
+        queryKey: warehousesQueryKeys.stock(warehouseId),
+      });
+      expect(invalidateQueries).toHaveBeenCalledWith({
+        queryKey: warehousesQueryKeys.detail(warehouseId),
+      });
+    }
+  });
+
+  it('requires at least one product before transferring', async () => {
+    const user = userEvent.setup();
+    await openWithMainWarehouse();
+    await fillTransferInformation(user);
+
+    await user.click(screen.getByRole('button', { name: 'Transfer' }));
+
+    expect(
+      await screen.findByText('Add at least one product before transferring.')
+    ).toBeVisible();
+    expect(
+      screen.queryByRole('dialog', { name: 'Start transfer' })
+    ).not.toBeInTheDocument();
+    expect(createTransferMock).not.toHaveBeenCalled();
+  });
+
+  it('shows required field errors instead of the transfer confirmation', async () => {
+    const user = userEvent.setup();
+    await openWithMainWarehouse();
+    await pickOption(user, getProduct(1), /Jasmine Rice 5kg/);
+    await user.type(getQuantity(1), '20');
+
+    await user.click(screen.getByRole('button', { name: 'Transfer' }));
+
+    expect(await screen.findByText('Name is required')).toBeVisible();
+    expect(screen.getByText('Select a destination warehouse')).toBeVisible();
+    expect(
+      screen.queryByRole('dialog', { name: 'Start transfer' })
+    ).not.toBeInTheDocument();
+    expect(createTransferMock).not.toHaveBeenCalled();
+  });
+
+  it('shows row errors returned by the backend on the submitted row', async () => {
+    const user = userEvent.setup();
+    createTransferMock.mockResolvedValue({
+      ok: false,
+      error: {
+        status: 400,
+        message: 'Validation failed.',
+        fieldErrors: {
+          'transferEntries.0.quantity': 'Not enough stock',
+          destinationWarehouseId: 'Warehouse is archived',
+        },
+      },
+    });
+    await openWithMainWarehouse();
+    await fillTransferInformation(user);
+    await pickOption(user, getProduct(1), /Jasmine Rice 5kg/);
+    await user.type(getQuantity(1), '20');
+
+    await user.click(screen.getByRole('button', { name: 'Save draft' }));
+
+    await waitFor(() =>
+      expect(getQuantity(1)).toHaveAccessibleDescription('Not enough stock')
+    );
+    expect(screen.getByText('Warehouse is archived')).toBeVisible();
+    expect(mocks.replace).not.toHaveBeenCalled();
   });
 });

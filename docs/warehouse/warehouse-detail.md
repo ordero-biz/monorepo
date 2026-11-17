@@ -137,7 +137,7 @@ usability on phone screens.
 - [Shopify inventory reports](https://help.shopify.com/en/manual/reports-and-analytics/shopify-reports/report-types/default-reports/inventory-reports)
   distinguish inventory cost from selling-price value. This supports the
   terminology distinction; Ordero does not inherit Shopify's calculation rules.
-- [Warehouse detail implementation](../../../apps/store/src/features/warehouses/detail/WarehouseDetail/)
+- [Warehouse detail implementation](../../apps/store/src/features/warehouses/detail/WarehouseDetail/)
   owns page composition, labels, and stock columns.
 - [Inventory card tests](../../apps/store/src/features/warehouses/detail/WarehouseDetail/WarehouseDetailInventoryValue.test.tsx)
   cover formatting, currency, scope copy, zero, and fractional values.
