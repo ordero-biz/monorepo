@@ -3,13 +3,14 @@
 import { useState } from 'react';
 import { WAREHOUSE_STATUS } from '@/lib/domain/warehouses/constants';
 import { useRestoreFocus } from '@/lib/hooks/accessibility/useRestoreFocus';
-import {
-  getTransferFormDefaults,
-  useCreateTransferForm,
-} from './hooks/useCreateTransferForm';
+import { useCreateTransferForm } from './hooks/useCreateTransferForm';
+import { useSourceWarehouseChange } from './hooks/useSourceWarehouseChange';
+import { SourceWarehouseChangeDialog } from './SourceWarehouseChangeDialog';
+import { TransferEntries } from './TransferEntries';
 import { TransferInformation } from './TransferInformation';
 import { TransferWarehouseReviewDialog } from './TransferWarehouseReviewDialog';
 import type { CreateTransferFormProps } from './types';
+import { getTransferFormDefaults } from './utils/getTransferFormDefaults';
 
 type SourceWarehouseMode = 'prefill' | 'review' | 'manual';
 
@@ -24,7 +25,6 @@ export const CreateTransferForm = ({
       return isSourceWarehouseActive ? 'prefill' : 'review';
     });
   const isReviewOpen = sourceWarehouseMode === 'review';
-  const sourceWarehouseRef = useRestoreFocus<HTMLInputElement>(isReviewOpen);
 
   const { form } = useCreateTransferForm({
     defaultValues: getTransferFormDefaults(
@@ -33,6 +33,10 @@ export const CreateTransferForm = ({
         : null
     ),
   });
+  const sourceChange = useSourceWarehouseChange(form);
+  const sourceWarehouseRef = useRestoreFocus<HTMLInputElement>(
+    isReviewOpen || sourceChange.pendingChange !== null
+  );
 
   return (
     <form
@@ -46,13 +50,20 @@ export const CreateTransferForm = ({
     >
       <TransferInformation
         form={form}
+        onSourceWarehouseChange={sourceChange.requestChange}
         sourceWarehouseRef={sourceWarehouseRef}
+      />
+      <form.Subscribe selector={(state) => state.values.transferEntries}>
+        {(entries) => <TransferEntries entries={entries} form={form} />}
+      </form.Subscribe>
+      <SourceWarehouseChangeDialog
+        onCancel={sourceChange.cancelChange}
+        onConfirm={sourceChange.confirmChange}
+        pendingChange={sourceChange.pendingChange}
       />
       <TransferWarehouseReviewDialog
         onClose={() => setSourceWarehouseMode('manual')}
-        onSelect={(warehouse) =>
-          form.setFieldValue('sourceWarehouse', warehouse)
-        }
+        onSelect={sourceChange.requestChange}
         warehouse={isReviewOpen ? sourceWarehouse : null}
       />
     </form>

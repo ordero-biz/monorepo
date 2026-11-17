@@ -1,11 +1,9 @@
 import { useState } from 'react';
 import { WarehousesAsyncCombobox } from '@/features/warehouses/shared/WarehousesAsyncCombobox';
 import { WAREHOUSE_STATUS } from '@/lib/domain/warehouses/constants';
-import { TransferWarehouseReviewDialog } from './TransferWarehouseReviewDialog';
-import type {
-  TransferWarehouseComboboxProps,
-  TransferWarehouseSelection,
-} from './types';
+import { TransferWarehouseReviewDialog } from '../TransferWarehouseReviewDialog';
+import type { TransferWarehouseSelection } from '../types';
+import type { TransferWarehouseComboboxProps } from './types';
 
 export const TransferWarehouseCombobox = ({
   onBlur,

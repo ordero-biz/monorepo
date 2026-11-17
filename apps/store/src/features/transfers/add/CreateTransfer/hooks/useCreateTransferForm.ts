@@ -1,20 +1,7 @@
 'use client';
 
 import { useForm } from '@tanstack/react-form';
-import type { TransferFormValues } from '../types';
-
-type UseCreateTransferFormArgs = {
-  defaultValues: TransferFormValues;
-};
-
-export const getTransferFormDefaults = (
-  sourceWarehouse: TransferFormValues['sourceWarehouse'] = null
-): TransferFormValues => ({
-  transferNumber: '',
-  sourceWarehouse,
-  destinationWarehouse: null,
-  comment: '',
-});
+import type { UseCreateTransferFormArgs } from '../types';
 
 export const useCreateTransferForm = ({
   defaultValues,
@@ -23,7 +10,7 @@ export const useCreateTransferForm = ({
     defaultValues,
     // Run all field validators even when change validation has already failed.
     canSubmitWhenInvalid: true,
-    // Submitting is wired up once transfer entries and save actions exist.
+    // Saving the transfer is wired up together with the create/update requests.
     onSubmit: () => undefined,
   });
 
