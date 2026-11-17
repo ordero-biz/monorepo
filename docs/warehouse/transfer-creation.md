@@ -53,7 +53,7 @@ source in the form does not rewrite the URL or the breadcrumb.
 
 Publishing from the review is permanent and changes the shared warehouse
 record, even if the transfer is abandoned. It follows the same principle as
-[catalog entity activation](../catalog-lifecycle.md).
+[catalog entity activation](../product/catalog-lifecycle.md).
 
 ## Products to transfer
 
@@ -123,7 +123,7 @@ is a rough size indicator, not a quantity in one unit.
 | Quantity (non-empty row) | Quantity is required / Quantity must be a whole number greater than 0 / Only {available} available |
 
 Errors appear after the field is blurred or after a submit attempt, following
-the shared [form conventions](../../forms.md).
+the shared [form conventions](../forms.md).
 
 ## UX decisions and rationale
 
@@ -162,21 +162,21 @@ findings from usability testing.
 
 - [Create transfer implementation](../../../apps/store/src/features/transfers/add/CreateTransfer/)
   owns the page, transfer information, entries table, and source change flow.
-- [Validation rules](../../../apps/store/src/features/transfers/add/CreateTransfer/validations.ts)
-  and [validation tests](../../../apps/store/src/features/transfers/add/CreateTransfer/validations.test.ts)
+- [Validation rules](../../apps/store/src/features/transfers/add/CreateTransfer/validations.ts)
+  and [validation tests](../../apps/store/src/features/transfers/add/CreateTransfer/validations.test.ts)
   cover required fields, destination rules, and quantity limits.
-- [Page tests](../../../apps/store/src/features/transfers/add/CreateTransfer/CreateTransfer.test.tsx)
+- [Page tests](../../apps/store/src/features/transfers/add/CreateTransfer/CreateTransfer.test.tsx)
   cover the URL source, loading and failure states, and draft review.
-- [Entries tests](../../../apps/store/src/features/transfers/add/CreateTransfer/TransferEntries.test.tsx)
+- [Entries tests](../../apps/store/src/features/transfers/add/CreateTransfer/TransferEntries.test.tsx)
   cover the stock picker, quantity limits, duplicates, the source change modal,
   the use-all-available action, and row deletion.
-- [Create transfer browser test](../../../apps/store/e2e/CreateTransfer.spec.ts)
+- [Create transfer browser test](../../apps/store/e2e/CreateTransfer.spec.ts)
   covers the warehouse detail entry point, unavailable sources, and draft
   publishing.
 - [Warehouse detail](warehouse-detail.md) describes the page that launches
   this workflow.
-- [Shared DataTable documentation](../../data-tables.md) and
-  [form conventions](../../forms.md) describe reusable implementation contracts.
+- [Shared DataTable documentation](../data-tables.md) and
+  [form conventions](../forms.md) describe reusable implementation contracts.
 
 ## Keeping this specification current
 

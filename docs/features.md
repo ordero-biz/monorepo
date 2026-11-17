@@ -13,8 +13,8 @@ Link to the implementation and behavior tests, and update the document when
 those rules change. This guide covers code organization; shared UI and HTTP
 contracts remain in their existing guides.
 
-- [Warehouse detail business rules and UX decisions](product/warehouse/warehouse-detail.md)
-- [Transfer creation business rules and UX decisions](product/warehouse/transfer-creation.md)
+- [Warehouse detail business rules and UX decisions](warehouse/warehouse-detail.md)
+- [Transfer creation business rules and UX decisions](warehouse/transfer-creation.md)
 - [Product generation business rules and UX decisions](product/product-generation.md)
 - [Catalog entity lifecycle rules](product/catalog-lifecycle.md)
 

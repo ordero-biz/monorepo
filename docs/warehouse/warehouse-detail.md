@@ -139,19 +139,19 @@ usability on phone screens.
   terminology distinction; Ordero does not inherit Shopify's calculation rules.
 - [Warehouse detail implementation](../../../apps/store/src/features/warehouses/detail/WarehouseDetail/)
   owns page composition, labels, and stock columns.
-- [Inventory card tests](../../../apps/store/src/features/warehouses/detail/WarehouseDetail/WarehouseDetailInventoryValue.test.tsx)
+- [Inventory card tests](../../apps/store/src/features/warehouses/detail/WarehouseDetail/WarehouseDetailInventoryValue.test.tsx)
   cover formatting, currency, scope copy, zero, and fractional values.
-- [Warehouse detail tests](../../../apps/store/src/features/warehouses/detail/WarehouseDetail/WarehouseDetail.test.tsx)
+- [Warehouse detail tests](../../apps/store/src/features/warehouses/detail/WarehouseDetail/WarehouseDetail.test.tsx)
   cover aggregate scope and independence from product-list failures.
-- [Warehouse pagination browser test](../../../apps/store/e2e/WarehouseStockPagination.spec.ts)
+- [Warehouse pagination browser test](../../apps/store/e2e/WarehouseStockPagination.spec.ts)
   checks the aggregate while navigating product pages.
-- [Warehouse list switching tests](../../../apps/store/src/features/warehouses/detail/WarehouseDetail/WarehouseDetailLists.test.tsx)
+- [Warehouse list switching tests](../../apps/store/src/features/warehouses/detail/WarehouseDetail/WarehouseDetailLists.test.tsx)
   cover selection, loading, empty/error states, supply fields, and pagination.
-- [Warehouse supplies browser test](../../../apps/store/e2e/WarehouseSupplies.spec.ts)
+- [Warehouse supplies browser test](../../apps/store/e2e/WarehouseSupplies.spec.ts)
   covers switching, pagination, reload, detail links, and browser history.
 - [Warehouse supplies API](https://ordero-service-production.up.railway.app/swagger-ui/index.html#/warehouse-controller/getWarehouseStockSupplies)
   returns `PagedModelSupplyListDetailsResponse`; verified on 2026-10-28.
-- [Shared DataTable documentation](../../data-tables.md) describes the reusable
+- [Shared DataTable documentation](../data-tables.md) describes the reusable
   header and pagination APIs.
 
 ## Keeping this specification current
