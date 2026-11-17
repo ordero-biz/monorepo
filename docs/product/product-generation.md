@@ -7,11 +7,8 @@ Product creation helps store operators prepare **one product with one or more
 variants**. It separates choosing shared details and variant combinations from
 reviewing the generated variants and entering their identifiers.
 
-This specification covers the redesigned `/products/add2` workflow. It reuses
-generation, validation, and submission logic from the original `/products/add`
-implementation. The original route still exists; its presentation is not the
-reference for this document. This is a record of current behavior and product
-decisions, not a claim that the redesign is complete.
+Select **Add Product** on the Products list to open the creation workflow at
+`/add`.
 
 ## Product, variant, and attribute value
 
@@ -36,8 +33,8 @@ it does not establish that required fields are complete or that anything is save
    side by side on wider screens. Below them, the optional Description has a
    taller, non-resizable textarea beside **Status after creation** (Draft by
    default). The fields stack on narrower screens.
-2. Choose **Single variant** or **Multiple variants**. Single variant is the
-   default.
+2. Choose **Single variant** or **Multiple variants**. The form defaults to
+   **Single variant**.
 3. Use **Add attribute** to select an attribute, then choose its values. Setup
    permits multiple values per attribute in either mode. Already added attributes
    cannot be added again. Removing an attribute also removes its value selections.
@@ -399,7 +396,7 @@ the implementation inspected on 2026-11-02. They are product decisions, not
 findings from usability testing. Existing behavior tests provide regression
 coverage; this documentation change does not represent a new test run.
 
-- [Redesigned workflow](../../apps/store/src/features/products/add2/CreateProduct/CreateProduct.tsx)
+- [Creation workflow](../../apps/store/src/features/products/add/CreateProduct/CreateProduct.tsx)
   composes the two steps and opens shared editing for client errors.
 - [Generation rules](../../apps/store/src/features/products/add/CreateProduct/utils/productGeneration.ts)
   and [generation tests](../../apps/store/src/features/products/add/CreateProduct/utils/productGeneration.test.ts)
@@ -407,9 +404,9 @@ coverage; this documentation change does not represent a new test run.
 - [Validation rules](../../apps/store/src/features/products/add/CreateProduct/utils/validations.ts)
   and [validation tests](../../apps/store/src/features/products/add/CreateProduct/utils/validations.test.ts)
   cover required fields, limits, and duplicates.
-- [Workflow tests](../../apps/store/src/features/products/add2/CreateProduct/CreateProduct.test.tsx)
+- [Workflow tests](../../apps/store/src/features/products/add/CreateProduct/CreateProduct.test.tsx)
   cover generation modes, shared editing, cancellation, attribute changes, and submission.
-- [Variant table tests](../../apps/store/src/features/products/add2/CreateProduct/ProductVariantsTable.test.tsx)
+- [Variant table tests](../../apps/store/src/features/products/add/CreateProduct/ProductVariantsTable.test.tsx)
   cover hidden-error expansion, applying attributes without validation, incremental
   rendering, retained focus, and submission of the full collection.
 - [Attribute editor tests](../../apps/store/src/features/products/add/CreateProduct/EditProductVariantAttributesDialog.test.tsx)

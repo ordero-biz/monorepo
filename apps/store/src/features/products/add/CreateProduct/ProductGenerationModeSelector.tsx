@@ -1,5 +1,5 @@
 import { Radio, RadioGroup } from '@ordero/ui';
-import { PRODUCT_GENERATION_MODE } from '../../add/CreateProduct';
+import { PRODUCT_GENERATION_MODE } from './constants';
 import type { ProductGenerationModeSelectorProps } from './types';
 
 const options = [

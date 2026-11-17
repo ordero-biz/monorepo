@@ -1,7 +1,3 @@
-import {
-  PRODUCT_CREATION_MODE_SEARCH_PARAM,
-  type ProductCreationMode,
-} from '@/lib/domain/products/constants';
 import { TRANSFER_SOURCE_WAREHOUSE_SEARCH_PARAM } from '@/lib/domain/transfers/constants';
 
 export const clientRoutes = {
@@ -9,7 +5,7 @@ export const clientRoutes = {
   signIn: '/sign-in',
   dashboard: '/dashboard',
   products: '/products',
-  addProduct: '/products/add',
+  addProduct: '/add',
   categories: '/products/categories',
   attributes: '/products/attributes',
   supplies: '/warehouse/supplies',
@@ -19,9 +15,6 @@ export const clientRoutes = {
   unitsOfMeasurement: '/warehouse/units-of-measurement',
   warehouses: '/warehouse',
 } as const;
-
-export const getAddProductRoute = (creationMode: ProductCreationMode) =>
-  `${clientRoutes.addProduct}?${PRODUCT_CREATION_MODE_SEARCH_PARAM}=${creationMode}`;
 
 export const getAddTransferRoute = (sourceWarehouseId?: string | number) =>
   sourceWarehouseId === undefined

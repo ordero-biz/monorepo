@@ -2,7 +2,7 @@ import { PRODUCT_STATUS } from '@/lib/domain/products/constants';
 import type {
   ProductCommonValues,
   ProductVariantsCreationFormApi,
-} from '../../../add/CreateProduct';
+} from '../types';
 
 type UpdateProductDetailsArgs = {
   form: ProductVariantsCreationFormApi;

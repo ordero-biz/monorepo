@@ -89,8 +89,8 @@ alone. Cover both cases in the pilot.
 
 - [Store error helper](../../apps/store/src/lib/utils/form/error/field.ts)
 - [Platform error helper](../../apps/platform/src/lib/utils/form/error/field.ts)
-- [Product Details editor](../../apps/store/src/features/products/add2/CreateProduct/ProductDetailsEditor.tsx)
-- [Product Details form hook](../../apps/store/src/features/products/add2/CreateProduct/hooks/useProductDetailsForm.ts)
+- [Product Details editor](../../apps/store/src/features/products/add/CreateProduct/ProductDetailsEditor.tsx)
+- [Product Details form hook](../../apps/store/src/features/products/add/CreateProduct/hooks/useProductDetailsForm.ts)
 - [Create Transfer fields](../../apps/store/src/features/transfers/add/CreateTransfer/TransferInformation.tsx)
 - [Add Store form](../../apps/platform/src/features/stores/add/AddStoreForm.tsx)
 - [Supply submit workflow](../../apps/store/src/features/supplies/shared/SupplyEditorForm/hooks/useSubmitSupplyForm.ts)

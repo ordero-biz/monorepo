@@ -1,174 +1,142 @@
 import { Textarea, TextField } from '@ordero/ui';
 import { useStore } from '@tanstack/react-form';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
-import { ProductAttributesCombobox } from '../../shared/ProductAttributesCombobox';
 import { ProductCategoryCombobox } from '../../shared/ProductCategoryCombobox';
-import { PRODUCT_GENERATION_MODE } from './constants';
+import { productStatusDescriptions } from './constants';
 import { ProductImageDropzone } from './ProductImageDropzone';
+import { ProductStatusSelector } from './ProductStatusSelector';
 import type { ProductTemplateFieldsProps } from './types';
-import { getAttributeValueSelections } from './utils/productGeneration';
 import {
-  validateProductAttributes,
   validateProductCategory,
   validateProductName,
+  validateProductStatus,
 } from './utils/validations';
 
 export const ProductTemplateFields = ({
   productVariantsGenerationForm,
-  generationMode,
 }: ProductTemplateFieldsProps) => {
   const submissionAttempts = useStore(
     productVariantsGenerationForm.store,
     (state) => state.submissionAttempts
   );
 
-  const requiresAttributes = generationMode === PRODUCT_GENERATION_MODE.many;
-
   return (
-    <div className="grid gap-[var(--space-3)] lg:grid-cols-[1fr_1fr_0.5fr] lg:items-start">
-      <div className="grid gap-[var(--space-3)] lg:col-span-2 lg:grid-cols-2 lg:items-stretch">
-        <div className="flex flex-col gap-[var(--space-2)]">
-          <productVariantsGenerationForm.Field
-            name="name"
-            validators={{
-              onBlur: validateProductName,
-              onChange: validateProductName,
-              onSubmit: validateProductName,
-            }}
-          >
-            {(field) => {
-              const errorText = getFieldSubmitChangeErrorText(
-                field.state.meta,
-                submissionAttempts
-              );
-
-              return (
-                <TextField
-                  errorText={errorText}
-                  invalid={Boolean(errorText)}
-                  label="Base product name"
-                  name={field.name}
-                  onBlur={field.handleBlur}
-                  onValueChange={field.handleChange}
-                  required
-                  size="s"
-                  value={field.state.value}
-                />
-              );
-            }}
-          </productVariantsGenerationForm.Field>
-
-          <productVariantsGenerationForm.Field
-            name="category"
-            validators={{
-              onBlur: validateProductCategory,
-              onChange: validateProductCategory,
-              onSubmit: validateProductCategory,
-            }}
-          >
-            {(field) => {
-              const errorText = getFieldSubmitChangeErrorText(
-                field.state.meta,
-                submissionAttempts
-              );
-
-              return (
-                <ProductCategoryCombobox
-                  errorText={errorText}
-                  invalid={Boolean(errorText)}
-                  label="Category"
-                  name={field.name}
-                  onBlur={field.handleBlur}
-                  onValueChange={field.handleChange}
-                  placeholder="Select category"
-                  required
-                  size="s"
-                  value={field.state.value}
-                />
-              );
-            }}
-          </productVariantsGenerationForm.Field>
-
-          <productVariantsGenerationForm.Field
-            name="attributes"
-            validators={
-              requiresAttributes
-                ? {
-                    onBlur: validateProductAttributes,
-                    onChange: validateProductAttributes,
-                    onSubmit: validateProductAttributes,
-                  }
-                : undefined
-            }
-          >
-            {(field) => {
-              const errorText = getFieldSubmitChangeErrorText(
-                field.state.meta,
-                submissionAttempts
-              );
-
-              return (
-                <ProductAttributesCombobox
-                  errorText={errorText}
-                  helperText={
-                    requiresAttributes
-                      ? 'You must select attributes and their values to generate multiple products'
-                      : 'Optional: Add attributes for a single product'
-                  }
-                  invalid={Boolean(errorText)}
-                  label="Attributes"
-                  multiple
-                  name={field.name}
-                  onBlur={field.handleBlur}
-                  onValueChange={(attributes) => {
-                    field.handleChange(attributes);
-                    productVariantsGenerationForm.setFieldValue(
-                      'attributeValues',
-                      (currentValue) =>
-                        getAttributeValueSelections(currentValue, attributes)
-                    );
-                  }}
-                  placeholder="Select attributes"
-                  required={requiresAttributes}
-                  size="s"
-                  value={field.state.value}
-                />
-              );
-            }}
-          </productVariantsGenerationForm.Field>
-        </div>
-
+    <div className="flex flex-col gap-[var(--space-2)]">
+      <div className="grid gap-[var(--space-2)] md:grid-cols-[minmax(0,1fr)_minmax(var(--space-18),0.27fr)] md:items-start">
         <div className="flex min-w-0 flex-col gap-[var(--space-2)]">
-          <productVariantsGenerationForm.Field name="description">
-            {(field) => {
-              const errorText = getFieldSubmitChangeErrorText(
-                field.state.meta,
-                submissionAttempts
-              );
-
-              return (
-                <Textarea
-                  errorText={errorText}
-                  invalid={Boolean(errorText)}
-                  label="Description"
-                  name={field.name}
-                  onBlur={field.handleBlur}
-                  onValueChange={field.handleChange}
-                  placeholder="Description"
-                  resize="none"
-                  rows={2}
-                  value={field.state.value}
-                />
-              );
-            }}
-          </productVariantsGenerationForm.Field>
+          <div className="grid items-start gap-[var(--space-2)] md:grid-cols-2">
+            <productVariantsGenerationForm.Field
+              name="name"
+              validators={{
+                onBlur: validateProductName,
+                onChange: validateProductName,
+                onSubmit: validateProductName,
+              }}
+            >
+              {(field) => {
+                const errorText = getFieldSubmitChangeErrorText(
+                  field.state.meta,
+                  submissionAttempts
+                );
+                return (
+                  <TextField
+                    label="Product name"
+                    errorText={errorText}
+                    invalid={Boolean(errorText)}
+                    name={field.name}
+                    onBlur={field.handleBlur}
+                    onValueChange={field.handleChange}
+                    required
+                    size="s"
+                    value={field.state.value}
+                  />
+                );
+              }}
+            </productVariantsGenerationForm.Field>
+            <productVariantsGenerationForm.Field
+              name="category"
+              validators={{
+                onBlur: validateProductCategory,
+                onChange: validateProductCategory,
+                onSubmit: validateProductCategory,
+              }}
+            >
+              {(field) => {
+                const errorText = getFieldSubmitChangeErrorText(
+                  field.state.meta,
+                  submissionAttempts
+                );
+                return (
+                  <ProductCategoryCombobox
+                    label="Category"
+                    errorText={errorText}
+                    invalid={Boolean(errorText)}
+                    name={field.name}
+                    onBlur={field.handleBlur}
+                    onValueChange={field.handleChange}
+                    required
+                    size="s"
+                    value={field.state.value}
+                  />
+                );
+              }}
+            </productVariantsGenerationForm.Field>
+          </div>
+          <div className="grid items-start gap-[var(--space-2)] md:grid-cols-2">
+            <productVariantsGenerationForm.Field name="description">
+              {(field) => {
+                const errorText = getFieldSubmitChangeErrorText(
+                  field.state.meta,
+                  submissionAttempts
+                );
+                return (
+                  <Textarea
+                    label="Description"
+                    errorText={errorText}
+                    invalid={Boolean(errorText)}
+                    name={field.name}
+                    onBlur={field.handleBlur}
+                    onValueChange={field.handleChange}
+                    resize="none"
+                    rows={5}
+                    value={field.state.value}
+                  />
+                );
+              }}
+            </productVariantsGenerationForm.Field>
+            <productVariantsGenerationForm.Field
+              name="status"
+              validators={{
+                onChange: validateProductStatus,
+                onSubmit: validateProductStatus,
+              }}
+            >
+              {(field) => {
+                const errorText = getFieldSubmitChangeErrorText(
+                  field.state.meta,
+                  submissionAttempts
+                );
+                return (
+                  <ProductStatusSelector
+                    {...productStatusDescriptions}
+                    activeDescription="Allow active variants to be supplied and sold. Choose individual variant statuses in the next step."
+                    errorText={errorText}
+                    invalid={Boolean(errorText)}
+                    label="Status after creation"
+                    name={field.name}
+                    onValueChange={field.handleChange}
+                    value={field.state.value}
+                  />
+                );
+              }}
+            </productVariantsGenerationForm.Field>
+          </div>
         </div>
+        <ProductImageDropzone
+          className="aspect-square w-full min-w-0 text-center"
+          titleId="product-setup-image-title"
+        />
       </div>
-
-      <ProductImageDropzone
-        className="aspect-square w-full"
-        titleId="product-add-image-title"
-      />
     </div>
   );
 };

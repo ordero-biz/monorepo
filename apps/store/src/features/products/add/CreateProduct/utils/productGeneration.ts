@@ -20,13 +20,6 @@ type GetGeneratedProductVariantsArgs = {
   productName: string;
 };
 
-type UpdateAttributeValueSelectionArgs = {
-  attributeId: string;
-  attributeValueId: string;
-  attributeValuesByAttributeId: Record<string, string[]>;
-  pressed: boolean;
-};
-
 export const getAttributeValueSelections = (
   currentValue: Record<string, string[]>,
   attributes: AttributeDropdown[]
@@ -48,26 +41,6 @@ export const getAttributeValueSelections = (
       ];
     })
   );
-
-export const updateAttributeValueSelection = ({
-  attributeId,
-  attributeValueId,
-  attributeValuesByAttributeId,
-  pressed,
-}: UpdateAttributeValueSelectionArgs) => {
-  const selectedAttributeValueIds =
-    attributeValuesByAttributeId[attributeId] ?? [];
-
-  return {
-    ...attributeValuesByAttributeId,
-    [attributeId]: pressed
-      ? [...selectedAttributeValueIds, attributeValueId]
-      : selectedAttributeValueIds.filter(
-          (selectedAttributeValueId) =>
-            selectedAttributeValueId !== attributeValueId
-        ),
-  };
-};
 
 export const getSelectedAttributeValueGroups = (
   attributes: AttributeDropdown[],
@@ -183,7 +156,7 @@ export const getProductVariantsGeneratedArgs = ({
 }: {
   generationMode: ProductGenerationMode;
   value: ProductGenerationValues;
-}): ProductVariantsGeneratedArgs => {
+}): Omit<ProductVariantsGeneratedArgs, 'status'> => {
   const productVariants =
     generationMode === PRODUCT_GENERATION_MODE.many
       ? getGeneratedProductVariants({
