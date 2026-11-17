@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import AddProductPage from './page';
 
@@ -18,6 +18,16 @@ describe('AddProductPage', () => {
     expect(
       screen.getByRole('heading', { name: 'Create product' })
     ).toBeVisible();
+    const breadcrumbs = within(
+      screen.getByRole('navigation', { name: 'Breadcrumb' })
+    );
+    expect(breadcrumbs.getByRole('link', { name: 'Products' })).toHaveAttribute(
+      'href',
+      '/products'
+    );
+    expect(
+      breadcrumbs.getByText('Product setup · Step 1 of 2')
+    ).toHaveAttribute('aria-current', 'page');
     expect(screen.getByRole('radio', { name: 'Single variant' })).toBeChecked();
   });
 });

@@ -1,15 +1,17 @@
 'use client';
 
-import { PageHeader, Typography } from '@ordero/ui';
+import { PageHeader } from '@ordero/ui';
 import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { clientRoutes } from '@/lib/client/routes';
+import { AppBreadcrumbs } from '@/lib/components/AppBreadcrumbs';
 import { PRODUCT_STATUS } from '@/lib/domain/products/constants';
 import {
   productGroupsQueryKeys,
   productVariantsQueryKeys,
 } from '@/lib/query/products/productsQueryKeys';
+import { productsRootBreadcrumb } from '../../shared/breadcrumbs';
 import { CommonProductData } from './CommonProductData';
 import { PRODUCT_GENERATION_MODE } from './constants';
 import { useCreateProductForm } from './hooks/useCreateProductForm';
@@ -106,11 +108,17 @@ export const CreateProduct = () => {
             <h1 className="text-[length:var(--h5-size-mobile)] leading-[var(--h5-line-height-mobile)] font-[var(--h5-weight)] [font-family:var(--h5-family)] tracking-[var(--h5-letter-spacing)] md:text-[length:var(--h5-size-desktop)] md:leading-[var(--h5-line-height-desktop)]">
               Create product
             </h1>
-            <Typography color="text-secondary" variant="body2">
-              {isProductVariantGenerationStage
-                ? 'Step 1 of 2 · Product setup'
-                : 'Step 2 of 2 · Review & create'}
-            </Typography>
+            <AppBreadcrumbs
+              items={[
+                productsRootBreadcrumb,
+                {
+                  id: 'product-creation-step',
+                  label: isProductVariantGenerationStage
+                    ? 'Product setup · Step 1 of 2'
+                    : 'Review & create · Step 2 of 2',
+                },
+              ]}
+            />
           </header>
         </PageHeader.Left>
       </PageHeader.Root>

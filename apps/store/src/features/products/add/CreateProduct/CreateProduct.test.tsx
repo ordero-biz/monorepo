@@ -1097,16 +1097,21 @@ describe('Product creation', () => {
     expect(
       screen.getByText('You’re creating 1 product with 1 variant')
     ).toBeVisible();
-    expect(screen.getByText('Step 2 of 2 · Review & create')).toBeVisible();
+    const breadcrumbs = within(
+      screen.getByRole('navigation', { name: 'Breadcrumb' })
+    );
     expect(
-      screen.queryByText('Step 1 of 2 · Product setup')
+      breadcrumbs.getByText('Review & create · Step 2 of 2')
+    ).toHaveAttribute('aria-current', 'page');
+    expect(
+      breadcrumbs.queryByText('Product setup · Step 1 of 2')
     ).not.toBeInTheDocument();
   });
 
   it('lets users choose how variants are generated', async () => {
     const user = userEvent.setup();
     setup();
-    expect(screen.getByText('Step 1 of 2 · Product setup')).toBeVisible();
+    expect(screen.getByText('Product setup · Step 1 of 2')).toBeVisible();
     expect(
       within(
         screen.getByRole('complementary', {
