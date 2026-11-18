@@ -1,4 +1,5 @@
 import type { Ref } from 'react';
+import type { TransferDetails } from '@/lib/domain/transfers/types';
 import type { UnitOfMeasurement } from '@/lib/domain/units-of-measurement/types';
 import type {
   WarehouseSelection,
@@ -33,6 +34,8 @@ export type TransferFormValues = {
   transferEntries: TransferEntryFormValues[];
 };
 
+export type TransferSubmitIntent = 'draft' | 'transfer';
+
 export type TransferForm = ReturnType<typeof useCreateTransferForm>['form'];
 
 export type CreateTransferProps = {
@@ -48,6 +51,7 @@ export type PendingSourceWarehouseChange = {
 };
 
 export type TransferInformationProps = {
+  disabled: boolean;
   form: TransferForm;
   onSourceWarehouseChange: (
     warehouse: TransferWarehouseSelection | null
@@ -61,9 +65,21 @@ export type SourceWarehouseChangeDialogProps = {
   onConfirm: () => void;
 };
 
+export type StartTransferDialogProps = {
+  disabled: boolean;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onConfirm: () => void;
+};
+
 export type TransferEntriesProps = {
+  disabled: boolean;
   entries: TransferEntryFormValues[];
   form: TransferForm;
+  pendingIntent: TransferSubmitIntent | null;
+  onSaveDraft: () => void;
+  onReviewTransfer: () => Promise<boolean>;
+  onTransfer: () => void;
 };
 
 export type TransferActionsProps = {
@@ -73,10 +89,15 @@ export type TransferActionsProps = {
   selectedCount: number;
   onClearSelection: () => void;
   onDeleteSelected: () => void;
+  pendingIntent: TransferSubmitIntent | null;
+  onSaveDraft: () => void;
+  onReviewTransfer: () => Promise<boolean>;
+  onTransfer: () => void;
 };
 
 export type UseCreateTransferFormArgs = {
   defaultValues: TransferFormValues;
+  onCreated: (transfer: TransferDetails) => Promise<void> | void;
 };
 
 export type TransferWarehouseReviewDialogProps = {

@@ -10,6 +10,7 @@ import {
 } from './validations';
 
 export const TransferInformation = ({
+  disabled,
   form,
   onSourceWarehouseChange,
   sourceWarehouseRef,
@@ -46,6 +47,7 @@ export const TransferInformation = ({
 
                 return (
                   <TextField
+                    disabled={disabled}
                     errorText={errorText}
                     invalid={Boolean(errorText)}
                     label="Name"
@@ -74,6 +76,7 @@ export const TransferInformation = ({
 
                 return (
                   <TransferWarehouseCombobox
+                    disabled={disabled}
                     errorText={errorText}
                     invalid={Boolean(errorText)}
                     label="From warehouse"
@@ -109,6 +112,7 @@ export const TransferInformation = ({
 
                 return (
                   <TransferWarehouseCombobox
+                    disabled={disabled}
                     errorText={errorText}
                     invalid={Boolean(errorText)}
                     isOptionDisabled={(warehouse) =>
@@ -130,6 +134,7 @@ export const TransferInformation = ({
           <form.Field name="comment">
             {(field) => (
               <Textarea
+                disabled={disabled}
                 label="Comment"
                 name={field.name}
                 onBlur={field.handleBlur}

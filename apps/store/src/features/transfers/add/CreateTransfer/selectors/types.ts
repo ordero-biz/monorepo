@@ -25,6 +25,7 @@ export type SourceStockAsyncComboboxProps = Pick<
 
 export type TransferWarehouseComboboxProps = Pick<
   WarehousesAsyncComboboxProps,
+  | 'disabled'
   | 'errorText'
   | 'invalid'
   | 'isOptionDisabled'
