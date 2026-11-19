@@ -14,7 +14,7 @@ import {
   UnitsOfMeasurementAsyncCombobox,
 } from './selectors';
 import type { SupplyEntriesProps, SupplyEntryFormValues } from './types';
-import { hasOnlyBlankSupplyEntry, isBlankSupplyEntry } from './utils';
+import { hasOnlyBlankSupplyEntry, isBlankSupplyEntry } from './utils/entries';
 import {
   type SupplyEntryValidatedField,
   validateSupplyEntryField,

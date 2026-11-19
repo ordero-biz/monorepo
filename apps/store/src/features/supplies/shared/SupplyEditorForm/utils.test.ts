@@ -5,7 +5,7 @@ import {
   getSupplyEntriesPayload,
   getSupplyFormDefaults,
   getSupplyTotal,
-} from './utils';
+} from './utils/entries';
 
 const completeEntry: SupplyEntryFormValues = {
   ...createEmptySupplyEntry('new-1'),

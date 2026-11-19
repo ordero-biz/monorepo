@@ -2,7 +2,7 @@ import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import type { SupplyEntryFormValues } from '../../../shared/SupplyEditorForm/types';
-import { createEmptySupplyEntry } from '../../../shared/SupplyEditorForm/utils';
+import { createEmptySupplyEntry } from '../../../shared/SupplyEditorForm/utils/entries';
 import {
   SupplyProductsComparison,
   SupplyProductsTable,

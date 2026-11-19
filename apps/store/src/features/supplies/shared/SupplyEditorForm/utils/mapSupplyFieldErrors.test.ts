@@ -1,4 +1,4 @@
-import { createEmptySupplyEntry } from '../utils';
+import { createEmptySupplyEntry } from './entries';
 import { mapSupplyFieldErrors } from './mapSupplyFieldErrors';
 
 describe('mapSupplyFieldErrors', () => {

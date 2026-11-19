@@ -4,17 +4,17 @@ import { Info } from 'lucide-react';
 import { PRODUCT_STATUS } from '@/lib/domain/products/constants';
 import { useInitialFocus } from '@/lib/hooks/accessibility/useInitialFocus';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
+import { ProductCategoryCombobox } from '../../shared/ProductCategoryCombobox';
+import { productStatusDescriptions } from './constants';
+import { useProductDetailsForm } from './hooks/useProductDetailsForm';
+import { ProductImagePlaceholder } from './ProductImagePlaceholder';
+import { ProductStatusSelector } from './ProductStatusSelector';
+import type { ProductDetailsEditorProps } from './types';
 import {
-  ProductStatusSelector,
   validateProductCategory,
   validateProductName,
   validateProductStatus,
-} from '../../add/CreateProduct';
-import { productStatusDescriptions } from '../../add/CreateProduct/constants';
-import { ProductCategoryCombobox } from '../../shared/ProductCategoryCombobox';
-import { useProductDetailsForm } from './hooks/useProductDetailsForm';
-import { ProductImagePlaceholder } from './ProductImagePlaceholder';
-import type { ProductDetailsEditorProps } from './types';
+} from './utils/validations';
 
 export const ProductDetailsEditor = ({
   activeVariantCount,

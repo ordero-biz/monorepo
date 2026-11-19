@@ -4,10 +4,10 @@ import { StrictMode, useLayoutEffect, useState } from 'react';
 import { createProductGroup } from '@/lib/client/api/products';
 import type { AttributeDropdown } from '@/lib/domain/attributes/types';
 import { prepareStoreSetup } from '@/test/prepareSetup';
-import type { CreateProductVariantValues } from '../../add/CreateProduct/types';
-import { validateMultipleProductsConfiguration } from '../../add/CreateProduct/utils/validations';
 import { useCreateProductForm } from './hooks/useCreateProductForm';
 import { ProductVariantsTable } from './ProductVariantsTable';
+import type { CreateProductVariantValues } from './types';
+import { validateMultipleProductsConfiguration } from './utils/validations';
 
 vi.mock('@/lib/client/api/products', async () => ({
   ...(await vi.importActual<typeof import('@/lib/client/api/products')>(

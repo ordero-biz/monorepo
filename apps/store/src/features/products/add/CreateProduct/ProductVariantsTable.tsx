@@ -1,16 +1,14 @@
 import { DataTable, Typography } from '@ordero/ui';
 import { useStore } from '@tanstack/react-form';
 import { useEffect, useMemo, useState } from 'react';
-import {
-  PRODUCT_GENERATION_MODE,
-  useIncrementalProductVariants,
-  useProductVariantAttributes,
-} from '../../add/CreateProduct';
-import { getInvalidProductVariantIndexes } from '../../add/CreateProduct/utils/productVariantErrors';
 import { getColumns } from './columns';
+import { PRODUCT_GENERATION_MODE } from './constants';
 import { EditGeneratedProductVariantAttributes } from './EditGeneratedProductVariantAttributes';
+import { useIncrementalProductVariants } from './hooks/useIncrementalProductVariants';
+import { useProductVariantAttributes } from './hooks/useProductVariantAttributes';
 import { ProductVariantDetails } from './ProductVariantDetails';
 import type { ProductVariantsTableProps } from './types';
+import { getInvalidProductVariantIndexes } from './utils/productVariantErrors';
 
 // Generated variants have a fixed order and no removal/reordering in this step.
 const getRowId = (variantIndex: number) => String(variantIndex);

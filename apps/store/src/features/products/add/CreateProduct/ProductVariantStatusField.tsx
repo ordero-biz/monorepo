@@ -5,8 +5,8 @@ import { PRODUCT_STATUS } from '@/lib/domain/products/constants';
 import type { ProductStatus } from '@/lib/domain/products/types';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
 import type { ValidationArgs } from '@/lib/utils/form/validation/types';
-import { validateProductVariantStatus } from '../../add/CreateProduct/utils/validations';
 import type { ProductVariantStatusFieldProps } from './types';
+import { validateProductVariantStatus } from './utils/validations';
 
 export const ProductVariantStatusField = memo(
   ({ form, variantIndex }: ProductVariantStatusFieldProps) => {

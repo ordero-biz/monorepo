@@ -48,6 +48,10 @@ export const TransferEntries = ({
     );
   }, [form]);
 
+  const scheduleScrollAfterAppend = () => {
+    scrollAfterEntryCount.current = entries.length + 1;
+  };
+
   useEffect(() => {
     if (scrollAfterEntryCount.current !== entries.length) {
       return;
@@ -107,7 +111,7 @@ export const TransferEntries = ({
         <Button
           disabled={disabled || Boolean(lastEntry && !lastEntry.stockItem)}
           onClick={() => {
-            scrollAfterEntryCount.current = entries.length + 1;
+            scheduleScrollAfterAppend();
             appendEntry();
           }}
           ref={addProductButtonRef}

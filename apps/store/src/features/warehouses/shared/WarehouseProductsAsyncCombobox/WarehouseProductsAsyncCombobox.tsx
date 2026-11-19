@@ -1,25 +1,33 @@
 'use client';
 
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { getWarehouseStock } from '@/lib/client/api/warehouses';
 import {
   AsyncCombobox,
   type AsyncComboboxLoadOptionsArgs,
   type AsyncComboboxLoadOptionsResult,
+  type AsyncComboboxSingleProps,
 } from '@/lib/components/AsyncCombobox';
+import type { WarehouseProductSelection } from '@/lib/domain/warehouses/types';
 import { warehousesQueryKeys } from '@/lib/query/warehouses/warehousesQueryKeys';
-import type { TransferStockItemSelection } from '../types';
-import { getStockItemKey, getUnitOfMeasurementLabel } from '../utils/entries';
-import type { SourceStockAsyncComboboxProps } from './types';
+import type { WarehouseProductsAsyncComboboxProps } from './types';
 
-const getStockItemLabel = ({ productVariant }: TransferStockItemSelection) =>
+const getWarehouseProductKey = (stockItem: WarehouseProductSelection) =>
+  `${stockItem.productVariant.id}:${stockItem.unitOfMeasurement.id}`;
+const getWarehouseProductLabel = ({
+  productVariant,
+}: WarehouseProductSelection) =>
   productVariant.sku
     ? `${productVariant.name} · ${productVariant.sku}`
     : productVariant.name;
 
-const renderStockItemOption = (stockItem: TransferStockItemSelection) => (
+const getUnitOfMeasurementLabel = (
+  unit: WarehouseProductSelection['unitOfMeasurement']
+) => (unit.symbol ? `${unit.name} (${unit.symbol})` : unit.name);
+
+const renderWarehouseProductOption = (stockItem: WarehouseProductSelection) => (
   <span className="flex min-w-0 flex-1 items-center justify-between gap-[var(--space-2)]">
-    <span className="truncate">{getStockItemLabel(stockItem)}</span>
+    <span className="truncate">{getWarehouseProductLabel(stockItem)}</span>
     {/* Keeps the SKU and stock count apart in the option's accessible name. */}
     <span className="sr-only">, </span>
     <span className="shrink-0 text-muted-foreground">
@@ -29,16 +37,37 @@ const renderStockItemOption = (stockItem: TransferStockItemSelection) => (
   </span>
 );
 
-export const SourceStockAsyncCombobox = ({
+export const WarehouseProductsAsyncCombobox = ({
+  'aria-label': ariaLabel,
+  disabled,
+  disabledProductKeys,
+  errorText,
+  invalid,
+  name,
+  onBlur,
+  onValueChange,
+  placeholder,
+  required,
+  size,
+  value,
   warehouseId,
-  ...props
-}: SourceStockAsyncComboboxProps) => {
+}: WarehouseProductsAsyncComboboxProps) => {
+  const disabledStockItemKeySet = useMemo(
+    () => new Set(disabledProductKeys),
+    [disabledProductKeys]
+  );
+  const isOptionDisabled = useCallback(
+    (stockItem: WarehouseProductSelection) =>
+      disabledStockItemKeySet.has(getWarehouseProductKey(stockItem)),
+    [disabledStockItemKeySet]
+  );
+
   const loadStockOptions = useCallback(
     async ({
       page,
       pageSize,
     }: AsyncComboboxLoadOptionsArgs): Promise<
-      AsyncComboboxLoadOptionsResult<TransferStockItemSelection>
+      AsyncComboboxLoadOptionsResult<WarehouseProductSelection>
     > => {
       if (warehouseId === null) {
         return { options: [] };
@@ -76,21 +105,31 @@ export const SourceStockAsyncCombobox = ({
   );
 
   return (
-    <AsyncCombobox<TransferStockItemSelection>
-      {...props}
-      disabled={props.disabled || warehouseId === null}
+    <AsyncCombobox<WarehouseProductSelection>
+      aria-label={ariaLabel}
+      disabled={disabled || warehouseId === null}
       emptyText="No products in stock"
-      getOptionLabel={getStockItemLabel}
-      getOptionValue={getStockItemKey}
+      errorText={errorText}
+      getOptionLabel={getWarehouseProductLabel}
+      getOptionValue={getWarehouseProductKey}
+      invalid={invalid}
+      isOptionDisabled={isOptionDisabled}
       loadErrorText="We couldn't load warehouse stock right now."
       loadOptions={loadStockOptions}
       loadingText="Loading stock..."
+      name={name}
+      onBlur={onBlur}
+      onValueChange={onValueChange}
       pageSize={100}
+      placeholder={placeholder}
       queryKey={[
         ...warehousesQueryKeys.stock(warehouseId ?? 'none'),
         'combobox',
       ]}
-      renderOption={renderStockItemOption}
+      required={required}
+      renderOption={renderWarehouseProductOption}
+      size={size}
+      value={value}
     />
   );
 };

@@ -130,10 +130,10 @@ export const ReviewTransferWarehouse = ({
           </Typography>
         </div>
       </Dialog.Content>
-      <Dialog.Footer hideCloseButton>
-        <Dialog.Close disabled={publishWarehouse.isPending}>
-          Cancel
-        </Dialog.Close>
+      <Dialog.Footer
+        closeButtonLabel="Cancel"
+        closeDisabled={publishWarehouse.isPending}
+      >
         <Button
           color="primary"
           disabled={publishWarehouse.isPending || (!canSelect && !canPublish)}

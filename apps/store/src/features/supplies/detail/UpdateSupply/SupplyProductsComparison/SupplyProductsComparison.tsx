@@ -2,7 +2,7 @@ import { DataTable, Typography } from '@ordero/ui';
 import { useMemo } from 'react';
 import type { FormFieldRenderer } from '@/lib/components/FormConflictResolver';
 import type { SupplyEntryFormValues } from '../../../shared/SupplyEditorForm/types';
-import { isBlankSupplyEntry } from '../../../shared/SupplyEditorForm/utils';
+import { isBlankSupplyEntry } from '../../../shared/SupplyEditorForm/utils/entries';
 import { getAddedSupplyEntries } from '../utils/mergeSupplyChanges';
 import { columns } from './columns';
 import type {

@@ -1,27 +1,5 @@
 import type { WarehousesAsyncComboboxProps } from '@/features/warehouses/shared/WarehousesAsyncCombobox';
-import type { AsyncComboboxSingleProps } from '@/lib/components/AsyncCombobox';
-import type {
-  TransferStockItemSelection,
-  TransferWarehouseSelection,
-} from '../types';
-
-export type SourceStockAsyncComboboxProps = Pick<
-  AsyncComboboxSingleProps<TransferStockItemSelection>,
-  | 'aria-label'
-  | 'disabled'
-  | 'errorText'
-  | 'invalid'
-  | 'isOptionDisabled'
-  | 'name'
-  | 'onBlur'
-  | 'onValueChange'
-  | 'placeholder'
-  | 'required'
-  | 'size'
-  | 'value'
-> & {
-  warehouseId: number | null;
-};
+import type { TransferWarehouseSelection } from '../types';
 
 export type TransferWarehouseComboboxProps = Pick<
   WarehousesAsyncComboboxProps,

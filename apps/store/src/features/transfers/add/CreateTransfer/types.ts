@@ -1,23 +1,15 @@
 import type { Ref } from 'react';
 import type { TransferDetails } from '@/lib/domain/transfers/types';
-import type { UnitOfMeasurement } from '@/lib/domain/units-of-measurement/types';
 import type {
+  WarehouseProductSelection,
   WarehouseSelection,
-  WarehouseStockItem,
 } from '@/lib/domain/warehouses/types';
 import type { useCreateTransferForm } from './hooks/useCreateTransferForm';
 
 export type TransferWarehouseSelection = WarehouseSelection;
 
 /** One stock line of the source warehouse: a product variant in one unit. */
-export type TransferStockItemSelection = {
-  productVariant: Pick<
-    WarehouseStockItem['productVariant'],
-    'id' | 'name' | 'sku'
-  >;
-  unitOfMeasurement: Pick<UnitOfMeasurement, 'id' | 'name' | 'symbol'>;
-  available: number;
-};
+export type TransferStockItemSelection = WarehouseProductSelection;
 
 export type TransferEntryFormValues = {
   clientId: string;

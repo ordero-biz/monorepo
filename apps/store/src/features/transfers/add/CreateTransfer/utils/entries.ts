@@ -1,7 +1,18 @@
 import type {
   TransferEntryFormValues,
+  TransferFormValues,
   TransferStockItemSelection,
 } from '../types';
+
+export const getTransferFormDefaults = (
+  sourceWarehouse: TransferFormValues['sourceWarehouse'] = null
+): TransferFormValues => ({
+  transferNumber: '',
+  sourceWarehouse,
+  destinationWarehouse: null,
+  comment: '',
+  transferEntries: [createEmptyTransferEntry('initial-placeholder')],
+});
 
 export const createEmptyTransferEntry = (
   clientId: string

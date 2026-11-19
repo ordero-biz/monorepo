@@ -1,6 +1,8 @@
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
-import type { ProductVariantsCreationFormApi } from '../../../add/CreateProduct';
-import type { ProductDetailsErrors } from '../types';
+import type {
+  ProductDetailsErrors,
+  ProductVariantsCreationFormApi,
+} from '../types';
 
 const detailFields = ['name', 'category', 'status', 'description'] as const;
 

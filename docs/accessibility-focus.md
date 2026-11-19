@@ -154,9 +154,9 @@ wrapper. Close editing after valid Apply or Cancel; failed validation keeps
 the editor open.
 
 The working example is
-[`CommonProductData`](../apps/store/src/features/products/add2/CreateProduct/CommonProductData.tsx)
+[`CommonProductData`](../apps/store/src/features/products/add/CreateProduct/CommonProductData.tsx)
 and its child
-[`ProductDetailsEditor`](../apps/store/src/features/products/add2/CreateProduct/ProductDetailsEditor.tsx).
+[`ProductDetailsEditor`](../apps/store/src/features/products/add/CreateProduct/ProductDetailsEditor.tsx).
 Field ordering and field names do not need a parallel focus-ref list.
 
 ## Verify behavior
@@ -179,6 +179,6 @@ and [Form Architecture](forms.md) for the surrounding conventions.
 From the repository root:
 
 ```sh
-pnpm --dir apps/store exec vitest run src/lib/hooks/accessibility/useInitialFocus.test.tsx src/lib/hooks/accessibility/useRestoreFocus.test.tsx src/features/products/add2/CreateProduct/CreateProduct.test.tsx
+pnpm --dir apps/store exec vitest run src/lib/hooks/accessibility/useInitialFocus.test.tsx src/lib/hooks/accessibility/useRestoreFocus.test.tsx src/features/products/add/CreateProduct/CreateProduct.test.tsx
 pnpm --dir apps/store exec tsc --noEmit
 ```
