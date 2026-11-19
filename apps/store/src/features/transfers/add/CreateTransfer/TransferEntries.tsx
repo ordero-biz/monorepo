@@ -26,7 +26,6 @@ export const TransferEntries = ({
   entries,
   form,
   onSaveDraft,
-  onValidateTransfer,
   onTransfer,
   pendingIntent,
 }: TransferEntriesProps) => {
@@ -132,7 +131,6 @@ export const TransferEntries = ({
         {...getTransferSummary(entries)}
         deleteDisabled={disabled || hasOnlyBlankTransferEntry(entries)}
         onClearSelection={clearSelection}
-        onValidateTransfer={onValidateTransfer}
         onSaveDraft={onSaveDraft}
         onTransfer={onTransfer}
         pendingIntent={pendingIntent}

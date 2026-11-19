@@ -69,7 +69,6 @@ export type TransferEntriesProps = {
   form: TransferForm;
   pendingIntent: TransferSubmitIntent | null;
   onSaveDraft: () => void;
-  onValidateTransfer: () => Promise<boolean>;
   onTransfer: () => void;
 };
 
@@ -82,7 +81,6 @@ export type TransferActionsProps = {
   onDeleteSelected: () => void;
   pendingIntent: TransferSubmitIntent | null;
   onSaveDraft: () => void;
-  onValidateTransfer: () => Promise<boolean>;
   onTransfer: () => void;
 };
 

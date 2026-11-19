@@ -33,7 +33,7 @@ export const CreateTransferForm = ({
     });
   const isReviewOpen = sourceWarehouseMode === 'review';
 
-  const { form, submit, validateTransfer, pendingIntent } =
+  const { form, submit, pendingIntent } =
     useCreateTransferForm({
       defaultValues: getTransferFormDefaults(
         sourceWarehouseMode === 'prefill' && isSourceWarehouseActive
@@ -90,7 +90,6 @@ export const CreateTransferForm = ({
             disabled={disabled}
             entries={entries}
             form={form}
-            onValidateTransfer={validateTransfer}
             onSaveDraft={() => submit('draft')}
             onTransfer={() => submit('transfer')}
             pendingIntent={pendingIntent}
