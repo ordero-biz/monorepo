@@ -1,7 +1,9 @@
 import { useStore } from '@tanstack/react-form';
-import { EditProductVariantAttributesDialog } from '../../add/CreateProduct/EditProductVariantAttributesDialog';
-import type { ProductVariantAttributesUpdate } from '../../add/CreateProduct/types';
-import type { EditGeneratedProductVariantAttributesProps } from './types';
+import { EditProductVariantAttributesDialog } from './EditProductVariantAttributesDialog';
+import type {
+  EditGeneratedProductVariantAttributesProps,
+  ProductVariantAttributesUpdate,
+} from './types';
 
 export const EditGeneratedProductVariantAttributes = ({
   allowMultipleValuesPerAttribute,

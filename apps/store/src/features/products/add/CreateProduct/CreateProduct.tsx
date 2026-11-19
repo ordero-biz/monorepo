@@ -1,23 +1,74 @@
 'use client';
 
-import { PageHeader, Typography } from '@ordero/ui';
+import { PageHeader } from '@ordero/ui';
+import { useQueryClient } from '@tanstack/react-query';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { clientRoutes } from '@/lib/client/routes';
+import { AppBreadcrumbs } from '@/lib/components/AppBreadcrumbs';
+import { PRODUCT_STATUS } from '@/lib/domain/products/constants';
+import {
+  productGroupsQueryKeys,
+  productVariantsQueryKeys,
+} from '@/lib/query/products/productsQueryKeys';
+import { productsRootBreadcrumb } from '../../shared/breadcrumbs';
+import { CommonProductData } from './CommonProductData';
+import { PRODUCT_GENERATION_MODE } from './constants';
 import { useCreateProductForm } from './hooks/useCreateProductForm';
 import { useProductGenerationState } from './hooks/useProductGenerationState';
 import { useProductVariantsGenerationForm } from './hooks/useProductVariantsGenerationForm';
 import { ProductVariantsCreationForm } from './ProductVariantsCreationForm';
 import { ProductVariantsGenerationForm } from './ProductVariantsGenerationForm';
-import type { CreateProductProps } from './types';
+import { ProductVariantsTable } from './ProductVariantsTable';
+import type {
+  ProductCommonValues,
+  ProductVariantsGeneratedArgs,
+} from './types';
+import {
+  getProductDetailsErrors,
+  getProductDetailsFormErrors,
+} from './utils/getProductDetailsErrors';
+import { updateProductDetails } from './utils/updateProductDetails';
+import {
+  validateMultipleProductsConfiguration,
+  validateSingleProductConfiguration,
+} from './utils/validations';
 
-export const CreateProduct = ({
-  generationMode,
-  maxGeneratedProductVariants,
-  onCreated,
-  validateConfiguration,
-}: CreateProductProps) => {
-  const { form: productVariantsCreationForm } = useCreateProductForm({
-    onCreated,
-    validateConfiguration,
-  });
+export const CreateProduct = () => {
+  const queryClient = useQueryClient();
+  const router = useRouter();
+
+  const [isEditingProductDetails, setIsEditingProductDetails] = useState(false);
+
+  const openProductDetailsEditorForErrors = (
+    fieldErrors: Record<string, string>
+  ) => {
+    const errors = getProductDetailsErrors(fieldErrors);
+    if (Object.keys(errors).length > 0) {
+      setIsEditingProductDetails(true);
+    }
+  };
+
+  const { form: productVariantsCreationForm, submitProductForm } =
+    useCreateProductForm({
+      onFieldErrors: openProductDetailsEditorForErrors,
+      onCreated: async () => {
+        await Promise.all([
+          queryClient.invalidateQueries({
+            queryKey: productGroupsQueryKeys.list,
+          }),
+          queryClient.invalidateQueries({
+            queryKey: productVariantsQueryKeys.list,
+          }),
+        ]);
+        router.push(clientRoutes.products);
+      },
+      validateConfiguration: (value) =>
+        productVariantsGenerationForm.getFieldValue('generationMode') ===
+        PRODUCT_GENERATION_MODE.one
+          ? validateSingleProductConfiguration(value)
+          : validateMultipleProductsConfiguration(value),
+    });
 
   const {
     generatedAttributes,
@@ -26,13 +77,13 @@ export const CreateProduct = ({
   } = useProductGenerationState();
 
   const handleProductVariantsGenerated = (
-    args: Parameters<typeof onProductVariantsGenerated>[0]
+    args: ProductVariantsGeneratedArgs
   ) => {
     onProductVariantsGenerated(args);
-
     productVariantsCreationForm.setFieldValue('category', args.category);
     productVariantsCreationForm.setFieldValue('description', args.description);
     productVariantsCreationForm.setFieldValue('name', args.name);
+    productVariantsCreationForm.setFieldValue('status', args.status);
     productVariantsCreationForm.setFieldValue(
       'productVariants',
       args.productVariants
@@ -41,33 +92,98 @@ export const CreateProduct = ({
 
   const { form: productVariantsGenerationForm } =
     useProductVariantsGenerationForm({
-      generationMode,
-      maxGeneratedProductVariants,
       onProductVariantsGenerated: handleProductVariantsGenerated,
     });
 
+  const applyProductDetails = (values: ProductCommonValues) => {
+    updateProductDetails({ form: productVariantsCreationForm, values });
+    setIsEditingProductDetails(false);
+  };
+
   return (
-    <>
+    <div className="flex flex-col gap-[var(--space-2)]">
       <PageHeader.Root>
         <PageHeader.Left>
-          <Typography variant="h5">Create product</Typography>
+          <header className="flex min-w-0 flex-col gap-[var(--space-0-5)]">
+            <h1 className="text-[length:var(--h5-size-mobile)] leading-[var(--h5-line-height-mobile)] font-[var(--h5-weight)] [font-family:var(--h5-family)] tracking-[var(--h5-letter-spacing)] md:text-[length:var(--h5-size-desktop)] md:leading-[var(--h5-line-height-desktop)]">
+              Create product
+            </h1>
+            <AppBreadcrumbs
+              items={[
+                productsRootBreadcrumb,
+                {
+                  id: 'product-creation-step',
+                  label: isProductVariantGenerationStage
+                    ? 'Product setup · Step 1 of 2'
+                    : 'Review & create · Step 2 of 2',
+                },
+              ]}
+            />
+          </header>
         </PageHeader.Left>
-        <PageHeader.Right></PageHeader.Right>
       </PageHeader.Root>
-
       {isProductVariantGenerationStage ? (
         <ProductVariantsGenerationForm
           productVariantsGenerationForm={productVariantsGenerationForm}
-          generationMode={generationMode}
-          maxGeneratedProductVariants={maxGeneratedProductVariants}
         />
       ) : (
         <ProductVariantsCreationForm
+          onSubmit={submitProductForm}
+          variantFields={
+            <ProductVariantsTable
+              productVariantsCreationForm={productVariantsCreationForm}
+              generatedAttributes={generatedAttributes}
+              generationMode={productVariantsGenerationForm.getFieldValue(
+                'generationMode'
+              )}
+            />
+          }
+          isEditingProductDetails={isEditingProductDetails}
+          commonProductFields={
+            <productVariantsCreationForm.Subscribe
+              selector={(state) =>
+                [
+                  state.values.name,
+                  state.values.category,
+                  state.values.description,
+                  state.values.status,
+                  state.values.productVariants.length,
+                  state.values.productVariants.filter(
+                    (variant) => variant.status === PRODUCT_STATUS.ACTIVE
+                  ).length,
+                  state.fieldMeta,
+                  state.submissionAttempts,
+                ] as const
+              }
+            >
+              {([
+                name,
+                category,
+                description,
+                status,
+                variantCount,
+                activeVariantCount,
+                fieldMeta,
+                submissionAttempts,
+              ]) => (
+                <CommonProductData
+                  values={{ name, category, description, status }}
+                  variantCount={variantCount}
+                  activeVariantCount={activeVariantCount}
+                  isEditing={isEditingProductDetails}
+                  editorErrors={getProductDetailsFormErrors({
+                    fieldMeta,
+                    submissionAttempts,
+                  })}
+                  onEditingChange={setIsEditingProductDetails}
+                  onApply={applyProductDetails}
+                />
+              )}
+            </productVariantsCreationForm.Subscribe>
+          }
           productVariantsCreationForm={productVariantsCreationForm}
-          generatedAttributes={generatedAttributes}
-          generationMode={generationMode}
         />
       )}
-    </>
+    </div>
   );
 };

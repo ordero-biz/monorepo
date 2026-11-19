@@ -1,4 +1,4 @@
-import { PRODUCT_GENERATION_MODE } from '../../../add/CreateProduct';
+import { PRODUCT_GENERATION_MODE } from '../constants';
 import { getVariantCount } from './getVariantCount';
 
 describe('Variant count', () => {

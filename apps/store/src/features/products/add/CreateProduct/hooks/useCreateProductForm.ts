@@ -60,7 +60,15 @@ export const useCreateProductForm = ({
     },
   });
 
-  return {
-    form,
+  const submitProductForm = async () => {
+    if (form.state.isSubmitting || form.state.isValidating) {
+      return;
+    }
+    // Dialog Apply defers validation. Refresh errors before handleSubmit's
+    // validity guard; handleSubmit validates again when the form is valid.
+    await form.validate('submit');
+    await form.handleSubmit();
   };
+
+  return { form, submitProductForm };
 };
