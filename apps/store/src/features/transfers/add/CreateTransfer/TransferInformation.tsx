@@ -1,7 +1,7 @@
 import { Card, Textarea, TextField } from '@ordero/ui';
 import { useStore } from '@tanstack/react-form';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
-import { TransferWarehouseCombobox } from './TransferWarehouseCombobox';
+import { TransferWarehouseCombobox } from './selectors';
 import type { TransferInformationProps } from './types';
 import {
   validateTransferDestinationWarehouse,
@@ -11,6 +11,7 @@ import {
 
 export const TransferInformation = ({
   form,
+  onSourceWarehouseChange,
   sourceWarehouseRef,
 }: TransferInformationProps) => {
   const submissionAttempts = useStore(
@@ -78,7 +79,7 @@ export const TransferInformation = ({
                     label="From warehouse"
                     name={field.name}
                     onBlur={field.handleBlur}
-                    onValueChange={field.handleChange}
+                    onValueChange={onSourceWarehouseChange}
                     placeholder="Select warehouse"
                     ref={sourceWarehouseRef}
                     required

@@ -14,7 +14,7 @@ import {
   createEmptySupplyEntry,
   getSupplyTotal,
   hasOnlyBlankSupplyEntry,
-} from './utils';
+} from './utils/entries';
 
 const getRowId = (entry: SupplyEntryFormValues) => entry.clientId;
 

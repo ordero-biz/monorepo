@@ -5,4 +5,4 @@ export {
   getSupplyEntriesPayload,
   getSupplyFormDefaults,
   normalizeOptionalText,
-} from './utils';
+} from './utils/entries';

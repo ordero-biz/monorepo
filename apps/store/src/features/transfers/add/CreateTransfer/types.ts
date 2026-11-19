@@ -1,16 +1,31 @@
 import type { Ref } from 'react';
-import type { WarehousesAsyncComboboxProps } from '@/features/warehouses/shared/WarehousesAsyncCombobox';
-import type { WarehouseSelection } from '@/lib/domain/warehouses/types';
+import type {
+  WarehouseProductSelection,
+  WarehouseSelection,
+} from '@/lib/domain/warehouses/types';
 import type { useCreateTransferForm } from './hooks/useCreateTransferForm';
 
 export type TransferWarehouseSelection = WarehouseSelection;
+
+/** One stock line of the source warehouse: a product variant in one unit. */
+export type TransferStockItemSelection = WarehouseProductSelection;
+
+export type TransferEntryFormValues = {
+  clientId: string;
+  stockItem: TransferStockItemSelection | null;
+  quantity: number | undefined;
+  comment: string;
+};
 
 export type TransferFormValues = {
   transferNumber: string;
   sourceWarehouse: TransferWarehouseSelection | null;
   destinationWarehouse: TransferWarehouseSelection | null;
   comment: string;
+  transferEntries: TransferEntryFormValues[];
 };
+
+export type TransferForm = ReturnType<typeof useCreateTransferForm>['form'];
 
 export type CreateTransferProps = {
   sourceWarehouseId?: number;
@@ -20,26 +35,40 @@ export type CreateTransferFormProps = {
   sourceWarehouse: TransferWarehouseSelection | null;
 };
 
+export type PendingSourceWarehouseChange = {
+  warehouse: TransferWarehouseSelection | null;
+};
+
 export type TransferInformationProps = {
-  form: ReturnType<typeof useCreateTransferForm>['form'];
+  form: TransferForm;
+  onSourceWarehouseChange: (
+    warehouse: TransferWarehouseSelection | null
+  ) => void;
   sourceWarehouseRef: Ref<HTMLInputElement>;
 };
 
-export type TransferWarehouseComboboxProps = Pick<
-  WarehousesAsyncComboboxProps,
-  | 'errorText'
-  | 'invalid'
-  | 'isOptionDisabled'
-  | 'label'
-  | 'name'
-  | 'onBlur'
-  | 'placeholder'
-  | 'ref'
-  | 'required'
-  | 'size'
-  | 'value'
-> & {
-  onValueChange: (warehouse: TransferWarehouseSelection | null) => void;
+export type SourceWarehouseChangeDialogProps = {
+  pendingChange: PendingSourceWarehouseChange | null;
+  onCancel: () => void;
+  onConfirm: () => void;
+};
+
+export type TransferEntriesProps = {
+  entries: TransferEntryFormValues[];
+  form: TransferForm;
+};
+
+export type TransferActionsProps = {
+  count: number;
+  units: number;
+  deleteDisabled: boolean;
+  selectedCount: number;
+  onClearSelection: () => void;
+  onDeleteSelected: () => void;
+};
+
+export type UseCreateTransferFormArgs = {
+  defaultValues: TransferFormValues;
 };
 
 export type TransferWarehouseReviewDialogProps = {

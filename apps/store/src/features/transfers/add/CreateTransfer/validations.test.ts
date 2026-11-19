@@ -1,6 +1,7 @@
 import { WAREHOUSE_STATUS } from '@/lib/domain/warehouses/constants';
 import {
   validateTransferDestinationWarehouse,
+  validateTransferEntryField,
   validateTransferNumber,
   validateTransferSourceWarehouse,
 } from './validations';
@@ -55,5 +56,52 @@ describe('transfer validations', () => {
         sourceWarehouse: mainWarehouse,
       })
     ).toBe(undefined);
+  });
+
+  describe('entries', () => {
+    const entry = {
+      clientId: 'row',
+      stockItem: {
+        productVariant: { id: 11, name: 'Rice', sku: 'GR-1' },
+        unitOfMeasurement: { id: 4, name: 'Bag', symbol: 'bag' },
+        available: 10,
+      },
+      quantity: 3 as number | undefined,
+      comment: '',
+    };
+
+    it('skips the empty placeholder row', () => {
+      const blank = { ...entry, stockItem: null, quantity: undefined };
+      expect(
+        validateTransferEntryField({ value: blank, field: 'stockItem' })
+      ).toBe(undefined);
+      expect(
+        validateTransferEntryField({ value: blank, field: 'quantity' })
+      ).toBe(undefined);
+    });
+
+    it('requires a product once the row has data', () => {
+      expect(
+        validateTransferEntryField({
+          value: { ...entry, stockItem: null },
+          field: 'stockItem',
+        })
+      ).toBe('Select a product');
+    });
+
+    it.each([
+      [undefined, 'Quantity is required'],
+      [0, 'Quantity must be a whole number greater than 0'],
+      [1.5, 'Quantity must be a whole number greater than 0'],
+      [11, 'Only 10 available'],
+      [10, undefined],
+    ])('validates quantity %j', (quantity, expected) => {
+      expect(
+        validateTransferEntryField({
+          value: { ...entry, quantity },
+          field: 'quantity',
+        })
+      ).toBe(expected);
+    });
   });
 });

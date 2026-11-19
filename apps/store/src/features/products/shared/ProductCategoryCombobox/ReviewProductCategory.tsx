@@ -169,10 +169,10 @@ export const ReviewProductCategory = ({
           </Typography>
         </div>
       </Dialog.Content>
-      <Dialog.Footer hideCloseButton>
-        <Dialog.Close disabled={activateCategory.isPending}>
-          Cancel
-        </Dialog.Close>
+      <Dialog.Footer
+        closeButtonLabel="Cancel"
+        closeDisabled={activateCategory.isPending}
+      >
         <Button
           color="primary"
           disabled={activateCategory.isPending || (!canSelect && !canActivate)}

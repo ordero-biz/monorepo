@@ -178,10 +178,10 @@ export const ReviewProductAttributeValue = ({
           </Typography>
         </div>
       </Dialog.Content>
-      <Dialog.Footer hideCloseButton>
-        <Dialog.Close disabled={activateAttributeValue.isPending}>
-          Cancel
-        </Dialog.Close>
+      <Dialog.Footer
+        closeButtonLabel="Cancel"
+        closeDisabled={activateAttributeValue.isPending}
+      >
         <Button
           type="button"
           color="primary"

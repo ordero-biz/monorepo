@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { getValidationMessage } from '@/lib/utils/form/validation/message';
 import type { ValidationArgs } from '@/lib/utils/form/validation/types';
 import type { SupplyEntryFormValues, SupplyFormValues } from './types';
-import { isBlankSupplyEntry } from './utils';
+import { isBlankSupplyEntry } from './utils/entries';
 
 const createSelectionSchema = (message: string) =>
   z

@@ -7,7 +7,7 @@ import { useState } from 'react';
 import { SUPPLY_STATUS } from '@/lib/domain/supplies/constants';
 import type { SupplyDetails, SupplyStatus } from '@/lib/domain/supplies/types';
 import type { SupplyFormValues, SupplySubmitIntent } from '../types';
-import { isBlankSupplyEntry } from '../utils';
+import { isBlankSupplyEntry } from '../utils/entries';
 import { mapSupplyFieldErrors } from '../utils/mapSupplyFieldErrors';
 
 type UseSubmitSupplyFormArgs = {
