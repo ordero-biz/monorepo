@@ -10,8 +10,8 @@ import { getCreateTransferData } from '../utils/getCreateData';
 import { mapTransferFieldErrors } from '../utils/mapTransferFieldErrors';
 import { submitCreateTransfer } from '../utils/submitAction';
 
-// `review` validates the form before the transfer confirmation opens; it sends nothing.
-type TransferSubmitMeta = { intent: TransferSubmitIntent | 'review' };
+// `validate` checks the form before the transfer confirmation opens; it sends nothing.
+type TransferSubmitMeta = { intent: TransferSubmitIntent | 'validate' };
 
 const defaultSubmitMeta: TransferSubmitMeta = { intent: 'draft' };
 
@@ -22,7 +22,7 @@ export const useCreateTransferForm = ({
   const { add: addToast } = useToastManager();
   const [pendingIntent, setPendingIntent] =
     useState<TransferSubmitIntent | null>(null);
-  const isTransferReviewValid = useRef(false);
+  const isTransferValid = useRef(false);
 
   const form = useForm({
     defaultValues,
@@ -41,8 +41,8 @@ export const useCreateTransferForm = ({
         return;
       }
 
-      if (meta.intent === 'review') {
-        isTransferReviewValid.current = true;
+      if (meta.intent === 'validate') {
+        isTransferValid.current = true;
         return;
       }
 
@@ -100,15 +100,15 @@ export const useCreateTransferForm = ({
   };
 
   /** Validates like a submit, so invalid fields show their errors. */
-  const reviewTransfer = async () => {
+  const validateTransfer = async () => {
     if (form.state.isSubmitting) {
       return false;
     }
 
-    isTransferReviewValid.current = false;
-    await form.handleSubmit({ intent: 'review' });
-    return isTransferReviewValid.current;
+    isTransferValid.current = false;
+    await form.handleSubmit({ intent: 'validate' });
+    return isTransferValid.current;
   };
 
-  return { form, submit, reviewTransfer, pendingIntent };
+  return { form, submit, validateTransfer, pendingIntent };
 };

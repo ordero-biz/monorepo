@@ -33,8 +33,8 @@ export const CreateTransferForm = ({
     });
   const isReviewOpen = sourceWarehouseMode === 'review';
 
-  const { form, submit, reviewTransfer, pendingIntent } = useCreateTransferForm(
-    {
+  const { form, submit, validateTransfer, pendingIntent } =
+    useCreateTransferForm({
       defaultValues: getTransferFormDefaults(
         sourceWarehouseMode === 'prefill' && isSourceWarehouseActive
           ? sourceWarehouse
@@ -59,8 +59,7 @@ export const CreateTransferForm = ({
 
         router.replace(getWarehouseDetailRoute(transfer.sourceWarehouse.id));
       },
-    }
-  );
+    });
   const sourceChange = useSourceWarehouseChange(form);
   // The initial review dialog has no trigger, so return focus to the selector when it closes.
   const sourceWarehouseRef = useRestoreFocus<HTMLInputElement>(
@@ -91,7 +90,7 @@ export const CreateTransferForm = ({
             disabled={disabled}
             entries={entries}
             form={form}
-            onReviewTransfer={reviewTransfer}
+            onValidateTransfer={validateTransfer}
             onSaveDraft={() => submit('draft')}
             onTransfer={() => submit('transfer')}
             pendingIntent={pendingIntent}

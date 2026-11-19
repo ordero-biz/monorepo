@@ -16,7 +16,7 @@ export const TransferActions = ({
   onDeleteSelected,
   pendingIntent,
   onSaveDraft,
-  onReviewTransfer,
+  onValidateTransfer,
   onTransfer,
 }: TransferActionsProps) => {
   const [transferDialogOpen, setTransferDialogOpen] = useState(false);
@@ -78,7 +78,7 @@ export const TransferActions = ({
                   color="primary"
                   disabled={isSubmitting}
                   onClick={async () => {
-                    if (await onReviewTransfer()) {
+                    if (await onValidateTransfer()) {
                       setTransferDialogOpen(true);
                     }
                   }}
