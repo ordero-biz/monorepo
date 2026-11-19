@@ -10,7 +10,7 @@ import {
 } from '@ordero/ui';
 import { ArrowUpToLine, EllipsisVertical, Trash2 } from 'lucide-react';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
-import { SourceStockAsyncCombobox } from './selectors';
+import { WarehouseProductsAsyncCombobox } from '@/features/warehouses/shared/WarehouseProductsAsyncCombobox';
 import type { TransferEntryFormValues, TransferForm } from './types';
 import {
   getStockItemKey,
@@ -104,15 +104,14 @@ export const getColumns = ({
                         submissionAttempts
                       );
                       return (
-                        <SourceStockAsyncCombobox
+                        <WarehouseProductsAsyncCombobox
                           aria-label={`Product for row ${index + 1}`}
                           disabled={disabled}
                           errorText={errorText}
                           invalid={Boolean(errorText)}
-                          isOptionDisabled={(stockItem) => {
-                            const key = getStockItemKey(stockItem);
-                            return key !== currentKey && pickedKeys.has(key);
-                          }}
+                          disabledProductKeys={[...pickedKeys].filter(
+                            (key) => key !== currentKey
+                          )}
                           name={field.name}
                           onBlur={field.handleBlur}
                           onValueChange={field.handleChange}

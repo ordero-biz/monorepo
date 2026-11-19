@@ -1,6 +1,7 @@
 import type { TransferEntryFormValues } from '../types';
 import {
   getStockItemKey,
+  getTransferFormDefaults,
   getTransferSummary,
   hasOnlyBlankTransferEntry,
   isBlankTransferEntry,
@@ -23,6 +24,23 @@ const entry = (
 });
 
 describe('transfer entry utils', () => {
+  it('builds transfer defaults with an optional source warehouse', () => {
+    const defaults = getTransferFormDefaults();
+
+    expect(defaults).toEqual({
+      transferNumber: '',
+      sourceWarehouse: null,
+      destinationWarehouse: null,
+      comment: '',
+      transferEntries: [entry({ clientId: 'initial-placeholder' })],
+    });
+
+    const sourceWarehouse = { id: 7, name: 'North', status: 'ACTIVE' } as const;
+    expect(getTransferFormDefaults(sourceWarehouse).sourceWarehouse).toBe(
+      sourceWarehouse
+    );
+  });
+
   it('treats a row without product, quantity and comment as blank', () => {
     expect(isBlankTransferEntry(entry({ comment: '  ' }))).toBe(true);
     expect(isBlankTransferEntry(entry({ quantity: 1 }))).toBe(false);

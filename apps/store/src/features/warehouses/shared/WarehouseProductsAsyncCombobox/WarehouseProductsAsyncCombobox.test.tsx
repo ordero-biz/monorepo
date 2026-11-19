@@ -2,8 +2,8 @@ import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getWarehouseStock } from '@/lib/client/api/warehouses';
 import { prepareStoreSetup } from '@/test/prepareSetup';
-import { SourceStockAsyncCombobox } from './SourceStockAsyncCombobox';
-import type { SourceStockAsyncComboboxProps } from './types';
+import { WarehouseProductsAsyncCombobox } from './WarehouseProductsAsyncCombobox';
+import type { WarehouseProductsAsyncComboboxProps } from './types';
 
 vi.mock('@/lib/client/api/warehouses', async () => ({
   ...(await vi.importActual<typeof import('@/lib/client/api/warehouses')>(
@@ -23,8 +23,8 @@ const stockItem = (id: number, name: string, quantity: number) => ({
   totalPrice: 0,
 });
 
-const { setup } = prepareStoreSetup<SourceStockAsyncComboboxProps>({
-  component: SourceStockAsyncCombobox,
+const { setup } = prepareStoreSetup<WarehouseProductsAsyncComboboxProps>({
+  component: WarehouseProductsAsyncCombobox,
   props: {
     'aria-label': 'Product',
     placeholder: 'Select product',
@@ -32,7 +32,7 @@ const { setup } = prepareStoreSetup<SourceStockAsyncComboboxProps>({
   },
 });
 
-describe('SourceStockAsyncCombobox', () => {
+describe('WarehouseProductsAsyncCombobox', () => {
   beforeEach(() => {
     getWarehouseStockMock.mockReset();
   });

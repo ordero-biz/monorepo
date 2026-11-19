@@ -42,7 +42,6 @@ export const useSourceWarehouseChange = (form: TransferForm) => {
   const requestChange = (warehouse: TransferWarehouseSelection | null) => {
     const currentWarehouse = form.getFieldValue('sourceWarehouse');
     if (currentWarehouse?.id === warehouse?.id) {
-      form.setFieldValue('sourceWarehouse', warehouse);
       return;
     }
 

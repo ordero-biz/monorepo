@@ -41,3 +41,12 @@ export type WarehouseSupply = Pick<
 >;
 
 export type WarehouseSelection = Pick<Warehouse, 'id' | 'name' | 'status'>;
+
+export type WarehouseProductSelection = {
+  productVariant: Pick<
+    WarehouseStockItem['productVariant'],
+    'id' | 'name' | 'sku'
+  >;
+  unitOfMeasurement: Pick<UnitOfMeasurement, 'id' | 'name' | 'symbol'>;
+  available: number;
+};

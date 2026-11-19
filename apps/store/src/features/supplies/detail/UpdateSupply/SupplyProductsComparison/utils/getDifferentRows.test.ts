@@ -1,5 +1,5 @@
 import type { SupplyEntryFormValues } from '../../../../shared/SupplyEditorForm/types';
-import { createEmptySupplyEntry } from '../../../../shared/SupplyEditorForm/utils';
+import { createEmptySupplyEntry } from '../../../../shared/SupplyEditorForm/utils/entries';
 import { getDifferentRows } from './getDifferentRows';
 
 const rice = {

@@ -10,7 +10,7 @@ import { TransferEntries } from './TransferEntries';
 import { TransferInformation } from './TransferInformation';
 import { TransferWarehouseReviewDialog } from './TransferWarehouseReviewDialog';
 import type { CreateTransferFormProps } from './types';
-import { getTransferFormDefaults } from './utils/getTransferFormDefaults';
+import { getTransferFormDefaults } from './utils/entries';
 
 type SourceWarehouseMode = 'prefill' | 'review' | 'manual';
 

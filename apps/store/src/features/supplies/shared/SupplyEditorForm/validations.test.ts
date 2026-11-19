@@ -1,5 +1,5 @@
 import type { SupplyEntryFormValues, SupplyFormValues } from './types';
-import { createEmptySupplyEntry, getSupplyFormDefaults } from './utils';
+import { createEmptySupplyEntry, getSupplyFormDefaults } from './utils/entries';
 import {
   validateSupplyEntryField,
   validateSupplyNumber,
