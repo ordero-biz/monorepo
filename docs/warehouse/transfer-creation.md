@@ -160,7 +160,7 @@ These decisions come from the transfer design discussions and the
 implementation inspected on 2026-11-17. They are product decisions, not
 findings from usability testing.
 
-- [Create transfer implementation](../../../apps/store/src/features/transfers/add/CreateTransfer/)
+- [Create transfer implementation](../../apps/store/src/features/transfers/add/CreateTransfer/)
   owns the page, transfer information, entries table, and source change flow.
 - [Validation rules](../../apps/store/src/features/transfers/add/CreateTransfer/validations.ts)
   and [validation tests](../../apps/store/src/features/transfers/add/CreateTransfer/validations.test.ts)
