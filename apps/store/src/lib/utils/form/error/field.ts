@@ -28,6 +28,11 @@ export const getFieldSubmitChangeErrorText = (
     return submitErrorText ?? getErrorMessage(dynamicError);
   }
 
+  // A past submit should not reveal errors on fields added afterward.
+  if (submissionAttempts > 0 && !meta.isTouched && !meta.isBlurred) {
+    return undefined;
+  }
+
   // Editing also marks a field as touched, so it cannot indicate submission.
   if (!meta.isBlurred && submissionAttempts === 0) {
     return undefined;
