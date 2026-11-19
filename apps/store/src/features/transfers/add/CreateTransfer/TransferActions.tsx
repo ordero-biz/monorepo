@@ -95,7 +95,6 @@ export const TransferActions = ({
         )}
       </BaseLayoutContextualActionBar>
       <StartTransferDialog
-        disabled={isSubmitting}
         onConfirm={onTransfer}
         onOpenChange={setTransferDialogOpen}
         open={transferDialogOpen}
