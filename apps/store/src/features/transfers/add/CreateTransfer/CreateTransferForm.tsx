@@ -34,6 +34,7 @@ export const CreateTransferForm = ({
     ),
   });
   const sourceChange = useSourceWarehouseChange(form);
+  // The initial review dialog has no trigger, so return focus to the selector when it closes.
   const sourceWarehouseRef = useRestoreFocus<HTMLInputElement>(
     isReviewOpen || sourceChange.pendingChange !== null
   );
