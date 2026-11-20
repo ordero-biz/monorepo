@@ -90,6 +90,9 @@ describe('Store sidebar', () => {
       within(sidebar).getByRole('link', { name: 'Supplies' })
     ).toHaveAttribute('href', '/warehouse/supplies');
     expect(
+      within(sidebar).getByRole('link', { name: 'Transfers' })
+    ).toHaveAttribute('href', '/warehouse/transfers');
+    expect(
       within(sidebar).getByRole('link', { name: 'Suppliers' })
     ).toHaveAttribute('href', '/warehouse/suppliers');
     expect(
@@ -99,6 +102,7 @@ describe('Store sidebar', () => {
     for (const linkName of [
       'Warehouse',
       'Supplies',
+      'Transfers',
       'Suppliers',
       'Units of measurement',
     ]) {
