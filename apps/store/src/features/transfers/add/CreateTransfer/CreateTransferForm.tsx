@@ -7,6 +7,7 @@ import { getWarehouseDetailRoute } from '@/lib/client/routes';
 import { TRANSFER_STATUS } from '@/lib/domain/transfers/constants';
 import { WAREHOUSE_STATUS } from '@/lib/domain/warehouses/constants';
 import { useRestoreFocus } from '@/lib/hooks/accessibility/useRestoreFocus';
+import { transfersQueryKeys } from '@/lib/query/transfers/transfersQueryKeys';
 import { warehousesQueryKeys } from '@/lib/query/warehouses/warehousesQueryKeys';
 import { useCreateTransferForm } from './hooks/useCreateTransferForm';
 import { useSourceWarehouseChange } from './hooks/useSourceWarehouseChange';
@@ -41,21 +42,24 @@ export const CreateTransferForm = ({
           : null
       ),
       onCreated: async (transfer) => {
-        if (transfer.status !== TRANSFER_STATUS.DRAFT) {
-          await Promise.all(
-            [
-              transfer.sourceWarehouse.id,
-              transfer.destinationWarehouse.id,
-            ].flatMap((warehouseId) => [
-              queryClient.invalidateQueries({
-                queryKey: warehousesQueryKeys.stock(warehouseId),
-              }),
-              queryClient.invalidateQueries({
-                queryKey: warehousesQueryKeys.detail(warehouseId),
-              }),
-            ])
-          );
-        }
+        const warehouseIds =
+          transfer.status === TRANSFER_STATUS.DRAFT
+            ? []
+            : [transfer.sourceWarehouse.id, transfer.destinationWarehouse.id];
+
+        await Promise.all([
+          queryClient.invalidateQueries({
+            queryKey: transfersQueryKeys.list,
+          }),
+          ...warehouseIds.flatMap((warehouseId) => [
+            queryClient.invalidateQueries({
+              queryKey: warehousesQueryKeys.stock(warehouseId),
+            }),
+            queryClient.invalidateQueries({
+              queryKey: warehousesQueryKeys.detail(warehouseId),
+            }),
+          ]),
+        ]);
 
         router.replace(getWarehouseDetailRoute(transfer.sourceWarehouse.id));
       },

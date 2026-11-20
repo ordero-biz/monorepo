@@ -20,7 +20,7 @@ export type TransferEntry = {
   comment: string | null;
 };
 
-export type TransferDetails = {
+export type Transfer = {
   id: number;
   sourceWarehouse: WarehouseSelection;
   destinationWarehouse: WarehouseSelection;
@@ -28,13 +28,16 @@ export type TransferDetails = {
   status: TransferStatus;
   comment: string | null;
   dispatchedAt: string | null;
-  dispatchedBy: string | null;
   completedAt: string | null;
-  completedBy: string | null;
   createdAt: string;
+  version: number;
+};
+
+export type TransferDetails = Transfer & {
+  dispatchedBy: string | null;
+  completedBy: string | null;
   createdBy: string;
   updatedAt: string;
   updatedBy: string;
   transferEntries: TransferEntry[];
-  version: number;
 };
