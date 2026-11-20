@@ -8,7 +8,7 @@ variants**. It separates choosing shared details and variant combinations from
 reviewing the generated variants and entering their identifiers.
 
 Select **Add Product** on the Products list to open the creation workflow at
-`/add`.
+`/products/add`.
 
 ## Product, variant, and attribute value
 
