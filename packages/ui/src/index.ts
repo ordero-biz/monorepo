@@ -106,6 +106,16 @@ export {
   useDataTableSelection,
 } from './components/DataTable';
 export type {
+  DatePickerMode,
+  DatePickerProps,
+  DatePickerRange,
+  DatePickerRangeProps,
+  DatePickerSingleProps,
+  DatePickerSize,
+  DatePickerWidth,
+} from './components/DatePicker';
+export { DatePicker } from './components/DatePicker';
+export type {
   DialogBackdropProps,
   DialogCloseProps,
   DialogContentProps,
