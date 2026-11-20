@@ -31,7 +31,8 @@ const dataTableCellVariants = cva(
     variants: {
       width: {
         auto: '',
-        full: 'w-full min-w-0',
+        // Fill the column without letting controls determine its intrinsic width.
+        full: 'w-0 min-w-full',
       },
       variant: {
         actions: 'px-[var(--spacing-2)]',

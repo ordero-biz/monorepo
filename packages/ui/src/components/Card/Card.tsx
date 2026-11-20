@@ -125,7 +125,7 @@ export const CardContent = ({ children, id, ref }: CardContentProps) => {
     <div
       ref={ref}
       id={id}
-      className="p-[var(--card-content-p)]"
+      className="p-[var(--card-content-p)] [[data-slot=card-header]+&]:pt-0"
       data-slot="card-content"
     >
       {children}

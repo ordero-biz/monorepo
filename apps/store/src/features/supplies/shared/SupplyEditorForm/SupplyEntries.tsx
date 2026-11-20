@@ -108,29 +108,33 @@ export const SupplyEntries = ({
           columns={columns}
           data={entries}
           emptyMessage="No products in this supply."
+          footer={
+            <div className="flex w-full flex-col">
+              <form.Subscribe selector={(state) => state.isSubmitting}>
+                {(isSubmitting) => (
+                  <Button
+                    disabled={
+                      disabled ||
+                      isSubmitting ||
+                      Boolean(lastEntry && !lastEntry.productVariant)
+                    }
+                    onClick={() => {
+                      scheduleScrollAfterAppend();
+                      appendEntry();
+                    }}
+                    ref={addProductButtonRef}
+                    type="button"
+                    variant="text"
+                  >
+                    + Add another product
+                  </Button>
+                )}
+              </form.Subscribe>
+            </div>
+          }
           getRowId={getRowId}
           selection={selection}
         />
-        <form.Subscribe selector={(state) => state.isSubmitting}>
-          {(isSubmitting) => (
-            <Button
-              disabled={
-                disabled ||
-                isSubmitting ||
-                Boolean(lastEntry && !lastEntry.productVariant)
-              }
-              onClick={() => {
-                scheduleScrollAfterAppend();
-                appendEntry();
-              }}
-              ref={addProductButtonRef}
-              type="button"
-              variant="text"
-            >
-              + Add another product
-            </Button>
-          )}
-        </form.Subscribe>
       </div>
 
       <SupplyActions
