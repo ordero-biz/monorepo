@@ -130,7 +130,7 @@ describe('Store sidebar', () => {
 
   it.each([
     '/products',
-    '/add',
+    '/products/add',
   ])('highlights the Products link on %s', (pathname) => {
     mocks.pathname = pathname;
 
