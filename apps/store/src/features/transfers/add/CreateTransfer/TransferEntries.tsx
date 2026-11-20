@@ -97,21 +97,25 @@ export const TransferEntries = ({ entries, form }: TransferEntriesProps) => {
           columns={columns}
           data={entries}
           emptyMessage="No products in this transfer."
+          footer={
+            <div className="flex w-full flex-col">
+              <Button
+                disabled={Boolean(lastEntry && !lastEntry.stockItem)}
+                onClick={() => {
+                  scheduleScrollAfterAppend();
+                  appendEntry();
+                }}
+                ref={addProductButtonRef}
+                type="button"
+                variant="text"
+              >
+                + Add another product
+              </Button>
+            </div>
+          }
           getRowId={getRowId}
           selection={selection}
         />
-        <Button
-          disabled={Boolean(lastEntry && !lastEntry.stockItem)}
-          onClick={() => {
-            scheduleScrollAfterAppend();
-            appendEntry();
-          }}
-          ref={addProductButtonRef}
-          type="button"
-          variant="text"
-        >
-          + Add another product
-        </Button>
       </div>
 
       <TransferActions

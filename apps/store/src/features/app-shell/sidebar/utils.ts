@@ -2,7 +2,6 @@ import type {
   SidebarNavigationItem,
   SidebarNavigationSectionConfig,
 } from '@ordero/ui';
-import { clientRoutes } from '@/lib/client/routes';
 
 type GetSidebarSectionsArgs = {
   pathname: string;
@@ -51,15 +50,11 @@ export const getSidebarSections = ({
   sections,
 }: GetSidebarSectionsArgs): SidebarNavigationSectionConfig[] => {
   const normalizedPathname = normalizePathname(pathname);
-  const activePathname =
-    normalizedPathname === clientRoutes.addProduct
-      ? clientRoutes.products
-      : normalizedPathname;
   const activeItem = sections
     .flatMap((section) => getLinkItems(section.items))
     .filter(
       (item) =>
-        item.kind === 'link' && isMatchingHref(activePathname, item.href)
+        item.kind === 'link' && isMatchingHref(normalizedPathname, item.href)
     )
     .sort((left, right) => {
       const leftHrefLength = left.kind === 'link' ? left.href.length : 0;

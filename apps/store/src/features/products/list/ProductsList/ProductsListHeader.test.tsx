@@ -51,7 +51,7 @@ describe('ProductsListHeader', () => {
     ).not.toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Add Product' }));
 
-    expect(routerPushMock).toHaveBeenCalledWith('/add');
+    expect(routerPushMock).toHaveBeenCalledWith('/products/add');
   });
 
   it('shows products as the active list mode by default', () => {

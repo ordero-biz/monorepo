@@ -5,7 +5,7 @@ export const clientRoutes = {
   signIn: '/sign-in',
   dashboard: '/dashboard',
   products: '/products',
-  addProduct: '/add',
+  addProduct: '/products/add',
   categories: '/products/categories',
   attributes: '/products/attributes',
   supplies: '/warehouse/supplies',

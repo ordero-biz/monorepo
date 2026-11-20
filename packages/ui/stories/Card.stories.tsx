@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { expect, within } from 'storybook/test';
 import {
   BarChart2,
   Clock,
@@ -111,6 +112,28 @@ const CardBalanceTemplate = (args: CardProps) => (
 
 export const Default: Story = {
   render: (args) => <CardBalanceTemplate {...args} />,
+};
+
+export const HeaderAndContent: Story = {
+  render: (args) => (
+    <Card.Root {...args}>
+      <Card.Header>
+        <Card.Title>Inventory overview</Card.Title>
+      </Card.Header>
+      <Card.Content>
+        <p>Current stock information</p>
+      </Card.Content>
+    </Card.Root>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const title = canvas.getByRole('heading', { name: 'Inventory overview' });
+    const content = canvas.getByText('Current stock information');
+
+    await expect(
+      content.getBoundingClientRect().top - title.getBoundingClientRect().bottom
+    ).toBe(16);
+  },
 };
 
 export const Outlined: Story = {
