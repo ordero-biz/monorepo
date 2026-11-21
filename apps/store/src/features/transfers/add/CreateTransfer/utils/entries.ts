@@ -1,3 +1,4 @@
+import type { TransferEntryData } from '@/lib/client/api/transfers';
 import type {
   TransferEntryFormValues,
   TransferFormValues,
@@ -29,6 +30,22 @@ export const isBlankTransferEntry = (entry: TransferEntryFormValues) =>
 export const hasOnlyBlankTransferEntry = (
   entries: readonly TransferEntryFormValues[]
 ) => entries.length === 1 && isBlankTransferEntry(entries[0]);
+
+export const getTransferEntriesPayload = (
+  value: TransferFormValues
+): TransferEntryData[] =>
+  value.transferEntries
+    .filter((entry) => !isBlankTransferEntry(entry))
+    .map((entry) => {
+      const comment = entry.comment.trim();
+
+      return {
+        productVariantId: Number(entry.stockItem?.productVariant.id),
+        unitOfMeasurementId: Number(entry.stockItem?.unitOfMeasurement.id),
+        quantity: Number(entry.quantity),
+        ...(comment ? { comment } : {}),
+      };
+    });
 
 export const getStockItemKey = (stockItem: TransferStockItemSelection) =>
   `${stockItem.productVariant.id}:${stockItem.unitOfMeasurement.id}`;

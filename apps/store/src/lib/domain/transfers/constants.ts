@@ -10,3 +10,9 @@ export const getTransferSourceWarehouseId = (
     ? warehouseId
     : undefined;
 };
+
+export const TRANSFER_STATUS = {
+  DRAFT: 'DRAFT',
+  IN_TRANSIT: 'IN_TRANSIT',
+  COMPLETED: 'COMPLETED',
+} as const;

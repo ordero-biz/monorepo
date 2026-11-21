@@ -8,9 +8,9 @@ A transfer moves stock from one warehouse (the **source**) to another warehouse
 that movement: choose both warehouses, then build the list of stock lines and
 quantities to move.
 
-This specification covers the `/warehouse/transfers/add` page. Saving a
-transfer (create and update requests) is not part of the current
-implementation; see [Limitations and future decisions](#limitations-and-future-decisions).
+This specification covers the `/warehouse/transfers/add` page, from choosing
+the warehouses to creating the transfer. Editing a saved transfer is not part
+of the current implementation.
 
 ## Terms
 
@@ -112,6 +112,40 @@ With a selection, it shows the selected count, **Clear selection**, and
 Units are summed across rows even when units of measurement differ. The figure
 is a rough size indicator, not a quantity in one unit.
 
+## Saving
+
+The bottom bar offers two actions while no rows are selected:
+
+| Action | Result |
+| --- | --- |
+| **Save draft** | Creates the transfer with status Draft. Stock does not move. |
+| **Transfer** | Validates the form first. Only a valid form with at least one product opens the **Start transfer** confirmation. **Start transfer** creates the transfer with status In Transit; Cancel keeps the form unchanged. |
+
+Both actions send `POST /api/v1/warehouse-transfers` with the warehouses, the
+trimmed name, the comment when not empty, and the non-empty rows
+(`productVariantId`, `unitOfMeasurementId`, `quantity`, and the row comment
+when not empty).
+
+- Both actions run the same validation. Buttons stay enabled; invalid fields
+  show their errors after the attempt. For **Transfer** this happens before the
+  confirmation, so it never opens over missing required fields.
+- **Transfer** requires at least one product. Without one it shows **Add at
+  least one product before transferring.**, opens no confirmation, and sends
+  nothing. A draft may be saved without products.
+- The confirmation states that the transfer will be marked as "In transit" and
+  that its products will be unavailable for stock operations (such as selling,
+  moving, or counting) until the transfer is completed.
+- While a request is pending, the form is disabled and the pressed action
+  shows **Saving...** or **Transferring...**.
+- On success, a toast confirms the result (**Transfer draft created.** or
+  **Transfer started. Products are in transit.**) and the page returns to the
+  source warehouse detail. After **Transfer**, the stock and warehouse details
+  of both warehouses are refreshed.
+- On failure, the service message is shown in a toast and field errors are
+  attached to their fields. Row errors are matched to the row that was
+  submitted, even if rows were removed or reordered since; errors for rows that
+  no longer exist are dropped.
+
 ## Validation
 
 | Field | Message |
@@ -136,15 +170,17 @@ the shared [form conventions](../forms.md).
 | Put the "use all available" action inside the quantity input. | Filling the maximum is a per-row decision; a bulk action through checkboxes was harder to discover and mixed selection with editing. |
 | Keep the Quantity column narrow (160px). | The value is short; the extra width is more useful for the product name. |
 | Show the summary only for complete rows. | Invalid or partial rows would make the totals misleading. |
+| Confirm before **Transfer** but not before **Save draft**. | Products in transit are unavailable for stock operations; a draft does not affect stock. |
+| Validate before showing the transfer confirmation. | Confirming a transfer that cannot be sent would waste a step and hide the actual errors behind a dialog. |
+| Allow drafts without products. | A draft records the plan before its contents are known. |
 
 ## Limitations and future decisions
 
-- **Saving is not implemented.** There is no Save draft or Transfer action yet.
-  Create (`POST /api/v1/warehouse-transfers`) and update requests, transfer
-  statuses (Draft, In transit, Completed), server error mapping, and stock
-  refresh after sending will be added in a separate change. Update this
-  document in that change.
-- **Transfer detail and list pages** do not exist yet.
+- **Editing a saved transfer** (update request) is not implemented. A saved
+  draft cannot be reopened from this page yet.
+- **Transfer detail and list pages** do not exist yet, so after saving the page
+  returns to the source warehouse.
+- **Completing a transfer** (status Completed) is not part of this workflow.
 - **Available is a snapshot.** It is not refreshed while the page is open; the
   backend must make the final stock check when saving.
 - **Stock picker search and sorting** are not available; options use the
@@ -169,7 +205,11 @@ findings from usability testing.
   cover the URL source, loading and failure states, and draft review.
 - [Entries tests](../../apps/store/src/features/transfers/add/CreateTransfer/TransferEntries.test.tsx)
   cover the stock picker, quantity limits, duplicates, the source change modal,
-  the use-all-available action, and row deletion.
+  the use-all-available action, row deletion, saving a draft, starting a
+  transfer, and service errors.
+- [Request payload](../../apps/store/src/features/transfers/add/CreateTransfer/utils/getCreateData.ts)
+  and [service error mapping](../../apps/store/src/features/transfers/add/CreateTransfer/utils/mapTransferFieldErrors.ts),
+  with their tests, define what is sent and where returned errors appear.
 - [Create transfer browser test](../../apps/store/e2e/CreateTransfer.spec.ts)
   covers the warehouse detail entry point, unavailable sources, and draft
   publishing.

@@ -1,6 +1,7 @@
 import type { TransferEntryFormValues } from '../types';
 import {
   getStockItemKey,
+  getTransferEntriesPayload,
   getTransferFormDefaults,
   getTransferSummary,
   hasOnlyBlankTransferEntry,
@@ -47,6 +48,27 @@ describe('transfer entry utils', () => {
     expect(isBlankTransferEntry(entry({ comment: 'Fragile' }))).toBe(false);
     expect(hasOnlyBlankTransferEntry([entry()])).toBe(true);
     expect(hasOnlyBlankTransferEntry([entry(), entry()])).toBe(false);
+  });
+
+  it('builds the payload from non-blank rows only', () => {
+    expect(
+      getTransferEntriesPayload({
+        ...getTransferFormDefaults(),
+        transferEntries: [
+          entry({ stockItem, quantity: 4, comment: ' Fragile ' }),
+          entry(),
+          entry({ stockItem, quantity: 2, comment: '  ' }),
+        ],
+      })
+    ).toEqual([
+      {
+        productVariantId: 11,
+        unitOfMeasurementId: 4,
+        quantity: 4,
+        comment: 'Fragile',
+      },
+      { productVariantId: 11, unitOfMeasurementId: 4, quantity: 2 },
+    ]);
   });
 
   it('keys stock lines by product variant and unit', () => {

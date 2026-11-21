@@ -45,7 +45,7 @@ describe('getFieldSubmitChangeErrorText', () => {
     ).toBeUndefined();
   });
 
-  it('shows change errors after submission even when the field is untouched', () => {
+  it('hides post-submit change errors on a newly added untouched field', () => {
     expect(
       getFieldSubmitChangeErrorText(
         {
@@ -56,7 +56,7 @@ describe('getFieldSubmitChangeErrorText', () => {
         },
         1
       )
-    ).toBe('Name is required');
+    ).toBeUndefined();
   });
 
   it('shows errors after blur without a submission attempt', () => {

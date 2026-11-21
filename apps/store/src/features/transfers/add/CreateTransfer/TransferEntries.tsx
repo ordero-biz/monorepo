@@ -21,7 +21,14 @@ const getRowId = (entry: TransferEntryFormValues) => entry.clientId;
 const getRowCheckboxAriaLabel = (entry: TransferEntryFormValues) =>
   `Select ${entry.stockItem?.productVariant.name || 'transfer entry'}`;
 
-export const TransferEntries = ({ entries, form }: TransferEntriesProps) => {
+export const TransferEntries = ({
+  disabled,
+  entries,
+  form,
+  onSaveDraft,
+  onTransfer,
+  pendingIntent,
+}: TransferEntriesProps) => {
   const nextClientId = useRef(0);
   const addProductButtonRef = useRef<HTMLButtonElement>(null);
   const scrollAfterEntryCount = useRef<number | null>(null);
@@ -100,7 +107,9 @@ export const TransferEntries = ({ entries, form }: TransferEntriesProps) => {
           footer={
             <div className="flex w-full flex-col">
               <Button
-                disabled={Boolean(lastEntry && !lastEntry.stockItem)}
+                disabled={
+                  disabled || Boolean(lastEntry && !lastEntry.stockItem)
+                }
                 onClick={() => {
                   scheduleScrollAfterAppend();
                   appendEntry();
@@ -120,8 +129,11 @@ export const TransferEntries = ({ entries, form }: TransferEntriesProps) => {
 
       <TransferActions
         {...getTransferSummary(entries)}
-        deleteDisabled={hasOnlyBlankTransferEntry(entries)}
+        deleteDisabled={disabled || hasOnlyBlankTransferEntry(entries)}
         onClearSelection={clearSelection}
+        onSaveDraft={onSaveDraft}
+        onTransfer={onTransfer}
+        pendingIntent={pendingIntent}
         onDeleteSelected={() => deleteRows(new Set(selectedRows.map(getRowId)))}
         selectedCount={selectedRows.length}
       />

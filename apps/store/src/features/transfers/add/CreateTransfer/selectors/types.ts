@@ -3,6 +3,7 @@ import type { TransferWarehouseSelection } from '../types';
 
 export type TransferWarehouseComboboxProps = Pick<
   WarehousesAsyncComboboxProps,
+  | 'disabled'
   | 'errorText'
   | 'invalid'
   | 'isOptionDisabled'
