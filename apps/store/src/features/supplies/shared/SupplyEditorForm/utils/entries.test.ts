@@ -1,11 +1,11 @@
 import type { SupplyDetails } from '@/lib/domain/supplies/types';
-import type { SupplyEntryFormValues, SupplyFormValues } from './types';
+import type { SupplyEntryFormValues, SupplyFormValues } from '../types';
 import {
   createEmptySupplyEntry,
   getSupplyEntriesPayload,
   getSupplyFormDefaults,
   getSupplyTotal,
-} from './utils/entries';
+} from './entries';
 
 const completeEntry: SupplyEntryFormValues = {
   ...createEmptySupplyEntry('new-1'),
