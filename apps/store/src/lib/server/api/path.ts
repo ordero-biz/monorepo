@@ -34,6 +34,10 @@ export const BACKEND_UNITS_OF_MEASUREMENT_PATHS = {
   unitOfMeasurement: '/api/v1/units-of-measurement/{id}',
 } as const;
 
+export const BACKEND_TRANSFER_PATHS = {
+  warehouseTransfers: '/api/v1/warehouse-transfers',
+} as const;
+
 export const BACKEND_WAREHOUSE_PATHS = {
   warehouses: '/api/v1/warehouses',
   warehouse: '/api/v1/warehouses/{id}',
