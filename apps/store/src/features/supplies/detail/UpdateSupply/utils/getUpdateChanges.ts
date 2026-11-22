@@ -1,10 +1,10 @@
 import type { UpdateSupplyFieldData } from '@/lib/client/api/supplies';
 import type { SupplyDetails, SupplyStatus } from '@/lib/domain/supplies/types';
 import { getChangedValues } from '@/lib/utils/form/comparison/getChangedValues';
+import { normalizeOptionalText } from '@/lib/utils/form/normalizeOptionalText';
 import {
   getSupplyEntriesPayload,
   getSupplyFormDefaults,
-  normalizeOptionalText,
   type SupplyFormValues,
 } from '../../../shared/SupplyEditorForm';
 

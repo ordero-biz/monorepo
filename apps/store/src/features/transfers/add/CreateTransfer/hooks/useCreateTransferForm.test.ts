@@ -4,11 +4,12 @@ import { TRANSFER_STATUS } from '@/lib/domain/transfers/constants';
 import type { TransferDetails } from '@/lib/domain/transfers/types';
 import { WAREHOUSE_STATUS } from '@/lib/domain/warehouses/constants';
 import { prepareFormHookTestSetup } from '@/test/prepareFormHookTestSetup';
-import type { TransferFormValues, TransferSubmitIntent } from '../types';
 import {
   createEmptyTransferEntry,
   getTransferFormDefaults,
-} from '../utils/entries';
+  type TransferFormValues,
+  type TransferSubmitIntent,
+} from '../../../shared/TransferEditorForm';
 import { submitCreateTransfer } from '../utils/submitAction';
 import { useCreateTransferForm } from './useCreateTransferForm';
 

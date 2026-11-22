@@ -2,8 +2,8 @@ import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getWarehouseStock } from '@/lib/client/api/warehouses';
 import { prepareStoreSetup } from '@/test/prepareSetup';
-import { WarehouseProductsAsyncCombobox } from './WarehouseProductsAsyncCombobox';
 import type { WarehouseProductsAsyncComboboxProps } from './types';
+import { WarehouseProductsAsyncCombobox } from './WarehouseProductsAsyncCombobox';
 
 vi.mock('@/lib/client/api/warehouses', async () => ({
   ...(await vi.importActual<typeof import('@/lib/client/api/warehouses')>(

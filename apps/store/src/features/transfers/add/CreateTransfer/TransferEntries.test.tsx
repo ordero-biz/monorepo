@@ -326,7 +326,7 @@ describe('TransferEntries', () => {
     ).not.toBeInTheDocument();
   });
 
-  it('saves a draft and returns to the source warehouse', async () => {
+  it('saves a draft and opens its detail page', async () => {
     const user = userEvent.setup();
     createTransferMock.mockResolvedValue({
       ok: true,
@@ -348,7 +348,7 @@ describe('TransferEntries', () => {
     await user.click(screen.getByRole('button', { name: 'Save draft' }));
 
     await waitFor(() =>
-      expect(mocks.replace).toHaveBeenCalledWith('/warehouse/1')
+      expect(mocks.replace).toHaveBeenCalledWith('/warehouse/transfers/5')
     );
     expect(createTransferMock).toHaveBeenCalledWith({
       sourceWarehouseId: 1,

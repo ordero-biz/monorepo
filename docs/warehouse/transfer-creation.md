@@ -9,8 +9,10 @@ that movement: choose both warehouses, then build the list of stock lines and
 quantities to move.
 
 This specification covers the `/warehouse/transfers/add` page, from choosing
-the warehouses to creating the transfer. Editing a saved transfer is not part
-of the current implementation.
+the warehouses to creating the transfer. A saved Draft opens at
+`/warehouse/transfers/{id}` in the same editor, including the source warehouse change
+confirmation; rows restored from the draft show Available as "—" until the stock
+line is picked again. Other statuses have no detail view yet.
 
 ## Terms
 
@@ -138,9 +140,9 @@ when not empty).
 - While a request is pending, the form is disabled and the pressed action
   shows **Saving...** or **Transferring...**.
 - On success, a toast confirms the result (**Transfer draft created.** or
-  **Transfer started. Products are in transit.**) and the page returns to the
-  source warehouse detail. After **Transfer**, the stock and warehouse details
-  of both warehouses are refreshed.
+  **Transfer started. Products are in transit.**). A draft opens its transfer
+  detail page; after **Transfer** the page returns to the source warehouse
+  detail, and the stock and warehouse details of both warehouses are refreshed.
 - On failure, the service message is shown in a toast and field errors are
   attached to their fields. Row errors are matched to the row that was
   submitted, even if rows were removed or reordered since; errors for rows that
@@ -176,10 +178,10 @@ the shared [form conventions](../forms.md).
 
 ## Limitations and future decisions
 
-- **Editing a saved transfer** (update request) is not implemented. A saved
-  draft cannot be reopened from this page yet.
-- **Transfer detail and list pages** do not exist yet, so after saving the page
-  returns to the source warehouse.
+- **Transfer detail** exists only for Drafts. In transit and Completed
+  transfers have no detail view yet, so starting a transfer returns to the
+  source warehouse.
+- **Transfers list** (`/warehouse/transfers`) has no status filter yet.
 - **Completing a transfer** (status Completed) is not part of this workflow.
 - **Available is a snapshot.** It is not refreshed while the page is open; the
   backend must make the final stock check when saving.
@@ -197,9 +199,10 @@ implementation inspected on 2026-11-17. They are product decisions, not
 findings from usability testing.
 
 - [Create transfer implementation](../../apps/store/src/features/transfers/add/CreateTransfer/)
-  owns the page, transfer information, entries table, and source change flow.
-- [Validation rules](../../apps/store/src/features/transfers/add/CreateTransfer/validations.ts)
-  and [validation tests](../../apps/store/src/features/transfers/add/CreateTransfer/validations.test.ts)
+  owns the page and source change flow; the [shared editor](../../apps/store/src/features/transfers/shared/TransferEditorForm/)
+  owns transfer information and the entries table.
+- [Validation rules](../../apps/store/src/features/transfers/shared/TransferEditorForm/validations.ts)
+  and [validation tests](../../apps/store/src/features/transfers/shared/TransferEditorForm/validations.test.ts)
   cover required fields, destination rules, and quantity limits.
 - [Page tests](../../apps/store/src/features/transfers/add/CreateTransfer/CreateTransfer.test.tsx)
   cover the URL source, loading and failure states, and draft review.

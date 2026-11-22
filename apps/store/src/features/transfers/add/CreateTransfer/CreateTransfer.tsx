@@ -8,8 +8,9 @@ import { getWarehouse } from '@/lib/client/api/warehouses';
 import { getWarehouseDetailRoute } from '@/lib/client/routes';
 import { AppBreadcrumbs } from '@/lib/components/AppBreadcrumbs';
 import { warehouseQueryOptions } from '@/lib/query/warehouses/warehousesQueryOptions';
+import type { TransferWarehouseSelection } from '../../shared/TransferEditorForm';
 import { CreateTransferForm } from './CreateTransferForm';
-import type { CreateTransferProps, TransferWarehouseSelection } from './types';
+import type { CreateTransferProps } from './types';
 
 export const CreateTransfer = ({ sourceWarehouseId }: CreateTransferProps) => {
   const { add: addToast } = useToastManager();

@@ -1,5 +1,11 @@
 import { TRANSFER_STATUS } from '@/lib/domain/transfers/constants';
-import { createTransfer, getTransfers, getTransfersPath } from '.';
+import {
+  createTransfer,
+  getTransfer,
+  getTransfers,
+  getTransfersPath,
+  updateTransfer,
+} from '.';
 
 describe('transfer client helpers', () => {
   beforeEach(() => {
@@ -62,6 +68,51 @@ describe('transfer client helpers', () => {
     );
     expect(JSON.parse(String(fetchMock.mock.calls[0]?.[1]?.body))).toEqual(
       input
+    );
+  });
+
+  it('gets a transfer detail from the backend proxy', async () => {
+    const fetchMock = vi.mocked(fetch);
+    const transfer = { id: 5, status: TRANSFER_STATUS.DRAFT, version: 1 };
+    fetchMock.mockResolvedValue(new Response(JSON.stringify(transfer)));
+
+    await expect(getTransfer(5)).resolves.toEqual({
+      ok: true,
+      data: transfer,
+    });
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/backend/api/v1/warehouse-transfers/5',
+      expect.objectContaining({ method: 'GET', cache: 'no-store' })
+    );
+  });
+
+  it('patches the latest version with replacement entries and status', async () => {
+    const fetchMock = vi.mocked(fetch);
+    const transfer = { id: 5, status: TRANSFER_STATUS.IN_TRANSIT, version: 2 };
+    fetchMock.mockResolvedValue(new Response(JSON.stringify(transfer)));
+
+    await expect(
+      updateTransfer({
+        transferId: 5,
+        expectedVersion: 1,
+        status: TRANSFER_STATUS.IN_TRANSIT,
+        transferEntries: [
+          { productVariantId: 11, unitOfMeasurementId: 4, quantity: 3 },
+        ],
+      })
+    ).resolves.toEqual({ ok: true, data: transfer });
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/backend/api/v1/warehouse-transfers/5',
+      expect.objectContaining({
+        method: 'PATCH',
+        body: JSON.stringify({
+          expectedVersion: 1,
+          status: TRANSFER_STATUS.IN_TRANSIT,
+          transferEntries: [
+            { productVariantId: 11, unitOfMeasurementId: 4, quantity: 3 },
+          ],
+        }),
+      })
     );
   });
 });

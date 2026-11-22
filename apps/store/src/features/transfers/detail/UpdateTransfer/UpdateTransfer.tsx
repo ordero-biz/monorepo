@@ -1,0 +1,134 @@
+'use client';
+
+import { Card, PageHeader, Typography } from '@ordero/ui';
+import { useQueryClient } from '@tanstack/react-query';
+import { useState } from 'react';
+import { AppBreadcrumbs } from '@/lib/components/AppBreadcrumbs';
+import { TRANSFER_STATUS } from '@/lib/domain/transfers/constants';
+import type { TransferDetails } from '@/lib/domain/transfers/types';
+import { useRestoreFocus } from '@/lib/hooks/accessibility/useRestoreFocus';
+import { transfersQueryKeys } from '@/lib/query/transfers/transfersQueryKeys';
+import { warehousesQueryKeys } from '@/lib/query/warehouses/warehousesQueryKeys';
+import { transfersRootBreadcrumb } from '../../shared/breadcrumbs';
+import {
+  getTransferFormDefaults,
+  SourceWarehouseChangeDialog,
+  TransferEditorForm,
+  useSourceWarehouseChange,
+} from '../../shared/TransferEditorForm';
+import { TransferStatusChip } from '../../shared/TransferStatusChip';
+import { useUpdateTransferForm } from './hooks/useUpdateTransferForm';
+import type { UpdateTransferProps } from './types';
+
+export const UpdateTransfer = ({ transfer }: UpdateTransferProps) => {
+  const queryClient = useQueryClient();
+  // The PATCH baseline and expected version advance together, only after a
+  // successful save, so a background refresh never drops unsaved edits.
+  const [baseline, setBaseline] = useState(transfer);
+  const { form, submit, validateTransfer, pendingIntent } =
+    useUpdateTransferForm({
+      transfer: baseline,
+      onUpdated: async (updatedTransfer) => {
+        queryClient.setQueryData<TransferDetails>(
+          transfersQueryKeys.detail(updatedTransfer.id),
+          (cachedTransfer) =>
+            cachedTransfer && cachedTransfer.version > updatedTransfer.version
+              ? cachedTransfer
+              : updatedTransfer
+        );
+
+        const warehouseIds =
+          updatedTransfer.status === TRANSFER_STATUS.DRAFT
+            ? []
+            : [
+                updatedTransfer.sourceWarehouse.id,
+                updatedTransfer.destinationWarehouse.id,
+              ];
+
+        await Promise.all([
+          queryClient.invalidateQueries({
+            queryKey: transfersQueryKeys.list,
+          }),
+          ...warehouseIds.flatMap((warehouseId) => [
+            queryClient.invalidateQueries({
+              queryKey: warehousesQueryKeys.stock(warehouseId),
+            }),
+            queryClient.invalidateQueries({
+              queryKey: warehousesQueryKeys.detail(warehouseId),
+            }),
+          ]),
+        ]);
+
+        form.reset(getTransferFormDefaults(updatedTransfer));
+        setBaseline(updatedTransfer);
+      },
+    });
+  const sourceChange = useSourceWarehouseChange(form);
+  const sourceWarehouseRef = useRestoreFocus<HTMLInputElement>(
+    sourceChange.pendingChange !== null
+  );
+  const isDraft = baseline.status === TRANSFER_STATUS.DRAFT;
+
+  return (
+    <div className="flex flex-col gap-[var(--space-2)]">
+      <PageHeader.Root>
+        <PageHeader.Left>
+          <div className="flex min-w-0 flex-col gap-[var(--space-0-5)]">
+            <div className="flex min-w-0 items-center gap-[var(--space-1)]">
+              <Typography variant="h5">
+                {baseline.transferNumber || 'Transfer'}
+              </Typography>
+              <TransferStatusChip status={baseline.status} />
+            </div>
+            <AppBreadcrumbs
+              items={[
+                transfersRootBreadcrumb,
+                {
+                  id: 'current-transfer',
+                  label: baseline.transferNumber || 'Transfer',
+                },
+              ]}
+            />
+          </div>
+        </PageHeader.Left>
+      </PageHeader.Root>
+
+      {isDraft ? (
+        <>
+          <div
+            className="rounded-[var(--radius)] bg-muted p-[var(--space-1-5)]"
+            role="note"
+          >
+            <Typography variant="body2">
+              <strong>Draft.</strong> Nothing has left the warehouse yet. You
+              can change everything until you press Transfer.
+            </Typography>
+          </div>
+          <TransferEditorForm
+            form={form}
+            onSourceWarehouseChange={sourceChange.requestChange}
+            pendingIntent={pendingIntent}
+            sourceWarehouseRef={sourceWarehouseRef}
+            submit={submit}
+            validateTransfer={validateTransfer}
+          >
+            <SourceWarehouseChangeDialog
+              onCancel={sourceChange.cancelChange}
+              onConfirm={sourceChange.confirmChange}
+              pendingChange={sourceChange.pendingChange}
+            />
+          </TransferEditorForm>
+        </>
+      ) : (
+        // Views for the other statuses are not designed yet.
+        <Card.Root variant="filled">
+          <Card.Content>
+            <Typography color="text-secondary" variant="body2">
+              Details for this transfer status are not available yet.
+            </Typography>
+          </Card.Content>
+        </Card.Root>
+      )}
+    </div>
+  );
+};

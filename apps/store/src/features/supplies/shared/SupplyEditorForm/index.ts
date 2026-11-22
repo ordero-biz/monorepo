@@ -4,5 +4,4 @@ export type { SupplyFormValues, SupplySubmitIntent } from './types';
 export {
   getSupplyEntriesPayload,
   getSupplyFormDefaults,
-  normalizeOptionalText,
 } from './utils/entries';

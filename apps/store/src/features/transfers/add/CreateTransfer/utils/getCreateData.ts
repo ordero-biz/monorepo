@@ -1,7 +1,9 @@
 import type { CreateTransferData } from '@/lib/client/api/transfers';
 import type { TransferStatus } from '@/lib/domain/transfers/types';
-import type { TransferFormValues } from '../types';
-import { getTransferEntriesPayload } from './entries';
+import {
+  getTransferEntriesPayload,
+  type TransferFormValues,
+} from '../../../shared/TransferEditorForm';
 
 export const getCreateTransferData = (
   value: TransferFormValues,

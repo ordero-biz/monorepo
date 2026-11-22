@@ -1,10 +1,8 @@
 import type { CreateSupplyData } from '@/lib/client/api/supplies';
 import type { SupplyStatus } from '@/lib/domain/supplies/types';
+import { normalizeOptionalText } from '@/lib/utils/form/normalizeOptionalText';
 import type { SupplyFormValues } from '../../../shared/SupplyEditorForm';
-import {
-  getSupplyEntriesPayload,
-  normalizeOptionalText,
-} from '../../../shared/SupplyEditorForm';
+import { getSupplyEntriesPayload } from '../../../shared/SupplyEditorForm';
 
 export const getCreateSupplyData = (
   value: SupplyFormValues,
