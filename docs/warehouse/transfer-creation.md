@@ -121,19 +121,20 @@ The bottom bar offers two actions while no rows are selected:
 | Action | Result |
 | --- | --- |
 | **Save draft** | Creates the transfer with status Draft. Stock does not move. |
-| **Transfer** | Validates the form first. Only a valid form with at least one product opens the **Start transfer** confirmation. **Start transfer** creates the transfer with status In Transit; Cancel keeps the form unchanged. |
+| **Transfer** | Opens the **Start transfer** confirmation. **Start transfer** validates the form and creates the transfer with status In Transit; Cancel keeps the form unchanged. |
 
 Both actions send `POST /api/v1/warehouse-transfers` with the warehouses, the
 trimmed name, the comment when not empty, and the non-empty rows
 (`productVariantId`, `unitOfMeasurementId`, `quantity`, and the row comment
 when not empty).
 
-- Both actions run the same validation. Buttons stay enabled; invalid fields
-  show their errors after the attempt. For **Transfer** this happens before the
-  confirmation, so it never opens over missing required fields.
-- **Transfer** requires at least one product. Without one it shows **Add at
-  least one product before transferring.**, opens no confirmation, and sends
-  nothing. A draft may be saved without products.
+- Both actions run the same validation when the form is submitted: right away
+  for **Save draft**, after **Start transfer** for **Transfer**. Buttons stay
+  enabled; invalid fields show their errors after the attempt, and nothing is
+  sent.
+- **Transfer** requires at least one product. Without one, **Start transfer**
+  shows **Add at least one product before transferring.** and sends nothing. A
+  draft may be saved without products.
 - The confirmation states that the transfer will be marked as "In transit" and
   that its products will be unavailable for stock operations (such as selling,
   moving, or counting) until the transfer is completed.
@@ -173,7 +174,6 @@ the shared [form conventions](../forms.md).
 | Keep the Quantity column narrow (160px). | The value is short; the extra width is more useful for the product name. |
 | Show the summary only for complete rows. | Invalid or partial rows would make the totals misleading. |
 | Confirm before **Transfer** but not before **Save draft**. | Products in transit are unavailable for stock operations; a draft does not affect stock. |
-| Validate before showing the transfer confirmation. | Confirming a transfer that cannot be sent would waste a step and hide the actual errors behind a dialog. |
 | Allow drafts without products. | A draft records the plan before its contents are known. |
 
 ## Limitations and future decisions
