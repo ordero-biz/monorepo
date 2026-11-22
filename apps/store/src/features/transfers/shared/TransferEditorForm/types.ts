@@ -47,9 +47,6 @@ export type UseSubmitTransferFormArgs = {
 export type TransferEditorFormProps = {
   form: TransferForm;
   submit: ReturnType<typeof useSubmitTransferForm>['submit'];
-  validateTransfer: ReturnType<
-    typeof useSubmitTransferForm
-  >['validateTransfer'];
   pendingIntent: TransferSubmitIntent | null;
   onSourceWarehouseChange: (
     warehouse: TransferWarehouseSelection | null
@@ -89,7 +86,6 @@ export type TransferEntriesProps = {
   form: TransferForm;
   pendingIntent: TransferSubmitIntent | null;
   onSaveDraft: () => void;
-  onValidateTransfer: () => Promise<boolean>;
   onTransfer: () => void;
 };
 
@@ -102,7 +98,6 @@ export type TransferActionsProps = {
   onDeleteSelected: () => void;
   pendingIntent: TransferSubmitIntent | null;
   onSaveDraft: () => void;
-  onValidateTransfer: () => Promise<boolean>;
   onTransfer: () => void;
 };
 

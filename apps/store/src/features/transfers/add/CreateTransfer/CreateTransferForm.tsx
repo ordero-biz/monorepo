@@ -38,48 +38,47 @@ export const CreateTransferForm = ({
     });
   const isReviewOpen = sourceWarehouseMode === 'review';
 
-  const { form, submit, validateTransfer, pendingIntent } =
-    useCreateTransferForm({
-      defaultValues: {
-        ...getTransferFormDefaults(),
-        sourceWarehouse:
-          sourceWarehouseMode === 'prefill' && isSourceWarehouseActive
-            ? sourceWarehouse
-            : null,
-      },
-      onCreated: async (transfer) => {
-        queryClient.setQueryData(
-          transfersQueryKeys.detail(transfer.id),
-          transfer
-        );
+  const { form, submit, pendingIntent } = useCreateTransferForm({
+    defaultValues: {
+      ...getTransferFormDefaults(),
+      sourceWarehouse:
+        sourceWarehouseMode === 'prefill' && isSourceWarehouseActive
+          ? sourceWarehouse
+          : null,
+    },
+    onCreated: async (transfer) => {
+      queryClient.setQueryData(
+        transfersQueryKeys.detail(transfer.id),
+        transfer
+      );
 
-        const warehouseIds =
-          transfer.status === TRANSFER_STATUS.DRAFT
-            ? []
-            : [transfer.sourceWarehouse.id, transfer.destinationWarehouse.id];
+      const warehouseIds =
+        transfer.status === TRANSFER_STATUS.DRAFT
+          ? []
+          : [transfer.sourceWarehouse.id, transfer.destinationWarehouse.id];
 
-        await Promise.all([
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: transfersQueryKeys.list,
+        }),
+        ...warehouseIds.flatMap((warehouseId) => [
           queryClient.invalidateQueries({
-            queryKey: transfersQueryKeys.list,
+            queryKey: warehousesQueryKeys.stock(warehouseId),
           }),
-          ...warehouseIds.flatMap((warehouseId) => [
-            queryClient.invalidateQueries({
-              queryKey: warehousesQueryKeys.stock(warehouseId),
-            }),
-            queryClient.invalidateQueries({
-              queryKey: warehousesQueryKeys.detail(warehouseId),
-            }),
-          ]),
-        ]);
+          queryClient.invalidateQueries({
+            queryKey: warehousesQueryKeys.detail(warehouseId),
+          }),
+        ]),
+      ]);
 
-        // Only drafts have a detail view so far.
-        router.replace(
-          transfer.status === TRANSFER_STATUS.DRAFT
-            ? getTransferDetailRoute(transfer.id)
-            : getWarehouseDetailRoute(transfer.sourceWarehouse.id)
-        );
-      },
-    });
+      // Only drafts have a detail view so far.
+      router.replace(
+        transfer.status === TRANSFER_STATUS.DRAFT
+          ? getTransferDetailRoute(transfer.id)
+          : getWarehouseDetailRoute(transfer.sourceWarehouse.id)
+      );
+    },
+  });
   const sourceChange = useSourceWarehouseChange(form);
   // The initial review dialog has no trigger, so return focus to the selector when it closes.
   const sourceWarehouseRef = useRestoreFocus<HTMLInputElement>(
@@ -93,7 +92,6 @@ export const CreateTransferForm = ({
       pendingIntent={pendingIntent}
       sourceWarehouseRef={sourceWarehouseRef}
       submit={submit}
-      validateTransfer={validateTransfer}
     >
       <SourceWarehouseChangeDialog
         onCancel={sourceChange.cancelChange}

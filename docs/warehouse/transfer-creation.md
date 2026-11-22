@@ -134,7 +134,7 @@ when not empty).
 - **Transfer** requires at least one product. Without one it shows **Add at
   least one product before transferring.**, opens no confirmation, and sends
   nothing. A draft may be saved without products.
-- The confirmation states that the transfer will be marked as In Transit and
+- The confirmation states that the transfer will be marked as "In transit" and
   that its products will be unavailable for stock operations (such as selling,
   moving, or counting) until the transfer is completed.
 - While a request is pending, the form is disabled and the pressed action

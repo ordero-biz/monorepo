@@ -390,7 +390,7 @@ describe('TransferEntries', () => {
       name: 'Start transfer',
     });
     expect(dialog).toHaveTextContent(
-      'The transfer will be marked as In Transit. Its products will be unavailable for stock operations until the transfer is completed.'
+      'The transfer will be marked as "In transit". Its products will be unavailable for stock operations until the transfer is completed.'
     );
     await user.click(
       within(dialog).getByRole('button', { name: 'Start transfer' })
@@ -415,12 +415,15 @@ describe('TransferEntries', () => {
     }
   });
 
-  it('requires at least one product before transferring', async () => {
+  it('requires at least one product after confirming a transfer', async () => {
     const user = userEvent.setup();
     await openWithMainWarehouse();
     await fillTransferInformation(user);
 
     await user.click(screen.getByRole('button', { name: 'Transfer' }));
+    await user.click(
+      await screen.findByRole('button', { name: 'Start transfer' })
+    );
 
     expect(
       await screen.findByText('Add at least one product before transferring.')
@@ -431,13 +434,16 @@ describe('TransferEntries', () => {
     expect(createTransferMock).not.toHaveBeenCalled();
   });
 
-  it('shows required field errors instead of the transfer confirmation', async () => {
+  it('shows required field errors after confirming a transfer', async () => {
     const user = userEvent.setup();
     await openWithMainWarehouse();
     await pickOption(user, getProduct(1), /Jasmine Rice 5kg/);
     await user.type(getQuantity(1), '20');
 
     await user.click(screen.getByRole('button', { name: 'Transfer' }));
+    await user.click(
+      await screen.findByRole('button', { name: 'Start transfer' })
+    );
 
     expect(await screen.findByText('Name is required')).toBeVisible();
     expect(screen.getByText('Select a destination warehouse')).toBeVisible();

@@ -21,7 +21,7 @@ export const StartTransferDialog = ({
               </Typography>
               <Typography variant="body1">
                 <strong>
-                  The transfer will be marked as In Transit. Its products will
+                  The transfer will be marked as "In transit". Its products will
                   be unavailable for stock operations until the transfer is
                   completed.
                 </strong>

@@ -25,44 +25,43 @@ export const UpdateTransfer = ({ transfer }: UpdateTransferProps) => {
   // The PATCH baseline and expected version advance together, only after a
   // successful save, so a background refresh never drops unsaved edits.
   const [baseline, setBaseline] = useState(transfer);
-  const { form, submit, validateTransfer, pendingIntent } =
-    useUpdateTransferForm({
-      transfer: baseline,
-      onUpdated: async (updatedTransfer) => {
-        queryClient.setQueryData<TransferDetails>(
-          transfersQueryKeys.detail(updatedTransfer.id),
-          (cachedTransfer) =>
-            cachedTransfer && cachedTransfer.version > updatedTransfer.version
-              ? cachedTransfer
-              : updatedTransfer
-        );
+  const { form, submit, pendingIntent } = useUpdateTransferForm({
+    transfer: baseline,
+    onUpdated: async (updatedTransfer) => {
+      queryClient.setQueryData<TransferDetails>(
+        transfersQueryKeys.detail(updatedTransfer.id),
+        (cachedTransfer) =>
+          cachedTransfer && cachedTransfer.version > updatedTransfer.version
+            ? cachedTransfer
+            : updatedTransfer
+      );
 
-        const warehouseIds =
-          updatedTransfer.status === TRANSFER_STATUS.DRAFT
-            ? []
-            : [
-                updatedTransfer.sourceWarehouse.id,
-                updatedTransfer.destinationWarehouse.id,
-              ];
+      const warehouseIds =
+        updatedTransfer.status === TRANSFER_STATUS.DRAFT
+          ? []
+          : [
+              updatedTransfer.sourceWarehouse.id,
+              updatedTransfer.destinationWarehouse.id,
+            ];
 
-        await Promise.all([
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: transfersQueryKeys.list,
+        }),
+        ...warehouseIds.flatMap((warehouseId) => [
           queryClient.invalidateQueries({
-            queryKey: transfersQueryKeys.list,
+            queryKey: warehousesQueryKeys.stock(warehouseId),
           }),
-          ...warehouseIds.flatMap((warehouseId) => [
-            queryClient.invalidateQueries({
-              queryKey: warehousesQueryKeys.stock(warehouseId),
-            }),
-            queryClient.invalidateQueries({
-              queryKey: warehousesQueryKeys.detail(warehouseId),
-            }),
-          ]),
-        ]);
+          queryClient.invalidateQueries({
+            queryKey: warehousesQueryKeys.detail(warehouseId),
+          }),
+        ]),
+      ]);
 
-        form.reset(getTransferFormDefaults(updatedTransfer));
-        setBaseline(updatedTransfer);
-      },
-    });
+      form.reset(getTransferFormDefaults(updatedTransfer));
+      setBaseline(updatedTransfer);
+    },
+  });
   const sourceChange = useSourceWarehouseChange(form);
   const sourceWarehouseRef = useRestoreFocus<HTMLInputElement>(
     sourceChange.pendingChange !== null
@@ -110,7 +109,6 @@ export const UpdateTransfer = ({ transfer }: UpdateTransferProps) => {
             pendingIntent={pendingIntent}
             sourceWarehouseRef={sourceWarehouseRef}
             submit={submit}
-            validateTransfer={validateTransfer}
           >
             <SourceWarehouseChangeDialog
               onCancel={sourceChange.cancelChange}

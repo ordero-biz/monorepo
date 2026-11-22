@@ -7,7 +7,6 @@ import type { TransferEditorFormProps } from './types';
 export const TransferEditorForm = ({
   form,
   submit,
-  validateTransfer,
   pendingIntent,
   onSourceWarehouseChange,
   sourceWarehouseRef,
@@ -38,7 +37,6 @@ export const TransferEditorForm = ({
             disabled={disabled}
             entries={entries}
             form={form}
-            onValidateTransfer={validateTransfer}
             onSaveDraft={() => submit('draft')}
             onTransfer={() => submit('transfer')}
             pendingIntent={pendingIntent}
