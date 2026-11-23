@@ -30,7 +30,10 @@ vi.mock('@/lib/client/api/warehouses', async () => ({
   getWarehouseStock: vi.fn(),
 }));
 
-vi.mock('@/lib/client/api/transfers', () => ({
+vi.mock('@/lib/client/api/transfers', async () => ({
+  ...(await vi.importActual<typeof import('@/lib/client/api/transfers')>(
+    '@/lib/client/api/transfers'
+  )),
   createTransfer: vi.fn(),
 }));
 
