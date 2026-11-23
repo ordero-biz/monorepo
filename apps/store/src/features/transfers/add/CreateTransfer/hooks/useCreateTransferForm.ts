@@ -40,9 +40,11 @@ export const useCreateTransferForm = ({
         meta.intent === 'transfer'
           ? TRANSFER_STATUS.IN_TRANSIT
           : TRANSFER_STATUS.DRAFT;
+
       const submittedEntryIds = value.transferEntries
         .filter((entry) => !isBlankTransferEntry(entry))
         .map((entry) => entry.clientId);
+
       const result = await submitCreateTransfer(
         getCreateTransferData(value, status)
       );
