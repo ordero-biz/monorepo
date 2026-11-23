@@ -1,7 +1,6 @@
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { updateTransfer } from '@/lib/client/api/transfers';
-import { clientRoutes } from '@/lib/client/routes';
 import { TRANSFER_STATUS } from '@/lib/domain/transfers/constants';
 import type { TransferDetails } from '@/lib/domain/transfers/types';
 import { WAREHOUSE_STATUS } from '@/lib/domain/warehouses/constants';
@@ -70,21 +69,9 @@ describe('UpdateTransfer', () => {
     updateTransferMock.mockReset();
   });
 
-  it('shows the draft header, breadcrumb and editor', () => {
+  it('shows the draft note and editor', () => {
     setup();
 
-    expect(
-      screen.getByRole('heading', { name: 'Weekend restock' })
-    ).toBeVisible();
-    expect(screen.getByText('Draft')).toBeVisible();
-    const breadcrumb = screen.getByRole('navigation', { name: 'Breadcrumb' });
-    expect(
-      within(breadcrumb).getByRole('link', { name: 'Transfers' })
-    ).toHaveAttribute('href', clientRoutes.transfers);
-    expect(within(breadcrumb).getByText('Weekend restock')).toHaveAttribute(
-      'aria-current',
-      'page'
-    );
     expect(screen.getByRole('note')).toHaveTextContent(
       'Nothing has left the warehouse yet.'
     );
@@ -96,7 +83,6 @@ describe('UpdateTransfer', () => {
       transfer: { ...transfer, status: TRANSFER_STATUS.IN_TRANSIT },
     });
 
-    expect(screen.getByText('In transit')).toBeVisible();
     expect(
       screen.getByText(
         'Details for this transfer status are not available yet.'
@@ -128,9 +114,8 @@ describe('UpdateTransfer', () => {
     await user.type(nameInput, 'Monday restock');
     await user.click(screen.getByRole('button', { name: 'Save draft' }));
 
-    expect(
-      await screen.findByRole('heading', { name: 'Monday restock' })
-    ).toBeVisible();
+    // The button label returns once the save, cache update and reset finish.
+    await screen.findByRole('button', { name: 'Save draft' });
     expect(queryClient.getQueryData(transfersQueryKeys.detail(5))).toEqual(
       savedTransfer
     );
@@ -173,7 +158,11 @@ describe('UpdateTransfer', () => {
       )
     );
 
-    expect(await screen.findByText('In transit')).toBeVisible();
+    expect(
+      await screen.findByText(
+        'Details for this transfer status are not available yet.'
+      )
+    ).toBeVisible();
     for (const warehouseId of [1, 2]) {
       expect(invalidateQueries).toHaveBeenCalledWith({
         queryKey: warehousesQueryKeys.stock(warehouseId),

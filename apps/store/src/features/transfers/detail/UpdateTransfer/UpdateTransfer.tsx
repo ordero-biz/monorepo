@@ -1,22 +1,19 @@
 'use client';
 
-import { Card, PageHeader, Typography } from '@ordero/ui';
+import { Card, Typography } from '@ordero/ui';
 import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
-import { AppBreadcrumbs } from '@/lib/components/AppBreadcrumbs';
 import { TRANSFER_STATUS } from '@/lib/domain/transfers/constants';
 import type { TransferDetails } from '@/lib/domain/transfers/types';
 import { useRestoreFocus } from '@/lib/hooks/accessibility/useRestoreFocus';
 import { transfersQueryKeys } from '@/lib/query/transfers/transfersQueryKeys';
 import { warehousesQueryKeys } from '@/lib/query/warehouses/warehousesQueryKeys';
-import { transfersRootBreadcrumb } from '../../shared/breadcrumbs';
 import {
   getTransferFormDefaults,
   SourceWarehouseChangeDialog,
   TransferEditorForm,
   useSourceWarehouseChange,
 } from '../../shared/TransferEditorForm';
-import { TransferStatusChip } from '../../shared/TransferStatusChip';
 import { useUpdateTransferForm } from './hooks/useUpdateTransferForm';
 import type { UpdateTransferProps } from './types';
 
@@ -70,28 +67,6 @@ export const UpdateTransfer = ({ transfer }: UpdateTransferProps) => {
 
   return (
     <div className="flex flex-col gap-[var(--space-2)]">
-      <PageHeader.Root>
-        <PageHeader.Left>
-          <div className="flex min-w-0 flex-col gap-[var(--space-0-5)]">
-            <div className="flex min-w-0 items-center gap-[var(--space-1)]">
-              <Typography variant="h5">
-                {baseline.transferNumber || 'Transfer'}
-              </Typography>
-              <TransferStatusChip status={baseline.status} />
-            </div>
-            <AppBreadcrumbs
-              items={[
-                transfersRootBreadcrumb,
-                {
-                  id: 'current-transfer',
-                  label: baseline.transferNumber || 'Transfer',
-                },
-              ]}
-            />
-          </div>
-        </PageHeader.Left>
-      </PageHeader.Root>
-
       {isDraft ? (
         <>
           <div
