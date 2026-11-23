@@ -13,7 +13,7 @@ describe('CreateSupplierDialogTrigger', () => {
 
     setup();
 
-    await user.click(screen.getByRole('button', { name: 'Add Supplier' }));
+    await user.click(screen.getByRole('button', { name: 'Add supplier' }));
 
     expect(screen.getByRole('dialog', { name: 'Add supplier' })).toBeVisible();
   });
@@ -23,7 +23,7 @@ describe('CreateSupplierDialogTrigger', () => {
 
     setup();
 
-    await user.click(screen.getByRole('button', { name: 'Add Supplier' }));
+    await user.click(screen.getByRole('button', { name: 'Add supplier' }));
 
     const dialog = screen.getByRole('dialog', { name: 'Add supplier' });
     const nameField = within(dialog).getByRole('textbox', { name: 'Name' });
@@ -35,7 +35,7 @@ describe('CreateSupplierDialogTrigger', () => {
       screen.queryByRole('dialog', { name: 'Add supplier' })
     ).not.toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', { name: 'Add Supplier' }));
+    await user.click(screen.getByRole('button', { name: 'Add supplier' }));
 
     expect(
       within(screen.getByRole('dialog', { name: 'Add supplier' })).getByRole(

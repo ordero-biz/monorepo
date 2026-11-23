@@ -19,7 +19,7 @@ export const CreateAttributeValuesDialogTrigger = ({
         onClick={() => setOpen(true)}
         type="button"
       >
-        Add Value
+        Add value
       </Button>
 
       <CreateAttributeValuesDialog

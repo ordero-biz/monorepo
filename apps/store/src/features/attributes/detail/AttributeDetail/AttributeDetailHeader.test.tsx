@@ -84,7 +84,7 @@ describe('AttributeDetailHeader', () => {
     );
     expect(screen.getByText('Draft')).toBeVisible();
     expect(screen.getByRole('button', { name: 'Publish' })).toBeVisible();
-    expect(screen.getByRole('button', { name: 'Add Value' })).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Add value' })).toBeVisible();
     expect(
       screen.getByRole('button', { name: 'Actions for Color' })
     ).toBeVisible();
@@ -278,7 +278,7 @@ describe('AttributeDetailHeader', () => {
 
     setup();
 
-    await user.click(await screen.findByRole('button', { name: 'Add Value' }));
+    await user.click(await screen.findByRole('button', { name: 'Add value' }));
 
     expect(
       screen.getByRole('dialog', { name: 'Add attribute values' })

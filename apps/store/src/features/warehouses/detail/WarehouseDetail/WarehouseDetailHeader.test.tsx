@@ -49,18 +49,12 @@ describe('WarehouseDetailHeader', () => {
     const user = userEvent.setup();
     setup();
 
-    await user.click(
-      screen.getByRole('button', { name: 'Actions for Main Warehouse' })
-    );
-    await user.click(
-      await screen.findByRole('menuitem', { name: 'Create transfer' })
-    );
+    await user.click(screen.getByRole('button', { name: 'Create transfer' }));
 
     expect(mocks.push).toHaveBeenCalledWith(getAddTransferRoute(1));
   });
 
-  it('hides transfer creation for a draft warehouse', async () => {
-    const user = userEvent.setup();
+  it('hides transfer creation for a draft warehouse', () => {
     setup({
       warehouse: {
         phone: null,
@@ -74,15 +68,9 @@ describe('WarehouseDetailHeader', () => {
       },
     });
 
-    await user.click(
-      screen.getByRole('button', { name: 'Actions for Main Warehouse' })
-    );
-
+    expect(screen.getByRole('button', { name: 'Publish' })).toBeVisible();
     expect(
-      await screen.findByRole('menuitem', { name: 'Edit warehouse' })
-    ).toBeInTheDocument();
-    expect(
-      screen.queryByRole('menuitem', { name: 'Create transfer' })
+      screen.queryByRole('button', { name: 'Create transfer' })
     ).not.toBeInTheDocument();
   });
 });
