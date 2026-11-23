@@ -24,8 +24,10 @@ of the current implementation.
 
 ## Entry points
 
-- **Warehouse detail → ⋮ → Create transfer** opens the page with that warehouse
-  as the source (`?sourceWarehouseId={id}`). The item is shown only for Active
+- **Transfers list → Add transfer** opens `/warehouse/transfers/add` with an
+  empty source.
+- **Warehouse detail → Create transfer** opens the page with that warehouse as
+  the source (`?sourceWarehouseId={id}`). The button is shown only for Active
   warehouses.
 - Opening `/warehouse/transfers/add` without the parameter starts with an empty
   source.
@@ -35,12 +37,12 @@ of the current implementation.
 
 | Situation | Behavior |
 | --- | --- |
-| Active warehouse | Preselected as the source. The breadcrumb shows it between Warehouses and New transfer. |
+| Active warehouse | Preselected as the source. |
 | Draft warehouse | Opens the **Publish warehouse?** review. Publishing selects it; Cancel leaves the source empty and returns focus to From warehouse. |
 | Warehouse cannot be loaded | Shows a **Choose a source warehouse** notice and leaves the source empty for manual selection. |
 
-The breadcrumb reflects the warehouse the page was opened from. Changing the
-source in the form does not rewrite the URL or the breadcrumb.
+The breadcrumb always shows **Transfers / New transfer**. Changing the source
+in the form does not rewrite the URL.
 
 ## Transfer information
 
@@ -138,9 +140,10 @@ when not empty).
 - While a request is pending, the form is disabled and the pressed action
   shows **Saving...** or **Transferring...**.
 - On success, a toast confirms the result (**Transfer draft created.** or
-  **Transfer started. Products are in transit.**) and the page returns to the
-  source warehouse detail. After **Transfer**, the stock and warehouse details
-  of both warehouses are refreshed.
+  **Transfer started. Products are in transit.**), the transfers list is
+  refreshed, and the page returns to the source warehouse detail. After
+  **Transfer**, the stock and warehouse details of both warehouses are also
+  refreshed.
 - On failure, the service message is shown in a toast and field errors are
   attached to their fields. Row errors are matched to the row that was
   submitted, even if rows were removed or reordered since; errors for rows that
@@ -178,8 +181,8 @@ the shared [form conventions](../forms.md).
 
 - **Editing a saved transfer** (update request) is not implemented. A saved
   draft cannot be reopened from this page yet.
-- **Transfer detail and list pages** do not exist yet, so after saving the page
-  returns to the source warehouse.
+- **Transfer detail page** does not exist yet, so after saving the page returns
+  to the source warehouse.
 - **Completing a transfer** (status Completed) is not part of this workflow.
 - **Available is a snapshot.** It is not refreshed while the page is open; the
   backend must make the final stock check when saving.

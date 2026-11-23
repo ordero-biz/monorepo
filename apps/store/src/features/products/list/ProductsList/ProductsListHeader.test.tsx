@@ -30,7 +30,7 @@ describe('ProductsListHeader', () => {
     routerPushMock.mockClear();
   });
 
-  it('opens product creation from the Add Product button', async () => {
+  it('opens product creation from the Add product button', async () => {
     const user = userEvent.setup();
 
     setup();
@@ -49,7 +49,7 @@ describe('ProductsListHeader', () => {
         name: /^(Single product|Multiple products)$/,
       })
     ).not.toBeInTheDocument();
-    await user.click(screen.getByRole('button', { name: 'Add Product' }));
+    await user.click(screen.getByRole('button', { name: 'Add product' }));
 
     expect(routerPushMock).toHaveBeenCalledWith('/products/add');
   });

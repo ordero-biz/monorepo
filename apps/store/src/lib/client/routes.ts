@@ -11,6 +11,7 @@ export const clientRoutes = {
   supplies: '/warehouse/supplies',
   addSupply: '/warehouse/supplies/add',
   suppliers: '/warehouse/suppliers',
+  transfers: '/warehouse/transfers',
   addTransfer: '/warehouse/transfers/add',
   unitsOfMeasurement: '/warehouse/units-of-measurement',
   warehouses: '/warehouse',
@@ -35,6 +36,9 @@ export const getSupplyDetailRoute = (supplyId: string | number) =>
 
 export const getWarehouseDetailRoute = (warehouseId: string | number) =>
   `/warehouse/${warehouseId}`;
+
+export const getTransferDetailRoute = (transferId: string | number) =>
+  `/warehouse/transfers/${transferId}`;
 
 export const getUnitOfMeasurementDetailRoute = (
   unitOfMeasurementId: string | number

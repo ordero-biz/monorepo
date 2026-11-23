@@ -57,7 +57,7 @@ export const ProductsListHeader = ({
           onClick={() => router.push(clientRoutes.addProduct)}
           type="button"
         >
-          Add Product
+          Add product
         </Button>
       </PageHeader.Right>
     </PageHeader.Root>

@@ -10,7 +10,7 @@ export const CreateSupplierDialogTrigger = () => {
   return (
     <>
       <Button color="primary" onClick={() => setOpen(true)} type="button">
-        Add Supplier
+        Add supplier
       </Button>
 
       <CreateSupplierDialog onOpenChange={setOpen} open={open} />

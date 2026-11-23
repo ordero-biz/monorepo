@@ -9,6 +9,7 @@ import {
 import { TRANSFER_STATUS } from '@/lib/domain/transfers/constants';
 import type { TransferDetails } from '@/lib/domain/transfers/types';
 import { WAREHOUSE_STATUS } from '@/lib/domain/warehouses/constants';
+import { transfersQueryKeys } from '@/lib/query/transfers/transfersQueryKeys';
 import { warehousesQueryKeys } from '@/lib/query/warehouses/warehousesQueryKeys';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { CreateTransfer } from './CreateTransfer';
@@ -29,7 +30,10 @@ vi.mock('@/lib/client/api/warehouses', async () => ({
   getWarehouseStock: vi.fn(),
 }));
 
-vi.mock('@/lib/client/api/transfers', () => ({
+vi.mock('@/lib/client/api/transfers', async () => ({
+  ...(await vi.importActual<typeof import('@/lib/client/api/transfers')>(
+    '@/lib/client/api/transfers'
+  )),
   createTransfer: vi.fn(),
 }));
 
@@ -331,7 +335,8 @@ describe('TransferEntries', () => {
       ok: true,
       data: createdTransfer(TRANSFER_STATUS.DRAFT),
     });
-    await openWithMainWarehouse();
+    const { queryClient } = await openWithMainWarehouse();
+    const invalidateQueries = vi.spyOn(queryClient, 'invalidateQueries');
     await fillTransferInformation(user);
     await pickOption(user, getProduct(1), /Jasmine Rice 5kg/);
     await user.type(getQuantity(1), '20');
@@ -361,6 +366,12 @@ describe('TransferEntries', () => {
           comment: 'Fragile',
         },
       ],
+    });
+    expect(invalidateQueries).toHaveBeenCalledWith({
+      queryKey: transfersQueryKeys.list,
+    });
+    expect(invalidateQueries).not.toHaveBeenCalledWith({
+      queryKey: warehousesQueryKeys.stock(mainWarehouse.id),
     });
     expect(await screen.findByText('Transfer draft created.')).toBeVisible();
   });
@@ -394,6 +405,9 @@ describe('TransferEntries', () => {
     expect(createTransferMock).toHaveBeenCalledWith(
       expect.objectContaining({ status: TRANSFER_STATUS.IN_TRANSIT })
     );
+    expect(invalidateQueries).toHaveBeenCalledWith({
+      queryKey: transfersQueryKeys.list,
+    });
     for (const warehouseId of [mainWarehouse.id, eastWarehouse.id]) {
       expect(invalidateQueries).toHaveBeenCalledWith({
         queryKey: warehousesQueryKeys.stock(warehouseId),
