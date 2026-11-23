@@ -6,4 +6,5 @@ export type TransferDetailProps = {
 
 export type TransferDetailHeaderProps = {
   transfer: TransferDetails;
+  onDeleted: () => Promise<void> | void;
 };

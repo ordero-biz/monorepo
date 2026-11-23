@@ -1,17 +1,34 @@
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { getTransfer, updateTransfer } from '@/lib/client/api/transfers';
+import {
+  deleteTransfer,
+  getTransfer,
+  updateTransfer,
+} from '@/lib/client/api/transfers';
 import { getWarehouses } from '@/lib/client/api/warehouses';
+import { clientRoutes } from '@/lib/client/routes';
 import { TRANSFER_STATUS } from '@/lib/domain/transfers/constants';
 import type { TransferDetails } from '@/lib/domain/transfers/types';
 import { WAREHOUSE_STATUS } from '@/lib/domain/warehouses/constants';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { TransferDetail } from './TransferDetail';
 
+const routerPushMock = vi.fn();
+
+vi.mock('next/navigation', async () => ({
+  ...(await vi.importActual<typeof import('next/navigation')>(
+    'next/navigation'
+  )),
+  useRouter: () => ({
+    push: routerPushMock,
+  }),
+}));
+
 vi.mock('@/lib/client/api/transfers', async () => ({
   ...(await vi.importActual<typeof import('@/lib/client/api/transfers')>(
     '@/lib/client/api/transfers'
   )),
+  deleteTransfer: vi.fn(),
   getTransfer: vi.fn(),
   updateTransfer: vi.fn(),
 }));
@@ -23,6 +40,7 @@ vi.mock('@/lib/client/api/warehouses', async () => ({
   getWarehouses: vi.fn(),
 }));
 
+const deleteTransferMock = vi.mocked(deleteTransfer);
 const getTransferMock = vi.mocked(getTransfer);
 const getWarehousesMock = vi.mocked(getWarehouses);
 const updateTransferMock = vi.mocked(updateTransfer);
@@ -77,7 +95,9 @@ const transfer = {
 
 describe('TransferDetail', () => {
   beforeEach(() => {
+    deleteTransferMock.mockReset();
     getTransferMock.mockReset();
+    routerPushMock.mockReset();
     updateTransferMock.mockReset();
   });
 
@@ -236,6 +256,31 @@ describe('TransferDetail', () => {
     expect(
       screen.queryByRole('button', { name: 'Save draft' })
     ).not.toBeInTheDocument();
+  });
+
+  it('deletes the draft and navigates to the transfer list', async () => {
+    getTransferMock.mockResolvedValue({ ok: true, data: transfer });
+    deleteTransferMock.mockResolvedValue({ ok: true, data: undefined });
+    const user = userEvent.setup();
+    setup();
+
+    await user.click(
+      await screen.findByRole('button', { name: 'Actions for Weekend restock' })
+    );
+    await user.click(
+      await screen.findByRole('menuitem', { name: 'Delete transfer' })
+    );
+    await user.click(
+      within(screen.getByRole('dialog', { name: 'Delete transfer' })).getByRole(
+        'button',
+        { name: 'Delete' }
+      )
+    );
+
+    expect(deleteTransferMock).toHaveBeenCalledWith(5);
+    await waitFor(() =>
+      expect(routerPushMock).toHaveBeenCalledWith(clientRoutes.transfers)
+    );
   });
 
   it('retries when the transfer cannot be loaded', async () => {

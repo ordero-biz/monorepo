@@ -1,6 +1,7 @@
 import { TRANSFER_STATUS } from '@/lib/domain/transfers/constants';
 import {
   createTransfer,
+  deleteTransfer,
   getTransfer,
   getTransfers,
   getTransfersPath,
@@ -113,6 +114,17 @@ describe('transfer client helpers', () => {
           ],
         }),
       })
+    );
+  });
+
+  it('deletes a transfer through the backend proxy', async () => {
+    const fetchMock = vi.mocked(fetch);
+    fetchMock.mockResolvedValue(new Response(null, { status: 200 }));
+
+    await expect(deleteTransfer(5)).resolves.toMatchObject({ ok: true });
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/backend/api/v1/warehouse-transfers/5',
+      expect.objectContaining({ method: 'DELETE' })
     );
   });
 });

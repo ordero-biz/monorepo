@@ -1,5 +1,7 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
+import { clientRoutes } from '@/lib/client/routes';
 import { useTransferQuery } from '@/lib/hooks/transfers/useTransferQuery';
 import { Button, Card, Typography } from '@/ui/index';
 import { UpdateTransfer } from '../UpdateTransfer';
@@ -7,6 +9,7 @@ import { TransferDetailHeader } from './TransferDetailHeader';
 import type { TransferDetailProps } from './types';
 
 export const TransferDetail = ({ transferId }: TransferDetailProps) => {
+  const router = useRouter();
   const transferQuery = useTransferQuery(transferId);
 
   if (transferQuery.isPending) {
@@ -47,7 +50,12 @@ export const TransferDetail = ({ transferId }: TransferDetailProps) => {
 
   return (
     <div className="flex flex-col gap-[var(--space-2)]">
-      <TransferDetailHeader transfer={transferQuery.data} />
+      <TransferDetailHeader
+        onDeleted={() => {
+          router.push(clientRoutes.transfers);
+        }}
+        transfer={transferQuery.data}
+      />
       <UpdateTransfer
         key={transferQuery.data.id}
         transfer={transferQuery.data}
