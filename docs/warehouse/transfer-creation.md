@@ -26,8 +26,8 @@ of the current implementation.
 
 - **Transfers list → Add transfer** opens `/warehouse/transfers/add` with an
   empty source.
-- **Warehouse detail → ⋮ → Create transfer** opens the page with that warehouse
-  as the source (`?sourceWarehouseId={id}`). The item is shown only for Active
+- **Warehouse detail → Create transfer** opens the page with that warehouse as
+  the source (`?sourceWarehouseId={id}`). The button is shown only for Active
   warehouses.
 - Opening `/warehouse/transfers/add` without the parameter starts with an empty
   source.

@@ -4,7 +4,7 @@ import { SuppliersListHeader } from './SuppliersListHeader';
 
 vi.mock('@/features/suppliers/list/CreateSupplier', () => ({
   CreateSupplierDialogTrigger: () => (
-    <button type="button">Add Supplier</button>
+    <button type="button">Add supplier</button>
   ),
 }));
 
@@ -24,6 +24,6 @@ describe('SuppliersListHeader', () => {
         'Suppliers'
       )
     ).toHaveAttribute('aria-current', 'page');
-    expect(screen.getByRole('button', { name: 'Add Supplier' })).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Add supplier' })).toBeVisible();
   });
 });

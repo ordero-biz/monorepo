@@ -10,7 +10,7 @@ export const CreateAttributeDialogTrigger = () => {
   return (
     <>
       <Button color="primary" onClick={() => setOpen(true)} type="button">
-        Add Attribute
+        Add attribute
       </Button>
 
       <CreateAttributeDialog onOpenChange={setOpen} open={open} />
