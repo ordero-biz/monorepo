@@ -14,6 +14,7 @@ import {
   TransferEditorForm,
   useSourceWarehouseChange,
 } from '../../shared/TransferEditorForm';
+import { TransferInProgressDetail } from '../TransferInProgressDetail';
 import { useUpdateTransferForm } from './hooks/useUpdateTransferForm';
 import type { UpdateTransferProps } from './types';
 
@@ -63,45 +64,47 @@ export const UpdateTransfer = ({ transfer }: UpdateTransferProps) => {
   const sourceWarehouseRef = useRestoreFocus<HTMLInputElement>(
     sourceChange.pendingChange !== null
   );
-  const isDraft = baseline.status === TRANSFER_STATUS.DRAFT;
+  if (baseline.status === TRANSFER_STATUS.IN_TRANSIT) {
+    return <TransferInProgressDetail transfer={baseline} />;
+  }
+
+  if (baseline.status !== TRANSFER_STATUS.DRAFT) {
+    // Completed and Rejected get their own views later.
+    return (
+      <Card.Root variant="filled">
+        <Card.Content>
+          <Typography color="text-secondary" variant="body2">
+            Details for this transfer status are not available yet.
+          </Typography>
+        </Card.Content>
+      </Card.Root>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-[var(--space-2)]">
-      {isDraft ? (
-        <>
-          <div
-            className="rounded-[var(--radius)] bg-muted p-[var(--space-1-5)]"
-            role="note"
-          >
-            <Typography variant="body2">
-              <strong>Draft.</strong> Nothing has left the warehouse yet. You
-              can change everything until you press Transfer.
-            </Typography>
-          </div>
-          <TransferEditorForm
-            form={form}
-            onSourceWarehouseChange={sourceChange.requestChange}
-            pendingIntent={pendingIntent}
-            sourceWarehouseRef={sourceWarehouseRef}
-            submit={submit}
-          >
-            <SourceWarehouseChangeDialog
-              onCancel={sourceChange.cancelChange}
-              onConfirm={sourceChange.confirmChange}
-              pendingChange={sourceChange.pendingChange}
-            />
-          </TransferEditorForm>
-        </>
-      ) : (
-        // Views for the other statuses are not designed yet.
-        <Card.Root variant="filled">
-          <Card.Content>
-            <Typography color="text-secondary" variant="body2">
-              Details for this transfer status are not available yet.
-            </Typography>
-          </Card.Content>
-        </Card.Root>
-      )}
+      <div
+        className="rounded-[var(--radius)] bg-muted p-[var(--space-1-5)]"
+        role="note"
+      >
+        <Typography variant="body2">
+          <strong>Draft.</strong> Nothing has left the warehouse yet. You can
+          change everything until you press Transfer.
+        </Typography>
+      </div>
+      <TransferEditorForm
+        form={form}
+        onSourceWarehouseChange={sourceChange.requestChange}
+        pendingIntent={pendingIntent}
+        sourceWarehouseRef={sourceWarehouseRef}
+        submit={submit}
+      >
+        <SourceWarehouseChangeDialog
+          onCancel={sourceChange.cancelChange}
+          onConfirm={sourceChange.confirmChange}
+          pendingChange={sourceChange.pendingChange}
+        />
+      </TransferEditorForm>
     </div>
   );
 };

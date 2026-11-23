@@ -12,7 +12,9 @@ This specification covers the `/warehouse/transfers/add` page, from choosing
 the warehouses to creating the transfer. A saved Draft opens at
 `/warehouse/transfers/{id}` in the same editor, including the source warehouse change
 confirmation; rows restored from the draft show Available as "—" until the stock
-line is picked again. Other statuses have no detail view yet.
+line is picked again. In transit transfers open read-only: the transfer
+information and the sent entries with their total. Completed transfers have no
+detail view yet.
 
 ## Terms
 
@@ -178,9 +180,10 @@ the shared [form conventions](../forms.md).
 
 ## Limitations and future decisions
 
-- **Transfer detail** exists only for Drafts. In transit and Completed
-  transfers have no detail view yet, so starting a transfer returns to the
-  source warehouse.
+- **Transfer detail** is editable only for Drafts. In transit transfers are
+  read-only; receiving and rejecting are not available yet. Completed and
+  Rejected transfers will get their own detail views.
+  Starting a transfer from the create page returns to the source warehouse.
 - **Transfers list** (`/warehouse/transfers`) has no status filter yet.
 - **Completing a transfer** (status Completed) is not part of this workflow.
 - **Available is a snapshot.** It is not refreshed while the page is open; the

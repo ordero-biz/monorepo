@@ -78,9 +78,9 @@ describe('UpdateTransfer', () => {
     expect(screen.getByRole('form', { name: 'Transfer' })).toBeVisible();
   });
 
-  it('shows a placeholder instead of the editor for other statuses', () => {
+  it('shows a placeholder for statuses without a detail view yet', () => {
     setup({
-      transfer: { ...transfer, status: TRANSFER_STATUS.IN_TRANSIT },
+      transfer: { ...transfer, status: TRANSFER_STATUS.COMPLETED },
     });
 
     expect(
@@ -88,6 +88,23 @@ describe('UpdateTransfer', () => {
         'Details for this transfer status are not available yet.'
       )
     ).toBeVisible();
+    expect(
+      screen.queryByRole('table', { name: 'Transfer entries' })
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('form', { name: 'Transfer' })
+    ).not.toBeInTheDocument();
+  });
+
+  it('shows the in-progress detail instead of the editor for an in-transit transfer', () => {
+    setup({
+      transfer: { ...transfer, status: TRANSFER_STATUS.IN_TRANSIT },
+    });
+
+    expect(
+      screen.getByRole('table', { name: 'Transfer entries' })
+    ).toBeVisible();
+    expect(screen.queryByRole('note')).not.toBeInTheDocument();
     expect(
       screen.queryByRole('form', { name: 'Transfer' })
     ).not.toBeInTheDocument();
@@ -159,9 +176,7 @@ describe('UpdateTransfer', () => {
     );
 
     expect(
-      await screen.findByText(
-        'Details for this transfer status are not available yet.'
-      )
+      await screen.findByRole('table', { name: 'Transfer entries' })
     ).toBeVisible();
     for (const warehouseId of [1, 2]) {
       expect(invalidateQueries).toHaveBeenCalledWith({
