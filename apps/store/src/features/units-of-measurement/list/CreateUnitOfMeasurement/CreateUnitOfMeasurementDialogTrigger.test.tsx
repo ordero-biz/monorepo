@@ -14,7 +14,7 @@ describe('CreateUnitOfMeasurementDialogTrigger', () => {
     setup();
 
     await user.click(
-      screen.getByRole('button', { name: 'Add Unit of Measurement' })
+      screen.getByRole('button', { name: 'Add unit of measurement' })
     );
 
     expect(
@@ -28,7 +28,7 @@ describe('CreateUnitOfMeasurementDialogTrigger', () => {
     setup();
 
     await user.click(
-      screen.getByRole('button', { name: 'Add Unit of Measurement' })
+      screen.getByRole('button', { name: 'Add unit of measurement' })
     );
 
     const dialog = screen.getByRole('dialog', {
@@ -44,7 +44,7 @@ describe('CreateUnitOfMeasurementDialogTrigger', () => {
     ).not.toBeInTheDocument();
 
     await user.click(
-      screen.getByRole('button', { name: 'Add Unit of Measurement' })
+      screen.getByRole('button', { name: 'Add unit of measurement' })
     );
 
     expect(

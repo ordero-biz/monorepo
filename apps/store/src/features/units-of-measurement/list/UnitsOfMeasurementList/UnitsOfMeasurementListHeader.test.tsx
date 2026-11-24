@@ -4,7 +4,7 @@ import { UnitsOfMeasurementListHeader } from './UnitsOfMeasurementListHeader';
 
 vi.mock('../CreateUnitOfMeasurement', () => ({
   CreateUnitOfMeasurementDialogTrigger: () => (
-    <button type="button">Add Unit of Measurement</button>
+    <button type="button">Add unit of measurement</button>
   ),
 }));
 
@@ -25,7 +25,7 @@ describe('UnitsOfMeasurementListHeader', () => {
       )
     ).toHaveAttribute('aria-current', 'page');
     expect(
-      screen.getByRole('button', { name: 'Add Unit of Measurement' })
+      screen.getByRole('button', { name: 'Add unit of measurement' })
     ).toBeVisible();
   });
 });

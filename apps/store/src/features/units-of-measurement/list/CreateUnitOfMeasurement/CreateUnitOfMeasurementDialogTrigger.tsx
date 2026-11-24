@@ -10,7 +10,7 @@ export const CreateUnitOfMeasurementDialogTrigger = () => {
   return (
     <>
       <Button color="primary" onClick={() => setOpen(true)} type="button">
-        Add Unit of Measurement
+        Add unit of measurement
       </Button>
 
       <CreateUnitOfMeasurementDialog onOpenChange={setOpen} open={open} />

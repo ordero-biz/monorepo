@@ -157,7 +157,7 @@ describe('WarehouseDetail', () => {
     expect(screen.getByText('Primary stock location')).toBeVisible();
   });
 
-  it('shows edit actions but not Publish for an active warehouse', async () => {
+  it('shows edit actions and Create transfer but not Publish for an active warehouse', async () => {
     getWarehouseMock.mockResolvedValue({
       ok: true,
       data: { ...warehouse, status: WAREHOUSE_STATUS.ACTIVE },
@@ -169,6 +169,9 @@ describe('WarehouseDetail', () => {
     expect(
       screen.queryByRole('button', { name: 'Publish' })
     ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Create transfer' })
+    ).toBeVisible();
     expect(
       screen.getByRole('button', { name: 'Actions for Main Warehouse' })
     ).toBeVisible();

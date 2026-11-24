@@ -54,7 +54,6 @@ export const getTransfer = (transferId: string | number) =>
     tokenizePath(CLIENT_BACKEND_PATHS.warehouseTransfer, { id: transferId }),
     { method: 'GET' }
   );
-
 export const createTransfer = (input: CreateTransferData) =>
   apiFetch<TransferDetails>(CLIENT_BACKEND_PATHS.warehouseTransfers, {
     method: 'POST',

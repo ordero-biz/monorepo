@@ -13,7 +13,7 @@ describe('CreateCategoryDialogTrigger', () => {
 
     setup();
 
-    await user.click(screen.getByRole('button', { name: 'Add Category' }));
+    await user.click(screen.getByRole('button', { name: 'Add category' }));
 
     expect(
       screen.getByRole('dialog', { name: 'Add new category' })
@@ -25,7 +25,7 @@ describe('CreateCategoryDialogTrigger', () => {
 
     setup();
 
-    await user.click(screen.getByRole('button', { name: 'Add Category' }));
+    await user.click(screen.getByRole('button', { name: 'Add category' }));
 
     const dialog = screen.getByRole('dialog', { name: 'Add new category' });
     const nameField = within(dialog).getByRole('textbox', { name: 'Name' });
@@ -37,7 +37,7 @@ describe('CreateCategoryDialogTrigger', () => {
       screen.queryByRole('dialog', { name: 'Add new category' })
     ).not.toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', { name: 'Add Category' }));
+    await user.click(screen.getByRole('button', { name: 'Add category' }));
 
     const reopenedDialog = screen.getByRole('dialog', {
       name: 'Add new category',

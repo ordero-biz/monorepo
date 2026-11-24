@@ -7,7 +7,7 @@ Product creation helps store operators prepare **one product with one or more
 variants**. It separates choosing shared details and variant combinations from
 reviewing the generated variants and entering their identifiers.
 
-Select **Add Product** on the Products list to open the creation workflow at
+Select **Add product** on the Products list to open the creation workflow at
 `/products/add`.
 
 ## Product, variant, and attribute value

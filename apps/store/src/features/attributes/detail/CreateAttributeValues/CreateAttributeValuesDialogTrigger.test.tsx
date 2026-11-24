@@ -18,7 +18,7 @@ describe('CreateAttributeValuesDialogTrigger', () => {
 
     setup();
 
-    await user.click(screen.getByRole('button', { name: 'Add Value' }));
+    await user.click(screen.getByRole('button', { name: 'Add value' }));
 
     const dialog = screen.getByRole('dialog', {
       name: 'Add attribute values',
@@ -37,7 +37,7 @@ describe('CreateAttributeValuesDialogTrigger', () => {
       screen.queryByRole('dialog', { name: 'Add attribute values' })
     ).not.toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', { name: 'Add Value' }));
+    await user.click(screen.getByRole('button', { name: 'Add value' }));
 
     const reopenedDialog = screen.getByRole('dialog', {
       name: 'Add attribute values',

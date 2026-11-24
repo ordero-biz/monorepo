@@ -4,7 +4,7 @@ import { WarehousesListHeader } from './WarehousesListHeader';
 
 vi.mock('../CreateWarehouse', () => ({
   CreateWarehouseDialogTrigger: () => (
-    <button type="button">Add Warehouse</button>
+    <button type="button">Add warehouse</button>
   ),
 }));
 
@@ -24,6 +24,6 @@ describe('WarehousesListHeader', () => {
         'Warehouses'
       )
     ).toHaveAttribute('aria-current', 'page');
-    expect(screen.getByRole('button', { name: 'Add Warehouse' })).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Add warehouse' })).toBeVisible();
   });
 });

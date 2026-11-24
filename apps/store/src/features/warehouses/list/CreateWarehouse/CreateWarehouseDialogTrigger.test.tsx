@@ -13,7 +13,7 @@ describe('CreateWarehouseDialogTrigger', () => {
 
     setup();
 
-    await user.click(screen.getByRole('button', { name: 'Add Warehouse' }));
+    await user.click(screen.getByRole('button', { name: 'Add warehouse' }));
 
     expect(screen.getByRole('dialog', { name: 'Add warehouse' })).toBeVisible();
   });
@@ -23,7 +23,7 @@ describe('CreateWarehouseDialogTrigger', () => {
 
     setup();
 
-    await user.click(screen.getByRole('button', { name: 'Add Warehouse' }));
+    await user.click(screen.getByRole('button', { name: 'Add warehouse' }));
 
     const dialog = screen.getByRole('dialog', { name: 'Add warehouse' });
     const nameField = within(dialog).getByRole('textbox', { name: 'Name' });
@@ -35,7 +35,7 @@ describe('CreateWarehouseDialogTrigger', () => {
       screen.queryByRole('dialog', { name: 'Add warehouse' })
     ).not.toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', { name: 'Add Warehouse' }));
+    await user.click(screen.getByRole('button', { name: 'Add warehouse' }));
 
     expect(
       within(screen.getByRole('dialog', { name: 'Add warehouse' })).getByRole(
