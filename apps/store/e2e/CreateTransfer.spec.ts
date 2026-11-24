@@ -74,10 +74,7 @@ test('opens from an active warehouse and selects a different destination', async
   page,
 }) => {
   await page.goto(`/warehouse/${mainWarehouse.id}`);
-  await page
-    .getByRole('button', { name: `Actions for ${mainWarehouse.name}` })
-    .click();
-  await page.getByRole('menuitem', { name: 'Create transfer' }).click();
+  await page.getByRole('button', { name: 'Create transfer' }).click();
 
   await expect(page).toHaveURL(
     `${transferPath}?sourceWarehouseId=${mainWarehouse.id}`

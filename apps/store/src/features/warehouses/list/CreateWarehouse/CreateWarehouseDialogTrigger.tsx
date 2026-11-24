@@ -10,7 +10,7 @@ export const CreateWarehouseDialogTrigger = () => {
   return (
     <>
       <Button color="primary" onClick={() => setOpen(true)} type="button">
-        Add Warehouse
+        Add warehouse
       </Button>
 
       <CreateWarehouseDialog onOpenChange={setOpen} open={open} />

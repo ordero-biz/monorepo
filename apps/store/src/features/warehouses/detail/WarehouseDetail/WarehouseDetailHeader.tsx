@@ -1,5 +1,5 @@
-import { Menu, PageHeader, Typography } from '@ordero/ui';
-import { ArrowRightLeft, EllipsisVertical, Pencil } from 'lucide-react';
+import { Button, Menu, PageHeader, Typography } from '@ordero/ui';
+import { EllipsisVertical, Pencil } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { getAddTransferRoute } from '@/lib/client/routes';
@@ -35,9 +35,18 @@ export const WarehouseDetailHeader = ({
         </div>
       </PageHeader.Left>
       <PageHeader.Right>
-        {!isWarehouseActive ? (
+        {isWarehouseActive ? (
+          <Button
+            color="inherit"
+            onClick={() => router.push(getAddTransferRoute(warehouse.id))}
+            type="button"
+            variant="soft"
+          >
+            Create transfer
+          </Button>
+        ) : (
           <ActivateWarehouseDialogTrigger warehouse={warehouse} />
-        ) : null}
+        )}
         <Menu.Root>
           <Menu.Trigger
             aria-label={`Actions for ${warehouse.name}`}
@@ -57,19 +66,6 @@ export const WarehouseDetailHeader = ({
                   />
                   Edit warehouse
                 </Menu.Item>
-                {isWarehouseActive ? (
-                  <Menu.Item
-                    onClick={() =>
-                      router.push(getAddTransferRoute(warehouse.id))
-                    }
-                  >
-                    <ArrowRightLeft
-                      aria-hidden="true"
-                      className="size-[var(--icon-button-xs-icon)]"
-                    />
-                    Create transfer
-                  </Menu.Item>
-                ) : null}
               </Menu.Popup>
             </Menu.Positioner>
           </Menu.Portal>

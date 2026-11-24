@@ -3,11 +3,10 @@
 import { Card, PageHeader, Typography, useToastManager } from '@ordero/ui';
 import { useQuery } from '@tanstack/react-query';
 import { useEffect, useEffectEvent } from 'react';
-import { warehousesRootBreadcrumb } from '@/features/warehouses/shared/breadcrumbs';
 import { getWarehouse } from '@/lib/client/api/warehouses';
-import { getWarehouseDetailRoute } from '@/lib/client/routes';
 import { AppBreadcrumbs } from '@/lib/components/AppBreadcrumbs';
 import { warehouseQueryOptions } from '@/lib/query/warehouses/warehousesQueryOptions';
+import { transfersRootBreadcrumb } from '../../shared/breadcrumbs';
 import type { TransferWarehouseSelection } from '../../shared/TransferEditorForm';
 import { CreateTransferForm } from './CreateTransferForm';
 import type { CreateTransferProps } from './types';
@@ -62,16 +61,7 @@ export const CreateTransfer = ({ sourceWarehouseId }: CreateTransferProps) => {
             <Typography variant="h5">Create transfer</Typography>
             <AppBreadcrumbs
               items={[
-                warehousesRootBreadcrumb,
-                ...(sourceWarehouse
-                  ? [
-                      {
-                        href: getWarehouseDetailRoute(sourceWarehouse.id),
-                        id: 'source-warehouse',
-                        label: sourceWarehouse.name,
-                      },
-                    ]
-                  : []),
+                transfersRootBreadcrumb,
                 { id: 'current-transfer', label: 'New transfer' },
               ]}
             />

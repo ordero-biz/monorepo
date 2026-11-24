@@ -4,7 +4,7 @@ import { AttributesListHeader } from './AttributesListHeader';
 
 vi.mock('../CreateAttribute', () => ({
   CreateAttributeDialogTrigger: () => (
-    <button type="button">Add Attribute</button>
+    <button type="button">Add attribute</button>
   ),
 }));
 
@@ -24,6 +24,6 @@ describe('AttributesListHeader', () => {
         'Attributes'
       )
     ).toHaveAttribute('aria-current', 'page');
-    expect(screen.getByRole('button', { name: 'Add Attribute' })).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Add attribute' })).toBeVisible();
   });
 });

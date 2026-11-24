@@ -87,12 +87,14 @@ describe('CreateTransfer', () => {
     expect(screen.getByRole('combobox', { name: /To warehouse/ })).toHaveValue(
       ''
     );
+    const breadcrumb = screen.getByRole('navigation', { name: 'Breadcrumb' });
     expect(
-      within(screen.getByRole('navigation', { name: 'Breadcrumb' })).getByRole(
-        'link',
-        { name: 'Main Warehouse' }
-      )
-    ).toHaveAttribute('href', '/warehouse/1');
+      within(breadcrumb).getByRole('link', { name: 'Transfers' })
+    ).toHaveAttribute('href', '/warehouse/transfers');
+    expect(within(breadcrumb).getByText('New transfer')).toHaveAttribute(
+      'aria-current',
+      'page'
+    );
   });
 
   it('prompts the user to choose a source warehouse after a failed lookup', async () => {
