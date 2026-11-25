@@ -77,6 +77,9 @@ describe('SupplyReadOnly', () => {
     );
 
     const table = screen.getByRole('table', { name: 'Supply entries' });
+    expect(
+      screen.getByRole('heading', { name: 'Supply entries' })
+    ).toBeVisible();
     expect(within(table).getAllByRole('row')).toHaveLength(4);
     const rice = within(table).getByRole('row', { name: /Jasmine Rice 5kg/ });
     expect(within(rice).getByText('RICE-5KG')).toBeVisible();

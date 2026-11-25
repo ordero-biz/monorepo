@@ -3,7 +3,6 @@
 import {
   Button,
   DataTable,
-  Typography,
   useDataTableSelection,
 } from '@ordero/ui';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
@@ -97,35 +96,37 @@ export const TransferEntries = ({
 
   return (
     <>
-      <div className="flex flex-col gap-[var(--space-2)]">
-        <Typography variant="h6">Products to transfer</Typography>
-        <DataTable
-          ariaLabel="Transfer entries"
-          columns={columns}
-          data={entries}
-          emptyMessage="No products in this transfer."
-          footer={
-            <div className="flex w-full flex-col">
-              <Button
-                disabled={
-                  disabled || Boolean(lastEntry && !lastEntry.stockItem)
-                }
-                onClick={() => {
-                  scheduleScrollAfterAppend();
-                  appendEntry();
-                }}
-                ref={addProductButtonRef}
-                type="button"
-                variant="text"
-              >
-                + Add another product
-              </Button>
-            </div>
-          }
-          getRowId={getRowId}
-          selection={selection}
-        />
-      </div>
+      <DataTable
+        ariaLabel="Transfer entries"
+        columns={columns}
+        data={entries}
+        emptyMessage="No products in this transfer."
+        footer={
+          <div className="flex w-full flex-col">
+            <Button
+              disabled={
+                disabled || Boolean(lastEntry && !lastEntry.stockItem)
+              }
+              onClick={() => {
+                scheduleScrollAfterAppend();
+                appendEntry();
+              }}
+              ref={addProductButtonRef}
+              type="button"
+              variant="text"
+            >
+              + Add another product
+            </Button>
+          </div>
+        }
+        getRowId={getRowId}
+        header={
+          <h2 className="text-[length:var(--subtitle1-size-desktop)] leading-[var(--subtitle1-line-height-desktop)] font-[var(--subtitle1-weight)] [font-family:var(--subtitle1-family)]">
+            Products to transfer
+          </h2>
+        }
+        selection={selection}
+      />
 
       <TransferActions
         {...getTransferSummary(entries)}

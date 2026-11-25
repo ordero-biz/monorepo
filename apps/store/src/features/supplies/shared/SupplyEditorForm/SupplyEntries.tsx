@@ -3,7 +3,6 @@
 import {
   Button,
   DataTable,
-  Typography,
   useDataTableSelection,
 } from '@ordero/ui';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
@@ -101,41 +100,43 @@ export const SupplyEntries = ({
 
   return (
     <>
-      <div className="flex flex-col gap-[var(--space-2)]">
-        <Typography variant="h6">Supply products</Typography>
-        <DataTable
-          ariaLabel="Supply entries"
-          columns={columns}
-          data={entries}
-          emptyMessage="No products in this supply."
-          footer={
-            <div className="flex w-full flex-col">
-              <form.Subscribe selector={(state) => state.isSubmitting}>
-                {(isSubmitting) => (
-                  <Button
-                    disabled={
-                      disabled ||
-                      isSubmitting ||
-                      Boolean(lastEntry && !lastEntry.productVariant)
-                    }
-                    onClick={() => {
-                      scheduleScrollAfterAppend();
-                      appendEntry();
-                    }}
-                    ref={addProductButtonRef}
-                    type="button"
-                    variant="text"
-                  >
-                    + Add another product
-                  </Button>
-                )}
-              </form.Subscribe>
-            </div>
-          }
-          getRowId={getRowId}
-          selection={selection}
-        />
-      </div>
+      <DataTable
+        ariaLabel="Supply entries"
+        columns={columns}
+        data={entries}
+        emptyMessage="No products in this supply."
+        footer={
+          <div className="flex w-full flex-col">
+            <form.Subscribe selector={(state) => state.isSubmitting}>
+              {(isSubmitting) => (
+                <Button
+                  disabled={
+                    disabled ||
+                    isSubmitting ||
+                    Boolean(lastEntry && !lastEntry.productVariant)
+                  }
+                  onClick={() => {
+                    scheduleScrollAfterAppend();
+                    appendEntry();
+                  }}
+                  ref={addProductButtonRef}
+                  type="button"
+                  variant="text"
+                >
+                  + Add another product
+                </Button>
+              )}
+            </form.Subscribe>
+          </div>
+        }
+        getRowId={getRowId}
+        header={
+          <h2 className="text-[length:var(--subtitle1-size-desktop)] leading-[var(--subtitle1-line-height-desktop)] font-[var(--subtitle1-weight)] [font-family:var(--subtitle1-family)]">
+            Supply products
+          </h2>
+        }
+        selection={selection}
+      />
 
       <SupplyActions
         {...getSupplyTotal(form.state.values)}

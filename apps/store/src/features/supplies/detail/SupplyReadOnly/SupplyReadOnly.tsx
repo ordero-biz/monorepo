@@ -72,24 +72,26 @@ export const SupplyReadOnly = ({ supply }: SupplyReadOnlyProps) => {
           </Card.Content>
         </Card.Root>
 
-        <div className="flex flex-col gap-[var(--space-2)]">
-          <Typography variant="h6">Supply entries</Typography>
-          <DataTable
-            ariaLabel="Supply entries"
-            columns={columns}
-            data={supply.supplyEntries}
-            emptyMessage="No products in this supply."
-            footerColumns={{
-              product: <Typography variant="subtitle1">Total</Typography>,
-              total: (
-                <Typography variant="subtitle1">
-                  {formatMoney(supply.totalPrice)}
-                </Typography>
-              ),
-            }}
-            getRowId={getRowId}
-          />
-        </div>
+        <DataTable
+          ariaLabel="Supply entries"
+          columns={columns}
+          data={supply.supplyEntries}
+          emptyMessage="No products in this supply."
+          footerColumns={{
+            product: <Typography variant="subtitle1">Total</Typography>,
+            total: (
+              <Typography variant="subtitle1">
+                {formatMoney(supply.totalPrice)}
+              </Typography>
+            ),
+          }}
+          getRowId={getRowId}
+          header={
+            <h2 className="text-[length:var(--subtitle1-size-desktop)] leading-[var(--subtitle1-line-height-desktop)] font-[var(--subtitle1-weight)] [font-family:var(--subtitle1-family)]">
+              Supply entries
+            </h2>
+          }
+        />
       </div>
     </div>
   );

@@ -122,6 +122,9 @@ describe('TransferDetail', () => {
       screen.getByRole('combobox', { name: /From warehouse/ })
     ).toHaveValue('Main Warehouse');
     expect(
+      screen.getByRole('heading', { name: 'Products to transfer' })
+    ).toBeVisible();
+    expect(
       screen.getByRole('textbox', { name: 'Quantity for row 1' })
     ).toHaveValue('5');
     expect(
