@@ -96,6 +96,17 @@ describe('DeleteTransferDialog', () => {
     await screen.findByRole('button', { name: 'Delete' });
   });
 
+  it('disables deletion when disabled', async () => {
+    const user = userEvent.setup();
+    setup({ disabled: true });
+
+    const deleteButton = screen.getByRole('button', { name: 'Delete' });
+
+    expect(deleteButton).toBeDisabled();
+    await user.click(deleteButton);
+    expect(deleteTransferMock).not.toHaveBeenCalled();
+  });
+
   it('shows a toast and stays open when deletion fails', async () => {
     const user = userEvent.setup();
     deleteTransferMock.mockResolvedValue({

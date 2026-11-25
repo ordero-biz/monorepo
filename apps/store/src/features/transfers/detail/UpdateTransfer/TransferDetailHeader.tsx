@@ -4,6 +4,7 @@ import { Menu, PageHeader, Typography } from '@ordero/ui';
 import { EllipsisVertical, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { AppBreadcrumbs } from '@/lib/components/AppBreadcrumbs';
+import { FormConflictResolver } from '@/lib/components/FormConflictResolver';
 import { TRANSFER_STATUS } from '@/lib/domain/transfers/constants';
 import { transfersRootBreadcrumb } from '../../shared/breadcrumbs';
 import { TransferStatusChip } from '../../shared/TransferStatusChip';
@@ -14,6 +15,8 @@ export const TransferDetailHeader = ({
   transfer,
   onDeleted,
 }: TransferDetailHeaderProps) => {
+  const resolver = FormConflictResolver.useContext();
+  const deleteDisabled = resolver?.isReadOnly ?? false;
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const isDraft = transfer.status === TRANSFER_STATUS.DRAFT;
   const transferTitle = transfer.transferNumber || 'Transfer';
@@ -42,6 +45,7 @@ export const TransferDetailHeader = ({
             <Menu.Trigger
               aria-label={`Actions for ${transferTitle}`}
               appearance="iconButton"
+              disabled={deleteDisabled}
               size="s"
               title={`Actions for ${transferTitle}`}
             >
@@ -52,6 +56,7 @@ export const TransferDetailHeader = ({
                 <Menu.Popup>
                   <Menu.Item
                     color="error"
+                    disabled={deleteDisabled}
                     onClick={() => setIsDeleteDialogOpen(true)}
                   >
                     <Trash2
@@ -66,6 +71,7 @@ export const TransferDetailHeader = ({
           </Menu.Root>
 
           <DeleteTransferDialog
+            disabled={deleteDisabled}
             onDeleted={onDeleted}
             onOpenChange={setIsDeleteDialogOpen}
             open={isDeleteDialogOpen}

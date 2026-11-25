@@ -494,11 +494,53 @@ describe('TransferDetail', () => {
     expect(screen.getByRole('textbox', { name: 'Comment' })).toHaveValue(
       'Unsaved comment'
     );
+    expect(
+      screen.getByRole('button', { name: 'Actions for Weekend restock' })
+    ).toBeDisabled();
     expect(screen.getByRole('button', { name: 'Save draft' })).toBeDisabled();
     expect(screen.getByRole('button', { name: 'Transfer' })).toBeDisabled();
     await user.click(screen.getByRole('button', { name: 'Save draft' }));
     fireEvent.submit(screen.getByRole('form', { name: 'Transfer' }));
     expect(updateTransferMock).not.toHaveBeenCalled();
+  });
+
+  it('blocks an already open delete confirmation when the transfer becomes read-only', async () => {
+    getTransferMock.mockResolvedValue({ ok: true, data: transfer });
+    const user = userEvent.setup();
+    const { queryClient } = setup();
+    await user.type(
+      await screen.findByRole('textbox', { name: 'Comment' }),
+      'Unsaved comment'
+    );
+    await user.click(
+      screen.getByRole('button', { name: 'Actions for Weekend restock' })
+    );
+    await user.click(
+      await screen.findByRole('menuitem', { name: 'Delete transfer' })
+    );
+    getTransferMock.mockResolvedValue({
+      ok: true,
+      data: { ...transfer, status: TRANSFER_STATUS.IN_TRANSIT, version: 2 },
+    });
+
+    await act(() =>
+      queryClient.invalidateQueries({ queryKey: transfersQueryKeys.detail(5) })
+    );
+    await user.click(
+      within(
+        await screen.findByRole('dialog', { name: 'Transfer started' })
+      ).getByRole('button', { name: 'Close' })
+    );
+
+    const confirmation = screen.getByRole('dialog', {
+      name: 'Delete transfer',
+    });
+    const deleteButton = within(confirmation).getByRole('button', {
+      name: 'Delete',
+    });
+    expect(deleteButton).toBeDisabled();
+    await user.click(deleteButton);
+    expect(deleteTransferMock).not.toHaveBeenCalled();
   });
 
   it('blocks an already open start transfer confirmation when the transfer becomes read-only', async () => {
