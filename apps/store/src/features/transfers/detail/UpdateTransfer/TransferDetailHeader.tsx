@@ -38,7 +38,6 @@ export const TransferDetailHeader = ({
         </div>
       </PageHeader.Left>
 
-      {/* Only drafts can be deleted, and delete is the only action so far. */}
       {isDraft ? (
         <PageHeader.Right>
           <Menu.Root>
