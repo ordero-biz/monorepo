@@ -1,3 +1,4 @@
+import type { DataTableColumnDef } from '@ordero/ui';
 import type { ReactNode } from 'react';
 import type {
   FormMergeChoice,
@@ -7,6 +8,7 @@ import type {
   FormMergeUpdate,
   FormMergeValues,
 } from '@/lib/utils/form/comparison/mergeFormValues';
+import type { IdentifiableFormEntry } from './utils/mergeAddedEntries';
 
 export type FormRefreshAdapter<TValues extends object> = {
   isPristine: boolean;
@@ -115,4 +117,37 @@ export type FormConflictFormProps<TField extends string> = Pick<
 
 export type FormConflictFormValues = {
   choices: (FormMergeChoice | undefined)[];
+};
+
+export type FormEntryPreviewRow<TEntry extends IdentifiableFormEntry> =
+  TEntry & {
+    source?: 'Saved version' | 'Your added row · kept';
+    different: boolean;
+    highlighted: boolean;
+  };
+
+export type FormEntriesTableProps<TEntry extends IdentifiableFormEntry> = {
+  label: string;
+  entries: TEntry[];
+  addedEntries?: TEntry[];
+  comparedEntries?: TEntry[];
+  columns: DataTableColumnDef<FormEntryPreviewRow<TEntry>>[];
+  isBlankEntry: (entry: TEntry) => boolean;
+  normalizeEntry: (entry: TEntry) => unknown;
+};
+
+export type FormEntriesComparisonProps<TEntry extends IdentifiableFormEntry> =
+  FormMergeValues<TEntry[]> & {
+    merged: TEntry[];
+    columns: DataTableColumnDef<FormEntryPreviewRow<TEntry>>[];
+    isBlankEntry: (entry: TEntry) => boolean;
+    normalizeEntry: (entry: TEntry) => unknown;
+  };
+
+export type CreateFormEntriesRendererArgs<
+  TEntry extends IdentifiableFormEntry,
+> = {
+  columns: DataTableColumnDef<FormEntryPreviewRow<TEntry>>[];
+  isBlankEntry: (entry: TEntry) => boolean;
+  normalizeEntry: (entry: TEntry) => unknown;
 };

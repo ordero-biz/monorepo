@@ -4,6 +4,7 @@ import { Button, ContextualActionBar, Typography } from '@ordero/ui';
 import { Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { BaseLayoutContextualActionBar } from '@/features/app-shell';
+import { FormConflictResolver } from '@/lib/components/FormConflictResolver';
 import { StartTransferDialog } from './StartTransferDialog';
 import type { TransferActionsProps } from './types';
 
@@ -18,6 +19,8 @@ export const TransferActions = ({
   onSaveDraft,
   onTransfer,
 }: TransferActionsProps) => {
+  const resolver = FormConflictResolver.useContext();
+  const submitDisabled = resolver?.isReadOnly ?? false;
   const [transferDialogOpen, setTransferDialogOpen] = useState(false);
   const isSubmitting = pendingIntent !== null;
 
@@ -63,9 +66,10 @@ export const TransferActions = ({
             </ContextualActionBar.Left>
             <ContextualActionBar.Right>
               <div className="flex items-center gap-[var(--space-1)]">
+                <FormConflictResolver.ReviewButton />
                 <Button
                   color="inherit"
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || submitDisabled}
                   onClick={onSaveDraft}
                   size="m"
                   type="button"
@@ -75,7 +79,7 @@ export const TransferActions = ({
                 </Button>
                 <Button
                   color="primary"
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || submitDisabled}
                   onClick={() => setTransferDialogOpen(true)}
                   size="m"
                   type="button"
@@ -90,6 +94,7 @@ export const TransferActions = ({
         )}
       </BaseLayoutContextualActionBar>
       <StartTransferDialog
+        disabled={isSubmitting || submitDisabled}
         onConfirm={onTransfer}
         onOpenChange={setTransferDialogOpen}
         open={transferDialogOpen}

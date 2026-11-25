@@ -48,5 +48,6 @@ export type WarehouseProductSelection = {
     'id' | 'name' | 'sku'
   >;
   unitOfMeasurement: Pick<UnitOfMeasurement, 'id' | 'name' | 'symbol'>;
-  available: number;
+  /** Unknown for lines restored from a saved transfer until re-picked. */
+  available?: number;
 };

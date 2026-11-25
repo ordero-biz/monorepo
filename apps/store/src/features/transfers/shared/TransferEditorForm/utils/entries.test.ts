@@ -1,3 +1,4 @@
+import type { TransferDetails } from '@/lib/domain/transfers/types';
 import type { TransferEntryFormValues } from '../types';
 import {
   getStockItemKey,
@@ -25,7 +26,7 @@ const entry = (
 });
 
 describe('transfer entry utils', () => {
-  it('builds transfer defaults with an optional source warehouse', () => {
+  it('builds empty transfer defaults', () => {
     const defaults = getTransferFormDefaults();
 
     expect(defaults).toEqual({
@@ -35,11 +36,62 @@ describe('transfer entry utils', () => {
       comment: '',
       transferEntries: [entry({ clientId: 'initial-placeholder' })],
     });
+  });
 
-    const sourceWarehouse = { id: 7, name: 'North', status: 'ACTIVE' } as const;
-    expect(getTransferFormDefaults(sourceWarehouse).sourceWarehouse).toBe(
-      sourceWarehouse
-    );
+  it('builds transfer defaults from a saved transfer', () => {
+    const north = { id: 7, name: 'North', status: 'ACTIVE' } as const;
+    const east = { id: 8, name: 'East', status: 'ACTIVE' } as const;
+
+    expect(
+      getTransferFormDefaults({
+        id: 5,
+        sourceWarehouse: north,
+        destinationWarehouse: east,
+        transferNumber: 'TR-5',
+        status: 'DRAFT',
+        comment: null,
+        dispatchedAt: null,
+        dispatchedBy: null,
+        completedAt: null,
+        completedBy: null,
+        createdAt: '2026-11-17T10:00:00Z',
+        createdBy: 'owner@example.test',
+        updatedAt: '2026-11-17T10:00:00Z',
+        updatedBy: 'owner@example.test',
+        transferEntries: [
+          {
+            id: 17,
+            productVariant: { id: 11, name: 'Rice', sku: 'GR-1', barcode: '' },
+            unitOfMeasurement: {
+              id: 4,
+              name: 'Bag',
+              symbol: 'bag',
+              status: 'ACTIVE',
+              comment: null,
+            },
+            quantity: 5,
+            comment: null,
+          },
+        ],
+        version: 1,
+      } as TransferDetails)
+    ).toEqual({
+      transferNumber: 'TR-5',
+      sourceWarehouse: north,
+      destinationWarehouse: east,
+      comment: '',
+      transferEntries: [
+        {
+          clientId: 'existing-17',
+          stockItem: {
+            productVariant: { id: 11, name: 'Rice', sku: 'GR-1' },
+            unitOfMeasurement: { id: 4, name: 'Bag', symbol: 'bag' },
+          },
+          quantity: 5,
+          comment: '',
+        },
+      ],
+    });
   });
 
   it('treats a row without product, quantity and comment as blank', () => {

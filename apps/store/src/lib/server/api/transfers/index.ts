@@ -4,10 +4,11 @@ import {
   parseBackendResponseData,
 } from '@ordero/next-api/server';
 import { cookies } from 'next/headers';
-import type { Transfer } from '@/lib/domain/transfers/types';
+import type { Transfer, TransferDetails } from '@/lib/domain/transfers/types';
 import { BACKEND_TRANSFER_PATHS } from '@/lib/server/api/path';
 import { fetchBackendResponse } from '@/lib/server/fetch';
 import type { PaginatedResponse } from '@/lib/server/types';
+import { tokenizePath } from '@/lib/utils/tokenizePath';
 import {
   getPaginationSearch,
   type PaginationSearchInput,
@@ -52,4 +53,9 @@ export const getServerTransfers = (input?: PaginationSearchInput) =>
   fetchTransferResource<PaginatedResponse<Transfer>>(
     BACKEND_TRANSFER_PATHS.warehouseTransfers,
     getPaginationSearch(input)
+  );
+
+export const getServerTransfer = (transferId: string | number) =>
+  fetchTransferResource<TransferDetails>(
+    tokenizePath(BACKEND_TRANSFER_PATHS.warehouseTransfer, { id: transferId })
   );

@@ -91,6 +91,6 @@ alone. Cover both cases in the pilot.
 - [Platform error helper](../../apps/platform/src/lib/utils/form/error/field.ts)
 - [Product Details editor](../../apps/store/src/features/products/add/CreateProduct/ProductDetailsEditor.tsx)
 - [Product Details form hook](../../apps/store/src/features/products/add/CreateProduct/hooks/useProductDetailsForm.ts)
-- [Create Transfer fields](../../apps/store/src/features/transfers/add/CreateTransfer/TransferInformation.tsx)
+- [Create Transfer fields](../../apps/store/src/features/transfers/shared/TransferEditorForm/TransferInformation.tsx)
 - [Add Store form](../../apps/platform/src/features/stores/add/AddStoreForm.tsx)
 - [Supply submit workflow](../../apps/store/src/features/supplies/shared/SupplyEditorForm/hooks/useSubmitSupplyForm.ts)
