@@ -1,21 +1,19 @@
-import type { FormMergeValues } from '@/lib/utils/form/comparison/mergeFormValues';
+import type {
+  FormEntriesComparisonProps,
+  FormEntriesTableProps,
+  FormEntryPreviewRow,
+} from '@/lib/components/FormConflictResolver';
 import type { SupplyEntryFormValues } from '../../../shared/SupplyEditorForm/types';
 
-export type SupplyProductPreviewRow = SupplyEntryFormValues & {
-  source?: 'Saved version' | 'Your added row · kept';
-  different: boolean;
-  highlighted: boolean;
-};
+export type SupplyProductPreviewRow =
+  FormEntryPreviewRow<SupplyEntryFormValues>;
 
-export type SupplyProductsTableProps = {
-  label: string;
-  entries: SupplyEntryFormValues[];
-  addedEntries?: SupplyEntryFormValues[];
-  comparedEntries?: SupplyEntryFormValues[];
-};
+export type SupplyProductsTableProps = Omit<
+  FormEntriesTableProps<SupplyEntryFormValues>,
+  'columns' | 'isBlankEntry' | 'normalizeEntry'
+>;
 
-export type SupplyProductsComparisonProps = FormMergeValues<
-  SupplyEntryFormValues[]
-> & {
-  merged: SupplyEntryFormValues[];
-};
+export type SupplyProductsComparisonProps = Omit<
+  FormEntriesComparisonProps<SupplyEntryFormValues>,
+  'columns' | 'isBlankEntry' | 'normalizeEntry'
+>;

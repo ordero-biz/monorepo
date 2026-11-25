@@ -2,6 +2,7 @@ import { Button, Dialog, Typography } from '@ordero/ui';
 import type { StartTransferDialogProps } from './types';
 
 export const StartTransferDialog = ({
+  disabled,
   open,
   onOpenChange,
   onConfirm,
@@ -31,6 +32,7 @@ export const StartTransferDialog = ({
           <Dialog.Footer closeButtonLabel="Cancel">
             <Button
               color="primary"
+              disabled={disabled}
               onClick={() => {
                 onOpenChange(false);
                 onConfirm();

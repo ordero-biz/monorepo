@@ -10,13 +10,19 @@ import {
 } from '@/test/prepareSetup';
 import TransferDetailPage from './page';
 
-vi.mock('@/features/transfers', () => ({
+vi.mock('@/features/transfers', async () => ({
+  ...(await vi.importActual<typeof import('@/features/transfers')>(
+    '@/features/transfers'
+  )),
   TransferDetail: ({ transferId }: { transferId: string }) => (
     <div>Transfer detail {transferId}</div>
   ),
 }));
 
-vi.mock('@/lib/server/api/transfers', () => ({
+vi.mock('@/lib/server/api/transfers', async () => ({
+  ...(await vi.importActual<typeof import('@/lib/server/api/transfers')>(
+    '@/lib/server/api/transfers'
+  )),
   getServerTransfer: vi.fn(),
 }));
 

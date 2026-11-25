@@ -4,9 +4,14 @@ import {
   type ServerResponse,
 } from 'node:http';
 import type { CreateSupplyData } from '../../src/lib/client/api/supplies/index';
+import type {
+  CreateTransferData,
+  UpdateTransferFieldData,
+} from '../../src/lib/client/api/transfers/index';
 import type { Category } from '../../src/lib/domain/categories/types';
 import type { ProductVariant } from '../../src/lib/domain/products/types';
 import type { SupplyDetails } from '../../src/lib/domain/supplies/types';
+import type { TransferDetails } from '../../src/lib/domain/transfers/types';
 import type {
   Warehouse,
   WarehouseStockItem,
@@ -19,8 +24,10 @@ type Session = {
   categories?: Category[];
   warehouses?: Warehouse[];
   warehouseStock?: WarehouseStockItem[];
+  warehouseStockById?: Record<number, WarehouseStockItem[]>;
   warehouseSupplies?: WarehouseSupply[];
   saved: SupplyDetails;
+  savedTransfer?: TransferDetails;
   products: ProductVariant[];
   unit: SupplyDetails['supplyEntries'][number]['unitOfMeasurement'];
   readError?: boolean;
@@ -174,11 +181,19 @@ const server = createServer(async (request, response) => {
       });
       return;
     }
+    const stockWarehouseId = path.match(
+      /^\/api\/v1\/warehouses\/(\d+)\/stock$/
+    )?.[1];
     if (
       request.method === 'GET' &&
-      path === `/api/v1/warehouses/${saved.warehouse.id}/stock`
+      stockWarehouseId &&
+      (session.warehouseStockById?.[Number(stockWarehouseId)] ||
+        Number(stockWarehouseId) === saved.warehouse.id)
     ) {
-      const stock = session.warehouseStock ?? [];
+      const stock =
+        session.warehouseStockById?.[Number(stockWarehouseId)] ??
+        session.warehouseStock ??
+        [];
       const page = Number(url.searchParams.get('page') ?? 0);
       const size = Number(url.searchParams.get('size') ?? 10);
       respond({
@@ -289,8 +304,96 @@ const server = createServer(async (request, response) => {
       respond({ response, body: session.saved });
       return;
     }
+    const savedTransfer = session.savedTransfer;
+    const isTransferDetail =
+      savedTransfer !== undefined &&
+      path === `/api/v1/warehouse-transfers/${savedTransfer.id}`;
+    if (isTransferDetail && request.method === 'GET') {
+      respond({
+        response,
+        status: session.readError ? 503 : 200,
+        body: session.readError
+          ? { message: 'Temporary test outage.' }
+          : savedTransfer,
+      });
+      return;
+    }
+    if (
+      savedTransfer &&
+      ((isTransferDetail && request.method === 'PATCH') ||
+        (path === '/api/v1/warehouse-transfers' && request.method === 'POST'))
+    ) {
+      const input = await readJson<
+        (CreateTransferData | UpdateTransferFieldData) & {
+          expectedVersion?: number;
+        }
+      >(request);
+      if (
+        request.method === 'PATCH' &&
+        (input.expectedVersion !== savedTransfer.version ||
+          savedTransfer.status !== 'DRAFT')
+      ) {
+        respond({
+          response,
+          status: 409,
+          body: { message: 'This transfer was changed by another user.' },
+        });
+        return;
+      }
+      const {
+        expectedVersion: _version,
+        transferEntries,
+        sourceWarehouseId,
+        destinationWarehouseId,
+        ...fields
+      } = input;
+      const findWarehouse = (id?: number) => {
+        if (id === undefined) return undefined;
+        const match = (session.warehouses ?? [warehouse]).find(
+          (candidate) => candidate.id === id
+        );
+        if (!match) throw new Error(`Unknown test warehouse ${id}`);
+        return { id: match.id, name: match.name, status: match.status };
+      };
+      const entries =
+        transferEntries?.map((entry, index) => {
+          const product = session.products.find(
+            ({ id }) => id === entry.productVariantId
+          );
+          if (!product) {
+            throw new Error(`Unknown test product ${entry.productVariantId}`);
+          }
+          return {
+            id: savedTransfer.version * 100 + index,
+            productVariant: {
+              id: product.id,
+              name: product.name,
+              sku: product.sku,
+              barcode: product.barcode,
+            },
+            unitOfMeasurement: session.unit,
+            quantity: entry.quantity,
+            comment: entry.comment ?? null,
+          };
+        }) ?? (request.method === 'POST' ? [] : savedTransfer.transferEntries);
+      session.savedTransfer = {
+        ...savedTransfer,
+        ...(request.method === 'POST' ? { comment: null } : {}),
+        ...fields,
+        sourceWarehouse:
+          findWarehouse(sourceWarehouseId) ?? savedTransfer.sourceWarehouse,
+        destinationWarehouse:
+          findWarehouse(destinationWarehouseId) ??
+          savedTransfer.destinationWarehouse,
+        transferEntries: entries,
+        version: request.method === 'POST' ? 1 : savedTransfer.version + 1,
+      };
+      respond({ response, body: session.savedTransfer });
+      return;
+    }
     const lists: Record<string, unknown[]> = {
       '/api/v1/supplies': [saved],
+      '/api/v1/warehouse-transfers': savedTransfer ? [savedTransfer] : [],
       '/api/v1/suppliers': [saved.supplier],
       '/api/v1/warehouses': session.warehouses ?? [warehouse],
       '/api/v1/products/variants': session.products,

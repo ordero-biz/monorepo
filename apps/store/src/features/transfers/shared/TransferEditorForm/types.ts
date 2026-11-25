@@ -75,6 +75,7 @@ export type SourceWarehouseChangeDialogProps = {
 };
 
 export type StartTransferDialogProps = {
+  disabled?: boolean;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onConfirm: () => void;

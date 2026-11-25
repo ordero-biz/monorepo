@@ -1,5 +1,6 @@
 'use client';
 
+import { FormConflictResolver } from '@/lib/components/FormConflictResolver';
 import { TransferEntries } from './TransferEntries';
 import { TransferInformation } from './TransferInformation';
 import type { TransferEditorFormProps } from './types';
@@ -12,6 +13,8 @@ export const TransferEditorForm = ({
   sourceWarehouseRef,
   children,
 }: TransferEditorFormProps) => {
+  const resolver = FormConflictResolver.useContext();
+  const submitDisabled = resolver?.isReadOnly ?? false;
   const disabled = pendingIntent !== null;
 
   return (
@@ -22,7 +25,9 @@ export const TransferEditorForm = ({
       noValidate
       onSubmit={(event) => {
         event.preventDefault();
-        return submit('draft');
+        if (!submitDisabled) {
+          return submit('draft');
+        }
       }}
     >
       <TransferInformation
@@ -37,8 +42,16 @@ export const TransferEditorForm = ({
             disabled={disabled}
             entries={entries}
             form={form}
-            onSaveDraft={() => submit('draft')}
-            onTransfer={() => submit('transfer')}
+            onSaveDraft={() => {
+              if (!submitDisabled) {
+                return submit('draft');
+              }
+            }}
+            onTransfer={() => {
+              if (!submitDisabled) {
+                return submit('transfer');
+              }
+            }}
             pendingIntent={pendingIntent}
           />
         )}
