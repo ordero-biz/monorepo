@@ -7,6 +7,7 @@ import { useDeleteTransfer } from './hooks/useDeleteTransfer';
 import type { DeleteTransferDialogProps } from './types';
 
 export const DeleteTransferDialog = ({
+  disabled = false,
   transfer,
   onDeleted,
   onOpenChange,
@@ -57,7 +58,7 @@ export const DeleteTransferDialog = ({
             <Dialog.Footer closeDisabled={isDeleting}>
               <Button
                 color="error"
-                disabled={isDeleting}
+                disabled={disabled || isDeleting}
                 onClick={handleDelete}
                 type="button"
               >

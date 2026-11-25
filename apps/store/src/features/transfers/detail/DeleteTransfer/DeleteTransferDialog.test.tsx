@@ -4,6 +4,7 @@ import { deleteTransfer } from '@/lib/client/api/transfers';
 import { transfersQueryKeys } from '@/lib/query/transfers/transfersQueryKeys';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { DeleteTransferDialog } from './DeleteTransferDialog';
+import type { DeleteTransferDialogProps } from './types';
 
 vi.mock('@/lib/client/api/transfers', async () => ({
   ...(await vi.importActual<typeof import('@/lib/client/api/transfers')>(
@@ -14,7 +15,7 @@ vi.mock('@/lib/client/api/transfers', async () => ({
 
 const deleteTransferMock = vi.mocked(deleteTransfer);
 
-const { setup } = prepareStoreSetup({
+const { setup } = prepareStoreSetup<DeleteTransferDialogProps>({
   component: DeleteTransferDialog,
   props: {
     transfer: { id: 5, transferNumber: 'Weekend restock' },
@@ -94,6 +95,17 @@ describe('DeleteTransferDialog', () => {
     resolveDelete?.({ ok: true, data: undefined });
 
     await screen.findByRole('button', { name: 'Delete' });
+  });
+
+  it('disables deletion when disabled', async () => {
+    const user = userEvent.setup();
+    setup({ disabled: true });
+
+    const deleteButton = screen.getByRole('button', { name: 'Delete' });
+
+    expect(deleteButton).toBeDisabled();
+    await user.click(deleteButton);
+    expect(deleteTransferMock).not.toHaveBeenCalled();
   });
 
   it('shows a toast and stays open when deletion fails', async () => {

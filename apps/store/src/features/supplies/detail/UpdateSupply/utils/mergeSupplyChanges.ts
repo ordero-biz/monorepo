@@ -1,5 +1,8 @@
+import {
+  getAddedFormEntries,
+  mergeAddedFormEntries,
+} from '@/lib/components/FormConflictResolver';
 import type { SupplyDetails } from '@/lib/domain/supplies/types';
-import { areFormValuesEqual } from '@/lib/utils/form/comparison/areFormValuesEqual';
 import {
   type FormMergeChoices,
   type FormMergeFields,
@@ -55,48 +58,20 @@ export const getAddedSupplyEntries = ({
 }: Pick<
   FormMergeValues<SupplyFormValues['supplyEntries']>,
   'baseline' | 'current'
->) => {
-  // Compare local ids only with the editing baseline: saved ids may change.
-  // The default empty row is a placeholder, not a persisted product.
-  const initialEntries = baseline.filter(
-    (entry) => entry.clientId !== 'initial-placeholder'
-  );
-  const initialIds = new Set(initialEntries.map((entry) => entry.clientId));
-  const existingEntries = current.filter((entry) =>
-    initialIds.has(entry.clientId)
-  );
-  const addedEntries = current.filter(
-    (entry) => !initialIds.has(entry.clientId)
-  );
-  const existingEntriesUnchanged =
-    areFormValuesEqual(
-      existingEntries.map((entry) => entry.clientId),
-      initialEntries.map((entry) => entry.clientId)
-    ) &&
-    areFormValuesEqual(
-      normalizeEntries(existingEntries),
-      normalizeEntries(initialEntries)
-    );
+>) =>
+  getAddedFormEntries({
+    baseline,
+    current,
+    normalizeEntry: normalizeSupplyEntry,
+  });
 
-  return existingEntriesUnchanged && !areFormValuesEqual(current, baseline)
-    ? addedEntries
-    : [];
-};
-
-const mergeAddedEntries = ({
-  baseline,
-  current,
-  latest,
-}: FormMergeValues<SupplyFormValues['supplyEntries']>) => {
-  const addedEntries = getAddedSupplyEntries({ baseline, current });
-  if (addedEntries.length > 0) {
-    const savedEntries = latest.filter(
-      (entry) => entry.clientId !== 'initial-placeholder'
-    );
-    return { value: [...savedEntries, ...addedEntries] };
-  }
-  return undefined;
-};
+const mergeAddedEntries = (
+  values: FormMergeValues<SupplyFormValues['supplyEntries']>
+) =>
+  mergeAddedFormEntries({
+    ...values,
+    normalizeEntry: normalizeSupplyEntry,
+  });
 
 const fields: FormMergeFields<SupplyFormValues> = {
   supplier: {

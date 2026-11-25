@@ -1,6 +1,7 @@
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { updateTransfer } from '@/lib/client/api/transfers';
+import { clientRoutes } from '@/lib/client/routes';
 import { TRANSFER_STATUS } from '@/lib/domain/transfers/constants';
 import type { TransferDetails } from '@/lib/domain/transfers/types';
 import { WAREHOUSE_STATUS } from '@/lib/domain/warehouses/constants';
@@ -69,9 +70,21 @@ describe('UpdateTransfer', () => {
     updateTransferMock.mockReset();
   });
 
-  it('shows the draft note and editor', () => {
+  it('shows the draft header, breadcrumb and editor', () => {
     setup();
 
+    expect(
+      screen.getByRole('heading', { name: 'Weekend restock' })
+    ).toBeVisible();
+    expect(screen.getByText('Draft')).toBeVisible();
+    const breadcrumb = screen.getByRole('navigation', { name: 'Breadcrumb' });
+    expect(
+      within(breadcrumb).getByRole('link', { name: 'Transfers' })
+    ).toHaveAttribute('href', clientRoutes.transfers);
+    expect(within(breadcrumb).getByText('Weekend restock')).toHaveAttribute(
+      'aria-current',
+      'page'
+    );
     expect(screen.getByRole('note')).toHaveTextContent(
       'Nothing has left the warehouse yet.'
     );
@@ -83,6 +96,7 @@ describe('UpdateTransfer', () => {
       transfer: { ...transfer, status: TRANSFER_STATUS.COMPLETED },
     });
 
+    expect(screen.getByText('Completed')).toBeVisible();
     expect(
       screen.getByText(
         'Details for this transfer status are not available yet.'
@@ -101,6 +115,7 @@ describe('UpdateTransfer', () => {
       transfer: { ...transfer, status: TRANSFER_STATUS.IN_TRANSIT },
     });
 
+    expect(screen.getByText('In transit')).toBeVisible();
     expect(
       screen.getByRole('table', { name: 'Transfer entries' })
     ).toBeVisible();
