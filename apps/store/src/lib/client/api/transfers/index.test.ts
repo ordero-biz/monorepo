@@ -96,6 +96,7 @@ describe('transfer client helpers', () => {
       updateTransfer({
         transferId: 5,
         expectedVersion: 1,
+        comment: null,
         status: TRANSFER_STATUS.IN_TRANSIT,
         transferEntries: [
           { productVariantId: 11, unitOfMeasurementId: 4, quantity: 3 },
@@ -108,6 +109,7 @@ describe('transfer client helpers', () => {
         method: 'PATCH',
         body: JSON.stringify({
           expectedVersion: 1,
+          comment: null,
           status: TRANSFER_STATUS.IN_TRANSIT,
           transferEntries: [
             { productVariantId: 11, unitOfMeasurementId: 4, quantity: 3 },

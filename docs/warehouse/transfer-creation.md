@@ -1,7 +1,7 @@
 # Transfer Creation Business Rules and UX Decisions
 
 Status: accepted behavior for the current implementation, with limitations
-listed below. Updated: 2026-11-17.
+listed below. Updated: 2026-11-25.
 
 A transfer moves stock from one warehouse (the **source**) to another warehouse
 (the **destination**). The create-transfer page helps store operators prepare
@@ -152,6 +152,34 @@ when not empty).
   submitted, even if rows were removed or reordered since; errors for rows that
   no longer exist are dropped.
 
+## Editing a saved draft and background refresh
+
+Opening `/warehouse/transfers/{id}` for a Draft loads the same transfer editor
+with `PATCH /api/v1/warehouse-transfers/{id}` and optimistic concurrency
+(`expectedVersion`). Non-draft transfers (**In transit** or **Completed**) show
+the transfer header with **Details for this transfer status are not available
+yet.**
+
+When the saved transfer changes in the background (for example, on window focus):
+
+- **Pristine draft:** automatically adopts the latest saved version (or
+  switches to the non-draft placeholder if the transfer was started elsewhere).
+- **Dirty draft when started elsewhere:** opens the **Transfer started** notice,
+  preserves unsaved edits on the page, and disables **Save draft** and
+  **Transfer**.
+- **Dirty draft with saved draft changes:** opens the **Transfer changed**
+  notice (**Review updates** / **Keep editing**) and shows **Review updates** in
+  the bottom action bar until the latest version is reviewed and applied.
+- **Merging product rows:** if the source warehouse did not change and only new
+  local rows were added on top of the baseline rows, those local rows (including
+  unfinished rows) are appended after the latest saved rows. Competing edits to
+  existing rows require choosing one complete product list.
+- **Coupled source warehouse and products:** because transfer entries belong to
+  the source warehouse's stock, if local and saved versions end up with
+  different source warehouses while products are present and both sides changed
+  either the source warehouse or products, the conflict review resolves the
+  source warehouse and product list together as one choice.
+
 ## Validation
 
 | Field | Message |
@@ -202,23 +230,33 @@ implementation inspected on 2026-11-17. They are product decisions, not
 findings from usability testing.
 
 - [Create transfer implementation](../../apps/store/src/features/transfers/add/CreateTransfer/)
-  owns the page and source change flow; the [shared editor](../../apps/store/src/features/transfers/shared/TransferEditorForm/)
+  owns the create page and source change flow; [Update transfer](../../apps/store/src/features/transfers/detail/UpdateTransfer/)
+  owns draft editing, conflict resolution, and the detail header; the [shared editor](../../apps/store/src/features/transfers/shared/TransferEditorForm/)
   owns transfer information and the entries table.
+- [Transfer merge rules](../../apps/store/src/features/transfers/detail/UpdateTransfer/utils/mergeTransferChanges.ts)
+  and [merge tests](../../apps/store/src/features/transfers/detail/UpdateTransfer/utils/mergeTransferChanges.test.ts)
+  cover 3-way field merging, local row additions, and coupled source-warehouse +
+  product list conflicts.
 - [Validation rules](../../apps/store/src/features/transfers/shared/TransferEditorForm/validations.ts)
   and [validation tests](../../apps/store/src/features/transfers/shared/TransferEditorForm/validations.test.ts)
   cover required fields, destination rules, and quantity limits.
 - [Page tests](../../apps/store/src/features/transfers/add/CreateTransfer/CreateTransfer.test.tsx)
-  cover the URL source, loading and failure states, and draft review.
+  and [detail tests](../../apps/store/src/features/transfers/detail/TransferDetail/TransferDetail.test.tsx)
+  cover the URL source, loading and failure states, draft review, background
+  refresh, and conflict resolution.
 - [Entries tests](../../apps/store/src/features/transfers/add/CreateTransfer/TransferEntries.test.tsx)
   cover the stock picker, quantity limits, duplicates, the source change modal,
   the use-all-available action, row deletion, saving a draft, starting a
   transfer, and service errors.
-- [Request payload](../../apps/store/src/features/transfers/add/CreateTransfer/utils/getCreateData.ts)
-  and [service error mapping](../../apps/store/src/features/transfers/add/CreateTransfer/utils/mapTransferFieldErrors.ts),
+- [Create request payload](../../apps/store/src/features/transfers/add/CreateTransfer/utils/getCreateData.ts),
+  [update request payload](../../apps/store/src/features/transfers/detail/UpdateTransfer/utils/getUpdateChanges.ts),
+  and [service error mapping](../../apps/store/src/features/transfers/shared/TransferEditorForm/utils/mapTransferFieldErrors.ts),
   with their tests, define what is sent and where returned errors appear.
 - [Create transfer browser test](../../apps/store/e2e/CreateTransfer.spec.ts)
-  covers the warehouse detail entry point, unavailable sources, and draft
-  publishing.
+  and [Transfer refresh browser test](../../apps/store/e2e/TransferRefresh.spec.ts)
+  cover the warehouse detail entry point, unavailable sources, draft
+  publishing, background refresh, external start locking, and conflict
+  resolution.
 - [Warehouse detail](warehouse-detail.md) describes the page that launches
   this workflow.
 - [Shared DataTable documentation](../data-tables.md) and

@@ -1,14 +1,16 @@
-import type { SupplyEntryFormValues } from '../../../../shared/SupplyEditorForm/types';
-import { normalizeSupplyEntry } from '../../utils/normalizeSupplyEntry';
-
-const rowKey = (entry: SupplyEntryFormValues) =>
-  JSON.stringify(normalizeSupplyEntry(entry));
+type GetDifferentRowsArgs<TEntry> = {
+  entries: readonly TEntry[];
+  comparedEntries: readonly TEntry[];
+  normalizeEntry: (entry: TEntry) => unknown;
+};
 
 // Match whole values as a multiset. Never infer row identity from a SKU or index.
-export const getDifferentRows = (
-  entries: SupplyEntryFormValues[],
-  comparedEntries: SupplyEntryFormValues[]
-) => {
+export const getDifferentRows = <TEntry>({
+  entries,
+  comparedEntries,
+  normalizeEntry,
+}: GetDifferentRowsArgs<TEntry>) => {
+  const rowKey = (entry: TEntry) => JSON.stringify(normalizeEntry(entry));
   const available = new Map<string, number>();
   for (const entry of comparedEntries) {
     const key = rowKey(entry);

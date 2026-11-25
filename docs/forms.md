@@ -333,15 +333,21 @@ radio controls, required validation, revision resets, and applying choices;
 feature renderers own presentation only. Keep tables and interactive disclosure
 content outside radio labels, and do not parse the merge result's display strings.
 
-The supply renderer displays products, SKUs, quantities, units, and formatted
-unit prices in tables. Safe additions appear after saved rows and are identified
-as retained local rows. Conflicts retain one choice per complete list. Saved row
-IDs may change and duplicate products are valid. Highlighting compares normalized
-whole-row values with occurrence counts, and labels unmatched occurrences
-“Different”. Retained local additions keep their own label and are reserved
-before matching saved rows. The comparison is memoized and linear in row count
-and value size; it does not infer row additions, removals, or cell differences
-by SKU or array position.
+The shared entry comparison helpers in `src/lib/components/FormConflictResolver`
+(`createFormEntriesRenderer`, `FormEntriesComparison`, `FormEntriesTable`,
+`getDifferentRows`, `getAddedFormEntries`, and `mergeAddedFormEntries`) power
+table-based product previews for workflows such as supplies and transfers. Safe
+additions appear after saved rows and are identified as retained local rows.
+Conflicts retain one choice per complete list. Saved row IDs may change and
+duplicate products are valid where the workflow allows them. Highlighting
+compares normalized whole-row values with occurrence counts, and labels
+unmatched occurrences “Different”. Retained local additions keep their own label
+and are reserved before matching saved rows. The comparison is memoized and
+linear in row count and value size; it does not infer row additions, removals,
+or cell differences by SKU or array position. When an entry list depends on
+another field (such as transfer products belonging to the source warehouse),
+keep that coupling inside the feature's `merge` function so the shared
+`FormFieldRenderer` contract remains generic.
 
 Review instructions distinguish automatic updates, conflicting values, and
 reviews containing both. Only reviews with conflicts ask the user to choose.
