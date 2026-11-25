@@ -68,3 +68,9 @@ export const updateTransfer = ({ transferId, ...input }: UpdateTransferData) =>
       body: input,
     }
   );
+
+export const deleteTransfer = (transferId: string | number) =>
+  apiFetch<void>(
+    tokenizePath(CLIENT_BACKEND_PATHS.warehouseTransfer, { id: transferId }),
+    { method: 'DELETE' }
+  );

@@ -21,7 +21,10 @@ import { useUpdateTransferForm } from './hooks/useUpdateTransferForm';
 import { TransferDetailHeader } from './TransferDetailHeader';
 import type { UpdateTransferProps } from './types';
 
-export const UpdateTransfer = ({ transfer }: UpdateTransferProps) => {
+export const UpdateTransfer = ({
+  transfer,
+  onDeleted,
+}: UpdateTransferProps) => {
   const queryClient = useQueryClient();
   // The PATCH baseline and expected version must advance together, only after
   // a successful save or an accepted refresh of the editor.
@@ -73,7 +76,7 @@ export const UpdateTransfer = ({ transfer }: UpdateTransferProps) => {
     // Views for the other statuses are not designed yet.
     return (
       <div className="flex flex-col gap-[var(--space-2)]">
-        <TransferDetailHeader transfer={baseline} />
+        <TransferDetailHeader onDeleted={onDeleted} transfer={baseline} />
         <Card.Root variant="filled">
           <Card.Content>
             <Typography color="text-secondary" variant="body2">
@@ -105,7 +108,7 @@ export const UpdateTransfer = ({ transfer }: UpdateTransferProps) => {
       policy={transferConflictPolicy}
     >
       <div className="flex flex-col gap-[var(--space-2)]">
-        <TransferDetailHeader transfer={baseline} />
+        <TransferDetailHeader onDeleted={onDeleted} transfer={baseline} />
         <div
           className="rounded-[var(--radius)] bg-muted p-[var(--space-1-5)]"
           role="note"
