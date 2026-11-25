@@ -160,10 +160,12 @@ with `PATCH /api/v1/warehouse-transfers/{id}` and optimistic concurrency
 the transfer header with **Details for this transfer status are not available
 yet.**
 
-- **Deleting a draft:** the header actions menu offers **Delete transfer** only
-  while the transfer is a Draft. Confirming sends
-  `DELETE /api/v1/warehouse-transfers/{id}`, removes the cached transfer detail,
-  refreshes the transfers list, shows **Transfer was deleted.**, and navigates to
+- **Deleting a draft:** Draft transfers can be deleted from the detail header
+  actions menu (**Delete transfer**) or from the row actions menu (**Delete**) in
+  the transfers list (`/warehouse/transfers`). Non-draft rows have no row actions
+  menu. Confirming sends `DELETE /api/v1/warehouse-transfers/{id}`, removes the
+  cached transfer detail, refreshes the transfers list, and shows **Transfer was
+  deleted.** Deleting from the detail page also navigates to
   `/warehouse/transfers`.
 
 When the saved transfer changes in the background (for example, on window focus):
@@ -237,8 +239,9 @@ findings from usability testing.
 
 - [Create transfer implementation](../../apps/store/src/features/transfers/add/CreateTransfer/)
   owns the create page and source change flow; [Update transfer](../../apps/store/src/features/transfers/detail/UpdateTransfer/)
-  owns draft editing, conflict resolution, and the detail header; [Delete transfer](../../apps/store/src/features/transfers/detail/DeleteTransfer/)
-  owns draft deletion confirmation and cache cleanup; the [shared editor](../../apps/store/src/features/transfers/shared/TransferEditorForm/)
+  owns draft editing, conflict resolution, and the detail header; [Delete transfer](../../apps/store/src/features/transfers/shared/DeleteTransfer/)
+  owns draft deletion confirmation and cache cleanup across the list and detail
+  workflows; the [shared editor](../../apps/store/src/features/transfers/shared/TransferEditorForm/)
   owns transfer information and the entries table.
 - [Transfer merge rules](../../apps/store/src/features/transfers/detail/UpdateTransfer/utils/mergeTransferChanges.ts)
   and [merge tests](../../apps/store/src/features/transfers/detail/UpdateTransfer/utils/mergeTransferChanges.test.ts)

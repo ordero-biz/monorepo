@@ -1,6 +1,6 @@
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { getTransfers } from '@/lib/client/api/transfers';
+import { deleteTransfer, getTransfers } from '@/lib/client/api/transfers';
 import { getTransferDetailRoute } from '@/lib/client/routes';
 import { TRANSFER_STATUS } from '@/lib/domain/transfers/constants';
 import type { Transfer } from '@/lib/domain/transfers/types';
@@ -11,6 +11,7 @@ import { TransfersList } from './TransfersList';
 const mocks = vi.hoisted(() => ({
   pathname: '/warehouse/transfers',
   push: vi.fn(),
+  replace: vi.fn(),
   searchParams: new URLSearchParams(),
 }));
 
@@ -19,7 +20,7 @@ vi.mock('next/navigation', async () => ({
     'next/navigation'
   )),
   usePathname: () => mocks.pathname,
-  useRouter: () => ({ push: mocks.push }),
+  useRouter: () => ({ push: mocks.push, replace: mocks.replace }),
   useSearchParams: () => mocks.searchParams,
 }));
 
@@ -27,9 +28,11 @@ vi.mock('@/lib/client/api/transfers', async () => ({
   ...(await vi.importActual<typeof import('@/lib/client/api/transfers')>(
     '@/lib/client/api/transfers'
   )),
+  deleteTransfer: vi.fn(),
   getTransfers: vi.fn(),
 }));
 
+const deleteTransferMock = vi.mocked(deleteTransfer);
 const getTransfersMock = vi.mocked(getTransfers);
 
 const transfer = {
@@ -59,8 +62,10 @@ const { setup } = prepareStoreSetup({
 
 describe('TransfersList', () => {
   beforeEach(() => {
+    deleteTransferMock.mockReset();
     getTransfersMock.mockReset();
     mocks.push.mockReset();
+    mocks.replace.mockReset();
     mocks.searchParams = new URLSearchParams();
   });
 
@@ -129,7 +134,133 @@ describe('TransfersList', () => {
       'To warehouse',
       'Status',
       'Created at',
+      '',
     ]);
+  });
+
+  it('deletes a draft transfer from the row actions menu and hides actions for non-draft rows', async () => {
+    getTransfersMock.mockResolvedValue({
+      ok: true,
+      data: {
+        content: [
+          transfer,
+          {
+            ...transfer,
+            id: 2,
+            transferNumber: 'TR-002',
+            status: TRANSFER_STATUS.IN_TRANSIT,
+          },
+          {
+            ...transfer,
+            id: 3,
+            transferNumber: 'TR-003',
+            status: TRANSFER_STATUS.COMPLETED,
+          },
+        ],
+        page: { size: 10, number: 0, totalElements: 3, totalPages: 1 },
+      },
+    });
+    deleteTransferMock.mockResolvedValue({ ok: true, data: undefined });
+    const user = userEvent.setup();
+
+    setup();
+
+    expect(
+      await screen.findByRole('button', { name: 'Actions for TR-001' })
+    ).toBeVisible();
+    expect(
+      screen.queryByRole('button', { name: 'Actions for TR-002' })
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Actions for TR-003' })
+    ).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Actions for TR-001' }));
+    await user.click(await screen.findByRole('menuitem', { name: 'Delete' }));
+
+    const dialog = screen.getByRole('dialog', { name: 'Delete transfer' });
+    expect(dialog).toHaveTextContent(
+      'Are you sure you want to delete the "TR-001" transfer?'
+    );
+
+    await user.click(within(dialog).getByRole('button', { name: 'Delete' }));
+
+    expect(deleteTransferMock).toHaveBeenCalledWith(1);
+    await waitFor(() =>
+      expect(getTransfersMock).toHaveBeenCalledTimes(2)
+    );
+    expect(
+      screen.queryByRole('dialog', { name: 'Delete transfer' })
+    ).not.toBeInTheDocument();
+  });
+
+  it('returns to the remaining records after deleting the last page through the row action', async () => {
+    mocks.searchParams = new URLSearchParams('page=2&size=10');
+    const lastTransfer = {
+      ...transfer,
+      id: 11,
+      transferNumber: 'TR-011',
+    };
+    getTransfersMock
+      .mockResolvedValueOnce({
+        ok: true,
+        data: {
+          content: [lastTransfer],
+          page: { size: 10, number: 1, totalElements: 11, totalPages: 2 },
+        },
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        data: {
+          content: [],
+          page: { size: 10, number: 1, totalElements: 10, totalPages: 1 },
+        },
+      })
+      .mockResolvedValue({
+        ok: true,
+        data: {
+          content: Array.from({ length: 10 }, (_, index) => ({
+            ...lastTransfer,
+            id: index + 1,
+            transferNumber: `TR-${String(index + 1).padStart(3, '0')}`,
+          })),
+          page: { size: 10, number: 0, totalElements: 10, totalPages: 1 },
+        },
+      });
+    deleteTransferMock.mockResolvedValue({ ok: true, data: undefined });
+    const user = userEvent.setup();
+    const { renderResult } = setup({
+      paginationInput: { page: 2, size: 10 },
+    });
+
+    await user.click(
+      await screen.findByRole('button', { name: 'Actions for TR-011' })
+    );
+    await user.click(await screen.findByRole('menuitem', { name: 'Delete' }));
+    await user.click(
+      within(screen.getByRole('dialog', { name: 'Delete transfer' })).getByRole(
+        'button',
+        { name: 'Delete' }
+      )
+    );
+
+    await waitFor(() =>
+      expect(mocks.replace).toHaveBeenCalledExactlyOnceWith(
+        '/warehouse/transfers?page=1&size=10',
+        { scroll: false }
+      )
+    );
+    expect(deleteTransferMock).toHaveBeenCalledExactlyOnceWith(11);
+
+    mocks.searchParams = new URLSearchParams('page=1&size=10');
+    renderResult.rerender({ paginationInput: { page: 1, size: 10 } });
+
+    expect(await screen.findByRole('link', { name: 'TR-001' })).toBeVisible();
+    expect(getTransfersMock).toHaveBeenLastCalledWith({ page: 1, size: 10 });
+    expect(screen.queryByText('No transfers found.')).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('navigation', { name: 'Table pagination' })
+    ).toHaveTextContent('1-10 of 10');
   });
 
   it('requests transfers with pagination input', async () => {

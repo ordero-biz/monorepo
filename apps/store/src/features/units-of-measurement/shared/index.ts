@@ -1,4 +1,1 @@
-export {
-  DeleteUnitsOfMeasurementDialog,
-  useDeleteUnitsOfMeasurement,
-} from './DeleteUnitsOfMeasurement';
+export { DeleteUnitsOfMeasurementDialog } from './DeleteUnitsOfMeasurement';

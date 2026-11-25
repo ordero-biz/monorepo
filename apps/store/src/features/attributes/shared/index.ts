@@ -1,4 +1,1 @@
-export {
-  DeleteAttributesDialog,
-  useDeleteAttributes,
-} from './DeleteAttributes';
+export { DeleteAttributesDialog } from './DeleteAttributes';

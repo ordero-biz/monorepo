@@ -7,8 +7,8 @@ import { AppBreadcrumbs } from '@/lib/components/AppBreadcrumbs';
 import { FormConflictResolver } from '@/lib/components/FormConflictResolver';
 import { TRANSFER_STATUS } from '@/lib/domain/transfers/constants';
 import { transfersRootBreadcrumb } from '../../shared/breadcrumbs';
+import { DeleteTransferDialog } from '../../shared/DeleteTransfer';
 import { TransferStatusChip } from '../../shared/TransferStatusChip';
-import { DeleteTransferDialog } from '../DeleteTransfer';
 import type { TransferDetailHeaderProps } from './types';
 
 export const TransferDetailHeader = ({

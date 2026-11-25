@@ -1,4 +1,1 @@
-export {
-  DeleteCategoriesDialog,
-  useDeleteCategories,
-} from './DeleteCategories';
+export { DeleteCategoriesDialog } from './DeleteCategories';
