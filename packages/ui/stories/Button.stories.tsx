@@ -101,22 +101,28 @@ export const WithIcons: Story = {
             {variant}
           </p>
           <div className='flex flex-wrap gap-3'>
-            <Button
-              variant={variant}
-              color='primary'
-              size='l'
-              startIcon={<Sparkles />}
-            >
-              Start Icon
-            </Button>
-            <Button
-              variant={variant}
-              color='primary'
-              size='l'
-              endIcon={<ChevronRight />}
-            >
-              End Icon
-            </Button>
+            {sizes.map((size) => (
+              <Button
+                key={`${variant}-${size}-start`}
+                variant={variant}
+                color='primary'
+                size={size}
+                startIcon={<Sparkles />}
+              >
+                Start Icon
+              </Button>
+            ))}
+            {sizes.map((size) => (
+              <Button
+                key={`${variant}-${size}-end`}
+                variant={variant}
+                color='primary'
+                size={size}
+                endIcon={<ChevronRight />}
+              >
+                End Icon
+              </Button>
+            ))}
           </div>
         </div>
       ))}

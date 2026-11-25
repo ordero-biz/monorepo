@@ -1,0 +1,299 @@
+# Data Tables
+
+## Purpose
+
+`DataTable` in `@ordero/ui` is the shared presentation and interaction layer
+for tabular app data. Features own their row shape, column definitions,
+queries, mutations, and bulk-action workflows. The component owns table
+rendering, client-side sorting and pagination when enabled, and the standard
+current-page selection interaction.
+
+Read this guide before changing `packages/ui/src/components/DataTable` or
+adding a selectable table to an app feature.
+
+## Architecture and evolution
+
+| Pattern | Status | Ownership | Select-all scope |
+| --- | --- | --- | --- |
+| Consumer-defined columns with `selectable` and custom checkbox cells | Initial API; retained for compatibility | The feature owns the complete selection column | The feature must match the standard current-page behavior |
+| `DataTableSelectionCell` and `DataTableSelectionColumnHeader` | Previous reusable composition API; advanced use only | The feature owns the custom layout; the helpers own checkbox wiring | Current page |
+| `selection` prop and `useDataTableSelection` | Current standard | `DataTable` adds the selection column; the feature owns selection state and bulk actions | Current page |
+
+New feature work must use the current standard unless the selection checkbox
+must share a cell with feature-specific content or needs a custom column
+header. The composition helpers are not a second default API. They are kept
+for that advanced layout case and follow exactly the same selection scope.
+
+## Table responsibilities
+
+`DataTable` accepts stable `columns` and `data` references and supports:
+
+- accessible table labelling through the required `ariaLabel`
+- custom cells, widths, alignment, wrapping, empty states, and row ids
+- controlled or uncontrolled sorting; use `manualSorting` for server sorting
+- client or server pagination; use `manualPagination` when `data` already
+  contains only the server-provided page
+- controlled or uncontrolled row selection
+- a built-in selection column through `selection`
+- standalone title, count, or controls above the column headers through `header`
+- standalone footer content through `footer` and column-aligned summaries
+  through `footerColumns`
+
+Feature code owns fetching, filters, request parameters, mutation effects,
+dialogs, toasts, and bulk-action bars. Do not put an app resource's query or
+mutation logic into `DataTable`.
+
+Use `getRowTone` to return `warning` for rows that need visual emphasis, or
+`default` for normal rows. The warning tint remains visible on hover and
+selection. Compute domain comparisons in the feature and pass a cheap flag
+lookup here. Include a visible explanation such as “Different” in a cell;
+row color alone must not convey the meaning.
+
+## Editable cells
+
+Use `<DataTableCell width="full">` around form controls so they fill the
+column's available width inside the standard cell padding. The default cell
+width fits its content. Define column sizing through `meta.width` or
+`meta.minWidth`, rather than a wrapper around the control.
+
+## Header content
+
+Use `header` for a title, count, or feature-owned controls above the column
+headers. The component provides padding and a wrapping flex
+layout with space between its children. Group related content in an inner
+element. The header stays outside horizontal scrolling and remains visible
+when the table is empty. Omit it on tables that do not need a header.
+
+```tsx
+<DataTable
+  ariaLabel="Warehouse products"
+  columns={columns}
+  data={stock.content}
+  header={<h2>Products</h2>}
+/>
+```
+
+Features own any controls and their behavior. Adding search here requires
+filtering the full dataset or querying the server, not just filtering the
+current page. Continue supplying `ariaLabel` to name the table independently
+of the visual header.
+
+## Footers and summaries
+
+Use `footer` for a standalone `ReactNode` below the table. The component owns
+the divider, padding, gap, and minimum height, sharing the bottom-row spacing
+with `TablePagination`. Content is aligned to the end by default and stays
+outside the table's horizontal scroll area. Supply an inner layout element
+when the content needs a different arrangement.
+
+```tsx
+<DataTable
+  ariaLabel="Supply entries"
+  columns={columns}
+  data={supply.supplyEntries}
+  getRowId={getRowId}
+  footer={
+    <Typography variant="subtitle1">
+      Total {formatMoney(supply.totalPrice)}
+    </Typography>
+  }
+/>
+```
+
+Use `footerColumns` for one summary row aligned with the table columns. Its
+keys are resolved leaf column IDs: use the explicit `id` when present, or
+the ID derived from an `accessorKey`. Prefer explicit IDs for accessor
+functions or nested accessors so the footer mapping remains clear.
+
+```tsx
+<DataTable
+  ariaLabel="Supply entries"
+  columns={columns}
+  data={supply.supplyEntries}
+  getRowId={getRowId}
+  footerColumns={{
+    product: <Typography variant="subtitle1">Total</Typography>,
+    total: (
+      <Typography variant="subtitle1">
+        {formatMoney(supply.totalPrice)}
+      </Typography>
+    ),
+  }}
+/>
+```
+
+`DataTable` renders this summary in a native `tfoot` using the visible leaf
+column order, including when headers are grouped. Unspecified columns,
+including the built-in selection column, have empty cells. Unknown IDs are
+ignored. Each cell follows its column's width, alignment, and wrapping and
+includes the standard `DataTableCell` padding; pass content directly without
+another `DataTableCell` wrapper. The summary scrolls horizontally with the
+table and does not participate in sorting, selection, or pagination.
+
+Both props can be used independently or together. The display order is:
+data rows, column summary, standalone footer, pagination. Footers can also
+appear with the empty state. Numeric zero is valid content. A column summary
+is omitted when none of its visible columns has content; null, undefined,
+booleans, and empty strings do not create a summary on their own.
+
+Features own totals and their scope (current page, selected records, or all
+matching records). Pass server-provided aggregates when available rather
+than assuming the loaded rows represent the full dataset. Footer values can
+change without rebuilding the stable `columns` array. Use `footerColumns`
+for column summaries; `DataTable` does not render TanStack's
+`columns[].footer` definitions.
+
+## Current selection standard
+
+Use `useDataTableSelection` when a feature needs selected records for bulk
+actions. It returns the `selection` object for the table, the rows represented
+by the current `data`, and `clearSelection` for a completed action.
+
+```tsx
+const {
+  clearSelection,
+  selectedRows,
+  selection,
+} = useDataTableSelection({
+  data: attributeValuesQuery.data,
+  getRowCheckboxAriaLabel: (value) => `Select ${value.name}`,
+  getRowId: (value) => String(value.id),
+  selectAllCheckboxAriaLabel: 'Select all attribute values',
+});
+
+<DataTable
+  ariaLabel="Attribute values"
+  columns={columns}
+  data={attributeValuesQuery.data}
+  getRowId={(value) => String(value.id)}
+  selection={selection}
+/>;
+```
+
+Always provide the same stable domain `getRowId` to the table and the hook.
+Array indexes are not stable across sorting, filtering, pagination, or a data
+refresh and can apply a selection to the wrong record.
+
+The table adds a leading checkbox column automatically. Do not add a second
+selection column to `columns`.
+
+### Checkbox behavior
+
+- A row checkbox selects or clears that row.
+- The header checkbox selects or clears selectable rows on the current visible
+  page. It is checked when all selectable page rows are selected and
+  indeterminate when only some are selected.
+- A row excluded by `getRowCanSelect` has no built-in checkbox. The header
+  checkbox ignores it.
+- Row and header checkboxes require meaningful accessible labels. Use labels
+  that identify the record and the collection, not generic labels such as
+  `Select`.
+- `selectedRows` is derived from the hook's current `data`. It intentionally
+  does not promise a cross-page collection of records.
+
+### Pagination and server data
+
+Select-all is page-local. In a client-paginated table, it affects the rendered
+page rather than every loaded row. In a manually paginated table, it affects
+only the current server response. Moving to another page does not select its
+rows; `useDataTableSelection` resolves `selectedRows` only from the current
+response, even if row-selection ids remain in state.
+
+If a product requirement needs selection across pages, define an explicit
+resource-level selection model before extending the shared table: whether it
+stores ids or an inverted "all matching" query, how filters affect it, what the
+bulk endpoint accepts, and how the UI communicates the scope. Do not change
+the default select-all behavior to mean every loaded or matching record.
+
+### Bulk-action lifecycle
+
+Keep the bulk-action UI in the feature. Show it only when `selectedRows` is
+non-empty, pass those rows or their ids to the confirmation flow, and call
+`clearSelection` only after the mutation succeeds. Closing a dialog or a
+failed request must preserve the selection so the user can retry.
+
+## Advanced and legacy composition
+
+Use `DataTableSelectionCell` and `DataTableSelectionColumnHeader` only when a
+checkbox must be embedded beside feature-specific cell or header content. Pass
+the TanStack `row`, `column`, and `table` objects through the helpers. The
+feature must still pass `selectable`, stable `getRowId`, and accessible labels.
+
+Do not create a raw checkbox column for new work. It duplicates the selection
+contract and can easily drift on indeterminate state, disabled rows, labels, or
+current-page behavior.
+
+## Sorting and pagination
+
+- Keep `columns`, `data`, and controlled `sorting` references stable. Hoist
+  static columns and memoize derived data or dynamic columns.
+- Use the default sorting behavior only when all rows needed for sorting are in
+  `data`. With server sorting, use `manualSorting`, own `sorting` and
+  `onSortingChange` in the feature, and refetch from that state.
+- With client pagination, provide all rows in `data` and let `DataTable` derive
+  the page. With server pagination, provide the current page, the total
+  `pagination.count`, and `manualPagination`.
+- Test server sorting without assuming local rows reorder before the new server
+  response arrives.
+
+## Required coverage
+
+For shared DataTable changes, add behavior-focused unit coverage for the
+affected public contract and update Storybook when its documented API changes.
+Footer coverage should include standalone content, column mapping with empty
+cells and selection, zero totals with empty data, and both footers alongside
+pagination. Use Storybook/browser checks to verify spacing and alignment.
+For a selectable feature, cover the meaningful user flow at the nearest useful
+layer:
+
+- accessible table and checkbox names
+- individual selection, select-all, and indeterminate state when relevant
+- excluded rows when `getRowCanSelect` is used
+- current-page select-all when pagination is involved
+- bulk-action visibility and clearing only after successful completion
+- server sorting or pagination behavior when the feature uses it
+
+Use Testing Library for component-local behavior, Storybook browser checks for
+shared component states, and Playwright only for routed, composed app flows.
+
+## Expandable row details
+
+Use `rowDetails` for secondary content below a record. The table adds a leading
+Show details / Hide details button and a detail row spanning all columns, including selection. Each
+button exposes `aria-expanded` and controls a labelled region. Expanding a row
+is independent of selecting it or editing its cells.
+The details column fits its non-wrapping button and cell padding; spare table
+width is available to the data columns.
+
+```tsx
+<DataTable
+  ariaLabel="Products"
+  columns={columns}
+  data={products}
+  getRowId={product => String(product.id)}
+  rowDetails={{
+    getLabel: product => product.name,
+    render: product => <ProductDetails product={product} />,
+  }}
+/>
+```
+
+Expansion is uncontrolled by default. Supply `expandedRows` (a record of row IDs
+to booleans) and `onExpandedRowsChange` when the feature must reveal a row after
+validation. Use the same stable `getRowId` across updates, sorting, and pagination.
+Multiple rows can be expanded independently. Details follow their parent rows
+and do not count as separate records for selection or pagination.
+
+By default, collapsed details unmount. Set `keepMounted: true` for editors that
+must retain field registration and local state while hidden. Only rows rendered
+on the current page are mounted; the feature must own persistent form values
+across pagination. Validation and decisions about which rows to open stay in the
+feature. Expansion itself does not move focus into the details.
+
+`getLabel` identifies the detail region and provides context for the toggle’s
+accessible name (for example, “Show details: Coffee”). Expanded details share an
+accent border with their toggle and retain the normal card background. Features can open
+a row initially through `expandedRows`; subsequent user choices stay feature-owned.
+An expanded group ends with a narrow 4px gap before the next record, separating
+adjacent open groups and interrupting the accent border. This decorative border
+does not add table rows or change the accessible record count.

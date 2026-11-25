@@ -2,10 +2,12 @@ import type { InputChangeEventDetails } from '@base-ui/react/input';
 import type {
   ElementType,
   FocusEventHandler,
+  HTMLAttributes,
   HTMLInputAutoCompleteAttribute,
   HTMLInputTypeAttribute,
   KeyboardEventHandler,
   ReactNode,
+  Ref,
 } from 'react';
 
 export type TextFieldSize = 's' | 'm';
@@ -26,6 +28,7 @@ export type TextFieldProps = {
   helperIcon?: ReactNode;
   helperText?: ReactNode;
   id?: string;
+  inputMode?: HTMLAttributes<HTMLInputElement>['inputMode'];
   invalid?: boolean;
   label?: ReactNode;
   name?: string;
@@ -35,6 +38,7 @@ export type TextFieldProps = {
   onValueChange?: (value: string, details: InputChangeEventDetails) => void;
   placeholder?: string;
   readOnly?: boolean;
+  ref?: Ref<HTMLElement>;
   required?: boolean;
   size?: TextFieldSize;
   startAdornment?: ReactNode;

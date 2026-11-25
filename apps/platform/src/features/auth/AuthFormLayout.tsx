@@ -1,18 +1,9 @@
 'use client';
 
-import Link from 'next/link';
 import { Typography } from '@ordero/ui';
-import type { ReactNode } from 'react';
+import Link from 'next/link';
 import { AuthBadge } from './AuthBadge';
-
-type AuthFormLayoutProps = {
-  children: ReactNode;
-  footerHref: string;
-  footerLabel: string;
-  footerPrompt: string;
-  subtitle: string;
-  title: string;
-};
+import type { AuthFormLayoutProps } from './types';
 
 export const AuthFormLayout = ({
   children,

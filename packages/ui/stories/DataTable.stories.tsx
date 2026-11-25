@@ -1,14 +1,20 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import type { CellContext, HeaderContext } from '@tanstack/react-table';
 import { format, parseISO } from 'date-fns';
+import { useState } from 'react';
+import { expect, within } from 'storybook/test';
+import { Chip } from '@/ui/components/Chip';
+import { Button } from '@/ui/components/Button';
 import {
   DataTable,
+  DataTableCell,
   DataTableColumnHeader,
-  DataTableSelectionCell,
-  DataTableSelectionColumnHeader,
   type DataTableColumnDef,
+  type DataTableProps,
 } from '@/ui/components/DataTable';
 import { IconButton } from '@/ui/components/IconButton';
+import { TextField } from '@/ui/components/TextField';
+import { Typography } from '@/ui/components/Typography';
 import { cn } from '@/ui/lib/utils';
 import { MoreVertical } from 'lucide-react';
 
@@ -104,6 +110,14 @@ const rows: ProductRow[] = [
   },
 ];
 
+const getLastPage = ({
+  count,
+  rowsPerPage,
+}: {
+  count: number;
+  rowsPerPage: number;
+}) => Math.max(0, Math.ceil(count / rowsPerPage) - 1);
+
 const formatCreatedAt = (value: string) => format(parseISO(value), 'dd MMM yyyy');
 
 const formatPrice = (value: number) => `$${value.toFixed(2)}`;
@@ -131,30 +145,17 @@ const publishToneClassNames = {
   Published: 'bg-[var(--color-info-16)] text-[var(--info-dark)]',
 } as const;
 
-const productColumnHeader = ({
-  table,
-  column,
-}: HeaderContext<ProductRow, unknown>) => (
-  <DataTableSelectionColumnHeader
-    checkboxAriaLabel="Select all products"
-    column={column}
-    table={table}
-    title="Product"
-  />
+const productColumnHeader = ({ column }: HeaderContext<ProductRow, unknown>) => (
+  <DataTableColumnHeader column={column} title="Product" />
 );
 
 const productColumnCell = ({ row }: CellContext<ProductRow, unknown>) => (
-  <DataTableSelectionCell
-    checkboxAriaLabel={`Select ${row.original.name}`}
-    row={row}
-  >
-    <div className="flex min-w-0 flex-1 items-center py-[var(--spacing-2)]">
-      <div className="flex min-w-0 flex-1 flex-col items-start justify-center px-[var(--spacing-2)]">
-        <p className="w-full text-card-foreground">{row.original.name}</p>
-        <p className="w-full text-muted-foreground">{row.original.category}</p>
-      </div>
+  <div className="flex min-w-0 flex-1 items-center py-[var(--spacing-2)]">
+    <div className="flex min-w-0 flex-1 flex-col items-start justify-center px-[var(--spacing-2)]">
+      <p className="w-full text-card-foreground">{row.original.name}</p>
+      <p className="w-full text-muted-foreground">{row.original.category}</p>
     </div>
-  </DataTableSelectionCell>
+  </div>
 );
 
 const renderTextCell = (value: string) => (
@@ -163,6 +164,17 @@ const renderTextCell = (value: string) => (
       <p className="whitespace-nowrap text-card-foreground">{value}</p>
     </div>
   </div>
+);
+
+const renderLinkCell = (row: ProductRow) => (
+  <DataTableCell>
+    <a
+      className="inline-flex max-w-full rounded-[var(--radius-sm)] text-[var(--primary-dark)] outline-none transition-colors hover:text-[var(--primary-darker)] hover:underline focus-visible:ring-3 focus-visible:ring-ring/50"
+      href={`/products/${row.id}`}
+    >
+      {row.name}
+    </a>
+  </DataTableCell>
 );
 
 const columns: DataTableColumnDef<ProductRow>[] = [
@@ -199,9 +211,13 @@ const columns: DataTableColumnDef<ProductRow>[] = [
                 style={{ width: row.original.stockWidth }}
               />
             </div>
-            <p className="whitespace-nowrap text-[length:var(--caption-size-desktop)] leading-[var(--caption-line-height-desktop)] text-muted-foreground">
+            <Chip
+              color={row.original.stockTone}
+              size="s"
+              variant="soft"
+            >
               {formatStockValue(row.original.stockValue)}
-            </p>
+            </Chip>
           </div>
         </div>
       );
@@ -242,15 +258,15 @@ const columns: DataTableColumnDef<ProductRow>[] = [
   },
   {
     cell: ({ row }) => (
-      <div className="flex items-center justify-end p-[var(--spacing-2)]">
+      <DataTableCell variant="actions">
         <IconButton
           aria-label={`Open actions for ${row.original.name}`}
           color="default"
-          size="s"
+          size="xs"
         >
           <MoreVertical />
         </IconButton>
-      </div>
+      </DataTableCell>
     ),
     header: () => (
       <div className="w-full p-[var(--spacing-2)]">
@@ -264,6 +280,48 @@ const columns: DataTableColumnDef<ProductRow>[] = [
     },
   },
 ];
+
+const PaginatedDataTablePreview = (args: DataTableProps<ProductRow>) => {
+  const initialPagination = args.pagination ?? {
+    onPageChange: () => undefined,
+    page: 0,
+    rowsPerPage: 5,
+  };
+  const paginationCount = initialPagination.count ?? args.data.length;
+  const [page, setPage] = useState(initialPagination.page);
+  const [rowsPerPage, setRowsPerPage] = useState(
+    initialPagination.rowsPerPage
+  );
+
+  return (
+    <DataTable
+      {...args}
+      pagination={{
+        ...initialPagination,
+        count: paginationCount,
+        onPageChange: (nextPage) => {
+          setPage(nextPage);
+          initialPagination.onPageChange(nextPage);
+        },
+        onRowsPerPageChange: (nextRowsPerPage, details) => {
+          setRowsPerPage(nextRowsPerPage);
+          setPage((currentPage) =>
+            Math.min(
+              currentPage,
+              getLastPage({
+                count: paginationCount,
+                rowsPerPage: nextRowsPerPage,
+              })
+            )
+          );
+          initialPagination.onRowsPerPageChange?.(nextRowsPerPage, details);
+        },
+        page,
+        rowsPerPage,
+      }}
+    />
+  );
+};
 
 const meta = {
   title: 'Components/DataTable',
@@ -283,9 +341,266 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {};
 
+export const EditableCells: Story = {
+  args: {
+    data: rows.slice(0, 2),
+    columns: [
+      {
+        id: 'name',
+        header: () => <DataTableCell>Product name</DataTableCell>,
+        cell: ({ row }) => (
+          <DataTableCell width="full">
+            <TextField
+              aria-label={`Product name for row ${row.index + 1}`}
+              defaultValue={row.original.name}
+              size="s"
+            />
+          </DataTableCell>
+        ),
+        meta: { width: '70%' },
+      },
+      {
+        id: 'category',
+        header: () => <DataTableCell>Category</DataTableCell>,
+        cell: ({ row }) => (
+          <DataTableCell width="full">
+            <TextField
+              aria-label={`Category for row ${row.index + 1}`}
+              defaultValue={row.original.category}
+              size="s"
+            />
+          </DataTableCell>
+        ),
+        meta: { width: '30%' },
+      },
+    ],
+  },
+  play: async ({ canvasElement, userEvent }) => {
+    const canvas = within(canvasElement);
+    const name = canvas.getByRole('textbox', { name: 'Product name for row 1' });
+    await userEvent.clear(name);
+    await userEvent.type(name, 'Updated product');
+    await expect(name).toHaveValue('Updated product');
+  },
+};
+
+export const WithHeaderDescription: Story = {
+  args: {
+    header: (
+      <div>
+        <Typography variant="h5">Products ({rows.length})</Typography>
+        <Typography variant="body2" color="text-secondary">
+          Review product availability and pricing.
+        </Typography>
+      </div>
+    ),
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(
+      canvas.getByRole('heading', { name: `Products (${rows.length})` })
+    ).toBeVisible();
+    await expect(
+      canvas.getByRole('table', { name: 'Products table' })
+    ).toBeVisible();
+  },
+};
+
+export const WithHeader: Story = {
+  args: {
+    header: (
+      <>
+        <div className="flex items-center gap-[var(--spacing-1)]">
+          <h2>Products</h2>
+          <Chip size="s" variant="soft">{rows.length}</Chip>
+        </div>
+        <Button color="inherit" size="s">Export products</Button>
+      </>
+    ),
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('heading', { name: 'Products' })).toBeVisible();
+    await expect(canvas.getByRole('button', { name: 'Export products' })).toBeVisible();
+    await expect(canvas.getByRole('table', { name: 'Products table' })).toBeVisible();
+  },
+};
+
+export const EmptyWithHeader: Story = {
+  args: {
+    data: [],
+    header: <h2>Products (0)</h2>,
+  },
+};
+
+const summaryColumns: DataTableColumnDef<ProductRow>[] = [
+  {
+    accessorKey: 'name',
+    cell: productColumnCell,
+    header: productColumnHeader,
+  },
+  {
+    accessorKey: 'stockValue',
+    cell: ({ row }) => <DataTableCell>{row.original.stockValue}</DataTableCell>,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Stock" />
+    ),
+    meta: { align: 'right', wrap: 'nowrap' },
+  },
+  {
+    accessorKey: 'price',
+    cell: ({ row }) => <DataTableCell>{formatPrice(row.original.price)}</DataTableCell>,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Price" />
+    ),
+    meta: { align: 'right', wrap: 'nowrap' },
+  },
+];
+
+const totalPrice = rows.reduce((total, row) => total + row.price, 0);
+const footerColumns: DataTableProps<ProductRow>['footerColumns'] = {
+  name: <Typography variant="subtitle1">Totals</Typography>,
+  price: <Typography variant="subtitle1">{formatPrice(totalPrice)}</Typography>,
+  stockValue: rows.reduce((total, row) => total + row.stockValue, 0),
+};
+
+export const WithFooter: Story = {
+  args: {
+    columns: summaryColumns,
+    footer: (
+      <Typography variant="subtitle1">Total {formatPrice(totalPrice)}</Typography>
+    ),
+  },
+};
+
+export const WithFooterColumns: Story = {
+  args: {
+    columns: summaryColumns,
+    footerColumns,
+    selection: {
+      getRowCheckboxAriaLabel: (row) => `Select ${row.name}`,
+      selectAllCheckboxAriaLabel: 'Select all products',
+    },
+  },
+};
+
+export const WithBothFootersAndPagination: Story = {
+  args: {
+    columns: summaryColumns,
+    footer: (
+      <Typography color="text-secondary" variant="body2">
+        Totals cover all {rows.length} products.
+      </Typography>
+    ),
+    footerColumns,
+    pagination: {
+      onPageChange: () => undefined,
+      page: 0,
+      rowsPerPage: 5,
+      rowsPerPageOptions: [5, 10, 25],
+    },
+  },
+  render: (args) => <PaginatedDataTablePreview {...args} />,
+};
+
+export const EmptyWithFooterColumns: Story = {
+  args: {
+    columns: summaryColumns,
+    data: [],
+    footerColumns: { name: 'Totals', price: formatPrice(0), stockValue: 0 },
+  },
+};
+
+export const WithCheckboxSelection: Story = {
+  args: {
+    selection: {
+      getRowCheckboxAriaLabel: (row) => `Select ${row.name}`,
+      selectAllCheckboxAriaLabel: 'Select all products',
+    },
+  },
+};
+
+export const WithPagination: Story = {
+  args: {
+    pagination: {
+      onPageChange: () => undefined,
+      page: 0,
+      rowsPerPage: 5,
+      rowsPerPageOptions: [5, 10, 25],
+    },
+  },
+  render: (args) => <PaginatedDataTablePreview {...args} />,
+};
+
 export const Empty: Story = {
   args: {
     data: [],
     emptyMessage: 'No matching products found.',
+  },
+};
+
+export const WarningRows: Story = {
+  args: {
+    getRowTone: (row) => row.publish === 'Draft' ? 'warning' : 'default',
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const warning = canvas.getByRole('row', { name: /Mountain Trekking Boots/ });
+    const normal = canvas.getByRole('row', { name: /Urban Explorer Sneakers/ });
+    await expect(warning).toBeVisible();
+    await expect(getComputedStyle(warning).backgroundColor).not.toBe(getComputedStyle(normal).backgroundColor);
+  },
+};
+
+export const WithLinkCell: Story = {
+  args: {
+    columns: [
+      {
+        accessorKey: 'name',
+        cell: ({ row }) => renderLinkCell(row.original),
+        header: ({ column }) => (
+          <DataTableColumnHeader column={column} title="Product" />
+        ),
+      },
+      {
+        accessorKey: 'createdAt',
+        cell: ({ row }) =>
+          renderTextCell(formatCreatedAt(row.original.createdAt)),
+        header: ({ column }) => (
+          <DataTableColumnHeader column={column} title="Create at" />
+        ),
+        meta: { wrap: 'nowrap' },
+      },
+      {
+        accessorKey: 'price',
+        cell: ({ row }) => renderTextCell(formatPrice(row.original.price)),
+        header: ({ column }) => (
+          <DataTableColumnHeader column={column} title="Price" />
+        ),
+        meta: { wrap: 'nowrap' },
+      },
+    ],
+    selectable: false,
+  },
+};
+
+export const ExpandableRows: Story = {
+  args: {
+    getRowId: row => row.id,
+    selection: { getRowCheckboxAriaLabel: row => `Select ${row.name}` },
+    rowDetails: {
+      getLabel: row => row.name,
+      render: row => <Typography variant="body2">Category: {row.category}</Typography>,
+    },
+  },
+  play: async ({ canvasElement, userEvent }) => {
+    const canvas = within(canvasElement);
+    const toggle = canvas.getByRole('button', { name: `Show details: ${rows[0].name}` });
+    await userEvent.click(toggle);
+    await expect(toggle).toHaveAttribute('aria-expanded', 'true');
+    await expect(canvas.getByRole('region', { name: rows[0].name })).toBeVisible();
+    await userEvent.click(canvas.getByRole('button', { name: `Show details: ${rows[1].name}` }));
+    await expect(canvas.getByRole('region', { name: rows[0].name })).toBeVisible();
+    await expect(canvas.getByRole('region', { name: rows[1].name })).toBeVisible();
   },
 };

@@ -1,0 +1,1 @@
+export { DeleteAttributesDialog } from './DeleteAttributesDialog';

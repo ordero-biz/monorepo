@@ -1,0 +1,165 @@
+'use client';
+
+import { cva } from 'class-variance-authority';
+import type { KeyboardEvent } from 'react';
+import { cn } from '@/ui/lib/utils';
+import type {
+  CardContentProps,
+  CardDescriptionProps,
+  CardDividerProps,
+  CardFooterProps,
+  CardHeaderProps,
+  CardProps,
+  CardTitleProps,
+} from './types';
+
+const cardVariants = cva(
+  'relative flex min-w-0 flex-col overflow-hidden rounded-[var(--card-radius)] bg-card text-card-foreground transition-shadow duration-150',
+  {
+    variants: {
+      color: {
+        inherit:
+          '[--card-tint:transparent] [--card-outline:var(--color-paper-outlined)]',
+        primary:
+          '[--card-tint:var(--color-primary-8)] [--card-outline:var(--color-primary-20)]',
+        secondary:
+          '[--card-tint:var(--color-secondary-8)] [--card-outline:var(--color-secondary-20)]',
+        info: '[--card-tint:var(--color-info-8)] [--card-outline:var(--color-info-20)]',
+        success:
+          '[--card-tint:var(--color-success-8)] [--card-outline:var(--color-success-20)]',
+        warning:
+          '[--card-tint:var(--color-warning-8)] [--card-outline:var(--color-warning-20)]',
+        error:
+          '[--card-tint:var(--color-error-8)] [--card-outline:var(--color-error-20)]',
+      },
+      variant: {
+        filled:
+          'bg-[linear-gradient(var(--card-tint),var(--card-tint))] shadow-[var(--card-x1)_var(--card-y1)_var(--card-blur1)_var(--card-spread1)_var(--color-shadow-20),var(--card-x2)_var(--card-y2)_var(--card-blur2)_var(--card-spread2)_var(--color-shadow-12)]',
+        outlined: 'border border-[var(--card-outline)]',
+      },
+    },
+    defaultVariants: {
+      color: 'inherit',
+      variant: 'filled',
+    },
+  }
+);
+
+export const CardRoot = ({
+  children,
+  color,
+  id,
+  onClick,
+  ref,
+  variant,
+}: CardProps) => {
+  const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (onClick && (event.key === 'Enter' || event.key === ' ')) {
+      event.preventDefault();
+      event.currentTarget.click();
+    }
+  };
+
+  return (
+    // biome-ignore lint/a11y/noStaticElementInteractions: role="button" is applied conditionally when onClick is provided
+    <div
+      ref={ref}
+      id={id}
+      onClick={onClick}
+      onKeyDown={onClick ? handleKeyDown : undefined}
+      role={onClick ? 'button' : undefined}
+      tabIndex={onClick ? 0 : undefined}
+      className={cn(cardVariants({ color, variant }))}
+      data-slot="card"
+    >
+      {children}
+    </div>
+  );
+};
+
+export const CardHeader = ({ children, id, ref }: CardHeaderProps) => {
+  return (
+    <header
+      ref={ref}
+      id={id}
+      className="flex items-start justify-between gap-[var(--card-header-spacing)] pt-[var(--card-content-p)] px-[var(--card-content-p)] pb-[var(--spacing-2)]"
+      data-slot="card-header"
+    >
+      {children}
+    </header>
+  );
+};
+
+export const CardTitle = ({ children, id, ref }: CardTitleProps) => {
+  return (
+    <h3
+      ref={ref}
+      id={id}
+      className="text-[length:var(--subtitle1-size-desktop)] leading-[var(--subtitle1-line-height-desktop)] font-[var(--subtitle1-weight)] [font-family:var(--subtitle1-family)] text-[var(--text-primary)] font-semibold"
+      data-slot="card-title"
+    >
+      {children}
+    </h3>
+  );
+};
+
+export const CardDescription = ({
+  children,
+  id,
+  ref,
+}: CardDescriptionProps) => {
+  return (
+    <p
+      ref={ref}
+      id={id}
+      className="text-[length:var(--caption-size-desktop)] leading-[var(--caption-line-height-desktop)] font-[var(--caption-weight)] [font-family:var(--caption-family)] text-[var(--text-secondary)] font-normal"
+      data-slot="card-description"
+    >
+      {children}
+    </p>
+  );
+};
+
+export const CardContent = ({ children, id, ref }: CardContentProps) => {
+  return (
+    <div
+      ref={ref}
+      id={id}
+      className="p-[var(--card-content-p)] [[data-slot=card-header]+&]:pt-0"
+      data-slot="card-content"
+    >
+      {children}
+    </div>
+  );
+};
+
+export const CardFooter = ({ children, id, ref }: CardFooterProps) => {
+  return (
+    <footer
+      ref={ref}
+      id={id}
+      className="flex items-center gap-[var(--spacing-1-5)] p-[var(--card-content-p)] pt-0"
+      data-slot="card-footer"
+    >
+      {children}
+    </footer>
+  );
+};
+
+export const CardDivider = ({
+  id,
+  ref,
+  variant = 'dashed',
+}: CardDividerProps) => {
+  return (
+    <hr
+      ref={ref}
+      id={id}
+      className={cn(
+        'w-full border-t border-[var(--color-divider)]',
+        variant === 'dashed' && 'border-dashed'
+      )}
+      data-slot="card-divider"
+    />
+  );
+};

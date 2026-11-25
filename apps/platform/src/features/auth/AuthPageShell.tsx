@@ -1,8 +1,4 @@
-import type { ReactNode } from 'react';
-
-type AuthPageShellProps = {
-  children: ReactNode;
-};
+import type { AuthPageShellProps } from './types';
 
 const MarketingPanel = () => {
   return (

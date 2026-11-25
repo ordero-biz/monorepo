@@ -87,6 +87,9 @@ Keep the human review focus on issues that configs do not judge well, such as:
 - unsafe type escapes like `as any`, `@ts-ignore`, or broad assertions used to dodge modeling work
 - signatures or APIs that are technically valid but awkward, ambiguous, or easy to misuse
 - broken imports, exports, or alias usage that suggest structural drift
+- lower-level `src/lib` app code importing app-owned types from `src/features`;
+  prefer a shared domain module such as `src/lib/domain/[resource].ts`, with
+  separate API DTO types only when wire and domain shapes differ
 - convention breaks from `AGENTS.md` and local skills that reflect architecture, not formatting
 
 ## Docs to consult by change type
@@ -94,7 +97,13 @@ Keep the human review focus on issues that configs do not judge well, such as:
 Use this map to load the smallest relevant source of truth for the diff:
 
 - forms and validation: `docs/forms.md`, `docs/testing.md`
+- app feature folder structure and public feature exports: `docs/features.md`
 - shared UI components in `packages/ui`: `ui-component-build`, `ui-routine-conventions`
+- shared workspace/package boundaries: `docs/packages.md`, `AGENTS.md`
+- HTTP/auth, server-state queries, and mutation changes:
+  `docs/http-auth.md`, `docs/testing.md`, `platform-http-requests`
+- shared UI component API shape: `docs/ui-components.md`
+- shared or feature data-table behavior: `docs/data-tables.md`
 - tokens, CSS variables, and Tailwind exposure: `docs/ui-tokens.md`, `ui-routine-conventions`
 - TS and TSX authoring conventions: `ts-react-conventions`
 - shared UI accessibility testing: `docs/accessibility-testing.md`
@@ -129,8 +138,7 @@ When the diff touches UI components, styles, stories, or tests, also apply the r
 - favor accessible role and name coverage for user-facing behavior
 - avoid asserting class names, token names, or `cva` internals when a user-visible signal exists
 - check whether the change preserves the semantic token architecture described in `docs/ui-tokens.md`
-- for component tests across `apps` and `packages`, expect `prepareSetup` to be the default when the file has repeated default props or a stable wrapper; treat ad hoc render helpers as the exception
-- for `prepareSetup`-based tests, expect overridden props that are later asserted on to be destructured from `setup(...)` rather than tracked in separate local variables
+- for unit/component tests, expect mock configurations of any multi-export local or shared module to use inline async `vi.importActual` partial mocks to preserve all adjacent actual exports and prevent fragile test setups
 
 From `AGENTS.md` and local skills, pay particular attention to:
 
@@ -139,6 +147,7 @@ From `AGENTS.md` and local skills, pay particular attention to:
 - preferring existing semantic or bridged tokens in component code
 - reviewing `packages/ui/src/styles/globals.css` as the token entry point, then the imported token files under `packages/ui/src/styles`, before claiming a token is missing
 - exposing shared semantic tokens through `@theme inline` only when that reuse is justified
+- keeping component-specific selectors, keyframes, and other local CSS in that component's folder instead of `packages/ui/src/styles/globals.css`
 
 Read `docs/ui-tokens.md` when the review touches:
 
@@ -146,6 +155,39 @@ Read `docs/ui-tokens.md` when the review touches:
 - token files
 - Tailwind theme exposure
 - raw `--figma-*` usage
+
+### For app feature folders
+
+When a diff touches `apps/*/src/features`, review the structure against
+`docs/features.md`:
+
+- resource features should be split by logical workflow when they contain list,
+  detail, create/add, update, delete, or shared feature-local concerns
+- route consumers should import from the feature root barrel, and tests should
+  mock the same public entrypoint the consumer imports
+- root feature `index.ts` files should export only public components and public
+  types, not private hooks, submit actions, validators, constants, or table
+  columns
+- public component/workflow folders should have local `index.ts` files that
+  re-export their public surface
+- component props and component-owned types should live in the local
+  `types.ts`; shared API or domain contracts should not live in feature
+  component `types.ts` files
+- cross-workflow imports should use the nearest public barrel rather than deep
+  private component paths
+- for feature-folder refactors, expect the component-type verification from
+  `docs/features.md` to be run or otherwise accounted for
+
+### Component test setup rules
+
+Apply these rules strictly to component tests across `apps` and `packages`.
+
+- expect `prepareSetup` to be the default setup pattern when the file has repeated default props, repeated providers, or a stable wrapper
+- treat ad hoc render helpers as acceptable only when they are simpler than `prepareSetup` and do not duplicate setup state across tests
+- inspect every `setup({ ... })` override in `prepareSetup`-based tests
+- when an overridden prop is later asserted on, used in a Testing Library query, or used to prove callback behavior, expect that value to be destructured from `setup(...)`
+- raise a finding when a test keeps a separate local variable for an asserted overridden prop instead of using the `setup(...)` return value
+- after checking setup mechanics, still enforce behavior-first assertions through accessible roles, names, visible text, and user-visible outcomes
 
 ### For shared components in `packages/ui`
 
@@ -156,9 +198,11 @@ Also enforce the `ui-component-build` and `ui-routine-conventions` expectations:
 - keep public APIs explicit
 - do not expose `className` on shared `packages/ui` components
 - keep exported prop types in local `types.ts`
+- for new shared compound components, expect the Base UI-style namespace export pattern: `[ComponentName].Root`, `[ComponentName].Trigger`, etc., wired through `index.parts.ts` and `export * as [ComponentName] from './index.parts'`
 - ensure stable exports from `packages/ui/src/index.ts`
 - expect Storybook stories that cover meaningful public variants
 - expect behavior-focused tests for meaningful interactions and states
+- expect component-specific CSS files to live inside the component folder when Tailwind class strings are not enough
 
 Current `packages/ui` structure to review against:
 
@@ -173,9 +217,81 @@ Current import and export patterns to review against:
 - use local relative imports such as `./types` inside a component folder
 - use the `@/ui/...` aliases for cross-component and shared-library imports inside `packages/ui`
 - keep component public entrypoints flowing through each local `index.ts`
+- avoid new `Object.assign(root, { Part })` compound APIs unless explicit backward compatibility requires callable shorthand
 - keep consumer-facing exports flowing through `packages/ui/src/index.ts`
 
 Missing exports, misplaced files, tests not colocated with the file they cover, overly broad prop passthrough, absent tests for interactive behavior, or styling that bypasses the token system should usually be findings.
+
+## Server-state and mutation review rules
+
+When the diff touches TanStack Query hooks, `QueryClientProvider`,
+`HydrationBoundary`, `dehydrate`, `prefetchQuery`, app-owned request helpers,
+query keys, cache invalidation, or `useMutation`, review against
+`docs/http-auth.md`, `docs/testing.md`, and `platform-http-requests`.
+
+For cached reads, expect:
+
+- stable query keys under `src/lib/query/[resource]/*`, using `as const`
+- shared `queryOptions(...)` factories when the same resource is read by both
+  server pages and client hooks
+- query option factories to accept a fetcher so server pages can use
+  server-only helpers while client hooks use same-origin client helpers
+- `ApiResult` failures to be unwrapped by throwing `result.error` from the
+  query function, not by treating failed results as successful query data
+- app-wide Query defaults to live in `src/app/AppProviders.tsx` and
+  `src/lib/query/queryClient.ts`, rather than adding page-local providers
+
+For SSR prefetch and hydration, expect:
+
+- server pages to create a fresh per-request client with `makeQueryClient()`
+- server pages to call `prefetchQuery(...)` with the same query options and
+  keys used by the client hook
+- server pages to render client features inside `HydrationBoundary` with
+  `dehydrate(queryClient)`
+- server-only fetchers to stay under `src/lib/server/*` and avoid imports from
+  Client Components or browser-safe modules
+- server prefetch helpers to read the HttpOnly cookie only from server code and
+  use backend path constants from `src/lib/server/api/path.ts`
+
+Raise a finding when server-prefetched data uses different keys from the client
+hook, a server page imports browser-only helpers, client code imports server-only
+helpers, a singleton browser query client is reused for server prefetch, or a
+detail page duplicates query logic instead of sharing query options.
+
+For writes and mutations, expect:
+
+- TanStack Form submit actions to call direct client helpers when backend
+  `fieldErrors` need to map into form submit errors
+- button/menu/dialog commands such as logout, delete, archive, publish, and other
+  non-form writes to use `useMutation` when loading/error/success state is part
+  of the UI
+- mutation functions to keep the underlying request uncached and throw the
+  normalized `ApiError` only after receiving `{ ok: false }`
+- workflow components or narrow success callbacks to own dialog close/reset,
+  route navigation, and cache invalidation/removal
+- affected list queries to be invalidated after create/update/delete flows
+- detail and child-resource queries to be removed when deleting the entity that
+  made those cache entries invalid
+- mutation errors to be surfaced through the shared toast surface unless they
+  are mapped to visible form fields
+
+### Cache invalidation audit
+
+For writes, apply the cache-invalidation impact map in
+`platform-http-requests`. Raise a finding when any list, detail, selector, or
+nested/old/new owner collection can remain fresh but stale. Expect workflow
+tests to assert each new invalidation or removal key; a generic list
+invalidation does not prove a child-resource key is refreshed.
+
+For tests, expect coverage at the nearest useful boundary:
+
+- query hooks and query options cover success and normalized error behavior
+- server-prefetched pages prove the expected query keys/options are prefetched
+  and hydrated
+- `useMutation` wrappers cover success callbacks, loading state, and error toast
+  behavior
+- workflow component tests cover `invalidateQueries`, `removeQueries`, and
+  navigation when those are part of the user-visible flow
 
 ## TanStack Table review rules
 
@@ -188,11 +304,18 @@ When the diff touches `@tanstack/react-table`, `useReactTable`, shared table pri
 - treat always-on `getSortedRowModel()` without a `manualSorting` path as a likely finding when the component API suggests server-side sorting support
 - when `manualSorting` or server-side sorting support is introduced, expect targeted tests that confirm sorting state updates without local row reordering
 - when data updates are introduced alongside sorting, selection, pagination, or expanding behavior, verify whether TanStack auto-reset behavior is still desired and whether that expectation is tested
+- for selectable `DataTable` work, verify that select-all is limited to the
+  current visible page, row ids are stable domain ids, labels identify rows and
+  the collection, and tests cover the applicable pagination scope
+- treat consumer-created raw checkbox columns as a review concern unless a
+  custom layout cannot use the built-in `selection` API or the documented
+  composition helpers
 
 ## Form review rules
 
-When the diff touches feature forms, form validation, submit handling, or
-backend error mapping, also review against `docs/forms.md` and `docs/testing.md`.
+When the diff touches feature forms, form validation, submit handling, backend
+error mapping, or a `useCreateXForm`/`useUpdateXForm` hook, also review against
+`docs/forms.md`, `docs/testing.md`, and `feature-form-architecture`.
 
 Expect the form architecture to preserve these boundaries:
 
@@ -200,6 +323,17 @@ Expect the form architecture to preserve these boundaries:
 - Zod schemas and validation helpers stay feature-owned
 - shared UI fields remain presentational and form-library agnostic
 - backend validation remains authoritative over client validation
+- feature workflow shells own dialog/page/drawer state, navigation, query
+  invalidation, and UI-lifecycle reset behavior
+- feature form components own `<form>` markup, layout, field composition,
+  validation message placement, submit buttons, and controlled props passed to
+  presentational UI components
+- feature form hooks own form initialization, submit orchestration, backend
+  error mapping, submit toasts, and narrow success callbacks
+- field sections own dense field groups, field-array row factories, local row
+  ids, add/remove behavior, and section-specific layout
+- success callbacks such as `onCreated`, `onUpdated`, or `onSuccess` carry the
+  smallest useful result back to the workflow layer for side effects
 
 Expect the validation UX to preserve these defaults unless the feature has a
 clear documented reason to differ:
@@ -212,13 +346,78 @@ clear documented reason to differ:
 Review submit and error handling for:
 
 - backend field errors being mapped back into the form in the feature layer
-- form-level submit errors being rendered in a form-level error area
+- form-level submit errors being rendered in a toast or app-level notification
 - field-level submit errors not depending on prior blur state to become visible
+- repeated submit/change field error display logic using the shared helpers from
+  `@/lib/utils/form/error` instead of feature-local copies
 - client validation not being treated as a replacement for backend validation
 
 When form behavior changes, expect targeted tests that cover the user-visible
 validation and submit behavior. Use `docs/testing.md` as the source of truth for
 the testing split between component tests and Playwright flows.
+
+For form-hook tests that only need to submit the hook and assert submit-side
+effects, expect the app-local generic helper instead of one-off fixture
+components. In both `apps/platform` and `apps/store`, this means importing
+`prepareFormHookTestSetup` from `@/test/prepareFormHookTestSetup`, mocking the
+feature submit action, and asserting hook-specific behavior such as success
+callbacks, submit-error toasts, and no success callback on failure. Treat
+feature-specific fixture forms, hardcoded fields, custom submit labels, or
+field UI assertions in these hook tests as a likely maintainability finding
+unless the test is intentionally covering field rendering behavior.
+
+## Shared package review rules
+
+When the diff touches `packages/api-types`, `packages/api-client`,
+`packages/next-api`, or app wrappers under `src/lib/server/*` and
+`src/lib/client/*`, review against `docs/packages.md`, `docs/http-auth.md`, and
+`AGENTS.md`.
+
+Expect these boundaries:
+
+- shared HTTP/auth contracts live in `@ordero/api-types`
+- browser-safe request transport lives in `@ordero/api-client`
+- Next.js server/BFF helpers live in `@ordero/next-api`
+- browser code does not import `@ordero/next-api`
+- same-origin client route constants live in `src/lib/client/api/path.ts`
+- backend endpoint constants live in `src/lib/server/api/path.ts`
+- app-domain schemas, app routes, form payloads, and feature request helpers
+  stay app-owned unless multiple apps truly need them
+- client API DTOs stay near their API helper and do not import or derive from
+  feature form-value types
+- app-wide Query, toast, and similar providers are added through
+  `src/app/AppProviders.tsx`
+
+For PATCH request changes, verify that feature submit utilities compare
+normalized initial and current values and call the API with only changed fields.
+Raise a finding when a PATCH helper receives unchanged form fields, or when an
+API DTO is narrowed to a specific form and no longer supports valid non-form
+callers.
+
+For optional fields in create or PATCH flows, also verify the transport
+semantics and their coverage:
+
+- blank optional create values are omitted unless the endpoint requires `null`
+- clearing a persisted optional value sends `null`, not an empty-string sentinel,
+  and the update DTO models that nullable field
+- unchanged normalized blank or absent values produce no PATCH
+- the client-helper test asserts the serialized `null` PATCH body, while the
+  owning submit utility covers create omission and update comparison
+
+Do not raise a finding merely because create and update use separate
+normalizers: omission and clearing are distinct command semantics. Recommend a
+shared pure normalizer only when the same field-normalization rule is actually
+reused across several workflows.
+
+Raise a finding when a change crosses these boundaries without a clear reason,
+such as putting a platform-only store model into `@ordero/api-types`, importing
+server-only helpers into Client Components, or adding direct browser calls to
+`BACKEND_API_URL`.
+
+For server guards, expect auth pages and protected pages/layouts to use the
+app-local `hasAuthenticatedServerSession()` wrapper before render. Review route
+guard changes for stale-cookie behavior, backend-error behavior, and redirect
+targets owned by `clientRoutes`.
 
 ## Validation expectations
 
@@ -230,6 +429,7 @@ Prefer these commands as the validation baseline:
 
 - repo-wide formatting expectations: `pnpm format` or `pnpm format:write`
 - repo-wide type expectations: `pnpm typecheck`
+- shared package changes: relevant `pnpm --dir packages/[package] typecheck`
 - `packages/ui`: `pnpm --dir packages/ui format`, `pnpm --dir packages/ui typecheck`, and targeted `pnpm --dir packages/ui test ...`
 - `apps/platform`: `pnpm --dir apps/platform format`, `pnpm --dir apps/platform typecheck`, and targeted `pnpm --dir apps/platform test ...`
 - `apps/store`: `pnpm --dir apps/store format`, `pnpm --dir apps/store typecheck`, and targeted `pnpm --dir apps/store test ...`
@@ -249,6 +449,23 @@ If checks were not run, note that as residual risk. If the diff changes runtime 
 6. Check whether the change preserves the repo architecture:
    types, exports, tokens, component APIs, and test philosophy.
 7. Report only findings that clear the evidence bar.
+
+## Changed test checklist
+
+When reviewing changed `*.test.tsx` files, explicitly scan for these patterns
+before finalizing the review:
+
+1. Apply the component test setup rules above whenever the test has repeated
+   default props, repeated providers, a stable wrapper, or existing
+   `prepareSetup` usage.
+2. Check that assertions stay behavior-first:
+   prefer accessible roles, names, visible text, and user-visible outcomes over
+   implementation details.
+3. Check that multi-export local or shared module mocks preserve adjacent actual
+   exports with inline async `vi.importActual` partial mocks.
+4. Check that `vi.mock()` factories that reference shared mock functions use
+   `vi.hoisted()` instead of async `await import(...)` helper functions solely
+   to recover hoisted mock references.
 
 ## Review questions
 
@@ -273,6 +490,9 @@ Use these questions to sharpen the review before writing findings:
 - a shared component is added but not exported from `packages/ui/src/index.ts`
 - a `packages/ui` test file is placed away from the component instead of next to the file it covers
 - a shared component or story is added in a location that breaks the current `packages/ui` structure or import flow
+- a unit/component test mocks a local or shared multi-export module destructively (e.g. overriding the entire module) instead of preserving adjacent actual exports with an inline async `vi.importActual` partial mock
+- a test adds an async helper that imports a mocked module only to retrieve a
+  mock function that should have been declared with `vi.hoisted()`
 
 ## What not to over-report
 

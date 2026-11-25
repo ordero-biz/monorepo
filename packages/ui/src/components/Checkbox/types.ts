@@ -41,6 +41,7 @@ export type CheckboxProps = {
   onKeyDown?: KeyboardEventHandler<HTMLElement>;
   parent?: boolean;
   readOnly?: boolean;
+  ref?: Ref<HTMLElement>;
   required?: boolean;
   size?: CheckboxSize;
   tabIndex?: number;

@@ -30,6 +30,19 @@ test.describe('SignInForm', () => {
   });
 
   test('shows validation feedback for invalid credentials', async ({ page }) => {
+    await page.route('**/api/auth/sign-in', async (route) => {
+      await route.fulfill({
+        status: 422,
+        json: {
+          status: 422,
+          message: 'Sign-in failed.',
+          fieldErrors: {
+            email: 'Use a gmail.com email address.',
+          },
+        },
+      });
+    });
+
     const emailField = page.getByRole('textbox', { name: 'Email address' });
     const passwordField = page.getByRole('textbox', { name: 'Password' });
 
@@ -59,21 +72,67 @@ test.describe('SignInForm', () => {
     ).toBeVisible();
   });
 
-  test('keeps the email and clears the password after successful sign in', async ({
+  test('submits credentials after successful sign in', async ({
     page,
   }) => {
+    const expectedCredentials = {
+      email: 'admin@gmail.com',
+      password: '123456',
+    };
+
+    await page.route('**/api/auth/sign-in', async (route) => {
+      await route.fulfill({
+        json: {
+          authenticated: true,
+          user: {
+            email: expectedCredentials.email,
+          },
+        },
+      });
+    });
+
+    const emailField = page.getByRole('textbox', { name: 'Email address' });
+    const passwordField = page.getByRole('textbox', { name: 'Password' });
+
+    await emailField.pressSequentially(expectedCredentials.email);
+    await passwordField.pressSequentially(expectedCredentials.password);
+
+    await expect(emailField).toHaveValue(expectedCredentials.email);
+    await expect(passwordField).toHaveValue(expectedCredentials.password);
+
+    const signInRequestPromise = page.waitForRequest('**/api/auth/sign-in');
+    await page.getByRole('button', { name: 'Sign in' }).click();
+
+    const signInRequest = await signInRequestPromise;
+
+    expect(signInRequest.method()).toBe('POST');
+    expect(signInRequest.postDataJSON()).toEqual(expectedCredentials);
+  });
+
+  test('shows a toast when sign in fails with a form-level backend error', async ({
+    page,
+  }) => {
+    await page.route('**/api/auth/sign-in', async (route) => {
+      await route.fulfill({
+        status: 401,
+        json: {
+          status: 401,
+          message: 'Invalid credentials.',
+        },
+      });
+    });
+
     const emailField = page.getByRole('textbox', { name: 'Email address' });
     const passwordField = page.getByRole('textbox', { name: 'Password' });
 
     await emailField.pressSequentially('admin@gmail.com');
     await passwordField.pressSequentially('123456');
 
-    await expect(emailField).toHaveValue('admin@gmail.com');
-    await expect(passwordField).toHaveValue('123456');
-
     await page.getByRole('button', { name: 'Sign in' }).click();
 
-    await expect(emailField).toHaveValue('admin@gmail.com');
-    await expect(passwordField).toHaveValue('');
+    await expect(
+      page.getByRole('dialog', { name: 'Invalid credentials.' }),
+    ).toBeVisible();
+    await expect(passwordField).toHaveValue('123456');
   });
 });

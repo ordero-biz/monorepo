@@ -1,26 +1,25 @@
 import { z } from 'zod';
-
-export const signInEmailSchema = z.email('Enter a valid email address.');
-
-export const signInPasswordSchema = z
-  .string()
-  .min(6, 'Password must contain at least 6 characters.');
+import {
+  authEmailSchema,
+  authPasswordSchema,
+} from '@/lib/utils/auth/validations';
+import type { ValidationArgs } from '@/lib/utils/form/validation/types';
 
 export const signInSchema = z.object({
-  email: signInEmailSchema,
-  password: signInPasswordSchema,
+  email: authEmailSchema,
+  password: authPasswordSchema,
 });
 
 export type SignInFormValues = z.infer<typeof signInSchema>;
 
-export const validateSignInEmail = (value: string) => {
-  const result = signInEmailSchema.safeParse(value);
+export const validateSignInEmail = ({ value }: ValidationArgs<string>) => {
+  const result = authEmailSchema.safeParse(value);
 
   return result.success ? undefined : result.error.issues[0]?.message;
 };
 
-export const validateSignInPassword = (value: string) => {
-  const result = signInPasswordSchema.safeParse(value);
+export const validateSignInPassword = ({ value }: ValidationArgs<string>) => {
+  const result = authPasswordSchema.safeParse(value);
 
   return result.success ? undefined : result.error.issues[0]?.message;
 };

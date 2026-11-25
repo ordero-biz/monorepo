@@ -1,0 +1,100 @@
+import { screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { clientRoutes } from '@/lib/client/routes';
+import { prepareStoreSetup } from '@/test/prepareSetup';
+import { UnitOfMeasurementDetailHeader } from './UnitOfMeasurementDetailHeader';
+
+const { setup } = prepareStoreSetup({
+  component: UnitOfMeasurementDetailHeader,
+  props: {
+    onDeleted: vi.fn(),
+    unitOfMeasurement: {
+      id: 1,
+      name: 'Kilogram',
+      status: 'DRAFT' as 'ACTIVE' | 'DRAFT',
+      symbol: 'kg',
+      comment: 'Weight unit',
+    },
+  },
+});
+
+describe('UnitOfMeasurementDetailHeader', () => {
+  it('opens the edit action from the actions menu', async () => {
+    const user = userEvent.setup();
+
+    setup();
+
+    expect(screen.getByRole('heading', { name: 'Kilogram' })).toBeVisible();
+    const breadcrumbs = screen.getByRole('navigation', { name: 'Breadcrumb' });
+    expect(
+      within(breadcrumbs).getByRole('link', {
+        name: 'Units of measurement',
+      })
+    ).toHaveAttribute('href', clientRoutes.unitsOfMeasurement);
+    expect(within(breadcrumbs).getByText('Kilogram')).toHaveAttribute(
+      'aria-current',
+      'page'
+    );
+
+    await user.click(
+      screen.getByRole('button', { name: 'Actions for Kilogram' })
+    );
+    await user.click(
+      await screen.findByRole('menuitem', {
+        name: 'Edit unit of measurement',
+      })
+    );
+
+    expect(
+      screen.getByRole('dialog', { name: 'Edit unit of measurement' })
+    ).toBeVisible();
+    expect(screen.getByRole('textbox', { name: 'Name' })).toHaveValue(
+      'Kilogram'
+    );
+  });
+
+  it('opens a confirmation dialog before publishing a draft unit of measurement', async () => {
+    const user = userEvent.setup();
+
+    setup();
+
+    await user.click(screen.getByRole('button', { name: 'Publish' }));
+
+    expect(
+      screen.getByRole('dialog', { name: 'Publish unit of measurement' })
+    ).toBeVisible();
+    expect(
+      screen.getByText(
+        'This action cannot be undone. However, you will still be able to update the symbol and comment.'
+      )
+    ).toBeVisible();
+  });
+
+  it('shows edit actions but not Publish for an active unit of measurement', async () => {
+    const user = userEvent.setup();
+
+    setup({
+      unitOfMeasurement: {
+        id: 1,
+        name: 'Kilogram',
+        status: 'ACTIVE',
+        symbol: 'kg',
+        comment: 'Weight unit',
+      },
+    });
+
+    expect(
+      screen.queryByRole('button', { name: 'Publish' })
+    ).not.toBeInTheDocument();
+
+    await user.click(
+      screen.getByRole('button', { name: 'Actions for Kilogram' })
+    );
+
+    expect(
+      await screen.findByRole('menuitem', {
+        name: 'Edit unit of measurement',
+      })
+    ).toBeVisible();
+  });
+});

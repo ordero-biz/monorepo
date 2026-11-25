@@ -1,0 +1,47 @@
+export const BACKEND_AUTH_PATHS = {
+  signIn: '/api/v1/employees/sign-in',
+  me: '/api/v1/employees/me',
+} as const;
+
+export const BACKEND_ATTRIBUTE_PATHS = {
+  attributes: '/api/v1/attributes',
+  attribute: '/api/v1/attributes/{id}',
+  attributeValues: '/api/v1/attributes/{id}/values',
+} as const;
+
+export const BACKEND_CATEGORY_PATHS = {
+  categories: '/api/v1/categories',
+  category: '/api/v1/categories/{id}',
+} as const;
+
+export const BACKEND_PRODUCT_PATHS = {
+  productGroups: '/api/v1/products',
+  productVariants: '/api/v1/products/variants',
+} as const;
+
+export const BACKEND_SUPPLY_PATHS = {
+  supplies: '/api/v1/supplies',
+  supply: '/api/v1/supplies/{id}',
+} as const;
+
+export const BACKEND_SUPPLIER_PATHS = {
+  suppliers: '/api/v1/suppliers',
+  supplier: '/api/v1/suppliers/{id}',
+} as const;
+
+export const BACKEND_UNITS_OF_MEASUREMENT_PATHS = {
+  unitsOfMeasurement: '/api/v1/units-of-measurement',
+  unitOfMeasurement: '/api/v1/units-of-measurement/{id}',
+} as const;
+
+export const BACKEND_TRANSFER_PATHS = {
+  warehouseTransfers: '/api/v1/warehouse-transfers',
+  warehouseTransfer: '/api/v1/warehouse-transfers/{id}',
+} as const;
+
+export const BACKEND_WAREHOUSE_PATHS = {
+  warehouses: '/api/v1/warehouses',
+  warehouse: '/api/v1/warehouses/{id}',
+  warehouseStock: '/api/v1/warehouses/{id}/stock',
+  warehouseSupplies: '/api/v1/warehouses/{id}/supplies',
+} as const;

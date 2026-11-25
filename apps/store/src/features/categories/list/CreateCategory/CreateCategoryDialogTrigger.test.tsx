@@ -1,0 +1,50 @@
+import { screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { prepareStoreSetup } from '@/test/prepareSetup';
+import { CreateCategoryDialogTrigger } from './CreateCategoryDialogTrigger';
+
+const { setup } = prepareStoreSetup({
+  component: CreateCategoryDialogTrigger,
+});
+
+describe('CreateCategoryDialogTrigger', () => {
+  it('opens the create category dialog', async () => {
+    const user = userEvent.setup();
+
+    setup();
+
+    await user.click(screen.getByRole('button', { name: 'Add category' }));
+
+    expect(
+      screen.getByRole('dialog', { name: 'Add new category' })
+    ).toBeVisible();
+  });
+
+  it('resets unsaved fields when the dialog is closed and reopened', async () => {
+    const user = userEvent.setup();
+
+    setup();
+
+    await user.click(screen.getByRole('button', { name: 'Add category' }));
+
+    const dialog = screen.getByRole('dialog', { name: 'Add new category' });
+    const nameField = within(dialog).getByRole('textbox', { name: 'Name' });
+
+    await user.type(nameField, 'Sneakers');
+    await user.keyboard('{Escape}');
+
+    expect(
+      screen.queryByRole('dialog', { name: 'Add new category' })
+    ).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Add category' }));
+
+    const reopenedDialog = screen.getByRole('dialog', {
+      name: 'Add new category',
+    });
+
+    expect(
+      within(reopenedDialog).getByRole('textbox', { name: 'Name' })
+    ).toHaveValue('');
+  });
+});

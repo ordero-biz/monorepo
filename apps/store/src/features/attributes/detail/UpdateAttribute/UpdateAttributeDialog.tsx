@@ -1,0 +1,118 @@
+'use client';
+
+import { Button, Dialog, TextField } from '@ordero/ui';
+import { useQueryClient } from '@tanstack/react-query';
+import type { Attribute } from '@/lib/domain/attributes/types';
+import { attributesQueryKeys } from '@/lib/query/attributes/attributesQueryKeys';
+import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
+import { useUpdateAttributeForm } from './hooks/useUpdateAttributeForm';
+import type { UpdateAttributeDialogProps } from './types';
+import { validateUpdateAttributeName } from './utils/validations';
+
+const getAttributeFormValues = ({ name }: Attribute) => ({ name });
+
+export const UpdateAttributeDialog = ({
+  attribute,
+  onOpenChange,
+  open,
+}: UpdateAttributeDialogProps) => {
+  const queryClient = useQueryClient();
+  const { form } = useUpdateAttributeForm({
+    attributeId: attribute.id,
+    initialName: attribute.name,
+    onNoChanges: () => handleOpenChange(false),
+    onUpdated: async (updatedAttribute) => {
+      const updatedFormValues = getAttributeFormValues(updatedAttribute);
+
+      form.reset(updatedFormValues);
+      onOpenChange(false);
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: attributesQueryKeys.list,
+        }),
+        queryClient.invalidateQueries({
+          queryKey: attributesQueryKeys.detail(attribute.id),
+        }),
+      ]);
+    },
+  });
+
+  const handleOpenChange = (nextOpen: boolean) => {
+    onOpenChange(nextOpen);
+
+    if (!nextOpen) {
+      form.reset(getAttributeFormValues(attribute));
+    }
+  };
+
+  return (
+    <Dialog.Root onOpenChange={handleOpenChange} open={open}>
+      <Dialog.Portal>
+        <Dialog.Backdrop />
+        <Dialog.Viewport>
+          <Dialog.Popup size="xs">
+            <form
+              noValidate
+              onSubmit={(event) => {
+                event.preventDefault();
+                form.handleSubmit();
+              }}
+            >
+              <Dialog.Header>
+                <Dialog.Title>Edit Attribute</Dialog.Title>
+              </Dialog.Header>
+
+              <Dialog.Content>
+                <form.Field
+                  name="name"
+                  validators={{
+                    onChange: validateUpdateAttributeName,
+                    onSubmit: validateUpdateAttributeName,
+                  }}
+                >
+                  {(field) => (
+                    <form.Subscribe
+                      selector={(state) => state.submissionAttempts}
+                    >
+                      {(submissionAttempts) => {
+                        const errorText = getFieldSubmitChangeErrorText(
+                          field.state.meta,
+                          submissionAttempts
+                        );
+
+                        return (
+                          <TextField
+                            aria-label="Attribute name"
+                            errorText={errorText}
+                            invalid={Boolean(errorText)}
+                            label="Name"
+                            name={field.name}
+                            onBlur={field.handleBlur}
+                            onValueChange={field.handleChange}
+                            required
+                            value={field.state.value}
+                            size="s"
+                          />
+                        );
+                      }}
+                    </form.Subscribe>
+                  )}
+                </form.Field>
+              </Dialog.Content>
+
+              <Dialog.Footer>
+                <form.Subscribe selector={(state) => state.isSubmitting}>
+                  {(isSubmitting) => (
+                    <Button disabled={isSubmitting} type="submit">
+                      {isSubmitting ? 'Saving...' : 'Save'}
+                    </Button>
+                  )}
+                </form.Subscribe>
+              </Dialog.Footer>
+            </form>
+          </Dialog.Popup>
+        </Dialog.Viewport>
+      </Dialog.Portal>
+    </Dialog.Root>
+  );
+};

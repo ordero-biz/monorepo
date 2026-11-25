@@ -3,15 +3,9 @@
 import { Field } from '@base-ui/react/field';
 import { RadioGroup as RadioGroupPrimitive } from '@base-ui/react/radio-group';
 import { cva } from 'class-variance-authority';
-import {
-  forwardRef,
-  useCallback,
-  useEffect,
-  useId,
-  useRef,
-  useState,
-} from 'react';
-import { renderFieldLabelContent } from '@/ui/components/shared/renderFieldLabelContent';
+import { useCallback, useEffect, useId, useRef, useState } from 'react';
+import { FieldHelperText } from '@/ui/components/FieldHelperText';
+import { FieldLabel } from '@/ui/components/FieldLabel';
 import { cn } from '@/ui/lib/utils';
 import type { RadioGroupProps } from './types';
 
@@ -27,194 +21,129 @@ const radioGroupRootVariants = cva('flex min-w-0', {
   },
 });
 
-const labelClassName =
-  'mb-[6px] text-[length:var(--input-label-size-desktop)] leading-[var(--input-label-line-height-desktop)] font-[var(--input-label-weight)]';
+export const RadioGroup = ({
+  'aria-describedby': ariaDescribedBy,
+  'aria-label': ariaLabel,
+  'aria-labelledby': ariaLabelledBy,
+  children,
+  defaultValue,
+  disabled = false,
+  errorIcon,
+  errorText,
+  helperIcon,
+  helperText,
+  id,
+  inputRef,
+  invalid = false,
+  label,
+  name,
+  onValueChange,
+  orientation = 'vertical',
+  readOnly = false,
+  ref,
+  required = false,
+  value,
+}: RadioGroupProps) => {
+  const generatedLabelId = useId();
+  const supportTextId = useId();
+  const groupRef = useRef<HTMLDivElement | null>(null);
+  const [resetKey, setResetKey] = useState(0);
+  const hasErrorText = Boolean(invalid && errorText);
+  const hasHelperText = Boolean(helperText);
+  const labelId = label ? `${generatedLabelId}-label` : undefined;
+  const labelledBy =
+    [ariaLabelledBy, labelId].filter(Boolean).join(' ') || undefined;
+  const describedBy =
+    [ariaDescribedBy, hasErrorText || hasHelperText ? supportTextId : undefined]
+      .filter(Boolean)
+      .join(' ') || undefined;
+  const isUncontrolled = value === undefined;
+  const setRefs = useCallback(
+    (node: HTMLDivElement | null) => {
+      groupRef.current = node;
 
-const helperTextClassName =
-  'flex items-start gap-[var(--form-helper-text-spacing)] pl-[var(--form-helper-text-pl)] pt-[var(--form-helper-text-pt)] text-[length:var(--caption-size-desktop)] leading-[var(--caption-line-height-desktop)] font-[var(--caption-weight)]';
+      if (typeof ref === 'function') {
+        ref(node);
+        return;
+      }
 
-const helperIconClassName =
-  'mt-px shrink-0 [&_svg]:size-[var(--form-helper-text-icon)]';
-
-const getLabelColorClassName = ({
-  disabled,
-  invalid,
-}: {
-  disabled: boolean;
-  invalid: boolean;
-}) => {
-  if (disabled) {
-    return 'text-[var(--text-disabled)]';
-  }
-
-  if (invalid) {
-    return 'text-destructive';
-  }
-
-  return 'text-[var(--text-secondary)]';
-};
-
-const renderSupportText = ({
-  icon,
-  text,
-}: {
-  icon?: RadioGroupProps['helperIcon'];
-  text: RadioGroupProps['helperText'];
-}) => (
-  <>
-    {icon ? <span className={helperIconClassName}>{icon}</span> : null}
-    <span className="min-w-0 flex-1">{text}</span>
-  </>
-);
-
-export const RadioGroup = forwardRef<HTMLDivElement, RadioGroupProps>(
-  (
-    {
-      'aria-describedby': ariaDescribedBy,
-      'aria-label': ariaLabel,
-      'aria-labelledby': ariaLabelledBy,
-      children,
-      defaultValue,
-      disabled = false,
-      errorIcon,
-      errorText,
-      helperIcon,
-      helperText,
-      id,
-      inputRef,
-      invalid = false,
-      label,
-      name,
-      onValueChange,
-      orientation = 'vertical',
-      readOnly = false,
-      required = false,
-      value,
+      if (ref) {
+        ref.current = node;
+      }
     },
-    ref
-  ) => {
-    const generatedLabelId = useId();
-    const supportTextId = useId();
-    const groupRef = useRef<HTMLDivElement | null>(null);
-    const [resetKey, setResetKey] = useState(0);
-    const hasErrorText = Boolean(invalid && errorText);
-    const hasHelperText = Boolean(helperText);
-    const labelId = label ? `${generatedLabelId}-label` : undefined;
-    const labelledBy =
-      [ariaLabelledBy, labelId].filter(Boolean).join(' ') || undefined;
-    const describedBy =
-      [
-        ariaDescribedBy,
-        hasErrorText || hasHelperText ? supportTextId : undefined,
-      ]
-        .filter(Boolean)
-        .join(' ') || undefined;
-    const isUncontrolled = value === undefined;
-    const setRefs = useCallback(
-      (node: HTMLDivElement | null) => {
-        groupRef.current = node;
+    [ref]
+  );
 
-        if (typeof ref === 'function') {
-          ref(node);
-          return;
-        }
+  useEffect(() => {
+    if (!isUncontrolled) {
+      return;
+    }
 
-        if (ref) {
-          ref.current = node;
-        }
-      },
-      [ref]
-    );
+    const form = groupRef.current?.closest('form');
 
-    useEffect(() => {
-      if (!isUncontrolled) {
-        return;
-      }
+    if (!form) {
+      return;
+    }
 
-      const form = groupRef.current?.closest('form');
+    const handleReset = () => {
+      setResetKey((currentKey) => currentKey + 1);
+    };
 
-      if (!form) {
-        return;
-      }
+    form.addEventListener('reset', handleReset);
 
-      const handleReset = () => {
-        setResetKey((currentKey) => currentKey + 1);
-      };
+    return () => {
+      form.removeEventListener('reset', handleReset);
+    };
+  }, [isUncontrolled]);
 
-      form.addEventListener('reset', handleReset);
-
-      return () => {
-        form.removeEventListener('reset', handleReset);
-      };
-    }, [isUncontrolled]);
-
-    return (
-      <Field.Root
-        className="flex w-full min-w-0 flex-col"
-        data-slot="radio-group-field"
-        disabled={disabled}
-        invalid={invalid}
-        name={name}
-      >
-        {label ? (
-          <Field.Label
-            className={cn(
-              labelClassName,
-              getLabelColorClassName({
-                disabled,
-                invalid,
-              })
-            )}
-            id={labelId}
-          >
-            {renderFieldLabelContent({ label, required })}
-          </Field.Label>
-        ) : null}
-        <RadioGroupPrimitive
-          aria-describedby={describedBy}
-          aria-label={ariaLabel}
-          aria-labelledby={labelledBy}
-          defaultValue={isUncontrolled ? defaultValue : undefined}
+  return (
+    <Field.Root
+      className="flex w-full min-w-0 flex-col"
+      data-slot="radio-group-field"
+      disabled={disabled}
+      invalid={invalid}
+      name={name}
+    >
+      {label ? (
+        <FieldLabel
           disabled={disabled}
-          id={id}
-          inputRef={inputRef}
-          key={isUncontrolled ? resetKey : undefined}
-          name={name}
-          onValueChange={onValueChange}
-          readOnly={readOnly}
-          ref={setRefs}
+          id={labelId}
+          invalid={invalid}
           required={required}
-          value={value}
-          className={cn(radioGroupRootVariants({ orientation }))}
-          data-slot="radio-group"
         >
-          {children}
-        </RadioGroupPrimitive>
-        {hasErrorText ? (
-          <p
-            className={cn(helperTextClassName, 'text-destructive')}
-            id={supportTextId}
-          >
-            {renderSupportText({
-              icon: errorIcon,
-              text: errorText,
-            })}
-          </p>
-        ) : null}
-        {hasHelperText && !hasErrorText ? (
-          <p
-            className={cn(helperTextClassName, 'text-text-secondary')}
-            id={supportTextId}
-          >
-            {renderSupportText({
-              icon: helperIcon,
-              text: helperText,
-            })}
-          </p>
-        ) : null}
-      </Field.Root>
-    );
-  }
-);
-
-RadioGroup.displayName = 'RadioGroup';
+          {label}
+        </FieldLabel>
+      ) : null}
+      <RadioGroupPrimitive
+        aria-describedby={describedBy}
+        aria-label={ariaLabel}
+        aria-labelledby={labelledBy}
+        defaultValue={isUncontrolled ? defaultValue : undefined}
+        disabled={disabled}
+        id={id}
+        inputRef={inputRef}
+        key={isUncontrolled ? resetKey : undefined}
+        name={name}
+        onValueChange={onValueChange}
+        readOnly={readOnly}
+        ref={setRefs}
+        required={required}
+        value={value}
+        className={cn(radioGroupRootVariants({ orientation }))}
+        data-slot="radio-group"
+      >
+        {children}
+      </RadioGroupPrimitive>
+      {hasErrorText ? (
+        <FieldHelperText icon={errorIcon} id={supportTextId} invalid>
+          {errorText}
+        </FieldHelperText>
+      ) : null}
+      {hasHelperText && !hasErrorText ? (
+        <FieldHelperText icon={helperIcon} id={supportTextId}>
+          {helperText}
+        </FieldHelperText>
+      ) : null}
+    </Field.Root>
+  );
+};

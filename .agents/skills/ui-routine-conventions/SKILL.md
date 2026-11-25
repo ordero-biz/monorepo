@@ -28,9 +28,18 @@ When the task touches accessibility testing strategy for shared UI, also read:
 
 - `docs/accessibility-testing.md`
 
+When the task adds or changes a shared or feature-level data table, also read:
+
+- `docs/data-tables.md`
+
 ## Testing Conventions
 
 Use behavior-first tests.
+
+Before adding or changing a test, name the behavior in user or public-API terms.
+Then choose assertions that prove that behavior through observable output.
+Changing `document.querySelector(...)` to a Testing Library query is not enough if
+the assertion still checks internals.
 
 Good tests:
 
@@ -42,15 +51,64 @@ Good tests:
 Avoid:
 
 - testing implementation details
-- asserting class name presence unless there is no better observable signal
+- asserting class name presence
 - asserting token names or `cva` internals
+- asserting `data-*` state flags, generated ids, DOM ancestry, portals, slots, or
+  wrapper structure unless they are explicitly documented as public API
+- using `document`, `querySelector`, `querySelectorAll`, or `closest` when the
+  same element can be found by role, label, text, display value, placeholder, or
+  another Testing Library query
+
+If requested coverage cannot be achieved under these restrictions, pause before
+writing an implementation-detail assertion. Explain the gap and suggest the
+right layer instead, such as:
+
+- a Storybook/browser test for layout, animation, hover-only visuals, CSS state,
+  or a11y behavior that needs a browser
+- a Playwright flow for routed or composed application behavior
+- a visual regression check for pixel/layout fidelity
+- dropping the test when it would only freeze private implementation
+
+Examples:
+
+- Prefer `expect(screen.getByRole('button', { name: 'Save' })).toBeDisabled()`
+  over checking disabled class names.
+- Prefer clicking a control and asserting that visible text changes over
+  asserting `data-open`, `data-state`, or internal trigger classes.
+- Prefer `expect(screen.getByRole('dialog', { name: 'Saved' }))` over finding a
+  component root by `[data-slot="toast"]`.
+- Do not unit-test animation implementation such as `data-expanded`,
+  `data-promoted`, transform classes, or stack positioning; ask whether to cover
+  it with Storybook/browser/visual tests instead.
+- Do not assert icon SVG internals. If icon presence matters to users, expose and
+  assert an accessible label; otherwise treat decorative icons as visual styling.
 
 Required tooling defaults across apps and packages:
 
 - `@testing-library/react`
 - `@testing-library/user-event`
-- `prepareSetup` from `@ordero/test-config/react` for component test setup, unless a one-off `render(...)` makes required surrounding structure clearer
+- `prepareSetup` from the app/package test helper, or from `@ordero/test-config/react` when no local helper exists, for component test setup
 - Vitest globals (`describe`, `it`, `expect`, `vi`, etc.) without per-file imports
+- use `vi.hoisted()` when a `vi.mock()` factory needs to reference a shared mock
+  function from the test file; do not add async `await import(...)` helpers just
+  to recover hoisted mock references
+
+### `prepareSetup` rules
+
+Apply these rules strictly to component tests across `apps` and `packages`.
+
+- use the app or package-level `prepareSetup` helper when one exists so providers and test defaults stay consistent
+- if no local `prepareSetup` helper exists, use the shared helper from `@ordero/test-config/react`
+- expect `prepareSetup` to be the default setup pattern when a test file has repeated default props, repeated providers, or a stable wrapper
+- layer a small local `setup...` helper on top of `prepareSetup` only when the test needs named queried elements, a `userEvent` instance, or another behavior-oriented return value
+- avoid hand-rolled `render(...)` wrappers for provider setup; add missing providers to the local `prepareSetup` helper instead
+- use plain `render(...)` directly only for one-off tests that need test-local DOM around the component, such as a host form or extra focus targets
+- inspect every `setup({ ... })` override in `prepareSetup`-based tests
+- when an overridden prop is later asserted on, used in a Testing Library query, or used to prove callback behavior, destructure that value from `setup(...)`
+- do not keep a separate local variable for the same overridden prop when the value is available from `setup(...)`
+- after checking setup mechanics, keep assertions behavior-first through accessible roles, names, visible text, and user-visible outcomes
+
+See `references/prepare-setup-example.md` for the canonical pattern.
 
 Testing layer split for `packages/ui`:
 
@@ -64,14 +122,10 @@ For app feature/component tests outside `packages/ui`:
 - use Playwright for routed/composed app flows, smoke coverage, browser integration, and behavior that depends on the real browser page
 - prefer role/name queries when available; use `getByLabelText` for inputs that do not expose a queryable role in jsdom, such as `input[type="password"]`
 - configure app TypeScript/Vitest so Vitest globals are available in test files; do not import Vitest globals per file as a workaround
-- use `prepareSetup` as the base render helper, and layer a small local `setup...` helper on top when the test needs named queried elements or a `userEvent` instance
+- for request-driven component and hook tests, mock the nearest app-owned request helper rather than transport details
+- for request-driven component tests, assert user-visible behavior and request-helper contract rather than internal cache or state-container data
 
 For the repo-specific accessibility testing workflow, see `references/accessibility-testing.md`.
-
-For shared component tests with repeated default props, use `prepareSetup`.
-When a `prepareSetup` test overrides a prop and later asserts on that prop, destructure the asserted value from the object returned by `setup(...)` instead of keeping a separate local variable for the same override.
-Use plain `render(...)` only for one-off tests that need surrounding structure such as forms, extra focus targets, or similar setup that would be less clear with `prepareSetup`.
-See `references/prepare-setup-example.md` for the canonical pattern.
 
 ## CSS Variable Conventions
 
@@ -94,6 +148,12 @@ Required rules:
 - Do not make up new semantic or bridged tokens until you have reviewed the existing token files.
 - If an existing semantic or bridged token covers the need, reuse it.
 - Only add a new token mapping when the needed value truly does not exist in the current token layers.
+- Keep viewport breakpoint tokens and layout sizing tokens semantically separate.
+  Tailwind `--breakpoint-*` theme values are viewport switch points and must be
+  literal lengths because Tailwind emits them into media queries, where
+  `var(...)` is invalid. Container widths, page max widths, and shell sizing
+  should use semantic layout tokens such as `--layout-container-*`, even if
+  they currently share values with breakpoints.
 
 For Figma-driven implementation:
 
@@ -130,16 +190,26 @@ Do not promote every component token into Tailwind utilities up front. Revisit p
 
 For shared UI work across `packages` and `apps`:
 
+- keep app-level client context in a single `AppProviders` component near the app root; add new app-wide providers there instead of creating parallel provider wrappers in `layout.tsx`
+- prefer semantic HTML elements over generic `div` and `span` wrappers when the content has clear structural meaning such as navigation, lists, sections, headers, footers, or other landmark/sectioning roles
+- use non-semantic wrappers only when semantic elements would be incorrect for the content or when a library primitive constrains the rendered element
 - prefer Base UI primitives/components whenever a matching primitive/component exists
+- for field labels, use `Field.Label` when the label is inside a Base UI field context; use a native `label` with `htmlFor` when explicitly labeling a control outside that context; use non-label text such as `span` or `div` only for section headings or display text that should not label a control
 - prefer explicit component props for design-system components
 - do not expose `className` on shared `packages/ui` components
 - keep stories and tests aligned with the public API, not internal structure
 - preserve consistency with existing components unless there is a deliberate architectural improvement
 - do not move field-level helper text or error-text expectations into low-level primitives if wrapper components own that part of the API
+- keep component-specific styles in the component folder, for example `packages/ui/src/components/[ComponentName]/styles.css`, and import them from the component module that needs them
+- reserve `packages/ui/src/styles/globals.css` and its imported files for global base styles, design tokens, Tailwind theme exposure, and genuinely shared style layers
 
 For `packages/ui` specifically:
 
 - prefer stable exports from `packages/ui/src/index.ts`
+- use `DataTable`'s `selection` prop as the default selection API; reserve
+  `DataTableSelectionCell` and `DataTableSelectionColumnHeader` for advanced
+  custom layouts
+- preserve the standard current-page scope for select-all checkboxes
 
 ## Validation
 

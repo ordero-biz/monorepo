@@ -1,5 +1,5 @@
 import type { CheckboxGroup as CheckboxGroupPrimitive } from '@base-ui/react/checkbox-group';
-import type { ReactNode } from 'react';
+import type { ReactNode, Ref } from 'react';
 
 export type CheckboxGroupOrientation = 'horizontal' | 'vertical';
 
@@ -22,6 +22,7 @@ type CheckboxGroupCommonProps = {
     details: CheckboxGroupPrimitive.ChangeEventDetails
   ) => void;
   orientation?: CheckboxGroupOrientation;
+  ref?: Ref<HTMLDivElement>;
 };
 
 type CheckboxGroupStandardProps = CheckboxGroupCommonProps & {

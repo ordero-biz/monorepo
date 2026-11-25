@@ -1,0 +1,1 @@
+export { DeleteCategoriesDialog } from './DeleteCategories';

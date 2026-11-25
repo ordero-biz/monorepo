@@ -1,0 +1,1 @@
+export { UpdateAttributeDialog } from './UpdateAttributeDialog';

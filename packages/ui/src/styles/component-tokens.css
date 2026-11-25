@@ -46,7 +46,6 @@
   --figma-label-min-width: 24px;
 
   /* chip */
-  --figma-chip-spacing: -2px;
   --figma-chip-close-icon: 20px;
   --figma-chip-sm-radius: var(--figma-radius-1);
   --figma-chip-sm-px: 3px;
@@ -65,7 +64,7 @@
   --figma-card-header-pr: var(--figma-spacing-2);
   --figma-card-header-py: var(--figma-spacing-3);
   --figma-card-header-spacing: var(--figma-spacing-2);
-  --figma-card-content-p: var(--figma-spacing-3);
+  --figma-card-content-p: var(--figma-spacing-2);
 
   /* rating */
   --figma-rating-spacing: var(--figma-spacing-1);
@@ -100,6 +99,9 @@
   --figma-dialog-action-px: var(--figma-spacing-3);
   --figma-dialog-action-py: var(--figma-spacing-3);
   --figma-dialog-action-spacing: var(--figma-spacing-1-5);
+  --figma-dialog-width-xs: 444px;
+  --figma-dialog-width-sm: 600px;
+  --figma-dialog-width-md: 720px;
 
   /* switch */
   --figma-switch-p: 3px;
@@ -117,6 +119,24 @@
   --figma-menu-item-spacing: var(--figma-spacing-1);
   --figma-menu-list-p: 4px;
   --figma-menu-list-spacing: var(--figma-spacing-0-5);
+
+  /* nav vertical */
+  --figma-nav-bullet-light-color: #edeff2;
+  --figma-nav-bullet-line-width: 2px;
+  --figma-nav-bullet-size: 12px;
+  --figma-nav-bullet-offset: 10px;
+  --figma-nav-bullet-gutter: 22px;
+  --figma-nav-item-root-height: calc(
+    var(--figma-spacing-5) +
+    var(--figma-spacing-0-5)
+  );
+  --figma-nav-item-sub-height: calc(
+    var(--figma-spacing-4) +
+    var(--figma-spacing-0-5)
+  );
+  --figma-nav-width: calc(var(--figma-spacing-20) + var(--figma-spacing-15));
+  --figma-nav-mini-width: var(--figma-spacing-10);
+  --figma-nav-toggle-size: 26px;
 
   /* slider */
   --figma-slider-marks-color: var(--figma-grey-48);
@@ -265,6 +285,13 @@
   --figma-form-helper-text-icon: 16px;
   --figma-form-helper-text-spacing: var(--figma-spacing-0-5);
 
+  /* breakpoints */
+  --figma-breakpoint-xs: 0px;
+  --figma-breakpoint-sm: 600px;
+  --figma-breakpoint-md: 900px;
+  --figma-breakpoint-lg: 1200px;
+  --figma-breakpoint-xl: 1536px;
+
   /* fab bridge */
   --fab-icon-token: var(--figma-fab-icon);
   --fab-radius-token: var(--figma-fab-radius);
@@ -310,7 +337,6 @@
   --label-min-width-token: var(--figma-label-min-width);
 
   /* chip bridge */
-  --chip-spacing-token: var(--figma-chip-spacing);
   --chip-close-icon-token: var(--figma-chip-close-icon);
   --chip-sm-radius-token: var(--figma-chip-sm-radius);
   --chip-sm-px-token: var(--figma-chip-sm-px);
@@ -364,6 +390,14 @@
   --dialog-action-px-token: var(--figma-dialog-action-px);
   --dialog-action-py-token: var(--figma-dialog-action-py);
   --dialog-action-spacing-token: var(--figma-dialog-action-spacing);
+  --dialog-backdrop-token: var(--color-backdrop);
+  --dialog-scrollbar-color-token: var(--color-grey-24);
+  --dialog-title-size-token: var(--h6-size-desktop);
+  --dialog-title-line-height-token: var(--h6-line-height-desktop);
+  --dialog-title-weight-token: var(--h6-weight);
+  --dialog-width-xs-token: var(--figma-dialog-width-xs);
+  --dialog-width-sm-token: var(--figma-dialog-width-sm);
+  --dialog-width-md-token: var(--figma-dialog-width-md);
 
   /* switch bridge */
   --switch-p-token: var(--figma-switch-p);
@@ -381,6 +415,18 @@
   --menu-item-spacing-token: var(--figma-menu-item-spacing);
   --menu-list-p-token: var(--figma-menu-list-p);
   --menu-list-spacing-token: var(--figma-menu-list-spacing);
+
+  /* nav vertical bridge */
+  --nav-bullet-light-color-token: var(--figma-nav-bullet-light-color);
+  --nav-bullet-line-width-token: var(--figma-nav-bullet-line-width);
+  --nav-bullet-size-token: var(--figma-nav-bullet-size);
+  --nav-bullet-offset-token: var(--figma-nav-bullet-offset);
+  --nav-bullet-gutter-token: var(--figma-nav-bullet-gutter);
+  --nav-item-root-height-token: var(--figma-nav-item-root-height);
+  --nav-item-sub-height-token: var(--figma-nav-item-sub-height);
+  --nav-width-token: var(--figma-nav-width);
+  --nav-mini-width-token: var(--figma-nav-mini-width);
+  --nav-toggle-size-token: var(--figma-nav-toggle-size);
 
   /* slider bridge */
   --slider-marks-color-token: var(--figma-slider-marks-color);
@@ -574,6 +620,23 @@
   --form-helper-text-pt-token: var(--figma-form-helper-text-pt);
   --form-helper-text-icon-token: var(--figma-form-helper-text-icon);
   --form-helper-text-spacing-token: var(--figma-form-helper-text-spacing);
+
+  /* layout containers */
+  --layout-container-xs: var(--figma-breakpoint-xs);
+  --layout-container-sm: var(--figma-breakpoint-sm);
+  --layout-container-md: var(--figma-breakpoint-md);
+  --layout-container-lg: var(--figma-breakpoint-lg);
+  --layout-container-xl: var(--figma-breakpoint-xl);
+}
+
+/* Keep the tokens available at runtime for JavaScript media queries. Tailwind
+ * also inlines their literal values into responsive utilities. */
+@theme static {
+  --breakpoint-sm: 600px;
+  --breakpoint-md: 900px;
+  --breakpoint-lg: 1200px;
+  --breakpoint-xl: 1536px;
+  --breakpoint-2xl: initial;
 }
 
 @theme inline {
@@ -624,7 +687,6 @@
   --label-min-width: var(--label-min-width-token);
 
   /* chip */
-  --chip-spacing: var(--chip-spacing-token);
   --chip-close-icon: var(--chip-close-icon-token);
   --chip-sm-radius: var(--chip-sm-radius-token);
   --chip-sm-px: var(--chip-sm-px-token);
@@ -678,6 +740,14 @@
   --dialog-action-px: var(--dialog-action-px-token);
   --dialog-action-py: var(--dialog-action-py-token);
   --dialog-action-spacing: var(--dialog-action-spacing-token);
+  --dialog-backdrop: var(--dialog-backdrop-token);
+  --dialog-scrollbar-color: var(--dialog-scrollbar-color-token);
+  --dialog-title-size: var(--dialog-title-size-token);
+  --dialog-title-line-height: var(--dialog-title-line-height-token);
+  --dialog-title-weight: var(--dialog-title-weight-token);
+  --dialog-width-xs: var(--dialog-width-xs-token);
+  --dialog-width-sm: var(--dialog-width-sm-token);
+  --dialog-width-md: var(--dialog-width-md-token);
 
   /* switch */
   --switch-p: var(--switch-p-token);
@@ -695,6 +765,18 @@
   --menu-item-spacing: var(--menu-item-spacing-token);
   --menu-list-p: var(--menu-list-p-token);
   --menu-list-spacing: var(--menu-list-spacing-token);
+
+  /* nav vertical */
+  --nav-bullet-light-color: var(--nav-bullet-light-color-token);
+  --nav-bullet-line-width: var(--nav-bullet-line-width-token);
+  --nav-bullet-size: var(--nav-bullet-size-token);
+  --nav-bullet-offset: var(--nav-bullet-offset-token);
+  --nav-bullet-gutter: var(--nav-bullet-gutter-token);
+  --nav-item-root-height: var(--nav-item-root-height-token);
+  --nav-item-sub-height: var(--nav-item-sub-height-token);
+  --nav-width: var(--nav-width-token);
+  --nav-mini-width: var(--nav-mini-width-token);
+  --nav-toggle-size: var(--nav-toggle-size-token);
 
   /* slider */
   --slider-marks-color: var(--slider-marks-color-token);

@@ -1,0 +1,274 @@
+import { screen, waitFor, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { updateWarehouse } from '@/lib/client/api/warehouses';
+import { WAREHOUSE_STATUS } from '@/lib/domain/warehouses/constants';
+import { warehousesQueryKeys } from '@/lib/query/warehouses/warehousesQueryKeys';
+import { prepareStoreSetup } from '@/test/prepareSetup';
+import type { UpdateWarehouseDialogProps } from './types';
+import { UpdateWarehouseDialog } from './UpdateWarehouseDialog';
+
+const onOpenChangeMock = vi.fn();
+
+vi.mock('@/lib/client/api/warehouses', async () => ({
+  ...(await vi.importActual<typeof import('@/lib/client/api/warehouses')>(
+    '@/lib/client/api/warehouses'
+  )),
+  updateWarehouse: vi.fn(),
+}));
+
+const updateWarehouseMock = vi.mocked(updateWarehouse);
+
+const warehouse = {
+  phone: null,
+  status: WAREHOUSE_STATUS.DRAFT,
+  totalItemQuantity: 0,
+  totalPrice: 0,
+  id: 1,
+  name: 'Main Warehouse',
+  address: '123 Commerce Ave',
+  comment: 'Primary stock location',
+};
+
+const { setup } = prepareStoreSetup<UpdateWarehouseDialogProps>({
+  component: UpdateWarehouseDialog,
+  props: {
+    onOpenChange: onOpenChangeMock,
+    open: true,
+    warehouse,
+  },
+});
+
+describe('UpdateWarehouseDialog', () => {
+  beforeEach(() => {
+    onOpenChangeMock.mockClear();
+    updateWarehouseMock.mockReset();
+  });
+
+  it('submits changes, closes, and refreshes warehouse caches', async () => {
+    const updatedWarehouse = {
+      ...warehouse,
+      name: 'Central Warehouse',
+    };
+    updateWarehouseMock.mockResolvedValue({
+      ok: true,
+      data: updatedWarehouse,
+    });
+    const user = userEvent.setup();
+    const { onOpenChange, queryClient, renderResult } = setup();
+    const invalidateQueriesSpy = vi.spyOn(queryClient, 'invalidateQueries');
+    const dialog = screen.getByRole('dialog', { name: 'Edit warehouse' });
+    const nameField = within(dialog).getByRole('textbox', { name: 'Name' });
+
+    await user.clear(nameField);
+    await user.type(nameField, ' Updated Warehouse ');
+    await user.click(within(dialog).getByRole('button', { name: 'Save' }));
+
+    expect(updateWarehouseMock).toHaveBeenCalledWith({
+      warehouseId: 1,
+      name: 'Updated Warehouse',
+    });
+    await waitFor(() =>
+      expect(invalidateQueriesSpy).toHaveBeenCalledWith({
+        queryKey: warehousesQueryKeys.list,
+      })
+    );
+    expect(invalidateQueriesSpy).toHaveBeenCalledWith({
+      queryKey: warehousesQueryKeys.detail(1),
+    });
+    expect(onOpenChange).toHaveBeenCalledWith(false);
+
+    renderResult.rerender({ open: false });
+    renderResult.rerender({ open: true, warehouse: updatedWarehouse });
+
+    expect(screen.getByRole('textbox', { name: 'Name' })).toHaveValue(
+      'Central Warehouse'
+    );
+  });
+
+  it('closes without a request when normalized values are unchanged', async () => {
+    const user = userEvent.setup();
+    const { onOpenChange } = setup();
+
+    await user.click(
+      within(screen.getByRole('dialog', { name: 'Edit warehouse' })).getByRole(
+        'button',
+        { name: 'Save' }
+      )
+    );
+
+    await waitFor(() => expect(onOpenChange).toHaveBeenCalledWith(false));
+    expect(updateWarehouseMock).not.toHaveBeenCalled();
+  });
+
+  it('clears an existing address when it is removed', async () => {
+    updateWarehouseMock.mockResolvedValue({
+      ok: true,
+      data: {
+        ...warehouse,
+        address: null,
+      },
+    });
+    const user = userEvent.setup();
+
+    setup();
+
+    const dialog = screen.getByRole('dialog', { name: 'Edit warehouse' });
+    const addressField = within(dialog).getByRole('textbox', {
+      name: 'Address',
+    });
+
+    await user.clear(addressField);
+    await user.click(within(dialog).getByRole('button', { name: 'Save' }));
+
+    expect(updateWarehouseMock).toHaveBeenCalledWith({
+      warehouseId: 1,
+      address: null,
+    });
+  });
+
+  it('reveals required errors after blur and clears them while correcting input', async () => {
+    const user = userEvent.setup();
+    setup();
+    const dialog = screen.getByRole('dialog', { name: 'Edit warehouse' });
+    const nameField = within(dialog).getByRole('textbox', { name: 'Name' });
+
+    await user.clear(nameField);
+
+    expect(
+      within(dialog).queryByText('Warehouse name is required')
+    ).not.toBeInTheDocument();
+
+    await user.tab();
+
+    expect(
+      await within(dialog).findByText('Warehouse name is required')
+    ).toBeVisible();
+
+    await user.click(nameField);
+    await user.type(nameField, 'Main Warehouse');
+
+    await waitFor(() =>
+      expect(
+        within(dialog).queryByText('Warehouse name is required')
+      ).not.toBeInTheDocument()
+    );
+  });
+
+  it('discards unsaved changes after closing and reopening', async () => {
+    const user = userEvent.setup();
+    const { onOpenChange, renderResult } = setup();
+    const dialog = screen.getByRole('dialog', { name: 'Edit warehouse' });
+    const nameField = within(dialog).getByRole('textbox', { name: 'Name' });
+
+    await user.clear(nameField);
+    await user.type(nameField, 'Unsaved warehouse name');
+    await user.click(within(dialog).getByRole('button', { name: 'Close' }));
+
+    expect(onOpenChange).toHaveBeenCalledWith(false);
+
+    renderResult.rerender({ open: false });
+    renderResult.rerender({ open: true });
+
+    expect(screen.getByRole('textbox', { name: 'Name' })).toHaveValue(
+      'Main Warehouse'
+    );
+  });
+
+  it('disables another save while the update is in flight', async () => {
+    let resolveUpdate:
+      | ((value: Awaited<ReturnType<typeof updateWarehouse>>) => void)
+      | undefined;
+
+    updateWarehouseMock.mockReturnValue(
+      new Promise((resolve) => {
+        resolveUpdate = resolve;
+      })
+    );
+    const user = userEvent.setup();
+
+    setup();
+
+    const dialog = screen.getByRole('dialog', { name: 'Edit warehouse' });
+    const saveButton = within(dialog).getByRole('button', { name: 'Save' });
+    const nameField = within(dialog).getByRole('textbox', { name: 'Name' });
+
+    await user.clear(nameField);
+    await user.type(nameField, 'Central Warehouse');
+
+    await user.click(saveButton);
+
+    expect(saveButton).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Saving...' })).toBeVisible();
+
+    resolveUpdate?.({ ok: true, data: warehouse });
+
+    await screen.findByRole('button', { name: 'Save' });
+  });
+
+  it('shows backend field errors and keeps the dialog open', async () => {
+    updateWarehouseMock.mockResolvedValue({
+      ok: false,
+      error: {
+        status: 422,
+        message: 'Warehouse update failed.',
+        fieldErrors: { name: 'Warehouse name already exists.' },
+      },
+    });
+    const user = userEvent.setup();
+    const { onOpenChange } = setup();
+    const dialog = screen.getByRole('dialog', { name: 'Edit warehouse' });
+    const nameField = within(dialog).getByRole('textbox', { name: 'Name' });
+
+    await user.clear(nameField);
+    await user.type(nameField, 'Central Warehouse');
+    await user.click(within(dialog).getByRole('button', { name: 'Save' }));
+
+    expect(
+      await within(dialog).findByText('Warehouse name already exists.')
+    ).toBeVisible();
+    expect(nameField).toHaveAccessibleDescription(
+      'Warehouse name already exists.'
+    );
+    expect(
+      await screen.findByRole('dialog', { name: 'Warehouse update failed.' })
+    ).toBeVisible();
+    expect(onOpenChange).not.toHaveBeenCalledWith(false);
+  });
+
+  it('updates an active warehouse address without submitting a name', async () => {
+    updateWarehouseMock.mockResolvedValue({
+      ok: true,
+      data: {
+        ...warehouse,
+        status: WAREHOUSE_STATUS.ACTIVE,
+        address: '124 Commerce Ave',
+      },
+    });
+    const user = userEvent.setup();
+
+    setup({
+      warehouse: {
+        ...warehouse,
+        status: WAREHOUSE_STATUS.ACTIVE,
+      },
+    });
+
+    const dialog = screen.getByRole('dialog', { name: 'Edit warehouse' });
+    const addressField = within(dialog).getByRole('textbox', {
+      name: 'Address',
+    });
+
+    expect(
+      within(dialog).queryByRole('textbox', { name: 'Name' })
+    ).not.toBeInTheDocument();
+
+    await user.clear(addressField);
+    await user.type(addressField, '124 Commerce Ave');
+    await user.click(within(dialog).getByRole('button', { name: 'Save' }));
+
+    expect(updateWarehouseMock).toHaveBeenCalledWith({
+      warehouseId: 1,
+      address: '124 Commerce Ave',
+    });
+  });
+});

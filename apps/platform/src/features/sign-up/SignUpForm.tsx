@@ -7,10 +7,14 @@ import {
   TextField,
   Typography,
 } from '@ordero/ui';
-import { useForm } from '@tanstack/react-form';
+import { useQueryClient } from '@tanstack/react-query';
 import Link from 'next/link';
-import { getErrorMessage } from '@/features/sign-in/utils/error';
-import { signUpDefaultValues } from './constants';
+import { useRouter } from 'next/navigation';
+import { clientRoutes } from '@/lib/client/routes';
+import { authQueryKeys } from '@/lib/hooks/auth/useSessionQuery';
+import { getErrorMessage } from '@/lib/utils/form/error/error';
+import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
+import { useSignUpForm } from './hooks/useSignUpForm';
 import {
   validateAcceptTerms,
   validateSignUpEmail,
@@ -18,13 +22,12 @@ import {
 } from './utils/validations';
 
 export const SignUpForm = () => {
-  const form = useForm({
-    defaultValues: signUpDefaultValues,
-    onSubmit: async ({ formApi, value }) => {
-      formApi.reset({
-        ...signUpDefaultValues,
-        email: value.email,
-      });
+  const queryClient = useQueryClient();
+  const router = useRouter();
+  const { form } = useSignUpForm({
+    onSignedUp: (session) => {
+      queryClient.setQueryData(authQueryKeys.session, session);
+      router.push(clientRoutes.stores);
     },
   });
 
@@ -40,21 +43,12 @@ export const SignUpForm = () => {
       <form.Field
         name="email"
         validators={{
-          onChange: ({ value }) => validateSignUpEmail(value),
-          onSubmit: ({ value }) => validateSignUpEmail(value),
+          onChange: validateSignUpEmail,
+          onSubmit: validateSignUpEmail,
         }}
       >
         {(field) => {
-          const submitError = field.state.meta.errorMap.onSubmit;
-          const changeError = field.state.meta.errorMap.onChange;
-          const submitErrorText = submitError
-            ? getErrorMessage(submitError)
-            : undefined;
-          const changeErrorText =
-            !submitErrorText && field.state.meta.isBlurred && changeError
-              ? getErrorMessage(changeError)
-              : undefined;
-          const errorText = submitErrorText ?? changeErrorText;
+          const errorText = getFieldSubmitChangeErrorText(field.state.meta);
 
           return (
             <TextField
@@ -64,7 +58,7 @@ export const SignUpForm = () => {
               label="Email address"
               name={field.name}
               onBlur={field.handleBlur}
-              onValueChange={(value) => field.handleChange(value)}
+              onValueChange={field.handleChange}
               placeholder="example@gmail.com"
               required
               size="s"
@@ -78,21 +72,12 @@ export const SignUpForm = () => {
         <form.Field
           name="password"
           validators={{
-            onChange: ({ value }) => validateSignUpPassword(value),
-            onSubmit: ({ value }) => validateSignUpPassword(value),
+            onChange: validateSignUpPassword,
+            onSubmit: validateSignUpPassword,
           }}
         >
           {(field) => {
-            const submitError = field.state.meta.errorMap.onSubmit;
-            const changeError = field.state.meta.errorMap.onChange;
-            const submitErrorText = submitError
-              ? getErrorMessage(submitError)
-              : undefined;
-            const changeErrorText =
-              !submitErrorText && field.state.meta.isBlurred && changeError
-                ? getErrorMessage(changeError)
-                : undefined;
-            const errorText = submitErrorText ?? changeErrorText;
+            const errorText = getFieldSubmitChangeErrorText(field.state.meta);
 
             return (
               <PasswordField
@@ -102,7 +87,7 @@ export const SignUpForm = () => {
                 label="Password"
                 name={field.name}
                 onBlur={field.handleBlur}
-                onValueChange={(value) => field.handleChange(value)}
+                onValueChange={field.handleChange}
                 placeholder="6+ characters"
                 required
                 size="s"
@@ -115,7 +100,7 @@ export const SignUpForm = () => {
         <form.Field
           name="acceptTerms"
           validators={{
-            onSubmit: ({ value }) => validateAcceptTerms(value),
+            onSubmit: validateAcceptTerms,
           }}
         >
           {(field) => {
@@ -131,34 +116,32 @@ export const SignUpForm = () => {
                   color="primary"
                   name={field.name}
                   onBlur={field.handleBlur}
-                  onCheckedChange={(checked) =>
-                    field.handleChange(checked === true)
-                  }
+                  onCheckedChange={field.handleChange}
                   size="s"
                 >
                   <span className="text-[var(--text-secondary)]">
                     By signing up, I agree to{' '}
                     <Link
                       className="text-[var(--text-secondary)] underline underline-offset-[3px]"
-                      href="/terms"
+                      href={clientRoutes.terms}
                     >
                       terms of use
                     </Link>{' '}
                     and{' '}
                     <Link
                       className="text-[var(--text-secondary)] underline underline-offset-[3px]"
-                      href="/privacy"
+                      href={clientRoutes.privacy}
                     >
                       privacy policy
                     </Link>
                     .
                   </span>
                 </Checkbox>
-                {errorText ? (
+                {errorText && (
                   <Typography color="error" variant="caption">
                     {errorText}
                   </Typography>
-                ) : null}
+                )}
               </div>
             );
           }}

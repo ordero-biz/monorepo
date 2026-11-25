@@ -1,0 +1,1 @@
+export { AttributeDetail } from './AttributeDetail';

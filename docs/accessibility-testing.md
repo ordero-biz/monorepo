@@ -6,6 +6,10 @@ This repo uses a layered accessibility testing approach for shared UI work in `p
 For the general repo testing workflow, app E2E commands, and app Vitest setup,
 see `docs/testing.md`.
 
+For store app initial focus and trigger restoration, see
+[Accessibility Focus Hooks](accessibility-focus.md). That guide covers the
+hook APIs, lifecycle requirements, and app-level focus tests.
+
 Each layer answers a different question:
 
 - unit Vitest tests verify semantic behavior and interaction details

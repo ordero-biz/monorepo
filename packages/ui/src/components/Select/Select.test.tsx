@@ -38,7 +38,9 @@ describe('Select', () => {
       placeholder: 'Select view',
     });
 
-    expect(screen.getByRole('combobox', { name: ariaLabel })).toHaveTextContent(placeholder);
+    expect(screen.getByRole('combobox', { name: ariaLabel })).toHaveTextContent(
+      placeholder
+    );
   });
 
   it('opens the list and calls onValueChange when the user picks an option', async () => {
@@ -55,6 +57,71 @@ describe('Select', () => {
     expect(onValueChange).toHaveBeenLastCalledWith(
       'details',
       expect.any(Object)
+    );
+  });
+
+  it('describes options without adding their descriptions to the selected value', async () => {
+    const user = userEvent.setup();
+    const { 'aria-label': ariaLabel, onValueChange } = setup({
+      options: [
+        { label: 'List', value: 'list' },
+        {
+          label: 'Details',
+          value: 'details',
+          description: 'Show the complete record.',
+        },
+        {
+          label: 'Create',
+          value: 'create',
+          disabled: true,
+          description: 'Requires permission to create records.',
+        },
+      ],
+    });
+    const trigger = screen.getByRole('combobox', { name: ariaLabel });
+    await user.click(trigger);
+    const disabledOption = screen.getByRole('option', { name: 'Create' });
+    expect(disabledOption).toHaveAttribute('aria-disabled', 'true');
+    expect(disabledOption).toHaveAccessibleDescription(
+      'Requires permission to create records.'
+    );
+    await user.click(disabledOption);
+    expect(onValueChange).not.toHaveBeenCalled();
+    const details = screen.getByRole('option', { name: 'Details' });
+    expect(details).toHaveAccessibleDescription('Show the complete record.');
+    await user.click(details);
+    expect(onValueChange).toHaveBeenLastCalledWith(
+      'details',
+      expect.any(Object)
+    );
+    expect(trigger).toHaveTextContent(/^Details$/);
+  });
+
+  it('supports selecting multiple options', async () => {
+    const user = userEvent.setup();
+
+    const { 'aria-label': ariaLabel, onValueChange } = setup({
+      'aria-label': 'Visible columns',
+      defaultValue: ['list'],
+      multiple: true,
+      onValueChange: vi.fn(),
+    });
+
+    const trigger = screen.getByRole('combobox', { name: ariaLabel });
+
+    expect(trigger).toHaveTextContent('List');
+
+    await user.click(trigger);
+    await user.click(screen.getByRole('option', { name: 'Details' }));
+
+    expect(trigger).toHaveTextContent('List (+1 more)');
+    expect(onValueChange).toHaveBeenLastCalledWith(
+      ['list', 'details'],
+      expect.any(Object)
+    );
+    expect(screen.getByRole('option', { name: 'Details' })).toHaveAttribute(
+      'aria-selected',
+      'true'
     );
   });
 
@@ -76,6 +143,23 @@ describe('Select', () => {
     expect(
       screen.getByRole('combobox', { name: 'View mode' })
     ).toHaveTextContent('List');
+  });
+
+  it('uses the label as the accessible name without opening when users click the label', async () => {
+    const user = userEvent.setup();
+
+    const { label } = setup({
+      'aria-label': undefined,
+      label: 'Mode',
+    });
+
+    expect(screen.getByRole('combobox', { name: label })).toBeInTheDocument();
+
+    await user.click(screen.getByText(label));
+
+    expect(
+      screen.queryByRole('option', { name: 'List' })
+    ).not.toBeInTheDocument();
   });
 
   it('renders error text when invalid', () => {

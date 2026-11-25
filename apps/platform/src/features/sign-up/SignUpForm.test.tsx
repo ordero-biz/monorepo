@@ -1,20 +1,46 @@
-import { prepareSetup } from '@ordero/test-config/react';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { signUp } from '@/lib/client/api/auth';
+import { clientRoutes } from '@/lib/client/routes';
+import { authQueryKeys } from '@/lib/hooks/auth/useSessionQuery';
+import { preparePlatformSetup } from '@/test/prepareSetup';
 import { SignUpForm } from './SignUpForm';
 
-const { setup } = prepareSetup({
+const { routerPushMock } = vi.hoisted(() => ({
+  routerPushMock: vi.fn(),
+}));
+
+vi.mock('next/navigation', async () => ({
+  ...(await vi.importActual<typeof import('next/navigation')>(
+    'next/navigation'
+  )),
+  useRouter: () => ({
+    push: routerPushMock,
+  }),
+}));
+
+vi.mock('@/lib/client/api/auth', async () => ({
+  ...(await vi.importActual<typeof import('@/lib/client/api/auth')>(
+    '@/lib/client/api/auth'
+  )),
+  signUp: vi.fn(),
+}));
+
+const signUpMock = vi.mocked(signUp);
+
+const { setup } = preparePlatformSetup({
   component: SignUpForm,
 });
 
 const setupSignUpForm = () => {
   const user = userEvent.setup();
 
-  setup();
+  const result = setup();
 
   return {
+    ...result,
     emailField: screen.getByRole('textbox', { name: 'Email address' }),
-    passwordField: screen.getByLabelText('Password'),
+    passwordField: screen.getByLabelText(/Password/),
     signUpButton: screen.getByRole('button', { name: 'Sign up' }),
     termsCheckbox: screen.getByRole('checkbox', {
       name: /by signing up, i agree to/i,
@@ -24,6 +50,10 @@ const setupSignUpForm = () => {
 };
 
 describe('SignUpForm', () => {
+  beforeEach(() => {
+    signUpMock.mockReset();
+    routerPushMock.mockClear();
+  });
   it('renders the expected form controls', () => {
     const { emailField, passwordField, signUpButton, termsCheckbox } =
       setupSignUpForm();
@@ -32,12 +62,13 @@ describe('SignUpForm', () => {
     expect(passwordField).toBeVisible();
     expect(signUpButton).toHaveAttribute('type', 'submit');
     expect(termsCheckbox).not.toBeChecked();
-    expect(
-      screen.getByRole('link', { name: 'terms of use' })
-    ).toHaveAttribute('href', '/terms');
+    expect(screen.getByRole('link', { name: 'terms of use' })).toHaveAttribute(
+      'href',
+      clientRoutes.terms
+    );
     expect(
       screen.getByRole('link', { name: 'privacy policy' })
-    ).toHaveAttribute('href', '/privacy');
+    ).toHaveAttribute('href', clientRoutes.privacy);
   });
 
   it('does not show client email validation on the first keystroke', async () => {
@@ -167,7 +198,51 @@ describe('SignUpForm', () => {
     ).not.toBeInTheDocument();
   });
 
-  it('keeps the email and clears the password after successful sign up', async () => {
+  it('submits account credentials and redirects to stores after successful sign up', async () => {
+    const session = {
+      authenticated: true,
+      user: {
+        email: 'admin@gmail.com',
+      },
+    };
+    signUpMock.mockResolvedValue({
+      ok: true,
+      data: session,
+    });
+    const {
+      emailField,
+      passwordField,
+      queryClient,
+      signUpButton,
+      termsCheckbox,
+      user,
+    } = setupSignUpForm();
+
+    await user.type(emailField, 'admin@gmail.com');
+    await user.type(passwordField, '123456');
+    await user.click(termsCheckbox);
+    await user.click(signUpButton);
+
+    expect(signUpMock).toHaveBeenCalledWith({
+      email: 'admin@gmail.com',
+      password: '123456',
+    });
+    expect(queryClient.getQueryData(authQueryKeys.session)).toStrictEqual(
+      session
+    );
+    expect(routerPushMock).toHaveBeenCalledWith(clientRoutes.stores);
+  });
+
+  it('prevents another submission while sign up is in flight', async () => {
+    let resolveSignUp:
+      | ((value: Awaited<ReturnType<typeof signUp>>) => void)
+      | undefined;
+
+    signUpMock.mockReturnValue(
+      new Promise((resolve) => {
+        resolveSignUp = resolve;
+      })
+    );
     const { emailField, passwordField, signUpButton, termsCheckbox, user } =
       setupSignUpForm();
 
@@ -176,8 +251,70 @@ describe('SignUpForm', () => {
     await user.click(termsCheckbox);
     await user.click(signUpButton);
 
-    expect(emailField).toHaveValue('admin@gmail.com');
-    expect(passwordField).toHaveValue('');
-    expect(termsCheckbox).not.toBeChecked();
+    expect(signUpButton).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Signing up...' })).toBeVisible();
+
+    resolveSignUp?.({
+      ok: true,
+      data: {
+        authenticated: true,
+        user: {
+          email: 'admin@gmail.com',
+        },
+      },
+    });
+
+    await screen.findByRole('button', { name: 'Sign up' });
+  });
+
+  it('shows a toast when sign up fails with a form-level backend error', async () => {
+    signUpMock.mockResolvedValue({
+      ok: false,
+      error: {
+        status: 500,
+        message: 'Unable to create account.',
+      },
+    });
+    const { emailField, passwordField, signUpButton, termsCheckbox, user } =
+      setupSignUpForm();
+
+    await user.type(emailField, 'admin@gmail.com');
+    await user.type(passwordField, '123456');
+    await user.click(termsCheckbox);
+    await user.click(signUpButton);
+
+    expect(
+      await screen.findByRole('dialog', { name: 'Unable to create account.' })
+    ).toBeVisible();
+    expect(passwordField).toHaveValue('123456');
+    expect(termsCheckbox).toBeChecked();
+  });
+
+  it('clears the backend email error when the user edits the email field after a failed submit', async () => {
+    signUpMock.mockResolvedValue({
+      ok: false,
+      error: {
+        status: 409,
+        message: 'Sign-up failed.',
+        fieldErrors: {
+          email: 'This email is already registered.',
+        },
+      },
+    });
+    const { emailField, passwordField, signUpButton, termsCheckbox, user } =
+      setupSignUpForm();
+
+    await user.type(emailField, 'existing@gmail.com');
+    await user.type(passwordField, '123456');
+    await user.click(termsCheckbox);
+    await user.click(signUpButton);
+
+    expect(screen.getByText('This email is already registered.')).toBeVisible();
+
+    await user.type(emailField, 'g');
+
+    expect(
+      screen.queryByText('This email is already registered.')
+    ).not.toBeInTheDocument();
   });
 });

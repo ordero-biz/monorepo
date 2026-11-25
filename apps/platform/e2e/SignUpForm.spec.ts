@@ -66,9 +66,58 @@ test.describe('SignUpForm', () => {
     ).toBeVisible();
   });
 
-  test('keeps the email and clears the password and checkbox after successful sign up', async ({
+  test('submits account credentials after successful sign up', async ({
     page,
   }) => {
+    const expectedCredentials = {
+      email: 'admin@gmail.com',
+      password: '123456',
+    };
+
+    await page.route('**/api/auth/sign-up', async (route) => {
+      await route.fulfill({
+        json: {
+          authenticated: true,
+          user: {
+            email: expectedCredentials.email,
+          },
+        },
+      });
+    });
+
+    const emailField = page.getByRole('textbox', { name: 'Email address' });
+    const passwordField = page.getByRole('textbox', { name: 'Password' });
+    const termsCheckbox = page.getByRole('checkbox', {
+      name: /by signing up, i agree to/i,
+    });
+
+    await emailField.pressSequentially(expectedCredentials.email);
+    await passwordField.pressSequentially(expectedCredentials.password);
+    await termsCheckbox.check();
+
+    const signUpRequestPromise = page.waitForRequest('**/api/auth/sign-up');
+
+    await page.getByRole('button', { name: 'Sign up' }).click();
+
+    const signUpRequest = await signUpRequestPromise;
+
+    expect(signUpRequest.method()).toBe('POST');
+    expect(signUpRequest.postDataJSON()).toEqual(expectedCredentials);
+  });
+
+  test('shows a toast when sign up fails with a form-level backend error', async ({
+    page,
+  }) => {
+    await page.route('**/api/auth/sign-up', async (route) => {
+      await route.fulfill({
+        status: 500,
+        json: {
+          status: 500,
+          message: 'Unable to create account.',
+        },
+      });
+    });
+
     const emailField = page.getByRole('textbox', { name: 'Email address' });
     const passwordField = page.getByRole('textbox', { name: 'Password' });
     const termsCheckbox = page.getByRole('checkbox', {
@@ -78,10 +127,13 @@ test.describe('SignUpForm', () => {
     await emailField.pressSequentially('admin@gmail.com');
     await passwordField.pressSequentially('123456');
     await termsCheckbox.check();
+
     await page.getByRole('button', { name: 'Sign up' }).click();
 
-    await expect(emailField).toHaveValue('admin@gmail.com');
-    await expect(passwordField).toHaveValue('');
-    await expect(termsCheckbox).not.toBeChecked();
+    await expect(
+      page.getByRole('dialog', { name: 'Unable to create account.' }),
+    ).toBeVisible();
+    await expect(passwordField).toHaveValue('123456');
+    await expect(termsCheckbox).toBeChecked();
   });
 });

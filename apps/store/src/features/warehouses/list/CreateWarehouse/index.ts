@@ -1,0 +1,1 @@
+export { CreateWarehouseDialogTrigger } from './CreateWarehouseDialogTrigger';

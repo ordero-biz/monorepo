@@ -1,0 +1,134 @@
+/*
+ * Sidebar motion, shared by the width change, the mobile drawer and app
+ * layout parts that follow the sidebar width. Defined on :root because the
+ * drawer is portaled outside the provider.
+ */
+:root {
+  --sidebar-navigation-duration: 200ms;
+  --sidebar-navigation-overlay-duration: 300ms;
+  --sidebar-navigation-easing: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sidebar-navigation-provider {
+  --sidebar-navigation-panel-width: var(--nav-width);
+}
+
+/* The selected breakpoint's utility overrides this width in drawer mode. */
+@layer components {
+  .sidebar-navigation-provider {
+    --sidebar-navigation-width: var(--sidebar-navigation-panel-width);
+  }
+}
+
+.sidebar-navigation-provider[data-collapsed='true'] {
+  --sidebar-navigation-panel-width: var(--nav-mini-width);
+}
+
+.sidebar-navigation-drawer-close {
+  display: flex;
+  flex-shrink: 0;
+  justify-content: flex-end;
+  padding: var(--space-1) var(--space-2) 0;
+}
+
+/* 280px drawer + 40px close button + 8px clearance on each side. */
+@media (width >= 336px) {
+  .sidebar-navigation-drawer {
+    --sidebar-navigation-drawer-close-overhang: calc(
+      var(--space-1) +
+      var(--icon-button-md-size)
+    );
+  }
+
+  .sidebar-navigation-drawer-close {
+    position: absolute;
+    top: var(--space-1);
+    left: calc(100% + var(--space-1));
+    padding: 0;
+  }
+
+  .sidebar-navigation-drawer-close svg {
+    color: var(--white-main);
+  }
+}
+
+.sidebar-navigation-panel {
+  /* Base UI supplies the measured height as an inline custom property. */
+  --accordion-panel-height: auto;
+  box-sizing: border-box;
+  overflow: hidden;
+  height: var(--accordion-panel-height);
+  opacity: 1;
+  transition:
+    height 150ms ease,
+    opacity 120ms ease;
+}
+
+.sidebar-navigation-panel[data-starting-style] {
+  opacity: 0;
+}
+
+.sidebar-navigation-panel[data-ending-style] {
+  height: 0;
+  opacity: 0;
+}
+
+.sidebar-navigation-subtree > ul > li::before {
+  position: absolute;
+  top: 0;
+  bottom: -8px;
+  left: calc(var(--nav-bullet-size) * -1);
+  width: var(--nav-bullet-line-width);
+  content: '';
+  background-color: var(--nav-bullet-light-color);
+  z-index: -1;
+}
+
+.sidebar-navigation-branch-trigger[data-open]::after,
+.sidebar-navigation-branch-trigger[data-state='open']::after,
+[data-open] .sidebar-navigation-branch-trigger::after,
+[data-state='open'] .sidebar-navigation-branch-trigger::after {
+  position: absolute;
+  top: 100%;
+  left: calc(var(--nav-bullet-gutter) - var(--nav-bullet-size));
+  width: var(--nav-bullet-line-width);
+  height: calc(var(--space-0-5) * 2);
+  content: '';
+  background-color: var(--nav-bullet-light-color);
+  z-index: -1;
+}
+
+.sidebar-navigation-subtree > ul > li:last-of-type::before {
+  bottom: calc(
+    100% -
+    var(--nav-bullet-line-width) -
+    var(--nav-bullet-size) /
+    2
+  );
+}
+
+.sidebar-navigation-subitem::before {
+  position: absolute;
+  top: calc(var(--nav-bullet-size));
+  left: 0;
+  width: var(--nav-bullet-size);
+  height: var(--nav-bullet-size);
+  content: '';
+  background-color: var(--nav-bullet-light-color);
+  -webkit-mask:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='none' viewBox='0 0 14 14'%3E%3Cpath d='M1 1v4a8 8 0 0 0 8 8h4' stroke='%23efefef' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E")
+    50% 50% / 100% no-repeat;
+  mask:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='none' viewBox='0 0 14 14'%3E%3Cpath d='M1 1v4a8 8 0 0 0 8 8h4' stroke='%23efefef' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E")
+    50% 50% / 100% no-repeat;
+  transform: translate(
+    calc(var(--nav-bullet-size) * -1),
+    calc(var(--nav-bullet-size) * -0.4)
+  );
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sidebar-navigation-panel {
+    transition-duration: 0.01ms;
+  }
+}

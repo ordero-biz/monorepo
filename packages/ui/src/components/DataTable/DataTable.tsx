@@ -3,23 +3,70 @@
 import {
   flexRender,
   getCoreRowModel,
+  getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table';
-import type { CSSProperties } from 'react';
-import { useState } from 'react';
+import { cva } from 'class-variance-authority';
+import { ChevronDown, ChevronUp } from 'lucide-react';
+import type { CSSProperties, ReactNode } from 'react';
+import { Fragment, useId, useMemo, useState } from 'react';
+import { Button } from '@/ui/components/Button';
+import { Checkbox } from '@/ui/components/Checkbox';
+import { TablePagination } from '@/ui/components/TablePagination';
+import { tableFooterRowClassName } from '@/ui/components/TablePagination/styles';
 import { cn } from '@/ui/lib/utils';
 import type {
+  DataTableCellProps,
   DataTableColumnAlignment,
+  DataTableColumnDef,
   DataTableProps,
   DataTableRowSelectionState,
   DataTableSortingState,
 } from './types';
 
+const dataTableCellVariants = cva(
+  'inline-flex items-center text-card-foreground',
+  {
+    variants: {
+      width: {
+        auto: '',
+        // Fill the column without letting controls determine its intrinsic width.
+        full: 'w-0 min-w-full',
+      },
+      variant: {
+        actions: 'px-[var(--spacing-2)]',
+        default: 'p-[var(--spacing-2)]',
+      },
+    },
+    defaultVariants: {
+      variant: 'default',
+    },
+  }
+);
+
 const tableShellStyle = {
   boxShadow:
     'var(--card-x1) var(--card-y1) var(--card-blur1) var(--card-spread1) var(--color-grey-20), var(--card-x2) var(--card-y2) var(--card-blur2) var(--card-spread2) var(--color-grey-12)',
 } satisfies CSSProperties;
+
+const dataTableRowVariants = cva('last:[&_td]:border-b-0', {
+  variants: {
+    tone: {
+      default:
+        'bg-card hover:bg-[var(--color-grey-8)] data-[state=selected]:bg-[var(--color-grey-8)]',
+      warning:
+        'bg-[var(--color-warning-8)] hover:bg-[var(--color-warning-16)] data-[state=selected]:bg-[var(--color-warning-16)]',
+    },
+  },
+  defaultVariants: { tone: 'default' },
+});
+
+const contentCellClassName =
+  'p-0 align-middle text-[length:var(--body2-size-desktop)] leading-[var(--body2-line-height-desktop)] font-[var(--body2-weight)] [font-family:var(--body2-family)] text-card-foreground';
+
+const hasContent = (content: ReactNode) =>
+  content != null && typeof content !== 'boolean' && content !== '';
 
 const resolveRowSelectionState = (
   updater:
@@ -82,48 +129,163 @@ const getColumnStyle = ({
   } satisfies CSSProperties;
 };
 
+export const DataTableCell = ({
+  children,
+  variant,
+  width,
+}: DataTableCellProps) => (
+  <div className={dataTableCellVariants({ variant, width })}>{children}</div>
+);
+
+const createSelectionColumn = <TData,>(): DataTableColumnDef<TData> => ({
+  cell: ({ row, table }) => {
+    if (!row.getCanSelect()) {
+      return null;
+    }
+
+    const checkboxAriaLabel =
+      table.options.meta?.dataTableSelection?.getRowCheckboxAriaLabel?.(
+        row.original,
+        row.index
+      ) ?? `Select row ${row.index + 1}`;
+
+    return (
+      <div className="flex items-center justify-center px-[var(--spacing-1)]">
+        <Checkbox
+          aria-label={checkboxAriaLabel}
+          checked={row.getIsSelected()}
+          onCheckedChange={(checked) => row.toggleSelected(checked)}
+          size="s"
+        />
+      </div>
+    );
+  },
+  enableSorting: false,
+  header: ({ table }) => {
+    const hasSelectableRows = table
+      .getRowModel()
+      .rows.some((row) => row.getCanSelect());
+
+    if (!hasSelectableRows) {
+      return null;
+    }
+
+    return (
+      <div className="flex items-center justify-center px-[var(--spacing-1)]">
+        <Checkbox
+          aria-label={
+            table.options.meta?.dataTableSelection
+              ?.selectAllCheckboxAriaLabel ?? 'Select all rows'
+          }
+          checked={table.getIsAllPageRowsSelected()}
+          indeterminate={
+            table.getIsSomePageRowsSelected() &&
+            !table.getIsAllPageRowsSelected()
+          }
+          onCheckedChange={(checked) =>
+            table.toggleAllPageRowsSelected(checked)
+          }
+          size="s"
+        />
+      </div>
+    );
+  },
+  id: '__selection',
+  meta: {
+    align: 'center',
+    width: 48,
+    wrap: 'nowrap',
+  },
+});
+
 export const DataTable = <TData,>({
   ariaLabel,
   columns,
   data,
   emptyMessage = 'No results.',
+  footer,
+  footerColumns,
   getRowCanSelect,
   getRowId,
+  getRowTone,
+  header,
+  manualPagination = false,
   manualSorting = false,
   onRowSelectionChange,
   onSortingChange,
+  pagination,
   rowSelection,
+  rowDetails,
+  selection,
   sorting,
   selectable = false,
 }: DataTableProps<TData>) => {
+  const detailsId = useId();
+  const [uncontrolledExpandedRows, setUncontrolledExpandedRows] = useState<
+    Record<string, boolean>
+  >({});
+  const expandedRows = rowDetails?.expandedRows ?? uncontrolledExpandedRows;
+  const toggleRowDetails = (id: string) => {
+    const nextRows = { ...expandedRows, [id]: !expandedRows[id] };
+    if (rowDetails?.expandedRows === undefined)
+      setUncontrolledExpandedRows(nextRows);
+    rowDetails?.onExpandedRowsChange?.(nextRows);
+  };
   const [uncontrolledRowSelection, setUncontrolledRowSelection] =
     useState<DataTableRowSelectionState>({});
   const [uncontrolledSorting, setUncontrolledSorting] =
     useState<DataTableSortingState>([]);
-  const resolvedRowSelection = rowSelection ?? uncontrolledRowSelection;
+  const selectionRowState = selection?.rowSelection ?? rowSelection;
+  const selectionChangeHandler =
+    selection?.onRowSelectionChange ?? onRowSelectionChange;
+  const getSelectableRow = selection?.getRowCanSelect ?? getRowCanSelect;
+  const isRowSelectionEnabled = selection !== undefined || selectable;
+  const hasBuiltInSelectionColumn = selection !== undefined;
+  const resolvedRowSelection = selectionRowState ?? uncontrolledRowSelection;
   const resolvedSorting = sorting ?? uncontrolledSorting;
+  const resolvedPagination = pagination
+    ? {
+        pageIndex: pagination.page,
+        pageSize: pagination.rowsPerPage,
+      }
+    : undefined;
+  const paginationRowCount = pagination?.count ?? data.length;
+
+  const tableColumns = useMemo(() => {
+    if (!hasBuiltInSelectionColumn) {
+      return columns;
+    }
+
+    return [createSelectionColumn<TData>(), ...columns];
+  }, [columns, hasBuiltInSelectionColumn]);
 
   const table = useReactTable({
-    columns,
+    columns: tableColumns,
     data,
-    enableRowSelection: selectable
-      ? (row) => getRowCanSelect?.(row.original, row.index) ?? true
+    enableRowSelection: isRowSelectionEnabled
+      ? (row) => getSelectableRow?.(row.original, row.index) ?? true
       : false,
     getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel:
+      pagination && !manualPagination ? getPaginationRowModel() : undefined,
     getRowId,
     getSortedRowModel: manualSorting ? undefined : getSortedRowModel(),
+    manualPagination: pagination ? manualPagination : false,
     manualSorting,
+    meta: {
+      dataTableSelection: selection,
+    },
     onRowSelectionChange: (updater) => {
       const nextRowSelection = resolveRowSelectionState(
         updater,
         resolvedRowSelection
       );
 
-      if (rowSelection === undefined) {
+      if (selectionRowState === undefined) {
         setUncontrolledRowSelection(nextRowSelection);
       }
 
-      onRowSelectionChange?.(nextRowSelection);
+      selectionChangeHandler?.(nextRowSelection);
     },
     onSortingChange: (updater) => {
       const nextSorting = resolveSortingState(updater, resolvedSorting);
@@ -134,29 +296,57 @@ export const DataTable = <TData,>({
 
       onSortingChange?.(nextSorting);
     },
+    rowCount: paginationRowCount,
     state: {
+      pagination: resolvedPagination,
       rowSelection: resolvedRowSelection,
       sorting: resolvedSorting,
     },
   });
 
+  const footerCells = footerColumns
+    ? table.getVisibleLeafColumns().map((column) => ({
+        column,
+        content: Object.hasOwn(footerColumns, column.id)
+          ? footerColumns[column.id]
+          : undefined,
+      }))
+    : [];
+  const hasFooterColumns = footerCells.some(({ content }) =>
+    hasContent(content)
+  );
+
   return (
     <div
-      className="overflow-hidden rounded-[var(--card-radius)] bg-card text-card-foreground"
+      className="min-w-0 overflow-hidden rounded-[var(--card-radius)] bg-card text-card-foreground"
       data-slot="data-table"
       style={tableShellStyle}
     >
+      {hasContent(header) ? (
+        <div className="flex flex-wrap items-center justify-between gap-[var(--spacing-2)] p-[var(--card-content-p)]">
+          {header}
+        </div>
+      ) : null}
       <div className="overflow-x-auto">
         <table
           aria-label={ariaLabel}
           className="min-w-full w-max border-collapse border-spacing-0"
         >
           <thead>
-            {table.getHeaderGroups().map((headerGroup) => (
+            {table.getHeaderGroups().map((headerGroup, groupIndex) => (
               <tr
                 key={headerGroup.id}
                 className="bg-[var(--background-neutral)]"
               >
+                {rowDetails && groupIndex === 0 ? (
+                  <th
+                    scope="col"
+                    rowSpan={table.getHeaderGroups().length}
+                    className="w-0 whitespace-nowrap bg-[var(--background-neutral)] p-0"
+                  >
+                    <span className="sr-only">Details</span>
+                  </th>
+                ) : null}
                 {headerGroup.headers.map((header) => {
                   const meta = header.column.columnDef.meta;
                   const sortDirection = header.column.getIsSorted();
@@ -188,47 +378,156 @@ export const DataTable = <TData,>({
           </thead>
           <tbody>
             {table.getRowModel().rows.length > 0 ? (
-              table.getRowModel().rows.map((row) => (
-                <tr
-                  key={row.id}
-                  className="bg-card last:[&_td]:border-b-0 data-[state=selected]:bg-[var(--color-primary-8)]"
-                  data-state={row.getIsSelected() ? 'selected' : undefined}
-                >
-                  {row.getVisibleCells().map((cell) => {
-                    const meta = cell.column.columnDef.meta;
-
-                    return (
+              table.getRowModel().rows.map((row, rowIndex) => (
+                <Fragment key={row.id}>
+                  <tr
+                    className={dataTableRowVariants({
+                      tone: getRowTone?.(row.original, row.index),
+                    })}
+                    data-state={row.getIsSelected() ? 'selected' : undefined}
+                  >
+                    {rowDetails ? (
                       <td
-                        key={cell.id}
                         className={cn(
-                          'border-b border-dashed border-[var(--color-divider)] p-0 align-middle text-[length:var(--body2-size-desktop)] leading-[var(--body2-line-height-desktop)] font-[var(--body2-weight)] [font-family:var(--body2-family)] text-card-foreground',
-                          getAlignmentClassName(meta?.align),
-                          meta?.wrap === 'nowrap' && 'whitespace-nowrap'
+                          contentCellClassName,
+                          'w-0 whitespace-nowrap border-b border-dashed border-[var(--color-divider)] border-l-[length:var(--space-2px)] [border-left-style:solid]',
+                          expandedRows[row.id]
+                            ? 'border-l-primary'
+                            : 'border-l-transparent'
                         )}
-                        style={getColumnStyle(meta ?? {})}
                       >
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
-                        )}
+                        <DataTableCell variant="actions">
+                          <Button
+                            aria-label={`${expandedRows[row.id] ? 'Hide details' : 'Show details'}: ${rowDetails.getLabel(row.original, row.index)}`}
+                            aria-expanded={Boolean(expandedRows[row.id])}
+                            aria-controls={`${detailsId}-${row.id}`}
+                            onClick={() => toggleRowDetails(row.id)}
+                            type="button"
+                            size="s"
+                            variant="text"
+                            color="primary"
+                            startIcon={
+                              expandedRows[row.id] ? (
+                                <ChevronUp aria-hidden="true" />
+                              ) : (
+                                <ChevronDown aria-hidden="true" />
+                              )
+                            }
+                          >
+                            {expandedRows[row.id]
+                              ? 'Hide details'
+                              : 'Show details'}
+                          </Button>
+                        </DataTableCell>
                       </td>
-                    );
-                  })}
-                </tr>
+                    ) : null}
+                    {row.getVisibleCells().map((cell) => {
+                      const meta = cell.column.columnDef.meta;
+
+                      return (
+                        <td
+                          key={cell.id}
+                          className={cn(
+                            contentCellClassName,
+                            'border-b border-dashed border-[var(--color-divider)]',
+                            getAlignmentClassName(meta?.align),
+                            meta?.wrap === 'nowrap' && 'whitespace-nowrap'
+                          )}
+                          style={getColumnStyle(meta ?? {})}
+                        >
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
+                          )}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                  {rowDetails &&
+                  (expandedRows[row.id] || rowDetails.keepMounted) ? (
+                    <tr hidden={!expandedRows[row.id]} className="bg-card">
+                      <td
+                        colSpan={row.getVisibleCells().length + 1}
+                        className={cn(
+                          'border-b border-dashed border-[var(--color-divider)] border-l-[length:var(--space-2px)] [border-left-style:solid] border-l-primary p-[var(--spacing-2)]',
+                          rowIndex < table.getRowModel().rows.length - 1 &&
+                            'border-b-[length:var(--spacing-0-5)] [border-bottom-style:solid] border-b-muted'
+                        )}
+                      >
+                        <section
+                          id={`${detailsId}-${row.id}`}
+                          aria-label={rowDetails.getLabel(
+                            row.original,
+                            row.index
+                          )}
+                        >
+                          {rowDetails.render(row.original, row.index)}
+                        </section>
+                      </td>
+                    </tr>
+                  ) : null}
+                </Fragment>
               ))
             ) : (
               <tr className="bg-card">
                 <td
                   className="px-[var(--spacing-2)] py-[var(--spacing-2-5)] text-center text-muted-foreground"
-                  colSpan={table.getAllLeafColumns().length}
+                  colSpan={
+                    table.getAllLeafColumns().length + (rowDetails ? 1 : 0)
+                  }
                 >
                   {emptyMessage}
                 </td>
               </tr>
             )}
           </tbody>
+          {hasFooterColumns ? (
+            <tfoot>
+              <tr className="bg-card">
+                {rowDetails ? <td /> : null}
+                {footerCells.map(({ column, content }) => {
+                  const meta = column.columnDef.meta;
+
+                  return (
+                    <td
+                      key={column.id}
+                      className={cn(
+                        contentCellClassName,
+                        'border-t border-dashed border-[var(--color-divider)]',
+                        getAlignmentClassName(meta?.align),
+                        meta?.wrap === 'nowrap' && 'whitespace-nowrap'
+                      )}
+                      style={getColumnStyle(meta ?? {})}
+                    >
+                      <DataTableCell>{content}</DataTableCell>
+                    </td>
+                  );
+                })}
+              </tr>
+            </tfoot>
+          ) : null}
         </table>
       </div>
+      {hasContent(footer) ? (
+        <div
+          className={cn(
+            tableFooterRowClassName,
+            'flex-wrap border-t border-dashed border-[var(--color-divider)]'
+          )}
+        >
+          {footer}
+        </div>
+      ) : null}
+      {pagination ? (
+        <div className="border-t border-dashed border-[var(--color-divider)]">
+          <TablePagination
+            {...pagination}
+            count={paginationRowCount}
+            page={pagination.page}
+            rowsPerPage={pagination.rowsPerPage}
+          />
+        </div>
+      ) : null}
     </div>
   );
 };

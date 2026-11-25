@@ -1,0 +1,1 @@
+export { TransferDetail } from './TransferDetail';

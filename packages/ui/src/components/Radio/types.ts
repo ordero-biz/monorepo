@@ -17,7 +17,11 @@ export type RadioColor =
 
 export type RadioSize = 's' | 'm';
 
+export type RadioAlignment = 'start' | 'center' | 'end';
+
 export type RadioProps = {
+  /** `start` centers the circle on the first text line, including multiline labels. */
+  align?: RadioAlignment;
   'aria-describedby'?: string;
   'aria-label'?: string;
   'aria-labelledby'?: string;
@@ -31,6 +35,7 @@ export type RadioProps = {
   onFocus?: FocusEventHandler<HTMLElement>;
   onKeyDown?: KeyboardEventHandler<HTMLElement>;
   readOnly?: boolean;
+  ref?: Ref<HTMLElement>;
   required?: boolean;
   size?: RadioSize;
   tabIndex?: number;

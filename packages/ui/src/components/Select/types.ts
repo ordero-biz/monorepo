@@ -4,25 +4,28 @@ import type {
   FocusEventHandler,
   KeyboardEventHandler,
   ReactNode,
+  Ref,
 } from 'react';
 
 export type SelectSize = 's' | 'm';
 export type SelectVariant = 'outlined' | 'filled';
+export type SelectWidth = 'content' | 'full';
 
 export type SelectOption = {
+  /** Supporting text shown only in the option list, not in the selected value. */
+  description?: ReactNode;
   disabled?: boolean;
   label: ReactNode;
   value: string;
 };
 
-export type SelectProps = {
+type SelectCommonProps = {
   'aria-describedby'?: string;
   'aria-label'?: string;
   'aria-labelledby'?: string;
   alignItemWithTrigger?: boolean;
   autoComplete?: string;
   defaultOpen?: boolean;
-  defaultValue?: string | null;
   disabled?: boolean;
   errorIcon?: ReactNode;
   errorText?: ReactNode;
@@ -39,17 +42,36 @@ export type SelectProps = {
     open: boolean,
     details: SelectRoot.ChangeEventDetails
   ) => void;
-  onValueChange?: (
-    value: string | null,
-    details: SelectRoot.ChangeEventDetails
-  ) => void;
   options: SelectOption[];
   placeholder?: ReactNode;
   readOnly?: boolean;
+  ref?: Ref<HTMLButtonElement>;
   required?: boolean;
   size?: SelectSize;
   startAdornment?: ReactNode;
   startIcon?: ElementType<{ className?: string }>;
-  value?: string | null;
   variant?: SelectVariant;
+  width?: SelectWidth;
 };
+
+export type SelectSingleProps = SelectCommonProps & {
+  defaultValue?: string | null;
+  multiple?: false;
+  onValueChange?: (
+    value: string | null,
+    details: SelectRoot.ChangeEventDetails
+  ) => void;
+  value?: string | null;
+};
+
+export type SelectMultipleProps = SelectCommonProps & {
+  defaultValue?: string[];
+  multiple: true;
+  onValueChange?: (
+    value: string[],
+    details: SelectRoot.ChangeEventDetails
+  ) => void;
+  value?: string[];
+};
+
+export type SelectProps = SelectSingleProps | SelectMultipleProps;

@@ -1,0 +1,32 @@
+export const CLIENT_AUTH_PATHS = {
+  signIn: '/api/auth/sign-in',
+  logout: '/api/auth/logout',
+  session: '/api/auth/session',
+} as const;
+
+export const CLIENT_BACKEND_PATHS = {
+  attributes: '/api/backend/api/v1/attributes',
+  attributesDropdown: '/api/backend/api/v1/attributes/dropdown',
+  attribute: '/api/backend/api/v1/attributes/{id}',
+  attributeValues: '/api/backend/api/v1/attributes/{id}/values',
+  attributeValuesBulk: '/api/backend/api/v1/attributes/{id}/values/bulk',
+  attributeValuesDelete: '/api/backend/api/v1/attributes/values',
+  attributeValue: '/api/backend/api/v1/attributes/values/{id}',
+  categories: '/api/backend/api/v1/categories',
+  category: '/api/backend/api/v1/categories/{id}',
+  categoryChildren: '/api/backend/api/v1/categories/{parentId}/children',
+  productGroups: '/api/backend/api/v1/products',
+  productVariants: '/api/backend/api/v1/products/variants',
+  supplies: '/api/backend/api/v1/supplies',
+  supply: '/api/backend/api/v1/supplies/{id}',
+  suppliers: '/api/backend/api/v1/suppliers',
+  supplier: '/api/backend/api/v1/suppliers/{id}',
+  unitsOfMeasurement: '/api/backend/api/v1/units-of-measurement',
+  unitOfMeasurement: '/api/backend/api/v1/units-of-measurement/{id}',
+  warehouseTransfers: '/api/backend/api/v1/warehouse-transfers',
+  warehouseTransfer: '/api/backend/api/v1/warehouse-transfers/{id}',
+  warehouses: '/api/backend/api/v1/warehouses',
+  warehouse: '/api/backend/api/v1/warehouses/{id}',
+  warehouseStock: '/api/backend/api/v1/warehouses/{id}/stock',
+  warehouseSupplies: '/api/backend/api/v1/warehouses/{id}/supplies',
+} as const;

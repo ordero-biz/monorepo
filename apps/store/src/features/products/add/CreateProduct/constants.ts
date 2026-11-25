@@ -1,0 +1,36 @@
+import { PRODUCT_STATUS } from '@/lib/domain/products/constants';
+import type {
+  ProductGenerationValues,
+  ProductVariantsCreationValues,
+} from './types';
+
+export const PRODUCT_GENERATION_MODE = {
+  one: 'one',
+  many: 'many',
+} as const;
+
+export const DEFAULT_MAX_GENERATED_PRODUCT_VARIANTS = 500;
+
+export const productStatusDescriptions = {
+  draftDescription:
+    'Save for further editing. The product cannot be supplied or sold, and all variants must remain Draft.',
+  activeDescription:
+    'Allow active variants to be supplied and sold. Draft variants remain unavailable and can be activated later.',
+};
+
+export const createProductGenerationDefaultValues: ProductGenerationValues = {
+  attributes: [],
+  attributeValues: {},
+  category: null,
+  description: '',
+  name: '',
+};
+
+export const createProductVariantsCreationDefaultValues: ProductVariantsCreationValues =
+  {
+    category: null,
+    description: '',
+    name: '',
+    productVariants: [],
+    status: PRODUCT_STATUS.DRAFT,
+  };

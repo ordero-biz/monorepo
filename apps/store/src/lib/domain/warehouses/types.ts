@@ -1,0 +1,53 @@
+import type { Supply } from '@/lib/domain/supplies/types';
+import type { UnitOfMeasurement } from '@/lib/domain/units-of-measurement/types';
+import type { WAREHOUSE_STATUS } from './constants';
+
+export type WarehouseStatus =
+  (typeof WAREHOUSE_STATUS)[keyof typeof WAREHOUSE_STATUS];
+
+export type Warehouse = {
+  id: number;
+  name: string;
+  address: string | null;
+  comment: string;
+  phone: string | null;
+  status: WarehouseStatus;
+  totalItemQuantity: number;
+  totalPrice: number;
+};
+
+export type WarehouseStockItem = {
+  productVariant: {
+    id: number;
+    name: string;
+    sku: string;
+    barcode: string;
+  };
+  unitOfMeasurement: UnitOfMeasurement;
+  quantity: number;
+  totalPrice: number;
+};
+
+// The warehouse supplies endpoint omits warehouse and quantity totals.
+export type WarehouseSupply = Pick<
+  Supply,
+  | 'id'
+  | 'supplier'
+  | 'status'
+  | 'supplyNumber'
+  | 'supplierInvoiceNumber'
+  | 'totalPrice'
+  | 'createdAt'
+>;
+
+export type WarehouseSelection = Pick<Warehouse, 'id' | 'name' | 'status'>;
+
+export type WarehouseProductSelection = {
+  productVariant: Pick<
+    WarehouseStockItem['productVariant'],
+    'id' | 'name' | 'sku'
+  >;
+  unitOfMeasurement: Pick<UnitOfMeasurement, 'id' | 'name' | 'symbol'>;
+  /** Unknown for lines restored from a saved transfer until re-picked. */
+  available?: number;
+};

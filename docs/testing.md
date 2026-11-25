@@ -23,16 +23,26 @@ Use these tools:
 
 - `@testing-library/react`
 - `@testing-library/user-event`
-- `prepareSetup` from `@ordero/test-config/react`
+- `prepareSetup` from the app/package test helper, or from `@ordero/test-config/react` when no local helper exists
 - Vitest globals such as `describe`, `it`, `expect`, and `vi`
 
 For component tests across `apps` and `packages`, default to `prepareSetup`
-when the file has repeated default props or a stable wrapper. Treat ad hoc
-render helpers as the exception, not the default.
+when the file has repeated default props, repeated providers, or a stable
+wrapper. Treat ad hoc render helpers as the exception, not the default.
+Do not hand-roll `render(...)` wrappers for provider setup; add missing
+providers to the local `prepareSetup` helper instead.
+
+When a `prepareSetup` test overrides a prop and later asserts on that prop,
+uses it in a Testing Library query, or uses it to prove callback behavior,
+destructure that prop from the object returned by `setup(...)`. Do not keep a
+separate local variable for the same override.
 
 Use plain `render(...)` directly only when a one-off test is clearer because it
 needs surrounding structure such as a form, extra focus targets, or similar
 test-local setup.
+
+For the canonical setup shape, see
+`.agents/skills/ui-routine-conventions/references/prepare-setup-example.md`.
 
 Do not import Vitest globals in individual test files. App and package
 TypeScript configs should expose them through a local Vitest shim.
@@ -40,6 +50,28 @@ TypeScript configs should expose them through a local Vitest shim.
 For `input[type="password"]`, prefer `getByLabelText(...)` in jsdom tests.
 Password inputs do not expose the same role behavior in Testing Library that
 they do in a real browser.
+
+### Module Mocking
+
+When mocking local or shared modules that have multiple exports, avoid
+destructive full-module mocks like
+`vi.mock('@/path/to/module', () => ({ ... }))`. Full module mocks destroy all
+other actual exports inside the module, leading to fragile tests and high
+maintenance overhead when developers later import other helper functions from
+the same file.
+
+Instead, preserve the original implementation of other exported helpers by
+using an inline async partial mock with `vi.importActual`:
+
+```typescript
+vi.mock('@/path/to/module', async () => ({
+  ...(await vi.importActual<typeof import('@/path/to/module')>('@/path/to/module')),
+  targetExport: vi.fn(),
+}));
+```
+
+Using this pattern keeps all adjacent utilities fully operational while safely
+isolating your mock target.
 
 ### Storybook Browser Tests
 
@@ -59,8 +91,6 @@ Run:
 pnpm --dir packages/ui test:storybook
 ```
 
-See `docs/accessibility-testing.md` for the shared UI accessibility workflow.
-
 ### Playwright E2E Tests
 
 Use Playwright Test for routed app flows and browser integration.
@@ -75,6 +105,58 @@ Good candidates:
 
 Do not use Playwright as the default layer for component-local behavior such as
 field blur timing. Cover that with unit/component tests instead.
+
+When an E2E test mocks an app-owned request with `page.route()` or
+`context.route()`, register the route before the user action that triggers it.
+If the request contract is part of the behavior under test, wait for the request
+and assert stable details such as method and JSON body.
+
+## Server-State Testing
+
+For TanStack Query reads, mock the nearest app-owned request helper rather than
+`fetch` unless the helper itself is under test.
+
+Good coverage targets:
+
+- query hooks call the expected app-owned client helper and expose success and
+  error states
+- shared `queryOptions(...)` factories unwrap `ApiResult` success data and throw
+  normalized `ApiError` failures
+- server-prefetched pages pass server-only fetchers into the same query options
+  used by client hooks
+- hydrated pages render the client feature inside `HydrationBoundary` after
+  prefetching the expected query keys
+
+For writes, keep tests aligned with the caller shape:
+
+- form submit hooks mock the feature submit action and assert field-error,
+  toast, and success-callback behavior
+- `useMutation` wrappers mock the client helper and assert loading state,
+  success toasts, error toasts, and narrow success callbacks
+- auth mutation wrappers also assert session cache updates, query clearing or
+  invalidation, and route navigation after success
+- workflow component tests assert cache side effects such as
+  `invalidateQueries`, `removeQueries`, and route navigation after the mutation
+  succeeds
+- request-helper tests assert the same-origin path, HTTP method, body shape,
+  and normalized `ApiResult`
+- for optional fields, request and submit tests cover create-time omission of
+  blank values, update-time `null` for a cleared persisted value, and no request
+  for unchanged normalized update data
+
+For update and publish flows that refresh an active detail or nested collection
+query, cover the complete workflow with a real QueryClient, query hook, and
+dialog. Mock the request helpers and assert both the updated visible data and
+exactly one refresh after the successful write. For a fresh mount with one
+initial read, that means two reads in total. A spy on `invalidateQueries` alone
+cannot catch an extra parent `onUpdated` callback calling `refetch()`.
+
+For deletion flows, verify that deleted detail/child caches are removed,
+affected collections refresh, and any required navigation or selection cleanup
+happens. When deletion clears table selection, keep the list refresh pending
+and verify that selection is cleared and the confirmation dialog closes before
+the refresh resolves. Retain coverage that failed writes do not run success
+callbacks or perform success-only navigation and selection cleanup.
 
 ## Commands
 
@@ -94,7 +176,7 @@ pnpm --dir apps/store test
 Run a specific app unit test file:
 
 ```bash
-pnpm --dir apps/platform test src/features/log-in/LogInForm.test.tsx
+pnpm --dir apps/platform test src/features/sign-in/SignInForm.test.tsx
 ```
 
 Run all app E2E tests through Turbo:
@@ -119,7 +201,7 @@ pnpm --dir apps/store test:e2e
 Run a specific E2E file:
 
 ```bash
-pnpm --dir apps/platform test:e2e:file e2e/LogInForm.spec.ts
+pnpm --dir apps/platform test:e2e:file e2e/SignInForm.spec.ts
 pnpm --dir apps/store test:e2e:file e2e/Home.spec.ts
 ```
 
@@ -133,7 +215,7 @@ pnpm --dir apps/store test:e2e:grep "renders the starter page"
 Pass extra Playwright flags after the script arguments when needed:
 
 ```bash
-pnpm --dir apps/platform test:e2e:file e2e/LogInForm.spec.ts --project=chromium
+pnpm --dir apps/platform test:e2e:file e2e/SignInForm.spec.ts --project=chromium
 ```
 
 ## App Test Setup
@@ -182,6 +264,41 @@ tasks in parallel. Current ports:
 - `apps/platform`: `127.0.0.1:3000`
 - `apps/store`: `127.0.0.1:3001`
 
+### Supply Refresh Browser Scenarios
+
+`apps/store/e2e/SupplyRefresh.spec.ts` covers pristine and dirty refreshes,
+external and local finalization, read-only notices, both conflict choices,
+cancellation and reopening, revision changes during review, appended product
+rows, conflicting existing rows, failed reads, delayed saves, and creation
+without a resolver.
+
+The store Playwright config starts a test-only backend on `127.0.0.1:3101`.
+Each test gets a separate session and saved record. Both server prefetch and
+browser requests use that backend through the normal application paths; no real
+account or saved supply is required. The test app uses `.next/playwright` so it
+can run alongside a developer's Next.js server.
+
+Chromium's Playwright focus emulation keeps background tabs visible. The refresh
+fixture dispatches `visibilitychange` to simulate returning to the editor and
+waits for the resulting HTTP request. It does not reload the page or access form
+state or the query cache. This tests the application's response to the event,
+not operating-system tab visibility.
+
+Watch the scenarios sequentially in a visible browser from the repository root:
+
+```sh
+PLAYWRIGHT_SLOW_MO=250 pnpm exec playwright test -c apps/store/playwright.config.ts SupplyRefresh.spec.ts --project=chromium --headed --workers=1
+```
+
+The suite records videos, traces, and named screenshots, including successful
+cases. Open a test in the HTML report to replay its video or inspect each step:
+
+```sh
+pnpm exec playwright show-report apps/store/playwright-report
+```
+
+Run without `--headed` and `PLAYWRIGHT_SLOW_MO` for normal automated checks.
+
 ## Turbo E2E Graph
 
 The root `test:e2e` task is app-aware through Turbo. Each app owns its own
@@ -209,15 +326,9 @@ exploration. It is not the CI runner.
 Use it to inspect the real page, generate locators, and debug interactions:
 
 ```bash
-pnpm exec playwright-cli open http://127.0.0.1:3000/log-in --headed
+pnpm exec playwright-cli open http://127.0.0.1:3000/sign-in --headed
 pnpm exec playwright-cli snapshot
 pnpm exec playwright-cli generate-locator e19 --raw
-```
-
-Use Playwright Test for committed E2E tests and CI:
-
-```bash
-pnpm test:e2e
 ```
 
 ## Form Testing
@@ -232,3 +343,14 @@ Feature forms should use unit/component tests for field-level UX rules:
 
 Use Playwright for the routed form flows that prove browser integration and
 submit behavior on the real page.
+
+For form-hook tests that only need to submit the hook and assert submit-side
+effects, use the app-local helper:
+
+- `apps/platform/src/test/prepareFormHookTestSetup`
+- `apps/store/src/test/prepareFormHookTestSetup`
+
+Mock the feature submit action, submit through the helper form, and assert
+hook-owned behavior such as success callbacks, toast errors, and no success
+callback on failure. Keep field rendering, labels, visible validation messages,
+and field-array interactions in component tests.

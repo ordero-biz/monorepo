@@ -1,56 +1,24 @@
 'use client';
 
 import { Button, PasswordField, TextField, Typography } from '@ordero/ui';
-import { useForm } from '@tanstack/react-form';
-import { signInDefaultValues } from './constants';
-import { getErrorMessage } from './utils/error';
+import { useQueryClient } from '@tanstack/react-query';
+import { useRouter } from 'next/navigation';
+import { clientRoutes } from '@/lib/client/routes';
+import { authQueryKeys } from '@/lib/hooks/auth/useSessionQuery';
+import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
+import { useSignInForm } from './hooks/useSignInForm';
 import {
-  type SignInFormValues,
   validateSignInEmail,
   validateSignInPassword,
 } from './utils/validations';
 
-const gmailEmailRegex = /^[^@\s]+@gmail\.com$/i;
-
-const submitSignInToBackend = async (value: SignInFormValues) => {
-  if (!gmailEmailRegex.test(value.email)) {
-    return {
-      ok: false,
-      error: {
-        fieldErrors: {
-          email: 'Use a gmail.com email address.',
-        },
-        formError: undefined,
-      },
-    };
-  }
-
-  return {
-    ok: true,
-    error: {},
-  };
-};
-
 export const SignInForm = () => {
-  const form = useForm({
-    defaultValues: signInDefaultValues,
-    onSubmit: async ({ formApi, value }) => {
-      const result = await submitSignInToBackend(value);
-
-      if (!result.ok) {
-        formApi.setErrorMap({
-          onSubmit: {
-            fields: result.error.fieldErrors ?? {},
-            form: result.error.formError,
-          },
-        });
-        return;
-      }
-
-      formApi.reset({
-        ...signInDefaultValues,
-        email: value.email,
-      });
+  const queryClient = useQueryClient();
+  const router = useRouter();
+  const { form } = useSignInForm({
+    onSignedIn: (session) => {
+      queryClient.setQueryData(authQueryKeys.session, session);
+      router.push(clientRoutes.stores);
     },
   });
 
@@ -66,21 +34,12 @@ export const SignInForm = () => {
       <form.Field
         name="email"
         validators={{
-          onChange: ({ value }) => validateSignInEmail(value),
-          onSubmit: ({ value }) => validateSignInEmail(value),
+          onChange: validateSignInEmail,
+          onSubmit: validateSignInEmail,
         }}
       >
         {(field) => {
-          const submitError = field.state.meta.errorMap.onSubmit;
-          const changeError = field.state.meta.errorMap.onChange;
-          const submitErrorText = submitError
-            ? getErrorMessage(submitError)
-            : undefined;
-          const changeErrorText =
-            !submitErrorText && field.state.meta.isBlurred && changeError
-              ? getErrorMessage(changeError)
-              : undefined;
-          const errorText = submitErrorText ?? changeErrorText;
+          const errorText = getFieldSubmitChangeErrorText(field.state.meta);
 
           return (
             <TextField
@@ -90,7 +49,7 @@ export const SignInForm = () => {
               label="Email address"
               name={field.name}
               onBlur={field.handleBlur}
-              onValueChange={(value) => field.handleChange(value)}
+              onValueChange={field.handleChange}
               placeholder="example@gmail.com"
               required
               value={field.state.value}
@@ -104,21 +63,12 @@ export const SignInForm = () => {
         <form.Field
           name="password"
           validators={{
-            onChange: ({ value }) => validateSignInPassword(value),
-            onSubmit: ({ value }) => validateSignInPassword(value),
+            onChange: validateSignInPassword,
+            onSubmit: validateSignInPassword,
           }}
         >
           {(field) => {
-            const submitError = field.state.meta.errorMap.onSubmit;
-            const changeError = field.state.meta.errorMap.onChange;
-            const submitErrorText = submitError
-              ? getErrorMessage(submitError)
-              : undefined;
-            const changeErrorText =
-              !submitErrorText && field.state.meta.isBlurred && changeError
-                ? getErrorMessage(changeError)
-                : undefined;
-            const errorText = submitErrorText ?? changeErrorText;
+            const errorText = getFieldSubmitChangeErrorText(field.state.meta);
 
             return (
               <PasswordField
@@ -127,7 +77,7 @@ export const SignInForm = () => {
                 label="Password"
                 name={field.name}
                 onBlur={field.handleBlur}
-                onValueChange={(value) => field.handleChange(value)}
+                onValueChange={field.handleChange}
                 placeholder="6+ characters"
                 required
                 value={field.state.value}
@@ -142,10 +92,8 @@ export const SignInForm = () => {
         </button>
       </div>
 
-      <form.Subscribe
-        selector={(state) => [state.values, state.isSubmitting] as const}
-      >
-        {([_, isSubmitting]) => (
+      <form.Subscribe selector={(state) => state.isSubmitting}>
+        {(isSubmitting) => (
           <Button
             color="inherit"
             disabled={isSubmitting}

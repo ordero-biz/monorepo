@@ -1,0 +1,237 @@
+import { act, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { getCategories } from '@/lib/client/api/categories';
+import { categoriesQueryKeys } from '@/lib/query/categories/categoriesQueryKeys';
+import { prepareStoreSetup } from '@/test/prepareSetup';
+import { CategoriesAsyncCombobox } from './CategoriesAsyncCombobox';
+import type { CategoriesAsyncComboboxProps } from './types';
+
+const mocks = vi.hoisted(() => ({
+  getCategories: vi.fn(),
+  onValueChange: vi.fn(),
+}));
+
+vi.mock('@/lib/client/api/categories', async () => ({
+  ...(await vi.importActual<typeof import('@/lib/client/api/categories')>(
+    '@/lib/client/api/categories'
+  )),
+  getCategories: mocks.getCategories,
+}));
+
+const getCategoriesMock = vi.mocked(getCategories);
+
+const { setup } = prepareStoreSetup<CategoriesAsyncComboboxProps>({
+  component: CategoriesAsyncCombobox,
+  props: {
+    'aria-label': 'Category',
+    onValueChange: mocks.onValueChange,
+    placeholder: 'Select category',
+  },
+});
+
+describe('CategoriesAsyncCombobox', () => {
+  beforeEach(() => {
+    getCategoriesMock.mockReset();
+    mocks.onValueChange.mockReset();
+  });
+
+  const mockSuccessfulCategories = () => {
+    getCategoriesMock.mockResolvedValue({
+      ok: true,
+      data: {
+        content: [
+          {
+            createdAt: '2026-07-01T10:54:34.839Z',
+            id: 1,
+            name: 'Shoes',
+            sortOrder: 10,
+          },
+        ],
+        page: {
+          number: 0,
+          size: 100,
+          totalElements: 1,
+          totalPages: 1,
+        },
+      },
+    });
+  };
+
+  it('calls onValueChange when the user picks a category', async () => {
+    const user = userEvent.setup();
+
+    mockSuccessfulCategories();
+
+    setup();
+
+    await user.click(screen.getByRole('combobox', { name: 'Category' }));
+    await user.click(await screen.findByRole('option', { name: /^Shoes\b/ }));
+
+    expect(getCategoriesMock).toHaveBeenCalledWith({
+      page: 1,
+      size: 100,
+      sort: ['name,asc'],
+    });
+    expect(mocks.onValueChange).toHaveBeenLastCalledWith(
+      { id: 1, name: 'Shoes', status: undefined },
+      expect.any(Object)
+    );
+  });
+
+  it('displays saved values before loading and responds to controlled resets', () => {
+    const {
+      renderResult: { rerender },
+    } = setup({ value: { id: 2, name: 'Saved category' } });
+    const input = screen.getByRole('combobox', { name: 'Category' });
+    expect(input).toHaveValue('Saved category');
+    expect(getCategoriesMock).not.toHaveBeenCalled();
+    rerender({ value: null });
+    expect(input).toHaveValue('');
+    expect(mocks.onValueChange).not.toHaveBeenCalled();
+  });
+
+  it('keeps an initial selection that is absent from loaded results', async () => {
+    const user = userEvent.setup();
+    mockSuccessfulCategories();
+    setup({ defaultValue: { id: 2, name: 'Saved category' } });
+    const input = screen.getByRole('combobox', { name: 'Category' });
+    expect(input).toHaveValue('Saved category');
+    await user.click(input);
+    await screen.findByRole('option', { name: 'Shoes' });
+    await user.keyboard('{Escape}');
+    expect(input).toHaveValue('Saved category');
+    expect(mocks.onValueChange).not.toHaveBeenCalled();
+  });
+
+  it('refreshes a saved label by ID without emitting a form change', async () => {
+    const user = userEvent.setup();
+    mockSuccessfulCategories();
+    setup({ value: { id: 1, name: 'Old name' } });
+    const input = screen.getByRole('combobox', { name: 'Category' });
+    await user.click(input);
+    expect(
+      await screen.findByRole('option', { name: 'Shoes' })
+    ).toHaveAttribute('aria-selected', 'true');
+    await user.keyboard('{Escape}');
+    expect(input).toHaveValue('Shoes');
+    expect(mocks.onValueChange).not.toHaveBeenCalled();
+  });
+
+  it('emits null for the explicit no-parent choice', async () => {
+    const user = userEvent.setup();
+    mockSuccessfulCategories();
+    setup({ allowNoParent: true, value: { id: 1, name: 'Shoes' } });
+    await user.click(screen.getByRole('combobox', { name: 'Category' }));
+    await user.click(
+      await screen.findByRole('option', { name: 'No parent category' })
+    );
+    expect(mocks.onValueChange).toHaveBeenLastCalledWith(
+      null,
+      expect.any(Object)
+    );
+  });
+
+  it('disables specified categories while leaving them visible', async () => {
+    const user = userEvent.setup();
+
+    mockSuccessfulCategories();
+    setup({ disabledCategoryIds: [1] });
+
+    await user.click(screen.getByRole('combobox', { name: 'Category' }));
+
+    expect(
+      await screen.findByRole('option', { name: /^Shoes\b/ })
+    ).toHaveAttribute('aria-disabled', 'true');
+  });
+
+  it('shows a Draft chip for draft category options', async () => {
+    getCategoriesMock.mockResolvedValue({
+      ok: true,
+      data: {
+        content: [
+          {
+            createdAt: '2026-07-01T10:54:34.839Z',
+            id: 1,
+            name: 'Shoes',
+            sortOrder: 10,
+            status: 'DRAFT',
+          },
+        ],
+        page: {
+          number: 0,
+          size: 100,
+          totalElements: 1,
+          totalPages: 1,
+        },
+      },
+    });
+    const user = userEvent.setup();
+
+    setup();
+
+    await user.click(screen.getByRole('combobox', { name: 'Category' }));
+
+    expect(await screen.findByRole('option', { name: /Shoes/ })).toBeVisible();
+    expect(screen.getByText('Draft')).toBeVisible();
+  });
+
+  it('refetches when category list queries are invalidated', async () => {
+    const user = userEvent.setup();
+
+    mockSuccessfulCategories();
+    const { queryClient } = setup();
+
+    await user.click(screen.getByRole('combobox', { name: 'Category' }));
+
+    await waitFor(() => expect(getCategoriesMock).toHaveBeenCalledTimes(1));
+
+    await act(async () => {
+      await queryClient.invalidateQueries({
+        queryKey: categoriesQueryKeys.list,
+      });
+    });
+
+    await waitFor(() => expect(getCategoriesMock).toHaveBeenCalledTimes(2));
+  });
+
+  it('shows an empty state when no categories are available', async () => {
+    getCategoriesMock.mockResolvedValue({
+      ok: true,
+      data: {
+        content: [],
+        page: {
+          number: 0,
+          size: 100,
+          totalElements: 0,
+          totalPages: 0,
+        },
+      },
+    });
+    const user = userEvent.setup();
+
+    setup();
+
+    await user.click(screen.getByRole('combobox', { name: 'Category' }));
+
+    expect(await screen.findByText('No categories found')).toBeVisible();
+  });
+
+  it('shows a load error when categories cannot be retrieved', async () => {
+    getCategoriesMock.mockResolvedValue({
+      ok: false,
+      error: {
+        status: 500,
+        message: 'Could not load categories.',
+      },
+    });
+    const user = userEvent.setup();
+
+    setup();
+
+    await user.click(screen.getByRole('combobox', { name: 'Category' }));
+
+    expect(
+      await screen.findByText("We couldn't load categories right now.")
+    ).toBeVisible();
+  });
+});

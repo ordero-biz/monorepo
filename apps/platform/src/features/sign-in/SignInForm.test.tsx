@@ -1,26 +1,57 @@
-import { prepareSetup } from '@ordero/test-config/react';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { signIn } from '@/lib/client/api/auth';
+import { clientRoutes } from '@/lib/client/routes';
+import { authQueryKeys } from '@/lib/hooks/auth/useSessionQuery';
+import { preparePlatformSetup } from '@/test/prepareSetup';
 import { SignInForm } from './SignInForm';
 
-const { setup } = prepareSetup({
+const { routerPushMock } = vi.hoisted(() => ({
+  routerPushMock: vi.fn(),
+}));
+
+vi.mock('next/navigation', async () => ({
+  ...(await vi.importActual<typeof import('next/navigation')>(
+    'next/navigation'
+  )),
+  useRouter: () => ({
+    push: routerPushMock,
+  }),
+}));
+
+vi.mock('@/lib/client/api/auth', async () => ({
+  ...(await vi.importActual<typeof import('@/lib/client/api/auth')>(
+    '@/lib/client/api/auth'
+  )),
+  signIn: vi.fn(),
+}));
+
+const signInMock = vi.mocked(signIn);
+
+const { setup } = preparePlatformSetup({
   component: SignInForm,
 });
 
 const setupSignInForm = () => {
   const user = userEvent.setup();
 
-  setup();
+  const result = setup();
 
   return {
+    ...result,
     emailField: screen.getByRole('textbox', { name: 'Email address' }),
-    passwordField: screen.getByLabelText('Password'),
+    passwordField: screen.getByLabelText(/Password/),
     signInButton: screen.getByRole('button', { name: 'Sign in' }),
     user,
   };
 };
 
 describe('SignInForm', () => {
+  beforeEach(() => {
+    signInMock.mockReset();
+    routerPushMock.mockClear();
+  });
+
   it('renders the expected form controls and secondary actions', () => {
     const { emailField, passwordField, signInButton } = setupSignInForm();
 
@@ -121,13 +152,27 @@ describe('SignInForm', () => {
     ).not.toBeInTheDocument();
   });
 
-  it('shows the backend email error for a valid non-gmail address on submit', async () => {
+  it('shows the backend email error for a valid rejected address on submit', async () => {
+    signInMock.mockResolvedValue({
+      ok: false,
+      error: {
+        status: 422,
+        message: 'Sign-in failed.',
+        fieldErrors: {
+          email: 'Use a gmail.com email address.',
+        },
+      },
+    });
     const { emailField, passwordField, signInButton, user } = setupSignInForm();
 
     await user.type(emailField, 'admin@mail.com');
     await user.type(passwordField, '123456');
     await user.click(signInButton);
 
+    expect(signInMock).toHaveBeenCalledWith({
+      email: 'admin@mail.com',
+      password: '123456',
+    });
     expect(screen.getByText('Use a gmail.com email address.')).toBeVisible();
     expect(emailField).toHaveAccessibleDescription(
       'Use a gmail.com email address.'
@@ -135,14 +180,109 @@ describe('SignInForm', () => {
     expect(passwordField).toHaveValue('123456');
   });
 
-  it('keeps the email and clears the password after successful sign in', async () => {
+  it('clears the backend email error when the user edits the email field after a failed submit', async () => {
+    signInMock.mockResolvedValue({
+      ok: false,
+      error: {
+        status: 422,
+        message: 'Sign-in failed.',
+        fieldErrors: {
+          email: 'Use a gmail.com email address.',
+        },
+      },
+    });
+    const { emailField, passwordField, signInButton, user } = setupSignInForm();
+
+    await user.type(emailField, 'admin@mail.com');
+    await user.type(passwordField, '123456');
+    await user.click(signInButton);
+
+    expect(screen.getByText('Use a gmail.com email address.')).toBeVisible();
+
+    await user.type(emailField, 'g');
+
+    expect(
+      screen.queryByText('Use a gmail.com email address.')
+    ).not.toBeInTheDocument();
+  });
+
+  it('submits credentials and redirects to stores after successful sign in', async () => {
+    const session = {
+      authenticated: true,
+      user: {
+        email: 'admin@gmail.com',
+      },
+    };
+    signInMock.mockResolvedValue({
+      ok: true,
+      data: session,
+    });
+    const { emailField, passwordField, queryClient, signInButton, user } =
+      setupSignInForm();
+
+    await user.type(emailField, 'admin@gmail.com');
+    await user.type(passwordField, '123456');
+    await user.click(signInButton);
+
+    expect(signInMock).toHaveBeenCalledWith({
+      email: 'admin@gmail.com',
+      password: '123456',
+    });
+    expect(queryClient.getQueryData(authQueryKeys.session)).toStrictEqual(
+      session
+    );
+    expect(routerPushMock).toHaveBeenCalledWith(clientRoutes.stores);
+  });
+
+  it('shows a submitting state while login is in flight', async () => {
+    let resolveLogin:
+      | ((value: Awaited<ReturnType<typeof signIn>>) => void)
+      | undefined;
+
+    signInMock.mockReturnValue(
+      new Promise((resolve) => {
+        resolveLogin = resolve;
+      })
+    );
     const { emailField, passwordField, signInButton, user } = setupSignInForm();
 
     await user.type(emailField, 'admin@gmail.com');
     await user.type(passwordField, '123456');
     await user.click(signInButton);
 
-    expect(emailField).toHaveValue('admin@gmail.com');
-    expect(passwordField).toHaveValue('');
+    expect(signInButton).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Signing in...' })).toBeVisible();
+
+    resolveLogin?.({
+      ok: true,
+      data: {
+        authenticated: true,
+        user: {
+          email: 'admin@gmail.com',
+        },
+      },
+    });
+
+    await screen.findByRole('button', { name: 'Sign in' });
+  });
+
+  it('shows a toast when sign in fails with a form-level backend error', async () => {
+    signInMock.mockResolvedValue({
+      ok: false,
+      error: {
+        status: 401,
+        message: 'Invalid credentials.',
+      },
+    });
+    const { emailField, passwordField, signInButton, user } = setupSignInForm();
+
+    await user.type(emailField, 'admin@gmail.com');
+    await user.type(passwordField, '123456');
+    await user.click(signInButton);
+
+    expect(
+      await screen.findByRole('dialog', { name: 'Invalid credentials.' })
+    ).toBeVisible();
+    expect(passwordField).toHaveValue('123456');
   });
 });

@@ -2,7 +2,7 @@
 
 import { Radio as RadioPrimitive } from '@base-ui/react/radio';
 import { cva } from 'class-variance-authority';
-import { forwardRef, type MouseEvent, useCallback, useId, useRef } from 'react';
+import { type MouseEvent, useCallback, useId, useRef } from 'react';
 import { cn } from '@/ui/lib/utils';
 import type { RadioColor, RadioProps, RadioSize } from './types';
 
@@ -59,6 +59,12 @@ const radioRingClassName =
 const labelClassName =
   'min-w-0 text-[length:var(--body2-size-desktop)] leading-[var(--body2-line-height-desktop)] font-[var(--body2-weight)]';
 
+// Align the first text line with the circle without shrinking its padded target.
+const startLabelPaddingClassNames: Record<RadioSize, string> = {
+  m: 'pt-[max(0px,calc((var(--radio-md-icon)+var(--radio-p)-var(--body2-line-height-desktop))/2))]',
+  s: 'pt-[max(0px,calc((var(--radio-sm-icon)+var(--radio-p)-var(--body2-line-height-desktop))/2))]',
+};
+
 const indicatorSizeClassNames: Record<RadioSize, string> = {
   m: 'size-[10px]',
   s: 'size-[8px]',
@@ -111,155 +117,161 @@ const getRadioRingStateClassName = ({
 const getLabelColorClassName = ({ disabled }: { disabled: boolean }) =>
   disabled ? 'text-[var(--text-disabled)]' : 'text-[var(--text-primary)]';
 
-export const Radio = forwardRef<HTMLElement, RadioProps>(
-  (
-    {
-      'aria-describedby': ariaDescribedBy,
-      'aria-label': ariaLabel,
-      'aria-labelledby': ariaLabelledBy,
-      children,
-      color = 'primary',
-      disabled = false,
-      id,
-      inputRef,
-      onBlur,
-      onClick,
-      onFocus,
-      onKeyDown,
-      readOnly = false,
-      required = false,
-      size = 'm',
-      tabIndex,
-      title,
-      value,
+export const Radio = ({
+  align: alignProp,
+  'aria-describedby': ariaDescribedBy,
+  'aria-label': ariaLabel,
+  'aria-labelledby': ariaLabelledBy,
+  children,
+  color = 'primary',
+  disabled = false,
+  id,
+  inputRef,
+  onBlur,
+  onClick,
+  onFocus,
+  onKeyDown,
+  readOnly = false,
+  ref,
+  required = false,
+  size = 'm',
+  tabIndex,
+  title,
+  value,
+}: RadioProps) => {
+  const align = alignProp ?? 'center';
+  const generatedId = useId();
+  const controlId = id ?? generatedId;
+  const generatedLabelId = useId();
+  const controlElementRef = useRef<HTMLElement | null>(null);
+  const radioLabelId = children ? `${generatedLabelId}-label` : undefined;
+  const labelledBy =
+    [ariaLabel ? undefined : ariaLabelledBy, radioLabelId]
+      .filter(Boolean)
+      .join(' ') || undefined;
+  const setControlRefs = useCallback(
+    (node: HTMLElement | null) => {
+      controlElementRef.current = node;
+
+      if (typeof ref === 'function') {
+        ref(node);
+        return;
+      }
+
+      if (ref) {
+        ref.current = node;
+      }
     },
-    ref
-  ) => {
-    const generatedId = useId();
-    const controlId = id ?? generatedId;
-    const generatedLabelId = useId();
-    const controlElementRef = useRef<HTMLElement | null>(null);
-    const radioLabelId = children ? `${generatedLabelId}-label` : undefined;
-    const labelledBy =
-      [ariaLabelledBy, radioLabelId].filter(Boolean).join(' ') || undefined;
-    const setControlRefs = useCallback(
-      (node: HTMLElement | null) => {
-        controlElementRef.current = node;
+    [ref]
+  );
+  const handleLabelMouseDown = useCallback(
+    (event: MouseEvent<HTMLLabelElement>) => {
+      if (disabled || readOnly) {
+        return;
+      }
 
-        if (typeof ref === 'function') {
-          ref(node);
-          return;
-        }
+      const target = event.target;
 
-        if (ref) {
-          ref.current = node;
-        }
-      },
-      [ref]
-    );
-    const handleLabelMouseDown = useCallback(
-      (event: MouseEvent<HTMLLabelElement>) => {
-        if (disabled || readOnly) {
-          return;
-        }
+      if (!(target instanceof HTMLElement)) {
+        return;
+      }
 
-        const target = event.target;
+      if (target.closest('[data-slot="radio"]')) {
+        return;
+      }
 
-        if (!(target instanceof HTMLElement)) {
-          return;
-        }
+      event.preventDefault();
+      controlElementRef.current?.click();
+    },
+    [disabled, readOnly]
+  );
 
-        if (target.closest('[data-slot="radio"]')) {
-          return;
-        }
-
-        event.preventDefault();
-        controlElementRef.current?.click();
-      },
-      [disabled, readOnly]
-    );
-
-    return (
-      <label
-        className={cn(
-          'inline-flex max-w-fit items-center gap-0 align-top',
-          disabled ? 'cursor-not-allowed' : 'cursor-pointer'
-        )}
-        htmlFor={controlId}
-        onMouseDown={handleLabelMouseDown}
-      >
-        <RadioPrimitive.Root
-          ref={setControlRefs}
-          aria-describedby={ariaDescribedBy}
-          aria-label={ariaLabel}
-          aria-labelledby={labelledBy}
-          disabled={disabled}
-          id={controlId}
-          inputRef={inputRef}
-          onBlur={onBlur}
-          onClick={onClick}
-          onFocus={onFocus}
-          onKeyDown={onKeyDown}
-          readOnly={readOnly}
-          render={(rootProps, state) => (
-            <span
-              {...rootProps}
-              className={cn(
-                rootProps.className,
-                radioRootVariants({ size }),
-                getRadioRootStateClassName({
-                  checked: state.checked,
-                  color,
-                  disabled: state.disabled,
-                })
-              )}
-              data-slot="radio"
-            >
-              <span className={cn(radioIconViewportVariants({ size }))}>
-                <span
-                  className={cn(
-                    radioRingClassName,
-                    getRadioRingStateClassName({
-                      checked: state.checked,
-                      color,
-                      disabled: state.disabled,
-                    })
-                  )}
-                >
-                  {state.checked ? (
-                    <span className="absolute inset-0 flex items-center justify-center">
-                      <span
-                        aria-hidden="true"
-                        className={cn(
-                          'shrink-0 rounded-full bg-current',
-                          indicatorSizeClassNames[size]
-                        )}
-                      />
-                    </span>
-                  ) : null}
-                </span>
+  return (
+    <label
+      className={cn(
+        'inline-flex max-w-fit gap-0 align-top',
+        align === 'start' && 'items-start',
+        align === 'center' && 'items-center',
+        align === 'end' && 'items-end',
+        disabled ? 'cursor-not-allowed' : 'cursor-pointer'
+      )}
+      htmlFor={controlId}
+      onMouseDown={handleLabelMouseDown}
+    >
+      <RadioPrimitive.Root
+        ref={setControlRefs}
+        aria-describedby={ariaDescribedBy}
+        aria-label={ariaLabel}
+        aria-labelledby={labelledBy}
+        disabled={disabled}
+        id={controlId}
+        inputRef={inputRef}
+        onBlur={onBlur}
+        onClick={onClick}
+        onFocus={onFocus}
+        onKeyDown={onKeyDown}
+        readOnly={readOnly}
+        render={(rootProps, state) => (
+          // biome-ignore lint/a11y/useAriaPropsSupportedByRole: Base UI supplies role="radio" through rootProps.
+          <span
+            {...rootProps}
+            aria-label={ariaLabel}
+            aria-labelledby={labelledBy}
+            className={cn(
+              rootProps.className,
+              radioRootVariants({ size }),
+              getRadioRootStateClassName({
+                checked: state.checked,
+                color,
+                disabled: state.disabled,
+              })
+            )}
+            data-slot="radio"
+          >
+            <span className={cn(radioIconViewportVariants({ size }))}>
+              <span
+                className={cn(
+                  radioRingClassName,
+                  getRadioRingStateClassName({
+                    checked: state.checked,
+                    color,
+                    disabled: state.disabled,
+                  })
+                )}
+              >
+                {state.checked ? (
+                  <span className="absolute inset-0 flex items-center justify-center">
+                    <span
+                      aria-hidden="true"
+                      className={cn(
+                        'shrink-0 rounded-full bg-current',
+                        indicatorSizeClassNames[size]
+                      )}
+                    />
+                  </span>
+                ) : null}
               </span>
             </span>
-          )}
-          required={required}
-          tabIndex={tabIndex}
-          title={title}
-          value={value}
-        />
-        {children ? (
-          <span
-            className={cn(labelClassName, getLabelColorClassName({ disabled }))}
-            data-slot="radio-label"
-            id={radioLabelId}
-          >
-            {children}
           </span>
-        ) : null}
-      </label>
-    );
-  }
-);
-
-Radio.displayName = 'Radio';
-
-export { radioRootVariants };
+        )}
+        required={required}
+        tabIndex={tabIndex}
+        title={title}
+        value={value}
+      />
+      {children ? (
+        <span
+          className={cn(
+            labelClassName,
+            align === 'start' && startLabelPaddingClassNames[size],
+            getLabelColorClassName({ disabled })
+          )}
+          data-slot="radio-label"
+          id={radioLabelId}
+        >
+          {children}
+        </span>
+      ) : null}
+    </label>
+  );
+};

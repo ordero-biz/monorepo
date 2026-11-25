@@ -1,0 +1,185 @@
+import { screen, waitFor, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { createUnitOfMeasurement } from '@/lib/client/api/units-of-measurement';
+import { unitsOfMeasurementQueryKeys } from '@/lib/query/units-of-measurement/unitsOfMeasurementQueryKeys';
+import { prepareStoreSetup } from '@/test/prepareSetup';
+import { CreateUnitOfMeasurementDialog } from './CreateUnitOfMeasurementDialog';
+
+const onOpenChangeMock = vi.fn();
+
+vi.mock('@/lib/client/api/units-of-measurement', async () => ({
+  ...(await vi.importActual<
+    typeof import('@/lib/client/api/units-of-measurement')
+  >('@/lib/client/api/units-of-measurement')),
+  createUnitOfMeasurement: vi.fn(),
+}));
+
+const createUnitOfMeasurementMock = vi.mocked(createUnitOfMeasurement);
+
+const { setup } = prepareStoreSetup({
+  component: CreateUnitOfMeasurementDialog,
+  props: {
+    onOpenChange: onOpenChangeMock,
+    open: true,
+  },
+});
+
+describe('CreateUnitOfMeasurementDialog', () => {
+  beforeEach(() => {
+    createUnitOfMeasurementMock.mockReset();
+    onOpenChangeMock.mockClear();
+  });
+
+  it('keeps the save draft CTA enabled and validates name on submit', async () => {
+    const user = userEvent.setup();
+
+    setup();
+
+    const dialog = screen.getByRole('dialog', {
+      name: 'Add unit of measurement',
+    });
+    const addButton = within(dialog).getByRole('button', {
+      name: 'Save draft',
+    });
+
+    expect(addButton).toBeEnabled();
+
+    await user.click(addButton);
+
+    expect(
+      await within(dialog).findByText('Unit name is required')
+    ).toBeVisible();
+    expect(addButton).toBeEnabled();
+    expect(createUnitOfMeasurementMock).not.toHaveBeenCalled();
+  });
+
+  it('explains the effects of each unit status', () => {
+    setup();
+
+    const dialog = screen.getByRole('dialog', {
+      name: 'Add unit of measurement',
+    });
+
+    expect(
+      within(dialog).getByText(
+        'Editable only. Cannot be used in supplies or tracked in analytics. Can be activated later'
+      )
+    ).toBeVisible();
+    expect(
+      within(dialog).getByText(
+        'Fully functional. Can be used in supplies and tracked in analytics. Name and status cannot be edited after publishing'
+      )
+    ).toBeVisible();
+  });
+
+  it('describes the symbol field', () => {
+    setup();
+
+    const dialog = screen.getByRole('dialog', {
+      name: 'Add unit of measurement',
+    });
+    const symbolField = within(dialog).getByRole('textbox', {
+      name: 'Symbol',
+    });
+
+    expect(symbolField).toHaveAccessibleDescription(
+      'Short abbreviation for the unit (e.g., kg, cm)'
+    );
+  });
+
+  it('creates a unit of measurement, closes the dialog, and invalidates the list', async () => {
+    const user = userEvent.setup();
+    createUnitOfMeasurementMock.mockResolvedValue({
+      ok: true,
+      data: {
+        id: 1,
+        status: 'DRAFT',
+        name: 'Kilogram',
+        symbol: '',
+        comment: 'Weight unit',
+      },
+    });
+
+    const { onOpenChange, queryClient } = setup();
+    const invalidateQueriesSpy = vi.spyOn(queryClient, 'invalidateQueries');
+
+    const dialog = screen.getByRole('dialog', {
+      name: 'Add unit of measurement',
+    });
+
+    await user.click(within(dialog).getByRole('radio', { name: /^Active/ }));
+
+    await user.type(
+      within(dialog).getByRole('textbox', { name: 'Name' }),
+      ' Kilogram '
+    );
+    await user.type(
+      within(dialog).getByRole('textbox', { name: 'Comment' }),
+      ' Weight unit '
+    );
+    await user.click(within(dialog).getByRole('button', { name: 'Publish' }));
+
+    expect(createUnitOfMeasurementMock).toHaveBeenCalledWith({
+      name: 'Kilogram',
+      status: 'ACTIVE',
+      comment: 'Weight unit',
+    });
+    await waitFor(() =>
+      expect(invalidateQueriesSpy).toHaveBeenCalledWith({
+        queryKey: unitsOfMeasurementQueryKeys.list,
+      })
+    );
+    expect(onOpenChange).toHaveBeenCalledWith(false);
+  });
+
+  it('shows backend errors and keeps the dialog open when submit fails', async () => {
+    const user = userEvent.setup();
+    createUnitOfMeasurementMock.mockResolvedValue({
+      ok: false,
+      error: {
+        status: 422,
+        message: 'Unit of measurement creation failed.',
+        fieldErrors: {
+          name: 'Unit name already exists.',
+        },
+      },
+    });
+
+    const { onOpenChange } = setup();
+
+    const dialog = screen.getByRole('dialog', {
+      name: 'Add unit of measurement',
+    });
+    const nameField = within(dialog).getByRole('textbox', {
+      name: 'Name',
+    });
+
+    await user.type(nameField, 'Kilogram');
+    await user.type(
+      within(dialog).getByRole('textbox', { name: 'Symbol' }),
+      'kg'
+    );
+    await user.click(
+      within(dialog).getByRole('button', { name: 'Save draft' })
+    );
+
+    expect(createUnitOfMeasurementMock).toHaveBeenCalledWith({
+      name: 'Kilogram',
+      status: 'DRAFT',
+      symbol: 'kg',
+    });
+    expect(
+      await within(dialog).findByText('Unit name already exists.')
+    ).toBeVisible();
+    expect(nameField).toHaveAccessibleDescription('Unit name already exists.');
+    expect(
+      await screen.findByRole('dialog', {
+        name: 'Unit of measurement creation failed.',
+      })
+    ).toBeVisible();
+    expect(
+      screen.getByRole('dialog', { name: 'Add unit of measurement' })
+    ).toBeVisible();
+    expect(onOpenChange).not.toHaveBeenCalledWith(false);
+  });
+});

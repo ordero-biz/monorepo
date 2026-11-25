@@ -1,0 +1,119 @@
+import { screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { SUPPLIER_STATUS } from '@/lib/domain/suppliers/constants';
+import { prepareFormHookTestSetup } from '@/test/prepareFormHookTestSetup';
+import { getSupplierUpdateChanges } from '../utils/getUpdateChanges';
+import { submitUpdateSupplier } from '../utils/submitAction';
+import { useUpdateSupplierForm } from './useUpdateSupplierForm';
+
+const { addToastMock } = vi.hoisted(() => ({
+  addToastMock: vi.fn(),
+}));
+
+vi.mock('@ordero/ui', async () => ({
+  ...(await vi.importActual<typeof import('@ordero/ui')>('@ordero/ui')),
+  useToastManager: () => ({
+    add: addToastMock,
+  }),
+}));
+
+vi.mock('../utils/submitAction', async () => ({
+  ...(await vi.importActual<typeof import('../utils/submitAction')>(
+    '../utils/submitAction'
+  )),
+  submitUpdateSupplier: vi.fn(),
+}));
+
+vi.mock('../utils/getUpdateChanges', () => ({
+  getSupplierUpdateChanges: vi.fn(),
+}));
+
+const getSupplierUpdateChangesMock = vi.mocked(getSupplierUpdateChanges);
+const submitUpdateSupplierMock = vi.mocked(submitUpdateSupplier);
+
+const supplier = {
+  id: 1,
+  name: 'Fresh Farms',
+  status: SUPPLIER_STATUS.DRAFT,
+  email: 'orders@fresh.example',
+  phone: '+1 555 0100',
+  address: '123 Market St',
+  comment: 'Preferred produce supplier',
+};
+
+const { setup } = prepareFormHookTestSetup({
+  hookProps: {
+    onNoChanges: vi.fn(),
+    onUpdated: vi.fn(),
+    supplier,
+  },
+  useFormHook: useUpdateSupplierForm,
+});
+
+const setupUpdateSupplierFormHook = () => {
+  const user = userEvent.setup();
+  const hookProps = {
+    onNoChanges: vi.fn(),
+    onUpdated: vi.fn(),
+    supplier,
+  };
+  const result = setup({
+    hookProps,
+  });
+
+  return {
+    ...result,
+    onNoChanges: result.hookProps.onNoChanges,
+    onUpdated: result.hookProps.onUpdated,
+    submitButton: screen.getByRole('button', { name: 'Submit' }),
+    user,
+  };
+};
+
+describe('useUpdateSupplierForm', () => {
+  beforeEach(() => {
+    addToastMock.mockClear();
+    getSupplierUpdateChangesMock.mockReset();
+    submitUpdateSupplierMock.mockReset();
+  });
+
+  it('closes without a request when the normalized values are unchanged', async () => {
+    getSupplierUpdateChangesMock.mockReturnValue(undefined);
+    const { onNoChanges, onUpdated, submitButton, user } =
+      setupUpdateSupplierFormHook();
+
+    await user.click(submitButton);
+
+    await waitFor(() => expect(onNoChanges).toHaveBeenCalled());
+    expect(submitUpdateSupplierMock).not.toHaveBeenCalled();
+    expect(onUpdated).not.toHaveBeenCalled();
+  });
+
+  it('shows a toast when submit fails with a form-level error', async () => {
+    getSupplierUpdateChangesMock.mockReturnValue({
+      email: 'orders.updated@fresh.example',
+    });
+    submitUpdateSupplierMock.mockResolvedValue({
+      ok: false,
+      error: {
+        fieldErrors: {
+          email: 'Supplier email already exists.',
+        },
+        formError: 'Supplier update failed.',
+      },
+    });
+    const { onNoChanges, onUpdated, submitButton, user } =
+      setupUpdateSupplierFormHook();
+
+    await user.click(submitButton);
+
+    await waitFor(() =>
+      expect(addToastMock).toHaveBeenCalledWith({
+        description: 'Supplier update failed.',
+        type: 'error',
+      })
+    );
+    expect(onNoChanges).not.toHaveBeenCalled();
+    expect(onUpdated).not.toHaveBeenCalled();
+  });
+});

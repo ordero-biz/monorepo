@@ -1,0 +1,32 @@
+'use client';
+
+import { IconButton } from '@ordero/ui';
+import { Pencil } from 'lucide-react';
+import { useState } from 'react';
+import type { UpdateSupplierDialogTriggerProps } from './types';
+import { UpdateSupplierDialog } from './UpdateSupplierDialog';
+
+export const UpdateSupplierDialogTrigger = ({
+  supplier,
+}: UpdateSupplierDialogTriggerProps) => {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <>
+      <IconButton
+        aria-label={`Edit ${supplier.name}`}
+        onClick={() => setOpen(true)}
+        size="xs"
+        title={`Edit ${supplier.name}`}
+      >
+        <Pencil aria-hidden="true" />
+      </IconButton>
+
+      <UpdateSupplierDialog
+        onOpenChange={setOpen}
+        open={open}
+        supplier={supplier}
+      />
+    </>
+  );
+};

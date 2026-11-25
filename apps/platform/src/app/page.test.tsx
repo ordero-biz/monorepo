@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
+import { clientRoutes } from '@/lib/client/routes';
 import Home from './page';
 
 describe('platform Home', () => {
@@ -10,6 +11,6 @@ describe('platform Home', () => {
     ).toBeInTheDocument();
     expect(
       screen.getByRole('link', { name: /go to sign in/i })
-    ).toHaveAttribute('href', '/sign-in');
+    ).toHaveAttribute('href', clientRoutes.signIn);
   });
 });

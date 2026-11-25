@@ -2,10 +2,12 @@ import type { InputChangeEventDetails } from '@base-ui/react/input';
 import type {
   ElementType,
   FocusEventHandler,
+  HTMLAttributes,
   HTMLInputAutoCompleteAttribute,
   HTMLInputTypeAttribute,
   KeyboardEventHandler,
   ReactNode,
+  Ref,
 } from 'react';
 
 export type InputSize = 's' | 'm';
@@ -23,6 +25,7 @@ export type InputProps = {
   endIcon?: ElementType<{ className?: string }>;
   focused?: boolean;
   id?: string;
+  inputMode?: HTMLAttributes<HTMLInputElement>['inputMode'];
   invalid?: boolean;
   name?: string;
   onBlur?: FocusEventHandler<HTMLInputElement>;
@@ -31,6 +34,7 @@ export type InputProps = {
   onValueChange?: (value: string, details: InputChangeEventDetails) => void;
   placeholder?: string;
   readOnly?: boolean;
+  ref?: Ref<HTMLElement>;
   required?: boolean;
   size?: InputSize;
   startAdornment?: ReactNode;
