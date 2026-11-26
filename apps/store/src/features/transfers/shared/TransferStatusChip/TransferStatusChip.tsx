@@ -14,8 +14,22 @@ const statusColors = {
   [TRANSFER_STATUS.COMPLETED]: 'primary',
 } as const;
 
+const InTransitIndicator = () => (
+  <span className="relative flex size-[var(--space-0-75)]">
+    <span className="absolute inline-flex size-full animate-ping rounded-full bg-[var(--info-main)] opacity-75" />
+    <span className="relative inline-flex size-[var(--space-0-75)] rounded-full bg-[var(--info-main)]" />
+  </span>
+);
+
 export const TransferStatusChip = ({ status }: TransferStatusChipProps) => (
-  <Chip color={statusColors[status]} size="s" variant="soft">
+  <Chip
+    color={statusColors[status]}
+    size="s"
+    startIcon={
+      status === TRANSFER_STATUS.IN_TRANSIT ? <InTransitIndicator /> : undefined
+    }
+    variant="soft"
+  >
     {statusLabels[status]}
   </Chip>
 );
