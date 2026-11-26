@@ -23,10 +23,11 @@ export const CLIENT_BACKEND_PATHS = {
   supplier: '/api/backend/api/v1/suppliers/{id}',
   unitsOfMeasurement: '/api/backend/api/v1/units-of-measurement',
   unitOfMeasurement: '/api/backend/api/v1/units-of-measurement/{id}',
-  warehouseTransfers: '/api/backend/api/v1/warehouse-transfers',
-  warehouseTransfer: '/api/backend/api/v1/warehouse-transfers/{id}',
+  transfers: '/api/backend/api/v1/warehouse-transfers',
+  transfer: '/api/backend/api/v1/warehouse-transfers/{id}',
   warehouses: '/api/backend/api/v1/warehouses',
   warehouse: '/api/backend/api/v1/warehouses/{id}',
   warehouseStock: '/api/backend/api/v1/warehouses/{id}/stock',
   warehouseSupplies: '/api/backend/api/v1/warehouses/{id}/supplies',
+  warehouseTransfers: '/api/backend/api/v1/warehouses/{id}/transfers',
 } as const;

@@ -1,4 +1,8 @@
-import { dehydrate, HydrationBoundary } from '@tanstack/react-query';
+import {
+  dehydrate,
+  HydrationBoundary,
+  type QueryClient,
+} from '@tanstack/react-query';
 import { WarehouseDetail } from '@/features/warehouses';
 import {
   getWarehouseListMode,
@@ -10,14 +14,17 @@ import {
   warehouseQueryOptions,
   warehouseStockQueryOptions,
   warehouseSuppliesQueryOptions,
+  warehouseTransfersQueryOptions,
 } from '@/lib/query/warehouses/warehousesQueryOptions';
 import {
   getServerWarehouse,
   getServerWarehouseStock,
   getServerWarehouseSupplies,
+  getServerWarehouseTransfers,
 } from '@/lib/server/api/warehouses';
 import {
   getPaginationSearchInput,
+  type PaginationSearchInput,
   type SearchParamsInput,
 } from '@/lib/utils/url';
 
@@ -27,6 +34,51 @@ type WarehouseDetailPageProps = {
     id: string;
   }>;
 };
+
+type PrefetchListArgs = {
+  queryClient: QueryClient;
+  warehouseId: string;
+  input: PaginationSearchInput;
+};
+
+const listPrefetchers = {
+  [WAREHOUSE_LIST_MODE.products]: ({
+    queryClient,
+    warehouseId,
+    input,
+  }: PrefetchListArgs) =>
+    queryClient.prefetchQuery(
+      warehouseStockQueryOptions({
+        warehouseId,
+        fetchWarehouseStock: getServerWarehouseStock,
+        input,
+      })
+    ),
+  [WAREHOUSE_LIST_MODE.supplies]: ({
+    queryClient,
+    warehouseId,
+    input,
+  }: PrefetchListArgs) =>
+    queryClient.prefetchQuery(
+      warehouseSuppliesQueryOptions({
+        warehouseId,
+        fetchWarehouseSupplies: getServerWarehouseSupplies,
+        input,
+      })
+    ),
+  [WAREHOUSE_LIST_MODE.movements]: ({
+    queryClient,
+    warehouseId,
+    input,
+  }: PrefetchListArgs) =>
+    queryClient.prefetchQuery(
+      warehouseTransfersQueryOptions({
+        warehouseId,
+        fetchWarehouseTransfers: getServerWarehouseTransfers,
+        input,
+      })
+    ),
+} as const;
 
 export default async function WarehouseDetailPage({
   params,
@@ -42,21 +94,11 @@ export default async function WarehouseDetailPage({
 
   await Promise.all([
     queryClient.prefetchQuery(warehouseQueryOptions(id, getServerWarehouse)),
-    listMode === WAREHOUSE_LIST_MODE.supplies
-      ? queryClient.prefetchQuery(
-          warehouseSuppliesQueryOptions({
-            warehouseId: id,
-            fetchWarehouseSupplies: getServerWarehouseSupplies,
-            input: paginationInput,
-          })
-        )
-      : queryClient.prefetchQuery(
-          warehouseStockQueryOptions({
-            warehouseId: id,
-            fetchWarehouseStock: getServerWarehouseStock,
-            input: paginationInput,
-          })
-        ),
+    listPrefetchers[listMode]({
+      queryClient,
+      warehouseId: id,
+      input: paginationInput,
+    }),
   ]);
 
   return (

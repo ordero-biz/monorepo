@@ -3,7 +3,9 @@ import userEvent from '@testing-library/user-event';
 import {
   getWarehouseStock,
   getWarehouseSupplies,
+  getWarehouseTransfers,
 } from '@/lib/client/api/warehouses';
+import type { Transfer } from '@/lib/domain/transfers/types';
 import type { WarehouseSupply } from '@/lib/domain/warehouses/types';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import type { WarehouseDetailListsProps } from './types';
@@ -25,6 +27,7 @@ vi.mock('@/lib/client/api/warehouses', async () => ({
   )),
   getWarehouseStock: vi.fn(),
   getWarehouseSupplies: vi.fn(),
+  getWarehouseTransfers: vi.fn(),
 }));
 
 const supply: WarehouseSupply = {
@@ -39,6 +42,29 @@ const supply: WarehouseSupply = {
 const supplies = {
   content: [supply],
   page: { number: 0, size: 10, totalElements: 21, totalPages: 3 },
+};
+const transfer: Transfer = {
+  id: 31,
+  sourceWarehouse: { id: 7, name: 'Main', status: 'ACTIVE' },
+  destinationWarehouse: { id: 9, name: 'Outlet', status: 'ACTIVE' },
+  transferNumber: 'TR-0031',
+  status: 'IN_TRANSIT',
+  comment: null,
+  dispatchedAt: '2026-10-29T10:00:00Z',
+  completedAt: null,
+  createdAt: '2026-10-28T10:00:00Z',
+  version: 1,
+};
+const incomingTransfer: Transfer = {
+  ...transfer,
+  id: 32,
+  sourceWarehouse: { id: 11, name: 'Supplier hub', status: 'ACTIVE' },
+  destinationWarehouse: { id: 7, name: 'Main', status: 'ACTIVE' },
+  transferNumber: 'TR-0032',
+};
+const transfers = {
+  content: [transfer, incomingTransfer],
+  page: { number: 0, size: 10, totalElements: 4, totalPages: 1 },
 };
 const { setup } = prepareStoreSetup<WarehouseDetailListsProps>({
   component: WarehouseDetailLists,
@@ -62,6 +88,9 @@ describe('WarehouseDetailLists', () => {
     vi.mocked(getWarehouseSupplies)
       .mockReset()
       .mockResolvedValue({ ok: true, data: supplies });
+    vi.mocked(getWarehouseTransfers)
+      .mockReset()
+      .mockResolvedValue({ ok: true, data: transfers });
   });
 
   it.each([
@@ -251,5 +280,62 @@ describe('WarehouseDetailLists', () => {
       '/warehouse/7?view=supplies&page=3&size=10',
       { scroll: false }
     );
+  });
+
+  it('renders warehouse movements and links to transfer details', async () => {
+    navigation.searchParams = new URLSearchParams('view=movements');
+    setup();
+    const table = await screen.findByRole('table', {
+      name: 'Warehouse movements',
+    });
+    expect(
+      within(table).getByRole('link', { name: 'TR-0031' })
+    ).toHaveAttribute('href', '/warehouse/transfers/31');
+    const [, outgoingRow, incomingRow] = within(table).getAllByRole('row');
+    expect(within(outgoingRow).getByText('Out')).toBeVisible();
+    expect(within(outgoingRow).getByText('Outlet')).toBeVisible();
+    expect(within(incomingRow).getByText('In')).toBeVisible();
+    expect(within(incomingRow).getByText('Supplier hub')).toBeVisible();
+    expect(within(table).queryByText('Main')).not.toBeInTheDocument();
+    expect(getWarehouseTransfers).toHaveBeenCalledExactlyOnceWith('7', {
+      page: 1,
+      size: 10,
+    });
+    expect(screen.getByRole('heading', { name: 'Movements' })).toBeVisible();
+    expect(screen.getByText('4', { exact: true })).toBeVisible();
+    expect(
+      screen.getByRole('button', { name: 'Movements', pressed: true })
+    ).toBeVisible();
+    expect(getWarehouseStock).not.toHaveBeenCalled();
+    expect(getWarehouseSupplies).not.toHaveBeenCalled();
+  });
+
+  it('switches to movements via the URL', async () => {
+    const user = userEvent.setup();
+    setup();
+    await screen.findByRole('table', { name: 'Warehouse products' });
+    await user.click(screen.getByRole('button', { name: 'Movements' }));
+    expect(navigation.push).toHaveBeenCalledExactlyOnceWith(
+      '/warehouse/7?view=movements&page=1',
+      { scroll: false }
+    );
+  });
+
+  it('retries movements after a failure', async () => {
+    navigation.searchParams = new URLSearchParams('view=movements');
+    vi.mocked(getWarehouseTransfers).mockResolvedValueOnce({
+      ok: false,
+      error: { status: 503, message: 'Unavailable' },
+    });
+    const user = userEvent.setup();
+    setup();
+    expect(
+      await screen.findByText(
+        "We couldn't load this warehouse's movements right now."
+      )
+    ).toBeVisible();
+    await user.click(screen.getByRole('button', { name: 'Retry' }));
+    expect(await screen.findByRole('link', { name: 'TR-0031' })).toBeVisible();
+    expect(getWarehouseTransfers).toHaveBeenCalledTimes(2);
   });
 });

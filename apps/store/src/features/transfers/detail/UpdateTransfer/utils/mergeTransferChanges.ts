@@ -183,8 +183,7 @@ export const mergeTransferChanges = ({
   };
   const conflicts = [
     ...result.conflicts.filter(
-      ({ field }) =>
-        field !== 'sourceWarehouse' && field !== 'transferEntries'
+      ({ field }) => field !== 'sourceWarehouse' && field !== 'transferEntries'
     ),
     coupledConflict,
   ];

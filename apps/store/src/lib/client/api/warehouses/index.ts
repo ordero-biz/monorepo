@@ -1,6 +1,7 @@
 'use client';
 
 import { apiFetch } from '@ordero/api-client';
+import type { Transfer } from '@/lib/domain/transfers/types';
 import type {
   Warehouse,
   WarehouseStatus,
@@ -79,6 +80,21 @@ export const getWarehouseSupplies = (
 ) =>
   apiFetch<PaginatedResponse<WarehouseSupply>>(
     getWarehouseSuppliesPath(warehouseId, input),
+    { method: 'GET' }
+  );
+
+export const getWarehouseTransfersPath = (
+  warehouseId: string | number,
+  input?: PaginationSearchInput
+) =>
+  `${tokenizePath(CLIENT_BACKEND_PATHS.warehouseTransfers, { id: warehouseId })}?${getPaginationSearch(input)}`;
+
+export const getWarehouseTransfers = (
+  warehouseId: string | number,
+  input?: PaginationSearchInput
+) =>
+  apiFetch<PaginatedResponse<Transfer>>(
+    getWarehouseTransfersPath(warehouseId, input),
     { method: 'GET' }
   );
 

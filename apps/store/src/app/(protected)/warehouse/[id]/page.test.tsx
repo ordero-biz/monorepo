@@ -1,11 +1,13 @@
 import { render, screen } from '@testing-library/react';
 import { WAREHOUSE_STATUS } from '@/lib/domain/warehouses/constants';
 import { suppliesQueryKeys } from '@/lib/query/supplies/suppliesQueryKeys';
+import { transfersQueryKeys } from '@/lib/query/transfers/transfersQueryKeys';
 import { warehousesQueryKeys } from '@/lib/query/warehouses/warehousesQueryKeys';
 import {
   getServerWarehouse,
   getServerWarehouseStock,
   getServerWarehouseSupplies,
+  getServerWarehouseTransfers,
 } from '@/lib/server/api/warehouses';
 import {
   createTestQueryClient,
@@ -26,6 +28,7 @@ vi.mock('@/lib/server/api/warehouses', () => ({
   getServerWarehouse: vi.fn(),
   getServerWarehouseStock: vi.fn(),
   getServerWarehouseSupplies: vi.fn(),
+  getServerWarehouseTransfers: vi.fn(),
 }));
 
 const getServerWarehouseMock = vi.mocked(getServerWarehouse);
@@ -34,6 +37,7 @@ describe('WarehouseDetailPage', () => {
   beforeEach(() => {
     getServerWarehouseMock.mockReset();
     vi.mocked(getServerWarehouseSupplies).mockReset();
+    vi.mocked(getServerWarehouseTransfers).mockReset();
     vi.mocked(getServerWarehouseStock).mockReset();
     vi.mocked(getServerWarehouseStock).mockResolvedValue({
       ok: true,
@@ -116,6 +120,44 @@ describe('WarehouseDetailPage', () => {
     expect(
       queryClient.getQueryData(
         suppliesQueryKeys.warehouseListPage('7', { page: 2, size: 25 })
+      )
+    ).toEqual(data);
+  });
+
+  it('prefetches transfers instead of stock when the movements view is requested', async () => {
+    const data = {
+      content: [],
+      page: { number: 1, size: 25, totalElements: 0, totalPages: 0 },
+    };
+    getServerWarehouseMock.mockResolvedValue({
+      ok: false,
+      error: { status: 503, message: 'Unavailable' },
+    });
+    vi.mocked(getServerWarehouseTransfers).mockResolvedValue({
+      ok: true,
+      data,
+    });
+    const queryClient = createTestQueryClient();
+    render(
+      await WarehouseDetailPage({
+        params: Promise.resolve({ id: '7' }),
+        searchParams: Promise.resolve({
+          view: 'movements',
+          page: '2',
+          size: '25',
+        }),
+      }),
+      { wrapper: createTestQueryProvider(queryClient) }
+    );
+    expect(getServerWarehouseTransfers).toHaveBeenCalledExactlyOnceWith('7', {
+      page: 2,
+      size: 25,
+    });
+    expect(getServerWarehouseStock).not.toHaveBeenCalled();
+    expect(getServerWarehouseSupplies).not.toHaveBeenCalled();
+    expect(
+      queryClient.getQueryData(
+        transfersQueryKeys.warehouseListPage('7', { page: 2, size: 25 })
       )
     ).toEqual(data);
   });

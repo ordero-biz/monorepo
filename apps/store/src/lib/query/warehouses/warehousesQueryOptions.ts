@@ -1,5 +1,6 @@
 import type { ApiResult } from '@ordero/api-types';
 import { queryOptions } from '@tanstack/react-query';
+import type { Transfer } from '@/lib/domain/transfers/types';
 import type {
   Warehouse,
   WarehouseStockItem,
@@ -8,6 +9,7 @@ import type {
 import type { PaginatedResponse } from '@/lib/server/types';
 import type { PaginationSearchInput } from '@/lib/utils/url';
 import { suppliesQueryKeys } from '../supplies/suppliesQueryKeys';
+import { transfersQueryKeys } from '../transfers/transfersQueryKeys';
 import { warehousesQueryKeys } from './warehousesQueryKeys';
 
 type WarehouseSuppliesQueryOptionsArgs = {
@@ -16,6 +18,15 @@ type WarehouseSuppliesQueryOptionsArgs = {
     warehouseId: string | number,
     input?: PaginationSearchInput
   ) => Promise<ApiResult<PaginatedResponse<WarehouseSupply>>>;
+  input?: PaginationSearchInput;
+};
+
+type WarehouseTransfersQueryOptionsArgs = {
+  warehouseId: string | number;
+  fetchWarehouseTransfers: (
+    warehouseId: string | number,
+    input?: PaginationSearchInput
+  ) => Promise<ApiResult<PaginatedResponse<Transfer>>>;
   input?: PaginationSearchInput;
 };
 
@@ -84,4 +95,14 @@ export const warehouseSuppliesQueryOptions = ({
   queryOptions({
     queryKey: suppliesQueryKeys.warehouseListPage(warehouseId, input),
     queryFn: () => unwrapApiResult(fetchWarehouseSupplies(warehouseId, input)),
+  });
+
+export const warehouseTransfersQueryOptions = ({
+  warehouseId,
+  fetchWarehouseTransfers,
+  input,
+}: WarehouseTransfersQueryOptionsArgs) =>
+  queryOptions({
+    queryKey: transfersQueryKeys.warehouseListPage(warehouseId, input),
+    queryFn: () => unwrapApiResult(fetchWarehouseTransfers(warehouseId, input)),
   });
