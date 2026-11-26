@@ -6,7 +6,8 @@ import {
   TextField,
   Typography,
 } from '@ordero/ui';
-import { EllipsisVertical, Package, Trash2 } from 'lucide-react';
+import { EllipsisVertical, Trash2 } from 'lucide-react';
+import { ProductImagePlaceholder } from '@/lib/components/TableCell';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
 import { formatMoney } from '@/lib/utils/formatMoney';
 import {
@@ -76,71 +77,58 @@ export const getColumns = ({
 
   return [
     {
-      id: 'image',
-      cell: () => (
-        <DataTableCell>
-          <div
-            aria-label="Product image unavailable"
-            className="flex size-[var(--space-5)] items-center justify-center rounded-[var(--radius)] bg-[var(--background-neutral)] text-[var(--text-secondary)]"
-            role="img"
-          >
-            <Package aria-hidden="true" className="size-[var(--space-3)]" />
-          </div>
-        </DataTableCell>
-      ),
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Image" />
-      ),
-      meta: { width: 64, wrap: 'nowrap' },
-    },
-    {
       id: 'product',
       cell: ({ row }) => {
         const index = row.index;
 
         return (
           <DataTableCell width="full">
-            <form.Field
-              listeners={getEntryListeners(index)}
-              name={`supplyEntries[${index}].productVariant` as const}
-              validators={getEntryValidators(index, 'productVariant')}
-            >
-              {(field) => (
-                <form.Subscribe
-                  selector={(state) =>
-                    [state.isSubmitting, state.submissionAttempts] as const
-                  }
+            <div className="flex w-full items-center gap-[var(--space-2)]">
+              <ProductImagePlaceholder />
+              <div className="min-w-0 flex-1">
+                <form.Field
+                  listeners={getEntryListeners(index)}
+                  name={`supplyEntries[${index}].productVariant` as const}
+                  validators={getEntryValidators(index, 'productVariant')}
                 >
-                  {([disabled, submissionAttempts]) => {
-                    const errorText = getFieldSubmitChangeErrorText(
-                      field.state.meta,
-                      submissionAttempts
-                    );
-                    return (
-                      <ProductVariantsAsyncCombobox
-                        disabled={disabled}
-                        aria-label={`Product for row ${index + 1}`}
-                        errorText={errorText}
-                        invalid={Boolean(errorText)}
-                        name={field.name}
-                        onBlur={field.handleBlur}
-                        onValueChange={field.handleChange}
-                        required
-                        size="s"
-                        value={field.state.value}
-                      />
-                    );
-                  }}
-                </form.Subscribe>
-              )}
-            </form.Field>
+                  {(field) => (
+                    <form.Subscribe
+                      selector={(state) =>
+                        [state.isSubmitting, state.submissionAttempts] as const
+                      }
+                    >
+                      {([disabled, submissionAttempts]) => {
+                        const errorText = getFieldSubmitChangeErrorText(
+                          field.state.meta,
+                          submissionAttempts
+                        );
+                        return (
+                          <ProductVariantsAsyncCombobox
+                            disabled={disabled}
+                            aria-label={`Product for row ${index + 1}`}
+                            errorText={errorText}
+                            invalid={Boolean(errorText)}
+                            name={field.name}
+                            onBlur={field.handleBlur}
+                            onValueChange={field.handleChange}
+                            required
+                            size="s"
+                            value={field.state.value}
+                          />
+                        );
+                      }}
+                    </form.Subscribe>
+                  )}
+                </form.Field>
+              </div>
+            </div>
           </DataTableCell>
         );
       },
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Product" />
       ),
-      meta: { minWidth: 352 },
+      meta: { minWidth: 280 },
     },
     {
       id: 'unit',
@@ -189,7 +177,7 @@ export const getColumns = ({
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Unit" />
       ),
-      meta: { minWidth: 160 },
+      meta: { minWidth: 136 },
     },
     {
       id: 'quantity',
@@ -235,7 +223,7 @@ export const getColumns = ({
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Quantity" />
       ),
-      meta: { minWidth: 120 },
+      meta: { minWidth: 104 },
     },
     {
       id: 'unitPrice',
@@ -281,7 +269,7 @@ export const getColumns = ({
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Unit price" />
       ),
-      meta: { minWidth: 135 },
+      meta: { minWidth: 112 },
     },
     {
       id: 'total',
@@ -304,7 +292,7 @@ export const getColumns = ({
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Total" />
       ),
-      meta: { minWidth: 115, wrap: 'nowrap' },
+      meta: { minWidth: 88, wrap: 'nowrap' },
     },
     {
       id: 'comment',
@@ -335,7 +323,7 @@ export const getColumns = ({
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Comment" />
       ),
-      meta: { minWidth: 195 },
+      meta: { minWidth: 144 },
     },
     {
       id: 'actions',
