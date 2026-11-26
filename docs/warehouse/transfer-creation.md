@@ -12,7 +12,9 @@ This specification covers the `/warehouse/transfers/add` page, from choosing
 the warehouses to creating the transfer. A saved Draft opens at
 `/warehouse/transfers/{id}` in the same editor, including the source warehouse change
 confirmation; rows restored from the draft show Available as "—" until the stock
-line is picked again. Other statuses have no detail view yet.
+line is picked again. In transit transfers open read-only: the transfer
+information and the sent entries with their total. Completed transfers have no
+detail view yet.
 
 ## Terms
 
@@ -156,9 +158,10 @@ when not empty).
 
 Opening `/warehouse/transfers/{id}` for a Draft loads the same transfer editor
 with `PATCH /api/v1/warehouse-transfers/{id}` and optimistic concurrency
-(`expectedVersion`). Non-draft transfers (**In transit** or **Completed**) show
-the transfer header with **Details for this transfer status are not available
-yet.**
+(`expectedVersion`). **In transit** transfers show the transfer header,
+transfer information, and sent entries table with totals. Other statuses
+(**Completed**) show the transfer header with **Details for this transfer
+status are not available yet.**
 
 - **Deleting a draft:** the header actions menu offers **Delete transfer** only
   while the transfer is a Draft. Confirming sends
@@ -169,7 +172,8 @@ yet.**
 When the saved transfer changes in the background (for example, on window focus):
 
 - **Pristine draft:** automatically adopts the latest saved version (or
-  switches to the non-draft placeholder if the transfer was started elsewhere).
+  switches to the read-only in-transit detail view if the transfer was started
+  elsewhere).
 - **Dirty draft when started elsewhere:** opens the **Transfer started** notice,
   preserves unsaved edits on the page, and disables **Save draft**,
   **Transfer**, and **Delete transfer**.
@@ -215,9 +219,10 @@ the shared [form conventions](../forms.md).
 
 ## Limitations and future decisions
 
-- **Transfer detail** exists only for Drafts. In transit and Completed
-  transfers have no detail view yet, so starting a transfer returns to the
-  source warehouse.
+- **Transfer detail** is editable only for Drafts. In transit transfers are
+  read-only; receiving and rejecting are not available yet. Completed and
+  Rejected transfers will get their own detail views.
+  Starting a transfer from the create page returns to the source warehouse.
 - **Transfers list** (`/warehouse/transfers`) has no status filter yet.
 - **Completing a transfer** (status Completed) is not part of this workflow.
 - **Available is a snapshot.** It is not refreshed while the page is open; the
@@ -237,7 +242,8 @@ findings from usability testing.
 
 - [Create transfer implementation](../../apps/store/src/features/transfers/add/CreateTransfer/)
   owns the create page and source change flow; [Update transfer](../../apps/store/src/features/transfers/detail/UpdateTransfer/)
-  owns draft editing, conflict resolution, and the detail header; [Delete transfer](../../apps/store/src/features/transfers/detail/DeleteTransfer/)
+  owns draft editing, conflict resolution, and the detail header; [In-progress transfer detail](../../apps/store/src/features/transfers/detail/TransferInProgressDetail/)
+  owns the read-only in-transit detail view; [Delete transfer](../../apps/store/src/features/transfers/detail/DeleteTransfer/)
   owns draft deletion confirmation and cache cleanup; the [shared editor](../../apps/store/src/features/transfers/shared/TransferEditorForm/)
   owns transfer information and the entries table.
 - [Transfer merge rules](../../apps/store/src/features/transfers/detail/UpdateTransfer/utils/mergeTransferChanges.ts)
@@ -251,7 +257,7 @@ findings from usability testing.
   and [detail tests](../../apps/store/src/features/transfers/detail/TransferDetail/TransferDetail.test.tsx)
   cover the URL source, loading and failure states, draft review, background
   refresh, and conflict resolution.
-- [Entries tests](../../apps/store/src/features/transfers/add/CreateTransfer/TransferEntries.test.tsx)
+- [Form and entries tests](../../apps/store/src/features/transfers/add/CreateTransfer/CreateTransferForm.test.tsx)
   cover the stock picker, quantity limits, duplicates, the source change modal,
   the use-all-available action, row deletion, saving a draft, starting a
   transfer, and service errors.

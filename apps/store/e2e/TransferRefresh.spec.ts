@@ -72,7 +72,7 @@ test.describe('Transfer refresh and conflict resolution', () => {
 
     await expect(page.getByText('In transit', { exact: true })).toBeVisible();
     await expect(
-      page.getByText('Details for this transfer status are not available yet.')
+      page.getByRole('table', { name: 'Transfer entries' })
     ).toBeVisible();
     await expect(page.getByRole('form', { name: 'Transfer' })).toHaveCount(0);
     await expect(page.getByRole('dialog')).toHaveCount(0);
@@ -97,7 +97,7 @@ test.describe('Transfer refresh and conflict resolution', () => {
 
     await expect(page.getByText('In transit', { exact: true })).toBeVisible();
     await expect(
-      page.getByText('Details for this transfer status are not available yet.')
+      page.getByRole('table', { name: 'Transfer entries' })
     ).toBeVisible();
     await expect(page.getByRole('form', { name: 'Transfer' })).toHaveCount(0);
     await expect(page.getByRole('dialog')).toHaveCount(0);
@@ -208,9 +208,7 @@ test.describe('Transfer refresh and conflict resolution', () => {
     capture,
   }) => {
     await openEditor(page);
-    await page
-      .getByRole('button', { name: 'Transfer', exact: true })
-      .click();
+    await page.getByRole('button', { name: 'Transfer', exact: true }).click();
     const confirmation = page.getByRole('dialog', {
       name: 'Start transfer',
       exact: true,
@@ -289,9 +287,7 @@ test.describe('Transfer refresh and conflict resolution', () => {
       'This action does not save or start this transfer.'
     );
     await expect(summary.getByText('TR-009', { exact: true })).toBeVisible();
-    await expect(
-      summary.getByText('TR-SECOND', { exact: true })
-    ).toBeVisible();
+    await expect(summary.getByText('TR-SECOND', { exact: true })).toBeVisible();
     await expect(review.getByRole('radiogroup')).toHaveCount(0);
     await expect(page.getByLabel(/^Name/)).toHaveValue('TR-009');
     await capture('Automatic updates are previewed before application');
@@ -651,9 +647,7 @@ test.describe('Transfer refresh and conflict resolution', () => {
     await openEditor(page);
     await page.getByRole('button', { name: '+ Add another product' }).click();
     await page.getByRole('combobox', { name: 'Product for row 2' }).click();
-    await page
-      .getByRole('option', { name: /Lentils · LENTILS/ })
-      .click();
+    await page.getByRole('option', { name: /Lentils · LENTILS/ }).click();
     await page
       .getByRole('textbox', { name: 'Comment for row 2' })
       .fill('My unfinished new row');
@@ -1029,9 +1023,7 @@ test.describe('Transfer refresh and conflict resolution', () => {
     await page
       .getByRole('textbox', { name: 'Comment', exact: true })
       .fill('My unsaved comment');
-    await page
-      .getByRole('button', { name: 'Transfer', exact: true })
-      .click();
+    await page.getByRole('button', { name: 'Transfer', exact: true }).click();
     await savedTransfer.replace({ status: 'IN_TRANSIT' });
     await returnToEditor(page);
     await page

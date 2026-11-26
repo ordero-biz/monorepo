@@ -1,0 +1,1 @@
+export { TransferInProgressDetail } from './TransferInProgressDetail';

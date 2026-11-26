@@ -16,6 +16,7 @@ import {
   TransferEditorForm,
   useSourceWarehouseChange,
 } from '../../shared/TransferEditorForm';
+import { TransferInProgressDetail } from '../TransferInProgressDetail';
 import { transferConflictPolicy } from './conflictPolicy';
 import { useUpdateTransferForm } from './hooks/useUpdateTransferForm';
 import { TransferDetailHeader } from './TransferDetailHeader';
@@ -72,11 +73,20 @@ export const UpdateTransfer = ({
     sourceChange.pendingChange !== null
   );
 
-  if (baseline.status !== TRANSFER_STATUS.DRAFT) {
-    // Views for the other statuses are not designed yet.
+  if (baseline.status === TRANSFER_STATUS.IN_TRANSIT) {
     return (
       <div className="flex flex-col gap-[var(--space-2)]">
-        <TransferDetailHeader onDeleted={onDeleted} transfer={baseline} />
+        <TransferDetailHeader transfer={baseline} />
+        <TransferInProgressDetail transfer={baseline} />
+      </div>
+    );
+  }
+
+  if (baseline.status !== TRANSFER_STATUS.DRAFT) {
+    // Completed and Rejected get their own views later.
+    return (
+      <div className="flex flex-col gap-[var(--space-2)]">
+        <TransferDetailHeader transfer={baseline} />
         <Card.Root variant="filled">
           <Card.Content>
             <Typography color="text-secondary" variant="body2">

@@ -4,6 +4,7 @@ import { deleteTransfer } from '@/lib/client/api/transfers';
 import { transfersQueryKeys } from '@/lib/query/transfers/transfersQueryKeys';
 import { prepareStoreSetup } from '@/test/prepareSetup';
 import { DeleteTransferDialog } from './DeleteTransferDialog';
+import type { DeleteTransferDialogProps } from './types';
 
 vi.mock('@/lib/client/api/transfers', async () => ({
   ...(await vi.importActual<typeof import('@/lib/client/api/transfers')>(
@@ -14,7 +15,7 @@ vi.mock('@/lib/client/api/transfers', async () => ({
 
 const deleteTransferMock = vi.mocked(deleteTransfer);
 
-const { setup } = prepareStoreSetup({
+const { setup } = prepareStoreSetup<DeleteTransferDialogProps>({
   component: DeleteTransferDialog,
   props: {
     transfer: { id: 5, transferNumber: 'Weekend restock' },

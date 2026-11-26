@@ -596,9 +596,7 @@ describe('TransferDetail', () => {
 
     expect(await screen.findByText('In transit')).toBeVisible();
     expect(
-      screen.getByText(
-        'Details for this transfer status are not available yet.'
-      )
+      screen.getByRole('table', { name: 'Transfer entries' })
     ).toBeVisible();
     expect(
       screen.queryByRole('form', { name: 'Transfer' })

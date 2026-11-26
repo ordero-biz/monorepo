@@ -25,7 +25,11 @@ const added: TransferEntryFormValues = {
   },
   comment: 'Keep dry',
 };
-const saved = { ...rice, clientId: 'existing-20', quantity: 4 };
+const saved: TransferEntryFormValues = {
+  ...rice,
+  clientId: 'existing-20',
+  quantity: 4,
+};
 
 const { setup } = prepareStoreSetup({
   component: TransferProductsComparison,
