@@ -84,7 +84,7 @@ describe('transfer entry utils', () => {
         {
           clientId: 'existing-17',
           stockItem: {
-            productVariant: { id: 11, name: 'Rice', sku: 'GR-1' },
+            productVariant: { id: 11, name: 'Rice', sku: 'GR-1', barcode: '' },
             unitOfMeasurement: { id: 4, name: 'Bag', symbol: 'bag' },
           },
           quantity: 5,

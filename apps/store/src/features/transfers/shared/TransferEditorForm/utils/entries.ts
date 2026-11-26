@@ -34,6 +34,7 @@ export const getTransferFormDefaults = (
             id: entry.productVariant.id,
             name: entry.productVariant.name,
             sku: entry.productVariant.sku,
+            barcode: entry.productVariant.barcode,
           },
           unitOfMeasurement: {
             id: entry.unitOfMeasurement.id,

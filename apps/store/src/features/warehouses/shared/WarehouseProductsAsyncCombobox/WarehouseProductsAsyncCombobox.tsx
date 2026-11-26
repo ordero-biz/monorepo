@@ -91,6 +91,7 @@ export const WarehouseProductsAsyncCombobox = ({
               id: productVariant.id,
               name: productVariant.name,
               sku: productVariant.sku,
+              barcode: productVariant.barcode,
             },
             unitOfMeasurement: {
               id: unitOfMeasurement.id,

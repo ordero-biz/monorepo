@@ -1,0 +1,20 @@
+@keyframes transfer-route-dash {
+  to {
+    background-position: var(--space-1-25) 0;
+  }
+}
+
+.transfer-route-dash {
+  background-image: repeating-linear-gradient(
+    to right,
+    var(--info-main) 0 var(--space-0-75),
+    transparent var(--space-0-75) var(--space-1-25)
+  );
+  animation: transfer-route-dash 0.7s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .transfer-route-dash {
+    animation: none;
+  }
+}
