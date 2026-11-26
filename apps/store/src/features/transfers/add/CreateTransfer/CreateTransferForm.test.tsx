@@ -340,10 +340,11 @@ describe('CreateTransferForm', () => {
     await fillTransferInformation(user);
     await pickOption(user, getProduct(1), /Jasmine Rice 5kg/);
     await user.type(getQuantity(1), '20');
-    await user.type(
-      screen.getByRole('textbox', { name: 'Comment for row 1' }),
-      ' Fragile '
-    );
+    const rowComment = screen.getByRole('textbox', {
+      name: 'Comment for row 1',
+    });
+    expect(rowComment).not.toHaveAttribute('placeholder');
+    await user.type(rowComment, ' Fragile ');
     await user.click(
       screen.getByRole('button', { name: '+ Add another product' })
     );

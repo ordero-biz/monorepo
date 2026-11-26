@@ -261,7 +261,6 @@ export const getColumns = ({
                     name={field.name}
                     onBlur={field.handleBlur}
                     onValueChange={field.handleChange}
-                    placeholder="Add comment"
                     size="s"
                     value={field.state.value}
                   />

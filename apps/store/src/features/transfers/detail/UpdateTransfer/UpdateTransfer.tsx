@@ -76,7 +76,7 @@ export const UpdateTransfer = ({
   if (baseline.status === TRANSFER_STATUS.IN_TRANSIT) {
     return (
       <div className="flex flex-col gap-[var(--space-2)]">
-        <TransferDetailHeader onDeleted={onDeleted} transfer={baseline} />
+        <TransferDetailHeader transfer={baseline} />
         <TransferInProgressDetail transfer={baseline} />
       </div>
     );
@@ -86,7 +86,7 @@ export const UpdateTransfer = ({
     // Completed and Rejected get their own views later.
     return (
       <div className="flex flex-col gap-[var(--space-2)]">
-        <TransferDetailHeader onDeleted={onDeleted} transfer={baseline} />
+        <TransferDetailHeader transfer={baseline} />
         <Card.Root variant="filled">
           <Card.Content>
             <Typography color="text-secondary" variant="body2">
