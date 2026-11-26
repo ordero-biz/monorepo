@@ -135,7 +135,7 @@ const fillTransferInformation = async (user: User) => {
   );
 };
 
-describe('TransferEntries', () => {
+describe('CreateTransferForm', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     getWarehouseMock.mockResolvedValue({ ok: true, data: mainWarehouse });

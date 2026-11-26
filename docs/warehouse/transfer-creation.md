@@ -257,7 +257,7 @@ findings from usability testing.
   and [detail tests](../../apps/store/src/features/transfers/detail/TransferDetail/TransferDetail.test.tsx)
   cover the URL source, loading and failure states, draft review, background
   refresh, and conflict resolution.
-- [Entries tests](../../apps/store/src/features/transfers/add/CreateTransfer/TransferEntries.test.tsx)
+- [Form and entries tests](../../apps/store/src/features/transfers/add/CreateTransfer/CreateTransferForm.test.tsx)
   cover the stock picker, quantity limits, duplicates, the source change modal,
   the use-all-available action, row deletion, saving a draft, starting a
   transfer, and service errors.
