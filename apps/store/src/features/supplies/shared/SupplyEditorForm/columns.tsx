@@ -6,7 +6,8 @@ import {
   TextField,
   Typography,
 } from '@ordero/ui';
-import { EllipsisVertical, Package, Trash2 } from 'lucide-react';
+import { EllipsisVertical, Trash2 } from 'lucide-react';
+import { ProductImageTableCell } from '@/lib/components/ProductImageTableCell';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
 import { formatMoney } from '@/lib/utils/formatMoney';
 import {
@@ -77,17 +78,7 @@ export const getColumns = ({
   return [
     {
       id: 'image',
-      cell: () => (
-        <DataTableCell>
-          <div
-            aria-label="Product image unavailable"
-            className="flex size-[var(--space-5)] items-center justify-center rounded-[var(--radius)] bg-[var(--background-neutral)] text-[var(--text-secondary)]"
-            role="img"
-          >
-            <Package aria-hidden="true" className="size-[var(--space-3)]" />
-          </div>
-        </DataTableCell>
-      ),
+      cell: () => <ProductImageTableCell />,
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Image" />
       ),
@@ -140,7 +131,7 @@ export const getColumns = ({
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Product" />
       ),
-      meta: { minWidth: 352 },
+      meta: { minWidth: 240 },
     },
     {
       id: 'unit',
@@ -189,7 +180,7 @@ export const getColumns = ({
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Unit" />
       ),
-      meta: { minWidth: 160 },
+      meta: { minWidth: 136 },
     },
     {
       id: 'quantity',
@@ -235,7 +226,7 @@ export const getColumns = ({
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Quantity" />
       ),
-      meta: { minWidth: 120 },
+      meta: { minWidth: 104 },
     },
     {
       id: 'unitPrice',
@@ -281,7 +272,7 @@ export const getColumns = ({
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Unit price" />
       ),
-      meta: { minWidth: 135 },
+      meta: { minWidth: 112 },
     },
     {
       id: 'total',
@@ -304,7 +295,7 @@ export const getColumns = ({
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Total" />
       ),
-      meta: { minWidth: 115, wrap: 'nowrap' },
+      meta: { minWidth: 88, wrap: 'nowrap' },
     },
     {
       id: 'comment',
@@ -335,7 +326,7 @@ export const getColumns = ({
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Comment" />
       ),
-      meta: { minWidth: 195 },
+      meta: { minWidth: 144 },
     },
     {
       id: 'actions',

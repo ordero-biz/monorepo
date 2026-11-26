@@ -84,8 +84,8 @@ describe('TransferInProgressDetail', () => {
     const table = screen.getByRole('table', { name: 'Transfer entries' });
     expect(within(table).getAllByRole('row')).toHaveLength(4);
     const rice = within(table).getByRole('row', { name: /Jasmine Rice 5kg/ });
-    expect(within(rice).getAllByRole('cell')[1]).toHaveTextContent(
-      /^GR-1042Jasmine Rice 5kg$/
+    expect(within(rice).getAllByRole('cell')[0]).toHaveTextContent(
+      /^Jasmine Rice 5kgGR-1042$/
     );
     expect(within(rice).getByText('Bag (bag)')).toBeVisible();
     expect(within(rice).getByText('1,200')).toBeVisible();

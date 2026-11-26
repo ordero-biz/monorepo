@@ -1,3 +1,4 @@
+import { ProductImageTableCell } from '@/lib/components/ProductImageTableCell';
 import type { ProductGroup, ProductVariant } from '@/lib/domain/products/types';
 import { formatDate } from '@/lib/utils/formatDate';
 import {
@@ -16,6 +17,14 @@ const getProductVariantAttributesText = (productVariant: ProductVariant) => {
 };
 
 export const productGroupColumns: DataTableColumnDef<ProductGroup>[] = [
+  {
+    id: 'image',
+    cell: () => <ProductImageTableCell />,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Image" />
+    ),
+    meta: { width: 64, wrap: 'nowrap' },
+  },
   {
     accessorKey: 'name',
     cell: ({ row }) => <DataTableCell>{row.original.name}</DataTableCell>,
@@ -53,6 +62,14 @@ export const productGroupColumns: DataTableColumnDef<ProductGroup>[] = [
 ];
 
 export const productVariantColumns: DataTableColumnDef<ProductVariant>[] = [
+  {
+    id: 'image',
+    cell: () => <ProductImageTableCell />,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Image" />
+    ),
+    meta: { width: 64, wrap: 'nowrap' },
+  },
   {
     accessorKey: 'name',
     cell: ({ row }) => <DataTableCell>{row.original.name}</DataTableCell>,

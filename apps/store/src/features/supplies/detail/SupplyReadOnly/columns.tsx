@@ -2,48 +2,22 @@ import {
   DataTableCell,
   type DataTableColumnDef,
   DataTableColumnHeader,
-  Typography,
 } from '@ordero/ui';
-import { Package } from 'lucide-react';
+import { ProductExtendedTableCell } from '@/lib/components/ProductExtendedTableCell';
 import type { SupplyEntry } from '@/lib/domain/supplies/types';
 import { formatMoney } from '@/lib/utils/formatMoney';
 
 export const columns: DataTableColumnDef<SupplyEntry>[] = [
-  {
-    id: 'image',
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Image" />
-    ),
-    cell: () => (
-      <DataTableCell>
-        <div
-          aria-label="Product image unavailable"
-          className="flex size-[var(--space-5)] items-center justify-center rounded-[var(--radius)] bg-[var(--background-neutral)] text-[var(--text-secondary)]"
-          role="img"
-        >
-          <Package aria-hidden="true" className="size-[var(--space-3)]" />
-        </div>
-      </DataTableCell>
-    ),
-  },
   {
     id: 'product',
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Product" />
     ),
     cell: ({ row }) => (
-      <DataTableCell>
-        <div className="flex flex-col gap-[var(--space-0-5)]">
-          <Typography variant="body2">
-            {row.original.productVariant.name}
-          </Typography>
-          {row.original.productVariant.sku ? (
-            <Typography color="text-secondary" variant="body2">
-              {row.original.productVariant.sku}
-            </Typography>
-          ) : null}
-        </div>
-      </DataTableCell>
+      <ProductExtendedTableCell
+        name={row.original.productVariant.name}
+        sku={row.original.productVariant.sku}
+      />
     ),
   },
   {

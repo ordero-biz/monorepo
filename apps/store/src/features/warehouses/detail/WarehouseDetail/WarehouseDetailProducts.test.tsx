@@ -194,6 +194,9 @@ describe('WarehouseDetailProducts', () => {
     expect(screen.getByRole('heading', { name: 'Products' })).toBeVisible();
     expect(screen.getByText('21', { exact: true })).toBeVisible();
     expect(
+      within(table).getByRole('img', { name: 'Product image unavailable' })
+    ).toBeVisible();
+    expect(
       within(table).getByRole('columnheader', { name: 'Stock value' })
     ).toBeVisible();
     expect(getWarehouseStockMock).toHaveBeenCalledWith('1', {

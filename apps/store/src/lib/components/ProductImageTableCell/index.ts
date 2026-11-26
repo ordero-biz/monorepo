@@ -1,0 +1,1 @@
+export { ProductImageTableCell } from './ProductImageTableCell';
