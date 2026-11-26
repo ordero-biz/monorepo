@@ -1,4 +1,5 @@
 import { createUnitOfMeasurement } from '@/lib/client/api/units-of-measurement';
+import { getApiErrorMessage } from '@/lib/utils/apiError';
 import type { CreateUnitOfMeasurementFormValues } from './validations';
 
 const normalizeCreateUnitOfMeasurementFormData = (
@@ -26,7 +27,7 @@ export const submitCreateUnitOfMeasurement = async (
       ok: false,
       error: {
         fieldErrors: result.error.fieldErrors,
-        formError: result.error.message,
+        formError: getApiErrorMessage(result.error),
       },
     } as const;
   }
