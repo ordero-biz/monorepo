@@ -3,7 +3,7 @@ import {
   type DataTableColumnDef,
   DataTableColumnHeader,
 } from '@ordero/ui';
-import { ProductExtendedTableCell } from '@/lib/components/ProductExtendedTableCell';
+import { ProductExtendedTableCell } from '@/lib/components/TableCell';
 import type { SupplyEntry } from '@/lib/domain/supplies/types';
 import { formatMoney } from '@/lib/utils/formatMoney';
 

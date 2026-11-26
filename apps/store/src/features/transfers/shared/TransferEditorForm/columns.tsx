@@ -10,6 +10,7 @@ import {
 } from '@ordero/ui';
 import { ArrowUpToLine, EllipsisVertical, Trash2 } from 'lucide-react';
 import { WarehouseProductsAsyncCombobox } from '@/features/warehouses/shared/WarehouseProductsAsyncCombobox';
+import { ProductImagePlaceholder } from '@/lib/components/TableCell';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
 import type { TransferEntryFormValues, TransferForm } from './types';
 import {
@@ -81,55 +82,58 @@ export const getColumns = ({
         );
 
         return (
-          <DataTableCell>
-            <div className="w-[320px]">
-              <form.Field
-                listeners={getEntryListeners(index)}
-                name={`transferEntries[${index}].stockItem` as const}
-                validators={getEntryValidators(index, 'stockItem')}
-              >
-                {(field) => (
-                  <form.Subscribe
-                    selector={(state) =>
-                      [
-                        state.isSubmitting,
-                        state.submissionAttempts,
-                        state.values.sourceWarehouse?.id ?? null,
-                      ] as const
-                    }
-                  >
-                    {([disabled, submissionAttempts, sourceWarehouseId]) => {
-                      const errorText = getFieldSubmitChangeErrorText(
-                        field.state.meta,
-                        submissionAttempts
-                      );
-                      return (
-                        <WarehouseProductsAsyncCombobox
-                          aria-label={`Product for row ${index + 1}`}
-                          disabled={disabled}
-                          errorText={errorText}
-                          invalid={Boolean(errorText)}
-                          disabledProductKeys={[...pickedKeys].filter(
-                            (key) => key !== currentKey
-                          )}
-                          name={field.name}
-                          onBlur={field.handleBlur}
-                          onValueChange={field.handleChange}
-                          placeholder={
-                            sourceWarehouseId === null
-                              ? 'Select a source warehouse first'
-                              : 'Select product'
-                          }
-                          required
-                          size="s"
-                          value={field.state.value}
-                          warehouseId={sourceWarehouseId}
-                        />
-                      );
-                    }}
-                  </form.Subscribe>
-                )}
-              </form.Field>
+          <DataTableCell width="full">
+            <div className="flex w-full items-center gap-[var(--space-2)]">
+              <ProductImagePlaceholder />
+              <div className="min-w-0 flex-1">
+                <form.Field
+                  listeners={getEntryListeners(index)}
+                  name={`transferEntries[${index}].stockItem` as const}
+                  validators={getEntryValidators(index, 'stockItem')}
+                >
+                  {(field) => (
+                    <form.Subscribe
+                      selector={(state) =>
+                        [
+                          state.isSubmitting,
+                          state.submissionAttempts,
+                          state.values.sourceWarehouse?.id ?? null,
+                        ] as const
+                      }
+                    >
+                      {([disabled, submissionAttempts, sourceWarehouseId]) => {
+                        const errorText = getFieldSubmitChangeErrorText(
+                          field.state.meta,
+                          submissionAttempts
+                        );
+                        return (
+                          <WarehouseProductsAsyncCombobox
+                            aria-label={`Product for row ${index + 1}`}
+                            disabled={disabled}
+                            errorText={errorText}
+                            invalid={Boolean(errorText)}
+                            disabledProductKeys={[...pickedKeys].filter(
+                              (key) => key !== currentKey
+                            )}
+                            name={field.name}
+                            onBlur={field.handleBlur}
+                            onValueChange={field.handleChange}
+                            placeholder={
+                              sourceWarehouseId === null
+                                ? 'Select a source warehouse first'
+                                : 'Select product'
+                            }
+                            required
+                            size="s"
+                            value={field.state.value}
+                            warehouseId={sourceWarehouseId}
+                          />
+                        );
+                      }}
+                    </form.Subscribe>
+                  )}
+                </form.Field>
+              </div>
             </div>
           </DataTableCell>
         );

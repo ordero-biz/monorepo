@@ -1,4 +1,4 @@
-import { ProductImageTableCell } from '@/lib/components/ProductImageTableCell';
+import { ProductImageTableCell } from '@/lib/components/TableCell';
 import type { ProductGroup, ProductVariant } from '@/lib/domain/products/types';
 import { formatDate } from '@/lib/utils/formatDate';
 import {

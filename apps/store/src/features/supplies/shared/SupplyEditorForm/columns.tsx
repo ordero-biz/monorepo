@@ -7,7 +7,7 @@ import {
   Typography,
 } from '@ordero/ui';
 import { EllipsisVertical, Trash2 } from 'lucide-react';
-import { ProductImageTableCell } from '@/lib/components/ProductImageTableCell';
+import { ProductImagePlaceholder } from '@/lib/components/TableCell';
 import { getFieldSubmitChangeErrorText } from '@/lib/utils/form/error/field';
 import { formatMoney } from '@/lib/utils/formatMoney';
 import {
@@ -77,61 +77,58 @@ export const getColumns = ({
 
   return [
     {
-      id: 'image',
-      cell: () => <ProductImageTableCell />,
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Image" />
-      ),
-      meta: { width: 64, wrap: 'nowrap' },
-    },
-    {
       id: 'product',
       cell: ({ row }) => {
         const index = row.index;
 
         return (
           <DataTableCell width="full">
-            <form.Field
-              listeners={getEntryListeners(index)}
-              name={`supplyEntries[${index}].productVariant` as const}
-              validators={getEntryValidators(index, 'productVariant')}
-            >
-              {(field) => (
-                <form.Subscribe
-                  selector={(state) =>
-                    [state.isSubmitting, state.submissionAttempts] as const
-                  }
+            <div className="flex w-full items-center gap-[var(--space-2)]">
+              <ProductImagePlaceholder />
+              <div className="min-w-0 flex-1">
+                <form.Field
+                  listeners={getEntryListeners(index)}
+                  name={`supplyEntries[${index}].productVariant` as const}
+                  validators={getEntryValidators(index, 'productVariant')}
                 >
-                  {([disabled, submissionAttempts]) => {
-                    const errorText = getFieldSubmitChangeErrorText(
-                      field.state.meta,
-                      submissionAttempts
-                    );
-                    return (
-                      <ProductVariantsAsyncCombobox
-                        disabled={disabled}
-                        aria-label={`Product for row ${index + 1}`}
-                        errorText={errorText}
-                        invalid={Boolean(errorText)}
-                        name={field.name}
-                        onBlur={field.handleBlur}
-                        onValueChange={field.handleChange}
-                        required
-                        size="s"
-                        value={field.state.value}
-                      />
-                    );
-                  }}
-                </form.Subscribe>
-              )}
-            </form.Field>
+                  {(field) => (
+                    <form.Subscribe
+                      selector={(state) =>
+                        [state.isSubmitting, state.submissionAttempts] as const
+                      }
+                    >
+                      {([disabled, submissionAttempts]) => {
+                        const errorText = getFieldSubmitChangeErrorText(
+                          field.state.meta,
+                          submissionAttempts
+                        );
+                        return (
+                          <ProductVariantsAsyncCombobox
+                            disabled={disabled}
+                            aria-label={`Product for row ${index + 1}`}
+                            errorText={errorText}
+                            invalid={Boolean(errorText)}
+                            name={field.name}
+                            onBlur={field.handleBlur}
+                            onValueChange={field.handleChange}
+                            required
+                            size="s"
+                            value={field.state.value}
+                          />
+                        );
+                      }}
+                    </form.Subscribe>
+                  )}
+                </form.Field>
+              </div>
+            </div>
           </DataTableCell>
         );
       },
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Product" />
       ),
-      meta: { minWidth: 240 },
+      meta: { minWidth: 280 },
     },
     {
       id: 'unit',
