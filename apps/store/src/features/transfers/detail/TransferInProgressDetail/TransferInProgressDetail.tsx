@@ -1,7 +1,7 @@
 'use client';
 
 import { Card, DataTable, Typography } from '@ordero/ui';
-import { Warehouse } from 'lucide-react';
+import { Info, Warehouse } from 'lucide-react';
 import type { TransferEntry } from '@/lib/domain/transfers/types';
 import { formatDate } from '@/lib/utils/formatDate';
 import { columns } from './columns';
@@ -39,6 +39,22 @@ export const TransferInProgressDetail = ({
 
   return (
     <div className="flex flex-col gap-[var(--space-3)]">
+      <div
+        className="flex items-start gap-[var(--space-1-5)] rounded-[var(--radius-1-5)] border border-[var(--color-info-16)] bg-[var(--color-info-8)] px-[var(--space-2)] py-[var(--space-1-5)]"
+        role="note"
+      >
+        <Info
+          aria-hidden="true"
+          className="mt-[var(--space-2px)] size-[var(--icon-button-xs-icon)] shrink-0 text-[var(--info-main)]"
+        />
+        <Typography variant="body2">
+          <strong>In transit.</strong> Stock has been deducted from{' '}
+          <strong>{transfer.sourceWarehouse.name}</strong> and is locked until
+          received at <strong>{transfer.destinationWarehouse.name}</strong>.
+          Transfer details are read-only while in transit.
+        </Typography>
+      </div>
+
       <Card.Root variant="filled">
         <Card.Header>
           <Card.Title>Transfer information</Card.Title>

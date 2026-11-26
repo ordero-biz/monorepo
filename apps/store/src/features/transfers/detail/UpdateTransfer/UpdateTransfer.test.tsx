@@ -119,7 +119,9 @@ describe('UpdateTransfer', () => {
     expect(
       screen.getByRole('table', { name: 'Transfer entries' })
     ).toBeVisible();
-    expect(screen.queryByRole('note')).not.toBeInTheDocument();
+    expect(screen.getByRole('note')).toHaveTextContent(
+      'In transit. Stock has been deducted from Main Warehouse and is locked until received at East Warehouse.'
+    );
     expect(
       screen.queryByRole('form', { name: 'Transfer' })
     ).not.toBeInTheDocument();

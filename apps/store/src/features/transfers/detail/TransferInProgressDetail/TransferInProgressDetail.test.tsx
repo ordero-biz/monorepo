@@ -73,13 +73,20 @@ describe('TransferInProgressDetail', () => {
   it('displays the transfer information and every entry without editing controls', () => {
     setup();
 
+    expect(screen.getByRole('note')).toHaveTextContent(
+      'In transit. Stock has been deducted from Main Warehouse and is locked until received at East Warehouse. Transfer details are read-only while in transit.'
+    );
     expect(screen.getAllByRole('term').map((term) => term.textContent)).toEqual(
       ['From warehouse', 'To warehouse', 'Sent', 'Comment']
     );
-    expect(screen.getByText('Main Warehouse')).toBeVisible();
-    expect(screen.getByText('East Warehouse')).toBeVisible();
-    expect(screen.getByText('30 Oct 2026 · owner@example.test')).toBeVisible();
-    expect(screen.getByText('Fragile items on top')).toBeVisible();
+    expect(
+      screen.getAllByRole('definition').map((item) => item.textContent)
+    ).toEqual([
+      'Main Warehouse',
+      'East Warehouse',
+      '30 Oct 2026 · owner@example.test',
+      'Fragile items on top',
+    ]);
 
     const table = screen.getByRole('table', { name: 'Transfer entries' });
     expect(within(table).getAllByRole('row')).toHaveLength(4);
