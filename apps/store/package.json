@@ -4,7 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:https": "next dev --experimental-https",
     "dev:remote": "dotenv -e .env.remote -- pnpm run dev",
+    "dev:remote:https": "dotenv -e .env.remote -- pnpm run dev:https",
     "build": "next build",
     "start": "next start",
     "lint": "biome check",
