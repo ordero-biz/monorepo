@@ -1,5 +1,5 @@
 import { prepareSetup } from '@ordero/test-config/react';
-import { screen } from '@testing-library/react';
+import { cleanup, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { CopyButton } from './CopyButton';
 import type { CopyButtonProps } from './types';
@@ -107,6 +107,63 @@ describe('CopyButton', () => {
 
     expect(button).toBeDisabled();
     expect(writeTextSpy).not.toHaveBeenCalled();
+    expect(onCopy).not.toHaveBeenCalled();
+  });
+
+  it('resets copied state and calls onCopyError when clipboard API is unavailable', async () => {
+    const user = userEvent.setup();
+    const originalClipboard = navigator.clipboard;
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: undefined,
+    });
+
+    try {
+      const { copiedLabel, copyLabel, onCopy, onCopyError } = setup({
+        copiedLabel: 'Copied',
+        copyLabel: 'Copy transfer number',
+        defaultCopied: true,
+        onCopy: vi.fn(),
+        onCopyError: vi.fn(),
+      });
+
+      await user.click(screen.getByRole('button', { name: copiedLabel }));
+
+      expect(onCopyError).toHaveBeenCalledWith(
+        expect.objectContaining({ message: 'Clipboard API is not available' })
+      );
+      expect(onCopy).not.toHaveBeenCalled();
+      expect(
+        screen.getByRole('button', { name: copyLabel })
+      ).toBeInTheDocument();
+    } finally {
+      Object.defineProperty(navigator, 'clipboard', {
+        configurable: true,
+        value: originalClipboard,
+      });
+    }
+  });
+
+  it('does not invoke onCopy if unmounted before clipboard write resolves', async () => {
+    const user = userEvent.setup();
+    let resolveWrite: (() => void) | undefined;
+    vi.spyOn(navigator.clipboard, 'writeText').mockImplementationOnce(
+      () =>
+        new Promise<void>((resolve) => {
+          resolveWrite = resolve;
+        })
+    );
+
+    const { copyLabel, onCopy } = setup({
+      copyLabel: 'Copy transfer number',
+      onCopy: vi.fn(),
+    });
+
+    await user.click(screen.getByRole('button', { name: copyLabel }));
+    cleanup();
+    resolveWrite?.();
+    await Promise.resolve();
+
     expect(onCopy).not.toHaveBeenCalled();
   });
 });

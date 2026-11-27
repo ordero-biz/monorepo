@@ -27,10 +27,15 @@ export const CopyButton = ({
   ...props
 }: CopyButtonProps) => {
   const [copied, setCopied] = useState(defaultCopied);
+  const isMountedRef = useRef(true);
   const timeoutRef = useRef<number | null>(null);
 
   useEffect(() => {
+    isMountedRef.current = true;
+
     return () => {
+      isMountedRef.current = false;
+
       if (timeoutRef.current !== null) {
         window.clearTimeout(timeoutRef.current);
       }
@@ -49,12 +54,17 @@ export const CopyButton = ({
     }
 
     if (!navigator.clipboard?.writeText) {
+      setCopied(false);
       onCopyError?.(new Error('Clipboard API is not available'));
       return;
     }
 
     try {
       await navigator.clipboard.writeText(value);
+
+      if (!isMountedRef.current) {
+        return;
+      }
 
       if (timeoutRef.current !== null) {
         window.clearTimeout(timeoutRef.current);
@@ -68,6 +78,10 @@ export const CopyButton = ({
         timeoutRef.current = null;
       }, copiedDurationMs);
     } catch (error) {
+      if (!isMountedRef.current) {
+        return;
+      }
+
       setCopied(false);
       onCopyError?.(error);
     }

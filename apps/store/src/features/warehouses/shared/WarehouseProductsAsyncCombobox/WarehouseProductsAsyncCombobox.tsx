@@ -6,7 +6,6 @@ import {
   AsyncCombobox,
   type AsyncComboboxLoadOptionsArgs,
   type AsyncComboboxLoadOptionsResult,
-  type AsyncComboboxSingleProps,
 } from '@/lib/components/AsyncCombobox';
 import type { WarehouseProductSelection } from '@/lib/domain/warehouses/types';
 import { warehousesQueryKeys } from '@/lib/query/warehouses/warehousesQueryKeys';

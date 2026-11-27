@@ -15,8 +15,8 @@ const statusColors = {
 } as const;
 
 const InTransitIndicator = () => (
-  <span className="relative flex size-[var(--space-0-75)]">
-    <span className="absolute inline-flex size-full animate-ping rounded-full bg-[var(--info-main)] opacity-75" />
+  <span aria-hidden="true" className="relative flex size-[var(--space-0-75)]">
+    <span className="absolute inline-flex size-full animate-ping rounded-full bg-[var(--info-main)] opacity-75 motion-reduce:animate-none" />
     <span className="relative inline-flex size-[var(--space-0-75)] rounded-full bg-[var(--info-main)]" />
   </span>
 );
