@@ -232,7 +232,7 @@ describe('mergeTransferChanges', () => {
       ...current.transferEntries[0],
       clientId: 'new-0',
       stockItem: {
-        productVariant: { id: 12, name: 'Beans', sku: 'GR-2' },
+        productVariant: { id: 12, name: 'Beans', sku: 'GR-2', barcode: '' },
         unitOfMeasurement: { id: 4, name: 'Bag', symbol: 'bag' },
         available: 25,
       },

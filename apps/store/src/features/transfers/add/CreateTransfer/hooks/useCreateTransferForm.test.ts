@@ -56,7 +56,7 @@ const filledValues: TransferFormValues = {
     {
       clientId: 'row-1',
       stockItem: {
-        productVariant: { id: 11, name: 'Rice', sku: 'GR-1' },
+        productVariant: { id: 11, name: 'Rice', sku: 'GR-1', barcode: '' },
         unitOfMeasurement: { id: 4, name: 'Bag', symbol: 'bag' },
         available: 120,
       },
