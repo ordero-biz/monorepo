@@ -2,6 +2,7 @@
 
 import {
   Button,
+  Chip,
   DataTable,
   Typography,
   useDataTableSelection,
@@ -14,6 +15,7 @@ import {
   createEmptyTransferEntry,
   getTransferSummary,
   hasOnlyBlankTransferEntry,
+  isBlankTransferEntry,
 } from './utils/entries';
 
 const getRowId = (entry: TransferEntryFormValues) => entry.clientId;
@@ -94,11 +96,19 @@ export const TransferEntries = ({
     () => getColumns({ form, onDeleteEntry: deleteEntry }),
     [deleteEntry, form]
   );
+  const entriesCount = entries.filter(
+    (entry) => !isBlankTransferEntry(entry)
+  ).length;
 
   return (
     <>
       <div className="flex flex-col gap-[var(--space-2)]">
-        <Typography variant="h6">Products to transfer</Typography>
+        <div className="flex items-center gap-[var(--space-1)]">
+          <Typography variant="h6">Products to transfer</Typography>
+          <Chip color="inherit" size="s" variant="soft">
+            {entriesCount.toLocaleString('en-US')}
+          </Chip>
+        </div>
         <DataTable
           ariaLabel="Transfer entries"
           columns={columns}

@@ -89,6 +89,10 @@ describe('UpdateTransfer', () => {
       'Nothing has left the warehouse yet.'
     );
     expect(screen.getByRole('form', { name: 'Transfer' })).toBeVisible();
+    expect(
+      screen.getByRole('heading', { name: 'Products to transfer' })
+    ).toBeVisible();
+    expect(screen.getByText('1')).toBeVisible();
   });
 
   it('shows a placeholder for statuses without a detail view yet', () => {
