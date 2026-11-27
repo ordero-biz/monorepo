@@ -164,6 +164,9 @@ describe('ProductsList', () => {
     expect(
       await screen.findByRole('table', { name: 'Products list' })
     ).toBeVisible();
+    expect(
+      screen.getByRole('img', { name: 'Product image unavailable' })
+    ).toBeVisible();
     expect(screen.getByText('Running Shoes / Blue / 42')).toBeVisible();
     expect(
       screen.queryByText('Lightweight daily trainer')
@@ -200,6 +203,9 @@ describe('ProductsList', () => {
     });
 
     expect(await screen.findByText('Running Shoes')).toBeVisible();
+    expect(
+      screen.getByRole('img', { name: 'Product image unavailable' })
+    ).toBeVisible();
     expect(
       screen.queryByText('Lightweight daily trainer')
     ).not.toBeInTheDocument();

@@ -11,6 +11,7 @@ storybook-static
 .env
 .env.local
 .env.*.local
+certificates/
 .playwright-cli/
 
 # tooling

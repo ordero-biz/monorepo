@@ -1,7 +1,7 @@
 'use client';
 
-import { Menu, PageHeader, Typography } from '@ordero/ui';
-import { EllipsisVertical, Trash2 } from 'lucide-react';
+import { Chip, CopyButton, Menu, PageHeader, Typography } from '@ordero/ui';
+import { Clock, EllipsisVertical, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { AppBreadcrumbs } from '@/lib/components/AppBreadcrumbs';
 import { FormConflictResolver } from '@/lib/components/FormConflictResolver';
@@ -10,24 +10,56 @@ import { transfersRootBreadcrumb } from '../../shared/breadcrumbs';
 import { TransferStatusChip } from '../../shared/TransferStatusChip';
 import { DeleteTransferDialog } from '../DeleteTransfer';
 import type { TransferDetailHeaderProps } from './types';
+import { formatTransitDuration } from './utils/formatTransitDuration';
 
 export const TransferDetailHeader = ({
   transfer,
+  referenceTime,
   onDeleted,
 }: TransferDetailHeaderProps) => {
   const resolver = FormConflictResolver.useContext();
   const deleteDisabled = resolver?.isReadOnly ?? false;
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const isDraft = transfer.status === TRANSFER_STATUS.DRAFT;
+  const isInTransit = transfer.status === TRANSFER_STATUS.IN_TRANSIT;
+  const hasTransferNumber = Boolean(transfer.transferNumber);
   const transferTitle = transfer.transferNumber || 'Transfer';
+  const transitDuration = isInTransit
+    ? formatTransitDuration(
+        transfer.dispatchedAt,
+        referenceTime !== undefined ? new Date(referenceTime) : undefined
+      )
+    : null;
 
   return (
     <PageHeader.Root>
       <PageHeader.Left>
         <div className="flex min-w-0 flex-col gap-[var(--space-0-5)]">
-          <div className="flex min-w-0 items-center gap-[var(--space-1)]">
+          <div className="flex min-w-0 flex-wrap items-center gap-[var(--space-1)]">
             <Typography variant="h5">{transferTitle}</Typography>
+            {hasTransferNumber ? (
+              <CopyButton
+                copyLabel="Copy transfer number"
+                size="s"
+                value={transfer.transferNumber}
+              />
+            ) : null}
             <TransferStatusChip status={transfer.status} />
+            {transitDuration ? (
+              <Chip
+                color="inherit"
+                size="s"
+                startIcon={
+                  <Clock
+                    aria-hidden="true"
+                    className="size-[var(--space-1-75)]"
+                  />
+                }
+                variant="soft"
+              >
+                {transitDuration}
+              </Chip>
+            ) : null}
           </div>
           <AppBreadcrumbs
             items={[

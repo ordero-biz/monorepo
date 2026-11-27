@@ -11,7 +11,7 @@ import {
 const rice: TransferEntryFormValues = {
   clientId: 'existing-1',
   stockItem: {
-    productVariant: { id: 11, name: 'Rice', sku: 'RICE' },
+    productVariant: { id: 11, name: 'Rice', sku: 'RICE', barcode: '' },
     unitOfMeasurement: { id: 3, name: 'Bag', symbol: 'bag' },
   },
   quantity: 2,
@@ -20,7 +20,7 @@ const rice: TransferEntryFormValues = {
 const added: TransferEntryFormValues = {
   ...createEmptyTransferEntry('local-added'),
   stockItem: {
-    productVariant: { id: 13, name: 'Lentils', sku: 'LENTILS' },
+    productVariant: { id: 13, name: 'Lentils', sku: 'LENTILS', barcode: '' },
     unitOfMeasurement: { id: 3, name: 'Bag', symbol: 'bag' },
   },
   comment: 'Keep dry',
@@ -113,7 +113,7 @@ describe('TransferProductsComparison', () => {
           ...rice,
           clientId: 'no-symbol',
           stockItem: {
-            productVariant: { id: 12, name: 'Flour', sku: '' },
+            productVariant: { id: 12, name: 'Flour', sku: '', barcode: '' },
             unitOfMeasurement: { id: 5, name: 'Box', symbol: '' },
           },
         },

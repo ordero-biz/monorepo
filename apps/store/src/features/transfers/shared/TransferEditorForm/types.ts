@@ -91,8 +91,6 @@ export type TransferEntriesProps = {
 };
 
 export type TransferActionsProps = {
-  count: number;
-  units: number;
   deleteDisabled: boolean;
   selectedCount: number;
   onClearSelection: () => void;

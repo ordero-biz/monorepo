@@ -6,7 +6,6 @@ import {
   AsyncCombobox,
   type AsyncComboboxLoadOptionsArgs,
   type AsyncComboboxLoadOptionsResult,
-  type AsyncComboboxSingleProps,
 } from '@/lib/components/AsyncCombobox';
 import type { WarehouseProductSelection } from '@/lib/domain/warehouses/types';
 import { warehousesQueryKeys } from '@/lib/query/warehouses/warehousesQueryKeys';
@@ -91,6 +90,7 @@ export const WarehouseProductsAsyncCombobox = ({
               id: productVariant.id,
               name: productVariant.name,
               sku: productVariant.sku,
+              barcode: productVariant.barcode,
             },
             unitOfMeasurement: {
               id: unitOfMeasurement.id,

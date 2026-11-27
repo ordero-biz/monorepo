@@ -65,6 +65,21 @@ describe('TransferDetailHeader', () => {
     setup({ transfer: { ...transfer, transferNumber: '' } });
 
     expect(screen.getByRole('heading', { name: 'Transfer' })).toBeVisible();
+    expect(
+      screen.queryByRole('button', { name: 'Copy transfer number' })
+    ).not.toBeInTheDocument();
+  });
+
+  it('copies the transfer number from the header', async () => {
+    const user = userEvent.setup();
+    setup();
+
+    await user.click(
+      screen.getByRole('button', { name: 'Copy transfer number' })
+    );
+
+    expect(await navigator.clipboard.readText()).toBe(transfer.transferNumber);
+    expect(screen.getByRole('button', { name: 'Copied' })).toBeVisible();
   });
 
   it('opens the delete dialog from the actions menu', async () => {
@@ -94,5 +109,18 @@ describe('TransferDetailHeader', () => {
     expect(
       screen.queryByRole('button', { name: 'Actions for Weekend restock' })
     ).not.toBeInTheDocument();
+  });
+
+  it('shows the time in transit badge for in-transit transfers with a dispatch timestamp', () => {
+    setup({
+      referenceTime: new Date('2026-11-26T15:00:00Z').getTime(),
+      transfer: {
+        ...transfer,
+        dispatchedAt: '2026-11-20T10:00:00Z',
+        status: TRANSFER_STATUS.IN_TRANSIT,
+      },
+    });
+
+    expect(screen.getByText('6 days in transit')).toBeVisible();
   });
 });

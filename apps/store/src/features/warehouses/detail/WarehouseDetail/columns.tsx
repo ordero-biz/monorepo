@@ -2,8 +2,8 @@ import {
   DataTableCell,
   type DataTableColumnDef,
   DataTableColumnHeader,
-  Typography,
 } from '@ordero/ui';
+import { ProductExtendedTableCell } from '@/lib/components/TableCell';
 import type { WarehouseStockItem } from '@/lib/domain/warehouses/types';
 import { formatMoney } from '@/lib/utils/formatMoney';
 
@@ -14,18 +14,10 @@ export const columns: DataTableColumnDef<WarehouseStockItem>[] = [
       <DataTableColumnHeader column={column} title="Product" />
     ),
     cell: ({ row }) => (
-      <DataTableCell>
-        <div className="flex flex-col gap-[var(--space-0-5)]">
-          <Typography variant="body2">
-            {row.original.productVariant.name}
-          </Typography>
-          {row.original.productVariant.sku ? (
-            <Typography color="text-secondary" variant="body2">
-              {row.original.productVariant.sku}
-            </Typography>
-          ) : null}
-        </div>
-      </DataTableCell>
+      <ProductExtendedTableCell
+        name={row.original.productVariant.name}
+        sku={row.original.productVariant.sku}
+      />
     ),
   },
   {
