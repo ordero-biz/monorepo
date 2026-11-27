@@ -4,13 +4,12 @@ import {
   getStockItemKey,
   getTransferEntriesPayload,
   getTransferFormDefaults,
-  getTransferSummary,
   hasOnlyBlankTransferEntry,
   isBlankTransferEntry,
 } from './entries';
 
 const stockItem = {
-  productVariant: { id: 11, name: 'Rice', sku: 'GR-1' },
+  productVariant: { id: 11, name: 'Rice', sku: 'GR-1', barcode: '' },
   unitOfMeasurement: { id: 4, name: 'Bag', symbol: 'bag' },
   available: 10,
 };
@@ -84,7 +83,7 @@ describe('transfer entry utils', () => {
         {
           clientId: 'existing-17',
           stockItem: {
-            productVariant: { id: 11, name: 'Rice', sku: 'GR-1' },
+            productVariant: { id: 11, name: 'Rice', sku: 'GR-1', barcode: '' },
             unitOfMeasurement: { id: 4, name: 'Bag', symbol: 'bag' },
           },
           quantity: 5,
@@ -125,17 +124,5 @@ describe('transfer entry utils', () => {
 
   it('keys stock lines by product variant and unit', () => {
     expect(getStockItemKey(stockItem)).toBe('11:4');
-  });
-
-  it('sums only complete rows within the available stock', () => {
-    expect(
-      getTransferSummary([
-        entry({ stockItem, quantity: 4 }),
-        entry({ stockItem, quantity: 11 }),
-        entry({ stockItem }),
-        entry({ quantity: 3 }),
-        entry({ stockItem, quantity: 6 }),
-      ])
-    ).toEqual({ count: 2, units: 10 });
   });
 });

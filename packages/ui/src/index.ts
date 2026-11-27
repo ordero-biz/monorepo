@@ -77,6 +77,13 @@ export type {
 } from './components/ContextualActionBar';
 export { ContextualActionBar } from './components/ContextualActionBar';
 export type {
+  CopyButtonColor,
+  CopyButtonProps,
+  CopyButtonSize,
+  CopyButtonVariant,
+} from './components/CopyButton';
+export { CopyButton } from './components/CopyButton';
+export type {
   DataTableCellProps,
   DataTableCellVariant,
   DataTableColumnAlignment,

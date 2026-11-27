@@ -144,6 +144,20 @@ export const getColumns = ({
       meta: { minWidth: 352 },
     },
     {
+      id: 'barcode',
+      cell: ({ row }) => (
+        <DataTableCell>
+          <Typography variant="body2">
+            {row.original.stockItem?.productVariant.barcode || '—'}
+          </Typography>
+        </DataTableCell>
+      ),
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Barcode" />
+      ),
+      meta: { minWidth: 120, wrap: 'nowrap' },
+    },
+    {
       id: 'unit',
       cell: ({ row }) => (
         <DataTableCell>

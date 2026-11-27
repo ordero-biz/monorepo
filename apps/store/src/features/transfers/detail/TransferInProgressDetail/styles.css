@@ -1,0 +1,38 @@
+@keyframes transfer-route-dots {
+  to {
+    background-position: var(--space-1-25) 0;
+  }
+}
+
+@keyframes transfer-route-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(calc(var(--space-2px) * -1.5));
+  }
+}
+
+.transfer-route-dots {
+  background-image: radial-gradient(
+    circle,
+    var(--info-main) 1.75px,
+    transparent 2px
+  );
+  background-size: var(--space-1-25) var(--space-0-5);
+  background-repeat: repeat-x;
+  background-position: 0 0;
+  animation: transfer-route-dots 1.2s linear infinite;
+}
+
+.transfer-route-chip {
+  animation: transfer-route-bob 2.2s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .transfer-route-dots,
+  .transfer-route-chip {
+    animation: none;
+  }
+}

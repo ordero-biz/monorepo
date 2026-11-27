@@ -24,3 +24,16 @@ export const formatDate = (value: string) => {
 
   return `${day} ${month} ${year}`;
 };
+
+export const formatDateTime = (value: string) => {
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+
+  const hours = String(date.getUTCHours()).padStart(2, '0');
+  const minutes = String(date.getUTCMinutes()).padStart(2, '0');
+
+  return `${formatDate(value)}, ${hours}:${minutes}`;
+};

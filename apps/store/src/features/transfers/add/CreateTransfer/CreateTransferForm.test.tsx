@@ -63,9 +63,10 @@ const stockItem = (
   id: number,
   name: string,
   sku: string,
-  quantity: number
+  quantity: number,
+  barcode = ''
 ) => ({
-  productVariant: { id, name, sku, barcode: '' },
+  productVariant: { id, name, sku, barcode },
   unitOfMeasurement: bag,
   quantity,
   totalPrice: 0,
@@ -73,7 +74,7 @@ const stockItem = (
 
 const stockByWarehouse: Record<number, ReturnType<typeof stockItem>[]> = {
   [mainWarehouse.id]: [
-    stockItem(11, 'Jasmine Rice 5kg', 'GR-1042', 120),
+    stockItem(11, 'Jasmine Rice 5kg', 'GR-1042', 120, '4820019200014'),
     stockItem(12, 'Sunflower Oil 1L', 'OL-0318', 80),
     stockItem(13, 'Sold Out Flour', 'GR-2207', 0),
   ],
@@ -192,6 +193,7 @@ describe('CreateTransferForm', () => {
 
     await user.click(screen.getByRole('option', { name: /Jasmine Rice 5kg/ }));
     const row = getProduct(1).closest('tr') as HTMLElement;
+    expect(within(row).getByText('4820019200014')).toBeVisible();
     expect(within(row).getByText('Bag (bag)')).toBeVisible();
     expect(within(row).getByText('120')).toBeVisible();
   });
@@ -295,7 +297,6 @@ describe('CreateTransferForm', () => {
 
     expect(getQuantity(1)).toHaveValue('120');
     expect(useAll).toBeDisabled();
-    expect(screen.getByText('1 product · 120 units')).toBeVisible();
   });
 
   it('keeps selection actions without a bulk quantity fill', async () => {

@@ -3,6 +3,7 @@
 import { Card, Typography } from '@ordero/ui';
 import { useStore } from '@tanstack/react-form';
 import { useQueryClient } from '@tanstack/react-query';
+import { Info } from 'lucide-react';
 import { useState } from 'react';
 import { FormConflictResolver } from '@/lib/components/FormConflictResolver';
 import { TRANSFER_STATUS } from '@/lib/domain/transfers/constants';
@@ -24,6 +25,7 @@ import type { UpdateTransferProps } from './types';
 
 export const UpdateTransfer = ({
   transfer,
+  referenceTime,
   onDeleted,
 }: UpdateTransferProps) => {
   const queryClient = useQueryClient();
@@ -76,7 +78,10 @@ export const UpdateTransfer = ({
   if (baseline.status === TRANSFER_STATUS.IN_TRANSIT) {
     return (
       <div className="flex flex-col gap-[var(--space-2)]">
-        <TransferDetailHeader transfer={baseline} />
+        <TransferDetailHeader
+          referenceTime={referenceTime}
+          transfer={baseline}
+        />
         <TransferInProgressDetail transfer={baseline} />
       </div>
     );
@@ -86,7 +91,10 @@ export const UpdateTransfer = ({
     // Completed and Rejected get their own views later.
     return (
       <div className="flex flex-col gap-[var(--space-2)]">
-        <TransferDetailHeader transfer={baseline} />
+        <TransferDetailHeader
+          referenceTime={referenceTime}
+          transfer={baseline}
+        />
         <Card.Root variant="filled">
           <Card.Content>
             <Typography color="text-secondary" variant="body2">
@@ -118,11 +126,19 @@ export const UpdateTransfer = ({
       policy={transferConflictPolicy}
     >
       <div className="flex flex-col gap-[var(--space-2)]">
-        <TransferDetailHeader onDeleted={onDeleted} transfer={baseline} />
+        <TransferDetailHeader
+          onDeleted={onDeleted}
+          referenceTime={referenceTime}
+          transfer={baseline}
+        />
         <div
-          className="rounded-[var(--radius)] bg-muted p-[var(--space-1-5)]"
+          className="flex items-start gap-[var(--space-1-5)] rounded-[var(--radius-1-5)] border border-[var(--border)] bg-[var(--background-neutral)] px-[var(--space-2)] py-[var(--space-1-5)]"
           role="note"
         >
+          <Info
+            aria-hidden="true"
+            className="mt-[var(--space-2px)] size-[var(--icon-button-xs-icon)] shrink-0 text-[var(--text-secondary)]"
+          />
           <Typography variant="body2">
             <strong>Draft.</strong> Nothing has left the warehouse yet. You can
             change everything until you press Transfer.

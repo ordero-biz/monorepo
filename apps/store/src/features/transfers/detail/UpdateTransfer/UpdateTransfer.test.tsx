@@ -89,6 +89,10 @@ describe('UpdateTransfer', () => {
       'Nothing has left the warehouse yet.'
     );
     expect(screen.getByRole('form', { name: 'Transfer' })).toBeVisible();
+    expect(
+      screen.getByRole('heading', { name: 'Products to transfer' })
+    ).toBeVisible();
+    expect(screen.getByText('1')).toBeVisible();
   });
 
   it('shows a placeholder for statuses without a detail view yet', () => {
@@ -119,7 +123,9 @@ describe('UpdateTransfer', () => {
     expect(
       screen.getByRole('table', { name: 'Transfer entries' })
     ).toBeVisible();
-    expect(screen.queryByRole('note')).not.toBeInTheDocument();
+    expect(screen.getByRole('note')).toHaveTextContent(
+      'In transit. Stock has been deducted from Main Warehouse and is locked until received at East Warehouse.'
+    );
     expect(
       screen.queryByRole('form', { name: 'Transfer' })
     ).not.toBeInTheDocument();

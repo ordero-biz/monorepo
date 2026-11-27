@@ -121,7 +121,12 @@ describe('getTransferUpdateChanges', () => {
   it('ignores product display changes for an unchanged stock line', () => {
     const value = getTransferFormDefaults(initialTransfer);
     value.transferEntries[0].stockItem = {
-      productVariant: { id: 11, name: 'Renamed rice', sku: 'NEW-SKU' },
+      productVariant: {
+        id: 11,
+        name: 'Renamed rice',
+        sku: 'NEW-SKU',
+        barcode: '9999999999999',
+      },
       unitOfMeasurement: { id: 4, name: 'Sack', symbol: 'sk' },
       available: 50,
     };

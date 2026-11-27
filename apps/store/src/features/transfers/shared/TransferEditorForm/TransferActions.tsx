@@ -9,8 +9,6 @@ import { StartTransferDialog } from './StartTransferDialog';
 import type { TransferActionsProps } from './types';
 
 export const TransferActions = ({
-  count,
-  units,
   deleteDisabled,
   selectedCount,
   onClearSelection,
@@ -58,12 +56,7 @@ export const TransferActions = ({
           </ContextualActionBar.Root>
         ) : (
           <ContextualActionBar.Root ariaLabel="Transfer creation actions">
-            <ContextualActionBar.Left>
-              <Typography variant="body2">
-                {count} {count === 1 ? 'product' : 'products'} ·{' '}
-                {units.toLocaleString('en-US')} {units === 1 ? 'unit' : 'units'}
-              </Typography>
-            </ContextualActionBar.Left>
+            <ContextualActionBar.Left>{null}</ContextualActionBar.Left>
             <ContextualActionBar.Right>
               <div className="flex items-center gap-[var(--space-1)]">
                 <FormConflictResolver.ReviewButton />

@@ -20,6 +20,17 @@ export const columns: DataTableColumnDef<TransferEntry>[] = [
     ),
   },
   {
+    id: 'barcode',
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Barcode" />
+    ),
+    cell: ({ row }) => (
+      <DataTableCell>
+        {row.original.productVariant.barcode || '-'}
+      </DataTableCell>
+    ),
+  },
+  {
     id: 'unit',
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Unit" />

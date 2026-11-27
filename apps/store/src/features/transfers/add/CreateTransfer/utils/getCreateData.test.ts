@@ -21,7 +21,12 @@ describe('getCreateTransferData', () => {
             {
               clientId: 'a',
               stockItem: {
-                productVariant: { id: 11, name: 'Rice', sku: 'GR-1' },
+                productVariant: {
+                  id: 11,
+                  name: 'Rice',
+                  sku: 'GR-1',
+                  barcode: '',
+                },
                 unitOfMeasurement: { id: 4, name: 'Bag', symbol: 'bag' },
                 available: 10,
               },

@@ -45,7 +45,7 @@ export type WarehouseSelection = Pick<Warehouse, 'id' | 'name' | 'status'>;
 export type WarehouseProductSelection = {
   productVariant: Pick<
     WarehouseStockItem['productVariant'],
-    'id' | 'name' | 'sku'
+    'id' | 'name' | 'sku' | 'barcode'
   >;
   unitOfMeasurement: Pick<UnitOfMeasurement, 'id' | 'name' | 'symbol'>;
   /** Unknown for lines restored from a saved transfer until re-picked. */
