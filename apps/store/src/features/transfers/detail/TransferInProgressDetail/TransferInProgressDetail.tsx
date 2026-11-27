@@ -74,28 +74,23 @@ export const TransferInProgressDetail = ({
           </Card.Header>
 
           <Card.Content>
-            <dl className="grid grid-cols-1 items-center gap-[var(--space-2)] md:grid-cols-[1fr_auto_1fr]">
-              <div className="flex min-w-0 flex-col gap-[var(--space-1-5)] rounded-[var(--radius-1-5)] border border-[var(--border)] bg-[var(--background-neutral)] p-[var(--space-2)]">
-                <div className="flex items-center justify-between gap-[var(--space-1)]">
-                  <dt>
+            <div className="grid grid-cols-1 items-center gap-[var(--space-2)] md:grid-cols-[1fr_auto_1fr]">
+              <div className="grid min-w-0 grid-cols-[1fr_auto] items-center gap-x-[var(--space-1)] gap-y-[var(--space-1-5)] rounded-[var(--radius-1-5)] border border-[var(--border)] bg-[var(--background-neutral)] p-[var(--space-2)]">
+                <dl className="contents">
+                  <dt className="col-start-1 row-start-1 min-w-0">
                     <Typography color="text-secondary" variant="overline">
                       From warehouse
                     </Typography>
                   </dt>
-                  <Chip color="inherit" size="s" variant="soft">
-                    Dispatched
-                  </Chip>
-                </div>
-                <div className="flex min-w-0 items-center gap-[var(--space-1-5)]">
-                  <div className="flex size-[var(--space-5)] shrink-0 items-center justify-center rounded-[var(--radius-1-25)] border border-[var(--border)] bg-card text-[var(--text-secondary)]">
-                    <Warehouse
-                      aria-hidden="true"
-                      className="size-[var(--space-2-5)]"
-                    />
-                  </div>
-                  <dd className="min-w-0">
+                  <dd className="col-span-2 row-start-2 flex min-w-0 items-center gap-[var(--space-1-5)]">
+                    <div className="flex size-[var(--space-5)] shrink-0 items-center justify-center rounded-[var(--radius-1-25)] border border-[var(--border)] bg-card text-[var(--text-secondary)]">
+                      <Warehouse
+                        aria-hidden="true"
+                        className="size-[var(--space-2-5)]"
+                      />
+                    </div>
                     <Link
-                      className="group inline-flex max-w-full items-center gap-[var(--space-0-5)] text-[var(--text-primary)] hover:underline"
+                      className="group inline-flex min-w-0 max-w-full items-center gap-[var(--space-0-5)] text-[var(--text-primary)] hover:underline"
                       href={getWarehouseDetailRoute(
                         transfer.sourceWarehouse.id
                       )}
@@ -109,6 +104,11 @@ export const TransferInProgressDetail = ({
                       />
                     </Link>
                   </dd>
+                </dl>
+                <div className="col-start-2 row-start-1">
+                  <Chip color="inherit" size="s" variant="soft">
+                    Dispatched
+                  </Chip>
                 </div>
               </div>
 
@@ -140,27 +140,22 @@ export const TransferInProgressDetail = ({
                 </div>
               </div>
 
-              <div className="flex min-w-0 flex-col gap-[var(--space-1-5)] rounded-[var(--radius-1-5)] border border-[var(--border)] bg-[var(--background-neutral)] p-[var(--space-2)]">
-                <div className="flex items-center justify-between gap-[var(--space-1)]">
-                  <dt>
+              <div className="grid min-w-0 grid-cols-[1fr_auto] items-center gap-x-[var(--space-1)] gap-y-[var(--space-1-5)] rounded-[var(--radius-1-5)] border border-[var(--border)] bg-[var(--background-neutral)] p-[var(--space-2)]">
+                <dl className="contents">
+                  <dt className="col-start-1 row-start-1 min-w-0">
                     <Typography color="text-secondary" variant="overline">
                       To warehouse
                     </Typography>
                   </dt>
-                  <Chip color="info" size="s" variant="soft">
-                    Awaiting receipt
-                  </Chip>
-                </div>
-                <div className="flex min-w-0 items-center gap-[var(--space-1-5)]">
-                  <div className="flex size-[var(--space-5)] shrink-0 items-center justify-center rounded-[var(--radius-1-25)] border border-[var(--border)] bg-card text-[var(--text-secondary)]">
-                    <Warehouse
-                      aria-hidden="true"
-                      className="size-[var(--space-2-5)]"
-                    />
-                  </div>
-                  <dd className="min-w-0">
+                  <dd className="col-span-2 row-start-2 flex min-w-0 items-center gap-[var(--space-1-5)]">
+                    <div className="flex size-[var(--space-5)] shrink-0 items-center justify-center rounded-[var(--radius-1-25)] border border-[var(--border)] bg-card text-[var(--text-secondary)]">
+                      <Warehouse
+                        aria-hidden="true"
+                        className="size-[var(--space-2-5)]"
+                      />
+                    </div>
                     <Link
-                      className="group inline-flex max-w-full items-center gap-[var(--space-0-5)] text-[var(--text-primary)] hover:underline"
+                      className="group inline-flex min-w-0 max-w-full items-center gap-[var(--space-0-5)] text-[var(--text-primary)] hover:underline"
                       href={getWarehouseDetailRoute(
                         transfer.destinationWarehouse.id
                       )}
@@ -174,9 +169,14 @@ export const TransferInProgressDetail = ({
                       />
                     </Link>
                   </dd>
+                </dl>
+                <div className="col-start-2 row-start-1">
+                  <Chip color="info" size="s" variant="soft">
+                    Awaiting receipt
+                  </Chip>
                 </div>
               </div>
-            </dl>
+            </div>
           </Card.Content>
 
           <Card.Divider />
