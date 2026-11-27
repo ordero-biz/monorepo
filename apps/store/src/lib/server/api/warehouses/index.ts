@@ -4,6 +4,7 @@ import {
   parseBackendResponseData,
 } from '@ordero/next-api/server';
 import { cookies } from 'next/headers';
+import type { Transfer } from '@/lib/domain/transfers/types';
 import type {
   Warehouse,
   WarehouseStockItem,
@@ -82,6 +83,17 @@ export const getServerWarehouseSupplies = (
 ) =>
   fetchWarehouseResource<PaginatedResponse<WarehouseSupply>>(
     tokenizePath(BACKEND_WAREHOUSE_PATHS.warehouseSupplies, {
+      id: warehouseId,
+    }),
+    getPaginationSearch(input)
+  );
+
+export const getServerWarehouseTransfers = (
+  warehouseId: string | number,
+  input?: PaginationSearchInput
+) =>
+  fetchWarehouseResource<PaginatedResponse<Transfer>>(
+    tokenizePath(BACKEND_WAREHOUSE_PATHS.warehouseTransfers, {
       id: warehouseId,
     }),
     getPaginationSearch(input)

@@ -42,7 +42,7 @@ export type UpdateTransferData = UpdateTransferFieldData & {
 };
 
 export const getTransfersPath = (input?: PaginationSearchInput) =>
-  `${CLIENT_BACKEND_PATHS.warehouseTransfers}?${getPaginationSearch(input)}`;
+  `${CLIENT_BACKEND_PATHS.transfers}?${getPaginationSearch(input)}`;
 
 export const getTransfers = (input?: PaginationSearchInput) =>
   apiFetch<TransfersListResponse>(getTransfersPath(input), {
@@ -51,18 +51,18 @@ export const getTransfers = (input?: PaginationSearchInput) =>
 
 export const getTransfer = (transferId: string | number) =>
   apiFetch<TransferDetails>(
-    tokenizePath(CLIENT_BACKEND_PATHS.warehouseTransfer, { id: transferId }),
+    tokenizePath(CLIENT_BACKEND_PATHS.transfer, { id: transferId }),
     { method: 'GET' }
   );
 export const createTransfer = (input: CreateTransferData) =>
-  apiFetch<TransferDetails>(CLIENT_BACKEND_PATHS.warehouseTransfers, {
+  apiFetch<TransferDetails>(CLIENT_BACKEND_PATHS.transfers, {
     method: 'POST',
     body: input,
   });
 
 export const updateTransfer = ({ transferId, ...input }: UpdateTransferData) =>
   apiFetch<TransferDetails>(
-    tokenizePath(CLIENT_BACKEND_PATHS.warehouseTransfer, { id: transferId }),
+    tokenizePath(CLIENT_BACKEND_PATHS.transfer, { id: transferId }),
     {
       method: 'PATCH',
       body: input,
@@ -71,6 +71,6 @@ export const updateTransfer = ({ transferId, ...input }: UpdateTransferData) =>
 
 export const deleteTransfer = (transferId: string | number) =>
   apiFetch<void>(
-    tokenizePath(CLIENT_BACKEND_PATHS.warehouseTransfer, { id: transferId }),
+    tokenizePath(CLIENT_BACKEND_PATHS.transfer, { id: transferId }),
     { method: 'DELETE' }
   );

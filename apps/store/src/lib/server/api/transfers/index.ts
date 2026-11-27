@@ -51,11 +51,11 @@ const fetchTransferResource = async <T>(
 
 export const getServerTransfers = (input?: PaginationSearchInput) =>
   fetchTransferResource<PaginatedResponse<Transfer>>(
-    BACKEND_TRANSFER_PATHS.warehouseTransfers,
+    BACKEND_TRANSFER_PATHS.transfers,
     getPaginationSearch(input)
   );
 
 export const getServerTransfer = (transferId: string | number) =>
   fetchTransferResource<TransferDetails>(
-    tokenizePath(BACKEND_TRANSFER_PATHS.warehouseTransfer, { id: transferId })
+    tokenizePath(BACKEND_TRANSFER_PATHS.transfer, { id: transferId })
   );

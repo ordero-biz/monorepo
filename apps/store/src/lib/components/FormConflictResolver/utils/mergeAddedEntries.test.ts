@@ -42,14 +42,11 @@ describe('mergeAddedEntries', () => {
   it('returns added entries and appends them after saved entries when existing rows are unchanged', () => {
     const baseline = [rice];
     const current = [{ ...rice, name: ' Rice ' }, added];
-    const latest = [
-      { ...rice, clientId: 'existing-10', quantity: 5 },
-      beans,
-    ];
+    const latest = [{ ...rice, clientId: 'existing-10', quantity: 5 }, beans];
 
-    expect(
-      getAddedFormEntries({ baseline, current, normalizeEntry })
-    ).toEqual([added]);
+    expect(getAddedFormEntries({ baseline, current, normalizeEntry })).toEqual([
+      added,
+    ]);
     expect(
       mergeAddedFormEntries({ baseline, current, latest, normalizeEntry })
     ).toEqual({
@@ -117,9 +114,9 @@ describe('mergeAddedEntries', () => {
     }
     current.push(added);
 
-    expect(
-      getAddedFormEntries({ baseline, current, normalizeEntry })
-    ).toEqual([]);
+    expect(getAddedFormEntries({ baseline, current, normalizeEntry })).toEqual(
+      []
+    );
     expect(
       mergeAddedFormEntries({
         baseline,

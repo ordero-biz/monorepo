@@ -9,8 +9,15 @@ import {
 } from '@/lib/domain/warehouses/constants';
 import { DEFAULT_PAGE } from '@/lib/utils/url';
 import type { WarehouseDetailListsProps } from './types';
+import { WarehouseDetailMovements } from './WarehouseDetailMovements';
 import { WarehouseDetailProducts } from './WarehouseDetailProducts';
 import { WarehouseDetailSupplies } from './WarehouseDetailSupplies';
+
+const listComponents = {
+  [WAREHOUSE_LIST_MODE.products]: WarehouseDetailProducts,
+  [WAREHOUSE_LIST_MODE.supplies]: WarehouseDetailSupplies,
+  [WAREHOUSE_LIST_MODE.movements]: WarehouseDetailMovements,
+} as const;
 
 export const WarehouseDetailLists = ({
   warehouseId,
@@ -30,7 +37,7 @@ export const WarehouseDetailLists = ({
     const nextSearchParams = new URLSearchParams(searchParams.toString());
     nextSearchParams.set(WAREHOUSE_LIST_MODE_SEARCH_PARAM, nextListMode);
     nextSearchParams.set('page', String(DEFAULT_PAGE.page));
-    // Stock and supplies have different sortable fields.
+    // Stock, movements and supplies have different sortable fields.
     nextSearchParams.delete('sort');
     router.push(`${pathname}?${nextSearchParams.toString()}`, {
       scroll: false,
@@ -51,17 +58,16 @@ export const WarehouseDetailLists = ({
       <ToggleButton.Item value={WAREHOUSE_LIST_MODE.supplies}>
         Supplies
       </ToggleButton.Item>
+      <ToggleButton.Item value={WAREHOUSE_LIST_MODE.movements}>
+        Movements
+      </ToggleButton.Item>
     </ToggleButton.Group>
   );
 
-  return listMode === WAREHOUSE_LIST_MODE.supplies ? (
-    <WarehouseDetailSupplies
-      warehouseId={warehouseId}
-      paginationInput={paginationInput}
-      headerActions={headerActions}
-    />
-  ) : (
-    <WarehouseDetailProducts
+  const ListComponent = listComponents[listMode];
+
+  return (
+    <ListComponent
       warehouseId={warehouseId}
       paginationInput={paginationInput}
       headerActions={headerActions}

@@ -1,11 +1,13 @@
 import { QueryClient } from '@tanstack/react-query';
 import { WAREHOUSE_STATUS } from '@/lib/domain/warehouses/constants';
 import { suppliesQueryKeys } from '../supplies/suppliesQueryKeys';
+import { transfersQueryKeys } from '../transfers/transfersQueryKeys';
 import {
   warehouseQueryOptions,
   warehouseStockQueryOptions,
   warehouseSuppliesQueryOptions,
   warehousesListQueryOptions,
+  warehouseTransfersQueryOptions,
 } from './warehousesQueryOptions';
 
 const createQueryClient = () =>
@@ -193,6 +195,48 @@ describe('warehouseSuppliesQueryOptions', () => {
         warehouseSuppliesQueryOptions({
           warehouseId: 7,
           fetchWarehouseSupplies: async () => ({ ok: false, error }),
+        })
+      )
+    ).rejects.toEqual(error);
+  });
+});
+
+describe('warehouseTransfersQueryOptions', () => {
+  it('isolates warehouses and pages while sharing transfer-list invalidation', async () => {
+    const client = createQueryClient();
+    const data = {
+      content: [],
+      page: { number: 0, size: 10, totalElements: 0, totalPages: 0 },
+    };
+    const fetchWarehouseTransfers = vi.fn(async () => ({
+      ok: true as const,
+      data,
+    }));
+    const input = { page: 1, size: 10 };
+    const options = warehouseTransfersQueryOptions({
+      warehouseId: 7,
+      input,
+      fetchWarehouseTransfers,
+    });
+    await expect(client.fetchQuery(options)).resolves.toEqual(data);
+    expect(fetchWarehouseTransfers).toHaveBeenCalledExactlyOnceWith(7, input);
+    expect(
+      client.getQueryData(transfersQueryKeys.warehouseListPage('7', input))
+    ).toEqual(data);
+    expect(
+      client.getQueryData(transfersQueryKeys.warehouseListPage(8, input))
+    ).toBeUndefined();
+    await client.invalidateQueries({ queryKey: transfersQueryKeys.list });
+    expect(client.getQueryState(options.queryKey)?.isInvalidated).toBe(true);
+  });
+
+  it('throws normalized backend errors', async () => {
+    const error = { status: 503, message: 'Transfers unavailable.' };
+    await expect(
+      createQueryClient().fetchQuery(
+        warehouseTransfersQueryOptions({
+          warehouseId: 7,
+          fetchWarehouseTransfers: async () => ({ ok: false, error }),
         })
       )
     ).rejects.toEqual(error);

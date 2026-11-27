@@ -14,6 +14,7 @@ export type WarehouseDetailProductsProps = {
 };
 
 export type WarehouseDetailSuppliesProps = WarehouseDetailProductsProps;
+export type WarehouseDetailMovementsProps = WarehouseDetailProductsProps;
 export type WarehouseDetailListsProps = WarehouseDetailProps;
 
 export type WarehouseDetailHeaderProps = {

@@ -13,11 +13,7 @@ export const FormConflictResolver = {
   useContext: useFormConflictResolver,
 };
 
-export {
-  createFormEntriesRenderer,
-  FormEntriesComparison,
-  FormEntriesTable,
-};
+export { createFormEntriesRenderer, FormEntriesComparison, FormEntriesTable };
 
 export type {
   CreateFormEntriesRendererArgs,
