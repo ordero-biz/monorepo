@@ -53,6 +53,7 @@ export const TransferDetail = ({ transferId }: TransferDetailProps) => {
       onDeleted={() => {
         router.push(clientRoutes.transfers);
       }}
+      referenceTime={transferQuery.dataUpdatedAt || undefined}
       transfer={transferQuery.data}
     />
   );

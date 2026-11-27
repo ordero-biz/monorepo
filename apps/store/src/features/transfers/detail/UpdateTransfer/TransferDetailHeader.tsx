@@ -14,6 +14,7 @@ import { formatTransitDuration } from './utils/formatTransitDuration';
 
 export const TransferDetailHeader = ({
   transfer,
+  referenceTime,
   onDeleted,
 }: TransferDetailHeaderProps) => {
   const resolver = FormConflictResolver.useContext();
@@ -24,7 +25,10 @@ export const TransferDetailHeader = ({
   const hasTransferNumber = Boolean(transfer.transferNumber);
   const transferTitle = transfer.transferNumber || 'Transfer';
   const transitDuration = isInTransit
-    ? formatTransitDuration(transfer.dispatchedAt)
+    ? formatTransitDuration(
+        transfer.dispatchedAt,
+        referenceTime !== undefined ? new Date(referenceTime) : undefined
+      )
     : null;
 
   return (

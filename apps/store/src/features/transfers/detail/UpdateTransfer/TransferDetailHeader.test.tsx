@@ -112,14 +112,11 @@ describe('TransferDetailHeader', () => {
   });
 
   it('shows the time in transit badge for in-transit transfers with a dispatch timestamp', () => {
-    const sixDaysAgo = new Date(
-      Date.now() - 6 * 24 * 60 * 60 * 1000
-    ).toISOString();
-
     setup({
+      referenceTime: new Date('2026-11-26T15:00:00Z').getTime(),
       transfer: {
         ...transfer,
-        dispatchedAt: sixDaysAgo,
+        dispatchedAt: '2026-11-20T10:00:00Z',
         status: TRANSFER_STATUS.IN_TRANSIT,
       },
     });
