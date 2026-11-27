@@ -113,32 +113,37 @@ export const TransferInProgressDetail = ({
               </div>
 
               <div className="flex items-center justify-center gap-[var(--space-1)] py-[var(--space-0-5)] md:flex-col md:px-[var(--space-1)]">
-                <Chip
-                  color="info"
-                  size="s"
-                  startIcon={
-                    <Truck
-                      aria-hidden="true"
-                      className="size-[var(--space-1-75)]"
-                    />
-                  }
-                  variant="soft"
-                >
-                  {skuCountLabel}
-                </Chip>
+                <div className="transfer-route-chip">
+                  <Chip
+                    color="info"
+                    size="s"
+                    startIcon={
+                      <Truck
+                        aria-hidden="true"
+                        className="size-[var(--space-1-75)]"
+                      />
+                    }
+                    variant="soft"
+                  >
+                    {skuCountLabel}
+                  </Chip>
+                </div>
                 <div
                   aria-hidden="true"
                   className="hidden items-center text-[var(--info-main)] md:flex"
                 >
-                  <span className="transfer-route-dash h-[var(--space-2px)] w-[var(--space-12)]" />
-                  <ChevronRight className="-ml-[var(--space-1)] size-[var(--space-2)]" />
+                  <span className="transfer-route-dots h-[var(--space-0-5)] w-[var(--space-14)]" />
+                  <ChevronRight
+                    className="-ml-[var(--space-1)] size-[var(--space-2)]"
+                    strokeWidth={3}
+                  />
                 </div>
               </div>
 
-              <div className="flex min-w-0 flex-col gap-[var(--space-1-5)] rounded-[var(--radius-1-5)] border border-[var(--color-info-24)] bg-[var(--color-info-8)] p-[var(--space-2)]">
+              <div className="flex min-w-0 flex-col gap-[var(--space-1-5)] rounded-[var(--radius-1-5)] border border-[var(--border)] bg-[var(--background-neutral)] p-[var(--space-2)]">
                 <div className="flex items-center justify-between gap-[var(--space-1)]">
                   <dt>
-                    <Typography color="info" variant="overline">
+                    <Typography color="text-secondary" variant="overline">
                       To warehouse
                     </Typography>
                   </dt>
@@ -147,7 +152,7 @@ export const TransferInProgressDetail = ({
                   </Chip>
                 </div>
                 <div className="flex min-w-0 items-center gap-[var(--space-1-5)]">
-                  <div className="flex size-[var(--space-5)] shrink-0 items-center justify-center rounded-[var(--radius-1-25)] border border-[var(--color-info-24)] bg-card text-[var(--info-main)]">
+                  <div className="flex size-[var(--space-5)] shrink-0 items-center justify-center rounded-[var(--radius-1-25)] border border-[var(--border)] bg-card text-[var(--text-secondary)]">
                     <Warehouse
                       aria-hidden="true"
                       className="size-[var(--space-2-5)]"
@@ -165,7 +170,7 @@ export const TransferInProgressDetail = ({
                       </Typography>
                       <ArrowUpRight
                         aria-hidden="true"
-                        className="size-[var(--space-1-75)] shrink-0 text-[var(--info-dark)] opacity-0 transition-opacity group-hover:opacity-100"
+                        className="size-[var(--space-1-75)] shrink-0 text-[var(--text-secondary)] opacity-0 transition-opacity group-hover:opacity-100"
                       />
                     </Link>
                   </dd>

@@ -297,7 +297,6 @@ describe('CreateTransferForm', () => {
 
     expect(getQuantity(1)).toHaveValue('120');
     expect(useAll).toBeDisabled();
-    expect(screen.getByText('1 product · 120 units')).toBeVisible();
   });
 
   it('keeps selection actions without a bulk quantity fill', async () => {

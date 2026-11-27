@@ -13,7 +13,6 @@ import { TransferActions } from './TransferActions';
 import type { TransferEntriesProps, TransferEntryFormValues } from './types';
 import {
   createEmptyTransferEntry,
-  getTransferSummary,
   hasOnlyBlankTransferEntry,
   isBlankTransferEntry,
 } from './utils/entries';
@@ -138,7 +137,6 @@ export const TransferEntries = ({
       </div>
 
       <TransferActions
-        {...getTransferSummary(entries)}
         deleteDisabled={disabled || hasOnlyBlankTransferEntry(entries)}
         onClearSelection={clearSelection}
         onSaveDraft={onSaveDraft}

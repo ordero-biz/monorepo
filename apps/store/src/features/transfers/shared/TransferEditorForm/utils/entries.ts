@@ -86,25 +86,3 @@ export const getStockItemKey = (stockItem: TransferStockItemSelection) =>
 export const getUnitOfMeasurementLabel = (
   unit: TransferStockItemSelection['unitOfMeasurement']
 ) => (unit.symbol ? `${unit.name} (${unit.symbol})` : unit.name);
-
-const isCompleteTransferEntry = (entry: TransferEntryFormValues) =>
-  entry.stockItem !== null &&
-  entry.quantity !== undefined &&
-  Number.isInteger(entry.quantity) &&
-  entry.quantity > 0 &&
-  (entry.stockItem.available === undefined ||
-    entry.quantity <= entry.stockItem.available);
-
-export const getTransferSummary = (
-  entries: readonly TransferEntryFormValues[]
-): { count: number; units: number } => {
-  const completeEntries = entries.filter(isCompleteTransferEntry);
-
-  return {
-    count: completeEntries.length,
-    units: completeEntries.reduce(
-      (total, entry) => total + (entry.quantity ?? 0),
-      0
-    ),
-  };
-};
